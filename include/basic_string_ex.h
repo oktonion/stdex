@@ -1,7 +1,7 @@
-#ifndef STDEX_BASIC_STRING_H
-#define STDEX_BASIC_STRING_H
+#ifndef _STDEX_BASIC_STRING_H
+#define _STDEX_BASIC_STRING_H
 
-#include "code_extensions.h"
+#include "./core.h"
 
 #include <cstring>
 #include <cctype>
@@ -12,7 +12,7 @@
 #include <string>
 #include <sstream>
 
-namespace std
+namespace stdex
 {
 
 	namespace details
@@ -92,7 +92,7 @@ namespace std
 		return stot<T>(s.c_str(), base);
 	}
 	
-#ifndef STDEX_HAS_CPP11_SUPPORT
+#ifndef _STDEX_HAS_CPP11_SUPPORT
 	inline int stoi(const std::string &s, int base = 10)
 	{
 		return stot<int>(s.c_str(), base);
@@ -199,4 +199,4 @@ namespace std
 	
 }
 
-#endif
+#endif // _STDEX_BASIC_STRING_H

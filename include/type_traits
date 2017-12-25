@@ -1,0 +1,241 @@
+#ifndef _STDEX_TYPE_TRAITS_H
+#define _STDEX_TYPE_TRAITS_H
+
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
+namespace stdex
+{
+	template<class T, T Val>
+	struct integral_constant
+	{	// convenient template for integral constant types
+		static const T value = Val;
+
+		typedef const T value_type;
+		typedef integral_constant<T, Val> type;
+
+		operator value_type() const
+		{	// return stored value
+			return (value);
+		}
+
+		value_type operator()() const
+		{	// return stored value
+			return (value);
+		}
+	};
+
+	typedef integral_constant<bool, true> true_type;
+	typedef integral_constant<bool, false> false_type;
+
+	template<bool Val>
+	struct bool_constant :
+		public integral_constant<bool, Val>
+	{};
+
+	template<bool Val>
+	struct Cat_base
+		: integral_constant<bool, Val>
+	{	// base class for type predicates
+	};
+
+	template<class T>
+	struct remove_const
+	{	// remove top level const qualifier
+		typedef T type;
+	};
+
+	template<class T>
+	struct remove_const<const T *>
+	{	// remove top level const qualifier
+		typedef T *type;
+	};
+
+	template<class T>
+	struct remove_const<const volatile T *>
+	{	// remove top level const qualifier
+		typedef volatile T *type;
+	};
+
+	// TEMPLATE CLASS remove_volatile
+	template<class T>
+	struct remove_volatile
+	{	// remove top level volatile qualifier
+		typedef T type;
+	};
+
+	template<class T>
+	struct remove_volatile<volatile T*>
+	{	// remove top level volatile qualifier
+		typedef T *type;
+	};
+
+	// TEMPLATE CLASS remove_cv
+	template<class T>
+	struct remove_cv
+	{	// remove top level const and volatile qualifiers
+		typedef typename remove_const<typename remove_volatile<T>::type>::type
+			type;
+	};
+
+	namespace detail
+	{
+		template <class T> struct is_floating_point : public false_type {};
+
+		template<> struct is_floating_point<float> : public true_type {};
+		template<> struct is_floating_point<double> : public true_type {};
+		template<> struct is_floating_point<long double> : public true_type {};
+
+		template <class T> struct is_integral : public false_type {};
+
+		template<> struct is_integral<bool> : public true_type {};
+		template<> struct is_integral<char> : public true_type {};
+		template<> struct is_integral<wchar_t> : public true_type {};
+
+#ifdef STDEX_FORCE_CPP11_TYPES_SUPPORT
+#include "types_ex.h"
+		template<> struct is_integral<char16_t> : public true_type {};
+		template<> struct is_integral<char32_t> : public true_type {};
+		template<> struct is_integral<int64_t> : public true_type {};
+		template<> struct is_integral<uint64_t> : public true_type {};
+#endif
+
+		template<> struct is_integral<unsigned char> : public true_type {};
+		template<> struct is_integral<unsigned short int> : public true_type {};
+		template<> struct is_integral<unsigned int> : public true_type {};
+		template<> struct is_integral<unsigned long int> : public true_type {};
+
+		template<> struct is_integral<signed char> : public true_type {};
+		template<> struct is_integral<short int> : public true_type {};
+		template<> struct is_integral<int> : public true_type {};
+		template<> struct is_integral<long int> : public true_type {};
+	}
+
+
+	template <class T> struct is_floating_point : public detail::is_floating_point<typename remove_cv<T>::type> {};
+
+	template <class T>
+	struct is_integral :
+		public true_type
+	{
+	};
+
+	namespace detail
+	{
+		template<bool>
+		struct SignUnsignChooser
+		{
+		};
+
+		template<typename T>
+		struct SignedComparer
+		{
+			static const bool value = T(-1) < T(0);
+		};
+
+		template<typename T>
+		struct UnsignedComparer
+		{
+			static const bool value = T(0) < T(-1);
+		};
+
+		template<>
+		struct SignUnsignChooser<true>//integral
+		{
+			template<class T>
+			struct Signed :
+				public Cat_base<SignedComparer<typename remove_cv<T>::type>::value>
+			{
+			};
+
+			template<class T>
+			struct Unsigned :
+				public Cat_base<UnsignedComparer<typename remove_cv<T>::type>::value>
+			{
+			};
+		};
+
+		template<>
+		struct SignUnsignChooser<false>//floating point
+		{
+			template<class T>
+			struct Signed :
+				public is_floating_point<T>
+			{
+			};
+
+			template<class T>
+			struct Unsigned :
+				public false_type
+			{
+			};
+		};
+	}
+
+	template <bool, typename T = void>
+	struct enable_if
+	{};
+
+	template <typename T>
+	struct enable_if<true, T> {
+		typedef T type;
+	};
+
+	template<typename T, typename U>
+	struct is_same :
+		public false_type
+	{
+	};
+
+	template<typename T>
+	struct is_same<T, T> :
+		public true_type//specialization
+	{
+	};
+
+	template <typename T>
+	struct is_const :
+		public false_type
+	{
+	};
+
+	template <typename T>
+	struct is_const<const T*> :
+		public true_type
+	{
+	};
+
+	template <typename T>
+	struct is_const<const volatile T*> :
+		public true_type
+	{
+	};
+
+	template< class T >
+	struct remove_reference
+	{
+		typedef T type;
+	};
+
+	template< class T >
+	struct remove_reference<T&>
+	{
+		typedef T type;
+	};
+
+	template<class T>
+	struct is_signed
+	{	// determine whether T is a signed type
+
+		static const bool value = detail::SignUnsignChooser<is_integral<T>::value>::template Signed<T>::value;
+	};
+
+	template<class T>
+	struct is_unsigned
+	{	// determine whether T is an unsigned type
+		static const bool value = detail::SignUnsignChooser<is_integral<T>::value>::template Unsigned<T>::value;
+	};
+} // namespace stdex
+
+#endif // _STDEX_TYPE_TRAITS_H
