@@ -29,29 +29,33 @@ namespace stdex
 			return 0;
 		}
 
-		/*template<class T, class C>
+		template<class T, class C>
 		inline operator T C::*() const   // or any type of null member pointer...
 		{
 			return 0;
-		}*/
+		}
 
 		template<typename T>
-		inline bool operator==(T *val) { return equal(val); }
+		inline bool operator==(T *val) const { return equal(val); }
 
 		template<typename T>
-		inline bool operator!=(T *val) { return !equal(val); }
+		inline bool operator!=(T *val) const { return !equal(val); }
 
 		template<typename T>
-		inline bool operator<(T *val) { return less(val); }
+		inline bool operator<(T *val) const { return less(val); }
 
 		template<typename T>
-		inline bool operator<=(T *val) { return less_equal(val); }
+		inline bool operator<=(T *val) const { return less_equal(val); }
 
 		template<typename T>
-		inline bool operator>(T *val) { return false; }//nullptr always less or equal (can't be greater than)
+		inline bool operator>(T *val) const { return false; }//nullptr always less or equal (can't be greater than)
 
 		template<typename T>
-		inline bool operator>=(T *val) { return greater_equal(val); }
+		inline bool operator>=(T *val) const { return greater_equal(val); }
+
+		inline bool operator==(bool val) const { return false == val; }
+
+		inline bool operator!=(bool val) const { return false != val; }
 
 		//friends:
 		template<typename T>
@@ -71,6 +75,10 @@ namespace stdex
 
 		template<typename T>
 		friend inline bool operator>=(T *val, nullptr_t np) { return greater_equal(val, np); }
+
+		friend inline bool operator==(bool val, nullptr_t np) { return false == val; }
+
+		friend inline bool operator!=(bool val, nullptr_t np) { return false != val; }
 
 	private: //template overloads
 
@@ -117,9 +125,17 @@ namespace stdex
 		static inline bool greater_equal(nullptr_t, nullptr_t) { return true; }
 	};
 
+	namespace detail
+	{
+		struct nullptr_initializer
+		{
+			static const stdex::nullptr_t nullptr_init;
+		};
+	}
+
 }
 
 
-#define nullptr stdex::nullptr_t(0)
+extern const stdex::nullptr_t nullptr;
 
 #endif

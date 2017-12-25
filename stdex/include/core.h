@@ -29,11 +29,14 @@ namespace stdex
 }
 	#define countof(arr) stdex::detail::my_countof(arr)
 	#define STATIC_ASSERT(expression, message) static_assert(expression, #message)
+
+
 #else //no C++11 support
 	#if (!defined(_MSC_VER) || _MSC_VER < 1800)
 	
 #include "nullptr.h"
-
+namespace stdex
+{
 	namespace detail {
 
 		template <bool>
@@ -49,6 +52,7 @@ namespace stdex
 		{
 		}; // StaticAssertionTest<int>
 	}
+}
 
 #define CONCATENATE(arg1, arg2)   CONCATENATE1(arg1, arg2)
 #define CONCATENATE1(arg1, arg2)  CONCATENATE2(arg1, arg2)
@@ -57,9 +61,9 @@ namespace stdex
 #define STATIC_ASSERT(expression, message)\
   struct CONCATENATE(__static_assertion_at_line_, __LINE__)\
   {\
-	detail::StaticAssertion<static_cast<bool>((expression))> CONCATENATE(CONCATENATE(CONCATENATE(STATIC_ASSERTION_FAILED_AT_LINE_, __LINE__), _WITH__), message);\
+	stdex::detail::StaticAssertion<static_cast<bool>((expression))> CONCATENATE(CONCATENATE(CONCATENATE(STATIC_ASSERTION_FAILED_AT_LINE_, __LINE__), _WITH__), message);\
   };\
-  typedef detail::StaticAssertionTest<sizeof(CONCATENATE(__static_assertion_at_line_, __LINE__))> CONCATENATE(__static_assertion_test_at_line_, __LINE__)
+  typedef stdex::detail::StaticAssertionTest<sizeof(CONCATENATE(__static_assertion_at_line_, __LINE__))> CONCATENATE(__static_assertion_test_at_line_, __LINE__)
 
 	#define static_assert(expression, message) STATIC_ASSERT(expression, ERROR_MESSAGE_STRING)
 
