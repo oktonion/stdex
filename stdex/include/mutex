@@ -15,8 +15,17 @@
 // std includes
 #include <algorithm>
 
-#define DELETED_FUNCTION //=delete
-#define NOEXCEPT_FUNCTION //throw() 
+#ifdef _STDEX_HAS_CPP11_SUPPORT
+
+#define DELETED_FUNCTION =delete
+#define NOEXCEPT_FUNCTION throw() 
+
+#else
+
+#define DELETED_FUNCTION 
+#define NOEXCEPT_FUNCTION
+
+#endif
 
 namespace stdex
 {
