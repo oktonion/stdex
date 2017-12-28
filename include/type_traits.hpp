@@ -43,6 +43,76 @@ namespace stdex
 		public integral_constant<bool, Val>
 	{};
 
+	// Primary template.
+	/// Define a member typedef @c type to one of two argument types.
+	template<bool _Cond, class _Iftrue, class _Iffalse>
+	struct conditional
+	{
+		typedef _Iftrue type;
+	};
+
+	// Partial specialization for false.
+	template<class _Iftrue, class _Iffalse>
+	struct conditional<false, _Iftrue, _Iffalse>
+	{
+		typedef _Iffalse type;
+	};
+
+	namespace detail
+	{
+		struct void_type {};
+
+		template<class _B1 = void_type, class _B2 = void_type, class _B3 = void_type, class _B4 = void_type>
+		struct _or_;
+
+
+		template<>
+		struct _or_<void_type, void_type, void_type, void_type>;
+
+		template<class _B1>
+		struct _or_<_B1, void_type, void_type, void_type>
+			: public _B1
+		{ };
+
+		template<class _B1, class _B2>
+		struct _or_<_B1, _B2, void_type, void_type>
+			: public conditional<_B1::value, _B1, _B2>::type
+		{ };
+
+		template<class _B1, class _B2, class _B3>
+		struct _or_<_B1, _B2, _B3, void_type>
+			: public conditional<_B1::value, _B1, _or_<_B2, _B3> >::type
+		{ };
+
+		template<class _B1 = void_type, class _B2 = void_type, class _B3 = void_type, class _B4 = void_type>
+		struct _and_;
+
+
+		template<>
+		struct _and_<void_type, void_type, void_type, void_type>;
+
+		template<class _B1>
+		struct _and_<_B1, void_type, void_type, void_type>
+			: public _B1
+		{ };
+
+		template<class _B1, class _B2>
+		struct _and_<_B1, _B2, void_type, void_type>
+			: public conditional<_B1::value, _B2, _B1>::type
+		{ };
+
+		template<class _B1, class _B2, class _B3>
+		struct _and_<_B1, _B2, _B3, void_type>
+			: public conditional<_B1::value, _and_<_B2, _B3>, _B1>::type
+		{ };
+
+		template<class _Pp>
+		struct _not_
+		{ 
+			static const bool value = !bool(_Pp::value);
+		};
+	}
+
 	template<bool Val>
 	struct _cat_base: 
 		integral_constant<bool, Val>
@@ -454,8 +524,23 @@ namespace stdex
 		public detail::_is_member_function_pointer_helper<typename remove_cv<_Tp>::type>::type
 	{ };
 
-
+	/// is_reference
+	template<class _Tp>
+	struct is_reference: 
+		public detail::_or_<is_lvalue_reference<_Tp>/*, is_rvalue_reference<_Tp> */>::type
+	{};
 	
+	/// is_arithmetic
+	template<class _Tp>
+	struct is_arithmetic: 
+		public detail::_or_<is_integral<_Tp>, is_floating_point<_Tp> >::type
+	{ };
+
+	/// is_object
+	template<class _Tp>
+	struct is_object: 
+		public detail::_not_< detail::_or_< is_function<_Tp>, is_reference<_Tp>, is_void<_Tp> > >::type
+	{};
 
 } // namespace stdex
 
