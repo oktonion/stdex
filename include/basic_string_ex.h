@@ -92,7 +92,7 @@ namespace stdex
 		return stot<T>(s.c_str(), base);
 	}
 	
-#ifndef _STDEX_HAS_CPP11_SUPPORT
+#ifndef _STDEX_NATIVE_CPP11_SUPPORT
 	inline int stoi(const std::string &s, int base = 10)
 	{
 		return stot<int>(s.c_str(), base);
