@@ -536,11 +536,49 @@ namespace stdex
 		public detail::_or_<is_integral<_Tp>, is_floating_point<_Tp> >::type
 	{ };
 
+	/// is_fundamental
+	template<typename _Tp>
+	struct is_fundamental:
+		public detail::_or_<is_arithmetic<_Tp>, is_void<_Tp>/*, is_null_pointer<_Tp>*/ >::type
+	{};
+
 	/// is_object
 	template<class _Tp>
 	struct is_object: 
 		public detail::_not_< detail::_or_< is_function<_Tp>, is_reference<_Tp>, is_void<_Tp> > >::type
 	{};
+
+	template<class>
+	struct is_member_pointer;
+
+	/// is_scalar
+	template<class _Tp>
+	struct is_scalar: 
+		public detail::_or_<is_arithmetic<_Tp>, is_pointer<_Tp>, is_member_pointer<_Tp>/*, is_null_pointer<_Tp>, is_enum<_Tp>*/ >::type
+	{};
+
+	/// is_compound
+	template<class _Tp>
+	struct is_compound
+	{ 
+		static const bool value = !is_fundamental<_Tp>::value;
+	};
+
+	namespace detail
+	{
+		template<class _Tp>
+		struct _is_member_pointer_helper :
+			public false_type { };
+
+		template<class _Tp, class _Cp>
+		struct _is_member_pointer_helper<_Tp _Cp::*> :
+			public true_type { };
+	}
+	/// is_member_pointer
+	template<class _Tp>
+	struct is_member_pointer
+		: public detail::_is_member_pointer_helper<typename remove_cv<_Tp>::type>::type
+	{ };
 
 } // namespace stdex
 
