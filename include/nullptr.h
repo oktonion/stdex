@@ -126,15 +126,14 @@ namespace stdex
 		static inline bool greater_equal(nullptr_t, nullptr_t) { return true; }
 	};*/
 
+	typedef void* nullptr_t;
 }
 
 
-typedef void* nullptr_t;
-
 #ifdef NULL
-	#define nullptr nullptr_t(NULL)
+	#define nullptr stdex::nullptr_t(NULL)
 #else
-	#define nullptr nullptr_t(0)
+	#define nullptr stdex::nullptr_t(0)
 #endif
 
 #endif

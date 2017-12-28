@@ -107,7 +107,9 @@
 	  };\
 	  typedef stdex::detail::StaticAssertionTest<sizeof(CONCATENATE(__static_assertion_at_line_, __LINE__))> CONCATENATE(__static_assertion_test_at_line_, __LINE__)
 
+#ifndef _STDEX_NATIVE_NULLPTR_SUPPORT
 	#define static_assert(expression, message) STATIC_ASSERT(expression, ERROR_MESSAGE_STRING)
+#endif
 
 
 	#ifdef _STDEX_NATIVE_MICROSOFT_COMPILER_EXTENSIONS_SUPPORT // Visual C++ fallback
