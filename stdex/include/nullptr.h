@@ -8,7 +8,7 @@
 namespace stdex
 {
 
-	class nullptr_t
+	/*class nullptr_t
 	{
 	private:
 		void *_padding;
@@ -80,6 +80,7 @@ namespace stdex
 
 		friend inline bool operator!=(bool val, nullptr_t np) { return false != val; }
 
+
 	private: //template overloads
 
 
@@ -123,19 +124,17 @@ namespace stdex
 		static inline bool greater_equal(T *val, nullptr_t np) { return val >= static_cast<T*>(np); }
 
 		static inline bool greater_equal(nullptr_t, nullptr_t) { return true; }
-	};
-
-	namespace detail
-	{
-		struct nullptr_initializer
-		{
-			static const stdex::nullptr_t nullptr_init;
-		};
-	}
+	};*/
 
 }
 
 
-extern const stdex::nullptr_t nullptr;
+typedef void* nullptr_t;
+
+#ifdef NULL
+	#define nullptr nullptr_t(NULL)
+#else
+	#define nullptr nullptr_t(0)
+#endif
 
 #endif
