@@ -13,6 +13,7 @@
 
 // std includes
 #include <cstddef>
+#include <climits>
 
 namespace stdex
 {
@@ -112,6 +113,19 @@ namespace stdex
 		struct _not_
 		{
 			static const bool value = !bool(_Pp::value);
+
+			typedef const bool value_type;
+			typedef _not_<_Pp> type;
+
+			operator value_type() const
+			{	// return stored value
+				return (value);
+			}
+
+			value_type operator()() const
+			{	// return stored value
+				return (value);
+			}
 		};
 	}
 
@@ -184,45 +198,55 @@ namespace stdex
 
 	namespace detail
 	{
-		template <class> struct is_floating_point : public false_type {};
+		template <class> struct _is_floating_point : public false_type {};
 
-		template<> struct is_floating_point<float> : public true_type {};
-		template<> struct is_floating_point<double> : public true_type {};
-		template<> struct is_floating_point<long double> : public true_type {};
+		template<> struct _is_floating_point<float> : public true_type {};
+		template<> struct _is_floating_point<double> : public true_type {};
+		template<> struct _is_floating_point<long double> : public true_type {};
 
-		template <class> struct is_integral : public false_type {};
+		template <class> struct _is_integral : public false_type {};
 
-		template<> struct is_integral<bool> : public true_type {};
-		template<> struct is_integral<char> : public true_type {};
-		template<> struct is_integral<wchar_t> : public true_type {};
+		template<> struct _is_integral<bool> : public true_type {};
+		template<> struct _is_integral<char> : public true_type {};
+		template<> struct _is_integral<wchar_t> : public true_type {};
 
 #ifdef STDEX_FORCE_CPP11_TYPES_SUPPORT
 #include "types_ex.h"
-		template<> struct is_integral<char16_t> : public true_type {};
-		template<> struct is_integral<char32_t> : public true_type {};
-		template<> struct is_integral<int64_t> : public true_type {};
-		template<> struct is_integral<uint64_t> : public true_type {};
+		template<> struct _is_integral<char16_t> : public true_type {};
+		template<> struct _is_integral<char32_t> : public true_type {};
+		template<> struct _is_integral<int64_t> : public true_type {};
+		template<> struct _is_integral<uint64_t> : public true_type {};
 #endif
 
-		template<> struct is_integral<unsigned char> : public true_type {};
-		template<> struct is_integral<unsigned short int> : public true_type {};
-		template<> struct is_integral<unsigned int> : public true_type {};
-		template<> struct is_integral<unsigned long int> : public true_type {};
+		template<> struct _is_integral<unsigned char> : public true_type {};
+		template<> struct _is_integral<unsigned short int> : public true_type {};
+		template<> struct _is_integral<unsigned int> : public true_type {};
+		template<> struct _is_integral<unsigned long int> : public true_type {};
 
-		template<> struct is_integral<signed char> : public true_type {};
-		template<> struct is_integral<short int> : public true_type {};
-		template<> struct is_integral<int> : public true_type {};
-		template<> struct is_integral<long int> : public true_type {};
+#ifdef LLONG_MAX
+		template<> struct _is_integral<unsigned long long int> : public true_type {};
+#endif
+
+		template<> struct _is_integral<signed char> : public true_type {};
+		template<> struct _is_integral<short int> : public true_type {};
+		template<> struct _is_integral<int> : public true_type {};
+		template<> struct _is_integral<long int> : public true_type {};
+
+#ifdef LLONG_MAX
+		template<> struct _is_integral<long long int> : public true_type {};
+#endif
 	}
 
 
-	template <class _Tp> struct is_floating_point : public detail::is_floating_point<typename remove_cv<_Tp>::type> {};
+	template <class _Tp> 
+	struct is_floating_point : 
+		public detail::_is_floating_point<typename remove_cv<_Tp>::type> 
+	{ };
 
 	template <class _Tp>
 	struct is_integral :
-		public true_type
-	{
-	};
+		public detail::_is_integral<typename remove_cv<_Tp>::type>
+	{ };
 
 	namespace detail
 	{
@@ -605,10 +629,9 @@ namespace stdex
 			public false_type { };
 
 		template<class _Tp, class _Cp>
-		struct _is_member_object_pointer_helper<_Tp _Cp::*>
-		{
-			static const bool value = !is_function<_Tp>::value;
-		};
+		struct _is_member_object_pointer_helper<_Tp _Cp::*>:
+			public _not_<is_function<_Tp> >::type
+		{ };
 
 		template<class>
 		struct _is_member_function_pointer_helper :
@@ -668,10 +691,9 @@ namespace stdex
 
 	// is_compound
 	template<class _Tp>
-	struct is_compound
-	{
-		static const bool value = !is_fundamental<_Tp>::value;
-	};
+	struct is_compound:
+		public detail::_not_<is_fundamental<_Tp> >::type
+	{ };
 
 	namespace detail
 	{
@@ -818,11 +840,13 @@ namespace stdex
 			typedef unsigned long _type;
 		};
 
+#ifdef LLONG_MAX
 		template<>
 		struct _make_unsigned<long long>
 		{
 			typedef unsigned long long _type;
 		};
+#endif
 
 
 		template<class _Tp>
@@ -833,7 +857,11 @@ namespace stdex
 			static const bool _b1 = sizeof(_Tp) <= sizeof(unsigned short);
 			static const bool _b2 = sizeof(_Tp) <= sizeof(unsigned int);
 			static const bool _b3 = sizeof(_Tp) <= sizeof(unsigned long);
+#ifdef LLONG_MAX
 			typedef conditional<_make_unsigned_selector<_Tp>::_b3, unsigned long, unsigned long long> _cond3;
+#else
+			typedef conditional<_make_unsigned_selector<_Tp>::_b3, unsigned long, unsigned long> _cond3;
+#endif
 			typedef typename _cond3::type _cond3_type;
 			typedef conditional<_make_unsigned_selector<_Tp>::_b2, unsigned int, _cond3_type> _cond2;
 			typedef typename _cond2::type _cond2_type;
@@ -899,11 +927,13 @@ namespace stdex
 			typedef signed long _type;
 		};
 
+#ifdef LLONG_MAX
 		template<>
 		struct _make_signed<unsigned long long>
 		{
 			typedef signed long long _type;
 		};
+#endif
 
 		template<class _Tp>
 		class _make_signed_selector
