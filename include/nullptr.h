@@ -126,7 +126,22 @@ namespace stdex
 		static inline bool greater_equal(nullptr_t, nullptr_t) { return true; }
 	};*/
 
-	typedef void* nullptr_t;
+	namespace detail
+	{
+		template<bool>
+		struct nullptr_chooser
+		{
+			typedef int type;
+		};
+
+		template<>
+		struct nullptr_chooser<false>
+		{
+			typedef void* type;
+		};
+	}
+
+	typedef detail::nullptr_chooser<sizeof(int) == sizeof(void*)>::type nullptr_t;
 }
 
 
