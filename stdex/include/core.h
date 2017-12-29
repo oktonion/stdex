@@ -15,7 +15,7 @@
 
 #endif
 
-#ifndef _STDEX_NATIVE_CPP11_SUPPORT
+//#ifndef _STDEX_NATIVE_CPP11_SUPPORT
 
 	#if (!defined(_MSC_VER) || _MSC_VER < 1800)
 
@@ -27,7 +27,7 @@
 
 	#endif
 
-#endif
+//#endif
 
 #if _MSC_VER // Visual C++ fallback
 
@@ -69,6 +69,13 @@
 	}
 	#define countof(arr) stdex::detail::my_countof(arr)
 	#define STATIC_ASSERT(expression, message) static_assert(expression, #message)
+
+	#ifdef _STDEX_NATIVE_NULLPTR_SUPPORT
+		namespace stdex
+		{
+			typedef std::nullptr_t nullptr_t;
+		}
+	#endif
 
 #else //no C++11 support
 
