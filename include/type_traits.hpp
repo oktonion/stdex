@@ -1017,9 +1017,9 @@ namespace stdex
 		// Decay trait for arrays and functions, used for perfect forwarding
 		// in make_pair, make_tuple, etc.
 		template<class _Up,
-			bool _IsArray = is_array<_Up>::value,
-			bool _IsFunction = is_function<_Up>::value>
-			struct _decay_selector;
+			bool _IsArray,
+			bool _IsFunction>
+		struct _decay_selector;
 
 		template<class _Up>
 		struct _decay_selector<_Up, false, false>
@@ -1047,37 +1047,14 @@ namespace stdex
 		typedef typename remove_reference<_Tp>::type _remove_type;
 
 	public:
-		typedef typename detail::_decay_selector<_remove_type>::_type type;
+		typedef typename detail::_decay_selector<_remove_type, is_array<_remove_type>::value, is_function<_remove_type>::value>::_type type;
 	};
 
-	template<typename _Tp>
-	class reference_wrapper;
-
-	namespace detail
-	{
-		// Helper which adds a reference to a type when given a reference_wrapper
-		template<class _Tp>
-		struct _strip_reference_wrapper
-		{
-			typedef _Tp _type;
-		};
-
-		template<class _Tp>
-		struct _strip_reference_wrapper<reference_wrapper<_Tp> >
-		{
-			typedef _Tp& _type;
-		};
-
-		template<class _Tp>
-		struct _decay_and_strip
-		{
-			typedef typename _strip_reference_wrapper<
-				typename decay<_Tp>::type>::_type _type;
-		};
-	}
+	template<class _Tp, class T0 = detail::void_type, class T1 = detail::void_type, class T2 = detail::void_type, class T3 = detail::void_type, class T4 = detail::void_type, class T5 = detail::void_type, class T6 = detail::void_type, class T7 = detail::void_type, class T8 = detail::void_type, class T9 = detail::void_type, class T10 = detail::void_type, class T11 = detail::void_type, class T12 = detail::void_type, class T13 = detail::void_type, class T14 = detail::void_type, class T15 = detail::void_type, class T16 = detail::void_type, class T17 = detail::void_type, class T18 = detail::void_type, class T19 = detail::void_type, class T20 = detail::void_type, class T21 = detail::void_type, class T22 = detail::void_type, class T23 = detail::void_type, class T24 = detail::void_type>
+	struct common_type;
 
 	template<class _Tp>
-	struct common_type
+	struct common_type<_Tp, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type>
 	{
 		typedef typename decay<_Tp>::type type;
 	};
