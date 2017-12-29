@@ -613,6 +613,19 @@ namespace stdex
 	struct is_function
 	{
 		static const bool value = detail::_is_function_ptr_helper<_Tp>::value;
+
+		typedef const bool value_type;
+		typedef integral_constant<bool, is_function::value == bool(1)> type;
+
+		operator value_type() const
+		{	// return stored value
+			return (value);
+		}
+
+		value_type operator()() const
+		{	// return stored value
+			return (value);
+		}
 	};
 
 	namespace detail
@@ -666,6 +679,19 @@ namespace stdex
 		struct _is_member_function_pointer_helper<_Tp _Cp::*>
 		{
 			static const bool value = is_function<_Tp>::value;
+
+			typedef const bool value_type;
+			typedef integral_constant<bool, _is_member_function_pointer_helper::value == bool(1)> type;
+
+			operator value_type() const
+			{	// return stored value
+				return (value);
+			}
+
+			value_type operator()() const
+			{	// return stored value
+				return (value);
+			}
 		};
 	}
 
@@ -767,6 +793,19 @@ namespace stdex
 	struct rank<_Tp[_Size]>
 	{
 		static const std::size_t value = 1 + rank<_Tp>::value;
+
+		typedef const bool value_type;
+		typedef integral_constant<std::size_t, std::size_t(rank::value)> type;
+
+		operator value_type() const
+		{	// return stored value
+			return (value);
+		}
+
+		value_type operator()() const
+		{	// return stored value
+			return (value);
+		}
 	};
 
 	/*template<class _Tp>
