@@ -115,7 +115,7 @@ namespace stdex
 			static const bool value = !bool(_Pp::value);
 
 			typedef const bool value_type;
-			typedef _not_<_Pp> type;
+			typedef integral_constant<bool, _not_::value == bool(1)> type;
 
 			operator value_type() const
 			{	// return stored value
@@ -251,17 +251,15 @@ namespace stdex
 	namespace detail
 	{
 		template<bool>
-		struct _sign_unsign_chooser
-		{
-		};
+		struct _sign_unsign_chooser;
 
-		template<typename _Tp>
+		template<class _Tp>
 		struct _signed_comparer
 		{
 			static const bool value = _Tp(-1) < _Tp(0);
 		};
 
-		template<typename _Tp>
+		template<class _Tp>
 		struct UnsignedComparer
 		{
 			static const bool value = _Tp(0) < _Tp(-1);
@@ -408,12 +406,39 @@ namespace stdex
 	{	// determine whether T is a signed type
 
 		static const bool value = detail::_sign_unsign_chooser<is_integral<T>::value>::template _signed<T>::value;
+
+		typedef const bool value_type;
+		typedef integral_constant<bool, is_signed::value == bool(1)> type;
+
+		operator value_type() const
+		{	// return stored value
+			return (value);
+		}
+
+		value_type operator()() const
+		{	// return stored value
+			return (value);
+		}
 	};
 
 	template<class T>
 	struct is_unsigned
 	{	// determine whether T is an unsigned type
+
 		static const bool value = detail::_sign_unsign_chooser<is_integral<T>::value>::template _unsigned<T>::value;
+
+		typedef const bool value_type;
+		typedef integral_constant<bool, is_unsigned::value == bool(1)> type;
+
+		operator value_type() const
+		{	// return stored value
+			return (value);
+		}
+
+		value_type operator()() const
+		{	// return stored value
+			return (value);
+		}
 	};
 
 	namespace detail
