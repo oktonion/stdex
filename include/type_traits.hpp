@@ -5,6 +5,23 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+// Implemented all basic standart C++11 features. 
+// What can not be implemented or implemented with some limits:
+// is_class - ni
+// is_enum - ni
+// is_rvalue_reference - ni
+// is_union - ni
+// is_scalar - can't detect unions
+// is_abstract - ni
+// is_empty - ni
+// is_literal_type - ni
+// is_pod - ni
+// is_polymorphic - ni
+// is_standard_layout - ni
+// is_trivial - ni
+// is_trivially_copyable - ni
+// All type features (like is_assignable) - ni
+
 // stdex includes
 /*none*/
 
