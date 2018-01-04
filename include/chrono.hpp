@@ -423,11 +423,11 @@ namespace stdex
 		operator+(const duration<_Rep1, _Period1> &lhs,
 				const duration<_Rep2, _Period2> &rhs)
 		{
-			typedef duration<_Rep1, _Period1>			__dur1;
-			typedef duration<_Rep2, _Period2>			__dur2;
-			typedef typename common_type<__dur1, __dur2>::type	__cd;
+			typedef duration<_Rep1, _Period1>			_dur1;
+			typedef duration<_Rep2, _Period2>			_dur2;
+			typedef typename common_type<_dur1, _dur2>::type	_cd;
 
-			return __cd(__cd(lhs).count() + __cd(rhs).count());
+			return _cd(_cd(lhs).count() + _cd(rhs).count());
 		}
 
 		template<class _Rep1, class _Period1,
