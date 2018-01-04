@@ -32,3 +32,7 @@
 *.app
 *.~h
 *.~hpp
+
+#vscode
+.vscode
+.vscode/*
