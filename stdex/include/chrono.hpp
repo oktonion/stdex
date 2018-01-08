@@ -217,7 +217,7 @@ namespace stdex
 				return -__INTMAX_MAX;
 			}
 
-			// since we have no constexpt use this in template params
+			// since we have no constexpr use this in template params
 			struct template_constants
 			{
 				static const intmax_t zero = 0;
