@@ -2,6 +2,7 @@
 #define _STDEX_BASIC_STRING_H
 
 #include "./core.h"
+#include "./type_traits.hpp"
 
 #include <cstring>
 #include <cctype>
@@ -81,7 +82,7 @@ namespace stdex
 				num = num * base + digit;
 			}
 
-		if(negative) details::minus<std::is_signed<T>::value>::apply(num);
+		if(negative) details::minus<stdex::is_signed<T>::value>::apply(num);
 		
 		return num;
 	}
