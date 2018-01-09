@@ -1,6 +1,11 @@
 #ifndef _STDEX_CORE_H
 #define _STDEX_CORE_H
 
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
+
 #ifndef __has_feature
 	#define __has_feature(x) 0 // Compatibility with non-clang compilers.
 #endif
@@ -15,19 +20,25 @@
 
 #endif
 
-//#ifndef _STDEX_NATIVE_CPP11_SUPPORT
+#if (!defined(_MSC_VER) || _MSC_VER < 1600)
 
-	#if (!defined(_MSC_VER) || _MSC_VER < 1800)
+	#define _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
 
-		#define _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
+#else
 
-	#else
+	#define _STDEX_NATIVE_NULLPTR_SUPPORT
 
-		#define _STDEX_NATIVE_NULLPTR_SUPPORT
+#endif
 
+#if (_MSC_VER >= 1600)
+
+	#ifndef _STDEX_NATIVE_CPP11_TYPES_SUPPORT
+		#define _STDEX_NATIVE_CPP11_TYPES_SUPPORT
 	#endif
 
-//#endif
+#endif
+
+
 
 #if _MSC_VER // Visual C++ fallback
 
@@ -82,6 +93,11 @@
 	// nullptr and nullptr_t implementation
 	#ifndef _STDEX_NATIVE_NULLPTR_SUPPORT
 		#include "nullptr.h"
+	#else
+	namespace stdex
+	{
+		typedef std::nullptr_t nullptr_t;
+	}
 	#endif // _STDEX_NATIVE_NULLPTR_SUPPORT
 
 	namespace stdex

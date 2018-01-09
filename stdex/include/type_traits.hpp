@@ -23,7 +23,7 @@
 // All type features (like is_assignable) - ni
 
 // stdex includes
-/*none*/
+#include "./stdint_ex.h"
 
 // POSIX includes
 /*none*/
@@ -31,6 +31,7 @@
 // std includes
 #include <cstddef>
 #include <climits>
+#include <stdint.h>
 
 namespace stdex
 {
@@ -221,37 +222,40 @@ namespace stdex
 		template<> struct _is_floating_point<double> : public true_type {};
 		template<> struct _is_floating_point<long double> : public true_type {};
 
-		template <class> struct _is_integral : public false_type {};
+		template <class> struct _is_integral_impl : public false_type {};
 
-		template<> struct _is_integral<bool> : public true_type {};
-		template<> struct _is_integral<char> : public true_type {};
-		template<> struct _is_integral<wchar_t> : public true_type {};
+		template<> struct _is_integral_impl<bool> : public true_type {};
+		template<> struct _is_integral_impl<char> : public true_type {};
+		template<> struct _is_integral_impl<wchar_t> : public true_type {};
 
-#ifdef STDEX_FORCE_CPP11_TYPES_SUPPORT
-#include "types_ex.h"
+
+
+		template<> struct _is_integral_impl<unsigned char> : public true_type {};
+		template<> struct _is_integral_impl<unsigned short int> : public true_type {};
+		template<> struct _is_integral_impl<unsigned int> : public true_type {};
+		template<> struct _is_integral_impl<unsigned long int> : public true_type {};
+
+#ifdef LLONG_MAX
+		template<> struct _is_integral_impl<unsigned long long int> : public true_type {};
+#endif
+
+		template<> struct _is_integral_impl<signed char> : public true_type {};
+		template<> struct _is_integral_impl<short int> : public true_type {};
+		template<> struct _is_integral_impl<int> : public true_type {};
+		template<> struct _is_integral_impl<long int> : public true_type {};
+
+#ifdef LLONG_MAX
+		template<> struct _is_integral_impl<long long int> : public true_type {};
+#endif
+
+		template <class _Tp> struct _is_integral : public _is_integral_impl<_Tp> {};
+
+		//#if defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT) || defined(STDEX_FORCE_CPP11_TYPES_SUPPORT)
 		template<> struct _is_integral<char16_t> : public true_type {};
 		template<> struct _is_integral<char32_t> : public true_type {};
 		template<> struct _is_integral<int64_t> : public true_type {};
 		template<> struct _is_integral<uint64_t> : public true_type {};
-#endif
-
-		template<> struct _is_integral<unsigned char> : public true_type {};
-		template<> struct _is_integral<unsigned short int> : public true_type {};
-		template<> struct _is_integral<unsigned int> : public true_type {};
-		template<> struct _is_integral<unsigned long int> : public true_type {};
-
-#ifdef LLONG_MAX
-		template<> struct _is_integral<unsigned long long int> : public true_type {};
-#endif
-
-		template<> struct _is_integral<signed char> : public true_type {};
-		template<> struct _is_integral<short int> : public true_type {};
-		template<> struct _is_integral<int> : public true_type {};
-		template<> struct _is_integral<long int> : public true_type {};
-
-#ifdef LLONG_MAX
-		template<> struct _is_integral<long long int> : public true_type {};
-#endif
+		//#endif
 	}
 
 
@@ -653,12 +657,12 @@ namespace stdex
 
 #ifdef _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
 		template<>
-		struct _is_null_pointer_helper<stdex::nullptr_t>
-			: public true_type { };
+		struct _is_null_pointer_helper<stdex::nullptr_t>: 
+			public true_type { };
 #elif defined(_STDEX_NATIVE_NULLPTR_SUPPORT)
 		template<>
-		struct _is_null_pointer_helper<std::nullptr_t>
-			: public true_type { };
+		struct _is_null_pointer_helper<std::nullptr_t>: 
+			public true_type { };
 #endif
 
 	}
