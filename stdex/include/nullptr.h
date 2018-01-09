@@ -5,6 +5,9 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include <stdint.h>
+#include <climits>
+
 namespace stdex
 {
 
@@ -128,20 +131,54 @@ namespace stdex
 
 	namespace detail
 	{
-		template<bool>
 		struct nullptr_chooser
 		{
-			typedef int type;
-		};
+			#ifdef LLONG_MAX
+			typedef ::uintmax_t uintmax_t;
+			#else
+			typedef uint32_t uintmax_t;
+			#endif
 
-		template<>
-		struct nullptr_chooser<false>
-		{
-			typedef void* type;
+			enum nullptr_t_as_enum
+			{
+				#ifdef NULL
+				nullptr = NULL,
+				#else
+				nullptr = 0,
+				#endif
+				__max_nullptr = uintmax_t(1) << (CHAR_BIT * sizeof(void*) - 1)
+			};
+
+			template<bool>
+			struct as_int
+			{
+				typedef int type;
+			};
+
+			template<>
+			struct as_int<false>
+			{
+				typedef void* type;
+			};
+
+			template<bool>
+			struct as_enum
+			{
+				typedef nullptr_t_as_enum type;
+			};
+
+			template<>
+			struct as_enum<false>
+			{
+				typedef as_int<sizeof(int) == sizeof(void*)>::type type;
+			};
+
+			typedef as_enum<sizeof(nullptr_t_as_enum) == sizeof(void*)>::type type;
 		};
 	}
 
-	typedef detail::nullptr_chooser<sizeof(int) == sizeof(void*)>::type nullptr_t;
+typedef detail::nullptr_chooser::type nullptr_t;
+
 }
 
 
