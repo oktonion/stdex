@@ -627,13 +627,25 @@ namespace stdex
 		struct _is_function_ptr_helper<R(*)(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24)> : true_type {};
 		template <class R, class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12, class T13, class T14, class T15, class T16, class T17, class T18, class T19, class T20, class T21, class T22, class T23, class T24>
 		struct _is_function_ptr_helper<R(*)(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24 ...)> : true_type {};
+		
+		template<class _Tp, bool _IsRef = true>
+		struct is_function_chooser :
+			public false_type
+		{ };
+		
+
+		template <class _Tp>
+		struct is_function_chooser<_Tp, false>
+		{
+			static const bool value = detail::_is_function_ptr_helper<_Tp*>::value;
+		};
 	}
 
 	// is_function
 	template<class _Tp>
 	struct is_function
 	{
-		static const bool value = detail::_is_function_ptr_helper<_Tp>::value;
+		static const bool value = detail::is_function_chooser<_Tp, is_reference<_Tp>::value>::value;
 
 		typedef const bool value_type;
 		typedef integral_constant<bool, is_function::value == bool(1)> type;
