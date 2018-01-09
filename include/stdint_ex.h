@@ -1,10 +1,16 @@
-#ifndef STDEX_TYPES_H
-#define STDEX_TYPES_H
+#ifndef _STDEX_STDINT_H
+#define _STDEX_STDINT_H
 
-#if __cplusplus >= 201103L || _MSC_VER >= 1900
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
 
+#include "./core.h"
+
+#ifdef _STDEX_NATIVE_CPP11_TYPES_SUPPORT
+	#include <stdint.h>
 #else
-	#if defined(_MSC_VER) || defined(__BORLANDC__)
+	#if (defined(_MSC_VER) || defined(__BORLANDC__))
 		typedef __int16 int16_t;
 		typedef unsigned __int16 uint16_t;
 		typedef __int32 int32_t;
@@ -21,6 +27,4 @@
 	typedef uint32_t uchar32_t;
 #endif
 
-typedef unsigned char byte;
-
-#endif
+#endif // _STDEX_STDINT_H

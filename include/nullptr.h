@@ -142,9 +142,9 @@ namespace stdex
 			enum nullptr_t_as_enum
 			{
 				#ifdef NULL
-				nullptr = NULL,
+				__nullptr_val = NULL,
 				#else
-				nullptr = 0,
+				__nullptr_val = 0,
 				#endif
 				__max_nullptr = uintmax_t(1) << (CHAR_BIT * sizeof(void*) - 1)
 			};
