@@ -628,16 +628,228 @@ namespace stdex
 		template <class R, class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12, class T13, class T14, class T15, class T16, class T17, class T18, class T19, class T20, class T21, class T22, class T23, class T24>
 		struct _is_function_ptr_helper<R(*)(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24 ...)> : true_type {};
 		
-		template<class _Tp, bool _IsRef = true>
-		struct is_function_chooser :
-			public false_type
-		{ };
+		// SFINAE magic
+
+		typedef char _yes_type;
+		struct _no_type
+		{
+			char padding[8];
+		};
+
+		_no_type _is_mem_function_ptr(...);
+
+#define _IS_MEM_FUN_PTR \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(T::*const volatile*)(ARGS)); \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(T::*const volatile*)(ARGS...)); \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(T::*const volatile*)(ARGS) const); \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(T::*const volatile*)(ARGS) volatile); \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(T::*const volatile*)(ARGS) const volatile); \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(T::*const volatile*)(ARGS...) const); \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(T::*const volatile*)(ARGS...) volatile); \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(T::*const volatile*)(ARGS...) const volatile);
 		
 
+		#define TYPES
+		#define ARGS
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+
+		#define TYPES , class T0
+		#define ARGS T0
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1
+		#define ARGS T0, T1
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2
+		#define ARGS T0, T1, T2
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3
+		#define ARGS T0, T1, T2, T3
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4
+		#define ARGS T0, T1, T2, T3, T4
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5
+		#define ARGS T0, T1, T2, T3, T4, T5
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6
+		#define ARGS T0, T1, T2, T3, T4, T5, T6
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7
+		#define ARGS T0, T1, T2, T3, T4, T5, T6, T7
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8
+		#define ARGS T0, T1, T2, T3, T4, T5, T6, T7, T8
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9
+		#define ARGS T0, T1, T2, T3, T4, T5, T6, T7, T8, T9
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10
+		#define ARGS T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11
+		#define ARGS T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12
+		#define ARGS T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12, class T13
+		#define ARGS T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12, class T13, class T14
+		#define ARGS T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12, class T13, class T14, class T15
+		#define ARGS T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12, class T13, class T14, class T15, class T16
+		#define ARGS T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12, class T13, class T14, class T15, class T16, class T17
+		#define ARGS T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12, class T13, class T14, class T15, class T16, class T17, class T18
+		#define ARGS T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12, class T13, class T14, class T15, class T16, class T17, class T18, class T19
+		#define ARGS T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12, class T13, class T14, class T15, class T16, class T17, class T18, class T19, class T20
+		#define ARGS T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12, class T13, class T14, class T15, class T16, class T17, class T18, class T19, class T20, class T21
+		#define ARGS T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12, class T13, class T14, class T15, class T16, class T17, class T18, class T19, class T20, class T21, class T22
+		#define ARGS T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12, class T13, class T14, class T15, class T16, class T17, class T18, class T19, class T20, class T21, class T22, class T23
+		#define ARGS T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+		
+		#define TYPES , class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12, class T13, class T14, class T15, class T16, class T17, class T18, class T19, class T20, class T21, class T22, class T23, class T24
+		#define ARGS T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24
+		_IS_MEM_FUN_PTR;
+#undef TYPES
+#undef ARGS
+
+#undef _IS_MEM_FUN_PTR
+
+
 		template <class _Tp>
-		struct is_function_chooser<_Tp, false>
+		struct _is_mem_function_ptr_impl
 		{
-			static const bool value = detail::_is_function_ptr_helper<_Tp*>::value;
+			static _Tp *p;
+			static const bool value = (sizeof(_is_mem_function_ptr(_is_mem_function_ptr_impl::p)) == sizeof(_yes_type));
+
+			typedef typename integral_constant<bool, _is_mem_function_ptr_impl::value == bool(1)>::type type;
+		};
+
+		template <class _Tp>
+		struct _is_mem_function_ptr_helper:
+			public _is_mem_function_ptr_impl<_Tp>::type
+		{};
+		
+		template <class _Tp, bool _IsMemberFunctionPtr>
+		struct _is_function_chooser_impl :
+			public false_type
+		{ };
+
+		template <class _Tp>
+		struct _is_function_chooser_impl<_Tp, false> :
+			public _is_function_ptr_helper<_Tp*>
+		{ };
+
+		template<class _Tp, bool _IsRef = true>
+		struct _is_function_chooser :
+			public false_type
+		{ };
+
+		template <class _Tp>
+		struct _is_function_chooser<_Tp, false>
+		{
+
+			static const bool value = _is_function_chooser_impl<_Tp, _is_mem_function_ptr_helper<_Tp>::value>::value;
 		};
 	}
 
@@ -645,7 +857,7 @@ namespace stdex
 	template<class _Tp>
 	struct is_function
 	{
-		static const bool value = detail::is_function_chooser<_Tp, is_reference<_Tp>::value>::value;
+		static const bool value = detail::_is_function_chooser<_Tp, is_reference<_Tp>::value>::value;
 
 		typedef const bool value_type;
 		typedef integral_constant<bool, is_function::value == bool(1)> type;
@@ -701,43 +913,23 @@ namespace stdex
 
 		template<class _Tp, class _Cp>
 		struct _is_member_object_pointer_helper<_Tp _Cp::*>:
-			public _not_<is_function<_Tp> >::type
+			public _not_<_or_<_is_function_ptr_helper<_Tp _Cp::*>, _is_mem_function_ptr_helper<_Tp _Cp::*> > >::type
 		{ };
-
-		template<class>
-		struct _is_member_function_pointer_helper :
-			public false_type { };
-
-		template<class _Tp, class _Cp>
-		struct _is_member_function_pointer_helper<_Tp _Cp::*>
-		{
-			static const bool value = is_function<_Tp>::value;
-
-			typedef const bool value_type;
-			typedef integral_constant<bool, _is_member_function_pointer_helper::value == bool(1)> type;
-
-			operator value_type() const
-			{	// return stored value
-				return (value);
-			}
-
-			value_type operator()() const
-			{	// return stored value
-				return (value);
-			}
-		};
 	}
+
+	template<class>
+	struct is_member_pointer;
+
+	// is_member_function_pointer
+	template<class _Tp>
+	struct is_member_function_pointer :
+		public detail::_is_mem_function_ptr_helper<typename remove_cv<_Tp>::type>::type
+	{ };
 
 	// is_member_object_pointer
 	template<class _Tp>
 	struct is_member_object_pointer :
 		public detail::_is_member_object_pointer_helper<typename remove_cv<_Tp>::type>::type
-	{ };
-
-	// is_member_function_pointer
-	template<class _Tp>
-	struct is_member_function_pointer :
-		public detail::_is_member_function_pointer_helper<typename remove_cv<_Tp>::type>::type
 	{ };
 
 	// is_reference
@@ -764,9 +956,6 @@ namespace stdex
 		public detail::_not_< detail::_or_< is_function<_Tp>, is_reference<_Tp>, is_void<_Tp> > >::type
 	{};
 
-	template<class>
-	struct is_member_pointer;
-
 	// is_scalar
 	template<class _Tp>
 	struct is_scalar :
@@ -788,6 +977,17 @@ namespace stdex
 		template<class _Tp, class _Cp>
 		struct _is_member_pointer_helper<_Tp _Cp::*> :
 			public true_type { };
+
+		template<class _Tp, class _Cp>
+		struct _is_member_pointer_helper<_Tp _Cp::*const> :
+			public true_type { };
+		template<class _Tp, class _Cp>
+		struct _is_member_pointer_helper<_Tp _Cp::*const volatile> :
+			public true_type { };
+		template<class _Tp, class _Cp>
+		struct _is_member_pointer_helper<_Tp _Cp::*volatile> :
+			public true_type { };
+
 	}
 
 	// is_member_pointer
