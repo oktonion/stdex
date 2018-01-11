@@ -43,6 +43,7 @@
 #if _MSC_VER // Visual C++ fallback
 
 	#define _STDEX_NATIVE_MICROSOFT_COMPILER_EXTENSIONS_SUPPORT
+	#define _STDEX_CDECL __cdecl
 
 	#if (__cplusplus >= 199711L)
 		#define _STDEX_NATIVE_CPP_98_SUPPORT
