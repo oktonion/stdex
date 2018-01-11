@@ -133,7 +133,7 @@ namespace stdex
 			static const bool value = !bool(_Pp::value);
 
 			typedef const bool value_type;
-			typedef integral_constant<bool, _not_::value == bool(1)> type;
+			typedef integral_constant<bool, _not_::value == bool(true)> type;
 
 			operator value_type() const
 			{	// return stored value
@@ -429,7 +429,7 @@ namespace stdex
 		static const bool value = detail::_sign_unsign_chooser<is_integral<T>::value>::template _signed<T>::value;
 
 		typedef const bool value_type;
-		typedef integral_constant<bool, is_signed::value == bool(1)> type;
+		typedef integral_constant<bool, is_signed::value == bool(true)> type;
 
 		operator value_type() const
 		{	// return stored value
@@ -449,7 +449,7 @@ namespace stdex
 		static const bool value = detail::_sign_unsign_chooser<is_integral<T>::value>::template _unsigned<T>::value;
 
 		typedef const bool value_type;
-		typedef integral_constant<bool, is_unsigned::value == bool(1)> type;
+		typedef integral_constant<bool, is_unsigned::value == bool(true)> type;
 
 		operator value_type() const
 		{	// return stored value
@@ -636,9 +636,7 @@ namespace stdex
 			char padding[8];
 		};
 
-		_no_type _is_mem_function_ptr(...);
-
-#define _IS_MEM_FUN_PTR \
+#define _IS_MEM_FUN_PTR_CLR \
 		template <class R, class T TYPES > \
 		_yes_type _is_mem_function_ptr(R(T::*const volatile*)(ARGS)); \
 		template <class R, class T TYPES > \
@@ -655,7 +653,51 @@ namespace stdex
 		_yes_type _is_mem_function_ptr(R(T::*const volatile*)(ARGS...) volatile); \
 		template <class R, class T TYPES > \
 		_yes_type _is_mem_function_ptr(R(T::*const volatile*)(ARGS...) const volatile);
-		
+
+#ifdef _STDEX_CDECL
+		_no_type _STDEX_CDECL _is_mem_function_ptr(...);
+
+#define _IS_MEM_FUN_CDECL_PTR \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(__cdecl T::*const volatile*)(ARGS)); \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(__cdecl T::*const volatile*)(ARGS) const); \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(__cdecl T::*const volatile*)(ARGS) volatile); \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(__cdecl T::*const volatile*)(ARGS) const volatile);
+
+#define _IS_MEM_FUN_STDCALL_PTR \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(__stdcall T::*const volatile*)(ARGS)); \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(__stdcall T::*const volatile*)(ARGS) const); \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(__stdcall T::*const volatile*)(ARGS) volatile); \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(__stdcall T::*const volatile*)(ARGS) const volatile);
+
+#define _IS_MEM_FUN_FASTCALL_PTR \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(__fastcall T::*const volatile*)(ARGS)); \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(__fastcall T::*const volatile*)(ARGS) const); \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(__fastcall T::*const volatile*)(ARGS) volatile); \
+		template <class R, class T TYPES > \
+		_yes_type _is_mem_function_ptr(R(__fastcall T::*const volatile*)(ARGS) const volatile);
+#else
+		_no_type _is_mem_function_ptr(...);
+#define _IS_MEM_FUN_CDECL_PTR
+#define _IS_MEM_FUN_STDCALL_PTR
+#define _IS_MEM_FUN_FASTCALL_PTR
+#endif
+
+#define _IS_MEM_FUN_PTR \
+		_IS_MEM_FUN_PTR_CLR \
+		_IS_MEM_FUN_CDECL_PTR \
+		_IS_MEM_FUN_STDCALL_PTR \
+		_IS_MEM_FUN_FASTCALL_PTR
 
 		#define TYPES
 		#define ARGS
@@ -814,6 +856,10 @@ namespace stdex
 #undef ARGS
 
 #undef _IS_MEM_FUN_PTR
+#undef _IS_MEM_FUN_PTR_CLR 		
+#undef _IS_MEM_FUN_CDECL_PTR
+#undef _IS_MEM_FUN_STDCALL_PTR
+#undef _IS_MEM_FUN_FASTCALL_PTR
 
 
 		template <class _Tp>
@@ -822,7 +868,7 @@ namespace stdex
 			static _Tp *p;
 			static const bool value = (sizeof(_is_mem_function_ptr(_is_mem_function_ptr_impl::p)) == sizeof(_yes_type));
 
-			typedef typename integral_constant<bool, _is_mem_function_ptr_impl::value == bool(1)>::type type;
+			typedef typename integral_constant<bool, _is_mem_function_ptr_impl::value == bool(true)>::type type;
 		};
 
 		template <class _Tp>
@@ -860,7 +906,7 @@ namespace stdex
 		static const bool value = detail::_is_function_chooser<_Tp, is_reference<_Tp>::value>::value;
 
 		typedef const bool value_type;
-		typedef integral_constant<bool, is_function::value == bool(1)> type;
+		typedef integral_constant<bool, is_function::value == bool(true)> type;
 
 		operator value_type() const
 		{	// return stored value
@@ -935,7 +981,13 @@ namespace stdex
 	// is_reference
 	template<class _Tp>
 	struct is_reference :
-		public detail::_or_<is_lvalue_reference<_Tp>/*, is_rvalue_reference<_Tp> */>::type
+		//public detail::_or_<is_lvalue_reference<_Tp>, is_rvalue_reference<_Tp> >::type
+		public false_type
+	{};
+
+	template<class _Tp>
+	struct is_reference<_Tp&> :
+		public true_type
 	{};
 
 	// is_arithmetic
