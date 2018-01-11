@@ -1023,8 +1023,10 @@ namespace stdex
 	namespace detail
 	{
 		template<class _Tp>
-		struct _is_member_pointer_helper :
-			public false_type { };
+		struct _is_member_pointer_helper:
+			public integral_constant<bool, is_member_function_pointer<_Tp>::value == bool(true)>::type
+		{ 
+		};
 
 		template<class _Tp, class _Cp>
 		struct _is_member_pointer_helper<_Tp _Cp::*> :
@@ -1039,7 +1041,6 @@ namespace stdex
 		template<class _Tp, class _Cp>
 		struct _is_member_pointer_helper<_Tp _Cp::*volatile> :
 			public true_type { };
-
 	}
 
 	// is_member_pointer
