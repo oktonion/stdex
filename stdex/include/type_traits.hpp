@@ -913,7 +913,7 @@ namespace stdex
 
 		template<class _Tp, class _Cp>
 		struct _is_member_object_pointer_helper<_Tp _Cp::*>:
-			public _not_<_or_<_is_function_ptr_helper<_Tp _Cp::*>, _is_mem_function_ptr_helper<_Tp _Cp::*> > >::type
+			public _not_< _or_<_is_function_ptr_helper<_Tp _Cp::*>, _is_mem_function_ptr_helper<_Tp _Cp::*> > >::type
 		{ };
 	}
 
