@@ -17,15 +17,23 @@
 
 namespace stdex
 {
-#ifdef LLONG_MAX
-	#define __INTMAX_MAX LLONG_MAX//9223372036854775807i64
+#if defined(INTMAX_MAX) && defined(LLONG_MAX)
+#define __INTMAX_MAX INTMAX_MAX
 	typedef ::intmax_t intmax_t;
 	typedef ::uintmax_t uintmax_t;
+#else
+
+#ifdef LLONG_MAX
+	#define __INTMAX_MAX LLONG_MAX//9223372036854775807i64
+	typedef int64_t intmax_t;
+	typedef int64_t uintmax_t;
 #else
 	#define __INTMAX_MAX LONG_MAX//	2147483647
 	typedef int32_t intmax_t;
 	typedef uint32_t uintmax_t;
 #endif
+
+#endif // INTMAX_MAX
 
 	template<intmax_t _Val>
 	struct _sign_of
