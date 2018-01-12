@@ -1447,10 +1447,29 @@ namespace stdex
 		typedef _Tp     type;
 	};
 
+
 	template<class _Tp, std::size_t _Size>
 	struct remove_extent<_Tp[_Size]>
 	{
 		typedef _Tp     type;
+	};
+
+	template<class _Tp, std::size_t _Size>
+	struct remove_extent< const _Tp[_Size]>
+	{
+		typedef const _Tp     type;
+	};
+
+	template<class _Tp, std::size_t _Size>
+	struct remove_extent< volatile _Tp[_Size]>
+	{
+		typedef volatile _Tp     type;
+	};
+
+	template<class _Tp, std::size_t _Size>
+	struct remove_extent< const volatile _Tp[_Size]>
+	{
+		typedef const volatile _Tp     type;
 	};
 
 	/*template<class _Tp>
@@ -1470,6 +1489,24 @@ namespace stdex
 	struct remove_all_extents<_Tp[_Size]>
 	{
 		typedef typename remove_all_extents<_Tp>::type     type;
+	};
+
+	template<class _Tp, std::size_t _Size>
+	struct remove_all_extents<const _Tp[_Size]>
+	{
+		typedef const typename remove_all_extents<const _Tp>::type     type;
+	};
+
+	template<class _Tp, std::size_t _Size>
+	struct remove_all_extents<volatile _Tp[_Size]>
+	{
+		typedef volatile typename remove_all_extents<volatile _Tp>::type     type;
+	};
+
+	template<class _Tp, std::size_t _Size>
+	struct remove_all_extents<const volatile _Tp[_Size]>
+	{
+		typedef const volatile typename remove_all_extents<const volatile _Tp>::type     type;
 	};
 
 	/*template<class _Tp>
