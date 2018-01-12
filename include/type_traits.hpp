@@ -436,18 +436,8 @@ namespace stdex
 	{
 		template<class _Tp>
 		struct _is_referenceable :
-			public _or_<is_object<_Tp>, is_reference<_Tp> >::type
+			public _or_<is_object<_Tp>, is_reference<_Tp>, is_function<_Tp> >::type
 		{ };
-
-		/*template<typename _Res, typename... _Args>
-		struct _is_referenceable<_Res(_Args...)>
-		: public true_type
-		{ };*/
-
-		/*template<typename _Res, typename... _Args>
-		struct _is_referenceable<_Res(_Args......)>
-		: public true_type
-		{ };*/
 	}
 
 	template< class _Tp >
@@ -464,7 +454,7 @@ namespace stdex
 
 	namespace detail
 	{
-		template<class _Tp, bool = _is_referenceable<_Tp>::value>
+		template<class _Tp, bool = _is_referenceable<_Tp>::value>//_and_<_is_referenceable<_Tp>, _not_< _and_<is_const<_Tp>, is_volatile<_Tp> > > >::value>
 		struct _add_lvalue_reference_helper
 		{
 			typedef _Tp   type;
@@ -482,6 +472,12 @@ namespace stdex
 	struct add_lvalue_reference :
 		public detail::_add_lvalue_reference_helper<_Tp>
 	{ };
+
+	template<class _Tp>
+	struct add_lvalue_reference<_Tp&>
+	{
+		typedef _Tp&   type;
+	};
 
 	template<class T>
 	struct is_signed
@@ -1174,6 +1170,30 @@ namespace stdex
 		public integral_constant<std::size_t, _Uint == 0 ? 0 : extent<_Tp, _Uint - 1>::value>
 	{ };*/
 
+	namespace intern
+	{
+		// since we have no static_assert in pre-C++11 we just compile-time assert this way:
+		struct type_traits_asserts
+		{
+			template<bool>
+			struct make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type;
+
+			template<>
+			struct make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type<true>
+			{
+				typedef bool is_ok;
+			};
+
+			template<bool>
+			struct make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type;
+
+			template<>
+			struct make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type<true>
+			{
+				typedef bool is_ok;
+			};
+		};
+	}
 
 	namespace detail
 	{
@@ -1263,6 +1283,12 @@ namespace stdex
 		template<class _Tp>
 		class _make_unsigned_selector
 		{
+		private:
+			typedef intern::type_traits_asserts check;
+
+			typedef typename check::make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type< is_integral<_Tp>::value >::is_ok
+				check1; // if you are there means _Tp is not an integral type
+
 			typedef unsigned char _smallest;
 			static const bool _b0 = sizeof(_Tp) <= sizeof(_smallest);
 			static const bool _b1 = sizeof(_Tp) <= sizeof(unsigned short);
@@ -1293,6 +1319,24 @@ namespace stdex
 	struct make_unsigned
 	{
 		typedef typename detail::_make_unsigned_selector<_Tp>::_type type;
+	};
+
+	template<class _Tp>
+	struct make_unsigned<_Tp const>
+	{
+		typedef const typename detail::_make_unsigned_selector<_Tp const>::_type type;
+	};
+
+	template<class _Tp>
+	struct make_unsigned<_Tp volatile>
+	{
+		typedef volatile typename detail::_make_unsigned_selector<_Tp volatile>::_type type;
+	};
+
+	template<class _Tp>
+	struct make_unsigned<_Tp const volatile>
+	{
+		typedef const volatile typename detail::_make_unsigned_selector<_Tp const volatile>::_type type;
 	};
 
 	// Integral, but don't define.
@@ -1349,6 +1393,12 @@ namespace stdex
 		template<class _Tp>
 		class _make_signed_selector
 		{
+		private:
+			typedef intern::type_traits_asserts check;
+
+			typedef typename check::make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type< is_integral<_Tp>::value >::is_ok
+				check1; // if you are there means _Tp is not an integral type
+
 			typedef typename _make_unsigned_selector<_Tp>::_type _unsigned_type;
 
 			typedef _make_signed<typename remove_cv<_unsigned_type>::type> _signedt;
@@ -1365,6 +1415,24 @@ namespace stdex
 	struct make_signed
 	{
 		typedef typename detail::_make_signed_selector<_Tp>::_type type;
+	};
+
+	template<class _Tp>
+	struct make_signed<_Tp const>
+	{
+		typedef const typename detail::_make_signed_selector<_Tp const>::_type type;
+	};
+
+	template<class _Tp>
+	struct make_signed<_Tp volatile>
+	{
+		typedef volatile typename detail::_make_signed_selector<_Tp volatile>::_type type;
+	};
+
+	template<class _Tp>
+	struct make_signed<_Tp const volatile>
+	{
+		typedef const volatile typename detail::_make_signed_selector<_Tp const volatile>::_type type;
 	};
 
 	// Integral, but don't define.
@@ -1444,6 +1512,24 @@ namespace stdex
 		struct _add_pointer_helper<_Tp, true>
 		{
 			typedef typename remove_reference<_Tp>::type*     type;
+		};
+
+		template<class _Tp>
+		struct _add_pointer_helper<const _Tp, true>
+		{
+			typedef const typename remove_reference<_Tp>::type*     type;
+		};
+
+		template<class _Tp>
+		struct _add_pointer_helper<volatile _Tp, true>
+		{
+			typedef volatile typename remove_reference<_Tp>::type*     type;
+		};
+
+		template<class _Tp>
+		struct _add_pointer_helper<const volatile _Tp, true>
+		{
+			typedef const volatile typename remove_reference<_Tp>::type*     type;
 		};
 	}
 
