@@ -20,6 +20,8 @@
 // is_standard_layout - ni
 // is_trivial - ni
 // is_trivially_copyable - ni
+// is_base_of - ni
+// is_convertible - ni
 // All type features (like is_assignable) - ni
 
 // stdex includes
@@ -154,6 +156,9 @@ namespace stdex
 	};
 
 	template<class _Tp>
+	struct is_function;
+
+	template<class _Tp>
 	struct remove_const
 	{	// remove top level const qualifier
 		typedef _Tp type;
@@ -192,26 +197,82 @@ namespace stdex
 			type;
 	};
 
-	// add_const
-	template<typename _Tp>
-	struct add_const
+	namespace detail
 	{
-		typedef _Tp const     type;
+		template<class _Tp, bool _IsFunction>
+		struct _add_const_helper
+		{
+			typedef _Tp const type;
+		};
+
+		template<class _Tp>
+		struct _add_const_helper<_Tp, true>
+		{
+			typedef _Tp type;
+		};
+
+		template<class _Tp, bool _IsFunction>
+		struct _add_volatile_helper
+		{
+			typedef _Tp volatile type;
+		};
+
+		template<class _Tp>
+		struct _add_volatile_helper<_Tp, true>
+		{
+			typedef _Tp type;
+		};
+
+		template<class _Tp, bool _IsFunction>
+		struct _add_cv_helper
+		{
+			typedef _Tp const volatile type;
+		};
+
+		template<class _Tp>
+		struct _add_cv_helper<_Tp, true>
+		{
+			typedef _Tp type;
+		};
+	}
+
+	// add_const
+	template<class _Tp>
+	struct add_const:
+		public detail::_add_const_helper<_Tp, is_function<_Tp>::value>
+	{
+	};
+
+	template<class _Tp>
+	struct add_const<_Tp&>
+	{
+		typedef _Tp &     type;
 	};
 
 	// add_volatile
-	template<typename _Tp>
-	struct add_volatile
+	template<class _Tp>
+	struct add_volatile :
+		public detail::_add_volatile_helper<_Tp, is_function<_Tp>::value>
 	{
-		typedef _Tp volatile     type;
+	};
+
+	template<class _Tp>
+	struct add_volatile<_Tp&>
+	{
+		typedef _Tp &     type;
 	};
 
 	// add_cv
-	template<typename _Tp>
-	struct add_cv
+	template<class _Tp>
+	struct add_cv :
+		public detail::_add_cv_helper<_Tp, is_function<_Tp>::value>
 	{
-		typedef typename
-			add_const<typename add_volatile<_Tp>::type>::type     type;
+	};
+
+	template<class _Tp>
+	struct add_cv<_Tp&>
+	{
+		typedef _Tp &     type;
 	};
 
 	namespace detail
@@ -997,7 +1058,7 @@ namespace stdex
 	{ };
 
 	// is_fundamental
-	template<typename _Tp>
+	template<class _Tp>
 	struct is_fundamental :
 		public detail::_or_<is_arithmetic<_Tp>, is_void<_Tp>, is_null_pointer<_Tp> >::type
 	{};

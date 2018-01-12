@@ -80,7 +80,7 @@
 		} // namespace detail
 	}
 	#define countof(arr) stdex::detail::my_countof(arr)
-	#define STATIC_ASSERT(expression, message) static_assert(expression, #message)
+	#define STATIC_ASSERT(expression, message) static_assert((expression), #message)
 
 	#ifdef _STDEX_NATIVE_NULLPTR_SUPPORT
 		namespace stdex
