@@ -152,11 +152,14 @@ namespace stdex
 		};
 	}
 
-	template<bool Val>
-	struct _cat_base :
-		integral_constant<bool, Val>
-	{	// base class for type predicates
-	};
+	namespace detail
+	{
+		template<bool Val>
+		struct _cat_base :
+			integral_constant<bool, Val>
+		{	// base class for type predicates
+		};
+	}
 
 	template<class _Tp>
 	struct is_function;
@@ -1004,7 +1007,7 @@ namespace stdex
 
 	namespace detail
 	{
-		// __is_nullptr_t (extension).
+		// _is_nullptr_t (extension).
 		template<class _Tp>
 		struct _is_nullptr_t :
 			public is_null_pointer<_Tp>

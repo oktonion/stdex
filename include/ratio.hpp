@@ -365,7 +365,7 @@ namespace stdex
 		bool = (_sign_of<_R1::num>::value == -1
 			&& _sign_of<_R2::num>::value == -1)>
 	struct _ratio_less_impl: 
-		_ratio_less_impl_1<_R1, _R2>::type
+		_ratio_less_impl_1<_R1, _R2>
 	{ };
 
 	template<class _R1, class _R2>
@@ -376,13 +376,13 @@ namespace stdex
 
 	template<class _R1, class _R2>
 	struct _ratio_less_impl<_R1, _R2, false, true>: 
-		_ratio_less_impl_1< ratio<-_R2::num, _R2::den>, ratio<-_R1::num, _R1::den> >::type
+		_ratio_less_impl_1< ratio<-_R2::num, _R2::den>, ratio<-_R1::num, _R1::den> >
 	{ };
 
 	// ratio_less
 	template<class _R1, class _R2>
 	struct ratio_less
-		: _ratio_less_impl<_R1, _R2>::type
+		: _ratio_less_impl<_R1, _R2>
 	{ };
 
 	// ratio_less_equal
