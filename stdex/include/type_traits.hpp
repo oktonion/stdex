@@ -24,6 +24,7 @@
 // is_convertible - ni
 // aligned_storage - ni
 // aligned_union - ni
+// underlying_type - ni
 // All type features (like is_assignable) - ni
 
 // stdex includes
