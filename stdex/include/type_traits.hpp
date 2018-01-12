@@ -22,6 +22,8 @@
 // is_trivially_copyable - ni
 // is_base_of - ni
 // is_convertible - ni
+// aligned_storage - ni
+// aligned_union - ni
 // All type features (like is_assignable) - ni
 
 // stdex includes
