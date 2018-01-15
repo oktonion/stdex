@@ -1016,14 +1016,24 @@ namespace stdex
 
 	namespace detail
 	{
-		template<class>
-		struct _is_member_object_pointer_helper :
+		template<class _Tp>
+		struct _is_member_object_pointer_impl1 :
+			public _not_< _or_<_is_function_ptr_helper<_Tp>, _is_mem_function_ptr_helper<_Tp> > >::type
+		{ };
+
+		template<class _Tp>
+		struct _is_member_object_pointer_impl2 :
 			public false_type { };
 
 		template<class _Tp, class _Cp>
-		struct _is_member_object_pointer_helper<_Tp _Cp::*>:
-			public _not_< _or_<_is_function_ptr_helper<_Tp _Cp::*>, _is_mem_function_ptr_helper<_Tp _Cp::*> > >::type
-		{ };
+		struct _is_member_object_pointer_impl2<_Tp _Cp::*> :
+			public true_type { };
+
+		template<class _Tp>
+		struct _is_member_object_pointer_helper:
+			public _and_<_is_member_object_pointer_impl1<_Tp>, _is_member_object_pointer_impl2<_Tp> >::type
+		{};
+
 	}
 
 	template<class>
