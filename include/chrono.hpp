@@ -66,8 +66,8 @@ namespace stdex
 		chrono::duration<_Rep2, _Period2> >
 	{
 	private:
-		typedef _gcd<_Period1::num, _Period2::num> 	_gcd_num;
-		typedef _gcd<_Period1::den, _Period2::den> 	_gcd_den;
+		typedef detail::_gcd<_Period1::num, _Period2::num> 	_gcd_num;
+		typedef detail::_gcd<_Period1::den, _Period2::den> 	_gcd_den;
 		typedef typename common_type<_Rep1, _Rep2>::type		_cr;
 		typedef ratio<_gcd_num::value,
 			(_Period1::den / _gcd_den::value) * _Period2::den> _r;
