@@ -1124,23 +1124,28 @@ namespace stdex
 
 	namespace detail
 	{
-		template <class T>
+		template <class _Tp, bool _IsReference>
 		struct _is_class_helper
 		{
+			typedef integral_constant<bool, false> type;
+		};
+
+		template <class _Tp>
+		struct _is_class_helper<_Tp, false>
+		{
 			typedef integral_constant<bool,
-				!is_scalar<T>::value
-				//&& !is_union<T>::value >::value
-				&& !is_array<T>::value
-				&& !is_reference<T>::value
-				&& !is_void<T>::value
-				&& !is_function<T>::value> type;
+				(is_scalar<_Tp>::value == bool(false))
+				//&& !is_union<_Tp>::value >::value
+				&& (is_array<_Tp>::value == bool(false))
+				&& (is_void<_Tp>::value == bool(false))
+				&& (is_function<_Tp>::value == bool(false))> type;
 		};
 	}
 
 	// is_class
 	template<class _Tp>
 	struct is_class :
-		public detail::_is_class_helper<typename remove_cv<_Tp>::type>::type
+		public detail::_is_class_helper<typename remove_cv<_Tp>::type, is_reference<_Tp>::value>::type
 	{ };
 
 	template<class, unsigned = 0>
@@ -1225,6 +1230,15 @@ namespace stdex
 
 			template<>
 			struct make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type<true>
+			{
+				typedef bool is_ok;
+			};
+
+			template<bool>
+			struct not_allowed_arithmetic_type;
+
+			template<>
+			struct not_allowed_arithmetic_type<true>
 			{
 				typedef bool is_ok;
 			};
@@ -1650,19 +1664,235 @@ namespace stdex
 		typedef typename detail::_decay_selector<_remove_type, is_array<_remove_type>::value, is_function<_remove_type>::value>::_type type;
 	};
 
-	template<class _Tp, class T0 = detail::void_type, class T1 = detail::void_type, class T2 = detail::void_type, class T3 = detail::void_type, class T4 = detail::void_type, class T5 = detail::void_type, class T6 = detail::void_type, class T7 = detail::void_type, class T8 = detail::void_type, class T9 = detail::void_type, class T10 = detail::void_type, class T11 = detail::void_type, class T12 = detail::void_type, class T13 = detail::void_type, class T14 = detail::void_type, class T15 = detail::void_type, class T16 = detail::void_type, class T17 = detail::void_type, class T18 = detail::void_type, class T19 = detail::void_type, class T20 = detail::void_type, class T21 = detail::void_type, class T22 = detail::void_type, class T23 = detail::void_type, class T24 = detail::void_type>
-	struct common_type;
+	namespace detail
+	{
+		template<int I> struct _arithmetic_type
+		{
+			typedef void type;
+		private:
+			typedef intern::type_traits_asserts check;
+			typedef typename check::not_allowed_arithmetic_type< I != 0 >::is_ok
+				check1; // if you are there means 
+		};
 
-	template<class _Tp>
-	struct common_type<_Tp, _Tp> 
-	{ 
-		typedef typename decay<_Tp>::type type; 
+		template<> struct _arithmetic_type<1>
+		{
+			typedef bool type;
+			typedef char(&result_type)[1];
+		};
+
+		template<> struct _arithmetic_type<2>
+		{
+			typedef char type;
+			typedef char(&result_type)[2];
+		};
+
+		template<> struct _arithmetic_type<3>
+		{
+			typedef wchar_t type;
+			typedef char(&result_type)[3];
+		};
+
+		template<> struct _arithmetic_type<4>
+		{
+			typedef signed char type;
+			typedef char(&result_type)[4];
+		};
+
+		template<> struct _arithmetic_type<5>
+		{
+			typedef short int type;
+			typedef char(&result_type)[5];
+		};
+
+		template<> struct _arithmetic_type<6>
+		{
+			typedef int type;
+			typedef char(&result_type)[6];
+		};
+
+		template<> struct _arithmetic_type<7>
+		{
+			typedef long type;
+			typedef char(&result_type)[7];
+		};
+
+#ifdef LLONG_MAX
+		template<> struct _arithmetic_type<8>
+		{
+			typedef long long type;
+			typedef char(&result_type)[8];
+		};
+#endif
+
+		template<> struct _arithmetic_type<9>
+		{
+			typedef unsigned char type;
+			typedef char(&result_type)[9];
+		};
+
+		template<> struct _arithmetic_type<10>
+		{
+			typedef unsigned short int type;
+			typedef char(&result_type)[10];
+		};
+
+		template<> struct _arithmetic_type<11>
+		{
+			typedef unsigned int type;
+			typedef char(&result_type)[11];
+		};
+
+		template<> struct _arithmetic_type<12>
+		{
+			typedef unsigned long type;
+			typedef char(&result_type)[12];
+		};
+
+#ifdef LLONG_MAX
+		template<> struct _arithmetic_type<13>
+		{
+			typedef unsigned long long type;
+			typedef char(&result_type)[13];
+		};
+#endif
+
+		template<> struct _arithmetic_type<14>
+		{
+			typedef float type;
+			typedef char(&result_type)[14];
+		};
+
+		template<> struct _arithmetic_type<15>
+		{
+			typedef double type;
+			typedef char(&result_type)[15];
+		};
+
+		template<> struct _arithmetic_type<16>
+		{
+			typedef long double type;
+			typedef char(&result_type)[16];
+		};
+
+#ifdef _STDEX_NATIVE_CPP11_TYPES_SUPPORT
+		template<> struct _arithmetic_type<17>
+		{
+			typedef char16_t type;
+			typedef char(&result_type)[17];
+		};
+
+		template<> struct _arithmetic_type<18>
+		{
+			typedef char32_t type;
+			typedef char(&result_type)[18];
+		};
+#endif
+
+		template<class _Tp, class _U> class _common_arithmetic_type
+		{
+		private:
+
+			static _arithmetic_type<1>::result_type select(_arithmetic_type<1>::type);
+			static _arithmetic_type<2>::result_type select(_arithmetic_type<2>::type);
+			static _arithmetic_type<3>::result_type select(_arithmetic_type<3>::type);
+			static _arithmetic_type<4>::result_type select(_arithmetic_type<4>::type);
+			static _arithmetic_type<5>::result_type select(_arithmetic_type<5>::type);
+			static _arithmetic_type<6>::result_type select(_arithmetic_type<6>::type);
+			static _arithmetic_type<7>::result_type select(_arithmetic_type<7>::type);
+#ifdef LLONG_MAX
+			static _arithmetic_type<8>::result_type select(_arithmetic_type<8>::type);
+#endif
+			static _arithmetic_type<9>::result_type select(_arithmetic_type<9>::type);
+			static _arithmetic_type<10>::result_type select(_arithmetic_type<10>::type);
+			static _arithmetic_type<11>::result_type select(_arithmetic_type<11>::type);
+			static _arithmetic_type<12>::result_type select(_arithmetic_type<12>::type);
+#ifdef LLONG_MAX
+			static _arithmetic_type<13>::result_type select(_arithmetic_type<13>::type);
+#endif
+			static _arithmetic_type<14>::result_type select(_arithmetic_type<14>::type);
+			static _arithmetic_type<15>::result_type select(_arithmetic_type<15>::type);
+			static _arithmetic_type<16>::result_type select(_arithmetic_type<16>::type);
+#ifdef _STDEX_NATIVE_CPP11_TYPES_SUPPORT
+			static _arithmetic_type<17>::result_type select(_arithmetic_type<17>::type);
+			static _arithmetic_type<18>::result_type select(_arithmetic_type<18>::type);
+#endif
+
+			static bool cond();
+
+		public:
+			static const int value = sizeof(select(cond() ? _Tp() : _U()));
+			typedef typename _arithmetic_type< _common_arithmetic_type<_Tp, _U>::value >::type type;
+		};
+
+		template<class _Tp>
+		class _common_arithmetic_type<_Tp, _Tp>
+		{
+			typedef _Tp type;
+		};
+
+		template<class _Tp, class _U>
+		struct _common_other_type :
+			conditional<(sizeof(_Tp) > sizeof(_U)), _Tp, _U >
+		{ };
+
+		template<class _Tp, class _U, bool _IsArithmetic>
+		struct _common_type_impl1 :
+			_common_arithmetic_type<_Tp, _U>
+		{ };
+
+		template<class _Tp, class _U>
+		struct _common_type_impl1<_Tp, _U, false> :
+			_common_other_type<_Tp, _U>
+		{ };
+
+		template<class _Tp, class _U> 
+		struct _common_type_impl:
+			public _common_type_impl1<_Tp, _U, (is_arithmetic<_Tp>::value == bool(true)) && (is_arithmetic<_U>::value == bool(true))>
+		{ };
+
+		template<class _Tp> 
+		struct _common_type_impl<_Tp, _Tp>
+		{
+			typedef typename decay<_Tp>::type type;
+		};
+
+
+	}
+
+	template<class _Tp, class T0 = detail::void_type, class T1 = detail::void_type, class T2 = detail::void_type, class T3 = detail::void_type, class T4 = detail::void_type, class T5 = detail::void_type, class T6 = detail::void_type, class T7 = detail::void_type, class T8 = detail::void_type, class T9 = detail::void_type, class T10 = detail::void_type, class T11 = detail::void_type, class T12 = detail::void_type, class T13 = detail::void_type, class T14 = detail::void_type, class T15 = detail::void_type, class T16 = detail::void_type, class T17 = detail::void_type, class T18 = detail::void_type, class T19 = detail::void_type, class T20 = detail::void_type, class T21 = detail::void_type, class T22 = detail::void_type, class T23 = detail::void_type, class T24 = detail::void_type>
+	struct common_type : 
+		common_type<typename common_type<T1, T2>::type>
+	{
+
 	};
+
+	namespace detail
+	{
+
+		template<class T1, class T2, class T1d = typename decay<T1>::type, class T2d = typename decay<T2>::type> 
+		struct _common_type_decay_helper : 
+			common_type<T1d, T2d>
+		{
+		};
+
+		template<class T1, class T2> 
+		struct _common_type_decay_helper<T1, T2, T1, T2> : 
+			_common_type_impl<T1, T2>
+		{
+		};
+	}
 
 	template<class _Tp>
 	struct common_type<_Tp>
 	{
 		typedef typename decay<_Tp>::type type;
+	};
+
+	template<class T1, class T2> 
+	struct common_type<T1, T2> : 
+		detail::_common_type_decay_helper<T1, T2>
+	{
 	};
 
 
