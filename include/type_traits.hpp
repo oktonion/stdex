@@ -7,11 +7,11 @@
 
 // Implemented all basic standart C++11 features. 
 // What can not be implemented or implemented with some limits:
-// is_class - ni
+// is_class - can't detect unions
 // is_enum - ni
 // is_rvalue_reference - ni
 // is_union - ni
-// is_scalar - can't detect unions
+// is_scalar - can't detect enums
 // is_abstract - ni
 // is_empty - ni
 // is_literal_type - ni
@@ -1122,6 +1122,26 @@ namespace stdex
 		public detail::_is_member_pointer_helper<typename remove_cv<_Tp>::type>::type
 	{ };
 
+	namespace detail
+	{
+		template <class T>
+		struct _is_class_helper
+		{
+			typedef integral_constant<bool,
+				!is_scalar<T>::value
+				//&& !is_union<T>::value >::value
+				&& !is_array<T>::value
+				&& !is_reference<T>::value
+				&& !is_void<T>::value
+				&& !is_function<T>::value> type;
+		};
+	}
+
+	// is_class
+	template<class _Tp>
+	struct is_class :
+		public detail::_is_class_helper<typename remove_cv<_Tp>::type>::type
+	{ };
 
 	template<class, unsigned = 0>
 	struct extent;

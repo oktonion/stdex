@@ -37,10 +37,10 @@ namespace stdex
 	namespace chrono
 	{
 		template<class _Rep, class _Period = ratio<1> >
-		struct duration;
+		class duration;
 
 		template<typename _Clock, typename _Dur = typename _Clock::duration>
-		struct time_point;
+		class time_point;
 	}
 
 	namespace detail
@@ -461,11 +461,11 @@ namespace stdex
 		template<class _Rep1, class _Rep2,
 			class _CRep = typename common_type<_Rep1, _Rep2>::type>
 		struct _common_rep_t:
-			_rep_t_enable_if<sizeof(_Rep2) <= sizeof(_CRep), _CRep>::type
+			_rep_t_enable_if<sizeof(_Rep2) <= sizeof(_CRep), _CRep>
 		{};
 
 		template<class _Rep1, class _Period, class _Rep2>
-		duration<_common_rep_t<_Rep1, _Rep2>, _Period>
+		duration<typename _common_rep_t<_Rep1, _Rep2>::type, _Period>
 		operator*(const duration<_Rep1, _Period> &d, const _Rep2 &s)
 		{
 			typedef duration<typename common_type<_Rep1, _Rep2>::type, _Period> _cd;
@@ -474,14 +474,14 @@ namespace stdex
 		}
 
 		template<class _Rep1, class _Rep2, class _Period>
-		duration<_common_rep_t<_Rep2, _Rep1>, _Period>
+		duration<typename _common_rep_t<_Rep2, _Rep1>::type, _Period>
 		operator*(const _Rep1 &s, const duration<_Rep2, _Period> &d)
 		{
 			return d * s;
 		}
 
 		template<class _Rep1, class _Period, class _Rep2>
-		duration<_common_rep_t<_Rep1, _disable_if_is_duration<_Rep2> >, _Period>
+		duration<typename _common_rep_t<_Rep1, _disable_if_is_duration<_Rep2> >::type, _Period>
 		operator/(const duration<_Rep1, _Period> &d, const _Rep2 &s)
 		{
 			typedef duration<typename common_type<_Rep1, _Rep2>::type, _Period> _cd;
@@ -503,7 +503,7 @@ namespace stdex
 
 		// DR 934.
 		template<class _Rep1, class _Period, class _Rep2>	
-		duration<_common_rep_t<_Rep1, _disable_if_is_duration<_Rep2> >, _Period>
+		duration<typename _common_rep_t<_Rep1, _disable_if_is_duration<_Rep2> >::type, _Period>
 		operator%(const duration<_Rep1, _Period> &d, const _Rep2 &s)
 		{
 			typedef duration<typename common_type<_Rep1, _Rep2>::type, _Period> _cd;
