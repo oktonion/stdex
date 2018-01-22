@@ -169,12 +169,12 @@ namespace stdex
 
 		template <class _Tp>
 		struct _enable_if_is_duration:
-			_enable_if_is_duration_impl<_is_duration<_Tp>::value, _Tp>
+			_enable_if_is_duration_impl<_is_duration<_Tp>::value == bool(true), _Tp>
 		{};
 
 		template <class _Tp>
 		struct _disable_if_is_duration :
-			_enable_if_is_duration_impl<!(_is_duration<_Tp>::value != 0), _Tp>
+			_enable_if_is_duration_impl<_is_duration<_Tp>::value == bool(false), _Tp>
 		{};
 
 		// duration_cast
@@ -481,7 +481,7 @@ namespace stdex
 		}
 
 		template<class _Rep1, class _Period, class _Rep2>
-		duration<typename _common_rep_t<_Rep1, _disable_if_is_duration<_Rep2> >::type, _Period>
+		duration<typename _common_rep_t<_Rep1, typename _disable_if_is_duration<_Rep2>::type >::type, _Period>
 		operator/(const duration<_Rep1, _Period> &d, const _Rep2 &s)
 		{
 			typedef duration<typename common_type<_Rep1, _Rep2>::type, _Period> _cd;
@@ -503,7 +503,7 @@ namespace stdex
 
 		// DR 934.
 		template<class _Rep1, class _Period, class _Rep2>	
-		duration<typename _common_rep_t<_Rep1, _disable_if_is_duration<_Rep2> >::type, _Period>
+		duration<typename _common_rep_t<_Rep1, typename _disable_if_is_duration<_Rep2>::type >::type, _Period>
 		operator%(const duration<_Rep1, _Period> &d, const _Rep2 &s)
 		{
 			typedef duration<typename common_type<_Rep1, _Rep2>::type, _Period> _cd;

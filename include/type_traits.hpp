@@ -1825,12 +1825,6 @@ namespace stdex
 			typedef typename _arithmetic_type< _common_arithmetic_type<_Tp, _U>::value >::type type;
 		};
 
-		template<class _Tp>
-		class _common_arithmetic_type<_Tp, _Tp>
-		{
-			typedef _Tp type;
-		};
-
 		template<class _Tp, class _U>
 		struct _common_other_type :
 			conditional<(sizeof(_Tp) > sizeof(_U)), _Tp, _U >
