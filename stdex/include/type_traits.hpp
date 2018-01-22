@@ -1775,7 +1775,6 @@ namespace stdex
 			typedef char(&result_type)[16];
 		};
 
-#ifdef _STDEX_NATIVE_CPP11_TYPES_SUPPORT
 		template<> struct _arithmetic_type<17>
 		{
 			typedef char16_t type;
@@ -1787,7 +1786,6 @@ namespace stdex
 			typedef char32_t type;
 			typedef char(&result_type)[18];
 		};
-#endif
 
 		template<class _Tp, class _U> class _common_arithmetic_type
 		{
@@ -1801,22 +1799,21 @@ namespace stdex
 			static _arithmetic_type<6>::result_type select(_arithmetic_type<6>::type);
 			static _arithmetic_type<7>::result_type select(_arithmetic_type<7>::type);
 #ifdef LLONG_MAX
-			static _arithmetic_type<8>::result_type select(_arithmetic_type<8>::type);
+			static _arithmetic_type<8>::result_type select(_arithmetic_type<8>::type, int i = 0);
 #endif
 			static _arithmetic_type<9>::result_type select(_arithmetic_type<9>::type);
 			static _arithmetic_type<10>::result_type select(_arithmetic_type<10>::type);
 			static _arithmetic_type<11>::result_type select(_arithmetic_type<11>::type);
 			static _arithmetic_type<12>::result_type select(_arithmetic_type<12>::type);
 #ifdef LLONG_MAX
-			static _arithmetic_type<13>::result_type select(_arithmetic_type<13>::type);
+			static _arithmetic_type<13>::result_type select(_arithmetic_type<13>::type, int i = 0);
 #endif
 			static _arithmetic_type<14>::result_type select(_arithmetic_type<14>::type);
 			static _arithmetic_type<15>::result_type select(_arithmetic_type<15>::type);
 			static _arithmetic_type<16>::result_type select(_arithmetic_type<16>::type);
-#ifdef _STDEX_NATIVE_CPP11_TYPES_SUPPORT
-			static _arithmetic_type<17>::result_type select(_arithmetic_type<17>::type);
-			static _arithmetic_type<18>::result_type select(_arithmetic_type<18>::type);
-#endif
+
+			static _arithmetic_type<17>::result_type select(_arithmetic_type<17>::type, int i = 0);
+			static _arithmetic_type<18>::result_type select(_arithmetic_type<18>::type, int i = 0);
 
 			static bool cond();
 
