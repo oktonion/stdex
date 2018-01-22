@@ -1634,10 +1634,17 @@ namespace stdex
 	struct common_type;
 
 	template<class _Tp>
-	struct common_type<_Tp, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type, detail::void_type>
+	struct common_type<_Tp, _Tp> 
+	{ 
+		typedef typename decay<_Tp>::type type; 
+	};
+
+	template<class _Tp>
+	struct common_type<_Tp>
 	{
 		typedef typename decay<_Tp>::type type;
 	};
+
 
 } // namespace stdex
 
