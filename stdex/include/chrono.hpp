@@ -7,6 +7,7 @@
 
 // stdex includes
 #include "./ratio"
+#include "./type_traits"
 
 // POSIX includes
 /*none*/
@@ -35,31 +36,28 @@ namespace stdex
 	//! The @c chrono namespace provides types for specifying time intervals.
 	namespace chrono
 	{
-		template<typename _Rep, typename _Period = ratio<1> >
+		template<class _Rep, class _Period = ratio<1> >
 		struct duration;
 
 		template<typename _Clock, typename _Dur = typename _Clock::duration>
 		struct time_point;
 	}
 
-	namespace
+	namespace detail
 	{
-		template<typename _Tp>
+		template<class _Tp>
 		struct _success_type
 		{
+			char padding[8];
 			typedef _Tp type;
 		};
 
-		struct _failure_type
-		{ };
-
-		template<class _T1, class _T2 = intmax_t, class _T3 = intmax_t>
-		struct common_type
-		{
-			typedef intmax_t type;
-		};
-
+		typedef char _failure_type;
 	}
+
+	template <class Rep1, class Period1, class Rep2, class Period2>
+	struct common_type<chrono::duration<Rep1, Period1>,
+		chrono::duration<Rep2, Period2> >;
 
 	template<class _Rep1, class _Period1, class _Rep2, class _Period2>
 	struct common_type<chrono::duration<_Rep1, _Period1>,
@@ -86,6 +84,13 @@ namespace stdex
 
 	public:
 		typedef chrono::time_point<_Clock, _ct> 			type;
+	};
+
+
+	template<class _Rep1, class _Rep2>
+	struct common_type<_Rep1, _Rep2, intmax_t>
+	{
+		typedef intmax_t type;
 	};
 
 	namespace chrono
@@ -293,7 +298,7 @@ namespace stdex
 
 			typedef typename check::rep_cannot_be_a_duration_assert< (!(_is_duration<_Rep>::value != 0)) >::is_ok
 				check1; // if you are there means 1st template param _Rep is duration type
-			typedef typename check::period_must_be_a_specialization_of_ratio_assert< (_is_ratio<_Period>::value) >::is_ok
+			typedef typename check::period_must_be_a_specialization_of_ratio_assert< (_is_ratio<typename _Period::type>::value) >::is_ok
 				check2; // if you are there means 2nd template param _Period is not a specialization of ratio class
 			typedef typename check::period_must_be_positive_assert< (_Period::num > 0) >::is_ok
 				check3; // if you are there means 2nd template param _Period in duration class is ratio of negative
@@ -332,7 +337,7 @@ namespace stdex
 
 			duration operator-() const
 			{	// get negated value
-				return (duration(0 - _r));
+				return (duration<_Rep, _Period>(0 - _r));
 			}
 
 			duration& operator++()
@@ -343,7 +348,7 @@ namespace stdex
 
 			duration operator++(int)
 			{	// postincrement rep
-				return (duration(_r++));
+				return (duration<_Rep, _Period>(_r++));
 			}
 
 			duration& operator--()
@@ -354,7 +359,7 @@ namespace stdex
 
 			duration operator--(int)
 			{	// postdecrement rep
-				return (duration(_r--));
+				return (duration<_Rep, _Period>(_r--));
 			}
 
 			duration& operator+=(const duration &other)
