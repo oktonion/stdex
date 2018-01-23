@@ -330,7 +330,7 @@ namespace stdex
 			duration(const _Rep2 &r) : 
 				_r(static_cast<_Rep>(r))
 			{
-				typedef typename check::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert<(is_floating_point<_Rep>::value == bool(true)) || ((is_floating_point<_Rep>::value == bool(false)) && (is_floating_point<_Rep2>::value == bool(false)))>::
+				typedef typename check::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert<(is_floating_point<_Rep>::value == bool(true)) || (is_floating_point<_Rep2>::value == bool(false))>::
 					a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert_failed
 				check4; // if you are there means rep type is integer but floating-point type is passed as argument
 			};
@@ -341,9 +341,9 @@ namespace stdex
 			{	// construct from a duration
 				typedef ratio_divide<_Period2, _Period> _Checked_type;
 
-				typedef typename check::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert<(is_floating_point<_Rep>::value == bool(true)) || ((is_floating_point<_Rep>::value == bool(false)) && (is_floating_point<_Rep2>::value == bool(false)))>::
+				typedef typename check::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert<(is_floating_point<_Rep>::value == bool(true)) || (is_floating_point<_Rep2>::value == bool(false))>::
 					a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert_failed
-				check4; // if you are there means rep type is integer but floating-point duration type is passed as argument
+				check5; // if you are there means rep type is integer but floating-point duration type is passed as argument
 			}
 
 			//! Return the value of the duration object.
