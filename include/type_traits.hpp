@@ -25,6 +25,7 @@
 // aligned_storage - ni
 // aligned_union - ni
 // underlying_type - ni
+// common_type - only for arithmetic types (compares other types by size that is not standart)
 // All type features (like is_assignable) - ni
 
 // stdex includes
