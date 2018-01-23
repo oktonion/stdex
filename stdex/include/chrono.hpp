@@ -86,13 +86,6 @@ namespace stdex
 		typedef chrono::time_point<_Clock, _ct> 			type;
 	};
 
-
-	template<class _Rep1, class _Rep2>
-	struct common_type<_Rep1, _Rep2, intmax_t>
-	{
-		typedef intmax_t type;
-	};
-
 	namespace chrono
 	{
 		// Primary template for duration_cast impl.
