@@ -76,7 +76,7 @@ namespace clock_gettime_impl
 		}
 		QueryPerformanceCounter((LARGE_INTEGER*) &curticks); curticks -= startticks;
 		spec->tv_sec = startspec.tv_sec + (curticks / tps);
-		spec->tv_nsec = startspec.tv_nsec + (double) (curticks % tps) * ticks2nano;
+		spec->tv_nsec = startspec.tv_nsec + (long)((double) (curticks % tps) * ticks2nano);
 		if (!(spec->tv_nsec < exp9)) { spec->tv_sec++; spec->tv_nsec -= exp9; }
 		return 0;
 	}
