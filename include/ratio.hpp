@@ -207,6 +207,7 @@ namespace stdex
 
 		// [Less template]
 
+#ifdef LLONG_MAX
 		// Some double-precision utilities, where numbers are represented as
 		// _hi*2^(8*sizeof(uintmax_t)) + _lo.
 		template<uintmax_t _hi1, uintmax_t _lo1, uintmax_t _hi2, uintmax_t _lo2>
@@ -265,6 +266,8 @@ namespace stdex
 			static const uintmax_t _lo = _Res::_lo;
 		};
 	}
+
+#endif // LLONG_MAX
 
 	/**
 	*  @brief Provides compile-time rational arithmetic.
@@ -371,6 +374,7 @@ namespace stdex
 
 	namespace detail
 	{
+#ifdef LLONG_MAX
 		// Both numbers are positive.
 		template<class _R1, class _R2,
 			class _Left = _big_multiply<_R1::num, _R2::den>,
@@ -400,6 +404,25 @@ namespace stdex
 		struct _ratio_less_impl<_R1, _R2, false, true> :
 			_ratio_less_impl_1< ratio<-_R2::num, _R2::den>, ratio<-_R1::num, _R1::den> >
 		{ };
+#else // LLONG_MAX
+		template<class _R1, class _R2>
+			struct _ratio_less_impl
+		{	// tests if ratio < ratio
+			static const intmax_t _n1 = _R1::num;
+			static const intmax_t _d1 = _R1::den;
+			static const intmax_t _n2 = _R2::num;
+			static const intmax_t _d2 = _R2::den;
+
+			static const intmax_t _gn = _gcd<_n1, _n2>::value;
+			static const intmax_t _gd = _gcd<_d1, _d2>::value;
+
+			static const intmax_t _left = _safe_multiply<_n1 / _gn, _d2 / _gd>::value;
+			static const intmax_t _right = _safe_multiply<_n2 / _gn, _d1 / _gd>::value;
+
+			static const bool value = _ratio_less_impl::_left < _ratio_less_impl::_right;
+		};
+
+#endif
 	}
 
 	// ratio_less
