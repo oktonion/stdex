@@ -247,7 +247,7 @@ namespace stdex
 				template<>
 				struct rep_cannot_be_a_duration_assert<true>
 				{
-					typedef bool is_ok;
+					typedef bool rep_cannot_be_a_duration_assert_failed;
 				};
 
 				template<bool>
@@ -256,7 +256,7 @@ namespace stdex
 				template<>
 				struct period_must_be_a_specialization_of_ratio_assert<true>
 				{
-					typedef bool is_ok;
+					typedef bool period_must_be_a_specialization_of_ratio_assert_failed;
 				};
 
 				template<bool>
@@ -265,7 +265,7 @@ namespace stdex
 				template<>
 				struct period_must_be_positive_assert<true>
 				{
-					typedef bool is_ok;
+					typedef bool period_must_be_positive_assert_failed;
 				};
 
 				template<bool>
@@ -274,7 +274,16 @@ namespace stdex
 				template<>
 				struct a_clocks_minimum_duration_cannot_be_less_than_its_epoch_assert<true>
 				{
-					typedef bool is_ok;
+					typedef bool a_clocks_minimum_duration_cannot_be_less_than_its_epoch_assert_failed;
+				};
+
+				template<bool>
+				struct a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert; // if you are there means that what it says
+
+				template<>
+				struct a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert<true>
+				{
+					typedef bool a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert_failed;
 				};
 			};
 		}
@@ -289,12 +298,15 @@ namespace stdex
 
 			typedef intern::chrono_asserts check;
 
-			typedef typename check::rep_cannot_be_a_duration_assert< (!(_is_duration<_Rep>::value != 0)) >::is_ok
-				check1; // if you are there means 1st template param _Rep is duration type
-			typedef typename check::period_must_be_a_specialization_of_ratio_assert< (_is_ratio<typename _Period::type>::value) >::is_ok
-				check2; // if you are there means 2nd template param _Period is not a specialization of ratio class
-			typedef typename check::period_must_be_positive_assert< (_Period::num > 0) >::is_ok
-				check3; // if you are there means 2nd template param _Period in duration class is ratio of negative
+			typedef typename check::rep_cannot_be_a_duration_assert< (_is_duration<_Rep>::value == bool(false)) >::
+				rep_cannot_be_a_duration_assert_failed
+			check1; // if you are there means 1st template param _Rep is duration type
+			typedef typename check::period_must_be_a_specialization_of_ratio_assert< (_is_ratio<typename _Period::type>::value) >::
+				period_must_be_a_specialization_of_ratio_assert_failed
+			check2; // if you are there means 2nd template param _Period is not a specialization of ratio class
+			typedef typename check::period_must_be_positive_assert< (_Period::num > 0) >::
+				period_must_be_positive_assert_failed
+			check3; // if you are there means 2nd template param _Period in duration class is ratio of negative
 
 		public:
 			typedef _Rep rep;
@@ -307,8 +319,12 @@ namespace stdex
 			//! Construct a duration object with the given duration.
 			template <class _Rep2>
 			duration(const _Rep2 &r) : 
-				_r(r) 
-			{};
+				_r(static_cast<_Rep>(r))
+			{
+				typedef typename check::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert<(is_floating_point<_Rep>::value == bool(true)) || ((is_floating_point<_Rep>::value == bool(false)) && (is_floating_point<_Rep2>::value == bool(false)))>::
+					a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert_failed
+				check4; // if you are there means rep type is integer but floating-point type is passed as argument
+			};
 
 			template<class _Rep2, class _Period2>
 			duration(const duration<_Rep2, _Period2> &other):
@@ -768,8 +784,9 @@ namespace stdex
 
 			typedef duration_values<rep>::template_constants duration_constants;
 	
-			typedef check::a_clocks_minimum_duration_cannot_be_less_than_its_epoch_assert< (duration_constants::min < duration_constants::zero) >::is_ok
-				check1; // if you are there means that what it says
+			typedef check::a_clocks_minimum_duration_cannot_be_less_than_its_epoch_assert< (duration_constants::min < duration_constants::zero) >::
+				a_clocks_minimum_duration_cannot_be_less_than_its_epoch_assert_failed	
+			check1; // if you are there means that what it says
 		};
 
 		/**

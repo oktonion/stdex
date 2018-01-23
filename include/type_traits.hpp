@@ -1220,30 +1220,30 @@ namespace stdex
 		struct type_traits_asserts
 		{
 			template<bool>
-			struct make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type;
+			struct make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert;
 
 			template<>
-			struct make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type<true>
+			struct make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert<true>
 			{
-				typedef bool is_ok;
+				typedef bool make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed;
 			};
 
 			template<bool>
-			struct make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type;
+			struct make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert;
 
 			template<>
-			struct make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type<true>
+			struct make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert<true>
 			{
-				typedef bool is_ok;
+				typedef bool make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed;
 			};
 
 			template<bool>
-			struct not_allowed_arithmetic_type;
+			struct not_allowed_arithmetic_type_assert;
 
 			template<>
-			struct not_allowed_arithmetic_type<true>
+			struct not_allowed_arithmetic_type_assert<true>
 			{
-				typedef bool is_ok;
+				typedef bool not_allowed_arithmetic_type_assert_failed;
 			};
 		};
 	}
@@ -1339,8 +1339,9 @@ namespace stdex
 		private:
 			typedef intern::type_traits_asserts check;
 
-			typedef typename check::make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type< is_integral<_Tp>::value >::is_ok
-				check1; // if you are there means _Tp is not an integral type
+			typedef typename check::make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert< is_integral<_Tp>::value >::
+				make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed
+			check1; // if you are there means _Tp is not an integral type
 
 			typedef unsigned char _smallest;
 			static const bool _b0 = sizeof(_Tp) <= sizeof(_smallest);
@@ -1449,8 +1450,9 @@ namespace stdex
 		private:
 			typedef intern::type_traits_asserts check;
 
-			typedef typename check::make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type< is_integral<_Tp>::value >::is_ok
-				check1; // if you are there means _Tp is not an integral type
+			typedef typename check::make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert< is_integral<_Tp>::value >::
+				make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed
+			check1; // if you are there means _Tp is not an integral type
 
 			typedef typename _make_unsigned_selector<_Tp>::_type _unsigned_type;
 
@@ -1674,8 +1676,9 @@ namespace stdex
 			typedef void type;
 		private:
 			typedef intern::type_traits_asserts check;
-			typedef typename check::not_allowed_arithmetic_type< I != 0 >::is_ok
-				check1; // if you are there means 
+			typedef typename check::not_allowed_arithmetic_type_assert< I != 0 >::
+				not_allowed_arithmetic_type_assert_failed
+			check1; // if you are there means you passed to common_type not known arithmetic type
 		};
 
 		template<> struct _arithmetic_type<1>
