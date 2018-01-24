@@ -1,8 +1,8 @@
 // stdex includes
-#include "../include/chrono"
+#include "../include/chrono.hpp"
 
 // POSIX includes
-#include <time.h> // for clock_gettime
+//#include <time.h> // for clock_gettime
 #include <pthread>
 
 // std includes
