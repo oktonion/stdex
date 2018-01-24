@@ -39,7 +39,7 @@ namespace stdex
 		template<class _Rep, class _Period = ratio<1> >
 		class duration;
 
-		template<typename _Clock, typename _Dur = typename _Clock::duration>
+		template<class _Clock, class _Dur = typename _Clock::duration>
 		class time_point;
 	}
 
@@ -605,7 +605,7 @@ namespace stdex
 			typedef typename _Duration::period period;
 
 			time_point()
-				: _d(duration::zero())
+				: _d(_Duration::zero())
 			{}
 
 			// construct from a duration

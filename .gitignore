@@ -36,3 +36,4 @@
 #vscode
 .vscode
 .vscode/*
+*.~cpp
