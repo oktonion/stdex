@@ -14,6 +14,8 @@
 
 // std includes
 #include <time.h>
+#include <climits>
+#include <limits>
 
 
 #ifdef _STDEX_HAS_CPP11_SUPPORT
@@ -187,7 +189,39 @@ namespace stdex
 
 		// duration_values
 		template<class _Rep>
-		struct duration_values;
+		struct duration_values		
+		{
+			static _Rep zero()
+			{
+				return _Rep(0);
+			}
+
+			#ifdef max
+			static _Rep(max)()
+			#else
+			static _Rep max()
+			#endif
+			{
+				return (std::numeric_limits<_Rep>::max)();
+			}
+
+			#ifdef min
+			static _Rep(min)()
+			#else
+			static _Rep min()
+			#endif
+			{
+				return (std::numeric_limits<_Rep>::min)();
+			}
+
+			// since we have no constexpr use this in template params
+			struct template_constants
+			{
+				static const _Rep zero = 0;
+				static const _Rep max = std::numeric_limits<_Rep>::max;
+				static const _Rep min = -std::numeric_limits<_Rep>::min;
+			};
+		};
 
 		template<>
 		struct duration_values<intmax_t>
@@ -221,6 +255,41 @@ namespace stdex
 				static const intmax_t zero = 0;
 				static const intmax_t max = __INTMAX_MAX;
 				static const intmax_t min = -__INTMAX_MAX;
+			};
+		};
+
+		template<>
+		struct duration_values<uintmax_t>
+		{
+			static uintmax_t zero()
+			{
+				return uintmax_t(0);
+			}
+
+			#ifdef max
+			static uintmax_t(max)()
+			#else
+			static uintmax_t max()
+			#endif
+			{
+				return __INTMAX_MAX * uintmax_t(2) + uintmax_t(1);
+			}
+
+			#ifdef min
+			static uintmax_t(min)()
+			#else
+			static uintmax_t min()
+			#endif
+			{
+				return 0;
+			}
+
+			// since we have no constexpr use this in template params
+			struct template_constants
+			{
+				static const uintmax_t zero = 0;
+				static const uintmax_t max = __INTMAX_MAX * uintmax_t(2) + uintmax_t(1);
+				static const uintmax_t min = 0;
 			};
 		};
 
