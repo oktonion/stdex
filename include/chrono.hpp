@@ -219,7 +219,7 @@ namespace stdex
 			{
 				static const _Rep zero = 0;
 				static const _Rep max = std::numeric_limits<_Rep>::max;
-				static const _Rep min = -std::numeric_limits<_Rep>::min;
+				static const _Rep min = std::numeric_limits<_Rep>::min;
 			};
 		};
 
