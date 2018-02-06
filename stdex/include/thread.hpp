@@ -304,6 +304,24 @@ namespace stdex
 			init(&detail::_function_proxy<func_t, args_t>::gproxy, new detail::_function_proxy<func_t, args_t>(fp, args_t(t0)));
 		}
 
+		template<class _RetT, class _T0, class _T1, class _Arg0T, class _Arg1T>
+		thread(_RetT(*fp) (_T0, _T1), _Arg0T t0, _Arg1T t1) :
+			_not_a_thread(true)
+		{
+			typedef typename detail::_function_proxy_helper<_RetT, _Arg0T, _Arg1T>::arguments_type args_t;
+			typedef typename detail::_function_proxy_helper<_RetT, _T0, _T1>::function_type func_t;
+			init(&detail::_function_proxy<func_t, args_t>::gproxy, new detail::_function_proxy<func_t, args_t>(fp, args_t(t0, t1)));
+		}
+
+		template<class _RetT, class _T0, class _T1, class _T2, class _Arg0T, class _Arg1T, class _Arg2T>
+		thread(_RetT(*fp) (_T0, _T1, _T2), _Arg0T t0, _Arg1T t1, _Arg2T t2) :
+			_not_a_thread(true)
+		{
+			typedef typename detail::_function_proxy_helper<_RetT, _Arg0T, _Arg1T, _Arg2T>::arguments_type args_t;
+			typedef typename detail::_function_proxy_helper<_RetT, _T0, _T1, _T2>::function_type func_t;
+			init(&detail::_function_proxy<func_t, args_t>::gproxy, new detail::_function_proxy<func_t, args_t>(fp, args_t(t0, t1, t2)));
+		}
+
 		//! Destructor.
 		//! @note If the thread is joinable upon destruction, @c std::terminate()
 		//! will be called, which terminates the process. It is always wise to do
