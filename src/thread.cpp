@@ -61,8 +61,10 @@ void* thread::wrapper_function(void *aArg)
 	}
 
 	// The thread is no longer executing
+	
 	lock_guard<mutex> guard(ti->thread_object->_data_mutex);
 	ti->thread_object->_not_a_thread = true;
+	
 
 	// The thread is responsible for freeing the startup information
 	delete ti;
@@ -93,12 +95,6 @@ void thread::init(void(*aFunction)(void *), void *aArg)
 	}
 }
 
-thread::thread(void(*aFunction)(void *), void * aArg) :
-	_not_a_thread(true)
-{
-	init(aFunction, aArg);
-}
-
 thread::~thread()
 {
 	if (joinable())
@@ -107,9 +103,11 @@ thread::~thread()
 
 void thread::join()
 {
-	if (joinable())
+	if (get_id() != id())
 	{
-		pthread_join(_thread_handle, NULL);
+		int err = pthread_join(_thread_handle, NULL);
+
+		err = err;
 	}
 }
 
