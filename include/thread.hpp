@@ -33,55 +33,12 @@ namespace stdex
 {
 	namespace detail
 	{
-		template<class _RetT, class _T0 = detail::void_type, class _T1 = detail::void_type, class _T2 = detail::void_type, class _T3 = detail::void_type, class _T4 = detail::void_type, class _T5 = detail::void_type, class _T6 = detail::void_type, class _T7 = detail::void_type, class _T8 = detail::void_type, class _T9 = detail::void_type, class _T10 = detail::void_type, class _T11 = detail::void_type, class _T12 = detail::void_type, class _T13 = detail::void_type, class _T14 = detail::void_type, class _T15 = detail::void_type, class _T16 = detail::void_type, class _T17 = detail::void_type, class _T18 = detail::void_type, class _T19 = detail::void_type, class _T20 = detail::void_type, class _T21 = detail::void_type, class _T22 = detail::void_type, class _T23 = detail::void_type, class _T24 = detail::void_type>
-		struct _thread_function_helper;
+		template<class _T0 = detail::void_type, class _T1 = detail::void_type, class _T2 = detail::void_type, class _T3 = detail::void_type, class _T4 = detail::void_type, class _T5 = detail::void_type, class _T6 = detail::void_type, class _T7 = detail::void_type, class _T8 = detail::void_type, class _T9 = detail::void_type, class _T10 = detail::void_type, class _T11 = detail::void_type, class _T12 = detail::void_type, class _T13 = detail::void_type, class _T14 = detail::void_type, class _T15 = detail::void_type, class _T16 = detail::void_type, class _T17 = detail::void_type, class _T18 = detail::void_type, class _T19 = detail::void_type, class _T20 = detail::void_type, class _T21 = detail::void_type, class _T22 = detail::void_type, class _T23 = detail::void_type, class _T24 = detail::void_type>
+		struct _thread_args_helper;
 
-		template<class _RetT, class _Arg1>
-		struct _thread_function_helper<_RetT, _Arg1>
+		template<class _Arg1>
+		struct _thread_args_helper<_Arg1>
 		{
-			struct _function
-			{
-				typedef _RetT(*type) (_Arg1);
-				typedef _RetT(*impl_type)(_function *, _Arg1);
-				typedef _RetT(_function::*member_type)();
-
-				type fp;
-				member_type mfp;
-				impl_type impl;
-
-				template<class _ObjectT>
-				static _RetT object_proxy(_function *fptr, _Arg1 pthis)
-				{
-					typedef _RetT(_ObjectT::*real_member_type)();
-
-					real_member_type ptr = reinterpret_cast<real_member_type>(fptr->mfp);
-
-					return (*pthis->ptr)(arg2);
-				}
-
-				static _RetT proxy(_function *fptr, _Arg1 arg1)
-				{
-					return (*fptr->fp)(arg1);
-				}
-
-				_function(type fp_):
-					fp(fp_),
-					impl(&proxy)
-				{ }
-
-				template<class _ObjectT>
-				_function(_RetT(_ObjectT::* fp_)()) :
-					mfp(reinterpret_cast<member_type>(fp_)),
-					impl((impl_type) (&object_proxy<_ObjectT>))
-				{ }
-
-				_RetT operator()(_Arg1 arg1)
-				{
-					return (*impl)(this, arg1);
-				}
-			};
-
-			typedef _function function_type;
 			struct _arguments
 			{
 				_Arg1 arg1;
@@ -100,55 +57,9 @@ namespace stdex
 			typedef _arguments arguments_type;
 		};
 
-		template<class _RetT, class _Arg1, class _Arg2>
-		struct _thread_function_helper<_RetT, _Arg1, _Arg2>
+		template<class _Arg1, class _Arg2>
+		struct _thread_args_helper<_Arg1, _Arg2>
 		{
-
-			struct _function
-			{
-				typedef _RetT(*type) (_Arg1, _Arg2);
-				typedef _RetT(*impl_type)(_function *, _Arg1, _Arg2);
-				typedef _RetT(_function::*member_type)(_Arg2);
-
-				type fp;
-				member_type mfp;
-				impl_type impl;
-
-				template<class _ObjectT>
-				static _RetT object_proxy(_function *fptr, _Arg1 pthis, _Arg2 arg2)
-				{
-					typedef _RetT(_ObjectT::*real_member_type)(_Arg2);
-
-					real_member_type ptr = reinterpret_cast<real_member_type>(fptr->mfp);
-
-					return (pthis->*ptr)(arg2);
-				}
-
-				static _RetT proxy(_function *fptr, _Arg1 arg1, _Arg2 arg2)
-				{
-					return fptr->fp(arg1, arg2);
-				}
-
-				_function(type fp_):
-					fp(fp_),
-					impl(&proxy)
-				{ }
-
-				template<class _ObjectT>
-				_function(_RetT(_ObjectT::* fp_)(_Arg2)) :
-					mfp(reinterpret_cast<member_type>(fp_)),
-					impl((impl_type)(&object_proxy<_ObjectT>))
-				{ }
-
-				_RetT operator()(_Arg1 arg1, _Arg2 arg2)
-				{
-					return (*impl)(this, arg1, arg2);
-				}
-			};
-
-			typedef _function function_type;
-
-
 			struct _arguments
 			{
 				_Arg1 arg1;
@@ -168,60 +79,14 @@ namespace stdex
 			typedef _arguments arguments_type;
 		};
 
-		template<class _RetT, class _Arg1, class _Arg2, class _Arg3>
-		struct _thread_function_helper<_RetT, _Arg1, _Arg2, _Arg3>
+		template<class _Arg1, class _Arg2, class _Arg3>
+		struct _thread_args_helper<_Arg1, _Arg2, _Arg3>
 		{
-
-			struct _function
-			{
-				typedef _RetT(*type) (_Arg1, _Arg2, _Arg3);
-				typedef _RetT(*impl_type)(_function *, _Arg1, _Arg2, _Arg3);
-				typedef _RetT(_function::*member_type)(_Arg2, _Arg3);
-
-				type fp;
-				member_type mfp;
-				impl_type impl;
-
-				template<class _ObjectT>
-				static _RetT object_proxy(_function *fptr, _Arg1 pthis, _Arg2 arg2, _Arg3 arg3)
-				{
-					typedef _RetT(_ObjectT::*real_member_type)(_Arg2, _Arg3);
-
-					real_member_type ptr = reinterpret_cast<real_member_type>(fptr->mfp);
-
-					return (pthis->*ptr)(arg2, arg3);
-				}
-
-				static _RetT proxy(_function *fptr, _Arg1 arg1, _Arg2 arg2, _Arg3 arg3)
-				{
-					return fptr->fp(arg1, arg2, arg3);
-				}
-
-				_function(type fp_) :
-					fp(fp_),
-					impl(&proxy)
-				{ }
-
-				template<class _ObjectT>
-				_function(_RetT(_ObjectT::* fp_)(_Arg2, _Arg3)) :
-					mfp(reinterpret_cast<member_type>(fp_)),
-					impl((impl_type) (&object_proxy<_ObjectT>))
-				{ }
-
-				_RetT operator()(_Arg1 arg1, _Arg2 arg2, _Arg2 arg3)
-				{
-					return (*impl)(this, arg1, arg2, arg3);
-				}
-			};
-
-			typedef _function function_type;
-
-
 			struct _arguments
 			{
 				_Arg1 arg1;
 				_Arg2 arg2;
-				_Arg2 arg3;
+				_Arg3 arg3;
 
 				_arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_) :
 					arg1(arg1_), arg2(arg2_), arg3(arg3_)
@@ -237,15 +102,57 @@ namespace stdex
 			typedef _arguments arguments_type;
 		};
 
-		template<class _RetT, class _T0 = detail::void_type, class _T1 = detail::void_type, class _T2 = detail::void_type, class _T3 = detail::void_type, class _T4 = detail::void_type, class _T5 = detail::void_type, class _T6 = detail::void_type, class _T7 = detail::void_type, class _T8 = detail::void_type, class _T9 = detail::void_type, class _T10 = detail::void_type, class _T11 = detail::void_type, class _T12 = detail::void_type, class _T13 = detail::void_type, class _T14 = detail::void_type, class _T15 = detail::void_type, class _T16 = detail::void_type, class _T17 = detail::void_type, class _T18 = detail::void_type, class _T19 = detail::void_type, class _T20 = detail::void_type, class _T21 = detail::void_type, class _T22 = detail::void_type, class _T23 = detail::void_type, class _T24 = detail::void_type>
-		struct _function_proxy_helper
+		template<class _Arg1, class _Arg2, class _Arg3, class _Arg4>
+		struct _thread_args_helper<_Arg1, _Arg2, _Arg3, _Arg4>
 		{
-			typedef typename _thread_function_helper<_RetT, _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23, _T24>::arguments_type arguments_type;
-			typedef typename _thread_function_helper<_RetT, _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23, _T24>::function_type function_type;
+			struct _arguments
+			{
+				_Arg1 arg1;
+				_Arg2 arg2;
+				_Arg3 arg3;
+				_Arg4 arg4;
+
+				_arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg4 arg4_) :
+					arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_)
+				{ }
+
+				template<class _FuncT>
+				void push(_FuncT fp)
+				{
+					fp(arg1, arg2, arg3, arg4);
+				}
+			};
+
+			typedef _arguments arguments_type;
+		};
+
+		template<class _Arg1, class _Arg2, class _Arg3, class _Arg4, class _Arg5>
+		struct _thread_args_helper<_Arg1, _Arg2, _Arg3, _Arg4, _Arg5>
+		{
+			struct _arguments
+			{
+				_Arg1 arg1;
+				_Arg2 arg2;
+				_Arg3 arg3;
+				_Arg4 arg4;
+				_Arg5 arg5;
+
+				_arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg3 arg4_, _Arg5 arg5_) :
+					arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_), arg5(arg5_)
+				{ }
+
+				template<class _FuncT>
+				void push(_FuncT fp)
+				{
+					fp(arg1, arg2, arg3, arg4, arg5);
+				}
+			};
+
+			typedef _arguments arguments_type;
 		};
 
 		template<class _FuncT, class _ArgT>
-		struct _function_proxy
+		struct _thread_function_proxy
 		{
 			typedef _ArgT arguments_type;
 			typedef _FuncT function_type;
@@ -253,12 +160,12 @@ namespace stdex
 			arguments_type args;
 			function_type fp;
 
-			_function_proxy(function_type fp_, arguments_type args_) :
+			_thread_function_proxy(function_type fp_, arguments_type args_) :
 				fp(fp_),
 				args(args_)
 			{ }
 
-			~_function_proxy()
+			~_thread_function_proxy()
 			{ }
 
 			void call()
@@ -268,7 +175,7 @@ namespace stdex
 
 			static void gproxy(void *data)
 			{
-				_function_proxy *pf = reinterpret_cast<_function_proxy*>(data);
+				_thread_function_proxy *pf = reinterpret_cast<_thread_function_proxy*>(data);
 
 				pf->call();
 
@@ -295,31 +202,31 @@ namespace stdex
 		{
 		}
 
-		template<class _RetT, class _T0, class _Arg0T>
-		thread(_RetT(*fp) (_T0), _Arg0T t0) :
+		template<class _FuncT, class _Arg0T>
+		thread(_FuncT fx, _Arg0T t0) :
 			_not_a_thread(true)
 		{
-			typedef typename detail::_function_proxy_helper<_RetT, _Arg0T>::arguments_type args_t;
-			typedef typename detail::_function_proxy_helper<_RetT, _T0>::function_type func_t;
-			init(&detail::_function_proxy<func_t, args_t>::gproxy, new detail::_function_proxy<func_t, args_t>(fp, args_t(t0)));
+			typedef typename detail::_thread_args_helper<_Arg0T>::arguments_type args_t;
+			typedef _FuncT func_t;
+			init(&detail::_thread_function_proxy<func_t, args_t>::gproxy, new detail::_thread_function_proxy<func_t, args_t>(fx, args_t(t0)));
 		}
 
-		template<class _RetT, class _T0, class _T1, class _Arg0T, class _Arg1T>
-		thread(_RetT(*fp) (_T0, _T1), _Arg0T t0, _Arg1T t1) :
+		template<class _FuncT, class _Arg0T, class _Arg1T>
+		thread(_FuncT fx, _Arg0T t0, _Arg1T t1) :
 			_not_a_thread(true)
 		{
-			typedef typename detail::_function_proxy_helper<_RetT, _Arg0T, _Arg1T>::arguments_type args_t;
-			typedef typename detail::_function_proxy_helper<_RetT, _T0, _T1>::function_type func_t;
-			init(&detail::_function_proxy<func_t, args_t>::gproxy, new detail::_function_proxy<func_t, args_t>(fp, args_t(t0, t1)));
+			typedef typename detail::_thread_args_helper<_Arg0T, _Arg1T>::arguments_type args_t;
+			typedef _FuncT func_t;
+			init(&detail::_thread_function_proxy<func_t, args_t>::gproxy, new detail::_thread_function_proxy<func_t, args_t>(fx, args_t(t0, t1)));
 		}
 
-		template<class _RetT, class _T0, class _T1, class _T2, class _Arg0T, class _Arg1T, class _Arg2T>
-		thread(_RetT(*fp) (_T0, _T1, _T2), _Arg0T t0, _Arg1T t1, _Arg2T t2) :
+		template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T>
+		thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2) :
 			_not_a_thread(true)
 		{
-			typedef typename detail::_function_proxy_helper<_RetT, _Arg0T, _Arg1T, _Arg2T>::arguments_type args_t;
-			typedef typename detail::_function_proxy_helper<_RetT, _T0, _T1, _T2>::function_type func_t;
-			init(&detail::_function_proxy<func_t, args_t>::gproxy, new detail::_function_proxy<func_t, args_t>(fp, args_t(t0, t1, t2)));
+			typedef typename detail::_thread_args_helper<_Arg0T, _Arg1T, _Arg2T>::arguments_type args_t;
+			typedef _FuncT func_t;
+			init(&detail::_thread_function_proxy<func_t, args_t>::gproxy, new detail::_thread_function_proxy<func_t, args_t>(fx, args_t(t0, t1, t2)));
 		}
 
 		//! Destructor.
