@@ -12,6 +12,7 @@
 /*none*/
 
 // std includes
+#include <errno.h>
 #include <cerrno>
 #include <cstdlib>		// for std::strerror
 #include <stdexcept>	// for std::runtime_error
