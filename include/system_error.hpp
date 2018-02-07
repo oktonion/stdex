@@ -15,6 +15,8 @@
 #include <cerrno>
 #include <cstdlib>		// for std::strerror
 #include <stdexcept>	// for std::runtime_error
+#include <string>
+#include <functional>
 
 #ifdef _STDEX_HAS_CPP11_SUPPORT
 
@@ -355,17 +357,17 @@ namespace stdex
 
 		virtual bool equivalent(const error_code& code, int i) const NOEXCEPT_FUNCTION;
 
-		bool operator<(const error_category &other) const NOEXCEPT_FUNCTION
+		inline bool operator<(const error_category &other) const NOEXCEPT_FUNCTION
 		{
 			return std::less<const error_category*>()(this, &other);
 		}
 
-		bool operator==(const error_category &other) const NOEXCEPT_FUNCTION
+		inline bool operator==(const error_category &other) const NOEXCEPT_FUNCTION
 		{
 			return this == &other;
 		}
 
-		bool operator!=(const error_category &other) const NOEXCEPT_FUNCTION
+		inline bool operator!=(const error_category &other) const NOEXCEPT_FUNCTION
 		{
 			return this != &other;
 		}
