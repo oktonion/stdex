@@ -36,6 +36,24 @@ namespace stdex
 		template<class _T0 = detail::void_type, class _T1 = detail::void_type, class _T2 = detail::void_type, class _T3 = detail::void_type, class _T4 = detail::void_type, class _T5 = detail::void_type, class _T6 = detail::void_type, class _T7 = detail::void_type, class _T8 = detail::void_type, class _T9 = detail::void_type, class _T10 = detail::void_type, class _T11 = detail::void_type, class _T12 = detail::void_type, class _T13 = detail::void_type, class _T14 = detail::void_type, class _T15 = detail::void_type, class _T16 = detail::void_type, class _T17 = detail::void_type, class _T18 = detail::void_type, class _T19 = detail::void_type, class _T20 = detail::void_type, class _T21 = detail::void_type, class _T22 = detail::void_type, class _T23 = detail::void_type, class _T24 = detail::void_type>
 		struct _thread_args_helper;
 
+		template<>
+		struct _thread_args_helper<>
+		{
+			struct _arguments
+			{
+				_arguments()
+				{ }
+
+				template<class _FuncT>
+				void push(_FuncT fp)
+				{
+					return fp();
+				}
+			};
+
+			typedef _arguments arguments_type;
+		};
+
 		template<class _Arg1>
 		struct _thread_args_helper<_Arg1>
 		{
@@ -202,8 +220,17 @@ namespace stdex
 		{
 		}
 
+		template<class _FuncT>
+		explicit thread(_FuncT fx) :
+			_not_a_thread(true)
+		{
+			typedef typename detail::_thread_args_helper<>::arguments_type args_t;
+			typedef _FuncT func_t;
+			init(&detail::_thread_function_proxy<func_t, args_t>::gproxy, new detail::_thread_function_proxy<func_t, args_t>(fx, args_t()));
+		}
+
 		template<class _FuncT, class _Arg0T>
-		thread(_FuncT fx, _Arg0T t0) :
+		explicit thread(_FuncT fx, _Arg0T t0) :
 			_not_a_thread(true)
 		{
 			typedef typename detail::_thread_args_helper<_Arg0T>::arguments_type args_t;
@@ -212,7 +239,7 @@ namespace stdex
 		}
 
 		template<class _FuncT, class _Arg0T, class _Arg1T>
-		thread(_FuncT fx, _Arg0T t0, _Arg1T t1) :
+		explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1) :
 			_not_a_thread(true)
 		{
 			typedef typename detail::_thread_args_helper<_Arg0T, _Arg1T>::arguments_type args_t;
@@ -221,12 +248,30 @@ namespace stdex
 		}
 
 		template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T>
-		thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2) :
+		explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2) :
 			_not_a_thread(true)
 		{
 			typedef typename detail::_thread_args_helper<_Arg0T, _Arg1T, _Arg2T>::arguments_type args_t;
 			typedef _FuncT func_t;
 			init(&detail::_thread_function_proxy<func_t, args_t>::gproxy, new detail::_thread_function_proxy<func_t, args_t>(fx, args_t(t0, t1, t2)));
+		}
+
+		template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T, class _Arg3T>
+		explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2, _Arg3T t3) :
+			_not_a_thread(true)
+		{
+			typedef typename detail::_thread_args_helper<_Arg0T, _Arg1T, _Arg2T, _Arg3T>::arguments_type args_t;
+			typedef _FuncT func_t;
+			init(&detail::_thread_function_proxy<func_t, args_t>::gproxy, new detail::_thread_function_proxy<func_t, args_t>(fx, args_t(t0, t1, t2, t3)));
+		}
+
+		template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T, class _Arg3T, class _Arg4T>
+		explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2, _Arg3T t3, _Arg4T t4) :
+			_not_a_thread(true)
+		{
+			typedef typename detail::_thread_args_helper<_Arg0T, _Arg1T, _Arg2T, _Arg3T, _Arg4T>::arguments_type args_t;
+			typedef _FuncT func_t;
+			init(&detail::_thread_function_proxy<func_t, args_t>::gproxy, new detail::_thread_function_proxy<func_t, args_t>(fx, args_t(t0, t1, t2, t3, t4)));
 		}
 
 		//! Destructor.
@@ -268,7 +313,7 @@ namespace stdex
 		//! use for a task.
 		//! @return The number of hardware thread contexts in the system.
 		//! @note If this value is not defined, the function returns zero (0).
-		static unsigned hardware_concurrency();
+		static unsigned hardware_concurrency() NOEXCEPT_FUNCTION;
 
 		void swap(thread &other) NOEXCEPT_FUNCTION;
 
