@@ -15,6 +15,17 @@
 // std includes
 #include <memory>
 
+#ifdef _STDEX_NATIVE_CPP11_SUPPORT
+
+#define DELETED_FUNCTION =delete
+#define NOEXCEPT_FUNCTION throw() 
+
+#else
+
+#define DELETED_FUNCTION 
+#define NOEXCEPT_FUNCTION
+
+#endif
 
 namespace stdex
 {
@@ -177,5 +188,8 @@ namespace stdex
 		condition_variable& operator=(const condition_variable&) DELETED_FUNCTION;
 	};
 } // namespace stdex
+
+#undef DELETED_FUNCTION
+#undef NOEXCEPT_FUNCTION
 
 #endif // _STDEX_CONDITION_VARIABLE_H

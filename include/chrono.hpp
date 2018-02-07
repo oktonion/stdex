@@ -936,4 +936,7 @@ namespace stdex
 
 } // namespace stdex
 
+#undef DELETED_FUNCTION
+#undef NOEXCEPT_FUNCTION
+
 #endif // _STDEX_CHRONO_H

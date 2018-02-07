@@ -604,113 +604,120 @@ namespace stdex
 		return (error_condition((int) _Errno, iostream_category()));
 	}
 
-	// CLASS _Generic_error_category
-	class _Generic_error_category
-		: public error_category
-	{	// categorize a generic error
-	public:
-		_Generic_error_category()
-		{	// default constructor
-		}
+	namespace detail
+	{
 
-		virtual const char *name() const NOEXCEPT_FUNCTION
-		{	// get name of category
-			return ("generic");
-		}
+		// CLASS _generic_error_category
+		class _generic_error_category
+			: public error_category
+		{	// categorize a generic error
+		public:
+			_generic_error_category()
+			{	// default constructor
+			}
 
-		virtual std::string message(int _Errcode) const
-		{	// convert to name of error
-			const char *_Name = std::strerror(_Errcode);
-			return (std::string(_Name != 0 ? _Name : "unknown error"));
-		}
-	};
+			virtual const char *name() const NOEXCEPT_FUNCTION
+			{	// get name of category
+				return ("generic");
+			}
 
-	// CLASS _Iostream_error_category
-	class _Iostream_error_category
-		: public _Generic_error_category
-	{	// categorize a Posix error
-	public:
-		_Iostream_error_category()
-		{	// default constructor
-		}
+			virtual std::string message(int _Errcode) const
+			{	// convert to name of error
+				const char *_Name = std::strerror(_Errcode);
+				return (std::string(_Name != 0 ? _Name : "unknown error"));
+			}
+		};
 
-		virtual const char *name() const NOEXCEPT_FUNCTION
-		{	// get name of category
-			return ("iostream");
-		}
+		// CLASS _io_stream_error_category
+		class _io_stream_error_category
+			: public _generic_error_category
+		{	// categorize a Posix error
+		public:
+			_io_stream_error_category()
+			{	// default constructor
+			}
 
-		virtual std::string message(int _Errcode) const
-		{	// convert to name of error
-			if (_Errcode == (int) stream)
-				return ("iostream stream error");
-			else
-				return (_Generic_error_category::message(_Errcode));
-		}
-	};
+			virtual const char *name() const NOEXCEPT_FUNCTION
+			{	// get name of category
+				return ("iostream");
+			}
 
-	// CLASS _System_error_category
-	class _System_error_category
-		: public _Generic_error_category
-	{	// categorize a generic error
-	public:
-		_System_error_category()
-		{	// default constructor
-		}
+			virtual std::string message(int _Errcode) const
+			{	// convert to name of error
+				if (_Errcode == (int) stream)
+					return ("iostream stream error");
+				else
+					return (_generic_error_category::message(_Errcode));
+			}
+		};
 
-		virtual const char *name() const NOEXCEPT_FUNCTION
-		{	// get name of category
-			return ("system");
-		}
+		// CLASS _system_error_category
+		class _system_error_category
+			: public _generic_error_category
+		{	// categorize a generic error
+		public:
+			_system_error_category()
+			{	// default constructor
+			}
 
-		virtual std::string message(int _Errcode) const
-		{	// convert to name of error
-			const char *_Name = std::strerror(_Errcode);
-			return (std::string(_Name != 0 ? _Name : "unknown error"));
-		}
+			virtual const char *name() const NOEXCEPT_FUNCTION
+			{	// get name of category
+				return ("system");
+			}
 
-		virtual error_condition
-			default_error_condition(int _Errval) const NOEXCEPT_FUNCTION
-		{	// make error_condition for error code (generic if possible)
-			if (std::strerror(_Errval))
-				return (error_condition(_Errval, generic_category()));
-			else
-				return (error_condition(_Errval, system_category()));
-		}
-	};
+			virtual std::string message(int _Errcode) const
+			{	// convert to name of error
+				const char *_Name = std::strerror(_Errcode);
+				return (std::string(_Name != 0 ? _Name : "unknown error"));
+			}
 
-	template<class _Cat>
-	struct _Error_objects
-	{	// wraps category objects
-		_Error_objects()
-		{	// default constructor
-		}
+			virtual error_condition
+				default_error_condition(int _Errval) const NOEXCEPT_FUNCTION
+			{	// make error_condition for error code (generic if possible)
+				if (std::strerror(_Errval))
+					return (error_condition(_Errval, generic_category()));
+				else
+					return (error_condition(_Errval, system_category()));
+			}
+		};
 
-		static _Generic_error_category _Generic_object;
-		static _Iostream_error_category _Iostream_object;
-		static _System_error_category _System_object;
-	};
+		template<class _Cat>
+		struct _error_objects
+		{	// wraps category objects
+			_error_objects()
+			{	// default constructor
+			}
 
-	template<class _Cat>
-	_Generic_error_category _Error_objects<_Cat>::_Generic_object;
-	template<class _Cat>
-	_Iostream_error_category _Error_objects<_Cat>::_Iostream_object;
-	template<class _Cat>
-	_System_error_category _Error_objects<_Cat>::_System_object;
+			static _generic_error_category _generic_object;
+			static _io_stream_error_category _io_stream_object;
+			static _system_error_category _system_object;
+		};
+
+		template<class _Cat>
+		_generic_error_category _error_objects<_Cat>::_generic_object;
+		template<class _Cat>
+		_io_stream_error_category _error_objects<_Cat>::_io_stream_object;
+		template<class _Cat>
+		_system_error_category _error_objects<_Cat>::_system_object;
+	}
 
 	inline const error_category& generic_category() NOEXCEPT_FUNCTION
 	{	// get generic_category
-		return (_Error_objects<int>::_Generic_object);
+		return (detail::_error_objects<int>::_generic_object);
 	}
 
 	inline const error_category& iostream_category() NOEXCEPT_FUNCTION
 	{	// get iostream_category
-		return (_Error_objects<int>::_Iostream_object);
+		return (detail::_error_objects<int>::_io_stream_object);
 	}
 
 	inline const error_category& system_category() NOEXCEPT_FUNCTION
 	{	// get system_category
-		return (_Error_objects<int>::_System_object);
+		return (detail::_error_objects<int>::_system_object);
 	}
 } // namespace stdex
+
+#undef DELETED_FUNCTION
+#undef NOEXCEPT_FUNCTION
 
 #endif // _STDEX_SYSTEM_ERROR_H
