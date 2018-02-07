@@ -606,8 +606,6 @@ namespace stdex
 
 	namespace detail
 	{
-
-		// CLASS _generic_error_category
 		class _generic_error_category
 			: public error_category
 		{	// categorize a generic error
@@ -628,7 +626,6 @@ namespace stdex
 			}
 		};
 
-		// CLASS _io_stream_error_category
 		class _io_stream_error_category
 			: public _generic_error_category
 		{	// categorize a Posix error
@@ -651,7 +648,6 @@ namespace stdex
 			}
 		};
 
-		// CLASS _system_error_category
 		class _system_error_category
 			: public _generic_error_category
 		{	// categorize a generic error
