@@ -7,6 +7,26 @@
 // std includes
 #include <map>
 
+// since windows is a 'special' platform there is some macro definitions to define platform
+#if defined(WIN32) || defined(_WIN32)
+#define _STDEX_THREAD_WIN
+#endif
+
+#ifdef _STDEX_THREAD_WIN
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#define __UNDEF_LEAN_AND_MEAN
+#endif
+#include <windows.h>
+#ifdef __UNDEF_LEAN_AND_MEAN
+#undef WIN32_LEAN_AND_MEAN
+#undef __UNDEF_LEAN_AND_MEAN
+#endif
+
+#include <winnt.h>
+
+#endif
+
 using namespace stdex;
 
 
@@ -143,7 +163,7 @@ thread::id thread::get_id() const
 
 unsigned thread::hardware_concurrency()
 {
-#if defined(_TTHREAD_WIN32_)
+#if defined(_STDEX_THREAD_WIN)
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
 	return (int) si.dwNumberOfProcessors;
@@ -186,22 +206,7 @@ thread::id this_thread::get_id()
 	return _pthread_t_to_ID(pthread_self());
 }
 
-#ifdef __PTW32_H // using windows implementation of POSIX threads
-
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#define __UNDEF_LEAN_AND_MEAN
-#endif
-#include <windows.h>
-#ifdef __UNDEF_LEAN_AND_MEAN
-#undef WIN32_LEAN_AND_MEAN
-#undef __UNDEF_LEAN_AND_MEAN
-#endif
-
-#include <string>
-#include <sstream>
-
-#include <winnt.h>
+#ifdef _STDEX_THREAD_WIN // windows platform
 
 #ifndef NT_ERROR
 #define NT_ERROR(Status) ((((ULONG)(Status)) >> 30) == 3)
@@ -236,15 +241,7 @@ extern "C"
 			_Out_ PULONG              CurrentResolution);
 
 }
-#pragma comment (lib, "ntdll.lib")
-
-template < class T >
-std::string to_string(const T &n)
-{
-	std::ostringstream stm;
-	stm << n;
-	return stm.str();
-}
+//#pragma comment (lib, "ntdll.lib") // uncomment to add lib explicitly
 
 ULONG AdjustSystemTimerResolutionTo500mcs()
 {
@@ -257,7 +254,7 @@ ULONG AdjustSystemTimerResolutionTo500mcs()
 	NTSTATUS ntRes = NtQueryTimerResolution(&maxRes, &minRes, &sysTimerOrigResolution);
 	if (NT_ERROR(ntRes))
 	{
-		throw std::runtime_error("Failed query system timer resolution: " + ::to_string(ntRes));
+		throw std::runtime_error("Failed query system timer resolution");
 	}
 
 	resolution = minRes < resolution ? minRes : resolution;
@@ -266,14 +263,9 @@ ULONG AdjustSystemTimerResolutionTo500mcs()
 	ntRes = NtSetTimerResolution(resolution, TRUE, &curRes);
 	if (NT_ERROR(ntRes))
 	{
-		throw std::runtime_error("Failed set system timer resolution: " + ::to_string(ntRes));
+		// throw std::runtime_error("Failed set system timer resolution" ); // does not matter actually
 	}
-	else if (curRes != resolution)
-	{
-		// здесь по идее надо проверять не равенство curRes и resolution, а их отношение. Т.е. возможны случаи, например,
-		// что запрашиваем 5000, а выставляется в 5008
-		//throw std::runtime_error("Failed set system timer resolution: req=" + ::to_string(resolution) + ", set=" + ::to_string(curRes));
-	}
+
 	return sysTimerOrigResolution;
 }
 
@@ -283,7 +275,7 @@ void AdjustSystemTimerResolutionTo(const ULONG &sysTimerOrigResolution)
 	NTSTATUS ntRes = NtSetTimerResolution(sysTimerOrigResolution, TRUE, &curRes);
 	if (NT_ERROR(ntRes))
 	{
-		throw std::runtime_error("Failed set system timer resolution: " + ::to_string(ntRes));
+		throw std::runtime_error("Failed set system timer resolution");
 	}
 }
 
@@ -296,7 +288,7 @@ public:
 	{
 		m_timer = ::CreateWaitableTimer(NULL, FALSE, NULL);
 		if (!m_timer)
-			throw std::runtime_error("Failed to create waitable time (CreateWaitableTimer), error:" + ::to_string(::GetLastError()));
+			throw std::runtime_error("Failed to create waitable time (CreateWaitableTimer)");
 	}
 
 	~WaitableTimer()
@@ -318,7 +310,7 @@ public:
 		if (!res)
 		{
 			AdjustSystemTimerResolutionTo(sysTimerOrigResolution);
-			throw std::runtime_error("SetAndWait: failed set waitable time (SetWaitableTimer), error:" + ::to_string(::GetLastError()));
+			throw std::runtime_error("SetAndWait: failed set waitable time (SetWaitableTimer)");
 		}
 
 		::WaitForSingleObjectEx(m_timer, FALSE, INFINITE);
