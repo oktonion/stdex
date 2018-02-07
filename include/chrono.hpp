@@ -18,7 +18,7 @@
 #include <limits>
 
 
-#ifdef _STDEX_HAS_CPP11_SUPPORT
+#ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
 #define DELETED_FUNCTION =delete
 #define NOEXCEPT_FUNCTION throw() 
