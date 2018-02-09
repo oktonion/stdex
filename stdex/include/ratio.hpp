@@ -85,56 +85,56 @@ namespace stdex
 			template<bool> 
 			struct overflow_in_multiplication_assert; // if you are there means overflow in safe template multiplication occured
 
-			template<> 
-			struct overflow_in_multiplication_assert<true> 
-			{
-				typedef bool is_ok;
-			};
-
 			template<bool>
 			struct internal_library_error_assert; // if you are there means internal library error occured
-
-			template<>
-			struct internal_library_error_assert<true>
-			{
-				typedef bool is_ok;
-			};
 
 			template<bool>
 			struct denominator_cant_be_zero_assert; // if you are there means you put the denominator to zero
 
-			template<>
-			struct denominator_cant_be_zero_assert<true>
-			{
-				typedef bool is_ok;
-			};
-
 			template<bool>
 			struct out_of_range; // if you are there means that value is out of range
-
-			template<>
-			struct out_of_range<true>
-			{
-				typedef bool is_ok;
-			};
 
 			template<bool>
 			struct division_by_zero; // if you are there means that divider is zero
 
-			template<>
-			struct division_by_zero<true>
-			{
-				typedef bool is_ok;
-			};
-
 			template<bool>
 			struct overflow_in_addition_assert; // if you are there means overflow in safe template addition occured
+		};
 
-			template<>
-			struct overflow_in_addition_assert<true>
-			{
-				typedef bool is_ok;
-			};
+		template<>
+		struct ratio_asserts::overflow_in_multiplication_assert<true>
+		{
+			typedef bool overflow_in_multiplication_assert_failed;
+		};
+
+		template<>
+		struct ratio_asserts::internal_library_error_assert<true>
+		{
+			typedef bool internal_library_error_assert_failed;
+		};
+
+		template<>
+		struct ratio_asserts::denominator_cant_be_zero_assert<true>
+		{
+			typedef bool denominator_cant_be_zero_assert_failed;
+		};
+
+		template<>
+		struct ratio_asserts::out_of_range<true>
+		{
+			typedef bool out_of_range_failed;
+		};
+
+		template<>
+		struct ratio_asserts::division_by_zero<true>
+		{
+			typedef bool division_by_zero_failed;
+		};
+
+		template<>
+		struct ratio_asserts::overflow_in_addition_assert<true>
+		{
+			typedef bool overflow_in_addition_assert_failed;
 		};
 	}
 
@@ -167,8 +167,9 @@ namespace stdex
 		private:
 			typedef intern::ratio_asserts check;
 
-			typedef typename check::overflow_in_addition_assert<_add_overflow_check<_Pn, _Qn>::value != 0>::is_ok
-				check1; // if you are there means overflow in safe template addition occured
+			typedef typename check::overflow_in_addition_assert<_add_overflow_check<_Pn, _Qn>::value != 0>::
+				overflow_in_addition_assert_failed
+			check1; // if you are there means overflow in safe template addition occured
 		};
 
 		template<uintmax_t _CharBitNum>
@@ -178,8 +179,9 @@ namespace stdex
 
 		private:
 			typedef intern::ratio_asserts check;
-			typedef typename check::internal_library_error_assert< (_CharBitNum % 2) == 0 >::is_ok
-				check1; // if you are there means internal library error occured (number of bits in char is not even on your platform)
+			typedef typename check::internal_library_error_assert< (_CharBitNum % 2) == 0 >::
+				internal_library_error_assert_failed
+			check1; // if you are there means internal library error occured (number of bits in char is not even on your platform)
 		};
 
 		// [Safe multiply template]
@@ -203,14 +205,18 @@ namespace stdex
 
 			typedef intern::ratio_asserts check;
 
-			typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_a1 == 0 || _safe_multiply::_b1 == 0) >::is_ok
-				check1; // if you are there means overflow in safe template multiplication occured
-			typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1 < (_safe_multiply::_c / uintmax_t(2))) >::is_ok
-				check2; // if you are there means overflow in safe template multiplication occured
-			typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_b0 * _safe_multiply::_a0 <= __INTMAX_MAX) >::is_ok
-				check3; // if you are there means overflow in safe template multiplication occured
-			typedef typename check::overflow_in_multiplication_assert< ((_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1) * _safe_multiply::_c <= __INTMAX_MAX - _safe_multiply::_b0 * _safe_multiply::_a0) >::is_ok
-				check4; // if you are there means overflow in safe template multiplication occured
+			typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_a1 == 0 || _safe_multiply::_b1 == 0) >::
+				overflow_in_multiplication_assert_failed
+			check1; // if you are there means overflow in safe template multiplication occured
+			typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1 < (_safe_multiply::_c / uintmax_t(2))) >::
+				overflow_in_multiplication_assert_failed
+			check2; // if you are there means overflow in safe template multiplication occured
+			typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_b0 * _safe_multiply::_a0 <= __INTMAX_MAX) >::
+				overflow_in_multiplication_assert_failed
+			check3; // if you are there means overflow in safe template multiplication occured
+			typedef typename check::overflow_in_multiplication_assert< ((_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1) * _safe_multiply::_c <= __INTMAX_MAX - _safe_multiply::_b0 * _safe_multiply::_a0) >::
+				overflow_in_multiplication_assert_failed
+			check4; // if you are there means overflow in safe template multiplication occured
 
 		public:
 			static const intmax_t value = _Pn * _Qn;
@@ -246,8 +252,9 @@ namespace stdex
 
 		private:
 			typedef intern::ratio_asserts check;
-			typedef typename check::internal_library_error_assert< (!(_big_less<_hi1, _lo1, _hi2, _lo2>::value != 0)) >::is_ok
-				check1; // if you are there means internal library error occured
+			typedef typename check::internal_library_error_assert< (!(_big_less<_hi1, _lo1, _hi2, _lo2>::value != 0)) >::
+				internal_library_error_assert_failed
+			check1; // if you are there means internal library error occured
 		};
 
 		// [Safe multiply for bigger numbers template]
@@ -306,10 +313,12 @@ namespace stdex
 	private:
 		typedef intern::ratio_asserts check;
 
-		typedef typename check::denominator_cant_be_zero_assert< (_Den != 0) >::is_ok 
-			check1; // if you are there means you put the denominator to zero
-		typedef typename check::out_of_range< (_Num >= -__INTMAX_MAX && _Den >= -__INTMAX_MAX) >::is_ok 
-			check2; // if you are there means that value is out of range
+		typedef typename check::denominator_cant_be_zero_assert< (_Den != 0) >::
+			denominator_cant_be_zero_assert_failed
+		check1; // if you are there means you put the denominator to zero
+		typedef typename check::out_of_range< (_Num >= -__INTMAX_MAX && _Den >= -__INTMAX_MAX) >::
+			out_of_range_failed
+		check2; // if you are there means that value is out of range
 	};
 
 	namespace detail
@@ -356,8 +365,9 @@ namespace stdex
 		private:
 			typedef intern::ratio_asserts check;
 
-			typedef typename check::out_of_range< (_R2::num != 0) >::is_ok
-				check1;// if you are there means that divider is zero
+			typedef typename check::out_of_range< (_R2::num != 0) >::
+				out_of_range_failed
+			check1;// if you are there means that divider is zero
 		};
 	}
 

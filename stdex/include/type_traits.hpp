@@ -1222,29 +1222,29 @@ namespace stdex
 			template<bool>
 			struct make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert;
 
-			template<>
-			struct make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert<true>
-			{
-				typedef bool make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed;
-			};
-
 			template<bool>
 			struct make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert;
 
-			template<>
-			struct make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert<true>
-			{
-				typedef bool make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed;
-			};
-
 			template<bool>
 			struct not_allowed_arithmetic_type_assert;
+		};
 
-			template<>
-			struct not_allowed_arithmetic_type_assert<true>
-			{
-				typedef bool not_allowed_arithmetic_type_assert_failed;
-			};
+		template<>
+		struct type_traits_asserts::make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert<true>
+		{
+			typedef bool make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed;
+		};
+
+		template<>
+		struct type_traits_asserts::make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert<true>
+		{
+			typedef bool make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed;
+		};
+
+		template<>
+		struct type_traits_asserts::not_allowed_arithmetic_type_assert<true>
+		{
+			typedef bool not_allowed_arithmetic_type_assert_failed;
 		};
 	}
 
