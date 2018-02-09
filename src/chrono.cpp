@@ -145,11 +145,11 @@ int(*clock_gettime_func_pointer)(int X, timespec *tv) = &clock_gettime;
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
-#define NOEXCEPT_FUNCTION throw() 
+#define NOEXCEPT_FUNCTION noexcept
 
 #else
 
-#define NOEXCEPT_FUNCTION
+#define NOEXCEPT_FUNCTION throw()
 
 #endif
 

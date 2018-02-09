@@ -22,12 +22,12 @@
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
 #define DELETED_FUNCTION =delete
-#define NOEXCEPT_FUNCTION throw() 
+#define NOEXCEPT_FUNCTION noexcept
 
 #else
 
 #define DELETED_FUNCTION 
-#define NOEXCEPT_FUNCTION
+#define NOEXCEPT_FUNCTION throw()
 
 #endif 
 
@@ -546,7 +546,7 @@ namespace stdex
 	}
 
 	// MEMBER FUNCTIONS for error_code
-	inline error_condition error_code::default_error_condition() const
+	inline error_condition error_code::default_error_condition() const NOEXCEPT_FUNCTION
 	{	// make error_condition for error code
 		return (category().default_error_condition(value()));
 	}
