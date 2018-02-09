@@ -171,6 +171,17 @@ namespace stdex
 				check1; // if you are there means overflow in safe template addition occured
 		};
 
+		template<uintmax_t _CharBitNum>
+		struct _half_char_bit
+		{
+			static const uintmax_t value = (_CharBitNum / 2);
+
+		private:
+			typedef intern::ratio_asserts check;
+			typedef typename check::internal_library_error_assert< (_CharBitNum % 2) == 0 >::is_ok
+				check1; // if you are there means internal library error occured (number of bits in char is not even on your platform)
+		};
+
 		// [Safe multiply template]
 
 		// Let c = 2^(half # of bits in an intmax_t)
@@ -183,7 +194,7 @@ namespace stdex
 		struct _safe_multiply
 		{
 		private:
-			static const uintmax_t _c = uintmax_t(1) << (sizeof(intmax_t) * 4);
+			static const uintmax_t _c = uintmax_t(1) << (sizeof(intmax_t) * _half_char_bit<CHAR_BIT>::value);
 
 			static const uintmax_t _a0 = _abs<_Pn>::value % _c;
 			static const uintmax_t _a1 = _abs<_Pn>::value / _c;
@@ -194,7 +205,7 @@ namespace stdex
 
 			typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_a1 == 0 || _safe_multiply::_b1 == 0) >::is_ok
 				check1; // if you are there means overflow in safe template multiplication occured
-			typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1 < (_safe_multiply::_c >> 1)) >::is_ok
+			typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1 < (_safe_multiply::_c / uintmax_t(2))) >::is_ok
 				check2; // if you are there means overflow in safe template multiplication occured
 			typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_b0 * _safe_multiply::_a0 <= __INTMAX_MAX) >::is_ok
 				check3; // if you are there means overflow in safe template multiplication occured
@@ -218,9 +229,9 @@ namespace stdex
 		template<uintmax_t _hi1, uintmax_t _lo1, uintmax_t _hi2, uintmax_t _lo2>
 		struct _big_add
 		{
-			static const uintmax_t _lo = _lo1 + _lo2;
+			static const uintmax_t _lo = _lo1 + _lo2; // overflow is ok
 			static const uintmax_t _hi = (_hi1 + _hi2 +
-				(_lo1 + intmax_t(_lo2 < _lo1))); // carry
+				uintmax_t(_big_add::_lo < _lo1) ); // carry
 		};
 
 		// [Subtract template]
@@ -246,7 +257,7 @@ namespace stdex
 		struct _big_multiply
 		{
 		private:
-			static const uintmax_t _c = uintmax_t(1) << (sizeof(intmax_t) * 4);
+			static const uintmax_t _c = uintmax_t(1) << (sizeof(intmax_t) * _half_char_bit<CHAR_BIT>::value);
 			static const uintmax_t _x0 = _x % _c;
 			static const uintmax_t _x1 = _x / _c;
 			static const uintmax_t _y0 = _y % _c;
@@ -256,7 +267,7 @@ namespace stdex
 			static const uintmax_t _x1y0 = _x1 * _y0;
 			static const uintmax_t _x1y1 = _x1 * _y1;
 			static const uintmax_t _mix = _x0y1 + _x1y0; // possible carry...
-			static const uintmax_t _mix_lo = _mix * _c;
+			static const uintmax_t _mix_lo = _mix * _c;  // overflow is ok
 			static const uintmax_t _mix_hi
 				= _mix / _c + ((_big_multiply::_mix < _x0y1) ? _c : 0); // ... added here
 			typedef _big_add<_big_multiply::_mix_hi, _big_multiply::_mix_lo, _big_multiply::_x1y1, _big_multiply::_x0y0> _Res;
