@@ -21,12 +21,12 @@
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
 #define DELETED_FUNCTION =delete
-#define NOEXCEPT_FUNCTION throw() 
+#define NOEXCEPT_FUNCTION noexcept
 
 #else
 
 #define DELETED_FUNCTION 
-#define NOEXCEPT_FUNCTION
+#define NOEXCEPT_FUNCTION throw()
 
 #endif
 
