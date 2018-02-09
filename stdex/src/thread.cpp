@@ -27,21 +27,35 @@
 
 #endif
 
+#ifdef _STDEX_NATIVE_CPP11_SUPPORT
+
+#define NOEXCEPT_FUNCTION noexcept
+
+#else
+
+#define NOEXCEPT_FUNCTION throw()
+
+#endif
+
 using namespace stdex;
 
 
 bool operator<(const pthread_t &lhs, const pthread_t &rhs)
 {
-	if (lhs.p < rhs.p)
-		return true;
-	if (lhs.x < rhs.x)
-		return true;
+	bool are_equal = (pthread_equal(lhs, rhs) != 0);
+	if (are_equal)
+		return false;
 
-	return false;
+	return std::less<const pthread_t*>()(&lhs, &rhs);
 }
 
+enum eThreadIDOperation
+{
+	RemoveThreadID,
+	GetThreadID
+};
 
-static thread::id _pthread_t_to_ID(const pthread_t &aHandle)
+static void _pthread_t_ID(const pthread_t &aHandle, const eThreadIDOperation operation, thread::id *id_out = NULL)
 {
 	static mutex idMapLock;
 	static std::map<pthread_t, unsigned long int> idMap;
@@ -49,10 +63,18 @@ static thread::id _pthread_t_to_ID(const pthread_t &aHandle)
 
 	lock_guard<mutex> guard(idMapLock);
 
-	if (idMap.find(aHandle) == idMap.end())
-		idMap[aHandle] = idCount++;
+	if (operation == GetThreadID)
+	{
+		if (idMap.find(aHandle) == idMap.end())
+			idMap[aHandle] = idCount++;
 
-	return thread::id(idMap[aHandle]);
+		if(id_out != NULL)
+			*id_out = thread::id(idMap[aHandle]);
+	}
+	else
+	{
+		idMap.erase(aHandle);
+	}
 }
 
 /// Information to pass to the new thread (what to run).
@@ -82,6 +104,8 @@ void* thread::wrapper_function(void *aArg)
 
 	// The thread is no longer executing
 	
+	_pthread_t_ID(ti->thread_object->_thread_handle, RemoveThreadID);
+
 	lock_guard<mutex> guard(ti->thread_object->_data_mutex);
 	ti->thread_object->_not_a_thread = true;
 	
@@ -125,13 +149,11 @@ void thread::join()
 {
 	if (get_id() != id())
 	{
-		int err = pthread_join(_thread_handle, NULL);
-
-		err = err;
+		pthread_join(_thread_handle, NULL);
 	}
 }
 
-bool thread::joinable() const
+bool thread::joinable() const NOEXCEPT_FUNCTION
 {
 	_data_mutex.lock();
 	bool result = !_not_a_thread;
@@ -153,15 +175,18 @@ void thread::detach()
 	_data_mutex.unlock();
 }
 
-thread::id thread::get_id() const
+thread::id thread::get_id() const NOEXCEPT_FUNCTION
 {
+	thread::id tmp;
 	if (!joinable())
 		return id();
 
-	return _pthread_t_to_ID(_thread_handle);
+	_pthread_t_ID(_thread_handle, GetThreadID, &tmp);
+
+	return tmp;
 }
 
-unsigned thread::hardware_concurrency()
+unsigned thread::hardware_concurrency() NOEXCEPT_FUNCTION
 {
 #if defined(_STDEX_THREAD_WIN)
 	SYSTEM_INFO si;
@@ -178,7 +203,7 @@ unsigned thread::hardware_concurrency()
 #endif
 }
 
-void thread::swap(thread & other)
+void thread::swap(thread & other) NOEXCEPT_FUNCTION
 {
 	if (&other == this)
 		return;
@@ -201,9 +226,13 @@ void thread::swap(thread & other)
 	swap(_thread_handle, other._thread_handle);
 }
 
-thread::id this_thread::get_id()
+thread::id this_thread::get_id() NOEXCEPT_FUNCTION
 {
-	return _pthread_t_to_ID(pthread_self());
+	thread::id tmp;
+
+	_pthread_t_ID(pthread_self(), GetThreadID, &tmp);
+
+	return tmp;
 }
 
 #ifdef _STDEX_THREAD_WIN // windows platform
@@ -313,7 +342,7 @@ public:
 			throw std::runtime_error("SetAndWait: failed set waitable time (SetWaitableTimer)");
 		}
 
-		::WaitForSingleObjectEx(m_timer, FALSE, INFINITE);
+		DWORD waitRes = ::WaitForSingleObjectEx(m_timer, INFINITE, FALSE);
 
 		AdjustSystemTimerResolutionTo(sysTimerOrigResolution);
 	}
@@ -339,3 +368,5 @@ void detail::sleep_for_impl(const struct timespec *reltime)
 
 #endif
 
+
+#undef NOEXCEPT_FUNCTION

@@ -20,7 +20,7 @@
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
 #define DELETED_FUNCTION =delete
-#define NOEXCEPT_FUNCTION noexcept
+#define NOEXCEPT_FUNCTION noexcept 
 
 #else
 
