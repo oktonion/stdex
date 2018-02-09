@@ -143,7 +143,17 @@ int clock_gettime(int X, timespec *tv);
 int(*clock_gettime_func_pointer)(int X, timespec *tv) = &clock_gettime;
 #endif
 
-system_clock::time_point system_clock::now()
+#ifdef _STDEX_NATIVE_CPP11_SUPPORT
+
+#define NOEXCEPT_FUNCTION throw() 
+
+#else
+
+#define NOEXCEPT_FUNCTION
+
+#endif
+
+system_clock::time_point system_clock::now() NOEXCEPT_FUNCTION
 {	// get current time
 	{
 		mytimespec ts;
@@ -158,7 +168,7 @@ system_clock::time_point system_clock::now()
 	}
 }
 
-steady_clock::time_point steady_clock::now()
+steady_clock::time_point steady_clock::now() NOEXCEPT_FUNCTION
 {	// get current time
 	{
 		mytimespec ts;
