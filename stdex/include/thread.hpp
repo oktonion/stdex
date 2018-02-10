@@ -169,6 +169,59 @@ namespace stdex
 			typedef _arguments arguments_type;
 		};
 
+		template<class _Arg1, class _Arg2, class _Arg3, class _Arg4, class _Arg5, class _Arg6>
+		struct _thread_args_helper<_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6>
+		{
+			struct _arguments
+			{
+				_Arg1 arg1;
+				_Arg2 arg2;
+				_Arg3 arg3;
+				_Arg4 arg4;
+				_Arg5 arg5;
+				_Arg6 arg6;
+
+				_arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg3 arg4_, _Arg5 arg5_, _Arg6 arg6_) :
+					arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_), arg5(arg5_), arg6(arg6_)
+				{ }
+
+				template<class _FuncT>
+				void push(_FuncT fp)
+				{
+					fp(arg1, arg2, arg3, arg4, arg5, arg6);
+				}
+			};
+
+			typedef _arguments arguments_type;
+		};
+
+		template<class _Arg1, class _Arg2, class _Arg3, class _Arg4, class _Arg5, class _Arg6, class _Arg7>
+		struct _thread_args_helper<_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7>
+		{
+			struct _arguments
+			{
+				_Arg1 arg1;
+				_Arg2 arg2;
+				_Arg3 arg3;
+				_Arg4 arg4;
+				_Arg5 arg5;
+				_Arg6 arg6;
+				_Arg7 arg7;
+
+				_arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg3 arg4_, _Arg5 arg5_, _Arg6 arg6_, _Arg7 arg7_)) :
+					arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_), arg5(arg5_), arg6(arg6_), arg7(arg7_)
+				{ }
+
+				template<class _FuncT>
+				void push(_FuncT fp)
+				{
+					fp(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+				}
+			};
+
+			typedef _arguments arguments_type;
+		};
+
 		template<class _FuncT, class _ArgT>
 		struct _thread_function_proxy
 		{
