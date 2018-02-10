@@ -26,7 +26,7 @@ namespace stdex
 #ifdef LLONG_MAX
 	#define __INTMAX_MAX LLONG_MAX//9223372036854775807i64
 	typedef int64_t intmax_t;
-	typedef int64_t uintmax_t;
+	typedef uint64_t uintmax_t;
 #else
 	#define __INTMAX_MAX LONG_MAX//	2147483647
 	typedef int32_t intmax_t;
