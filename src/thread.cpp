@@ -79,6 +79,7 @@ static void _pthread_t_ID(const pthread_t &aHandle, const eThreadIDOperation ope
 
 /// Information to pass to the new thread (what to run).
 struct thread::thread_start_info {
+	mutex info_mutex;
 	void(*exec_function)(void *); ///< Pointer to the function to be executed.
 	void *argument;               ///< Function argument for the thread function.
 	thread *thread_object;          ///< Pointer to the thread object.
@@ -104,12 +105,17 @@ void* thread::wrapper_function(void *aArg)
 
 	// The thread is no longer executing
 	
-	_pthread_t_ID(ti->thread_object->_thread_handle, RemoveThreadID);
+	ti->info_mutex.lock();
 
-	lock_guard<mutex> guard(ti->thread_object->_data_mutex);
-	ti->thread_object->_not_a_thread = true;
-	
+	if (ti->thread_object)
+	{
+		_pthread_t_ID(ti->thread_object->_thread_handle, RemoveThreadID);
 
+		lock_guard<mutex> guard(ti->thread_object->_data_mutex);
+		ti->thread_object->_not_a_thread = true;
+	}
+
+	ti->info_mutex.unlock();
 	// The thread is responsible for freeing the startup information
 	delete ti;
 
@@ -147,10 +153,15 @@ thread::~thread()
 
 void thread::join()
 {
+	int _e = invalid_argument;
+
 	if (get_id() != id())
 	{
-		pthread_join(_thread_handle, NULL);
+		_e = pthread_join(_thread_handle, NULL);
 	}
+
+	if (_e)
+		throw system_error(errc(_e));
 }
 
 bool thread::joinable() const NOEXCEPT_FUNCTION
@@ -164,22 +175,32 @@ bool thread::joinable() const NOEXCEPT_FUNCTION
 
 void thread::detach()
 {
+	int _e = invalid_argument;
+
 	_data_mutex.lock();
 
 	if (!_not_a_thread)
 	{
-		pthread_detach(_thread_handle);
+		_thread_info->info_mutex.lock();
+		_thread_info->thread_object = nullptr;
+		_thread_info->info_mutex.unlock();
+
+		_e = pthread_detach(_thread_handle);
 		_not_a_thread = true;
 	}
 
 	_data_mutex.unlock();
+
+	if (_e)
+		throw system_error(errc(_e));
 }
 
 thread::id thread::get_id() const NOEXCEPT_FUNCTION
 {
-	thread::id tmp;
 	if (!joinable())
 		return id();
+
+	thread::id tmp;
 
 	_pthread_t_ID(_thread_handle, GetThreadID, &tmp);
 

@@ -81,7 +81,7 @@ namespace stdex
 			// EINVAL, EAGAIN, EBUSY, EINVAL, EDEADLK(may)
 			if (e)
 				throw system_error( errc(e) );
-		}
+ 		}
 
 		//! Try to lock the mutex.
 		//! The method will try to lock the mutex. If it fails, the function will
