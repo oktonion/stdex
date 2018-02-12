@@ -342,7 +342,7 @@ public:
 			throw std::runtime_error("SetAndWait: failed set waitable time (SetWaitableTimer)");
 		}
 
-		DWORD waitRes = ::WaitForSingleObjectEx(m_timer, INFINITE, FALSE);
+		::WaitForSingleObjectEx(m_timer, INFINITE, FALSE);
 
 		AdjustSystemTimerResolutionTo(sysTimerOrigResolution);
 	}
