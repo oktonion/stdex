@@ -396,7 +396,7 @@ namespace stdex
 		template<class _R1, class _R2,
 			class _Left = _big_multiply<_R1::num, _R2::den>,
 			class _Right = _big_multiply<_R2::num, _R1::den> >
-			struct _ratio_less_impl_1
+		struct _ratio_less_impl_1
 		{
 			static const bool value = _big_less<_Left::_hi, _Left::_lo, _Right::_hi, _Right::_lo>::value;
 		};
@@ -407,7 +407,7 @@ namespace stdex
 					!= _sign_of<_R2::num>::value)),
 			bool = (_sign_of<_R1::num>::value == -1
 				&& _sign_of<_R2::num>::value == -1)>
-			struct _ratio_less_impl :
+		struct _ratio_less_impl :
 			_ratio_less_impl_1<_R1, _R2>
 		{ };
 
@@ -456,7 +456,7 @@ namespace stdex
 		template<class _R1, class _R2>
 		struct _ratio_add
 		{	// add two ratios
-
+		private:
 			static const intmax_t _n1 = _R1::num;
 			static const intmax_t _d1 = _R1::den;
 			static const intmax_t _n2 = _R2::num;
@@ -464,14 +464,18 @@ namespace stdex
 
 			static const intmax_t _gx = _gcd<_d1, _d2>::value;
 
+			static const intmax_t _n = _safe_add<
+				_safe_multiply<_R1::num, (_R2::den / _ratio_add::_gx)>::value,
+				_safe_multiply<_R2::num, (_R1::den / _ratio_add::_gx)>::value>::value;
+
+			// The new numerator may have common factors with the denominator,
+			// but they have to also be factors of __gcd.
+			static const intmax_t _gx2 = _gcd<_ratio_add::_n, _ratio_add::_gx>::value;
+
+		public:
 			// typename ratio<>::type is necessary here
-			typedef typename ratio<
-				_safe_add<
-				_safe_multiply<_ratio_add<_R1, _R2>::_n1, _ratio_add<_R1, _R2>::_d2 / _ratio_add<_R1, _R2>::_gx>::value,
-				_safe_multiply<_ratio_add<_R1, _R2>::_n2, _ratio_add<_R1, _R2>::_d1 / _ratio_add<_R1, _R2>::_gx>::value
-				>::value,
-				_safe_multiply<_ratio_add<_R1, _R2>::_d1, _ratio_add<_R1, _R2>::_d2 / _ratio_add<_R1, _R2>::_gx>::value
-			>::type type;
+			typedef typename ratio<_ratio_add::_n / _ratio_add::_gx2,
+				_safe_multiply<_R1::den / _ratio_add::_gx2, _R2::den / _ratio_add::_gx>::value>::type type;
 		};
 	}
 
