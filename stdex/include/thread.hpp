@@ -208,7 +208,7 @@ namespace stdex
 				_Arg6 arg6;
 				_Arg7 arg7;
 
-				_arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg3 arg4_, _Arg5 arg5_, _Arg6 arg6_, _Arg7 arg7_)) :
+				_arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg3 arg4_, _Arg5 arg5_, _Arg6 arg6_, _Arg7 arg7_) :
 					arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_), arg5(arg5_), arg6(arg6_), arg7(arg7_)
 				{ }
 
