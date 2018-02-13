@@ -188,4 +188,4 @@ typedef detail::nullptr_chooser::type nullptr_t;
 	#define nullptr stdex::nullptr_t(0)
 #endif
 
-#endif
+#endif // _STDEX_NULLPTR_H
