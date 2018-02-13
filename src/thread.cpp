@@ -39,37 +39,30 @@
 
 using namespace stdex;
 
-
-bool operator<(const pthread_t &lhs, const pthread_t &rhs)
-{
-	bool are_equal = (pthread_equal(lhs, rhs) != 0);
-	if (are_equal)
-		return false;
-
-	return std::less<const pthread_t*>()(&lhs, &rhs);
-}
-
 enum eThreadIDOperation
 {
 	RemoveThreadID,
 	GetThreadID
 };
 
-static void _pthread_t_ID(const pthread_t &aHandle, const eThreadIDOperation operation, thread::id *id_out = NULL)
+static void _pthread_t_ID(const thread::id &aHandle, const eThreadIDOperation operation, stdex::intmax_t *id_out = NULL)
 {
 	static mutex idMapLock;
-	static std::map<pthread_t, unsigned long int> idMap;
-	static unsigned long int idCount(1);
+	static std::map<thread::id, stdex::intmax_t> idMap;
+	static stdex::intmax_t idCount(1);
 
 	lock_guard<mutex> guard(idMapLock);
+
+	if (idMap.size() == 0)
+		idCount = 1;
 
 	if (operation == GetThreadID)
 	{
 		if (idMap.find(aHandle) == idMap.end())
 			idMap[aHandle] = idCount++;
 
-		if(id_out != NULL)
-			*id_out = thread::id(idMap[aHandle]);
+		if (id_out != NULL)
+			*id_out = idMap[aHandle];
 	}
 	else
 	{
@@ -77,12 +70,23 @@ static void _pthread_t_ID(const pthread_t &aHandle, const eThreadIDOperation ope
 	}
 }
 
+stdex::intmax_t thread::id::uid() const
+{
+	if (!_is_valid)
+		return stdex::intmax_t(0);
+
+	stdex::intmax_t _uid;
+
+	_pthread_t_ID(*this, GetThreadID, &_uid);
+
+	return _uid;
+
+}
+
 /// Information to pass to the new thread (what to run).
-struct thread::thread_start_info {
-	mutex info_mutex;
+struct thread_start_info {
 	void(*exec_function)(void *); ///< Pointer to the function to be executed.
 	void *argument;               ///< Function argument for the thread function.
-	thread *thread_object;          ///< Pointer to the thread object.
 };
 
 // Thread wrapper function.
@@ -105,43 +109,32 @@ void* thread::wrapper_function(void *aArg)
 
 	// The thread is no longer executing
 	
-	ti->info_mutex.lock();
-
-	if (ti->thread_object)
-	{
-		_pthread_t_ID(ti->thread_object->_thread_handle, RemoveThreadID);
-
-		lock_guard<mutex> guard(ti->thread_object->_data_mutex);
-		ti->thread_object->_not_a_thread = true;
-	}
-
-	ti->info_mutex.unlock();
 	// The thread is responsible for freeing the startup information
 	delete ti;
+
+	_pthread_t_ID(this_thread::get_id(), RemoveThreadID);
 
 	return 0;
 }
 
 void thread::init(void(*aFunction)(void *), void *aArg)
 {
-	// Serialize access to this thread structure
-	lock_guard<mutex> guard(_data_mutex);
-
 	// Fill out the thread startup information (passed to the thread wrapper,
 	// which will eventually free it)
-	_thread_info = new thread_start_info;
-	_thread_info->exec_function = aFunction;
-	_thread_info->argument = aArg;
-	_thread_info->thread_object = this;
+	thread_start_info *thread_info = new thread_start_info;
+	thread_info->exec_function = aFunction;
+	thread_info->argument = aArg;
 
-	// The thread is now alive
-	_not_a_thread = false;	
+	_id._is_valid = true;
 
 	// Create the thread
-	if (pthread_create(&_thread_handle, NULL, &wrapper_function, (void *) _thread_info) != 0)
+	int _e = pthread_create(&_id._handle, NULL, &wrapper_function, (void *) thread_info);
+	if (_e)
 	{// Did we fail to create the thread?
-		_not_a_thread = true;
-		delete _thread_info;
+		_id._is_valid = false;
+		delete thread_info;
+
+		throw system_error(errc(_e));
 	}
 }
 
@@ -155,44 +148,36 @@ void thread::join()
 {
 	int _e = invalid_argument;
 
-	if (get_id() != id())
+	if (joinable())
 	{
-		_e = pthread_join(_thread_handle, NULL);
+		_e = pthread_join(_id._handle, NULL);
 	}
 
 	if (_e)
 		throw system_error(errc(_e));
+
+	_id = id();
 }
 
 bool thread::joinable() const NOEXCEPT_FUNCTION
 {
-	_data_mutex.lock();
-	bool result = !_not_a_thread;
-	_data_mutex.unlock();
-
-	return result;
+	return _id != id();
 }
 
 void thread::detach()
 {
 	int _e = invalid_argument;
 
-	_data_mutex.lock();
 
-	if (!_not_a_thread)
+	if (joinable())
 	{
-		_thread_info->info_mutex.lock();
-		_thread_info->thread_object = nullptr;
-		_thread_info->info_mutex.unlock();
-
-		_e = pthread_detach(_thread_handle);
-		_not_a_thread = true;
+		_e = pthread_detach(_id._handle);
 	}
-
-	_data_mutex.unlock();
 
 	if (_e)
 		throw system_error(errc(_e));
+
+	_id = id();
 }
 
 thread::id thread::get_id() const NOEXCEPT_FUNCTION
@@ -200,11 +185,7 @@ thread::id thread::get_id() const NOEXCEPT_FUNCTION
 	if (!joinable())
 		return id();
 
-	thread::id tmp;
-
-	_pthread_t_ID(_thread_handle, GetThreadID, &tmp);
-
-	return tmp;
+	return _id;
 }
 
 unsigned thread::hardware_concurrency() NOEXCEPT_FUNCTION
@@ -231,29 +212,12 @@ void thread::swap(thread & other) NOEXCEPT_FUNCTION
 
 	using std::swap;
 
-	lock_guard<mutex> lk1(_data_mutex);
-	lock_guard<mutex> lk2(other._data_mutex);
-
-	swap(_not_a_thread, other._not_a_thread);
-	swap(_thread_info, other._thread_info);
-
-	if (!_not_a_thread)
-		_thread_info->thread_object = this;
-
-	if (!other._not_a_thread)
-		other._thread_info->thread_object = &other;
-
-	// swap handles of threads
-	swap(_thread_handle, other._thread_handle);
+	swap(_id, other._id);
 }
 
 thread::id this_thread::get_id() NOEXCEPT_FUNCTION
 {
-	thread::id tmp;
-
-	_pthread_t_ID(pthread_self(), GetThreadID, &tmp);
-
-	return tmp;
+	return thread::id(pthread_self());
 }
 
 #ifdef _STDEX_THREAD_WIN // windows platform
