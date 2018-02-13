@@ -522,4 +522,4 @@ namespace stdex
 
 } // namespace stdex
 
-#endif // _STDEX_THREAD_H
+#endif // _STDEX_RATIO_H
