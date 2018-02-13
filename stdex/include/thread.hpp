@@ -29,6 +29,10 @@
 
 #endif
 
+
+//template<class _CharT, class _Traits>
+//friend ::std::basic_ostream<_CharT, _Traits>& operator<<(::std::basic_ostream<_CharT, _Traits> &out, stdex::thread::id id);
+
 namespace stdex
 {
 	namespace detail
@@ -263,19 +267,112 @@ namespace stdex
 	public:
 		typedef pthread_t native_handle_type;
 
-		class id;
+		//! Thread ID.
+		//! The thread ID is a unique identifier for each thread.
+		//! @see thread::get_id()
+		class id {
+		public:
+			//! Default constructor.
+			//! The default constructed ID is that of thread without a thread of
+			//! execution.
+			id() NOEXCEPT_FUNCTION :
+				_handle(),
+				_is_valid(false)
+			{ }
+
+			explicit id(native_handle_type aId) :
+				_handle(aId),
+				_is_valid(true)
+			{ }
+
+			id(const id &aId) :
+				_handle(aId._handle),
+				_is_valid(aId._is_valid)
+			{ }
+
+			inline id& operator=(const id &aId)
+			{
+				_handle = aId._handle;
+				_is_valid = aId._is_valid;
+
+				return *this;
+			}
+
+			inline friend bool operator==(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
+			{
+				if (aId1._is_valid != aId2._is_valid)
+					return false;
+
+				if (&aId1 == &aId2 || (aId1._is_valid == false && aId2._is_valid == false))
+					return true;
+
+				return pthread_equal(aId1._handle, aId2._handle) != 0;
+			}
+
+			inline friend bool operator!=(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
+			{
+				if (aId1._is_valid != aId2._is_valid)
+					return true;
+
+				if (&aId1 == &aId2 || (aId1._is_valid == false && aId2._is_valid == false))
+					return false;
+
+				return pthread_equal(aId1._handle, aId2._handle) == 0;
+			}
+
+			inline friend bool operator<=(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
+			{
+				if (aId1 == aId2)
+					return true;
+
+				return std::less<const native_handle_type*>()(&aId1._handle, &aId2._handle);
+			}
+
+			inline friend bool operator<(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
+			{
+				if (aId1 == aId2)
+					return false;
+
+				return std::less<const native_handle_type*>()(&aId1._handle, &aId2._handle);
+			}
+
+			inline friend bool operator>=(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
+			{
+				if (aId1 == aId2)
+					return true;
+
+				return std::greater<const native_handle_type*>()(&aId1._handle, &aId2._handle);
+			}
+
+			inline friend bool operator>(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
+			{
+				if (aId1 == aId2)
+					return false;
+
+				return std::greater<const native_handle_type*>()(&aId1._handle, &aId2._handle);
+			}
+
+			//template<class _CharT, class _Traits>
+			//friend ::std::basic_ostream<_CharT, _Traits>& operator<<(::std::basic_ostream<_CharT, _Traits> &out, stdex::thread::id id);
+
+		private:
+			friend class thread;
+
+			native_handle_type _handle;
+			bool _is_valid;
+
+			intmax_t uid() const;
+		};
 
 		//! Default constructor.
 		//! Construct a @c thread object without an associated thread of execution
 		//! (i.e. non-joinable).
-		thread() NOEXCEPT_FUNCTION: 
-			_not_a_thread(true)
+		thread() NOEXCEPT_FUNCTION
 		{
 		}
 
 		template<class _FuncT>
-		explicit thread(_FuncT fx) :
-			_not_a_thread(true)
+		explicit thread(_FuncT fx)
 		{
 			typedef typename detail::_thread_args_helper<>::arguments_type args_t;
 			typedef _FuncT func_t;
@@ -283,8 +380,7 @@ namespace stdex
 		}
 
 		template<class _FuncT, class _Arg0T>
-		explicit thread(_FuncT fx, _Arg0T t0) :
-			_not_a_thread(true)
+		explicit thread(_FuncT fx, _Arg0T t0)
 		{
 			typedef typename detail::_thread_args_helper<_Arg0T>::arguments_type args_t;
 			typedef _FuncT func_t;
@@ -292,8 +388,7 @@ namespace stdex
 		}
 
 		template<class _FuncT, class _Arg0T, class _Arg1T>
-		explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1) :
-			_not_a_thread(true)
+		explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1)
 		{
 			typedef typename detail::_thread_args_helper<_Arg0T, _Arg1T>::arguments_type args_t;
 			typedef _FuncT func_t;
@@ -301,8 +396,7 @@ namespace stdex
 		}
 
 		template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T>
-		explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2) :
-			_not_a_thread(true)
+		explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2)
 		{
 			typedef typename detail::_thread_args_helper<_Arg0T, _Arg1T, _Arg2T>::arguments_type args_t;
 			typedef _FuncT func_t;
@@ -310,8 +404,7 @@ namespace stdex
 		}
 
 		template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T, class _Arg3T>
-		explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2, _Arg3T t3) :
-			_not_a_thread(true)
+		explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2, _Arg3T t3)
 		{
 			typedef typename detail::_thread_args_helper<_Arg0T, _Arg1T, _Arg2T, _Arg3T>::arguments_type args_t;
 			typedef _FuncT func_t;
@@ -319,8 +412,7 @@ namespace stdex
 		}
 
 		template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T, class _Arg3T, class _Arg4T>
-		explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2, _Arg3T t3, _Arg4T t4) :
-			_not_a_thread(true)
+		explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2, _Arg3T t3, _Arg4T t4)
 		{
 			typedef typename detail::_thread_args_helper<_Arg0T, _Arg1T, _Arg2T, _Arg3T, _Arg4T>::arguments_type args_t;
 			typedef _FuncT func_t;
@@ -354,11 +446,9 @@ namespace stdex
 		id get_id() const NOEXCEPT_FUNCTION;
 
 		//! Get the native handle for this thread.
-		//! @note Under Windows, this is a @c HANDLE, and under POSIX systems, this
-		//! is a @c pthread_t.
 		inline native_handle_type native_handle()
 		{
-			return _thread_handle;
+			return _id._handle;
 		}
 
 		//! Determine the number of threads which can possibly execute concurrently.
@@ -371,13 +461,8 @@ namespace stdex
 		void swap(thread &other) NOEXCEPT_FUNCTION;
 
 	private:
-		native_handle_type _thread_handle;   //!< Thread handle.
-		mutable mutex _data_mutex;     //!< Serializer for access to the thread private data.
-		bool _not_a_thread;			  //!< True if this object is not a thread of execution.
 
-		struct thread_start_info;
-
-		thread_start_info *_thread_info;
+		id _id;
 
 		//thread(thread&) DELETED_FUNCTION;
 		thread(const thread&) DELETED_FUNCTION;
@@ -388,74 +473,7 @@ namespace stdex
 	};
 
 
-	//! Thread ID.
-	//! The thread ID is a unique identifier for each thread.
-	//! @see thread::get_id()
-	class thread::id {
-	public:
-		//! Default constructor.
-		//! The default constructed ID is that of thread without a thread of
-		//! execution.
-		id() NOEXCEPT_FUNCTION :
-			_id(0) 
-		{}
-
-		explicit id(unsigned long int aId) :
-			_id(aId) 
-		{}
-
-		id(const id &aId) : 
-			_id(aId._id) 
-		{}
-
-		inline id& operator=(const id &aId)
-		{
-			_id = aId._id;
-			return *this;
-		}
-
-		inline friend bool operator==(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
-		{
-			return (aId1._id == aId2._id);
-		}
-
-		inline friend bool operator!=(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
-		{
-			return (aId1._id != aId2._id);
-		}
-
-		inline friend bool operator<=(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
-		{
-			return (aId1._id <= aId2._id);
-		}
-
-		inline friend bool operator<(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
-		{
-			return (aId1._id < aId2._id);
-		}
-
-		inline friend bool operator>=(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
-		{
-			return (aId1._id >= aId2._id);
-		}
-
-		inline friend bool operator>(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
-		{
-			return (aId1._id > aId2._id);
-		}
-
-		template<class _CharT, class _Traits>
-		inline friend ::std::basic_ostream<_CharT, _Traits>& operator<<(::std::basic_ostream<_CharT, _Traits> &out, thread::id id)
-		{
-			if (id == thread::id())
-				return out << "thread::id of a non-executing thread";
-			else
-				return out << id._id;
-		}
-
-	private:
-		unsigned long int _id;
-	};
+	
 
 	inline void swap(thread &rhs, thread &lhs) NOEXCEPT_FUNCTION
 	{
@@ -527,6 +545,15 @@ namespace stdex
 		}
 	}
 } // namespace stdex
+
+/*template<class _CharT, class _Traits>
+::std::basic_ostream<_CharT, _Traits>& operator<<(::std::basic_ostream<_CharT, _Traits> &out, stdex::thread::id id)
+{
+	if (id == stdex::thread::id())
+		return out << "thread::id of a non-executing thread";
+	else
+		return out << id.uid();
+}*/
 
 #undef DELETED_FUNCTION
 #undef NOEXCEPT_FUNCTION
