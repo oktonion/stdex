@@ -29,10 +29,6 @@
 
 #endif
 
-
-//template<class _CharT, class _Traits>
-//friend ::std::basic_ostream<_CharT, _Traits>& operator<<(::std::basic_ostream<_CharT, _Traits> &out, stdex::thread::id id);
-
 namespace stdex
 {
 	namespace detail
@@ -352,8 +348,13 @@ namespace stdex
 				return std::greater<const native_handle_type*>()(&aId1._handle, &aId2._handle);
 			}
 
-			//template<class _CharT, class _Traits>
-			//friend ::std::basic_ostream<_CharT, _Traits>& operator<<(::std::basic_ostream<_CharT, _Traits> &out, stdex::thread::id id);
+			friend ::std::ostream& operator<<(::std::ostream &out, const stdex::thread::id &id)
+			{
+				if (id == stdex::thread::id())
+					return out << "thread::id of a non-executing thread";
+				else
+					return out << id.uid();
+			}
 
 		private:
 			friend class thread;
@@ -368,8 +369,7 @@ namespace stdex
 		//! Construct a @c thread object without an associated thread of execution
 		//! (i.e. non-joinable).
 		thread() NOEXCEPT_FUNCTION
-		{
-		}
+		{ }
 
 		template<class _FuncT>
 		explicit thread(_FuncT fx)
@@ -546,14 +546,8 @@ namespace stdex
 	}
 } // namespace stdex
 
-/*template<class _CharT, class _Traits>
-::std::basic_ostream<_CharT, _Traits>& operator<<(::std::basic_ostream<_CharT, _Traits> &out, stdex::thread::id id)
-{
-	if (id == stdex::thread::id())
-		return out << "thread::id of a non-executing thread";
-	else
-		return out << id.uid();
-}*/
+
+
 
 #undef DELETED_FUNCTION
 #undef NOEXCEPT_FUNCTION
