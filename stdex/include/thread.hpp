@@ -548,6 +548,8 @@ namespace stdex
 
 
 
+using stdex::operator<<;
+
 
 #undef DELETED_FUNCTION
 #undef NOEXCEPT_FUNCTION
