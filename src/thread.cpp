@@ -37,38 +37,48 @@
 
 #endif
 
-using namespace stdex;
-
 enum eThreadIDOperation
 {
 	RemoveThreadID,
 	GetThreadID
 };
 
-static void _pthread_t_ID(const thread::id &aHandle, const eThreadIDOperation operation, stdex::intmax_t *id_out = NULL)
+static void _pthread_t_ID(stdex::thread::id aHandle, const eThreadIDOperation operation, stdex::intmax_t *id_out = NULL)
 {
-	static mutex idMapLock;
-	static std::map<thread::id, stdex::intmax_t> idMap;
-	static stdex::intmax_t idCount(1);
+	typedef std::map<stdex::thread::id, stdex::intmax_t> id_map_type;
 
-	lock_guard<mutex> guard(idMapLock);
+	static stdex::mutex idMapLock;
+	static id_map_type idMap;
+	static stdex::intmax_t idCount = 1;
+
+	stdex::lock_guard<stdex::mutex> guard(idMapLock);
 
 	if (idMap.size() == 0)
 		idCount = 1;
 
 	if (operation == GetThreadID)
 	{
-		if (idMap.find(aHandle) == idMap.end())
-			idMap[aHandle] = idCount++;
+		id_map_type::iterator it = idMap.find(aHandle);
+
+		if (it == idMap.end())
+		{
+			std::pair<id_map_type::iterator, bool> result =
+				idMap.insert(std::make_pair(aHandle, idCount++));
+			it = result.first;
+		}
 
 		if (id_out != NULL)
-			*id_out = idMap[aHandle];
+		{
+			*id_out = it->second;
+		}
 	}
 	else
 	{
 		idMap.erase(aHandle);
 	}
 }
+
+using namespace stdex;
 
 stdex::intmax_t thread::id::uid() const
 {
