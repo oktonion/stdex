@@ -43,18 +43,21 @@ enum eThreadIDOperation
 	GetThreadID
 };
 
-static void _pthread_t_ID(stdex::thread::id aHandle, const eThreadIDOperation operation, stdex::intmax_t *id_out = NULL)
+static void _pthread_t_ID(stdex::thread::id aHandle, const eThreadIDOperation operation, stdex::uintmax_t *id_out = NULL)
 {
-	typedef std::map<stdex::thread::id, stdex::intmax_t> id_map_type;
+	typedef std::map<stdex::thread::id, stdex::uintmax_t> id_map_type;
 
 	static stdex::mutex idMapLock;
 	static id_map_type idMap;
-	static stdex::intmax_t idCount = 1;
+	static stdex::uintmax_t idCount = 1;
 
 	stdex::lock_guard<stdex::mutex> guard(idMapLock);
 
 	if (idMap.size() == 0)
 		idCount = 1;
+	else if (idMap.size() == 1)
+		idCount = idMap.begin()->second + 1;
+
 
 	if (operation == GetThreadID)
 	{
@@ -80,12 +83,12 @@ static void _pthread_t_ID(stdex::thread::id aHandle, const eThreadIDOperation op
 
 using namespace stdex;
 
-stdex::intmax_t thread::id::uid() const
+stdex::uintmax_t thread::id::uid() const
 {
 	if (!_is_valid)
-		return stdex::intmax_t(0);
+		return stdex::uintmax_t(0);
 
-	stdex::intmax_t _uid;
+	stdex::uintmax_t _uid;
 
 	_pthread_t_ID(*this, GetThreadID, &_uid);
 

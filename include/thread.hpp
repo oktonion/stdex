@@ -362,7 +362,7 @@ namespace stdex
 			native_handle_type _handle;
 			bool _is_valid;
 
-			intmax_t uid() const;
+			stdex::uintmax_t uid() const;
 		};
 
 		//! Default constructor.
