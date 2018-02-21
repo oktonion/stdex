@@ -10,7 +10,7 @@
 #include "./chrono"
 
 // POSIX includes
-#include <pthread>
+#include <pthread.h>
 
 // std includes
 #include <algorithm>

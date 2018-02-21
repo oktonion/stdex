@@ -10,10 +10,12 @@
 #include "./chrono"
 
 // POSIX includes
-/*none*/
+#include <pthread.h>
 
 // std includes
 #include <memory>
+#include <mutex>
+#include <condition_variable>
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
@@ -79,17 +81,12 @@ namespace stdex
 		//! Wait for the condition.
 		//! The function will block the calling thread until the condition variable
 		//! is woken by @c notify_one(), @c notify_all() or a spurious wake up.
-		//! @param[in] m A mutex that will be unlocked when the wait operation
-		//!   starts, an locked again as soon as the wait operation is finished.
-		template <class _MutexT>
-		inline void wait(_MutexT &m)
-		{
-			pthread_cond_wait(&_condition_handle, m.native_handle());
-		}
-
 		inline void wait(unique_lock<mutex> &lock) NOEXCEPT_FUNCTION
 		{
-			pthread_cond_wait(&_condition_handle, lock.mutex()->native_handle());
+			int _e = pthread_cond_wait(&_condition_handle, lock.mutex()->native_handle());
+
+			if (_e)
+				std::terminate();
 		}
 
 		template<class _Predicate>
