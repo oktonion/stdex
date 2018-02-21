@@ -3,7 +3,7 @@
 
 // POSIX includes
 //#include <time.h> // for clock_gettime
-#include <pthread>
+#include <pthread.h>
 
 // std includes
 #include <exception>
