@@ -151,4 +151,13 @@
 	#endif
 #endif
 
+#ifdef _STDEX_NATIVE_CPP11_SUPPORT
+
+
+#else
+
+#define noexcept throw()
+
+#endif
+
 #endif // _STDEX_CORE_H
