@@ -272,97 +272,65 @@ namespace stdex
 			//! The default constructed ID is that of thread without a thread of
 			//! execution.
 			id() NOEXCEPT_FUNCTION :
-				_handle(),
-				_is_valid(false)
+				_uid()
 			{ }
 
-			explicit id(native_handle_type aId) :
-				_handle(aId),
-				_is_valid(true)
+			explicit id(const stdex::uintmax_t &uid) :
+				_uid(uid)
 			{ }
 
 			id(const id &aId) :
-				_handle(aId._handle),
-				_is_valid(aId._is_valid)
+				_uid(aId._uid)
 			{ }
 
 			inline id& operator=(const id &aId)
 			{
-				_handle = aId._handle;
-				_is_valid = aId._is_valid;
+				_uid = aId._uid;
 
 				return *this;
 			}
 
-			inline friend bool operator==(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
+			bool operator==(const id &other) const NOEXCEPT_FUNCTION
 			{
-				if (aId1._is_valid != aId2._is_valid)
-					return false;
-
-				if (&aId1 == &aId2 || (aId1._is_valid == false && aId2._is_valid == false))
-					return true;
-
-				return pthread_equal(aId1._handle, aId2._handle) != 0;
+				return _uid == other._uid;
 			}
 
 			inline friend bool operator!=(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
 			{
-				if (aId1._is_valid != aId2._is_valid)
-					return true;
-
-				if (&aId1 == &aId2 || (aId1._is_valid == false && aId2._is_valid == false))
-					return false;
-
-				return pthread_equal(aId1._handle, aId2._handle) == 0;
+				return !(aId1 == aId2);
 			}
 
 			inline friend bool operator<=(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
 			{
-				if (aId1 == aId2)
-					return true;
-
-				return std::less<const native_handle_type*>()(&aId1._handle, &aId2._handle);
+				return aId1._uid <= aId2._uid;
 			}
 
-			inline friend bool operator<(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
+			bool operator<(const id &other) const NOEXCEPT_FUNCTION
 			{
-				if (aId1 == aId2)
-					return false;
-
-				return std::less<const native_handle_type*>()(&aId1._handle, &aId2._handle);
+				return _uid < other._uid;
 			}
 
 			inline friend bool operator>=(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
 			{
-				if (aId1 == aId2)
-					return true;
-
-				return std::greater<const native_handle_type*>()(&aId1._handle, &aId2._handle);
+				return aId1._uid >= aId2._uid;
 			}
 
 			inline friend bool operator>(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
 			{
-				if (aId1 == aId2)
-					return false;
-
-				return std::greater<const native_handle_type*>()(&aId1._handle, &aId2._handle);
+				return aId1._uid > aId2._uid;
 			}
 
-			friend ::std::ostream& operator<<(::std::ostream &out, const stdex::thread::id &id)
+			::std::ostream& print(::std::ostream &out) const
 			{
-				if (id == stdex::thread::id())
+				if (*this == id())
 					return out << "thread::id of a non-executing thread";
 				else
-					return out << id.uid();
+					return out << _uid;
 			}
 
 		private:
 			friend class thread;
-
-			native_handle_type _handle;
-			bool _is_valid;
-
-			stdex::uintmax_t uid() const;
+			stdex::uintmax_t _uid;
 		};
 
 		//! Default constructor.
@@ -448,7 +416,7 @@ namespace stdex
 		//! Get the native handle for this thread.
 		inline native_handle_type native_handle()
 		{
-			return _id._handle;
+			return _handle;
 		}
 
 		//! Determine the number of threads which can possibly execute concurrently.
@@ -463,6 +431,7 @@ namespace stdex
 	private:
 
 		id _id;
+		native_handle_type _handle;
 
 		//thread(thread&) DELETED_FUNCTION;
 		thread(const thread&) DELETED_FUNCTION;
@@ -548,7 +517,12 @@ namespace stdex
 
 
 
-using stdex::operator<<;
+
+inline ::std::ostream& operator<<(::std::ostream &out, const stdex::thread::id &id)
+{
+	return id.print(out);
+}
+
 
 
 #undef DELETED_FUNCTION

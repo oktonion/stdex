@@ -1,11 +1,14 @@
 // stdex includes
 #include "../include/thread"
+#include "../include/mutex"
+#include "../include/condition_variable"
 
 // POSIX includes
 /*none*/
 
 // std includes
 #include <map>
+#include <set>
 
 // since windows is a 'special' platform there is some macro definitions to define platform
 #if defined(WIN32) || defined(_WIN32)
@@ -40,12 +43,27 @@
 enum eThreadIDOperation
 {
 	RemoveThreadID,
-	GetThreadID
+	GetThreadID,
+	AddThreadID
 };
 
-static void _pthread_t_ID(stdex::thread::id aHandle, const eThreadIDOperation operation, stdex::uintmax_t *id_out = NULL)
+struct _pthread_t_less
 {
-	typedef std::map<stdex::thread::id, stdex::uintmax_t> id_map_type;
+	bool operator() (const stdex::thread::native_handle_type &lhs, const stdex::thread::native_handle_type &rhs) const
+	{
+		if (&lhs == &rhs)
+			return false;
+
+		if (pthread_equal(lhs, rhs) != 0)
+			return false;
+
+		return memcmp(&lhs, &rhs, sizeof(const stdex::thread::native_handle_type)) < 0;
+	}
+};
+
+static void _pthread_t_ID(const eThreadIDOperation operation, stdex::uintmax_t *id_out = NULL)
+{
+	typedef std::map<stdex::thread::native_handle_type, stdex::uintmax_t, _pthread_t_less> id_map_type;
 
 	static stdex::mutex idMapLock;
 	static id_map_type idMap;
@@ -53,53 +71,87 @@ static void _pthread_t_ID(stdex::thread::id aHandle, const eThreadIDOperation op
 
 	stdex::lock_guard<stdex::mutex> guard(idMapLock);
 
-	if (idMap.size() == 0)
-		idCount = 1;
-	else if (idMap.size() == 1)
-		idCount = idMap.begin()->second + 1;
-
+	stdex::thread::native_handle_type aHandle = pthread_self();
 
 	if (operation == GetThreadID)
 	{
-		id_map_type::iterator it = idMap.find(aHandle);
+		id_map_type::iterator result =
+			idMap.find(aHandle);
 
-		if (it == idMap.end())
+		id_map_type::mapped_type out;
+
+		if (idMap.end() == result)
 		{
-			std::pair<id_map_type::iterator, bool> result =
-				idMap.insert(std::make_pair(aHandle, idCount++));
-			it = result.first;
+			result = idMap.find(aHandle);
+
+			idMap.insert(std::make_pair(aHandle, idCount));
+
+			out = idCount;
+
+			idCount++;
+		}
+		else
+		{
+			out = result->second;
 		}
 
 		if (id_out != NULL)
 		{
-			*id_out = it->second;
+			*id_out = out;
+		}
+	}
+	else if (operation == AddThreadID)
+	{
+		std::pair<id_map_type::iterator, bool> result =
+			idMap.insert(std::make_pair(aHandle, idCount));
+
+		id_map_type::mapped_type out = result.first->second;
+
+		if (result.second) // new element
+		{
+			idCount++;
+		}
+		else
+		{
+			std::terminate();
+		}
+
+		if (id_out != NULL)
+		{
+			*id_out = out;
 		}
 	}
 	else
 	{
-		idMap.erase(aHandle);
+		id_map_type::iterator result =
+			idMap.find(aHandle);
+
+		if (idMap.end() == result)
+		{
+			std::terminate();
+		}
+		else
+		{
+			idMap.erase(result);
+			if (idMap.size() == 0)
+				idCount = 1;
+			else if(idMap.size() == 1)
+				idCount = idMap.rbegin()->second + 1;
+		}
 	}
 }
 
 using namespace stdex;
 
-stdex::uintmax_t thread::id::uid() const
-{
-	if (!_is_valid)
-		return stdex::uintmax_t(0);
-
-	stdex::uintmax_t _uid;
-
-	_pthread_t_ID(*this, GetThreadID, &_uid);
-
-	return _uid;
-
-}
-
 /// Information to pass to the new thread (what to run).
 struct thread_start_info {
 	void(*exec_function)(void *); ///< Pointer to the function to be executed.
 	void *argument;               ///< Function argument for the thread function.
+
+	stdex::mutex *mtx;
+	stdex::condition_variable *cond;
+	bool *notified;
+	stdex::thread::id *id;
 };
 
 // Thread wrapper function.
@@ -107,6 +159,19 @@ void* thread::wrapper_function(void *aArg)
 {
 	// Get thread startup information
 	thread_start_info *ti = (thread_start_info *) aArg;
+
+	thread::id id;
+
+	{
+		stdex::unique_lock<stdex::mutex> lock((*ti->mtx));
+
+		_pthread_t_ID(AddThreadID, &ti->id->_uid);
+
+		id = *ti->id;
+
+		(*ti->notified) = true;
+		ti->cond->notify_one();
+	}
 
 	try
 	{
@@ -123,9 +188,10 @@ void* thread::wrapper_function(void *aArg)
 	// The thread is no longer executing
 	
 	// The thread is responsible for freeing the startup information
-	delete ti;
 
-	_pthread_t_ID(this_thread::get_id(), RemoveThreadID);
+	_pthread_t_ID(RemoveThreadID);
+
+	delete ti;
 
 	return 0;
 }
@@ -138,16 +204,33 @@ void thread::init(void(*aFunction)(void *), void *aArg)
 	thread_info->exec_function = aFunction;
 	thread_info->argument = aArg;
 
-	_id._is_valid = true;
+	stdex::mutex mtx;
+	stdex::condition_variable cond;
+	bool notified = false;
+
+	thread_info->mtx = &mtx;
+	thread_info->cond = &cond;
+	thread_info->notified = &notified;
+	thread_info->id = &_id;
+
+	stdex::unique_lock<stdex::mutex> lock(mtx);
 
 	// Create the thread
-	int _e = pthread_create(&_id._handle, NULL, &wrapper_function, (void *) thread_info);
+	int _e = pthread_create(&_handle, NULL, &wrapper_function, (void *) thread_info);
+
 	if (_e)
 	{// Did we fail to create the thread?
-		_id._is_valid = false;
+
+		lock.unlock();
+
 		delete thread_info;
 
 		throw system_error(errc(_e));
+	}
+	else
+	{
+		while(!notified)
+			cond.wait(lock);
 	}
 }
 
@@ -163,7 +246,7 @@ void thread::join()
 
 	if (joinable())
 	{
-		_e = pthread_join(_id._handle, NULL);
+		_e = pthread_join(_handle, NULL);
 	}
 
 	if (_e)
@@ -184,7 +267,7 @@ void thread::detach()
 
 	if (joinable())
 	{
-		_e = pthread_detach(_id._handle);
+		_e = pthread_detach(_handle);
 	}
 
 	if (_e)
@@ -230,7 +313,11 @@ void thread::swap(thread & other) NOEXCEPT_FUNCTION
 
 thread::id this_thread::get_id() NOEXCEPT_FUNCTION
 {
-	return thread::id(pthread_self());
+	stdex::uintmax_t uid;
+
+	_pthread_t_ID(GetThreadID, &uid);
+
+	return thread::id(uid);
 }
 
 #ifdef _STDEX_THREAD_WIN // windows platform
@@ -368,3 +455,5 @@ void detail::sleep_for_impl(const struct timespec *reltime)
 
 
 #undef NOEXCEPT_FUNCTION
+
+
