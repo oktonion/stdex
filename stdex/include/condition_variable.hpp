@@ -14,8 +14,6 @@
 
 // std includes
 #include <memory>
-//#include <mutex>
-//#include <condition_variable>
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
