@@ -395,7 +395,7 @@ namespace stdex
 			_cat(&cat) 
 		{}
 
-		error_condition(errc e) NOEXCEPT_FUNCTION
+		explicit error_condition(errc e) NOEXCEPT_FUNCTION
 		{
 			*this = make_error_condition(e);
 		}
@@ -685,32 +685,37 @@ namespace stdex
 			{	// default constructor
 			}
 
-			static _generic_error_category _generic_object;
-			static _io_stream_error_category _io_stream_object;
-			static _system_error_category _system_object;
+			static _generic_error_category &_generic_object()
+			{
+				static _generic_error_category _obj;
+				return _obj;
+			}
+			static _io_stream_error_category &_io_stream_object()
+			{
+				static _io_stream_error_category _obj;
+				return _obj;
+			}
+			static _system_error_category &_system_object()
+			{
+				static _system_error_category _obj;
+				return _obj;
+			}
 		};
-
-		template<class _Cat>
-		_generic_error_category _error_objects<_Cat>::_generic_object;
-		template<class _Cat>
-		_io_stream_error_category _error_objects<_Cat>::_io_stream_object;
-		template<class _Cat>
-		_system_error_category _error_objects<_Cat>::_system_object;
 	}
 
 	inline const error_category& generic_category() NOEXCEPT_FUNCTION
 	{	// get generic_category
-		return (detail::_error_objects<int>::_generic_object);
+		return (detail::_error_objects<int>::_generic_object());
 	}
 
 	inline const error_category& iostream_category() NOEXCEPT_FUNCTION
 	{	// get iostream_category
-		return (detail::_error_objects<int>::_io_stream_object);
+		return (detail::_error_objects<int>::_io_stream_object());
 	}
 
 	inline const error_category& system_category() NOEXCEPT_FUNCTION
 	{	// get system_category
-		return (detail::_error_objects<int>::_system_object);
+		return (detail::_error_objects<int>::_system_object());
 	}
 } // namespace stdex
 
