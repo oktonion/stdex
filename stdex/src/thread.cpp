@@ -57,7 +57,7 @@ struct _pthread_t_less
 		if (pthread_equal(lhs, rhs) != 0)
 			return false;
 
-		return memcmp(&lhs, &rhs, sizeof(const stdex::thread::native_handle_type)) < 0;
+		return memcmp(&lhs, &rhs, sizeof(const stdex::thread::native_handle_type)) < 0; // not so efficient but whatever
 	}
 };
 
@@ -82,8 +82,6 @@ static void _pthread_t_ID(const eThreadIDOperation operation, stdex::uintmax_t *
 
 		if (idMap.end() == result)
 		{
-			result = idMap.find(aHandle);
-
 			idMap.insert(std::make_pair(aHandle, idCount));
 
 			out = idCount;
@@ -160,14 +158,10 @@ void* thread::wrapper_function(void *aArg)
 	// Get thread startup information
 	thread_start_info *ti = (thread_start_info *) aArg;
 
-	thread::id id;
-
 	{
 		stdex::unique_lock<stdex::mutex> lock((*ti->mtx));
 
 		_pthread_t_ID(AddThreadID, &ti->id->_uid);
-
-		id = *ti->id;
 
 		(*ti->notified) = true;
 		ti->cond->notify_one();
