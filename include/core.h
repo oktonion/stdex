@@ -153,10 +153,11 @@
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
+#define stdex_noexcept noexcept
 
 #else
 
-#define noexcept throw()
+#define stdex_noexcept throw()
 
 #endif
 
