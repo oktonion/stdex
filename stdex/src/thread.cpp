@@ -409,7 +409,7 @@ public:
 	{
 		const ULONG sysTimerOrigResolution = AdjustSystemTimerResolutionTo500mcs();
 
-		LARGE_INTEGER dueTime = { 0 };
+		LARGE_INTEGER dueTime = { {0} };
 		dueTime.QuadPart = static_cast<LONGLONG>(relativeTime100Ns) * -1;
 
 
