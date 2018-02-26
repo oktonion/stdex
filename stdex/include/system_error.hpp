@@ -7,6 +7,7 @@
 
 // stdex includes
 /*none*/
+#include "./type_traits"
 
 // POSIX includes
 /*none*/
@@ -303,7 +304,13 @@ namespace stdex
 
 	template<>
 	struct is_error_code_enum<io_errc>
-	{	// tests for error_condition enumeration
+	{	// tests for error_code enumeration
+		static const bool value = true;
+	};
+
+	template<>
+	struct is_error_code_enum<errc>
+	{
 		static const bool value = true;
 	};
 
@@ -408,7 +415,8 @@ namespace stdex
 
 		error_condition& operator=(errc e) NOEXCEPT_FUNCTION
 		{
-			return *this = make_error_condition(e);
+			*this = make_error_condition(e);
+			return *this;
 		}
 
 		void clear() NOEXCEPT_FUNCTION
@@ -426,11 +434,24 @@ namespace stdex
 			return category().message(value());
 		}
 
-		operator bool() const NOEXCEPT_FUNCTION
+		typedef void(*unspecified_bool_type)();
+		static void unspecified_bool_true() {}
+
+		operator unspecified_bool_type() const NOEXCEPT_FUNCTION  // true if error
 		{
-			return _value != 0;
+			return _value == 0 ? 0 : unspecified_bool_true;
+		}
+
+		bool operator!() const NOEXCEPT_FUNCTION  // true if no error
+		{
+			return _value == 0;
 		}
 	};
+
+	template<class _Cond, class _T = void>
+	struct my_enable_if:
+		public enable_if<_Cond::value == bool(true), _T>
+	{ };
 
 	class error_code
 	{
@@ -443,16 +464,21 @@ namespace stdex
 		error_code() NOEXCEPT_FUNCTION: 
 			_value(0), 
 			_cat(&system_category()) 
-		{}
+		{ }
 
 		error_code(int v, const error_category& cat) NOEXCEPT_FUNCTION: 
 			_value(v), 
 			_cat(&cat) 
-		{}
+		{ }
 
-		error_code(errc e) NOEXCEPT_FUNCTION
+		template< class _ErrorCodeEnum>
+		error_code(_ErrorCodeEnum e) NOEXCEPT_FUNCTION
 		{
-			*this = make_error_code(e);
+			typedef typename my_enable_if<is_error_code_enum<_ErrorCodeEnum>, _ErrorCodeEnum >::type type;
+
+			type _e = e;
+
+			*this = make_error_code(_e);
 		}
 
 		void assign(int v, const error_category& cat) NOEXCEPT_FUNCTION
@@ -468,7 +494,9 @@ namespace stdex
 
 		error_code& operator=(errc e) NOEXCEPT_FUNCTION
 		{
-			return *this = make_error_code(e);
+			*this = make_error_code(e);
+
+			return *this;
 		}
 
 		int value() const NOEXCEPT_FUNCTION { return _value; }
@@ -482,9 +510,17 @@ namespace stdex
 			return category().message(value());
 		}
 
-		operator bool() const NOEXCEPT_FUNCTION
+		typedef void(*unspecified_bool_type)();
+		static void unspecified_bool_true() {}
+
+		operator unspecified_bool_type() const  NOEXCEPT_FUNCTION // true if error
 		{
-			return _value != 0;
+			return _value == 0 ? 0 : unspecified_bool_true;
+		}
+
+		bool operator!() const  NOEXCEPT_FUNCTION // true if no error
+		{
+			return _value == 0;
 		}
 	};
 
@@ -500,15 +536,18 @@ namespace stdex
 		{}
 
 		system_error(error_code ec, const std::string &what): 
-			std::runtime_error(what + ": " + ec.message()), _code(ec)
+			std::runtime_error(what + ": " + ec.message()),
+            _code(ec)
 		{}
 
 		system_error(error_code ec, const char *what): 
-			std::runtime_error(what + (": " + ec.message())), _code(ec)
+			std::runtime_error(std::string(what) + (": " + ec.message())),
+            _code(ec)
 		{}
 
 		system_error(int v, const error_category &ecat, const char *what): 
-			std::runtime_error(what + (": " + error_code(v, ecat).message())), _code(error_code(v, ecat))
+			std::runtime_error(std::string(what) + (": " + error_code(v, ecat).message())),
+            _code(v, ecat)
 		{}
 
 		system_error(int v, const error_category &ecat): 
@@ -523,6 +562,23 @@ namespace stdex
 
 		const error_code& code() const NOEXCEPT_FUNCTION { return _code; }
 	};
+
+	inline bool
+		operator<(const error_code& _lhs, const error_code& _rhs) NOEXCEPT_FUNCTION
+	{
+		return (_lhs.category() < _rhs.category()
+			|| (_lhs.category() == _rhs.category()
+				&& _lhs.value() < _rhs.value()));
+	}
+
+	inline bool
+		operator<(const error_condition& _lhs,
+			const error_condition& _rhs) noexcept
+	{
+		return (_lhs.category() < _rhs.category()
+			|| (_lhs.category() == _rhs.category()
+				&& _lhs.value() < _rhs.value()));
+	}
 
 	// VIRTUALS FOR error_category
 	inline error_condition
@@ -552,35 +608,63 @@ namespace stdex
 	}
 
 	// OPERATOR== FOR error_code/error_condition
-	inline bool operator==(
-		const error_code& _Left,
-		const error_condition& _Right) NOEXCEPT_FUNCTION
-	{	// test errors for equality
-		return (_Left.category().equivalent(_Left.value(), _Right)
-			|| _Right.category().equivalent(_Left, _Right.value()));
+	inline bool
+		operator==(const error_code& _lhs, const error_code& _rhs) NOEXCEPT_FUNCTION
+	{
+		return (_lhs.category() == _rhs.category()
+			&& _lhs.value() == _rhs.value());
 	}
 
 	inline bool operator==(
-		const error_condition& _Left,
-		const error_code& _Right) NOEXCEPT_FUNCTION
+		const error_code& _lhs,
+		const error_condition& _rhs) NOEXCEPT_FUNCTION
 	{	// test errors for equality
-		return (_Right.category().equivalent(_Right.value(), _Left)
-			|| _Left.category().equivalent(_Right, _Left.value()));
+		return (_lhs.category().equivalent(_lhs.value(), _rhs)
+			|| _rhs.category().equivalent(_lhs, _rhs.value()));
+	}
+
+	inline bool operator==(
+		const error_condition& _lhs,
+		const error_code& _rhs) NOEXCEPT_FUNCTION
+	{	// test errors for equality
+		return (_rhs.category().equivalent(_rhs.value(), _lhs)
+			|| _lhs.category().equivalent(_rhs, _lhs.value()));
+	}
+
+	inline bool
+		operator==(const error_condition& _lhs,
+			const error_condition& _rhs) NOEXCEPT_FUNCTION
+	{
+		return (_lhs.category() == _rhs.category()
+			&& _lhs.value() == _rhs.value());
 	}
 
 	// OPERATOR!= FOR error_code/error_condition
-	inline bool operator!=(
-		const error_code& _Left,
-		const error_condition& _Right) NOEXCEPT_FUNCTION
-	{	// test errors for inequality
-		return (!(_Left == _Right));
+	inline bool
+		operator!=(const error_code& _lhs, const error_code& _rhs) noexcept
+	{
+		return (!(_lhs == _rhs));
 	}
 
 	inline bool operator!=(
-		const error_condition& _Left,
-		const error_code& _Right) NOEXCEPT_FUNCTION
+		const error_code& _lhs,
+		const error_condition& _rhs) NOEXCEPT_FUNCTION
 	{	// test errors for inequality
-		return (!(_Left == _Right));
+		return (!(_lhs == _rhs));
+	}
+
+	inline bool operator!=(
+		const error_condition& _lhs,
+		const error_code& _rhs) NOEXCEPT_FUNCTION
+	{	// test errors for inequality
+		return (!(_lhs == _rhs));
+	}
+
+	inline bool
+		operator!=(const error_condition& _lhs,
+			const error_condition& _rhs) noexcept
+	{
+		return (!(_lhs == _rhs));
 	}
 
 	// FUNCTION make_error_code
