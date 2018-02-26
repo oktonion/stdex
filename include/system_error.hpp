@@ -402,7 +402,7 @@ namespace stdex
 			_cat(&cat) 
 		{}
 
-		explicit error_condition(errc e) NOEXCEPT_FUNCTION
+		explicit error_condition(generic_errno e) NOEXCEPT_FUNCTION
 		{
 			*this = make_error_condition(e);
 		}
@@ -414,10 +414,10 @@ namespace stdex
 		}
 
 		template<class _ErrorCondEnum>
-		error_condition& 
-			operator=(typename enable_if<is_error_condition_enum<_ErrorCondEnum>::value, const _ErrorCondEnum&>::type e) NOEXCEPT_FUNCTION
+		typename enable_if<detail::_or_<is_error_condition_enum<_ErrorCondEnum>, is_same<error_condition, _ErrorCondEnum> >::value, error_condition&>::type
+			operator=(const _ErrorCondEnum& e) NOEXCEPT_FUNCTION
 		{
-			return *this = make_error_condition(e);
+			return (*this = make_error_condition(e));
 		}
 
 		void clear() NOEXCEPT_FUNCTION
@@ -467,8 +467,7 @@ namespace stdex
 			_cat(&cat) 
 		{ }
 
-		template< class _ErrorCodeEnum>
-		error_code(const _ErrorCodeEnum &e) NOEXCEPT_FUNCTION
+		error_code(const errc &e) NOEXCEPT_FUNCTION
 		{
 			*this = make_error_code(e);
 		}
@@ -486,8 +485,8 @@ namespace stdex
 
 
 		template<class _ErrorCodeEnum>
-		error_code&
-			operator=(typename enable_if<is_error_code_enum<_ErrorCodeEnum>::value, const _ErrorCodeEnum&>::type e) NOEXCEPT_FUNCTION
+		typename enable_if<detail::_or_<is_error_code_enum<_ErrorCodeEnum>, is_same<error_code, _ErrorCodeEnum> >::value, error_code&>::type
+			operator=(const _ErrorCodeEnum& e) NOEXCEPT_FUNCTION
 		{
 			return (*this = make_error_code(e));
 		}
