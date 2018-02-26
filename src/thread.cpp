@@ -219,7 +219,7 @@ void thread::init(void(*aFunction)(void *), void *aArg)
 
 		delete thread_info;
 
-		throw system_error(errc(_e));
+		throw system_error(error_code(errc(_e)));
 	}
 	else
 	{
@@ -244,7 +244,7 @@ void thread::join()
 	}
 
 	if (_e)
-		throw system_error(errc(_e));
+		throw system_error(error_code(errc(_e)));
 
 	_id = id();
 }
@@ -265,7 +265,7 @@ void thread::detach()
 	}
 
 	if (_e)
-		throw system_error(errc(_e));
+		throw system_error(error_code(errc(_e)));
 
 	_id = id();
 }
