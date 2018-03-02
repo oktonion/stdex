@@ -30,7 +30,24 @@
 namespace stdex
 {
 	/// cv_status
-	enum cv_status { no_timeout, timeout };
+	struct cv_status
+	{
+		enum cv_status_t { no_timeout, timeout };
+
+		cv_status(cv_status_t cvstat) :
+			_cvstat(cvstat)
+		{
+
+		}
+
+		operator cv_status_t() const
+		{
+			return _cvstat;
+		}
+
+		private:
+			cv_status_t _cvstat;
+	};
 
 	//! Condition variable class.
 	//! This is a signalling object for synchronizing the execution flow for
@@ -174,7 +191,7 @@ namespace stdex
 			int res = pthread_cond_timedwait(&_condition_handle, lock.mutex()->native_handle(), &ts);
 
 			return (clock_t::now() < atime
-				? no_timeout : timeout);
+				? cv_status::no_timeout : cv_status::timeout);
 		}
 
 		pthread_cond_t _condition_handle;
