@@ -164,7 +164,7 @@ namespace stdex
 			template<bool>
 			struct as_enum
 			{
-				typedef nullptr_t_as_enum type;
+				typedef void* type;
 			};
 
 			template<>
