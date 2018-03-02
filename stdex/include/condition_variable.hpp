@@ -131,7 +131,7 @@ namespace stdex
 		bool wait_until(unique_lock<mutex> &lock, const chrono::time_point<_Clock, _Duration> &atime, _Predicate p)
 		{
 			while (!p())
-				if (wait_until(lock, atime) == timeout)
+				if (wait_until(lock, atime) == cv_status::timeout)
 					return p();
 			return true;
 		}
