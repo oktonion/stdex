@@ -34,257 +34,285 @@
 
 namespace stdex
 {
-	enum errc {	// names for generic error codes
+	struct errc
+	{
+		enum errc_t {	// names for generic error codes
 #ifdef EAFNOSUPPORT
-		address_family_not_supported = EAFNOSUPPORT,
+			address_family_not_supported = EAFNOSUPPORT,
 #else
-		address_family_not_supported = 102,
+			address_family_not_supported = 102,
 #endif
 #ifdef EADDRINUSE
-		address_in_use = EADDRINUSE,
+			address_in_use = EADDRINUSE,
 #else
-		address_in_use = 100,
+			address_in_use = 100,
 #endif
 #ifdef EADDRNOTAVAIL
-		address_not_available = EADDRNOTAVAIL,
+			address_not_available = EADDRNOTAVAIL,
 #else
-		address_not_available = 101,
+			address_not_available = 101,
 #endif
 #ifdef EISCONN
-		already_connected = EISCONN,
+			already_connected = EISCONN,
 #else
-		already_connected = 113,
+			already_connected = 113,
 #endif
-		argument_list_too_long = E2BIG,
-		argument_out_of_domain = EDOM,
-		bad_address = EFAULT,
-		bad_file_descriptor = EBADF,
+			argument_list_too_long = E2BIG,
+			argument_out_of_domain = EDOM,
+			bad_address = EFAULT,
+			bad_file_descriptor = EBADF,
 #ifdef EBADMSG
-		bad_message = EBADMSG,
+			bad_message = EBADMSG,
 #else
-		bad_message = 103,
+			bad_message = 103,
 #endif
-		broken_pipe = EPIPE,
+			broken_pipe = EPIPE,
 #ifdef ECONNABORTED
-		connection_aborted = ECONNABORTED,
+			connection_aborted = ECONNABORTED,
 #else
-		connection_aborted = 106,
+			connection_aborted = 106,
 #endif
 #ifdef EALREADY
-		connection_already_in_progress = EALREADY,
+			connection_already_in_progress = EALREADY,
 #else
-		connection_already_in_progress = 103,
+			connection_already_in_progress = 103,
 #endif
 #ifdef ECONNREFUSED
-		connection_refused = ECONNREFUSED,
+			connection_refused = ECONNREFUSED,
 #else
-		connection_refused = 107,
+			connection_refused = 107,
 #endif
 #ifdef ECONNRESET
-		connection_reset = ECONNRESET,
+			connection_reset = ECONNRESET,
 #else
-		connection_reset = 108,
+			connection_reset = 108,
 #endif
-		cross_device_link = EXDEV,
+			cross_device_link = EXDEV,
 #ifdef EDESTADDRREQ
-		destination_address_required = EDESTADDRREQ,
+			destination_address_required = EDESTADDRREQ,
 #else
-		destination_address_required = 109,
+			destination_address_required = 109,
 #endif
-		device_or_resource_busy = EBUSY,
-		directory_not_empty = ENOTEMPTY,
-		executable_format_error = ENOEXEC,
-		file_exists = EEXIST,
-		file_too_large = EFBIG,
-		filename_too_long = ENAMETOOLONG,
+			device_or_resource_busy = EBUSY,
+			directory_not_empty = ENOTEMPTY,
+			executable_format_error = ENOEXEC,
+			file_exists = EEXIST,
+			file_too_large = EFBIG,
+			filename_too_long = ENAMETOOLONG,
 #ifdef ENOSYS
-		function_not_supported = ENOSYS,
+			function_not_supported = ENOSYS,
 #else
-		function_not_supported = 40,
+			function_not_supported = 40,
 #endif
 #ifdef EHOSTUNREACH
-		host_unreachable = EHOSTUNREACH,
+			host_unreachable = EHOSTUNREACH,
 #else
-		host_unreachable = 110,
+			host_unreachable = 110,
 #endif
 #ifdef EIDRM
-		identifier_removed = EIDRM,
+			identifier_removed = EIDRM,
 #else
-		identifier_removed = 111,
+			identifier_removed = 111,
 #endif
 #ifdef EILSEQ
-		illegal_byte_sequence = EILSEQ,
+			illegal_byte_sequence = EILSEQ,
 #else
-		illegal_byte_sequence = 42,
+			illegal_byte_sequence = 42,
 #endif
-		inappropriate_io_control_operation = ENOTTY,
-		interrupted = EINTR,
-		invalid_argument = EINVAL,
-		invalid_seek = ESPIPE,
-		io_error = EIO,
-		is_a_directory = EISDIR,
+			inappropriate_io_control_operation = ENOTTY,
+			interrupted = EINTR,
+			invalid_argument = EINVAL,
+			invalid_seek = ESPIPE,
+			io_error = EIO,
+			is_a_directory = EISDIR,
 #ifdef EMSGSIZE
-		message_size = EMSGSIZE,
+			message_size = EMSGSIZE,
 #else
-		message_size = 115,
+			message_size = 115,
 #endif
 #ifdef ENETDOWN
-		network_down = ENETDOWN,
+			network_down = ENETDOWN,
 #else
-		network_down = 116,
+			network_down = 116,
 #endif
 #ifdef ENETRESET
-		network_reset = ENETRESET,
+			network_reset = ENETRESET,
 #else
-		network_reset = 117,
+			network_reset = 117,
 #endif
 #ifdef ENETUNREACH
-		network_unreachable = ENETUNREACH,
+			network_unreachable = ENETUNREACH,
 #else
-		network_unreachable = 118,
+			network_unreachable = 118,
 #endif
 #ifdef ENOBUFS
-		no_buffer_space = ENOBUFS,
+			no_buffer_space = ENOBUFS,
 #else
-		no_buffer_space = 119,
+			no_buffer_space = 119,
 #endif
-		no_child_process = ECHILD,
+			no_child_process = ECHILD,
 #ifdef ENOLINK
-		no_link = ENOLINK,
+			no_link = ENOLINK,
 #else
-		no_link = 121,
+			no_link = 121,
 #endif
 #ifdef ENOLCK
-		no_lock_available = ENOLCK,
+			no_lock_available = ENOLCK,
 #else
-		no_lock_available = 39,
+			no_lock_available = 39,
 #endif
 #ifdef ENODATA
-		no_message_available = ENODATA,
+			no_message_available = ENODATA,
 #else
-		no_message_available = 120,
+			no_message_available = 120,
 #endif
 #ifdef ENOMSG
-		no_message = ENOMSG,
+			no_message = ENOMSG,
 #else
-		no_message = 122,
+			no_message = 122,
 #endif
 #ifdef ENOPROTOOPT
-		no_protocol_option = ENOPROTOOPT,
+			no_protocol_option = ENOPROTOOPT,
 #else
-		no_protocol_option = 123,
+			no_protocol_option = 123,
 #endif
-		no_space_on_device = ENOSPC,
+			no_space_on_device = ENOSPC,
 #ifdef ENOSR
-		no_stream_resources = ENOSR,
+			no_stream_resources = ENOSR,
 #else
-		no_stream_resources = 124,
+			no_stream_resources = 124,
 #endif
-		no_such_device_or_address = ENXIO,
-		no_such_device = ENODEV,
-		no_such_file_or_directory = ENOENT,
-		no_such_process = ESRCH,
-		not_a_directory = ENOTDIR,
+			no_such_device_or_address = ENXIO,
+			no_such_device = ENODEV,
+			no_such_file_or_directory = ENOENT,
+			no_such_process = ESRCH,
+			not_a_directory = ENOTDIR,
 #ifdef ENOTSOCK
-		not_a_socket = ENOTSOCK,
+			not_a_socket = ENOTSOCK,
 #else
-		not_a_socket = 128,
+			not_a_socket = 128,
 #endif
 #ifdef ENOSTR
-		not_a_stream = ENOSTR,
+			not_a_stream = ENOSTR,
 #else
-		not_a_stream = 125,
+			not_a_stream = 125,
 #endif
 #ifdef ENOTCONN
-		not_connected = ENOTCONN,
+			not_connected = ENOTCONN,
 #else
-		not_connected = 126,
+			not_connected = 126,
 #endif
-		not_enough_memory = ENOMEM,
+			not_enough_memory = ENOMEM,
 #ifdef ENOTSUP
-		not_supported = ENOTSUP,
+			not_supported = ENOTSUP,
 #else
-		not_supported = 129,
+			not_supported = 129,
 #endif
 #ifdef ECANCELED
-		operation_canceled = ECANCELED,
+			operation_canceled = ECANCELED,
 #else
-		operation_canceled = 105,
+			operation_canceled = 105,
 #endif
 #ifdef EINPROGRESS
-		operation_in_progress = EINPROGRESS,
+			operation_in_progress = EINPROGRESS,
 #else
-		operation_in_progress = 112,
+			operation_in_progress = 112,
 #endif
-		operation_not_permitted = EPERM,
+			operation_not_permitted = EPERM,
 #ifdef EOPNOTSUPP
-		operation_not_supported = EOPNOTSUPP,
+			operation_not_supported = EOPNOTSUPP,
 #else
-		operation_not_supported = 130,
+			operation_not_supported = 130,
 #endif
 #ifdef EWOULDBLOCK
-		operation_would_block = EWOULDBLOCK,
+			operation_would_block = EWOULDBLOCK,
 #else
-		operation_would_block = 140,
+			operation_would_block = 140,
 #endif
 #ifdef EOWNERDEAD
-		owner_dead = EOWNERDEAD,
+			owner_dead = EOWNERDEAD,
 #else
-		owner_dead = 133,
+			owner_dead = 133,
 #endif
-		permission_denied = EACCES,
+			permission_denied = EACCES,
 #ifdef EPROTO
-		protocol_error = EPROTO,
+			protocol_error = EPROTO,
 #else
-		protocol_error = 134,
+			protocol_error = 134,
 #endif
 #ifdef EPROTONOSUPPORT
-		protocol_not_supported = EPROTONOSUPPORT,
+			protocol_not_supported = EPROTONOSUPPORT,
 #else
-		protocol_not_supported = 135,
+			protocol_not_supported = 135,
 #endif
-		read_only_file_system = EROFS,
+			read_only_file_system = EROFS,
 #ifdef EDEADLK
-		resource_deadlock_would_occur = EDEADLK,
+			resource_deadlock_would_occur = EDEADLK,
 #else
-		resource_deadlock_would_occur = 36,
+			resource_deadlock_would_occur = 36,
 #endif
-		resource_unavailable_try_again = EAGAIN,
-		result_out_of_range = ERANGE,
+			resource_unavailable_try_again = EAGAIN,
+			result_out_of_range = ERANGE,
 #ifdef ENOTRECOVERABLE
-		state_not_recoverable = ENOTRECOVERABLE,
+			state_not_recoverable = ENOTRECOVERABLE,
 #else
-		state_not_recoverable = 127,
+			state_not_recoverable = 127,
 #endif
 #ifdef ETIME
-		stream_timeout = ETIME,
+			stream_timeout = ETIME,
 #else
-		stream_timeout = 137,
+			stream_timeout = 137,
 #endif
-		text_file_busy = ETXTBSY,
+			text_file_busy = ETXTBSY,
 #ifdef ETIMEDOUT
-		timed_out = ETIMEDOUT,
+			timed_out = ETIMEDOUT,
 #else
-		timed_out = 138,
+			timed_out = 138,
 #endif
-		too_many_files_open_in_system = ENFILE,
-		too_many_files_open = EMFILE,
-		too_many_links = EMLINK,
+			too_many_files_open_in_system = ENFILE,
+			too_many_files_open = EMFILE,
+			too_many_links = EMLINK,
 #ifdef ELOOP
-		too_many_symbolic_link_levels = ELOOP,
+			too_many_symbolic_link_levels = ELOOP,
 #else
-		too_many_symbolic_link_levels = 114,
+			too_many_symbolic_link_levels = 114,
 #endif
 #ifdef EOVERFLOW
-		value_too_large = EOVERFLOW,
+			value_too_large = EOVERFLOW,
 #else
-		value_too_large = 132,
+			value_too_large = 132,
 #endif
 #ifdef EPROTOTYPE
-		wrong_protocol_type = EPROTOTYPE
+			wrong_protocol_type = EPROTOTYPE
 #else
-		wrong_protocol_type = 136
+			wrong_protocol_type = 136
 #endif
+		};
+
+		errc(errc_t code):
+			_code(code)
+		{
+
+		}
+
+		errc(int code) :
+			_code(errc_t(code))
+		{
+
+		}
+
+		operator errc_t&()
+		{
+			return _code;
+		}
+
+		operator const errc_t&() const
+		{
+			return _code;
+		}
+
+		private:
+			errc_t _code;
 	};
 
 	typedef errc generic_errno;
@@ -309,7 +337,7 @@ namespace stdex
 	};
 
 	template<>
-	struct is_error_code_enum<errc>
+	struct is_error_code_enum<errc::errc_t>
 	{
 		static const bool value = true;
 	};
@@ -329,9 +357,9 @@ namespace stdex
 
 	class error_code;
 	class error_condition;
-	error_code make_error_code(generic_errno) NOEXCEPT_FUNCTION;
+	error_code make_error_code(errc::errc_t) NOEXCEPT_FUNCTION;
 	error_code make_error_code(io_errc) NOEXCEPT_FUNCTION;
-	error_condition make_error_condition(generic_errno) NOEXCEPT_FUNCTION;
+	error_condition make_error_condition(errc::errc_t) NOEXCEPT_FUNCTION;
 	error_condition make_error_condition(io_errc) NOEXCEPT_FUNCTION;
 
 	class error_category;
@@ -467,7 +495,7 @@ namespace stdex
 			_cat(&cat) 
 		{ }
 
-		error_code(const errc &e) NOEXCEPT_FUNCTION
+		error_code(const errc::errc_t &e) NOEXCEPT_FUNCTION
 		{
 			*this = make_error_code(e);
 		}
@@ -661,7 +689,7 @@ namespace stdex
 	}
 
 	// FUNCTION make_error_code
-	inline error_code make_error_code(generic_errno _Errno) NOEXCEPT_FUNCTION
+	inline error_code make_error_code(errc::errc_t _Errno) NOEXCEPT_FUNCTION
 	{	// make an error_code
 		return (error_code((int) _Errno, generic_category()));
 	}
@@ -672,7 +700,7 @@ namespace stdex
 	}
 
 	// FUNCTION make_error_condition
-	inline error_condition make_error_condition(generic_errno _Errno) NOEXCEPT_FUNCTION
+	inline error_condition make_error_condition(errc::errc_t _Errno) NOEXCEPT_FUNCTION
 	{	// make an error_condition
 		return (error_condition((int) _Errno, generic_category()));
 	}
