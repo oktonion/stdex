@@ -342,11 +342,23 @@ namespace stdex
 		static const bool value = true;
 	};
 
+	template<>
+	struct is_error_code_enum<errc>
+	{
+		static const bool value = true;
+	};
+
 	// TEMPLATE CLASS is_error_condition_enum
 	template<class _Enum>
 	struct is_error_condition_enum
 	{	// tests for error_condition enumeration
 		static const bool value = false;
+	};
+
+	template<>
+	struct is_error_condition_enum<errc::errc_t>
+	{
+		static const bool value = true;
 	};
 
 	template<>
