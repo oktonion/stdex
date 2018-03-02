@@ -493,13 +493,11 @@ namespace stdex
 		static void* wrapper_function(void *aArg);
 	};
 
-
-	
-
-	inline void swap(thread &rhs, thread &lhs) NOEXCEPT_FUNCTION
+	inline void swap(stdex::thread &lhs, stdex::thread &rhs) NOEXCEPT_FUNCTION
 	{
-		rhs.swap(lhs);
+		lhs.swap(rhs);
 	}
+
 
 	namespace detail
 	{
@@ -573,6 +571,17 @@ namespace stdex
 inline ::std::ostream& operator<<(::std::ostream &out, const stdex::thread::id &id)
 {
 	return id.print(out);
+}
+
+namespace std
+{
+	template<>
+	inline void swap(stdex::thread &lhs, stdex::thread &rhs)
+	{
+		using namespace std;
+
+		lhs.swap(rhs);
+	}
 }
 
 
