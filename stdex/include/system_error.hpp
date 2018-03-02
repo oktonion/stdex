@@ -295,12 +295,6 @@ namespace stdex
 
 		}
 
-		errc(int code) :
-			_code(errc_t(code))
-		{
-
-		}
-
 		operator errc_t&()
 		{
 			return _code;
@@ -442,9 +436,10 @@ namespace stdex
 			_cat(&cat) 
 		{}
 
-		explicit error_condition(generic_errno e) NOEXCEPT_FUNCTION
+		template<class _ErrorCondEnum>
+		explicit error_condition(const _ErrorCondEnum& e) NOEXCEPT_FUNCTION
 		{
-			*this = make_error_condition(e);
+			*this = e;
 		}
 
 		void assign(int v, const error_category &cat) NOEXCEPT_FUNCTION
@@ -507,9 +502,10 @@ namespace stdex
 			_cat(&cat) 
 		{ }
 
-		error_code(const errc::errc_t &e) NOEXCEPT_FUNCTION
+		template<class _ErrorCodeEnum>
+		error_code(const _ErrorCodeEnum &e) NOEXCEPT_FUNCTION
 		{
-			*this = make_error_code(e);
+			*this = e;
 		}
 
 		void assign(int v, const error_category& cat) NOEXCEPT_FUNCTION
