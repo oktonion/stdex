@@ -81,7 +81,7 @@ namespace stdex
 
 			// EINVAL, EAGAIN, EBUSY, EINVAL, EDEADLK(may)
 			if (e)
-				throw system_error( error_code(errc(e)) );
+				throw system_error( error_code(errc::errc_t(e)) );
 		}
 
 		//! Try to lock the mutex.
@@ -169,7 +169,7 @@ namespace stdex
 
 			// EINVAL, EAGAIN, EBUSY, EINVAL, EDEADLK(may)
 			if (e)
-				throw system_error(error_code(errc(e)));
+				throw system_error(error_code(errc::errc_t(e)));
 		}
 
 		//! Try to lock the mutex.
