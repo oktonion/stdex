@@ -27,6 +27,7 @@
 
 #endif
 
+
 namespace stdex
 {
 	class mutex_base
@@ -81,7 +82,7 @@ namespace stdex
 			// EINVAL, EAGAIN, EBUSY, EINVAL, EDEADLK(may)
 			if (e)
 				throw system_error( error_code(errc(e)) );
- 		}
+		}
 
 		//! Try to lock the mutex.
 		//! The method will try to lock the mutex. If it fails, the function will
@@ -376,7 +377,7 @@ namespace stdex
 			}
 		}
 
-		template<typename _Clock, typename _Duration>
+		template<class _Clock, class _Duration>
 		bool try_lock_until(const chrono::time_point<_Clock, _Duration> &atime)
 		{
 			if (!_device)
@@ -390,7 +391,7 @@ namespace stdex
 			}
 		}
 
-		template<typename _Rep, typename _Period>
+		template<class _Rep, class _Period>
 		bool try_lock_for(const chrono::duration<_Rep, _Period> &rtime)
 		{
 			if (!_device)
@@ -453,8 +454,8 @@ namespace stdex
 	};
 
 	/// Swap overload for unique_lock objects.
-	template<typename _Mutex>
-	inline void swap(unique_lock<_Mutex> &lhs, unique_lock<_Mutex> &rhs) NOEXCEPT_FUNCTION
+	template<class _Mutex>
+	inline void swap(stdex::unique_lock<_Mutex> &lhs, stdex::unique_lock<_Mutex> &rhs) NOEXCEPT_FUNCTION
 	{
 		lhs.swap(rhs);
 	}
