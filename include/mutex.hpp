@@ -354,9 +354,9 @@ namespace stdex
 		void lock()
 		{
 			if (!_device)
-				throw system_error(error_code(operation_not_permitted));
+				throw system_error(error_code(errc::operation_not_permitted));
 			else if (_owns)
-				throw system_error(error_code(resource_deadlock_would_occur));
+				throw system_error(error_code(errc::resource_deadlock_would_occur));
 			else
 			{
 				_device->lock();
@@ -367,9 +367,9 @@ namespace stdex
 		bool try_lock()
 		{
 			if (!_device)
-				throw system_error(error_code(operation_not_permitted));
+				throw system_error(error_code(errc::operation_not_permitted));
 			else if (_owns)
-				throw system_error(error_code(resource_deadlock_would_occur));
+				throw system_error(error_code(errc::resource_deadlock_would_occur));
 			else
 			{
 				_owns = _device->try_lock();
@@ -381,9 +381,9 @@ namespace stdex
 		bool try_lock_until(const chrono::time_point<_Clock, _Duration> &atime)
 		{
 			if (!_device)
-				throw system_error(error_code(operation_not_permitted));
+				throw system_error(error_code(errc::operation_not_permitted));
 			else if (_owns)
-				throw system_error(error_code(resource_deadlock_would_occur));
+				throw system_error(error_code(errc::resource_deadlock_would_occur));
 			else
 			{
 				_owns = _device->try_lock_until(atime);
@@ -395,9 +395,9 @@ namespace stdex
 		bool try_lock_for(const chrono::duration<_Rep, _Period> &rtime)
 		{
 			if (!_device)
-				throw system_error(error_code(operation_not_permitted));
+				throw system_error(error_code(errc::operation_not_permitted));
 			else if (_owns)
-				throw system_error(error_code(resource_deadlock_would_occur));
+				throw system_error(error_code(errc::resource_deadlock_would_occur));
 			else
 			{
 				_owns = _device->try_lock_for(rtime);
@@ -408,7 +408,7 @@ namespace stdex
 		void unlock()
 		{
 			if (!_owns)
-				throw system_error(error_code(operation_not_permitted));
+				throw system_error(error_code(errc::operation_not_permitted));
 			else if (_device)
 			{
 				_device->unlock();

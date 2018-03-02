@@ -236,7 +236,7 @@ thread::~thread()
 
 void thread::join()
 {
-	int _e = invalid_argument;
+	int _e = errc::invalid_argument;
 
 	if (joinable())
 	{
@@ -256,7 +256,7 @@ bool thread::joinable() const NOEXCEPT_FUNCTION
 
 void thread::detach()
 {
-	int _e = invalid_argument;
+	int _e = errc::invalid_argument;
 
 
 	if (joinable())
