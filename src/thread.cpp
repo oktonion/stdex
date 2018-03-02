@@ -299,11 +299,19 @@ void thread::swap(thread & other) NOEXCEPT_FUNCTION
 {
 	if (&other == this)
 		return;
+    {
+       native_handle_type tmp;
+       tmp = _handle;
+       _handle = other._handle;
+       other._handle = tmp;
+    }
 
-	using std::swap;
-
-	swap(_handle, other._handle);
-	swap(_id, other._id);
+    {
+       id tmp;
+       tmp = _id;
+       _id = other._id;
+       other._id = tmp;
+    }
 }
 
 thread::id this_thread::get_id() NOEXCEPT_FUNCTION
