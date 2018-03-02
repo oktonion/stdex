@@ -302,6 +302,7 @@ void thread::swap(thread & other) NOEXCEPT_FUNCTION
 
 	using std::swap;
 
+	swap(_handle, other._handle);
 	swap(_id, other._id);
 }
 

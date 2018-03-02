@@ -47,7 +47,7 @@ namespace stdex
 				template<class _FuncT>
 				void push(_FuncT fp)
 				{
-					return fp();
+					fp();
 				}
 			};
 
@@ -68,7 +68,7 @@ namespace stdex
 				template<class _FuncT>
 				void push(_FuncT fp)
 				{
-					return fp(arg1);
+					fp(arg1);
 				}
 			};
 
