@@ -184,6 +184,7 @@ namespace stdex
 				_cr;
 			typedef  _duration_cast_impl<_ToDur, _cf, _cr,
 				_cf::num == 1, _cf::den == 1> _dc;
+				
 			return _dc::_cast(d);
 		}
 
