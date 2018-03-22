@@ -176,7 +176,14 @@ struct thread_notification_data {
 		}
 	}
 
-	static void _this_thread_notification_data(eThreadIDOperation operation, thread_notification_data *&result)
+	enum eThreadDataOperation
+	{
+		RemoveThreadData,
+		AddToThreadData,
+		SetThreadData
+	};
+
+	static void _this_thread_notification_data(eThreadDataOperation operation, thread_notification_data *data = NULL, condition_variable *cond = NULL, unique_lock<mutex> *lk = NULL)
 	{
 		typedef std::map<thread::id, thread_notification_data*> data_map_type;
 		static mutex dataMapLock;
@@ -184,38 +191,35 @@ struct thread_notification_data {
 
 		lock_guard<mutex> guard(dataMapLock);
 
-		if (operation == GetThreadID)
+		if (operation == AddToThreadData)
 		{
-			result = dataMap[this_thread::get_id()];
+			thread_notification_data *result = dataMap[this_thread::get_id()];
+			if(result)
+				result->notify_all_at_thread_exit(cond, lk->release());
 		}
-		else if (operation == AddThreadID)
+		else if (operation == SetThreadData)
 		{
-			dataMap[this_thread::get_id()] = result;
+			dataMap[this_thread::get_id()] = operation;
 		}
-		else if (operation == RemoveThreadID)
+		else if (operation == RemoveThreadData)
 		{
 			dataMap.erase(this_thread::get_id());
 		}
 	}
 
-	static thread_notification_data *get_this_thread_notification_data()
+	static void add_to_this_thread_notification_data(condition_variable *cond, unique_lock<mutex> *lk)
 	{
-		thread_notification_data *out;
-
-		_this_thread_notification_data(GetThreadID, out);
-
-		return out;
+		_this_thread_notification_data(AddToThreadData, NULL, cond, lk);
 	}
 
 	static void set_this_thread_notification_data(thread_notification_data *data)
 	{
-		_this_thread_notification_data(AddThreadID, data);
+		_this_thread_notification_data(SetThreadData, data);
 	}
 
 	static void remove_this_thread_notification_data()
 	{
-		thread_notification_data *out;
-		_this_thread_notification_data(RemoveThreadID, out);
+		_this_thread_notification_data(RemoveThreadData);
 	}
 };
 
@@ -435,7 +439,7 @@ extern "C"
 
 ULONG AdjustSystemTimerResolutionTo500mcs()
 {
-	static ULONG resolution = 5000; // 0.5 мс в 100-наносекундных интервалах.
+	static ULONG resolution = 5000; // 0.5 пїЅпїЅ пїЅ 100-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.
 
 	ULONG sysTimerOrigResolution = 10000;
 
@@ -533,15 +537,11 @@ namespace stdex
 {
 	void notify_all_at_thread_exit(condition_variable& cond, unique_lock<mutex> &lk)
 	{
-		thread_notification_data* const current_thread_data(thread_notification_data::get_this_thread_notification_data());
-		if (current_thread_data)
-		{
-			unique_lock<mutex> lk2;
+		unique_lock<mutex> lk2;
 
-			lk.swap(lk2);
+		lk.swap(lk2);
 
-			current_thread_data->notify_all_at_thread_exit(&cond, lk2.release());
-		}
+		thread_notification_data::add_to_this_thread_notification_data(&cond, &lk2);
 	}
 }
 
