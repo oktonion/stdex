@@ -124,7 +124,7 @@ namespace stdex
 			const typename _Clock::time_point c_entry = _Clock::now();
 			const clock_t::time_point s_entry = clock_t::now();
 
-			return wait_until_impl(lock, (s_entry + atime - c_entry));
+			return wait_until_impl(lock, (s_entry + (atime - c_entry)));
 		}
 
 		template<class _Clock, class _Duration, class _Predicate>
