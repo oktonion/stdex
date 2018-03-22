@@ -418,8 +418,17 @@ namespace stdex
 
 		void swap(unique_lock &other) NOEXCEPT_FUNCTION
 		{
-			std::swap(_device, other._device);
-			std::swap(_owns, other._owns);
+			{
+				mutex_type *tmp = _device;
+				_device = other._device;
+				other._device = tmp;
+			}
+
+			{
+				bool tmp = _owns;
+				_owns = other._owns;
+				other._owns = tmp;
+			}
 		}
 
 		mutex_type* release() NOEXCEPT_FUNCTION
