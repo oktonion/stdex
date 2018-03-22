@@ -9,6 +9,7 @@
 // std includes
 #include <map>
 #include <set>
+#include <vector>
 
 // since windows is a 'special' platform there is some macro definitions to define platform
 #if defined(WIN32) || defined(_WIN32)
@@ -152,16 +153,86 @@ struct thread_start_info {
 	stdex::thread::id *id;
 };
 
+
+
+struct thread_notification_data {
+	typedef std::vector<std::pair<condition_variable*, mutex*>
+	> notify_list_t;
+
+	notify_list_t notify;
+
+	void notify_all_at_thread_exit(condition_variable* cv, mutex* m)
+	{
+		notify.push_back(std::make_pair(cv, m));
+	}
+
+	~thread_notification_data()
+	{
+		for (notify_list_t::iterator i = notify.begin(), e = notify.end();
+			i != e; ++i)
+		{
+			i->second->unlock();
+			i->first->notify_all();
+		}
+	}
+
+	static void _this_thread_notification_data(eThreadIDOperation operation, thread_notification_data *&result)
+	{
+		typedef std::map<thread::id, thread_notification_data*> data_map_type;
+		static mutex dataMapLock;
+		static data_map_type dataMap;
+
+		lock_guard<mutex> guard(dataMapLock);
+
+		if (operation == GetThreadID)
+		{
+			result = dataMap[this_thread::get_id()];
+		}
+		else if (operation == AddThreadID)
+		{
+			dataMap[this_thread::get_id()] = result;
+		}
+		else if (operation == RemoveThreadID)
+		{
+			dataMap.erase(this_thread::get_id());
+		}
+	}
+
+	static thread_notification_data *get_this_thread_notification_data()
+	{
+		thread_notification_data *out;
+
+		_this_thread_notification_data(GetThreadID, out);
+
+		return out;
+	}
+
+	static void set_this_thread_notification_data(thread_notification_data *data)
+	{
+		_this_thread_notification_data(AddThreadID, data);
+	}
+
+	static void remove_this_thread_notification_data()
+	{
+		thread_notification_data *out;
+		_this_thread_notification_data(RemoveThreadID, out);
+	}
+};
+
+
+
 // Thread wrapper function.
 void* thread::wrapper_function(void *aArg)
 {
 	// Get thread startup information
 	thread_start_info *ti = (thread_start_info *) aArg;
+	thread_notification_data nd;
 
 	{
 		stdex::unique_lock<stdex::mutex> lock((*ti->mtx));
 
 		_pthread_t_ID(AddThreadID, &ti->id->_uid);
+		thread_notification_data::set_this_thread_notification_data(&nd);
 
 		(*ti->notified) = true;
 		ti->cond->notify_one();
@@ -182,6 +253,8 @@ void* thread::wrapper_function(void *aArg)
 	// The thread is no longer executing
 	
 	// The thread is responsible for freeing the startup information
+
+	thread_notification_data::remove_this_thread_notification_data();
 
 	_pthread_t_ID(RemoveThreadID);
 
@@ -299,19 +372,19 @@ void thread::swap(thread & other) NOEXCEPT_FUNCTION
 {
 	if (&other == this)
 		return;
-    {
-       native_handle_type tmp;
-       tmp = _handle;
-       _handle = other._handle;
-       other._handle = tmp;
-    }
+	{
+	   native_handle_type tmp;
+	   tmp = _handle;
+	   _handle = other._handle;
+	   other._handle = tmp;
+	}
 
-    {
-       id tmp;
-       tmp = _id;
-       _id = other._id;
-       other._id = tmp;
-    }
+	{
+	   id tmp;
+	   tmp = _id;
+	   _id = other._id;
+	   other._id = tmp;
+	}
 }
 
 thread::id this_thread::get_id() NOEXCEPT_FUNCTION
@@ -455,6 +528,22 @@ void detail::sleep_for_impl(const struct timespec *reltime)
 }
 
 #endif
+
+namespace stdex
+{
+	void notify_all_at_thread_exit(condition_variable& cond, unique_lock<mutex> &lk)
+	{
+		thread_notification_data* const current_thread_data(thread_notification_data::get_this_thread_notification_data());
+		if (current_thread_data)
+		{
+			unique_lock<mutex> lk2;
+
+			lk.swap(lk2);
+
+			current_thread_data->notify_all_at_thread_exit(&cond, lk2.release());
+		}
+	}
+}
 
 
 #undef NOEXCEPT_FUNCTION
