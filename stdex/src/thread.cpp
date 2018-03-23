@@ -199,7 +199,7 @@ struct thread_notification_data {
 		}
 		else if (operation == SetThreadData)
 		{
-			dataMap[this_thread::get_id()] = operation;
+			dataMap[this_thread::get_id()] = data;
 		}
 		else if (operation == RemoveThreadData)
 		{
