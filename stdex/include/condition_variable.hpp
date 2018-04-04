@@ -139,13 +139,13 @@ namespace stdex
 		template<class _Rep, class _Period>
 		cv_status wait_for(unique_lock<mutex> &lock, const chrono::duration<_Rep, _Period> &rtime)
 		{
-			return wait_until(lock, clock_t::now() + rtime);
+            return wait_for_impl(lock, rtime);
 		}
 
 		template<class _Rep, class _Period, class _Predicate>
 		bool wait_for(unique_lock<mutex> &lock, const chrono::duration<_Rep, _Period> &rtime, _Predicate p)
 		{
-			return wait_until(lock, clock_t::now() + rtime, p);
+            return wait_until(lock, clock_t::now() + chrono::duration_cast<clock_t::duration>(rtime), p);
 		}
 
 		native_handle_type native_handle()
@@ -191,6 +191,34 @@ namespace stdex
 			int res = pthread_cond_timedwait(&_condition_handle, lock.mutex()->native_handle(), &ts);
 
 			return (clock_t::now() < atime
+				? cv_status::no_timeout : cv_status::timeout);
+		}
+
+		template<class _Rep, class _Period>
+		cv_status wait_for_impl(unique_lock<mutex> &lock, const chrono::duration<_Rep, _Period> &rtime)
+		{
+			clock_t::time_point start_time_point = clock_t::now();
+
+			if (!lock.owns_lock())
+				std::terminate();
+
+			chrono::seconds rs = chrono::duration_cast<chrono::seconds>(rtime);
+			chrono::nanoseconds rns = chrono::duration_cast<chrono::nanoseconds>(rtime - rs);
+
+			timespec ts;
+
+			ts.tv_sec = static_cast<stdex::time_t>(rs.count());
+			ts.tv_nsec = static_cast<long>(rns.count());
+
+			chrono::time_point<clock_t, chrono::seconds> s = chrono::time_point_cast<chrono::seconds>(start_time_point);
+			chrono::nanoseconds ns = chrono::duration_cast<chrono::nanoseconds>(start_time_point - s);
+			
+			ts.tv_sec += static_cast<stdex::time_t>(s.time_since_epoch().count());
+			ts.tv_nsec += static_cast<long>(ns.count());
+
+			int res = pthread_cond_timedwait(&_condition_handle, lock.mutex()->native_handle(), &ts);
+
+			 return (clock_t::now() - start_time_point < rtime
 				? cv_status::no_timeout : cv_status::timeout);
 		}
 
