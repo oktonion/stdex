@@ -23,7 +23,7 @@ matrix:
         apt:
           sources: ['ubuntu-toolchain-r-test']
           packages: ['g++-3.4']
-      env: COMPILER=g++-3.4
+      env: COMPILER=g++
 
     - os: linux
       compiler: gcc
