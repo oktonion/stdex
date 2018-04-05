@@ -1,0 +1,1 @@
+$COMPILER -o dummy ./tests/dummy.cpp
