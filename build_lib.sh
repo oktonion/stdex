@@ -11,8 +11,8 @@ for file in ./src/*.cpp; do
   fi
 done
 
-if [ !$build_ok ]; then
-  echo "build failed with $build_ok"
+if [ $build_ok ]; then
+  echo "libstdex.a build failed"
   exit 1
 fi
 
