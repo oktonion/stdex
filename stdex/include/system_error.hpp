@@ -16,6 +16,7 @@
 #include <errno.h>
 #include <cerrno>
 #include <cstdlib>		// for std::strerror
+#include <cstring>		// for std::strerror
 #include <stdexcept>	// for std::runtime_error
 #include <string>
 #include <functional>
