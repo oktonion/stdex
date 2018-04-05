@@ -1,1 +1,1 @@
-$COMPILER -o dummy ./tests/dummy.cpp
+$COMPILER -o ./tests/bin/dummy ./tests/dummy.cpp
