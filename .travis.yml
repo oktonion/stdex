@@ -27,6 +27,7 @@ matrix:
         - echo "deb-src http://snapshot.debian.org/archive/debian-security/20070730T000000Z/ lenny/updates main" | sudo tee -a /etc/apt/sources.list
         - sudo apt-get update -qq
         - sudo apt-get install gcc-3.4 g++-3.4 --allow-unauthenticated -y
+        - sudo apt install gcc-multilib -y
 
     - os: linux
       compiler: gcc
