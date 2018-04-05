@@ -1,3 +1,5 @@
+$COMPILER --version
+
 mkdir ./obj
 
 build_ok=1
