@@ -28,6 +28,9 @@ matrix:
         - sudo apt-get update -qq
         - sudo apt-get install gcc-3.4 g++-3.4 --allow-unauthenticated -y
         - sudo apt install gcc-multilib -y
+        - sudo apt-get install libc6-dev
+        - LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH 
+        - export LIBRARY_PATH
 
     - os: linux
       compiler: gcc
