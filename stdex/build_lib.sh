@@ -12,6 +12,7 @@ for file in ./src/*.cpp; do
 done
 
 if [ !$build_ok ]; then
+  echo "build failed with $build_ok"
   exit 1
 fi
 
