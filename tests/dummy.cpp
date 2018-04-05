@@ -1,4 +1,7 @@
+#include <iostream>
+
 int main(void)
 {
-  return -1;
+    std::cout << "Dummy test fail" << std::endl;
+    return -1;
 } 
