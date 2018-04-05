@@ -1,2 +1,6 @@
 mkdir ./tests/bin
-$COMPILER -o ./tests/bin/dummy ./tests/dummy.cpp
+for file in ./tests/*.cpp; do
+  filename="${file%.*}"
+  echo "compiling test $filename"
+  $COMPILER -o ./tests/bin/$filename $file
+done
