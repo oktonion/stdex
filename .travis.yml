@@ -38,5 +38,6 @@ matrix:
       env: COMPILER=clang++-3.5
 
 script:
-  build_tests.sh
+chmod +x ./build_tests.sh
+./build_tests.sh
 #make CXX=$COMPILER -j3
