@@ -1,13 +1,13 @@
 mkdir ./obj
 
-build_ok = 0
+build_ok=0
 
 for file in ./src/*.cpp; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
   echo "compiling $filename"
   if ! $COMPILER -o "./obj/$filename.o" $file; then
-    build_ok = 1
+    build_ok=1
   fi
 done
 
