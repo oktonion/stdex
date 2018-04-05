@@ -1,6 +1,6 @@
 mkdir ./obj
 
-build_ok=0
+build_ok=1
 
 for file in ./src/*.cpp; do
   filename=$(basename -- "$file")
