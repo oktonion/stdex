@@ -11,7 +11,7 @@ for file in ./src/*.cpp; do
   fi
 done
 
-if ! build_ok; then
+if ! $build_ok; then
   exit 1
 fi
 
