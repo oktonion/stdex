@@ -39,6 +39,8 @@ matrix:
 
 script:
   - echo "script started"
+  - chmod +x ./stdex/build_lib.sh
+  - ./stdex/build_lib.sh
   - chmod +x ./build_tests.sh
   - ./build_tests.sh
   - chmod +x ./run_tests.sh
