@@ -6,7 +6,7 @@ for file in ./src/*.cpp; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
   echo "compiling $filename"
-  if ! $COMPILER -o "./obj/$filename.o" $file; then
+  if ! $COMPILER -c "$file" -o "./obj/$filename.o"; then
     build_ok=1
   fi
 done
@@ -20,7 +20,7 @@ mkdir ./lib
 for file in ./obj/*.o; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
-  echo "compiling $filename"
+  echo "archiving $filename to libstdex.a"
   ar rcs ./lib/libstdex.a $file
 done
 
