@@ -10,7 +10,7 @@ A:
 
 Not all features of C++ 11 could be implemented without compiler support so I have no plans to include such features in the library.
 
-The library is portable for any compiler that supports C++98 but as we all know there are lots of different implementations of std library in even major compilers so this library is tested on C++ Builder 6.0 Updt4, g++ 4.something, g++ 3.4, Visual Studio 2010, 2013, 2015 and thats it. If you use other compiler and decide to include my library in your project there is no guarantee that it will compile without errors. In case you will be able to fix the errors without breaking existing code for already supported compilers I would really appreciate your pull requests.
+The library is portable for any compiler that supports C++98 but as we all know there are lots of different implementations of std library in even major compilers so this library is tested on C++ Builder 6.0 Updt4, g++ 4.something, g++ 3.4, clang 3.something, Visual Studio 2010, 2013, 2015 and thats it. If you use other compiler and decide to include my library in your project there is no guarantee that it will compile without errors. In case you will be able to fix the errors without breaking existing code for already supported compilers I would really appreciate your pull requests.
 
 For the C++ threads (mutexes, threads) I'm using POSIX threads implementation. There is one for Windows platform and definetely should be one for every POSIX-friendly platform.
 
