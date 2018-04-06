@@ -1,7 +1,6 @@
 $COMPILER --version
 
 mkdir ./obj
-
 build_ok=1
 
 for file in ./src/*.cpp; do
