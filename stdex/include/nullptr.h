@@ -155,25 +155,25 @@ namespace stdex
 				typedef int type;
 			};
 
-			template<>
-			struct as_int<false>
-			{
-				typedef void* type;
-			};
-
 			template<bool>
 			struct as_enum
 			{
 				typedef void* type;
 			};
 
-			template<>
-			struct as_enum<false>
-			{
-				typedef as_int<sizeof(int) == sizeof(void*)>::type type;
-			};
-
 			typedef as_enum<sizeof(nullptr_t_as_enum) == sizeof(void*)>::type type;
+		};
+
+		template<>
+		struct nullptr_chooser::as_int<false>
+		{
+			typedef void* type;
+		};
+
+		template<>
+		struct nullptr_chooser::as_enum<false>
+		{
+			typedef as_int<sizeof(int) == sizeof(void*)>::type type;
 		};
 	}
 
