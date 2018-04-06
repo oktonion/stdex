@@ -91,94 +91,90 @@ namespace stdex
 	namespace chrono
 	{
 		// Primary template for duration_cast impl.
-
-		namespace detail
+		template<class _ToDur, class _CF, class _CR,
+			bool _NumIsOne = false, bool _DenIsOne = false>
+		struct _duration_cast_impl
 		{
-			template<class _ToDur, class _CF, class _CR,
-				bool _NumIsOne = false, bool _DenIsOne = false>
-			struct _duration_cast_impl
-			{
-				template<class _Rep, class _Period>
-				static _ToDur _cast(const duration<_Rep, _Period> &d)
-				{
-					typedef typename _ToDur::rep			_to_rep;
-					return _ToDur(static_cast<_to_rep>(static_cast<_CR>(d.count())
-						* static_cast<_CR>(_CF::num)
-						/ static_cast<_CR>(_CF::den)));
-				}
-			};
-
-			template<class _ToDur, class _CF, class _CR>
-			struct _duration_cast_impl<_ToDur, _CF, _CR, true, true>
-			{
-				template<class _Rep, class _Period>
-				static _ToDur _cast(const duration<_Rep, _Period> &d)
-				{
-					typedef typename _ToDur::rep			_to_rep;
-					return _ToDur(static_cast<_to_rep>(d.count()));
-				}
-			};
-
-			template<class _ToDur, class _CF, class _CR>
-			struct _duration_cast_impl<_ToDur, _CF, _CR, true, false>
-			{
-				template<class _Rep, class _Period>
-				static _ToDur _cast(const duration<_Rep, _Period> &d)
-				{
-					typedef typename _ToDur::rep			_to_rep;
-					return _ToDur(static_cast<_to_rep>(
-						static_cast<_CR>(d.count()) / static_cast<_CR>(_CF::den)));
-				}
-			};
-
-			template<class _ToDur, class _CF, class _CR>
-			struct _duration_cast_impl<_ToDur, _CF, _CR, false, true>
-			{
-				template<class _Rep, class _Period>
-				static _ToDur _cast(const duration<_Rep, _Period> &d)
-				{
-					typedef typename _ToDur::rep			_to_rep;
-					return _ToDur(static_cast<_to_rep>(
-						static_cast<_CR>(d.count()) * static_cast<_CR>(_CF::num)));
-				}
-			};
-
-			template<class _Tp>
-			struct _is_duration
-			{
-				static const bool value = false;
-			};
-
 			template<class _Rep, class _Period>
-			struct _is_duration<duration<_Rep, _Period> >
+			static _ToDur _cast(const duration<_Rep, _Period> &d)
 			{
-				static const bool value = true;
-			};
+				typedef typename _ToDur::rep			_to_rep;
+				return _ToDur(static_cast<_to_rep>(static_cast<_CR>(d.count())
+					* static_cast<_CR>(_CF::num)
+					/ static_cast<_CR>(_CF::den)));
+			}
+		};
 
-			template <bool, class _Tp>
-			struct _enable_if_is_duration_impl
-			{};
-
-			template <class _Tp>
-			struct _enable_if_is_duration_impl<true, _Tp>
+		template<class _ToDur, class _CF, class _CR>
+		struct _duration_cast_impl<_ToDur, _CF, _CR, true, true>
+		{
+			template<class _Rep, class _Period>
+			static _ToDur _cast(const duration<_Rep, _Period> &d)
 			{
-				typedef _Tp type;
-			};
+				typedef typename _ToDur::rep			_to_rep;
+				return _ToDur(static_cast<_to_rep>(d.count()));
+			}
+		};
 
-			template <class _Tp>
-			struct _enable_if_is_duration :
-				_enable_if_is_duration_impl<_is_duration<_Tp>::value == bool(true), _Tp>
-			{};
+		template<class _ToDur, class _CF, class _CR>
+		struct _duration_cast_impl<_ToDur, _CF, _CR, true, false>
+		{
+			template<class _Rep, class _Period>
+			static _ToDur _cast(const duration<_Rep, _Period> &d)
+			{
+				typedef typename _ToDur::rep			_to_rep;
+				return _ToDur(static_cast<_to_rep>(
+					static_cast<_CR>(d.count()) / static_cast<_CR>(_CF::den)));
+			}
+		};
 
-			template <class _Tp>
-			struct _disable_if_is_duration :
-				_enable_if_is_duration_impl<_is_duration<_Tp>::value == bool(false), _Tp>
-			{};
-		}
+		template<class _ToDur, class _CF, class _CR>
+		struct _duration_cast_impl<_ToDur, _CF, _CR, false, true>
+		{
+			template<class _Rep, class _Period>
+			static _ToDur _cast(const duration<_Rep, _Period> &d)
+			{
+				typedef typename _ToDur::rep			_to_rep;
+				return _ToDur(static_cast<_to_rep>(
+					static_cast<_CR>(d.count()) * static_cast<_CR>(_CF::num)));
+			}
+		};
+
+		template<class _Tp>
+		struct _is_duration
+		{ 
+			static const bool value = false;
+		};
+
+		template<class _Rep, class _Period>
+		struct _is_duration<duration<_Rep, _Period> >
+		{ 
+			static const bool value = true;
+		};
+
+		template <bool, class _Tp>
+		struct _enable_if_is_duration_impl
+		{};
+
+		template <class _Tp>
+		struct _enable_if_is_duration_impl<true, _Tp>
+		{
+			typedef _Tp type;
+		};
+
+		template <class _Tp>
+		struct _enable_if_is_duration:
+			_enable_if_is_duration_impl<_is_duration<_Tp>::value == bool(true), _Tp>
+		{};
+
+		template <class _Tp>
+		struct _disable_if_is_duration :
+			_enable_if_is_duration_impl<_is_duration<_Tp>::value == bool(false), _Tp>
+		{};
 
 		// duration_cast
 		template<class _ToDur, class _Rep, class _Period>
-		typename detail::_enable_if_is_duration<_ToDur>::type 
+		typename _enable_if_is_duration<_ToDur>::type 
 		duration_cast(const duration<_Rep, _Period> &d)
 		{
 			typedef typename _ToDur::period				_to_period;
@@ -186,9 +182,9 @@ namespace stdex
 			typedef ratio_divide<_Period, _to_period> 		_cf;
 			typedef typename common_type<_to_rep, _Rep, intmax_t>::type
 				_cr;
-			typedef  detail::_duration_cast_impl<_ToDur, _cf, _cr,
+			typedef  _duration_cast_impl<_ToDur, _cf, _cr,
 				_cf::num == 1, _cf::den == 1> _dc;
-			
+				
 			return _dc::_cast(d);
 		}
 
@@ -298,20 +294,17 @@ namespace stdex
 			};
 		};
 
-		namespace detail
-		{
-			template<class _Tp>
-			struct _is_ratio
-			{
-				static const bool value = false;
-			};
+		template<class _Tp>
+		struct _is_ratio
+		{ 
+			static const bool value = false;
+		};
 
-			template<intmax_t _Num, intmax_t _Den>
-			struct _is_ratio< ratio<_Num, _Den> >
-			{
-				static const bool value = true;
-			};
-		}
+		template<intmax_t _Num, intmax_t _Den>
+		struct _is_ratio< ratio<_Num, _Den> >
+		{ 
+			static const bool value = true;
+		};
 
 		namespace intern
 		{
@@ -384,10 +377,10 @@ namespace stdex
 
 			typedef intern::chrono_asserts check;
 
-			typedef typename check::rep_cannot_be_a_duration_assert< (detail::_is_duration<_Rep>::value == bool(false)) >::
+			typedef typename check::rep_cannot_be_a_duration_assert< (_is_duration<_Rep>::value == bool(false)) >::
 				rep_cannot_be_a_duration_assert_failed
 			check1; // if you are there means 1st template param _Rep is duration type
-			typedef typename check::period_must_be_a_specialization_of_ratio_assert< (detail::_is_ratio<typename _Period::type>::value) >::
+			typedef typename check::period_must_be_a_specialization_of_ratio_assert< (_is_ratio<typename _Period::type>::value) >::
 				period_must_be_a_specialization_of_ratio_assert_failed
 			check2; // if you are there means 2nd template param _Period is not a specialization of ratio class
 			typedef typename check::period_must_be_positive_assert< (_Period::num > 0) >::
@@ -508,7 +501,7 @@ namespace stdex
 				static const duration max()
 			#endif
 			{
-				return duration_values<_Rep>::(max)();
+				return duration_values<_Rep>::max();
 			}
 
 			#ifdef min
@@ -517,7 +510,7 @@ namespace stdex
 				static const duration min()
 			#endif
 			{
-				return duration_values<_Rep>::(min)();
+				return duration_values<_Rep>::min();
 			}
 		};
 
@@ -543,11 +536,6 @@ namespace stdex
 			typedef duration<_Rep1, _Period1>			_dur1;
 			typedef duration<_Rep2, _Period2>			_dur2;
 			typedef typename common_type<_dur1, _dur2>::type	_cd;
-
-			_cd var1;
-			var1 = _cd(lhs);
-			var1 = _cd(rhs);
-			var1 = _cd(_cd(lhs).count() - _cd(rhs).count());
 
 			return _cd(_cd(lhs).count() - _cd(rhs).count());
 		}
@@ -585,7 +573,7 @@ namespace stdex
 		}
 
 		template<class _Rep1, class _Period, class _Rep2>
-		duration<typename _common_rep_t<_Rep1, typename detail::_disable_if_is_duration<_Rep2>::type >::type, _Period>
+		duration<typename _common_rep_t<_Rep1, typename _disable_if_is_duration<_Rep2>::type >::type, _Period>
 		operator/(const duration<_Rep1, _Period> &d, const _Rep2 &s)
 		{
 			typedef duration<typename common_type<_Rep1, _Rep2>::type, _Period> _cd;
@@ -607,7 +595,7 @@ namespace stdex
 
 		// DR 934.
 		template<class _Rep1, class _Period, class _Rep2>	
-		duration<typename _common_rep_t<_Rep1, typename detail::_disable_if_is_duration<_Rep2>::type >::type, _Period>
+		duration<typename _common_rep_t<_Rep1, typename _disable_if_is_duration<_Rep2>::type >::type, _Period>
 		operator%(const duration<_Rep1, _Period> &d, const _Rep2 &s)
 		{
 			typedef duration<typename common_type<_Rep1, _Rep2>::type, _Period> _cd;
@@ -740,18 +728,15 @@ namespace stdex
 			duration _d;	// duration since the epoch
 		};
 
-		namespace detail
+		template <class _ToDur, class _Clock>
+		struct _time_point_enable_if_is_duration
 		{
-			template <class _ToDur, class _Clock>
-			struct _time_point_enable_if_is_duration
-			{
-				typedef time_point<_Clock, typename _enable_if_is_duration_impl<_is_duration<_ToDur>::value, _ToDur>::type> type;
-			};
-		}
+			typedef time_point<_Clock, typename _enable_if_is_duration_impl<_is_duration<_ToDur>::value, _ToDur>::type> type;
+		};
 
 		// time_point_cast
 		template<class _ToDur, class _Clock, class _Dur>
-		inline typename detail::_time_point_enable_if_is_duration<_ToDur, _Clock>::type
+		inline typename _time_point_enable_if_is_duration<_ToDur, _Clock>::type
 		time_point_cast(const time_point<_Clock, _Dur> &t)
 		{
 			typedef time_point<_Clock, _ToDur> 			_time_point;
