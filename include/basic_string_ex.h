@@ -44,6 +44,8 @@ namespace stdex
 	template <typename T>
 	inline T stot(const char *s, int base = 10)
 	{
+		using namespace std;
+		
 		T num = 0;
 		bool negative = false;
 		static const char digits[] = "0123456789abcdefghijklmnopqrstuvwxyz";
@@ -116,6 +118,8 @@ namespace stdex
 
 	inline double stod(const std::string &s)
 	{
+		using namespace std;
+		
 		return strtod(s.c_str(), nullptr);
 	}
 
@@ -141,6 +145,8 @@ namespace stdex
 	
 	inline std::string to_string(int value, int radix = 10)
 	{
+		using namespace std;
+		
 		static char buf[21];
 		itoa(value, buf, radix);
 		
@@ -149,6 +155,8 @@ namespace stdex
 
 	inline std::string to_string(unsigned int value)
 	{
+		using namespace std;
+		
 		static char buf[30];
 		sprintf(buf, "%ul", value);
 
@@ -164,6 +172,8 @@ namespace stdex
 
 	inline std::string to_string(float value)
 	{
+		using namespace std;
+		
 		static char buf[256];
 		sprintf(buf, "%f", value);
 
@@ -172,6 +182,8 @@ namespace stdex
 
 	inline std::string to_string(double value)
 	{
+		using namespace std;
+		
 		static char buf[512];
 		sprintf(buf, "%f", value);
 		
