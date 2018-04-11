@@ -56,6 +56,6 @@ after_success:
   - ./merge_to_work.sh
   - git remote
   - git config --global user.email travis@travis-ci.org
-  - git config --global user.name Travis CI
+  - git config --global user.name TravisCI
   - git push "https://${GH_TOKEN}@github.com/oktonion/stdex.git" work
 #make CXX=$COMPILER -j3
