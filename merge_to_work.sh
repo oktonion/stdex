@@ -1,5 +1,6 @@
+git remote update
 git fetch
-git checkout tmp
+git checkout -b tmp
 git merge -m "merging tested lib" origin/tests
 
 git filter-branch --prune-empty --subdirectory-filter stdex --
