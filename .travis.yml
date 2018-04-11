@@ -19,23 +19,6 @@ matrix:
 
     - os: linux
       compiler: gcc
-      env: COMPILER=g++-3.4
-      before_script:
-        - echo "deb     http://snapshot.debian.org/archive/debian/20070730T000000Z/ lenny main" | sudo tee -a /etc/apt/sources.list
-        - echo "deb-src http://snapshot.debian.org/archive/debian/20070730T000000Z/ lenny main" | sudo tee -a /etc/apt/sources.list
-        - echo "deb     http://snapshot.debian.org/archive/debian-security/20070730T000000Z/ lenny/updates main" | sudo tee -a /etc/apt/sources.list
-        - echo "deb-src http://snapshot.debian.org/archive/debian-security/20070730T000000Z/ lenny/updates main" | sudo tee -a /etc/apt/sources.list
-        - sudo apt-get update -qq
-        - sudo apt-get install gcc-3.4 g++-3.4 --allow-unauthenticated -y
-        - sudo apt install gcc-multilib g++-multilib -y
-        - sudo apt-get install libc6-dev -y
-        - sudo apt-get install lib32gcc1 -y
-        - LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:/usr/lib32:/usr/libx32:$LIBRARY_PATH 
-        - export LIBRARY_PATH
-        - sudo /sbin/ldconfig -p | grep libgcc
-
-    - os: linux
-      compiler: gcc
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']

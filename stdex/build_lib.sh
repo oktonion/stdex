@@ -7,7 +7,7 @@ for file in ./src/*.cpp; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
   echo "compiling $filename"
-  if ! $COMPILER -c "$file" -o "./obj/$filename.o"; then
+  if ! $COMPILER -std=c99 -c "$file" -o "./obj/$filename.o"; then
     build_ok=0
   fi
 done
