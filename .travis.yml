@@ -30,9 +30,8 @@ matrix:
         - sudo apt install gcc-multilib g++-multilib -y
         - sudo apt-get install libc6-dev -y
         - sudo apt-get install lib32gcc1 -y
-        - LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH 
+        - LIBRARY_PATH=/usr/lib/i386-linux-gnu:$LIBRARY_PATH 
         - export LIBRARY_PATH
-        - sudo cp /lib/i386-linux-gnu/libgcc_s.so.1 /lib/libgcc_s.so.1
         - sudo /sbin/ldconfig -p | grep libgcc
 
     - os: linux
