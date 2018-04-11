@@ -51,7 +51,7 @@ script:
 
 after_success:
   - chmod +x ./merge_to_work.sh
-  - merge_to_work.sh
+  - ./merge_to_work.sh
   - git remote
   - git config user.email 0oktonion0@gmail.com
   - git config user.name oktonion
