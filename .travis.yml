@@ -50,8 +50,9 @@ script:
   - ./run_tests.sh
 
 after_success:
-  - git status
+  - git checkout .
   - chmod +x ./merge_to_work.sh
+  - git status
   - ./merge_to_work.sh
   - git remote
   - git config user.email 0oktonion0@gmail.com
