@@ -1,3 +1,4 @@
+git fetch
 git checkout tmp
 git merge -m "merging tested lib" origin/tests
 
