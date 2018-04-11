@@ -50,6 +50,7 @@ script:
   - ./run_tests.sh
 
 after_success:
+  - git status
   - chmod +x ./merge_to_work.sh
   - ./merge_to_work.sh
   - git remote
