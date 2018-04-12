@@ -158,7 +158,26 @@ namespace stdex
 			template<bool>
 			struct as_enum
 			{
-				typedef void* type;
+				class type {
+					public:
+						// Required in order to create const nullptr_t objects without an
+						// explicit initializer in GCC 4.5, a la:
+						//
+						// const std::nullptr_t nullptr;
+						type() { }
+
+						// Make nullptr convertible to any pointer type.
+						template<typename T> operator T*() const { return 0; }
+						// Make nullptr convertible to any member pointer type.
+						template<typename C, typename T> operator T C::*() { return 0; }
+						bool operator==(type) const
+						{
+							return true;
+						}
+					private:
+						// Do not allow taking the address of nullptr.
+						void operator&();
+					};
 			};
 
 			typedef as_enum<sizeof(nullptr_t_as_enum) == sizeof(void*)>::type type;
@@ -182,10 +201,12 @@ typedef const detail::nullptr_chooser::type nullptr_t;
 }
 
 
-#ifdef NULL
+/*#ifdef NULL
 	#define nullptr (stdex::nullptr_t)(NULL)
 #else
 	#define nullptr (stdex::nullptr_t)(0)
-#endif
+#endif*/
+
+stdex::nullptr_t nullptr;
 
 #endif // _STDEX_NULLPTR_H
