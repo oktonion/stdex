@@ -33,8 +33,8 @@ int main(void)
 		//STATIC_ASSERT(!nullptr && nullptr == false && false == nullptr, nullptr_should_be_equal_false);
 		STATIC_ASSERT(sizeof(nullptr) == sizeof(void*), nullptr_should_be_sized_equal_to_void_ptr);
 		
-		if(! (&Test::mfunc != nullptr) ) throw(-1);
-		if (&func == nullptr)  throw(-1);
+		if(! (&Test::mfunc != nullptr) ) return 1;
+		if (&func == nullptr)  return 1;
 		Test::mfunc_ptr_type mf = nullptr;
 		func_type f = nullptr;
 		const Test::mfunc_ptr_type cmf = nullptr;
