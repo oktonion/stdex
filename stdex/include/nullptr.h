@@ -177,7 +177,7 @@ namespace stdex
 		};
 	}
 
-typedef detail::nullptr_chooser::type nullptr_t;
+typedef const detail::nullptr_chooser::type nullptr_t;
 
 }
 
