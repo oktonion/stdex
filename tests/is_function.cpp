@@ -13,24 +13,9 @@ typedef void foo5_t(int, bool, int*, int [], ...);
 
 struct Test
 {
-
+    typedef char(mfunc_type)(int, int, int);
+    typedef char(mfunc_margs_type)(int, int, int);
 };
-
-typedef char (Test::*mfunc_ptr_type)(int, int, int);
-typedef char(Test::*mfunc_margs_ptr_type)(int, int, int);
-
-template<class T>
-struct remove_ptr{
-    typedef T type;
-};
-
-template<class T>
-struct remove_ptr<T*>{
-    typedef T type;
-};
-
-typedef typename remove_ptr<mfunc_ptr_type>::type mfunc_type;
-typedef typename remove_ptr<mfunc_margs_ptr_type>::type mfunc_margs_type;
 
 int main(void)
 {
@@ -46,8 +31,8 @@ int main(void)
         STATIC_ASSERT(is_function<foo3_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<foo4_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<foo5_t>::value == (true), should_be_function);
-        STATIC_ASSERT(is_function<mfunc_type>::value == (true), should_be_function);
-        STATIC_ASSERT(is_function<mfunc_margs_type>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<Test::mfunc_type>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<Test::mfunc_margs_type>::value == (true), should_be_function);
     }
                                 
     // Negative tests.		
