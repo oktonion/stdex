@@ -2,13 +2,7 @@
 
 struct Test
 {
-	typedef char(Test::mfunc_type)(int, int, int);
-	typedef char(Test::mfunc_margs_type)(int, int, int);
-
-	typedef char(Test::mfunc_const_type)(int, int, int) const;
-	typedef char(Test::mfunc_const_margs_type)(int, int, int) const;
-
-	typedef mfunc_type* mfunc_ptr_type;
+	typedef char(Test::*mfunc_ptr_type)(int, int, int);
 
 	void mfunc() {}
 	void mfunc_const() const {}
