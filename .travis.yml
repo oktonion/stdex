@@ -48,14 +48,4 @@ script:
   - ./build_tests.sh
   - chmod +x ./run_tests.sh
   - ./run_tests.sh
-
-after_success:
-  - git checkout .
-  - chmod +x ./merge_to_work.sh
-  - git status
-  - ./merge_to_work.sh
-  - git remote
-  - git config --global user.email travis@travis-ci.org
-  - git config --global user.name TravisCI
-  - git push "https://${GH_TOKEN}@github.com/oktonion/stdex.git" work
 #make CXX=$COMPILER -j3
