@@ -1,4 +1,7 @@
 mkdir ./tests/bin
+
+build_ok=1
+
 for file in ./tests/*.cpp; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
