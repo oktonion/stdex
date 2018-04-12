@@ -158,7 +158,7 @@ namespace stdex
 			template<bool>
 			struct as_enum
 			{
-				typedef void* type;
+				typedef nullptr_t_as_enum type;
 			};
 
 			typedef as_enum<sizeof(nullptr_t_as_enum) == sizeof(void*)>::type type;
