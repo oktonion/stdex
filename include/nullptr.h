@@ -148,6 +148,10 @@ namespace stdex
 			_no_type _is_convertable_to_void_ptr(...);
 			_yes_type _is_convertable_to_void_ptr(void*);
 
+			_no_type _is_convertable_to_any_ptr(...);
+			template<class _T>
+			_yes_type _is_convertable_to_any_ptr(_T*);
+
 			enum nullptr_t_as_enum
 			{
 				#ifdef NULL
@@ -158,20 +162,41 @@ namespace stdex
 				__max_nullptr = uintmax_t(1) << (CHAR_BIT * sizeof(void*) - 1)
 			};
 
-			class nullptr_t_as_class {
+			class nullptr_t_as_class_impl {
 			public:
 				// Required in order to create const nullptr_t objects without an
 				// explicit initializer in GCC 4.5, a la:
 				//
 				// const std::nullptr_t nullptr;
-				nullptr_t_as_class() { }
+				nullptr_t_as_class_impl() { }
+				nullptr_t_as_class_impl(int) { }
 
 				// Make nullptr convertible to any pointer type.
 				template<typename T> operator T*() const { return 0; }
 				// Make nullptr convertible to any member pointer type.
 				template<typename C, typename T> operator T C::*() { return 0; }
-				bool operator==(nullptr_t_as_class) const { return true; }
-				bool operator!=(nullptr_t_as_class) const { return false; }
+				bool operator==(nullptr_t_as_class_impl) const { return true; }
+				bool operator!=(nullptr_t_as_class_impl) const { return false; }
+			private:
+				// Do not allow taking the address of nullptr.
+				void operator&();
+
+				void *_padding;
+			};
+
+			class nullptr_t_as_class_impl1 {
+			public:
+				// Required in order to create const nullptr_t objects without an
+				// explicit initializer in GCC 4.5, a la:
+				//
+				// const std::nullptr_t nullptr;
+				nullptr_t_as_class_impl1() { }
+				nullptr_t_as_class_impl1(int) { }
+
+				// Make nullptr convertible to any pointer type.
+				template<typename T> operator T*() const { return 0; }
+				bool operator==(nullptr_t_as_class_impl1) const { return true; }
+				bool operator!=(nullptr_t_as_class_impl1) const { return false; }
 			private:
 				// Do not allow taking the address of nullptr.
 				void operator&();
@@ -192,9 +217,41 @@ namespace stdex
 		};
 
 		template<class _T>
+		struct _is_convertable_to_any_ptr_impl
+		{
+			static const _T *p;
+			static const bool value = (sizeof(nullptr_detail::_is_convertable_to_any_ptr(*_is_convertable_to_any_ptr_impl::p)) == sizeof(nullptr_detail::_yes_type));
+		};
+
+		template<class _T>
+		struct _is_convertable_to_ptr_impl
+		{
+			static const bool value = (_is_convertable_to_void_ptr_impl<_T>::value == bool(true) && _is_convertable_to_any_ptr_impl<_T>::value == bool(true));
+		};
+
+		template<class _T>
 		struct _is_equal_size_to_void_ptr
 		{
 			static const bool value = (sizeof(_T) == sizeof(void*));
+		};
+
+		struct _member_ptr_is_same_as_ptr
+		{
+			struct test {};
+			typedef void(test::*member_ptr_type)(void);
+			static const bool value = _is_convertable_to_void_ptr_impl<member_ptr_type>::value;
+		};
+
+		template<bool>
+		struct nullptr_t_as_class_chooser
+		{
+			typedef nullptr_detail::nullptr_t_as_class_impl type;
+		};
+
+		template<>
+		struct nullptr_t_as_class_chooser<false>
+		{
+			typedef nullptr_detail::nullptr_t_as_class_impl1 type;
 		};
 
 		template<bool>
@@ -212,7 +269,7 @@ namespace stdex
 		template<bool>
 		struct _nullptr_choose_as_class
 		{
-			typedef nullptr_detail::nullptr_t_as_class type;
+			typedef nullptr_t_as_class_chooser<_member_ptr_is_same_as_ptr::value>::type type;
 		};
 
 		template<>
@@ -226,11 +283,11 @@ namespace stdex
 		{
 			struct as_int
 			{
-				static const bool _is_convertable_to_void_ptr = _is_convertable_to_void_ptr_impl<nullptr_detail::nullptr_t_as_int>::value;
+				static const bool _is_convertable_to_ptr = _is_convertable_to_ptr_impl<nullptr_detail::nullptr_t_as_int>::value;
 				static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<nullptr_detail::nullptr_t_as_int>::value;
 			};
 
-			typedef _nullptr_choose_as_int<as_int::_is_convertable_to_void_ptr == bool(true) && as_int::_equal_void_ptr == bool(true)>::type type;
+			typedef _nullptr_choose_as_int<as_int::_is_convertable_to_ptr == bool(true) && as_int::_equal_void_ptr == bool(true)>::type type;
 		};
 
 		template<>
@@ -238,11 +295,11 @@ namespace stdex
 		{
 			struct as_enum
 			{
-				static const bool _is_convertable_to_void_ptr = _is_convertable_to_void_ptr_impl<nullptr_detail::nullptr_t_as_enum>::value;
+				static const bool _is_convertable_to_ptr = _is_convertable_to_ptr_impl<nullptr_detail::nullptr_t_as_enum>::value;
 				static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<nullptr_detail::nullptr_t_as_enum>::value;
 			};
 
-			typedef _nullptr_choose_as_enum<as_enum::_is_convertable_to_void_ptr == bool(true) && as_enum::_equal_void_ptr == bool(true)>::type type;
+			typedef _nullptr_choose_as_enum<as_enum::_is_convertable_to_ptr == bool(true) && as_enum::_equal_void_ptr == bool(true)>::type type;
 		};
 
 		struct _nullptr_chooser
@@ -251,14 +308,14 @@ namespace stdex
 
 			struct as_class
 			{
-				struct test {};
-				typedef void(test::*member_ptr_type)(void);
-				static const bool _member_ptr_is_same_as_void_ptr = _is_convertable_to_void_ptr_impl<member_ptr_type>::value;
-				static const bool _is_convertable_to_void_ptr = _is_convertable_to_void_ptr_impl<nullptr_detail::nullptr_t_as_class>::value;
-				static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<nullptr_detail::nullptr_t_as_class>::value;
+				typedef nullptr_t_as_class_chooser<_member_ptr_is_same_as_ptr::value>::type nullptr_t_as_class;
+
+				static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<nullptr_t_as_class>::value;
 			};
 
-			typedef _nullptr_choose_as_enum<as_class::_member_ptr_is_same_as_void_ptr == bool(true) && as_class::_is_convertable_to_void_ptr == bool(true) && as_class::_equal_void_ptr == bool(true)>::type type;
+			typedef _nullptr_choose_as_class<as_class::_equal_void_ptr == bool(true)>::type type;
+
+			static const type value;
 		};
 	}
 
@@ -267,12 +324,13 @@ typedef detail::_nullptr_chooser::type nullptr_t;
 }
 
 
-#ifdef NULL
+/*#ifdef NULL
 	#define nullptr (stdex::nullptr_t)(NULL)
 #else
 	#define nullptr (stdex::nullptr_t)(0)
-#endif
+#endif*/
 
-//static stdex::nullptr_t nullptr = (stdex::nullptr_t)(0);
+#define nullptr stdex::detail::_nullptr_chooser::value
+
 
 #endif // _STDEX_NULLPTR_H
