@@ -170,13 +170,13 @@ namespace stdex
 						template<typename T> operator T*() const { return 0; }
 						// Make nullptr convertible to any member pointer type.
 						template<typename C, typename T> operator T C::*() { return 0; }
-						bool operator==(type) const
-						{
-							return true;
-						}
+						bool operator==(type) const { return true; }
+						bool operator!=(type) const { return false; }
 					private:
 						// Do not allow taking the address of nullptr.
 						void operator&();
+				
+						void *_padding;
 					};
 			};
 

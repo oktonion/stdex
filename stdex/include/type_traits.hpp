@@ -987,19 +987,15 @@ namespace stdex
 
 	namespace detail
 	{
+		typedef remove_cv<nullptr_t>::type _nullptr_t_clear;
+
 		template<class>
 		struct _is_null_pointer_helper
 			: public false_type { };
 
-#ifdef _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
 		template<>
-		struct _is_null_pointer_helper<stdex::nullptr_t>: 
+		struct _is_null_pointer_helper<_nullptr_t_clear>:
 			public true_type { };
-#elif defined(_STDEX_NATIVE_NULLPTR_SUPPORT)
-		template<>
-		struct _is_null_pointer_helper<std::nullptr_t>: 
-			public true_type { };
-#endif
 
 	}
 	// is_null_pointer (LWG 2247).
@@ -1007,6 +1003,8 @@ namespace stdex
 	struct is_null_pointer :
 		public detail::_is_null_pointer_helper<typename remove_cv<_Tp>::type>::type
 	{ };
+
+	
 
 	namespace detail
 	{
