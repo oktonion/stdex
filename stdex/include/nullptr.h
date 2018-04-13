@@ -131,13 +131,22 @@ namespace stdex
 
 	namespace detail
 	{
-		struct nullptr_chooser
+		namespace nullptr_detail
 		{
 			#ifdef LLONG_MAX
-			typedef ::uintmax_t uintmax_t;
+				typedef ::uintmax_t uintmax_t;
 			#else
-			typedef uint32_t uintmax_t;
+				typedef uint32_t uintmax_t;
 			#endif
+
+			typedef char _yes_type;
+			struct _no_type
+			{
+				char padding[8];
+			};
+
+			_no_type _is_convertable_to_void_ptr(...);
+			_yes_type _is_convertable_to_void_ptr(void*);
 
 			enum nullptr_t_as_enum
 			{
@@ -149,64 +158,121 @@ namespace stdex
 				__max_nullptr = uintmax_t(1) << (CHAR_BIT * sizeof(void*) - 1)
 			};
 
-			template<bool>
+			class nullptr_t_as_class {
+			public:
+				// Required in order to create const nullptr_t objects without an
+				// explicit initializer in GCC 4.5, a la:
+				//
+				// const std::nullptr_t nullptr;
+				nullptr_t_as_class() { }
+
+				// Make nullptr convertible to any pointer type.
+				template<typename T> operator T*() const { return 0; }
+				// Make nullptr convertible to any member pointer type.
+				template<typename C, typename T> operator T C::*() { return 0; }
+				bool operator==(nullptr_t_as_class) const { return true; }
+				bool operator!=(nullptr_t_as_class) const { return false; }
+			private:
+				// Do not allow taking the address of nullptr.
+				void operator&();
+
+				void *_padding;
+			};
+
+			typedef int nullptr_t_as_int;
+
+			typedef void* nullptr_t_as_void;
+		}
+
+		template<class _T>
+		struct _is_convertable_to_void_ptr_impl
+		{
+			static const _T *p;
+			static const bool value = (sizeof(nullptr_detail::_is_convertable_to_void_ptr(*_is_convertable_to_void_ptr_impl::p)) == sizeof(nullptr_detail::_yes_type));
+		};
+
+		template<class _T>
+		struct _is_equal_size_to_void_ptr
+		{
+			static const bool value = (sizeof(_T) == sizeof(void*));
+		};
+
+		template<bool>
+		struct _nullptr_choose_as_int
+		{
+			typedef nullptr_detail::nullptr_t_as_int type;
+		};
+
+		template<bool>
+		struct _nullptr_choose_as_enum
+		{
+			typedef nullptr_detail::nullptr_t_as_enum type;
+		};
+
+		template<bool>
+		struct _nullptr_choose_as_class
+		{
+			typedef nullptr_detail::nullptr_t_as_class type;
+		};
+
+		template<>
+		struct _nullptr_choose_as_int<false>
+		{
+			typedef nullptr_detail::nullptr_t_as_void type;
+		};
+
+		template<>
+		struct _nullptr_choose_as_enum<false>
+		{
 			struct as_int
 			{
-				typedef int type;
+				static const bool _is_convertable_to_void_ptr = _is_convertable_to_void_ptr_impl<nullptr_detail::nullptr_t_as_int>::value;
+				static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<nullptr_detail::nullptr_t_as_int>::value;
 			};
 
-			template<bool>
+			typedef _nullptr_choose_as_int<as_int::_is_convertable_to_void_ptr == bool(true) && as_int::_equal_void_ptr == bool(true)>::type type;
+		};
+
+		template<>
+		struct _nullptr_choose_as_class<false>
+		{
 			struct as_enum
 			{
-				class type {
-					public:
-						// Required in order to create const nullptr_t objects without an
-						// explicit initializer in GCC 4.5, a la:
-						//
-						// const std::nullptr_t nullptr;
-						type() { }
-
-						// Make nullptr convertible to any pointer type.
-						template<typename T> operator T*() const { return 0; }
-						// Make nullptr convertible to any member pointer type.
-						template<typename C, typename T> operator T C::*() { return 0; }
-						bool operator==(type) const { return true; }
-						bool operator!=(type) const { return false; }
-					private:
-						// Do not allow taking the address of nullptr.
-						void operator&();
-				
-						void *_padding;
-					};
+				static const bool _is_convertable_to_void_ptr = _is_convertable_to_void_ptr_impl<nullptr_detail::nullptr_t_as_enum>::value;
+				static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<nullptr_detail::nullptr_t_as_enum>::value;
 			};
 
-			typedef as_enum<sizeof(nullptr_t_as_enum) == sizeof(void*)>::type type;
+			typedef _nullptr_choose_as_enum<as_enum::_is_convertable_to_void_ptr == bool(true) && as_enum::_equal_void_ptr == bool(true)>::type type;
 		};
 
-		template<>
-		struct nullptr_chooser::as_int<false>
+		struct _nullptr_chooser
 		{
-			typedef void* type;
-		};
 
-		template<>
-		struct nullptr_chooser::as_enum<false>
-		{
-			typedef as_int<sizeof(int) == sizeof(void*)>::type type;
+
+			struct as_class
+			{
+				struct test {};
+				typedef void(test::*member_ptr_type)(void);
+				static const bool _member_ptr_is_same_as_void_ptr = _is_convertable_to_void_ptr_impl<member_ptr_type>::value;
+				static const bool _is_convertable_to_void_ptr = _is_convertable_to_void_ptr_impl<nullptr_detail::nullptr_t_as_class>::value;
+				static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<nullptr_detail::nullptr_t_as_class>::value;
+			};
+
+			typedef _nullptr_choose_as_enum<as_class::_member_ptr_is_same_as_void_ptr == bool(true) && as_class::_is_convertable_to_void_ptr == bool(true) && as_class::_equal_void_ptr == bool(true)>::type type;
 		};
 	}
 
-typedef const detail::nullptr_chooser::type nullptr_t;
+typedef detail::_nullptr_chooser::type nullptr_t;
 
 }
 
 
-/*#ifdef NULL
+#ifdef NULL
 	#define nullptr (stdex::nullptr_t)(NULL)
 #else
 	#define nullptr (stdex::nullptr_t)(0)
-#endif*/
+#endif
 
-stdex::nullptr_t nullptr;
+//static stdex::nullptr_t nullptr = (stdex::nullptr_t)(0);
 
 #endif // _STDEX_NULLPTR_H
