@@ -159,10 +159,10 @@ namespace stdex
 
 			#ifdef NULL
 			template<class T>
-			typename sfinae_true<(T(0), 0)>::type _nullptr_can_be_ct_constant(int);
-			#endif
-			template<class T>
 			typename sfinae_true<(T(NULL), 0)>::type _nullptr_can_be_ct_constant(int);
+			#else
+			template<class T>
+			typename sfinae_true<(T(0), 0)>::type _nullptr_can_be_ct_constant(int);
 			#endif
 			template<class>
 			_no_type _nullptr_can_be_ct_constant(...);
