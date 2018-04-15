@@ -154,7 +154,7 @@ namespace stdex
 
 			template<int> struct sfinae_true
 			{
-				typedef yes_type type;
+				typedef _yes_type type;
 			};
 
 			#ifdef NULL
@@ -165,7 +165,7 @@ namespace stdex
 			typename sfinae_true<(T(NULL), 0)>::type _nullptr_can_be_ct_constant(int);
 			#endif
 			template<class>
-			no_type _nullptr_can_be_ct_constant(...);
+			_no_type _nullptr_can_be_ct_constant(...);
 
 			enum nullptr_t_as_enum
 			{
