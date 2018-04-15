@@ -304,7 +304,7 @@ namespace stdex
 		{
 			struct as_int
 			{
-				typedef detail::nullptr_t_as_int nullptr_t_as_int;
+				typedef nullptr_detail::nullptr_t_as_int nullptr_t_as_int;
 
 				static const bool _is_convertable_to_ptr = _is_convertable_to_ptr_impl<nullptr_t_as_int>::value;
 				static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<nullptr_t_as_int>::value;
@@ -318,7 +318,7 @@ namespace stdex
 		{
 			struct as_enum
 			{
-				typedef detail::nullptr_t_as_enum nullptr_t_as_enum;
+				typedef nullptr_detail::nullptr_t_as_enum nullptr_t_as_enum;
 
 				static const bool _is_convertable_to_ptr = _is_convertable_to_ptr_impl<nullptr_t_as_enum>::value;
 				static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<nullptr_t_as_enum>::value;
