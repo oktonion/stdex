@@ -383,16 +383,16 @@ typedef detail::_nullptr_chooser::type nullptr_t;
 
 #ifdef NULL
 	#define nullptr stdex::detail::_nullptr_is_same_as<stdex::detail::nullptr_detail::nullptr_t_as_enum>::value ? \
-					stdex::detail::nullptr_detail::__nullptr_val : \
+					stdex::detail::nullptr_detail::__nullptr_val :( \
 					stdex::detail::_nullptr_is_same_as<stdex::detail::nullptr_detail::nullptr_t_as_int>::value ? \
 					NULL : \
-					(stdex::nullptr_t)(NULL)
+					(stdex::nullptr_t)(NULL))
 #else
 	#define nullptr stdex::detail::_nullptr_is_same_as<stdex::detail::nullptr_detail::nullptr_t_as_enum>::value ? \
-					stdex::detail::nullptr_detail::__nullptr_val : \
+					stdex::detail::nullptr_detail::__nullptr_val :( \
 					stdex::detail::_nullptr_is_same_as<stdex::detail::nullptr_detail::nullptr_t_as_int>::value ? \
 					0 : \
-					(stdex::nullptr_t)(0)
+					(stdex::nullptr_t)(0))
 #endif
 
 //#define nullptr stdex::detail::_nullptr_chooser::value
