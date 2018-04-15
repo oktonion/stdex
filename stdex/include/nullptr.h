@@ -247,7 +247,7 @@ namespace stdex
 		template<class _T>
 		struct _is_convertable_to_ptr_impl
 		{
-			static const bool value = (_is_convertable_to_void_ptr_impl<_T>::value == bool(true) && _is_convertable_to_any_ptr_impl<_T>::value == bool(true));
+			static const bool value = (_is_convertable_to_void_ptr_impl<_T>::value == bool(true));// && _is_convertable_to_any_ptr_impl<_T>::value == bool(true));
 		};
 
 		template<class _T>
