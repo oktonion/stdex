@@ -152,6 +152,21 @@ namespace stdex
 			template<class _T>
 			_yes_type _is_convertable_to_any_ptr(_T*);
 
+			template<int> struct sfinae_true
+			{
+				typedef yes_type type;
+			};
+
+			#ifdef NULL
+			template<class T>
+			typename sfinae_true<(T(0), 0)>::type _nullptr_can_be_ct_constant(int);
+			#endif
+			template<class T>
+			typename sfinae_true<(T(NULL), 0)>::type _nullptr_can_be_ct_constant(int);
+			#endif
+			template<class>
+			no_type _nullptr_can_be_ct_constant(...);
+
 			enum nullptr_t_as_enum
 			{
 				#ifdef NULL
@@ -208,6 +223,12 @@ namespace stdex
 
 			typedef void* nullptr_t_as_void;
 		}
+
+		template<class T>
+		struct _nullptr_can_be_ct_constant_impl
+		{
+			static const bool value = (sizeof(nullptr_detail::_nullptr_can_be_ct_constant<T>(0)) == sizeof(nullptr_detail::_yes_type));
+		};
 
 		template<class _T>
 		struct _is_convertable_to_void_ptr_impl
@@ -283,8 +304,10 @@ namespace stdex
 		{
 			struct as_int
 			{
-				static const bool _is_convertable_to_ptr = _is_convertable_to_ptr_impl<nullptr_detail::nullptr_t_as_int>::value;
-				static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<nullptr_detail::nullptr_t_as_int>::value;
+				typedef detail::nullptr_t_as_int nullptr_t_as_int;
+
+				static const bool _is_convertable_to_ptr = _is_convertable_to_ptr_impl<nullptr_t_as_int>::value;
+				static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<nullptr_t_as_int>::value;
 			};
 
 			typedef _nullptr_choose_as_int<as_int::_is_convertable_to_ptr == bool(true) && as_int::_equal_void_ptr == bool(true)>::type type;
@@ -295,11 +318,14 @@ namespace stdex
 		{
 			struct as_enum
 			{
-				static const bool _is_convertable_to_ptr = _is_convertable_to_ptr_impl<nullptr_detail::nullptr_t_as_enum>::value;
-				static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<nullptr_detail::nullptr_t_as_enum>::value;
+				typedef detail::nullptr_t_as_enum nullptr_t_as_enum;
+
+				static const bool _is_convertable_to_ptr = _is_convertable_to_ptr_impl<nullptr_t_as_enum>::value;
+				static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<nullptr_t_as_enum>::value;
+				static const bool _can_be_ct_constant = _nullptr_can_be_ct_constant_impl<nullptr_t_as_enum>::value;
 			};
 
-			typedef _nullptr_choose_as_enum<as_enum::_is_convertable_to_ptr == bool(true) && as_enum::_equal_void_ptr == bool(true)>::type type;
+			typedef _nullptr_choose_as_enum<as_enum::_is_convertable_to_ptr == bool(true) && as_enum::_equal_void_ptr == bool(true) && as_enum::_can_be_ct_constant == bool(true)>::type type;
 		};
 
 		struct _nullptr_chooser
@@ -311,9 +337,10 @@ namespace stdex
 				typedef nullptr_t_as_class_chooser<_member_ptr_is_same_as_ptr::value>::type nullptr_t_as_class;
 
 				static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<nullptr_t_as_class>::value;
+				static const bool _can_be_ct_constant = _nullptr_can_be_ct_constant_impl<nullptr_t_as_class>::value;
 			};
 
-			typedef _nullptr_choose_as_class<as_class::_equal_void_ptr == bool(true)>::type type;
+			typedef _nullptr_choose_as_class<as_class::_equal_void_ptr == bool(true) && as_class::_can_be_ct_constant == bool(true)>::type type;
 
 			static const type value;
 		};
