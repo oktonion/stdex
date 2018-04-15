@@ -244,10 +244,30 @@ namespace stdex
 			static const bool value = (sizeof(nullptr_detail::_is_convertable_to_any_ptr(*_is_convertable_to_any_ptr_impl::p)) == sizeof(nullptr_detail::_yes_type));
 		};
 
+		template<>
+		struct _is_convertable_to_void_ptr_impl<nullptr_detail::nullptr_t_as_int>
+		{
+			#ifdef NULL
+			static const bool value = (sizeof(nullptr_detail::_is_convertable_to_void_ptr(NULL)) == sizeof(nullptr_detail::_yes_type));
+			#else
+			static const bool value = (sizeof(nullptr_detail::_is_convertable_to_void_ptr(0)) == sizeof(nullptr_detail::_yes_type));
+			#endif
+		};
+
+		template<>
+		struct _is_convertable_to_any_ptr_impl<nullptr_detail::nullptr_t_as_int>
+		{
+			#ifdef NULL
+			static const bool value = (sizeof(nullptr_detail::_is_convertable_to_any_ptr(NULL)) == sizeof(nullptr_detail::_yes_type));
+			#else
+			static const bool value = (sizeof(nullptr_detail::_is_convertable_to_any_ptr(0)) == sizeof(nullptr_detail::_yes_type));
+			#endif
+		};
+
 		template<class _T>
 		struct _is_convertable_to_ptr_impl
 		{
-			static const bool value = (_is_convertable_to_void_ptr_impl<_T>::value == bool(true));// && _is_convertable_to_any_ptr_impl<_T>::value == bool(true));
+			static const bool value = (_is_convertable_to_void_ptr_impl<_T>::value == bool(true)) && _is_convertable_to_any_ptr_impl<_T>::value == bool(true));
 		};
 
 		template<class _T>
@@ -264,13 +284,13 @@ namespace stdex
 		};
 
 		template<bool>
-		struct nullptr_t_as_class_chooser
+		struct _nullptr_t_as_class_chooser
 		{
 			typedef nullptr_detail::nullptr_t_as_class_impl type;
 		};
 
 		template<>
-		struct nullptr_t_as_class_chooser<false>
+		struct _nullptr_t_as_class_chooser<false>
 		{
 			typedef nullptr_detail::nullptr_t_as_class_impl1 type;
 		};
@@ -290,7 +310,7 @@ namespace stdex
 		template<bool>
 		struct _nullptr_choose_as_class
 		{
-			typedef nullptr_t_as_class_chooser<_member_ptr_is_same_as_ptr::value>::type type;
+			typedef _nullptr_t_as_class_chooser<_member_ptr_is_same_as_ptr::value>::type type;
 		};
 
 		template<>
@@ -334,13 +354,25 @@ namespace stdex
 
 			struct as_class
 			{
-				typedef nullptr_t_as_class_chooser<_member_ptr_is_same_as_ptr::value>::type nullptr_t_as_class;
+				typedef _nullptr_t_as_class_chooser<_member_ptr_is_same_as_ptr::value>::type nullptr_t_as_class;
 
 				static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<nullptr_t_as_class>::value;
 				static const bool _can_be_ct_constant = _nullptr_can_be_ct_constant_impl<nullptr_t_as_class>::value;
 			};
 
 			typedef _nullptr_choose_as_class<as_class::_equal_void_ptr == bool(true) && as_class::_can_be_ct_constant == bool(true)>::type type;
+		};
+
+		template<class T>
+		struct _nullptr_is_same_as
+		{
+			static const bool value = false;
+		};
+
+		template<>
+		struct _nullptr_is_same_as<_nullptr_chooser::type>
+		{
+			static const bool value = true;
 		};
 	}
 
@@ -350,9 +382,17 @@ typedef detail::_nullptr_chooser::type nullptr_t;
 
 
 #ifdef NULL
-	#define nullptr (stdex::nullptr_t)(NULL)
+	#define nullptr stdex::detail::_nullptr_is_same_as<stdex::detail::nullptr_detail::nullptr_t_as_enum>::value ? \
+					stdex::detail::nullptr_detail::__nullptr_val : \
+					stdex::detail::_nullptr_is_same_as<stdex::detail::nullptr_detail::nullptr_t_as_int>::value ? \
+					NULL : \
+					(stdex::nullptr_t)(NULL)
 #else
-	#define nullptr (stdex::nullptr_t)(0)
+	#define nullptr stdex::detail::_nullptr_is_same_as<stdex::detail::nullptr_detail::nullptr_t_as_enum>::value ? \
+					stdex::detail::nullptr_detail::__nullptr_val : \
+					stdex::detail::_nullptr_is_same_as<stdex::detail::nullptr_detail::nullptr_t_as_int>::value ? \
+					0 : \
+					(stdex::nullptr_t)(0)
 #endif
 
 //#define nullptr stdex::detail::_nullptr_chooser::value
