@@ -5,8 +5,6 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-//clang 3.8.0
-
 #include <stdint.h>
 #include <climits>
 
@@ -178,20 +176,20 @@ namespace stdex
 			_no_type _is_convertable_to_class_f_ptr(...);
 			_yes_type _is_convertable_to_class_f_ptr(void(tester::*)(int));
 
-			template<int> struct sfinae_true
+			/*template<int> struct sfinae_true
 			{
 				typedef _yes_type type;
 			};
 
 			template<class T>
-			typename sfinae_true<(T(STDEX_NULL))>::type _nullptr_can_be_ct_constant(int);
+			typename sfinae_true<((T)(STDEX_NULL) == (T)(STDEX_NULL))>::type _nullptr_can_be_ct_constant(int);
 			template<class>
-			_no_type _nullptr_can_be_ct_constant(...);
+			_no_type _nullptr_can_be_ct_constant(...);*/
 
 			enum nullptr_t_as_enum
 			{
-				__nullptr_val = STDEX_NULL,
-				__max_nullptr = uintmax_t(1) << (CHAR_BIT * sizeof(void*) - 1)
+				_nullptr_val = STDEX_NULL,
+				_max_nullptr = uintmax_t(1) << (CHAR_BIT * sizeof(void*) - 1)
 			};
 
 			class nullptr_t_as_class_impl {
@@ -227,11 +225,14 @@ namespace stdex
 
 				// Make nullptr convertible to any pointer type.
 				template<typename T> operator T*() const { return 0; }
+
 				bool operator==(nullptr_t_as_class_impl1) const { return true; }
 				bool operator!=(nullptr_t_as_class_impl1) const { return false; }
 			private:
 				// Do not allow taking the address of nullptr.
 				void operator&();
+
+
 
 				void *_padding;
 			};
@@ -257,7 +258,7 @@ namespace stdex
 		template<class T>
 		struct _nullptr_can_be_ct_constant_impl
 		{
-			static const bool value = (sizeof(nullptr_detail::_nullptr_can_be_ct_constant<T>(0)) == sizeof(nullptr_detail::_yes_type));
+			static const bool value = false;// (sizeof(nullptr_detail::_nullptr_can_be_ct_constant<T>(0)) == sizeof(nullptr_detail::_yes_type));
 		};
 
 		template<class _T>
@@ -364,7 +365,7 @@ namespace stdex
 
 				static const bool _is_convertable_to_ptr = _is_convertable_to_ptr_impl<nullptr_t_as_enum>::value;
 				static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<nullptr_t_as_enum>::value;
-				static const bool _can_be_ct_constant = _nullptr_can_be_ct_constant_impl<nullptr_t_as_enum>::value;
+				static const bool _can_be_ct_constant = true;//_nullptr_can_be_ct_constant_impl<nullptr_t_as_enum>::value;
 			};
 
 			typedef _nullptr_choose_as_enum<as_enum::_is_convertable_to_ptr == bool(true) && as_enum::_equal_void_ptr == bool(true) && as_enum::_can_be_ct_constant == bool(true)>::type type;
