@@ -155,27 +155,27 @@ namespace stdex
 
 			_no_type _is_convertable_to_void_ptr(...);
 			_yes_type _is_convertable_to_void_ptr(void*);
-            
-            
-            _no_type _is_convertable_to_int_ptr(...);
+			
+			
+			_no_type _is_convertable_to_int_ptr(...);
 			_yes_type _is_convertable_to_int_ptr(int*);
-            
-            _no_type _is_convertable_to_float_ptr(...);
+			
+			_no_type _is_convertable_to_float_ptr(...);
 			_yes_type _is_convertable_to_float_ptr(float*);
-            
-            _no_type _is_convertable_to_bool_ptr(...);
+			
+			_no_type _is_convertable_to_bool_ptr(...);
 			_yes_type _is_convertable_to_bool_ptr(bool*);
-            
-            _no_type _is_convertable_to_const_bool_ptr(...);
+			
+			_no_type _is_convertable_to_const_bool_ptr(...);
 			_yes_type _is_convertable_to_const_bool_ptr(const bool*);
-            
-            _no_type _is_convertable_to_volatile_float_ptr(...);
+			
+			_no_type _is_convertable_to_volatile_float_ptr(...);
 			_yes_type _is_convertable_to_volatile_float_ptr(volatile float*);
-            
-            struct tester{};
-            _no_type _is_convertable_to_class_ptr(...);
+			
+			struct tester{};
+			_no_type _is_convertable_to_class_ptr(...);
 			_yes_type _is_convertable_to_class_ptr(tester*);
-            _no_type _is_convertable_to_class_f_ptr(...);
+			_no_type _is_convertable_to_class_f_ptr(...);
 			_yes_type _is_convertable_to_class_f_ptr(void(tester::*)(int));
 
 			template<int> struct sfinae_true
@@ -235,19 +235,19 @@ namespace stdex
 
 				void *_padding;
 			};
-            
-            template<bool>
-            struct nullptr_t_as_long_type { typedef long type; };
-            template<>
-            struct nullptr_t_as_long_type<false> { typedef long type; };
-            template<bool>
-            struct nullptr_t_as_short_type { typedef short type; };
-            template<>
-            struct nullptr_t_as_short_type<false> { typedef nullptr_t_as_long_type<sizeof(long) == sizeof(void*)>::type type; };
-            template<bool>
-            struct nullptr_t_as_int_type { typedef int type; };
-            template<>
-            struct nullptr_t_as_int_type<false> { typedef nullptr_t_as_short_type<sizeof(short) == sizeof(void*)>::type type; };
+			
+			template<bool>
+			struct nullptr_t_as_long_type { typedef long type; };
+			template<>
+			struct nullptr_t_as_long_type<false> { typedef long type; };
+			template<bool>
+			struct nullptr_t_as_short_type { typedef short type; };
+			template<>
+			struct nullptr_t_as_short_type<false> { typedef nullptr_t_as_long_type<sizeof(long) == sizeof(void*)>::type type; };
+			template<bool>
+			struct nullptr_t_as_int_type { typedef int type; };
+			template<>
+			struct nullptr_t_as_int_type<false> { typedef nullptr_t_as_short_type<sizeof(short) == sizeof(void*)>::type type; };
 
 			typedef nullptr_t_as_int_type<sizeof(int) == sizeof(void*)>::type nullptr_t_as_int;
 
@@ -270,20 +270,20 @@ namespace stdex
 		struct _is_convertable_to_any_ptr_impl
 		{
 			static const bool to_int_ptr = (sizeof(nullptr_detail::_is_convertable_to_int_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-            static const bool to_float_ptr = (sizeof(nullptr_detail::_is_convertable_to_float_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-            static const bool to_bool_ptr = (sizeof(nullptr_detail::_is_convertable_to_bool_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-            static const bool to_const_bool_ptr = (sizeof(nullptr_detail::_is_convertable_to_const_bool_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-            static const bool to_volatile_float_ptr = (sizeof(nullptr_detail::_is_convertable_to_volatile_float_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-            static const bool to_class_ptr = (sizeof(nullptr_detail::_is_convertable_to_class_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-            static const bool to_class_f_ptr = (sizeof(nullptr_detail::_is_convertable_to_class_f_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-            
-            static const bool value = _is_convertable_to_any_ptr_impl::to_int_ptr &&
-                                      _is_convertable_to_any_ptr_impl::to_float_ptr &&
-                                      _is_convertable_to_any_ptr_impl::to_bool_ptr &&
-                                      _is_convertable_to_any_ptr_impl::to_const_bool_ptr &&
-                                      _is_convertable_to_any_ptr_impl::to_volatile_float_ptr &&
-                                      _is_convertable_to_any_ptr_impl::to_class_ptr &&
-                                      _is_convertable_to_any_ptr_impl::to_class_f_ptr;
+			static const bool to_float_ptr = (sizeof(nullptr_detail::_is_convertable_to_float_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
+			static const bool to_bool_ptr = (sizeof(nullptr_detail::_is_convertable_to_bool_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
+			static const bool to_const_bool_ptr = (sizeof(nullptr_detail::_is_convertable_to_const_bool_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
+			static const bool to_volatile_float_ptr = (sizeof(nullptr_detail::_is_convertable_to_volatile_float_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
+			static const bool to_class_ptr = (sizeof(nullptr_detail::_is_convertable_to_class_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
+			static const bool to_class_f_ptr = (sizeof(nullptr_detail::_is_convertable_to_class_f_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
+			
+			static const bool value = _is_convertable_to_any_ptr_impl::to_int_ptr &&
+									  _is_convertable_to_any_ptr_impl::to_float_ptr &&
+									  _is_convertable_to_any_ptr_impl::to_bool_ptr &&
+									  _is_convertable_to_any_ptr_impl::to_const_bool_ptr &&
+									  _is_convertable_to_any_ptr_impl::to_volatile_float_ptr &&
+									  _is_convertable_to_any_ptr_impl::to_class_ptr &&
+									  _is_convertable_to_any_ptr_impl::to_class_f_ptr;
 		};
 
 		template<class _T>
