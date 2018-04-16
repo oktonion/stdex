@@ -314,9 +314,8 @@ namespace stdex
 			};
 
 			typedef _nullptr_choose_as_class<as_class::_equal_void_ptr == bool(true)>::type type;
-
-			static const type value;
 		};
+
 	}
 
 typedef detail::_nullptr_chooser::type nullptr_t;
@@ -324,13 +323,11 @@ typedef detail::_nullptr_chooser::type nullptr_t;
 }
 
 
-/*#ifdef NULL
+#ifdef NULL
 	#define nullptr (stdex::nullptr_t)(NULL)
 #else
 	#define nullptr (stdex::nullptr_t)(0)
-#endif*/
-
-#define nullptr stdex::detail::_nullptr_chooser::value
+#endif
 
 
 #endif // _STDEX_NULLPTR_H
