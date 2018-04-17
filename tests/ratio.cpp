@@ -85,20 +85,20 @@ int main(void)
 		VERIFY((ratio_less<ratio<2310, 18700>, ratio<18456, 19570> >::value == 1));
 
 		{
-			ratio<1, 3> r0;
-			ratio<2, 6> r1;
-			ratio<2, -6> r2;
-			ratio<-2, 6> r3;
+			typedef ratio<1, 3> r0;
+			typedef ratio<2, 6> r1;
+			typedef ratio<2, -6> r2;
+			typedef ratio<-2, 6> r3;
 
-			VERIFY((r0.num == 1));
-			VERIFY((r0.den == 3));
+			VERIFY((r0::num == 1));
+			VERIFY((r0::den == 3));
 
-			VERIFY((r1.num == r0.num));
-			VERIFY((r1.den == r0.den));
-			VERIFY((r2.num == -r0.num));
-			VERIFY((r2.den == r0.den));
-			VERIFY((r3.num == -r0.num));
-			VERIFY((r3.den == r0.den));
+			VERIFY((r1::num == r0::num));
+			VERIFY((r1::den == r0::den));
+			VERIFY((r2::num == -r0::num));
+			VERIFY((r2::den == r0::den));
+			VERIFY((r3::num == -r0::num));
+			VERIFY((r3::den == r0::den));
 		}
 
 		{
