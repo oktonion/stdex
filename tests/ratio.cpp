@@ -165,33 +165,33 @@ int main(void)
 		}
 
 		{
-			ratio_add<ratio<3, 8>, ratio<5, 12> >::type r;
+			typedef ratio_add<ratio<3, 8>, ratio<5, 12> >::type r;
 
-			VERIFY(r.num == 19);
-			VERIFY(r.den == 24);
+			VERIFY(r::num == 19);
+			VERIFY(r::den == 24);
 		}
 
 		{
-			ratio_subtract<ratio<3, 8>, ratio<5, 12> >::type r;
+			typedef ratio_subtract<ratio<3, 8>, ratio<5, 12> >::type r;
 
-			VERIFY(r.num == -1);
-			VERIFY(r.den == 24);
-		}
-
-
-		{
-			ratio_multiply<ratio<3, 8>, ratio<5, 12> >::type r;
-
-			VERIFY(r.num == 5);
-			VERIFY(r.den == 32);
+			VERIFY(r::num == -1);
+			VERIFY(r::den == 24);
 		}
 
 
 		{
-			ratio_divide<ratio<3, 8>, ratio<5, 12> >::type r;
+			typedef ratio_multiply<ratio<3, 8>, ratio<5, 12> >::type r;
 
-			VERIFY(r.num == 9);
-			VERIFY(r.den == 10);
+			VERIFY(r::num == 5);
+			VERIFY(r::den == 32);
+		}
+
+
+		{
+			typedef ratio_divide<ratio<3, 8>, ratio<5, 12> >::type r;
+
+			VERIFY(r::num == 9);
+			VERIFY(r::den == 10);
 		}
 
 		{
@@ -200,31 +200,31 @@ int main(void)
 			typedef ratio<M, 1> max_over_one;
 			typedef ratio<M, 2> max_over_two;
 
-			ratio_add<one_over_max, one_over_max>::type r1;
+			typedef ratio_add<one_over_max, one_over_max>::type r1;
 
-			VERIFY(r1.num == two_over_max::num);
-			VERIFY(r1.den == two_over_max::den);
+			VERIFY(r1::num == two_over_max::num);
+			VERIFY(r1::den == two_over_max::den);
 
-			ratio_add<
+			typedef ratio_add<
 				ratio<M / 2, M / 2>,
 				ratio<M / 2, M / 2 + 1> >::type r2;
 
-			VERIFY(r2.num == M);
-			VERIFY(r2.den == (M / 2) + 1);
+			VERIFY(r2::num == M);
+			VERIFY(r2::den == (M / 2) + 1);
 
 
 
-			ratio_subtract<one_over_max, one_over_max>::type r3;
+			typedef ratio_subtract<one_over_max, one_over_max>::type r3;
 
-			VERIFY(r3.num == 0);
-			VERIFY(r3.den == 1);
+			VERIFY(r3::num == 0);
+			VERIFY(r3::den == 1);
 
-			ratio_subtract<
+			typedef ratio_subtract<
 				ratio<M / 2, M / 2>,
 				ratio<M / 2, M / 2 + 1> >::type r4;
 
-			VERIFY(r4.num == 1);
-			VERIFY(r4.den == (M / 2) + 1);
+			VERIFY(r4::num == 1);
+			VERIFY(r4::den == (M / 2) + 1);
 		}
 
 		// sanity check
