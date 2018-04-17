@@ -16,125 +16,6 @@
 
 namespace stdex
 {
-
-	/*class nullptr_t
-	{
-	private:
-		void *_padding;
-		struct _nat { int _for_bool_; };
-
-		template<typename T>
-		struct identity { typedef T type; };
-
-	public:
-		nullptr_t() : _padding(0) { }
-		nullptr_t(int _nat::*) : _padding(0) { }
-
-		//operator int _nat::*() const { return 0; }
-
-		template<class T>
-		inline operator T*() const // convertible to any type of null non-member pointer...
-		{
-			return 0;
-		}
-
-		template<class T, class C>
-		inline operator T C::*() const   // or any type of null member pointer...
-		{
-			return 0;
-		}
-
-		template<typename T>
-		inline bool operator==(T *val) const { return equal(val); }
-
-		template<typename T>
-		inline bool operator!=(T *val) const { return !equal(val); }
-
-		template<typename T>
-		inline bool operator<(T *val) const { return less(val); }
-
-		template<typename T>
-		inline bool operator<=(T *val) const { return less_equal(val); }
-
-		template<typename T>
-		inline bool operator>(T *val) const { return false; }//nullptr always less or equal (can't be greater than)
-
-		template<typename T>
-		inline bool operator>=(T *val) const { return greater_equal(val); }
-
-		inline bool operator==(bool val) const { return false == val; }
-
-		inline bool operator!=(bool val) const { return false != val; }
-
-		//friends:
-		template<typename T>
-		friend inline bool operator==(T *val, nullptr_t np) { return equal(val, np); }
-
-		template<typename T>
-		friend inline bool operator!=(T *val, nullptr_t np) { return !equal(val, np); }
-
-		template<typename T>
-		friend inline bool operator<(T *val, nullptr_t np) { return false; }//value is always more or equal (can't be less than)
-
-		template<typename T>
-		friend inline bool operator<=(T *val, nullptr_t np) { return less_equal(val, np); }
-
-		template<typename T>
-		friend inline bool operator>(T *val, nullptr_t np) { return greater(val, np); }
-
-		template<typename T>
-		friend inline bool operator>=(T *val, nullptr_t np) { return greater_equal(val, np); }
-
-		friend inline bool operator==(bool val, nullptr_t np) { return false == val; }
-
-		friend inline bool operator!=(bool val, nullptr_t np) { return false != val; }
-
-
-	private: //template overloads
-
-
-		template<typename T>
-		inline bool equal(T *val) { return val == static_cast<T*>(*this); }
-
-		inline bool equal(nullptr_t) { return true; }
-
-		template<typename T>
-		inline bool less(T *val) { return static_cast<T*>(*this) < val; }
-
-		inline bool less(nullptr_t) { return false; }
-
-		template<typename T>
-		inline bool less_equal(T *val) { return  static_cast<T*>(*this) <= val; }
-
-		inline bool less_equal(nullptr_t) { return true; }
-
-		template<typename T>
-		inline bool greater_equal(T *val) { return static_cast<T*>(*this) >= val; }
-
-		inline bool greater_equal(nullptr_t) { return true; }
-
-		//friends:
-		template<typename T>
-		static inline bool equal(T *val, nullptr_t np) { return val == static_cast<T*>(np); }
-
-		static inline bool equal(nullptr_t, nullptr_t np) { return true; }
-
-		template<typename T>
-		static inline bool less_equal(T *val, nullptr_t np) { return val <= static_cast<T*>(np); }
-
-		static inline bool less_equal(nullptr_t, nullptr_t) { return true; }
-
-		template<typename T>
-		static inline bool greater(T *val, nullptr_t np) { return val > static_cast<T*>(np); }
-
-		static inline bool greater(nullptr_t, nullptr_t) { return false; }
-
-		template<typename T>
-		static inline bool greater_equal(T *val, nullptr_t np) { return val >= static_cast<T*>(np); }
-
-		static inline bool greater_equal(nullptr_t, nullptr_t) { return true; }
-	};*/
-
 	namespace detail
 	{
 		namespace nullptr_detail
@@ -258,6 +139,7 @@ namespace stdex
 		template<class T>
 		struct _nullptr_can_be_ct_constant_impl
 		{
+			// idk how to check for compile time constantness of type in gerenal for any c++98 compiler, so...
 			static const bool value = false;// (sizeof(nullptr_detail::_nullptr_can_be_ct_constant<T>(0)) == sizeof(nullptr_detail::_yes_type));
 		};
 
@@ -385,19 +267,6 @@ namespace stdex
 
 			typedef _nullptr_choose_as_class<as_class::_equal_void_ptr == bool(true) && as_class::_can_be_ct_constant == bool(true)>::type type;
 		};
-
-		template<class T>
-		struct _nullptr_is_same_as
-		{
-			static const bool value = false;
-		};
-
-		template<>
-		struct _nullptr_is_same_as<_nullptr_chooser::type>
-		{
-			static const bool value = true;
-		};
-
 	}
 
 typedef detail::_nullptr_chooser::type nullptr_t;
