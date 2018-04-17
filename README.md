@@ -1,3 +1,5 @@
+https://travis-ci.org/oktonion/stdex.svg?branch=tests
+
 # stdex
 C++ 11 standart library implementation with extra features using C++98 only and POSIX threads. Minimum ugly preprocessor macro and no configuration files. 
 
