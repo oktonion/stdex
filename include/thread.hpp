@@ -33,21 +33,48 @@ namespace stdex
 {
 	namespace detail
 	{
+
 		template<class _T0 = detail::void_type, class _T1 = detail::void_type, class _T2 = detail::void_type, class _T3 = detail::void_type, class _T4 = detail::void_type, class _T5 = detail::void_type, class _T6 = detail::void_type, class _T7 = detail::void_type, class _T8 = detail::void_type, class _T9 = detail::void_type, class _T10 = detail::void_type, class _T11 = detail::void_type, class _T12 = detail::void_type, class _T13 = detail::void_type, class _T14 = detail::void_type, class _T15 = detail::void_type, class _T16 = detail::void_type, class _T17 = detail::void_type, class _T18 = detail::void_type, class _T19 = detail::void_type, class _T20 = detail::void_type, class _T21 = detail::void_type, class _T22 = detail::void_type, class _T23 = detail::void_type, class _T24 = detail::void_type>
 		struct _thread_args_helper;
+
+		enum eTypeNullptr { _type_nullptr };
+		enum eTypeNotNullptr { _type_not_nullptr };
+
+		template<bool>
+		struct _type_is_nullptr_helper
+		{ 
+			typedef eTypeNullptr type;
+			static const type value = _type_nullptr;
+		};
+
+		template<>
+		struct _type_is_nullptr_helper<false>
+		{ 
+			typedef eTypeNotNullptr type;
+			static const type value = _type_not_nullptr;
+		};
+
+		template<class _T>
+		struct _type_is_nullptr
+		{
+			typedef _type_is_nullptr_helper<_is_nullptr_t<_T>::value == (true) && is_same<nullptr_t, void*>::value == (false) && is_integral<nullptr_t>::value == (false)> _check_type;
+			static const typename _check_type::type value = _check_type::value;
+		};
 
 		template<>
 		struct _thread_args_helper<>
 		{
 			struct _arguments
 			{
+				template<class _FuncT> void call(_FuncT &fp) { fp(); }
+
 				_arguments()
 				{ }
 
 				template<class _FuncT>
-				void push(_FuncT fp)
+				void push(_FuncT &fp)
 				{
-					fp();
+					call(fp);
 				}
 			};
 
@@ -65,10 +92,13 @@ namespace stdex
 					arg1(arg1_)
 				{ }
 
+				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr) { fp(arg1); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr) { fp(nullptr); }
+
 				template<class _FuncT>
-				void push(_FuncT fp)
+				void push(_FuncT &fp)
 				{
-					fp(arg1);
+					call(fp, _type_is_nullptr<_Arg1>::value);
 				}
 			};
 
@@ -87,10 +117,15 @@ namespace stdex
 					arg1(arg1_), arg2(arg2_)
 				{ }
 
+				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNotNullptr)	{ fp(arg1, arg2); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNullptr)		{ fp(nullptr, nullptr); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNotNullptr)		{ fp(nullptr, arg2); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNullptr)		{ fp(arg1, nullptr); }
+
 				template<class _FuncT>
-				void push(_FuncT fp)
+				void push(_FuncT &fp)
 				{
-					fp(arg1, arg2);
+					call(fp, _type_is_nullptr<_Arg1>::value, _type_is_nullptr<_Arg2>::value);
 				}
 			};
 
@@ -109,11 +144,23 @@ namespace stdex
 				_arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_) :
 					arg1(arg1_), arg2(arg2_), arg3(arg3_)
 				{ }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNullptr, eTypeNullptr)			{ fp(nullptr, nullptr, nullptr); }
+
+				
+				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNullptr, eTypeNotNullptr)	{ fp(arg1, nullptr, arg3); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNotNullptr, eTypeNullptr)	{ fp(arg1, arg2, nullptr); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNullptr, eTypeNullptr)		{ fp(arg1, nullptr, nullptr); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNotNullptr, eTypeNotNullptr) { fp(arg1, arg2, arg3); }
+
+				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNotNullptr, eTypeNotNullptr)	{ fp(nullptr, arg2, arg3); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNotNullptr, eTypeNullptr)		{ fp(nullptr, arg2, nullptr); }
+
+				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNullptr, eTypeNotNullptr)		{ fp(nullptr, nullptr, arg3); }
 
 				template<class _FuncT>
-				void push(_FuncT fp)
+				void push(_FuncT &fp)
 				{
-					fp(arg1, arg2, arg3);
+					call(fp, _type_is_nullptr<_Arg1>::value, _type_is_nullptr<_Arg2>::value, _type_is_nullptr<_Arg3>::value);
 				}
 			};
 
@@ -134,10 +181,34 @@ namespace stdex
 					arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_)
 				{ }
 
+				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNullptr, eTypeNullptr, eTypeNullptr)			{ fp(nullptr, nullptr, nullptr, nullptr); }
+
+				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNullptr, eTypeNullptr, eTypeNotNullptr)		{ fp(arg1, nullptr, nullptr, arg4); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNullptr, eTypeNotNullptr, eTypeNotNullptr)	{ fp(arg1, nullptr, arg3, arg4); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNullptr, eTypeNotNullptr, eTypeNullptr)		{ fp(arg1, nullptr, arg3, nullptr); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNotNullptr, eTypeNullptr, eTypeNullptr)		{ fp(arg1, arg2, nullptr, nullptr); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNullptr, eTypeNullptr, eTypeNullptr)			{ fp(arg1, nullptr, nullptr, nullptr); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNotNullptr, eTypeNullptr, eTypeNotNullptr)	{ fp(arg1, arg2, nullptr, arg4); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNotNullptr, eTypeNotNullptr, eTypeNullptr)	{ fp(arg1, arg2, arg3, nullptr); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNotNullptr, eTypeNotNullptr, eTypeNotNullptr){ fp(arg1, arg2, arg3, arg4); }
+
+				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNotNullptr, eTypeNullptr, eTypeNotNullptr)		{ fp(nullptr, arg2, nullptr, arg4); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNotNullptr, eTypeNotNullptr, eTypeNullptr)		{ fp(nullptr, arg2, arg3, nullptr); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNotNullptr, eTypeNullptr, eTypeNullptr)			{ fp(nullptr, arg2, nullptr, nullptr); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNotNullptr, eTypeNotNullptr, eTypeNotNullptr)	{ fp(nullptr, arg2, arg3, arg4); }
+
+				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNullptr, eTypeNotNullptr, eTypeNotNullptr)		{ fp(nullptr, nullptr, arg3, arg4); }
+				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNullptr, eTypeNotNullptr, eTypeNullptr)			{ fp(nullptr, nullptr, arg3, nullptr); }	
+
+				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNullptr, eTypeNullptr, eTypeNotNullptr)			{ fp(nullptr, nullptr, nullptr, arg4); }
+				
+				
+				
+
 				template<class _FuncT>
-				void push(_FuncT fp)
+				void push(_FuncT &fp)
 				{
-					fp(arg1, arg2, arg3, arg4);
+					call(fp, _type_is_nullptr<_Arg1>::value, _type_is_nullptr<_Arg2>::value, _type_is_nullptr<_Arg3>::value, _type_is_nullptr<_Arg4>::value);
 				}
 			};
 
@@ -160,7 +231,7 @@ namespace stdex
 				{ }
 
 				template<class _FuncT>
-				void push(_FuncT fp)
+				void push(_FuncT &fp)
 				{
 					fp(arg1, arg2, arg3, arg4, arg5);
 				}
@@ -186,7 +257,7 @@ namespace stdex
 				{ }
 
 				template<class _FuncT>
-				void push(_FuncT fp)
+				void push(_FuncT &fp)
 				{
 					fp(arg1, arg2, arg3, arg4, arg5, arg6);
 				}
@@ -213,7 +284,7 @@ namespace stdex
 				{ }
 
 				template<class _FuncT>
-				void push(_FuncT fp)
+				void push(_FuncT &fp)
 				{
 					fp(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 				}
@@ -241,7 +312,7 @@ namespace stdex
 				{ }
 
 				template<class _FuncT>
-				void push(_FuncT fp)
+				void push(_FuncT &fp)
 				{
 					fp(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
 				}
