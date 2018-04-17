@@ -21,7 +21,7 @@ fi
 
 mkdir ./lib
 
-ar_args
+ar_args=""
 
 for file in ./obj/*.o; do
   filename=$(basename -- "$file")
