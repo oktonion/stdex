@@ -28,3 +28,9 @@ for file in ./obj/*.o; do
   ar rcs ./lib/libstdex.a $file
 done
 
+cd ./lib && ls
+
+cd ..
+
+echo "lib done"
+
