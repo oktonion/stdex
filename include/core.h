@@ -20,6 +20,10 @@
 
 #endif
 
+#if (!defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT) && (__cplusplus > 199711L))
+	#define _STDEX_NATIVE_CPP11_TYPES_SUPPORT
+#endif
+
 #if ((!defined(_MSC_VER) || _MSC_VER < 1600) && !defined(_STDEX_NATIVE_CPP11_SUPPORT))
 
 	#define _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
