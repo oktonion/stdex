@@ -19,10 +19,22 @@ fi
 
 mkdir ./lib
 
+ar_args="rcs ./lib/libstdex.a"
+
 for file in ./obj/*.o; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
   echo "archiving $filename to libstdex.a"
-  ar rcs ./lib/libstdex.a $file
+  ar_args="$ar_args $file"
 done
+
+ls ./obj
+echo "ar $ar_args"
+ar $ar_args
+
+ls ./lib
+
+echo "lib done"
+echo "contains:"
+ar -t "./lib/libstdex.a"
 
