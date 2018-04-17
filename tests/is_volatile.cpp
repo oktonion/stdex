@@ -2,6 +2,9 @@
 #include "../stdex/include/type_traits.hpp"
 
 struct ClassType {};
+typedef const ClassType cClassType;
+typedef const volatile ClassType cvClassType;
+typedef volatile ClassType vClassType;
 
 int main(void)
 {
