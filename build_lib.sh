@@ -21,12 +21,16 @@ fi
 
 mkdir ./lib
 
+ar_args
+
 for file in ./obj/*.o; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
   echo "archiving $filename to libstdex.a"
-  ar rcs ./lib/libstdex.a $file
+  ar_args=$ar_args $file
 done
+
+ar rcs ./lib/libstdex.a $ar_args
 
 cd ./lib && ls
 
