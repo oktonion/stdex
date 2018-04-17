@@ -36,7 +36,7 @@ ar $ar_args
 
 ls ./lib
 
-ar -t "./lib/libstdex.a"
-
 echo "lib done"
+echo "contains:"
+ar -t "./lib/libstdex.a"
 
