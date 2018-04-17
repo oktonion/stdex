@@ -27,9 +27,10 @@ for file in ./obj/*.o; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
   echo "archiving $filename to libstdex.a"
-  ar_args=$ar_args $file
+  ar_args="$ar_args $file"
 done
 
+echo $ar_args
 ar rcs ./lib/libstdex.a $ar_args
 
 cd ./lib && ls
