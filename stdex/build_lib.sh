@@ -21,7 +21,7 @@ fi
 
 mkdir ./lib
 
-ar_args=""
+ar_args="rcs ./lib/libstdex.a"
 
 for file in ./obj/*.o; do
   filename=$(basename -- "$file")
@@ -30,12 +30,11 @@ for file in ./obj/*.o; do
   ar_args="$ar_args $file"
 done
 
-echo $ar_args
-ar rcs ./lib/libstdex.a $ar_args
+ls ./obj
+echo "ar $ar_args"
+ar $ar_args
 
-cd ./lib && ls
-
-cd ..
+ls ./lib
 
 echo "lib done"
 
