@@ -7,6 +7,9 @@
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 
+struct A { };
+struct B : A { };
+
 int main(void)
 {
     using namespace stdex;
