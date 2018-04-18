@@ -5,8 +5,8 @@ build_ok=1
 for file in ./tests/*.cpp; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
-  echo "compiling test c++0x $filename"
-  if ! $COMPILER -std=c++0x $file -L./stdex/lib/ -lstdex -o "./tests/bin/$filename"; then
+  echo "compiling test c++03 $filename"
+  if ! $COMPILER -std=c++03 $file -L./stdex/lib/ -lstdex -o "./tests/bin/$filename"; then
     build_ok=0
   fi
 done
