@@ -20,7 +20,7 @@
 
 #endif
 
-#if (!defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT) && (__cplusplus > 199711L))
+#if (!defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT) && ((__cplusplus > 199711L) || defined(__CHAR16_TYPE__) || defined(__CHAR32_TYPE__)))
 	#define _STDEX_NATIVE_CPP11_TYPES_SUPPORT
 #endif
 
