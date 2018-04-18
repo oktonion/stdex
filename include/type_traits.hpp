@@ -320,12 +320,12 @@ namespace stdex
 
 		template <class _Tp> struct _is_integral : public _is_integral_impl<_Tp> {};
 
-		//#if defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT) || defined(STDEX_FORCE_CPP11_TYPES_SUPPORT)
+		#if defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT) || defined(STDEX_FORCE_CPP11_TYPES_SUPPORT)
 		template<> struct _is_integral<char16_t> : public true_type {};
 		template<> struct _is_integral<char32_t> : public true_type {};
+		#endif
 		template<> struct _is_integral<int64_t> : public true_type {};
 		template<> struct _is_integral<uint64_t> : public true_type {};
-		//#endif
 	}
 
 
