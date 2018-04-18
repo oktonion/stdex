@@ -21,13 +21,10 @@
 		#include <stdint.h>
 	#endif
 
-#if (!defined(__CHAR16_TYPE__) || !defined(__CHAR32_TYPE__))
 	typedef int16_t char16_t;
 	typedef uint16_t uchar16_t;
 	typedef int32_t char32_t;
 	typedef uint32_t uchar32_t;
-
-#endif
 
 #endif
 
