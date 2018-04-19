@@ -57,7 +57,7 @@ namespace stdex
 		template<class _T>
 		struct _type_is_nullptr
 		{
-			typedef _type_is_nullptr_helper<_is_nullptr_t<_T>::value == (true) && is_same<nullptr_t, void*>::value == (false) && is_integral<nullptr_t>::value == (false)> _check_type;
+			typedef _type_is_nullptr_helper<_is_nullptr_t<_T>::value == (true) /*&& is_same<nullptr_t, void*>::value == (false) && is_integral<nullptr_t>::value == (false)*/> _check_type;
 			static const typename _check_type::type value = _check_type::value;
 		};
 
