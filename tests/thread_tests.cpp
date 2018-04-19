@@ -71,6 +71,61 @@ free_function(stdex::thread::id& id)
 	active_thread_left--;
 }
 
+struct copyable
+{
+	copyable() {}
+	~copyable() {}
+	copyable(const copyable& c)
+	{
+		++copy_count;
+	}
+
+	void operator()(stdex::thread::id& id) const
+	{
+		free_function(id);
+	}
+
+	static int copy_count;
+};
+
+int copyable::copy_count = 0;
+
+bool f_was_called = false;
+
+void f()
+{
+	f_was_called = true;
+	active_thread_left--;
+}
+
+struct ClassType {};
+
+int thread_func1(int) { return 0; }
+int thread_func2(int, float) { return 2; }
+int thread_func3(int, double, float) { return 2; }
+double thread_func4(int, int, int, float) { return 2.0; }
+void thread_func5(int, int, int, float, int) { return; }
+void thread_func7(int, int, int, float, int, float*, void*) { return; }
+void thread_func8(float*, float*, void*, ClassType*) { return; }
+
+int total = 0;
+
+// Functor has internal state.
+struct moveable
+{
+	int i;
+
+	moveable() {};
+	~moveable() {};
+	//moveable(const moveable& c) = delete;
+	//moveable& operator=(const moveable&) = delete;
+
+	moveable(int j) : i(j) { }
+	//moveable(moveable&& m) : i(m.i) { }
+
+	void operator()() const { total += i; active_thread_left--;}
+};
+
 int test0()
 {
     using namespace stdex;
@@ -133,10 +188,294 @@ int test2()
     return 0;
 }
 
+int test3()
+{
+    using namespace stdex;
+
+    try
+    {
+        thread::id t1_id1;
+        copyable c1;
+        active_thread_left++;
+        thread t1(c1, thread_tests_std::ref(t1_id1));
+        active_thread_left++;
+        thread tt1(c1, t1_id1);
+        thread::id t1_id2 = t1.get_id();
+        DYNAMIC_VERIFY(t1.joinable());
+        t1.join();
+        DYNAMIC_VERIFY(!t1.joinable());
+        DYNAMIC_VERIFY(t1_id1 == t1_id2);
+        //DYNAMIC_VERIFY(copyable::copy_count == 0);
+
+        thread::id t2_id1;
+        copyable c2;
+        active_thread_left++;
+        thread t2(c2, thread_tests_std::ref(t2_id1));
+        thread::id t2_id2 = t2.get_id();
+        DYNAMIC_VERIFY(t2.joinable());
+        t2.join();
+        DYNAMIC_VERIFY(!t2.joinable());
+        DYNAMIC_VERIFY(t2_id1 == t2_id2);
+        DYNAMIC_VERIFY(copyable::copy_count > 0);
+        copyable::copy_count = 0;
+
+        tt1.join();
+    }
+    catch (const system_error&)
+    {
+        DYNAMIC_VERIFY(false);
+    }
+    catch (const char *msg)
+    {
+        DYNAMIC_VERIFY(false);
+    }
+    catch (...)
+    {
+        DYNAMIC_VERIFY(false);
+    }
+
+    return 0;
+}
+
+int test4()
+{
+    using namespace stdex;
+
+    try
+    {
+        active_thread_left++;
+        thread t(f);
+        t.join();
+        DYNAMIC_VERIFY(f_was_called);
+        f_was_called = false;
+    }
+    catch (const system_error&)
+    {
+        DYNAMIC_VERIFY(false);
+    }
+    catch (const char *msg)
+    {
+        DYNAMIC_VERIFY(false);
+    }
+    catch (...)
+    {
+        DYNAMIC_VERIFY(false);
+    }
+
+    return 0;
+}
+
+int test5()
+{
+    using namespace stdex;
+
+    try
+    {
+        // first
+        active_thread_left++;
+        moveable m1(60);
+        thread t1(m1);
+        t1.join();
+        DYNAMIC_VERIFY(total == 60);
+
+        // second
+        active_thread_left++;
+        moveable m2(600);
+        thread t2(m2);
+        t2.join();
+        DYNAMIC_VERIFY(total == 660); // Not 120...
+
+        total = 0;
+    }
+    catch (const system_error&)
+    {
+        DYNAMIC_VERIFY(false);
+    }
+    catch (const char *msg)
+    {
+        DYNAMIC_VERIFY(false);
+    }
+    catch (...)
+    {
+        DYNAMIC_VERIFY(false);
+    }
+
+    return 0;
+}
+
+int test6()
+{
+    using namespace stdex;
+
+    {
+        thread t1;
+        thread t2(thread_func1, 1);
+        swap(static_cast<thread&>(t1), static_cast<thread&>(t2));
+
+        t1.join();
+    }
+
+    /*{
+        thread t1(thread_func7, 1, 1, 1, 1, 1, nullptr, nullptr);
+
+        t1.join();
+    }*/
+
+    {
+        thread t1(thread_func8, nullptr, nullptr, nullptr, nullptr);
+
+        t1.join();
+    }
+
+    return 0;
+}
+
+int test7()
+{
+    using namespace stdex;
+
+#if CHECK_FOR_COMPILE_ERROR_TESTS == 1
+		{
+			typedef thread test_type;
+			test_type t1;
+			test_type t2;
+			t1 = t2;
+		}
+
+		{
+			typedef thread test_type;
+			test_type t1;
+			test_type t2(t1);
+		}
+#endif
+    return 0;
+}
+
+int test_thread_id()
+{
+    // thread id
+    using namespace stdex;
+
+    thread::id id1;
+    thread::id id2;
+
+    id1 == id2;
+    id1 != id2;
+    id1 < id2;
+    id1 > id2;
+    id1 >= id2;
+    id1 <= id2;
+
+    return 0;
+}
+
+int test8()
+{
+    using namespace stdex;
+
+    try
+    {
+        active_thread_left++;
+        thread t(f);
+        DYNAMIC_VERIFY(t.joinable());
+        t.detach();
+        DYNAMIC_VERIFY(!t.joinable());
+    }
+    catch (const system_error&)
+    {
+        DYNAMIC_VERIFY(false);
+    }
+    catch (const char *msg)
+    {
+        DYNAMIC_VERIFY(false);
+    }
+    catch (...)
+    {
+        DYNAMIC_VERIFY(false);
+    }
+
+    return 0;
+}
+
+int test9()
+{
+    using namespace stdex;
+
+    try
+    {
+        active_thread_left++;
+        thread t(f);
+        DYNAMIC_VERIFY(t.get_id() != thread::id());
+        t.join();
+        DYNAMIC_VERIFY(t.get_id() == thread::id());
+    }
+    catch (const system_error&)
+    {
+        DYNAMIC_VERIFY(false);
+    }
+    catch (const char *msg)
+    {
+        DYNAMIC_VERIFY(false);
+    }
+    catch (...)
+    {
+        DYNAMIC_VERIFY(false);
+    }
+    return 0;
+}
+
+int test10()
+{
+    using namespace stdex;
+#if CHECK_FOR_THROW_EVENTS != 0
+		{
+			bool test = false;
+
+			thread t;
+			try
+			{
+				t.join();
+			}
+			catch (const system_error&)
+			{
+				test = true;
+			}
+			catch (const char *msg)
+			{
+				DYNAMIC_VERIFY(false);
+			}
+
+			DYNAMIC_VERIFY(test);
+		}
+
+		{
+			bool test = false;
+
+			thread t;
+
+			try
+			{
+				t.detach();
+			}
+			catch (const system_error&)
+			{
+				test = true;
+			}
+			catch (const char *msg)
+			{
+				DYNAMIC_VERIFY(false);
+			}
+
+			DYNAMIC_VERIFY(test);
+		}
+#endif
+    return 0;
+}
 
 int main(void)
 {
-
+    using namespace stdex;
+    
     test0();    
 
     for (size_t i = 0; i < 50; ++i)
@@ -145,9 +484,19 @@ int main(void)
 
         RUN_TEST(test1);
         RUN_TEST(test2);
+        RUN_TEST(test3);
+        RUN_TEST(test4);
+        RUN_TEST(test5);
+        RUN_TEST(test6);
+        RUN_TEST(test7);
+        RUN_TEST(test8);
+        RUN_TEST(test9);
+        RUN_TEST(test10);
+
+        DYNAMIC_VERIFY(thread::hardware_concurrency() >= 1);
     }
     
-
+    test_thread_id();
 
     return 0;
 }
