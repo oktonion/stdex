@@ -7,6 +7,7 @@
 #include <ctime>
 
 #define DYNAMIC_VERIFY(cond) if(!(cond)) return __LINE__;
+#define DYNAMIC_VERIFY_VOID_RETURN(cond) !(cond) ? __LINE__ : 0; if(!(cond)) return;
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) return line;}
 
 namespace thread_tests_std
@@ -107,6 +108,16 @@ double thread_func4(int, int, int, float) { return 2.0; }
 void thread_func5(int, int, int, float, int) { return; }
 void thread_func7(int, int, int, float, int, float*, void*) { return; }
 void thread_func8(float*, float*, void*, ClassType*) { return; }
+
+int thread_func_nullptr_check_ret = 0;
+
+void thread_func_nullptr_check(float *arg1, float *arg2, void *arg3, ClassType *arg4) 
+{ 
+    thread_func_nullptr_check_ret = DYNAMIC_VERIFY_VOID_RETURN(arg1 == nullptr);
+    thread_func_nullptr_check_ret = DYNAMIC_VERIFY_VOID_RETURN(arg2 != nullptr);
+    thread_func_nullptr_check_ret = DYNAMIC_VERIFY_VOID_RETURN(nullptr == arg3);
+    thread_func_nullptr_check_ret = DYNAMIC_VERIFY_VOID_RETURN(nullptr != arg4);
+}
 
 int total = 0;
 
@@ -472,6 +483,21 @@ int test10()
     return 0;
 }
 
+int test11()
+{
+    using namespace stdex;
+
+    {
+        float p;
+        ClassType cl;
+        thread t1(thread_func_nullptr_check, nullptr, &p, nullptr, &cl);
+
+        t1.join();
+    }
+
+    return thread_func_nullptr_check_ret;
+}
+
 int main(void)
 {
     using namespace stdex;
@@ -492,6 +518,7 @@ int main(void)
         RUN_TEST(test8);
         RUN_TEST(test9);
         RUN_TEST(test10);
+        RUN_TEST(test11);
 
         DYNAMIC_VERIFY(thread::hardware_concurrency() >= 1);
     }
