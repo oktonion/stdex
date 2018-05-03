@@ -40,6 +40,106 @@ namespace stdex
 		enum eTypeNullptr { _type_nullptr };
 		enum eTypeNotNullptr { _type_not_nullptr };
 
+		template<class _FuncT> struct _function_traits;
+
+		template<class R>
+		struct _function_traits<R(*)(void)>
+		{
+			typedef R result_type;
+		};
+
+		template<class R, class T1>
+		struct _function_traits<R(*)(T1)>
+		{
+			typedef R result_type;
+			typedef T1 arg1_type;
+			typedef T1 argument_type;
+		};
+
+		template<class R, class T1, class T2>
+		struct _function_traits<R(*)(T1, T2)>
+		{
+			typedef R result_type;
+			typedef T1 arg1_type;
+			typedef T2 arg2_type;
+			
+			
+		};
+
+		template<class R, class T1, class T2, class T3>
+		struct _function_traits<R(*)(T1, T2, T3)>
+		{
+			typedef R result_type;
+			typedef T1 arg1_type;
+			typedef T2 arg2_type;
+			typedef T3 arg3_type;
+		};
+
+		template<class R, class T1, class T2, class T3, class T4>
+		struct _function_traits<R(*)(T1, T2, T3, T4)>
+		{
+			typedef R result_type;
+			typedef T1 arg1_type;
+			typedef T2 arg2_type;
+			typedef T3 arg3_type;
+			typedef T4 arg4_type;
+		};
+
+		template<class R, class T1, class T2, class T3, class T4,
+			class T5>
+		struct _function_traits<R(*)(T1, T2, T3, T4, T5)>
+		{
+			typedef R result_type;
+			typedef T1 arg1_type;
+			typedef T2 arg2_type;
+			typedef T3 arg3_type;
+			typedef T4 arg4_type;
+			typedef T5 arg5_type;
+		};
+
+		template<class R, class T1, class T2, class T3, class T4,
+			class T5, class T6>
+		struct _function_traits<R(*)(T1, T2, T3, T4, T5, T6)>
+		{
+			typedef R result_type;
+			typedef T1 arg1_type;
+			typedef T2 arg2_type;
+			typedef T3 arg3_type;
+			typedef T4 arg4_type;
+			typedef T5 arg5_type;
+			typedef T6 arg6_type;
+		};
+
+		template<class R, class T1, class T2, class T3, class T4,
+			class T5, class T6, class T7>
+		struct _function_traits<R(*)(T1, T2, T3, T4, T5, T6, T7)>
+		{
+			typedef R result_type;
+			typedef T1 arg1_type;
+			typedef T2 arg2_type;
+			typedef T3 arg3_type;
+			typedef T4 arg4_type;
+			typedef T5 arg5_type;
+			typedef T6 arg6_type;
+			typedef T7 arg7_type;
+		};
+
+		template<class R, class T1, class T2, class T3, class T4,
+			class T5, class T6, class T7, class T8>
+		struct _function_traits<R(*)(T1, T2, T3, T4, T5, T6, T7, T8)>
+		{
+			typedef R result_type;
+			typedef T1 arg1_type;
+			typedef T2 arg2_type;
+			typedef T3 arg3_type;
+			typedef T4 arg4_type;
+			typedef T5 arg5_type;
+			typedef T6 arg6_type;
+			typedef T7 arg7_type;
+			typedef T8 arg8_type;
+		};
+
+
 		template<bool>
 		struct _type_is_nullptr_helper
 		{ 
@@ -54,10 +154,10 @@ namespace stdex
 			static const type value = _type_not_nullptr;
 		};
 
-		template<class _T>
+		template<class _T, class _ArgT = void*>
 		struct _type_is_nullptr
 		{
-			typedef _type_is_nullptr_helper<_is_nullptr_t<_T>::value == (true) /*&& is_same<nullptr_t, void*>::value == (false) && is_integral<nullptr_t>::value == (false)*/> _check_type;
+			typedef _type_is_nullptr_helper<_is_nullptr_t<_T>::value == (true) && is_pointer<_ArgT>::value == (true)> _check_type;
 			static const typename _check_type::type value = _check_type::value;
 		};
 
@@ -75,6 +175,12 @@ namespace stdex
 				void push(_FuncT &fp)
 				{
 					call(fp);
+				}
+
+				template<class _ObjectT, class _FuncT>
+				void push(_ObjectT &fp, _FuncT mp)
+				{
+					push(fp);
 				}
 			};
 
@@ -98,7 +204,22 @@ namespace stdex
 				template<class _FuncT>
 				void push(_FuncT &fp)
 				{
-					call(fp, _type_is_nullptr<_Arg1>::value);
+					call(fp,
+						_type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1))
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1) const)
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value);
 				}
 			};
 
@@ -125,7 +246,25 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr) { fp(null
 				template<class _FuncT>
 				void push(_FuncT &fp)
 				{
-					call(fp, _type_is_nullptr<_Arg1>::value, _type_is_nullptr<_Arg2>::value);
+					call(fp,
+						_type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
+						_type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2))
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2) const)
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value);
 				}
 			};
 
@@ -157,7 +296,28 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				template<class _FuncT>
 				void push(_FuncT &fp)
 				{
-					call(fp, _type_is_nullptr<_Arg1>::value, _type_is_nullptr<_Arg2>::value, _type_is_nullptr<_Arg3>::value);
+					call(fp,
+						_type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
+						_type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value,
+						_type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3))
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3) const)
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value);
 				}
 			};
 
@@ -199,7 +359,31 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				template<class _FuncT>
 				void push(_FuncT &fp)
 				{
-					call(fp, _type_is_nullptr<_Arg1>::value, _type_is_nullptr<_Arg2>::value, _type_is_nullptr<_Arg3>::value, _type_is_nullptr<_Arg4>::value);
+					call(fp,
+						_type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
+						_type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value,
+						_type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value,
+						_type_is_nullptr<_Arg4, typename _function_traits<_FuncT>::arg4_type>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4))
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4) const)
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value);
 				}
 			};
 
@@ -257,7 +441,34 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				template<class _FuncT>
 				void push(_FuncT &fp)
 				{
-					call(fp, _type_is_nullptr<_Arg1>::value, _type_is_nullptr<_Arg2>::value, _type_is_nullptr<_Arg3>::value, _type_is_nullptr<_Arg4>::value, _type_is_nullptr<_Arg5>::value);
+					call(fp,
+						_type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
+						_type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value,
+						_type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value,
+						_type_is_nullptr<_Arg4, typename _function_traits<_FuncT>::arg4_type>::value,
+						_type_is_nullptr<_Arg5, typename _function_traits<_FuncT>::arg5_type>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5))
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value,
+						_type_is_nullptr<_Arg5, _FArg5>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5) const)
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value,
+						_type_is_nullptr<_Arg5, _FArg5>::value);
 				}
 			};
 
@@ -349,7 +560,37 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				template<class _FuncT>
 				void push(_FuncT &fp)
 				{
-					call(fp, _type_is_nullptr<_Arg1>::value, _type_is_nullptr<_Arg2>::value, _type_is_nullptr<_Arg3>::value, _type_is_nullptr<_Arg4>::value, _type_is_nullptr<_Arg5>::value, _type_is_nullptr<_Arg6>::value);
+					call(fp,
+						_type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
+						_type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value,
+						_type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value,
+						_type_is_nullptr<_Arg4, typename _function_traits<_FuncT>::arg4_type>::value,
+						_type_is_nullptr<_Arg5, typename _function_traits<_FuncT>::arg5_type>::value,
+						_type_is_nullptr<_Arg6, typename _function_traits<_FuncT>::arg6_type>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6))
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value,
+						_type_is_nullptr<_Arg5, _FArg5>::value,
+						_type_is_nullptr<_Arg6, _FArg6>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6) const)
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value,
+						_type_is_nullptr<_Arg5, _FArg5>::value,
+						_type_is_nullptr<_Arg6, _FArg6>::value);
 				}
 			};
 
@@ -506,7 +747,40 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				template<class _FuncT>
 				void push(_FuncT &fp)
 				{
-					call(fp, _type_is_nullptr<_Arg1>::value, _type_is_nullptr<_Arg2>::value, _type_is_nullptr<_Arg3>::value, _type_is_nullptr<_Arg4>::value, _type_is_nullptr<_Arg5>::value, _type_is_nullptr<_Arg6>::value, _type_is_nullptr<_Arg7>::value);
+					call(fp,
+						_type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
+						_type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value,
+						_type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value,
+						_type_is_nullptr<_Arg4, typename _function_traits<_FuncT>::arg4_type>::value,
+						_type_is_nullptr<_Arg5, typename _function_traits<_FuncT>::arg5_type>::value,
+						_type_is_nullptr<_Arg6, typename _function_traits<_FuncT>::arg6_type>::value,
+						_type_is_nullptr<_Arg7, typename _function_traits<_FuncT>::arg7_type>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6, class _FArg7>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7))
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value,
+						_type_is_nullptr<_Arg5, _FArg5>::value,
+						_type_is_nullptr<_Arg6, _FArg6>::value,
+						_type_is_nullptr<_Arg7, _FArg7>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6, class _FArg7>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7) const)
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value,
+						_type_is_nullptr<_Arg5, _FArg5>::value,
+						_type_is_nullptr<_Arg6, _FArg6>::value,
+						_type_is_nullptr<_Arg7, _FArg7>::value);
 				}
 			};
 
@@ -792,11 +1066,62 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				template<class _FuncT>
 				void push(_FuncT &fp)
 				{
-					call(fp, _type_is_nullptr<_Arg1>::value, _type_is_nullptr<_Arg2>::value, _type_is_nullptr<_Arg3>::value, _type_is_nullptr<_Arg4>::value, _type_is_nullptr<_Arg5>::value, _type_is_nullptr<_Arg6>::value, _type_is_nullptr<_Arg7>::value, _type_is_nullptr<_Arg8>::value);
+					call(fp, 
+						_type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value, 
+						_type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value, 
+						_type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value,
+						_type_is_nullptr<_Arg4, typename _function_traits<_FuncT>::arg4_type>::value,
+						_type_is_nullptr<_Arg5, typename _function_traits<_FuncT>::arg5_type>::value,
+						_type_is_nullptr<_Arg6, typename _function_traits<_FuncT>::arg6_type>::value,
+						_type_is_nullptr<_Arg7, typename _function_traits<_FuncT>::arg7_type>::value,
+						_type_is_nullptr<_Arg8, typename _function_traits<_FuncT>::arg8_type>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6, class _FArg7, class _FArg8>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7, _FArg8))
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value,
+						_type_is_nullptr<_Arg5, _FArg5>::value,
+						_type_is_nullptr<_Arg6, _FArg6>::value,
+						_type_is_nullptr<_Arg7, _FArg7>::value,
+						_type_is_nullptr<_Arg8, _FArg8>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6, class _FArg7, class _FArg8>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7, _FArg8) const)
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value,
+						_type_is_nullptr<_Arg5, _FArg5>::value,
+						_type_is_nullptr<_Arg6, _FArg6>::value,
+						_type_is_nullptr<_Arg7, _FArg7>::value,
+						_type_is_nullptr<_Arg8, _FArg8>::value);
 				}
 			};
 
 			typedef _arguments arguments_type;
+		};
+
+		enum eTypeIsClass { _type_is_class };
+		enum eTypeIsNotClass { _type_is_not_class };
+
+		template<bool>
+		struct _is_class_overload
+		{
+			static const eTypeIsClass value = _type_is_class;
+		};
+
+		template<>
+		struct _is_class_overload<false>
+		{
+			static const eTypeIsNotClass value = _type_is_not_class;
 		};
 
 		template<class _FuncT, class _ArgT>
@@ -818,6 +1143,16 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 
 			void call()
 			{
+				call(_is_class_overload<is_class<_FuncT>::value>::value);
+			}
+
+			void call(eTypeIsClass)
+			{
+				args.push(fp, &_FuncT::operator());
+			}
+
+			void call(eTypeIsNotClass)
+			{
 				args.push(fp);
 			}
 
@@ -830,7 +1165,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				delete pf;
 			}
 		};
-	}
+}
 
 	//! Thread class.
 	class thread {
