@@ -5,7 +5,7 @@ for file in ./tests/bin/*; do
   filename=$([[ "$filename" = *.* ]] && echo "${filename%.*}" || echo "$filename")
   echo "running test $filename..."
   $file
-  local run_result=$?
+  run_result=$?
   if [ $run_result -eq 0 ]; then
     echo "...ok."
   else
