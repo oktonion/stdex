@@ -5,12 +5,12 @@ for file in ./tests/bin/*; do
   filename=$([[ "$filename" = *.* ]] && echo "${filename%.*}" || echo "$filename")
   echo "running test $filename..."
   run_result="$file"
-  if ! run_result; then
+  if [ $run_result -eq 0 ]; then
+    echo "...ok."
+  else
     run_ok=-1
     echo "...failed at line $run_result."
-  else
-    echo "...ok."
   fi 
 done
 
-return run_ok
+exit $run_ok
