@@ -6,7 +6,7 @@
 #include <iostream>
 #include <ctime>
 
-#define DYNAMIC_VERIFY(cond) if(!(cond)) return __LINE__;
+#define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << #cond << " failed at line " << __LINE__ << std::endl; return -1;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
 
 namespace thread_tests_std
@@ -136,6 +136,8 @@ void thread_func_nullptr_check(float *arg1, float *arg2, void *arg3, ClassType *
         std::cout << "fail: nullptr == arg4" << std::endl;
         return;
     }
+
+    thread_func_nullptr_check_ret = 0;
 }
 
 int total = 0;

@@ -1,7 +1,8 @@
 #include "../stdex/include/core.h"
 #include "../stdex/include/chrono.hpp"
 
-#define DYNAMIC_VERIFY(cond) if(!(cond)) return __LINE__;
+#include <iostream>
+#define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << #cond << " failed at line " << __LINE__ << std::endl; return -1;}
 
 int main(void)
 {
