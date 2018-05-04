@@ -8,7 +8,7 @@
 
 #define DYNAMIC_VERIFY(cond) if(!(cond)) return __LINE__;
 #define DYNAMIC_VERIFY_VOID_RETURN(cond) !(cond) ? __LINE__ : 0; if(!(cond)) return;
-#define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}
+#define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
 
 namespace thread_tests_std
 {
