@@ -7,7 +7,6 @@
 #include <ctime>
 
 #define DYNAMIC_VERIFY(cond) if(!(cond)) return __LINE__;
-#define DYNAMIC_VERIFY_VOID_RETURN(cond) !(cond) ? __LINE__ : 0; if(!(cond)) return;
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
 
 namespace thread_tests_std
@@ -113,10 +112,30 @@ int thread_func_nullptr_check_ret = 0;
 
 void thread_func_nullptr_check(float *arg1, float *arg2, void *arg3, ClassType *arg4) 
 { 
-    thread_func_nullptr_check_ret = DYNAMIC_VERIFY_VOID_RETURN(arg1 == nullptr);
-    thread_func_nullptr_check_ret = DYNAMIC_VERIFY_VOID_RETURN(arg2 != nullptr);
-    thread_func_nullptr_check_ret = DYNAMIC_VERIFY_VOID_RETURN(nullptr == arg3);
-    thread_func_nullptr_check_ret = DYNAMIC_VERIFY_VOID_RETURN(nullptr != arg4);
+    if (arg1 != nullptr)
+    {
+        thread_func_nullptr_check_ret = __LINE__;
+        std::cout << "fail: arg1(" << arg1 << ") != nullptr" << std::endl;
+        return;
+    }
+    if (arg2 == nullptr)
+    {
+        thread_func_nullptr_check_ret = __LINE__;
+        std::cout << "fail: arg2 == nullptr" << std::endl;
+        return;
+    }
+    if (nullptr != arg3)
+    {
+        thread_func_nullptr_check_ret = __LINE__;
+        std::cout << "fail: nullptr != arg3(" << arg3 << ")" << std::endl;
+        return;
+    }
+    if (nullptr == arg4)
+    {
+        thread_func_nullptr_check_ret = __LINE__;
+        std::cout << "fail: nullptr == arg4" << std::endl;
+        return;
+    }
 }
 
 int total = 0;
