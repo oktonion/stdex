@@ -313,7 +313,7 @@ int test12()
     return 0;
 }
 
-int test12()
+int test13()
 {
     using namespace stdex;
 
@@ -328,7 +328,7 @@ int test12()
     return 0;
 }
 
-int test13()
+int test14()
 {
     using namespace stdex;
 
@@ -350,7 +350,7 @@ int test13()
     return 0;
 }
 
-int test14()
+int test15()
 {
     using namespace stdex;
 
@@ -368,7 +368,7 @@ int test14()
     return 0;
 }
 
-int test15()
+int test16()
 {
     using namespace stdex;
 
@@ -389,7 +389,7 @@ int test15()
     return 0;
 }
 
-int test16()
+int test17()
 {
     using namespace stdex;
 
@@ -405,7 +405,7 @@ int test16()
     return 0;
 }
 
-int test17()
+int test18()
 {
     using namespace stdex;
 
@@ -442,6 +442,7 @@ int main(void)
     RUN_TEST(test15);
     RUN_TEST(test16);
     RUN_TEST(test17);
+    RUN_TEST(test18);
 
     return 0;
 }
