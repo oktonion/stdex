@@ -10,7 +10,7 @@ for file in ./tests/bin/*; do
     echo "...ok."
   else
     run_ok=-1
-    echo "...failed at line $run_result."
+    echo "...failed with $run_result."
   fi 
 done
 
