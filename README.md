@@ -19,7 +19,7 @@ The library is portable for any compiler that supports C++98 but as we all know 
 
 ...and thats it. If you use other compiler and decide to include my library in your project there is no guarantee that it will compile without errors. In case you will be able to fix the errors without breaking existing code for already supported compilers I would really appreciate your pull requests.
 
-For the C++ threads (mutexes, threads) I'm using POSIX threads implementation. There is one for Windows platform and definetely should be one for every POSIX-friendly platform.
+For the C++ threads (mutexes, threads) I'm using POSIX threads implementation. There is [one](https://github.com/GerHobbelt/pthread-win32 "I'm using this implementation") for Windows platform and definetely should be one for every POSIX-friendly platform.
 
 The library is in development so no backward compability guaranteed with previous stdex. But one thing for sure: it will be more and more standart in the way of std library for C++ 11. 
 
