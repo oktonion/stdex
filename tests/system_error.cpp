@@ -43,14 +43,14 @@ public:
 //namespace stdex
 //{
 	template<>
-	struct is_error_code_enum<my_errc>
+	struct stdex::is_error_code_enum<my_errc>
 		: public true_type {};
 //}
 
 //namespace stdex
 //{
 	template<>
-	struct is_error_condition_enum<my_errc>
+	struct stdex::is_error_condition_enum<my_errc>
 		: public true_type { };
 //}
 
