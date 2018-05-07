@@ -157,7 +157,7 @@ namespace stdex
 		template<class _T, class _ArgT = void*>
 		struct _type_is_nullptr
 		{
-			typedef _type_is_nullptr_helper<_is_nullptr_t<_T>::value == (true) && is_pointer<_ArgT>::value == (true)> _check_type;
+			typedef _type_is_nullptr_helper<_is_nullptr_t<_T>::value == (true) && (is_pointer<_ArgT>::value == (true) || is_member_function_pointer<_ArgT>::value == (true))> _check_type;
 			static const typename _check_type::type value = _check_type::value;
 		};
 
