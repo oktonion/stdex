@@ -42,6 +42,8 @@ namespace stdex
 	}
 }
 
+using stdex::make_error_condition;
+
 namespace stdex
 {
 	template<>
