@@ -40,3 +40,4 @@ echo "lib done"
 echo "contains:"
 ar -t "./lib/libstdex.a"
 
+
