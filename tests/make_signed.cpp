@@ -42,7 +42,7 @@ int main(void)
         STATIC_ASSERT((is_same<test21cv_type, const volatile signed int>::value == (true)), check);
 
         typedef make_signed<const char>::type  	test22_type;
-        STATIC_ASSERT((is_same<test22_type, const signed char>::value == (true)), );
+        STATIC_ASSERT((is_same<test22_type, const signed char>::value == (true)), check);
 
         typedef make_signed<volatile wchar_t>::type  	test23_type;
         STATIC_ASSERT((is_signed<test23_type>::value && is_volatile<test23_type>::value && sizeof(test23_type) == sizeof(volatile wchar_t)), check);
