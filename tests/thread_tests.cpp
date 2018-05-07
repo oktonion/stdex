@@ -108,6 +108,8 @@ void thread_func5(int, int, int, float, int) { return; }
 void thread_func7(int, int, int, float, int, float*, void*) { return; }
 void thread_func8(float*, float*, void*, ClassType*) { return; }
 
+int thread_func_nullptr_check_ret = 0;
+
 struct functor
 {
 	functor() {}
@@ -151,7 +153,7 @@ struct functor
 	}
 };
 
-int thread_func_nullptr_check_ret = 0;
+
 
 void thread_func_nullptr_check(float *arg1, float *arg2, void *arg3, ClassType *arg4) 
 { 
@@ -433,13 +435,16 @@ int test_thread_id()
 
     thread::id id1;
     thread::id id2;
+    bool res;
 
-    id1 == id2;
-    id1 != id2;
-    id1 < id2;
-    id1 > id2;
-    id1 >= id2;
-    id1 <= id2;
+    res = id1 == id2;
+    res = id1 != id2;
+    res = id1 < id2;
+    res = id1 > id2;
+    res = id1 >= id2;
+    res = id1 <= id2;
+
+    res = res;
 
     return 0;
 }
