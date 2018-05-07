@@ -28,10 +28,16 @@ int main(void)
         typedef int(ClassType::*mobj1);
         typedef const int(ClassType::*mobj2);
         typedef ClassType(ClassType::*mobj3);
+        typedef float &ref_type;
+        typedef int simple_type;
+        typedef long *ptr_type;
 
         STATIC_ASSERT(is_member_function_pointer<mobj1>::value == (false), can_not_be_a_member_function_pointer);
         STATIC_ASSERT(is_member_function_pointer<mobj2>::value == (false), can_not_be_a_member_function_pointer);
         STATIC_ASSERT(is_member_function_pointer<mobj3>::value == (false), can_not_be_a_member_function_pointer);
+        STATIC_ASSERT(is_member_function_pointer<ref_type>::value == (false), can_not_be_a_member_function_pointer);
+        STATIC_ASSERT(is_member_function_pointer<simple_type>::value == (false), can_not_be_a_member_function_pointer);
+        STATIC_ASSERT(is_member_function_pointer<ptr_type>::value == (false), can_not_be_a_member_function_pointer);
     }
 
     // Sanity check.
