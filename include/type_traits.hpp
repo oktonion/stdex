@@ -928,7 +928,7 @@ namespace stdex
 #undef _IS_MEM_FUN_FASTCALL_PTR
 
 
-		template <class _Tp>
+		template <class _Tp, bool _IsRef>
 		struct _is_mem_function_ptr_impl
 		{
 			static _Tp *p;
@@ -938,8 +938,13 @@ namespace stdex
 		};
 
 		template <class _Tp>
+		struct _is_mem_function_ptr_impl<_Tp, true>:
+			public false_type
+		{};
+
+		template <class _Tp>
 		struct _is_mem_function_ptr_helper:
-			public _is_mem_function_ptr_impl<_Tp>::type
+			public _is_mem_function_ptr_impl<_Tp, is_reference<_Tp>::value>::type
 		{};
 		
 		template <class _Tp, bool _IsMemberFunctionPtr>
