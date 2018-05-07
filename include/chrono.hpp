@@ -403,7 +403,7 @@ namespace stdex
 				typedef typename check::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert<(is_floating_point<_Rep>::value == bool(true)) || (is_floating_point<_Rep2>::value == bool(false))>::
 					a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert_failed
 				check4; // if you are there means rep type is integer but floating-point type is passed as argument
-			};
+			}
 
 			template<class _Rep2, class _Period2>
 			duration(const duration<_Rep2, _Period2> &other):
