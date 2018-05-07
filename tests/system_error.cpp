@@ -30,6 +30,8 @@ namespace stdex
 	}
 }
 
+using stdex::make_error_code;
+
 namespace stdex
 {
 	stdex::error_condition
