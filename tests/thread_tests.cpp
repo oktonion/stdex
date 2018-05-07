@@ -108,6 +108,49 @@ void thread_func5(int, int, int, float, int) { return; }
 void thread_func7(int, int, int, float, int, float*, void*) { return; }
 void thread_func8(float*, float*, void*, ClassType*) { return; }
 
+struct functor
+{
+	functor() {}
+	~functor() {}
+
+	int operator()(float *arg1, double *arg2, void(*arg3)(int, float, int*), float(functor::*arg4)(int, void*), ClassType *arg5)
+	{
+        if (arg1 == nullptr)
+        {
+            thread_func_nullptr_check_ret = __LINE__;
+            std::cout << "fail: arg1 == nullptr" << std::endl;
+            return 0;
+        }
+        if (arg2 != nullptr)
+        {
+            thread_func_nullptr_check_ret = __LINE__;
+            std::cout << "fail: arg2(" << arg2 << ") != nullptr" << std::endl;
+            return 0;
+        }
+        if (nullptr != arg3)
+        {
+            thread_func_nullptr_check_ret = __LINE__;
+            std::cout << "fail: nullptr != arg3(" << arg3 << ")" << std::endl;
+            return 0;
+        }
+        if (nullptr != arg4)
+        {
+            thread_func_nullptr_check_ret = __LINE__;
+            std::cout << "fail: nullptr != arg4(" << arg4 << ")" << std::endl;
+            return 0;
+        }
+        if (nullptr == arg5)
+        {
+            thread_func_nullptr_check_ret = __LINE__;
+            std::cout << "fail: nullptr == arg5" << std::endl;
+            return 0;
+        }
+
+        thread_func_nullptr_check_ret = 0;
+		return 0;
+	}
+};
+
 int thread_func_nullptr_check_ret = 0;
 
 void thread_func_nullptr_check(float *arg1, float *arg2, void *arg3, ClassType *arg4) 
@@ -512,6 +555,21 @@ int test11()
         float p;
         ClassType cl;
         thread t1(thread_func_nullptr_check, nullptr, &p, nullptr, &cl);
+
+        t1.join();
+    }
+
+    return thread_func_nullptr_check_ret;
+}
+
+int test12()
+{
+    using namespace stdex;
+
+    {
+        float p;
+        ClassType cl;
+        thread t1(functor(), &p, nullptr, nullptr, nullptr, &cl);
 
         t1.join();
     }
