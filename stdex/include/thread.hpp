@@ -40,6 +40,106 @@ namespace stdex
 		enum eTypeNullptr { _type_nullptr };
 		enum eTypeNotNullptr { _type_not_nullptr };
 
+		template<class _FuncT> struct _function_traits;
+
+		template<class R>
+		struct _function_traits<R(*)(void)>
+		{
+			typedef R result_type;
+		};
+
+		template<class R, class T1>
+		struct _function_traits<R(*)(T1)>
+		{
+			typedef R result_type;
+			typedef T1 arg1_type;
+			typedef T1 argument_type;
+		};
+
+		template<class R, class T1, class T2>
+		struct _function_traits<R(*)(T1, T2)>
+		{
+			typedef R result_type;
+			typedef T1 arg1_type;
+			typedef T2 arg2_type;
+			
+			
+		};
+
+		template<class R, class T1, class T2, class T3>
+		struct _function_traits<R(*)(T1, T2, T3)>
+		{
+			typedef R result_type;
+			typedef T1 arg1_type;
+			typedef T2 arg2_type;
+			typedef T3 arg3_type;
+		};
+
+		template<class R, class T1, class T2, class T3, class T4>
+		struct _function_traits<R(*)(T1, T2, T3, T4)>
+		{
+			typedef R result_type;
+			typedef T1 arg1_type;
+			typedef T2 arg2_type;
+			typedef T3 arg3_type;
+			typedef T4 arg4_type;
+		};
+
+		template<class R, class T1, class T2, class T3, class T4,
+			class T5>
+		struct _function_traits<R(*)(T1, T2, T3, T4, T5)>
+		{
+			typedef R result_type;
+			typedef T1 arg1_type;
+			typedef T2 arg2_type;
+			typedef T3 arg3_type;
+			typedef T4 arg4_type;
+			typedef T5 arg5_type;
+		};
+
+		template<class R, class T1, class T2, class T3, class T4,
+			class T5, class T6>
+		struct _function_traits<R(*)(T1, T2, T3, T4, T5, T6)>
+		{
+			typedef R result_type;
+			typedef T1 arg1_type;
+			typedef T2 arg2_type;
+			typedef T3 arg3_type;
+			typedef T4 arg4_type;
+			typedef T5 arg5_type;
+			typedef T6 arg6_type;
+		};
+
+		template<class R, class T1, class T2, class T3, class T4,
+			class T5, class T6, class T7>
+		struct _function_traits<R(*)(T1, T2, T3, T4, T5, T6, T7)>
+		{
+			typedef R result_type;
+			typedef T1 arg1_type;
+			typedef T2 arg2_type;
+			typedef T3 arg3_type;
+			typedef T4 arg4_type;
+			typedef T5 arg5_type;
+			typedef T6 arg6_type;
+			typedef T7 arg7_type;
+		};
+
+		template<class R, class T1, class T2, class T3, class T4,
+			class T5, class T6, class T7, class T8>
+		struct _function_traits<R(*)(T1, T2, T3, T4, T5, T6, T7, T8)>
+		{
+			typedef R result_type;
+			typedef T1 arg1_type;
+			typedef T2 arg2_type;
+			typedef T3 arg3_type;
+			typedef T4 arg4_type;
+			typedef T5 arg5_type;
+			typedef T6 arg6_type;
+			typedef T7 arg7_type;
+			typedef T8 arg8_type;
+		};
+
+
 		template<bool>
 		struct _type_is_nullptr_helper
 		{ 
@@ -54,10 +154,10 @@ namespace stdex
 			static const type value = _type_not_nullptr;
 		};
 
-		template<class _T>
+		template<class _T, class _ArgT = void*>
 		struct _type_is_nullptr
 		{
-			typedef _type_is_nullptr_helper<_is_nullptr_t<_T>::value == (true) && is_same<nullptr_t, void*>::value == (false) && is_integral<nullptr_t>::value == (false)> _check_type;
+			typedef _type_is_nullptr_helper<_is_nullptr_t<_T>::value == (true) && (is_pointer<_ArgT>::value == (true) || is_member_function_pointer<_ArgT>::value == (true))> _check_type;
 			static const typename _check_type::type value = _check_type::value;
 		};
 
@@ -75,6 +175,12 @@ namespace stdex
 				void push(_FuncT &fp)
 				{
 					call(fp);
+				}
+
+				template<class _ObjectT, class _FuncT>
+				void push(_ObjectT &fp, _FuncT mp)
+				{
+					push(fp);
 				}
 			};
 
@@ -98,7 +204,22 @@ namespace stdex
 				template<class _FuncT>
 				void push(_FuncT &fp)
 				{
-					call(fp, _type_is_nullptr<_Arg1>::value);
+					call(fp,
+						_type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1))
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1) const)
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value);
 				}
 			};
 
@@ -117,15 +238,33 @@ namespace stdex
 					arg1(arg1_), arg2(arg2_)
 				{ }
 
-				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNotNullptr)	{ fp(arg1, arg2); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNullptr)		{ fp(nullptr, nullptr); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNotNullptr)		{ fp(nullptr, arg2); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNullptr)		{ fp(arg1, nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr); }
 
 				template<class _FuncT>
 				void push(_FuncT &fp)
 				{
-					call(fp, _type_is_nullptr<_Arg1>::value, _type_is_nullptr<_Arg2>::value);
+					call(fp,
+						_type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
+						_type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2))
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2) const)
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value);
 				}
 			};
 
@@ -144,23 +283,41 @@ namespace stdex
 				_arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_) :
 					arg1(arg1_), arg2(arg2_), arg3(arg3_)
 				{ }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNullptr, eTypeNullptr)			{ fp(nullptr, nullptr, nullptr); }
 
-				
-				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNullptr, eTypeNotNullptr)	{ fp(arg1, nullptr, arg3); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNotNullptr, eTypeNullptr)	{ fp(arg1, arg2, nullptr); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNullptr, eTypeNullptr)		{ fp(arg1, nullptr, nullptr); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNotNullptr, eTypeNotNullptr) { fp(arg1, arg2, arg3); }
-
-				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNotNullptr, eTypeNotNullptr)	{ fp(nullptr, arg2, arg3); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNotNullptr, eTypeNullptr)		{ fp(nullptr, arg2, nullptr); }
-
-				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNullptr, eTypeNotNullptr)		{ fp(nullptr, nullptr, arg3); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr); }
 
 				template<class _FuncT>
 				void push(_FuncT &fp)
 				{
-					call(fp, _type_is_nullptr<_Arg1>::value, _type_is_nullptr<_Arg2>::value, _type_is_nullptr<_Arg3>::value);
+					call(fp,
+						_type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
+						_type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value,
+						_type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3))
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3) const)
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value);
 				}
 			};
 
@@ -180,35 +337,53 @@ namespace stdex
 				_arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg4 arg4_) :
 					arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_)
 				{ }
-
-				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNullptr, eTypeNullptr, eTypeNullptr)			{ fp(nullptr, nullptr, nullptr, nullptr); }
-
-				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNullptr, eTypeNullptr, eTypeNotNullptr)		{ fp(arg1, nullptr, nullptr, arg4); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNullptr, eTypeNotNullptr, eTypeNotNullptr)	{ fp(arg1, nullptr, arg3, arg4); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNullptr, eTypeNotNullptr, eTypeNullptr)		{ fp(arg1, nullptr, arg3, nullptr); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNotNullptr, eTypeNullptr, eTypeNullptr)		{ fp(arg1, arg2, nullptr, nullptr); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNullptr, eTypeNullptr, eTypeNullptr)			{ fp(arg1, nullptr, nullptr, nullptr); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNotNullptr, eTypeNullptr, eTypeNotNullptr)	{ fp(arg1, arg2, nullptr, arg4); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNotNullptr, eTypeNotNullptr, eTypeNullptr)	{ fp(arg1, arg2, arg3, nullptr); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr, eTypeNotNullptr, eTypeNotNullptr, eTypeNotNullptr){ fp(arg1, arg2, arg3, arg4); }
-
-				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNotNullptr, eTypeNullptr, eTypeNotNullptr)		{ fp(nullptr, arg2, nullptr, arg4); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNotNullptr, eTypeNotNullptr, eTypeNullptr)		{ fp(nullptr, arg2, arg3, nullptr); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNotNullptr, eTypeNullptr, eTypeNullptr)			{ fp(nullptr, arg2, nullptr, nullptr); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNotNullptr, eTypeNotNullptr, eTypeNotNullptr)	{ fp(nullptr, arg2, arg3, arg4); }
-
-				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNullptr, eTypeNotNullptr, eTypeNotNullptr)		{ fp(nullptr, nullptr, arg3, arg4); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNullptr, eTypeNotNullptr, eTypeNullptr)			{ fp(nullptr, nullptr, arg3, nullptr); }	
-
-				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr, eTypeNullptr, eTypeNullptr, eTypeNotNullptr)			{ fp(nullptr, nullptr, nullptr, arg4); }
 				
-				
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,arg4); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,arg4); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,arg4); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,arg4); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,arg4); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,arg4); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,arg4); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr, nullptr, nullptr, nullptr); }
 				
 
 				template<class _FuncT>
 				void push(_FuncT &fp)
 				{
-					call(fp, _type_is_nullptr<_Arg1>::value, _type_is_nullptr<_Arg2>::value, _type_is_nullptr<_Arg3>::value, _type_is_nullptr<_Arg4>::value);
+					call(fp,
+						_type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
+						_type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value,
+						_type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value,
+						_type_is_nullptr<_Arg4, typename _function_traits<_FuncT>::arg4_type>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4))
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4) const)
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value);
 				}
 			};
 
@@ -230,10 +405,70 @@ namespace stdex
 					arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_), arg5(arg5_)
 				{ }
 
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4,arg5); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,arg4,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,nullptr,arg5); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,arg4,arg5); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,arg4,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,nullptr,arg5); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,arg4,arg5); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,arg4,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,nullptr,arg5); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,arg4,arg5); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,arg4,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,nullptr,arg5); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,arg4,arg5); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,arg4,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,nullptr,arg5); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,arg4,arg5); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,arg4,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,nullptr,arg5); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,arg4,arg5); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,arg4,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,nullptr,arg5); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,arg4,arg5); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,arg4,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,arg5); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr); }
+
 				template<class _FuncT>
 				void push(_FuncT &fp)
 				{
-					fp(arg1, arg2, arg3, arg4, arg5);
+					call(fp,
+						_type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
+						_type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value,
+						_type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value,
+						_type_is_nullptr<_Arg4, typename _function_traits<_FuncT>::arg4_type>::value,
+						_type_is_nullptr<_Arg5, typename _function_traits<_FuncT>::arg5_type>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5))
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value,
+						_type_is_nullptr<_Arg5, _FArg5>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5) const)
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value,
+						_type_is_nullptr<_Arg5, _FArg5>::value);
 				}
 			};
 
@@ -256,10 +491,106 @@ namespace stdex
 					arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_), arg5(arg5_), arg6(arg6_)
 				{ }
 
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4,arg5,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,arg4,arg5,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4,nullptr,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,arg4,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,nullptr,arg5,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,nullptr,arg5,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,nullptr,nullptr,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,arg4,arg5,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,arg4,arg5,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,arg4,nullptr,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,arg4,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,nullptr,arg5,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,nullptr,arg5,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,nullptr,nullptr,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,arg4,arg5,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,arg4,arg5,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,arg4,nullptr,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,arg4,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,nullptr,arg5,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,nullptr,arg5,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,nullptr,nullptr,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,arg4,arg5,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,arg4,arg5,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,arg4,nullptr,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,arg4,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,nullptr,arg5,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,nullptr,arg5,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,nullptr,nullptr,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,arg4,arg5,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,arg4,arg5,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,arg4,nullptr,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,arg4,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,nullptr,arg5,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,nullptr,arg5,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,nullptr,nullptr,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,arg4,arg5,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,arg4,arg5,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,arg4,nullptr,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,arg4,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,nullptr,arg5,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,nullptr,arg5,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,nullptr,nullptr,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,arg4,arg5,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,arg4,arg5,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,arg4,nullptr,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,arg4,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,nullptr,arg5,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,nullptr,arg5,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,nullptr,nullptr,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,arg4,arg5,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,arg4,arg5,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,arg4,nullptr,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,arg4,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,arg5,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,arg5,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,arg6); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,nullptr); }
+
+
 				template<class _FuncT>
 				void push(_FuncT &fp)
 				{
-					fp(arg1, arg2, arg3, arg4, arg5, arg6);
+					call(fp,
+						_type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
+						_type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value,
+						_type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value,
+						_type_is_nullptr<_Arg4, typename _function_traits<_FuncT>::arg4_type>::value,
+						_type_is_nullptr<_Arg5, typename _function_traits<_FuncT>::arg5_type>::value,
+						_type_is_nullptr<_Arg6, typename _function_traits<_FuncT>::arg6_type>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6))
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value,
+						_type_is_nullptr<_Arg5, _FArg5>::value,
+						_type_is_nullptr<_Arg6, _FArg6>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6) const)
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value,
+						_type_is_nullptr<_Arg5, _FArg5>::value,
+						_type_is_nullptr<_Arg6, _FArg6>::value);
 				}
 			};
 
@@ -283,10 +614,173 @@ namespace stdex
 					arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_), arg5(arg5_), arg6(arg6_), arg7(arg7_)
 				{ }
 
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4,arg5,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,arg4,arg5,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4,arg5,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,arg4,arg5,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4,nullptr,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,arg4,nullptr,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4,nullptr,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,arg4,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,nullptr,arg5,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,nullptr,arg5,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,nullptr,arg5,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,nullptr,arg5,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,nullptr,nullptr,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,nullptr,nullptr,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,nullptr,nullptr,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,arg4,arg5,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,arg4,arg5,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,arg4,arg5,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,arg4,arg5,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,arg4,nullptr,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,arg4,nullptr,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,arg4,nullptr,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,arg4,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,nullptr,arg5,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,nullptr,arg5,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,nullptr,arg5,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,nullptr,arg5,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,nullptr,nullptr,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,nullptr,nullptr,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,nullptr,nullptr,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,arg4,arg5,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,arg4,arg5,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,arg4,arg5,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,arg4,arg5,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,arg4,nullptr,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,arg4,nullptr,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,arg4,nullptr,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,arg4,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,nullptr,arg5,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,nullptr,arg5,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,nullptr,arg5,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,nullptr,arg5,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,nullptr,nullptr,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,nullptr,nullptr,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,nullptr,nullptr,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,arg4,arg5,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,arg4,arg5,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,arg4,arg5,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,arg4,arg5,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,arg4,nullptr,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,arg4,nullptr,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,arg4,nullptr,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,arg4,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,nullptr,arg5,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,nullptr,arg5,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,nullptr,arg5,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,nullptr,arg5,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,nullptr,nullptr,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,nullptr,nullptr,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,nullptr,nullptr,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,arg4,arg5,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,arg4,arg5,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,arg4,arg5,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,arg4,arg5,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,arg4,nullptr,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,arg4,nullptr,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,arg4,nullptr,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,arg4,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,nullptr,arg5,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,nullptr,arg5,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,nullptr,arg5,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,nullptr,arg5,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,nullptr,nullptr,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,nullptr,nullptr,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,nullptr,nullptr,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,arg4,arg5,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,arg4,arg5,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,arg4,arg5,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,arg4,arg5,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,arg4,nullptr,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,arg4,nullptr,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,arg4,nullptr,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,arg4,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,nullptr,arg5,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,nullptr,arg5,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,nullptr,arg5,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,nullptr,arg5,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,nullptr,nullptr,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,nullptr,nullptr,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,nullptr,nullptr,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,arg4,arg5,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,arg4,arg5,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,arg4,arg5,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,arg4,arg5,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,arg4,nullptr,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,arg4,nullptr,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,arg4,nullptr,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,arg4,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,nullptr,arg5,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,nullptr,arg5,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,nullptr,arg5,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,nullptr,arg5,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,nullptr,nullptr,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,nullptr,nullptr,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,nullptr,nullptr,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,arg4,arg5,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,arg4,arg5,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,arg4,arg5,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,arg4,arg5,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,arg4,nullptr,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,arg4,nullptr,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,arg4,nullptr,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,arg4,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,arg5,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,arg5,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,arg5,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,arg5,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,arg6,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,arg6,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,arg7); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr); }
+
+
 				template<class _FuncT>
 				void push(_FuncT &fp)
 				{
-					fp(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+					call(fp,
+						_type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
+						_type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value,
+						_type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value,
+						_type_is_nullptr<_Arg4, typename _function_traits<_FuncT>::arg4_type>::value,
+						_type_is_nullptr<_Arg5, typename _function_traits<_FuncT>::arg5_type>::value,
+						_type_is_nullptr<_Arg6, typename _function_traits<_FuncT>::arg6_type>::value,
+						_type_is_nullptr<_Arg7, typename _function_traits<_FuncT>::arg7_type>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6, class _FArg7>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7))
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value,
+						_type_is_nullptr<_Arg5, _FArg5>::value,
+						_type_is_nullptr<_Arg6, _FArg6>::value,
+						_type_is_nullptr<_Arg7, _FArg7>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6, class _FArg7>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7) const)
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value,
+						_type_is_nullptr<_Arg5, _FArg5>::value,
+						_type_is_nullptr<_Arg6, _FArg6>::value,
+						_type_is_nullptr<_Arg7, _FArg7>::value);
 				}
 			};
 
@@ -311,14 +805,323 @@ namespace stdex
 					arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_), arg5(arg5_), arg6(arg6_), arg7(arg7_), arg8(arg8_)
 				{ }
 
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4,arg5,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,arg4,arg5,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4,arg5,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,arg4,arg5,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4,arg5,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,arg4,arg5,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4,arg5,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,arg4,arg5,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4,nullptr,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,arg4,nullptr,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4,nullptr,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,arg4,nullptr,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4,nullptr,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,arg4,nullptr,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4,nullptr,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,arg4,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,nullptr,arg5,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,nullptr,arg5,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,nullptr,arg5,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,nullptr,arg5,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,nullptr,arg5,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,nullptr,arg5,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,nullptr,arg5,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,nullptr,arg5,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,nullptr,nullptr,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,nullptr,nullptr,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,nullptr,nullptr,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,nullptr,nullptr,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,nullptr,nullptr,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,nullptr,nullptr,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,nullptr,nullptr,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,arg3,nullptr,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,arg4,arg5,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,arg4,arg5,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,arg4,arg5,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,arg4,arg5,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,arg4,arg5,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,arg4,arg5,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,arg4,arg5,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,arg4,arg5,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,arg4,nullptr,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,arg4,nullptr,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,arg4,nullptr,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,arg4,nullptr,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,arg4,nullptr,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,arg4,nullptr,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,arg4,nullptr,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,arg4,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,nullptr,arg5,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,nullptr,arg5,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,nullptr,arg5,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,nullptr,arg5,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,nullptr,arg5,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,nullptr,arg5,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,nullptr,arg5,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,nullptr,arg5,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,nullptr,nullptr,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,nullptr,nullptr,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,nullptr,nullptr,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,nullptr,nullptr,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,nullptr,nullptr,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,nullptr,nullptr,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,arg2,nullptr,nullptr,nullptr,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,arg2,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,arg4,arg5,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,arg4,arg5,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,arg4,arg5,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,arg4,arg5,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,arg4,arg5,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,arg4,arg5,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,arg4,arg5,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,arg4,arg5,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,arg4,nullptr,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,arg4,nullptr,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,arg4,nullptr,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,arg4,nullptr,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,arg4,nullptr,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,arg4,nullptr,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,arg4,nullptr,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,arg4,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,nullptr,arg5,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,nullptr,arg5,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,nullptr,arg5,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,nullptr,arg5,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,nullptr,arg5,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,nullptr,arg5,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,nullptr,arg5,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,nullptr,arg5,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,nullptr,nullptr,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,nullptr,nullptr,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,nullptr,nullptr,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,nullptr,nullptr,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,nullptr,nullptr,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,nullptr,nullptr,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,arg3,nullptr,nullptr,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,arg3,nullptr,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,arg4,arg5,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,arg4,arg5,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,arg4,arg5,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,arg4,arg5,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,arg4,arg5,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,arg4,arg5,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,arg4,arg5,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,arg4,arg5,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,arg4,nullptr,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,arg4,nullptr,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,arg4,nullptr,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,arg4,nullptr,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,arg4,nullptr,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,arg4,nullptr,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,arg4,nullptr,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,arg4,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,nullptr,arg5,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,nullptr,arg5,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,nullptr,arg5,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,nullptr,arg5,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,nullptr,arg5,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,nullptr,arg5,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,nullptr,arg5,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,nullptr,arg5,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,nullptr,nullptr,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,nullptr,nullptr,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,nullptr,nullptr,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,nullptr,nullptr,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,nullptr,nullptr,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,nullptr,nullptr,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(arg1,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(arg1,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,arg4,arg5,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,arg4,arg5,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,arg4,arg5,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,arg4,arg5,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,arg4,arg5,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,arg4,arg5,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,arg4,arg5,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,arg4,arg5,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,arg4,nullptr,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,arg4,nullptr,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,arg4,nullptr,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,arg4,nullptr,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,arg4,nullptr,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,arg4,nullptr,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,arg4,nullptr,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,arg4,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,nullptr,arg5,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,nullptr,arg5,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,nullptr,arg5,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,nullptr,arg5,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,nullptr,arg5,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,nullptr,arg5,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,nullptr,arg5,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,nullptr,arg5,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,nullptr,nullptr,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,nullptr,nullptr,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,nullptr,nullptr,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,nullptr,nullptr,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,nullptr,nullptr,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,nullptr,nullptr,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,arg3,nullptr,nullptr,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,arg3,nullptr,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,arg4,arg5,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,arg4,arg5,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,arg4,arg5,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,arg4,arg5,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,arg4,arg5,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,arg4,arg5,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,arg4,arg5,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,arg4,arg5,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,arg4,nullptr,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,arg4,nullptr,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,arg4,nullptr,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,arg4,nullptr,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,arg4,nullptr,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,arg4,nullptr,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,arg4,nullptr,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,arg4,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,nullptr,arg5,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,nullptr,arg5,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,nullptr,arg5,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,nullptr,arg5,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,nullptr,arg5,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,nullptr,arg5,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,nullptr,arg5,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,nullptr,arg5,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,nullptr,nullptr,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,nullptr,nullptr,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,nullptr,nullptr,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,nullptr,nullptr,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,nullptr,nullptr,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,nullptr,nullptr,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,arg2,nullptr,nullptr,nullptr,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,arg2,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,arg4,arg5,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,arg4,arg5,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,arg4,arg5,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,arg4,arg5,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,arg4,arg5,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,arg4,arg5,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,arg4,arg5,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,arg4,arg5,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,arg4,nullptr,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,arg4,nullptr,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,arg4,nullptr,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,arg4,nullptr,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,arg4,nullptr,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,arg4,nullptr,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,arg4,nullptr,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,arg4,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,nullptr,arg5,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,nullptr,arg5,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,nullptr,arg5,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,nullptr,arg5,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,nullptr,arg5,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,nullptr,arg5,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,nullptr,arg5,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,nullptr,arg5,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,nullptr,nullptr,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,nullptr,nullptr,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,nullptr,nullptr,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,nullptr,nullptr,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,nullptr,nullptr,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,nullptr,nullptr,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,arg3,nullptr,nullptr,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,arg3,nullptr,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,arg4,arg5,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,arg4,arg5,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,arg4,arg5,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,arg4,arg5,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,arg4,arg5,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,arg4,arg5,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,arg4,arg5,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,arg4,arg5,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,arg4,nullptr,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,arg4,nullptr,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,arg4,nullptr,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,arg4,nullptr,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,arg4,nullptr,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,arg4,nullptr,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,arg4,nullptr,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,arg4,nullptr,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,arg5,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,arg5,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,arg5,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,arg5,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,arg5,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,arg5,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,arg5,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,arg5,nullptr,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,arg6,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,arg6,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,arg6,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,arg6,nullptr,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,arg7,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,arg7,nullptr); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,arg8); }
+template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr); }
+
+
 				template<class _FuncT>
 				void push(_FuncT &fp)
 				{
-					fp(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
+					call(fp, 
+						_type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value, 
+						_type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value, 
+						_type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value,
+						_type_is_nullptr<_Arg4, typename _function_traits<_FuncT>::arg4_type>::value,
+						_type_is_nullptr<_Arg5, typename _function_traits<_FuncT>::arg5_type>::value,
+						_type_is_nullptr<_Arg6, typename _function_traits<_FuncT>::arg6_type>::value,
+						_type_is_nullptr<_Arg7, typename _function_traits<_FuncT>::arg7_type>::value,
+						_type_is_nullptr<_Arg8, typename _function_traits<_FuncT>::arg8_type>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6, class _FArg7, class _FArg8>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7, _FArg8))
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value,
+						_type_is_nullptr<_Arg5, _FArg5>::value,
+						_type_is_nullptr<_Arg6, _FArg6>::value,
+						_type_is_nullptr<_Arg7, _FArg7>::value,
+						_type_is_nullptr<_Arg8, _FArg8>::value);
+				}
+
+				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6, class _FArg7, class _FArg8>
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7, _FArg8) const)
+				{
+					call(fp,
+						_type_is_nullptr<_Arg1, _FArg1>::value,
+						_type_is_nullptr<_Arg2, _FArg2>::value,
+						_type_is_nullptr<_Arg3, _FArg3>::value,
+						_type_is_nullptr<_Arg4, _FArg4>::value,
+						_type_is_nullptr<_Arg5, _FArg5>::value,
+						_type_is_nullptr<_Arg6, _FArg6>::value,
+						_type_is_nullptr<_Arg7, _FArg7>::value,
+						_type_is_nullptr<_Arg8, _FArg8>::value);
 				}
 			};
 
 			typedef _arguments arguments_type;
+		};
+
+		enum eTypeIsClass { _type_is_class };
+		enum eTypeIsNotClass { _type_is_not_class };
+
+		template<bool>
+		struct _is_class_overload
+		{
+			static const eTypeIsClass value = _type_is_class;
+		};
+
+		template<>
+		struct _is_class_overload<false>
+		{
+			static const eTypeIsNotClass value = _type_is_not_class;
 		};
 
 		template<class _FuncT, class _ArgT>
@@ -340,6 +1143,16 @@ namespace stdex
 
 			void call()
 			{
+				call(_is_class_overload<is_class<_FuncT>::value>::value);
+			}
+
+			void call(eTypeIsClass)
+			{
+				args.push(fp, &_FuncT::operator());
+			}
+
+			void call(eTypeIsNotClass)
+			{
 				args.push(fp);
 			}
 
@@ -352,7 +1165,7 @@ namespace stdex
 				delete pf;
 			}
 		};
-	}
+}
 
 	//! Thread class.
 	class thread {
