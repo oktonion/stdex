@@ -40,19 +40,19 @@ public:
 	}
 //}
 
-//namespace stdex
-//{
+namespace stdex
+{
 	template<>
 	struct stdex::is_error_code_enum<my_errc>
 		: public true_type {};
-//}
+}
 
-//namespace stdex
-//{
+namespace stdex
+{
 	template<>
 	struct stdex::is_error_condition_enum<my_errc>
 		: public true_type { };
-//}
+}
 
 class fuzzy_logic :
     public stdex::system_error
