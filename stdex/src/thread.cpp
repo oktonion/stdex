@@ -11,6 +11,10 @@
 #include <set>
 #include <vector>
 
+#ifdef __GLIBC__
+#include <sys/sysinfo.h>
+#endif
+
 // since windows is a 'special' platform there is some macro definitions to define platform
 #if defined(WIN32) || defined(_WIN32)
 #define _STDEX_THREAD_WIN
@@ -365,6 +369,10 @@ unsigned thread::hardware_concurrency() NOEXCEPT_FUNCTION
 	return (int) sysconf(_SC_NPROCESSORS_ONLN);
 #elif defined(_SC_NPROC_ONLN)
 	return (int) sysconf(_SC_NPROC_ONLN);
+#elif defined(PTW32_VERSION)
+    return pthread_num_processors_np();
+#elif defined(__GLIBC__)
+	return get_nprocs();
 #else
 	// The standard requires this function to return zero if the number of
 	// hardware cores could not be determined.

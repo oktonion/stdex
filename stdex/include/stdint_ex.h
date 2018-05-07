@@ -25,6 +25,7 @@
 	typedef uint16_t uchar16_t;
 	typedef int32_t char32_t;
 	typedef uint32_t uchar32_t;
+
 #endif
 
 #endif // _STDEX_STDINT_H

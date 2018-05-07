@@ -212,7 +212,7 @@ system_clock::time_point system_clock::now() NOEXCEPT_FUNCTION
 		}
 
 		return time_point(duration(
-			seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec)));
+			seconds(ts.tv_sec) + duration_cast<duration>(nanoseconds(ts.tv_nsec))));
 	}
 }
 
@@ -227,6 +227,6 @@ steady_clock::time_point steady_clock::now() NOEXCEPT_FUNCTION
 		}
 
 		return time_point(duration(
-			seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec)));
+			seconds(ts.tv_sec) + duration_cast<duration>(nanoseconds(ts.tv_nsec))));
 	}
 }
