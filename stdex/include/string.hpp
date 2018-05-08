@@ -5,11 +5,16 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+// stdex includes
 #include "./core.h"
 #include "./type_traits.hpp"
 #include "./sstream.hpp"
 #include "./stdint_ex.h"
 
+// POSIX includes
+/*none*/
+
+// std includes
 #include <cstring>
 #include <cctype>
 #include <cstdlib>
@@ -18,6 +23,7 @@
 #include <iostream>
 #include <string>
 #include <stdint.h>
+#include <climits>
 
 
 
@@ -57,7 +63,7 @@ namespace stdex
 	template <class _T>
 	inline _T stot(const char *s, int base = 10)
 	{
-        using namespace std;
+		using namespace std;
 		_T num = 0;
 		bool negative = false;
 		static const char digits[] = "0123456789abcdefghijklmnopqrstuvwxyz";
@@ -146,33 +152,45 @@ namespace stdex
 	{
 		return stot<uint64_t>(s.c_str() + (idx ? *idx : 0), base);
 	}
+
+	template<class _T>
+	inline string to_string(const _T &t)
+	{
+		stringstream ss;
+		ss << t;
+		return ss.str();
+	}
 	
-	inline string to_string(int value, int radix = 10)
+	template<>
+	inline string to_string<int>(const int &value)
 	{
 		using namespace std;
 		char buf[21];
-		itoa(value, buf, radix);
+		itoa(value, buf, 10);
 		
 		return string(buf);
 	}
 
-	inline string to_string(unsigned int value)
+	template<>
+	inline string to_string<unsigned int>(const unsigned int &value)
 	{
 		using namespace std;
 		char buf[30];
-		sprintf(buf, "%ul", value);
+		sprintf(buf, "%u", value);
 
 		return string(buf);
 	}
 	
-	inline string to_string(bool value)
+	template<>
+	inline string to_string<bool>(const bool &value)
 	{
 		if(value)
 			return string("true");
 		return string("false");
 	}
 
-	inline string to_string(float value)
+	template<>
+	inline string to_string<float>(const float &value)
 	{
 		using namespace std;
 		char buf[256];
@@ -181,7 +199,8 @@ namespace stdex
 		return string(buf);
 	}
 
-	inline string to_string(double value)
+	template<>
+	inline string to_string<double>(const double &value)
 	{
 		using namespace std;
 		char buf[512];
@@ -195,19 +214,63 @@ namespace stdex
 		return x;
 	}
 
-	inline string to_string(const std::string &x)
+	template<>
+	inline string to_string<std::string>(const std::string &x)
 	{
 		return x;
 	}
 
-	template<class _T>
-	inline string to_string(const _T &t)
+	template<>
+	inline 
+		enable_if<is_same<int, long>::value == (false), string>::type 
+	to_string<long>(const long &value)
 	{
-		stringstream ss;
-		ss << t;
-		return ss.str();
+		using namespace std;
+		char buf[512];
+		sprintf(buf, "%ld", value);
+
+		return string(buf);
+	}
+
+	template<>
+	inline
+		enable_if<is_same<unsigned int, unsigned long>::value == (false), string>::type
+	to_string<unsigned long>(const unsigned long &value)
+	{
+		using namespace std;
+		char buf[512];
+		sprintf(buf, "%lu", value);
+
+		return string(buf);
 	}
 	
+
+#ifdef LLONG_MAX
+	template<>
+	inline
+		enable_if<is_same<long double, double>::value == (false), string>::type
+	to_string<long double>(const long double &value)
+	{
+		using namespace std;
+		char buf[512];
+		sprintf(buf, "%Lf", value);
+
+		return string(buf);
+	}
+
+	template<>
+	inline
+		enable_if<is_same<long long, long>::value == (false), string>::type
+	to_string<long long>(const long long &value)
+	{
+		using namespace std;
+		char buf[512];
+		sprintf(buf, "%lld", value);
+
+		return string(buf);
+	}
+#endif
+
 }
 
 #endif // _STDEX_STRING_H

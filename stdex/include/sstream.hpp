@@ -5,9 +5,14 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+// stdex includes
 #include "./core.h"
 
+// POSIX includes
+/*none*/
+
 #ifdef _STDEX_NATIVE_CPP_98_SUPPORT
+// std includes
 #include <sstream>
 
 namespace stdex
@@ -28,6 +33,7 @@ namespace stdex
 	using std::wstringbuf;
 }
 #else
+// std includes
 #include <strstream>
 
 namespace stdex
