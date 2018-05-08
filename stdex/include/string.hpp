@@ -165,8 +165,8 @@ namespace stdex
 	inline string to_string<int>(const int &value)
 	{
 		using namespace std;
-		char buf[21];
-		itoa(value, buf, 10);
+		char buf[30];
+		sprintf(buf, "%d", value);
 		
 		return string(buf);
 	}
