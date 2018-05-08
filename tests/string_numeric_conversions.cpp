@@ -44,7 +44,7 @@ namespace string_tests
         return 0;
     }
 
-    void test2()
+    int test2()
     {
         errno = ERANGE;
         stdex::stoi("42");
