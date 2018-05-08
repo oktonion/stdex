@@ -7,6 +7,7 @@ if [[ $COMPILER = *"clang"* ]]; then
   exclude_warn="-Wno-c++11-long-long"
 else
   exclude_warn="-Wlong-long"
+fi
 
 for file in ./tests/*.cpp; do
   filename=$(basename -- "$file")
