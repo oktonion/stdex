@@ -54,6 +54,110 @@ namespace string_tests
 
         return 0;
     }
+
+    int test3()
+    {
+        using namespace stdex;
+        bool test = false;
+
+        try
+        {
+            string one;
+            stdex::stod(one);
+        }
+        catch (std::invalid_argument)
+        {
+            test = true;
+        }
+        catch (...)
+        {
+        }
+        DYNAMIC_VERIFY(test);
+
+        test = false;
+        try
+        {
+            string one("a");
+            stdex::stod(one);
+        }
+        catch (std::invalid_argument)
+        {
+            test = true;
+        }
+        catch (...)
+        {
+        }
+        DYNAMIC_VERIFY(test);
+
+        double d1 = 0.0;
+        std::size_t idx1 = 0;
+        try
+        {
+            string one("2.0a");
+            d1 = stdex::stod(one, &idx1);
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(d1 == 2.0);
+        DYNAMIC_VERIFY(idx1 == 3);
+
+        test = false;
+        try
+        {
+            string one("1e");
+            one.append(2 * std::numeric_limits<double>::max_exponent10, '9');
+            d1 = stdex::stod(one);
+        }
+        catch (std::out_of_range)
+        {
+            test = true;
+        }
+        catch (...)
+        {
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(d1 == 2.0);
+
+        try
+        {
+            long double ld0 = std::numeric_limits<double>::max() / 100.0;
+            string one(to_string(ld0));
+            stdex::stod(one);
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+
+        if ((std::numeric_limits<long double>::max() / 10000.0L)
+                > std::numeric_limits<double>::max())
+        {
+            test = false;
+            d1 = -1.0;
+            try
+            {
+                long double ld1 = std::numeric_limits<double>::max();
+                ld1 *= 100.0;
+                string one(to_string(ld1));
+                d1 = stdex::stod(one);
+            }
+            catch (std::out_of_range)
+            {
+                test = true;
+            }
+            catch (...)
+            {
+            }
+            DYNAMIC_VERIFY(test);
+            DYNAMIC_VERIFY(d1 == -1.0);
+        }
+
+        return 0;
+    }
 }
 
 int main(void)
