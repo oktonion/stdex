@@ -25,6 +25,7 @@
 #include <stdint.h>
 #include <climits>
 #include <stdexcept>
+#include <cmath>
 
 
 
@@ -59,59 +60,81 @@ namespace stdex
 			{
 			}
 		};
-	}
 
-	template <class _T>
-	inline _T stot(const char *s, const char *&num_s_end, int base = 10)
-	{
-		using namespace std;
-		_T num = 0;
-		bool negative = false;
-		static const char digits[] = "0123456789abcdefghijklmnopqrstuvwxyz";
-		
-		while(isspace(*s)) s++;
-
-		if (*s == '-') { negative = true; s++;}
-		else if (*s == '+') { s++;}
-
-		if (*s == '0')
+		template <class _T>
+		inline _T _cs_to_integral(const char *s, const char *&num_s_end, int base = 10)
 		{
-			s++;
+			using namespace std;
+			_T num = 0;
+			bool negative = false;
+			static const char digits [] = "0123456789abcdefghijklmnopqrstuvwxyz";
 
-			if (*s == 'x' || *s == 'X')
+			while (isspace(*s)) s++;
+
+			if (*s == '-') { negative = true; s++; }
+			else if (*s == '+') { s++; }
+
+			if (*s == '0')
 			{
-				if (base == 0) base = 16;
-				else if (base != 16)
-					return 0;
 				s++;
+
+				if (*s == 'x' || *s == 'X')
+				{
+					if (base == 0) base = 16;
+					else if (base != 16)
+						return 0;
+					s++;
+				}
+				else if (isdigit(*s))
+				{
+					if (base == 0) base = 8;
+				}
+				else if (*s == 0)
+					return 0;
 			}
-			else if (isdigit(*s))
+			else if (*s == 0) return 0;
+			else if (base == 0) base = 10;
+
+			for (int digit; *s; s++)
 			{
-				if (base == 0) base = 8;
+				const char *where = strchr(digits, tolower(*s));
+
+				if (where == 0) break;
+				digit = where - digits;
+				if (digit >= base) break;
+
+				num = num * base + digit;
 			}
-			else if (*s == 0)
-				return 0;
-		}
-		else if (*s == 0) return 0;
-		else if (base == 0) base = 10;
 
-		for (int digit; *s; s++)
+			if (negative) stdex::detail::minus<stdex::is_signed<_T>::value>::apply(num);
+
+			num_s_end = s;
+
+			return num;
+		}
+
+		template <class _T>
+		inline double _cs_to_floating_point(const char *str, const char *&num_s_end)
 		{
-			const char *where = strchr(digits, tolower(*s));
+			using namespace std;
 
-			if (where == 0) break;
-			digit = where - digits;
-			if (digit >= base) break;
+			char *endptr = 0;
+			double _value = strtod(str, &endptr);
 
-			num = num * base + digit;
+#ifdef HUGE_VAL
+			if (_value == HUGE_VAL || _value == -HUGE_VAL)
+#else
+			if (errno == ERANGE)
+#endif
+				num_s_end = 0;
+			else
+				num_s_end = endptr;
+
+			return _value;
 		}
-		
-		if(negative) stdex::detail::minus<stdex::is_signed<_T>::value>::apply(num);
-
-		num_s_end = s;
-
-		return num;
 	}
+
+
 	
 	template <class _T>
 	inline _T stot(const string &s, size_t *idx = 0, int base = 10)
@@ -133,7 +156,7 @@ namespace stdex
 	inline int stoi(const string &s, size_t *idx = 0, int base = 10)
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
-		int _value = stot<int>(_ptr, _eptr, base);
+		int _value = detail::_cs_to_integral<int>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stoi argument"));
@@ -149,7 +172,7 @@ namespace stdex
 	inline long stol(const string &s, size_t *idx = 0, int base = 10)
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
-		long _value = stot<long>(_ptr, _eptr, base);
+		long _value = detail::_cs_to_integral<long>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stol argument"));
@@ -165,7 +188,7 @@ namespace stdex
 	inline unsigned long stoul(const string &s, size_t *idx = 0, int base = 10)
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
-		unsigned long _value = stot<unsigned long>(_ptr, _eptr, base);
+		unsigned long _value = detail::_cs_to_integral<unsigned long>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stoul argument"));
@@ -182,7 +205,7 @@ namespace stdex
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
-		float _value = stot<float>(_ptr, _eptr);
+		float _value = detail::_cs_to_floating_point<float>(_ptr, _eptr);
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stof argument"));
@@ -199,7 +222,7 @@ namespace stdex
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
-		double _value = stot<double>(_ptr, _eptr);
+		double _value = detail::_cs_to_floating_point<double>(_ptr, _eptr);
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stod argument"));
@@ -216,7 +239,7 @@ namespace stdex
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
-		long double _value = stot<long double>(_ptr, _eptr);
+		long double _value = detail::_cs_to_floating_point<long double>(_ptr, _eptr);
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stold argument"));
@@ -234,7 +257,7 @@ namespace stdex
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
-		int64_t _value = stot<int64_t>(_ptr, _eptr, base);
+		int64_t _value = detail::_cs_to_integral<int64_t>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stoll argument"));
@@ -251,7 +274,7 @@ namespace stdex
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
-		uint64_t _value = stot<uint64_t>(_ptr, _eptr, base);
+		uint64_t _value = detail::_cs_to_integral<uint64_t>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stoull argument"));
