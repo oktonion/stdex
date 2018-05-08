@@ -4,7 +4,7 @@ build_ok=1
 exclude_warn=""
 
 if [[ $COMPILER = *"clang"* ]]; then
-  exclude_warn="-Wno-c++11-long-long"
+  exclude_warn="-Wno-c++11-long-long -Wno-non-literal-null-conversion"
 else
   exclude_warn="-Wno-long-long"
 fi
