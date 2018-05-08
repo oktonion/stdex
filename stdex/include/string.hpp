@@ -57,6 +57,7 @@ namespace stdex
 	template <class _T>
 	inline _T stot(const char *s, int base = 10)
 	{
+        using namespace std;
 		_T num = 0;
 		bool negative = false;
 		static const char digits[] = "0123456789abcdefghijklmnopqrstuvwxyz";
