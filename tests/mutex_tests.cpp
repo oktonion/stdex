@@ -75,6 +75,8 @@ namespace mutex_tests
             try_lock_func_res = -1;
 			DYNAMIC_VERIFY(false);
 		}
+
+        return 0;
 	}
 
     int test1()
