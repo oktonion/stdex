@@ -51,6 +51,8 @@ namespace string_tests
         errno = ERANGE;
         stdex::stoi("42");
         DYNAMIC_VERIFY( errno == ERANGE ); // errno should not be altered by successful call
+
+        return 0;
     }
 }
 
