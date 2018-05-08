@@ -26,11 +26,13 @@ namespace string_tests
         const string four(to_string(3000ul));
         DYNAMIC_VERIFY( four == "3000" );
 
+#ifdef LLONG_MAX
         const string five(to_string(7ll));
         DYNAMIC_VERIFY( five == "7" );
 
         const string six(to_string(400ull));
         DYNAMIC_VERIFY( six == "400" );
+#endif
 
         const string seven(to_string(-1.0F));
         DYNAMIC_VERIFY( seven == "-1.000000" );
