@@ -24,6 +24,7 @@
 #include <string>
 #include <stdint.h>
 #include <climits>
+#include <stdexcept>
 
 
 
@@ -61,7 +62,7 @@ namespace stdex
 	}
 
 	template <class _T>
-	inline _T stot(const char *s, int base = 10)
+	inline _T stot(const char *s, const char *&num_s_end, int base = 10)
 	{
 		using namespace std;
 		_T num = 0;
@@ -69,89 +70,200 @@ namespace stdex
 		static const char digits[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 		
 		while(isspace(*s)) s++;
-			
-		if(*s == '-') {negative = true; s++;}
-		else if(*s == '+') s++;
-		
-		if(*s == '0')
-			{
-				s++;
-				if(*s == 'x' || *s == 'X')
-					{
-						if(base == 0) base = 16;
-						else if(base != 16) return 0;
-						s++;
-					}
-				else if(isdigit(*s))
-					{
-						if(base == 0) base = 8;
-					}
-				else if(*s == 0) return 0;
-			}
-		else if(*s == 0) return 0;
-		else if(base == 0) base = 10;
-		
-		for(int digit; *s; s++)
-			{
-				const char *where = strchr(digits, tolower(*s));
-				
-				if(where == 0) break;
-				digit = where - digits;
-				if(digit >= base) break;
-				
-				num = num * base + digit;
-			}
 
-		if(negative) stdex::detail::minus<stdex::is_signed<_T>::value>::apply(num);
+		if (*s == '-') { negative = true; s++;}
+		else if (*s == '+') { s++;}
+
+		if (*s == '0')
+		{
+			s++;
+
+			if (*s == 'x' || *s == 'X')
+			{
+				if (base == 0) base = 16;
+				else if (base != 16)
+					return 0;
+				s++;
+			}
+			else if (isdigit(*s))
+			{
+				if (base == 0) base = 8;
+			}
+			else if (*s == 0)
+				return 0;
+		}
+		else if (*s == 0) return 0;
+		else if (base == 0) base = 10;
+
+		for (int digit; *s; s++)
+		{
+			const char *where = strchr(digits, tolower(*s));
+
+			if (where == 0) break;
+			digit = where - digits;
+			if (digit >= base) break;
+
+			num = num * base + digit;
+		}
 		
+		if(negative) stdex::detail::minus<stdex::is_signed<_T>::value>::apply(num);
+
+		num_s_end = s;
+
 		return num;
 	}
 	
 	template <class _T>
 	inline _T stot(const string &s, size_t *idx = 0, int base = 10)
 	{
-		return stot<_T>(s.c_str() + (idx ? *idx : 0), base);
+		const char *_eptr = s.c_str(), *_ptr = _eptr;
+		_T _value = stot<_T>(_ptr, _eptr, base);
+
+		if (_ptr == _eptr)
+			throw(std::invalid_argument("invalid stdex::stot argument"));
+		if(!_eptr)
+			throw(std::out_of_range("stdex::stot argument out of range"));
+
+		if (idx != 0)
+			*idx = (size_t) (_eptr - _ptr);
+
+		return (_value);
 	}
 	
 	inline int stoi(const string &s, size_t *idx = 0, int base = 10)
 	{
-		return stot<int>(s.c_str() + (idx ? *idx : 0), base);
+		const char *_eptr = s.c_str(), *_ptr = _eptr;
+		int _value = stot<int>(_ptr, _eptr, base);
+
+		if (_ptr == _eptr)
+			throw(std::invalid_argument("invalid stdex::stoi argument"));
+		if (!_eptr)
+			throw(std::out_of_range("stdex::stoi argument out of range"));
+
+		if (idx != 0)
+			*idx = (size_t) (_eptr - _ptr);
+
+		return (_value);
 	}
 
 	inline long stol(const string &s, size_t *idx = 0, int base = 10)
 	{
-		return stot<long>(s.c_str() + (idx ? *idx : 0), base);
+		const char *_eptr = s.c_str(), *_ptr = _eptr;
+		long _value = stot<long>(_ptr, _eptr, base);
+
+		if (_ptr == _eptr)
+			throw(std::invalid_argument("invalid stdex::stol argument"));
+		if (!_eptr)
+			throw(std::out_of_range("stdex::stol argument out of range"));
+
+		if (idx != 0)
+			*idx = (size_t) (_eptr - _ptr);
+
+		return (_value);
 	}
 
 	inline unsigned long stoul(const string &s, size_t *idx = 0, int base = 10)
 	{
-		return stot<unsigned long>(s.c_str() + (idx ? *idx : 0), base);
+		const char *_eptr = s.c_str(), *_ptr = _eptr;
+		unsigned long _value = stot<unsigned long>(_ptr, _eptr, base);
+
+		if (_ptr == _eptr)
+			throw(std::invalid_argument("invalid stdex::stoul argument"));
+		if(!_eptr)
+			throw(std::out_of_range("stdex::stoul argument out of range"));
+
+		if (idx != 0)
+			*idx = (size_t) (_eptr - _ptr);
+
+		return (_value);
 	}
 	
 	inline float stof(const string &s, size_t *idx = 0)
 	{
-		return stot<float>(s.c_str() + (idx ? *idx : 0));
+		const char *_eptr = s.c_str(), *_ptr = _eptr;
+		
+		float _value = stot<float>(_ptr, _eptr);
+
+		if (_ptr == _eptr)
+			throw(std::invalid_argument("invalid stdex::stof argument"));
+		if(!_eptr)
+			throw(std::out_of_range("stdex::stof argument out of range"));
+
+		if (idx != 0)
+			*idx = (size_t) (_eptr - _ptr);
+
+		return (_value);
 	}
 
 	inline double stod(const string &s, size_t *idx = 0)
 	{
-		return strtod(s.c_str() + (idx ? *idx : 0), nullptr);
+		const char *_eptr = s.c_str(), *_ptr = _eptr;
+		
+		double _value = stot<double>(_ptr, _eptr);
+
+		if (_ptr == _eptr)
+			throw(std::invalid_argument("invalid stdex::stod argument"));
+		if(!_eptr)
+			throw(std::out_of_range("stdex::stod argument out of range"));
+
+		if (idx != 0)
+			*idx = (size_t) (_eptr - _ptr);
+
+		return (_value);
 	}
 
-	inline double stold(const string &s, size_t *idx = 0)
+	inline long double stold(const string &s, size_t *idx = 0)
 	{
-		return stot<long double>(s.c_str() + (idx ? *idx : 0));
+		const char *_eptr = s.c_str(), *_ptr = _eptr;
+		
+		long double _value = stot<long double>(_ptr, _eptr);
+
+		if (_ptr == _eptr)
+			throw(std::invalid_argument("invalid stdex::stold argument"));
+		if(!_eptr)
+			throw(std::out_of_range("stdex::stold argument out of range"));
+
+		if (idx != 0)
+			*idx = (size_t) (_eptr - _ptr);
+
+		return (_value);
 	}
 
+#ifdef LLONG_MAX
 	inline int64_t stoll(const string &s, size_t *idx = 0, int base = 10)
 	{
-		return stot<int64_t>(s.c_str() + (idx ? *idx : 0), base);
+		const char *_eptr = s.c_str(), *_ptr = _eptr;
+		
+		int64_t _value = stot<int64_t>(_ptr, _eptr, base);
+
+		if (_ptr == _eptr)
+			throw(std::invalid_argument("invalid stdex::stoll argument"));
+		if(!_eptr)
+			throw(std::out_of_range("stdex::stoll argument out of range"));
+
+		if (idx != 0)
+			*idx = (size_t) (_eptr - _ptr);
+
+		return (_value);
 	}
 
 	inline uint64_t stoull(const string &s, size_t *idx = 0, int base = 10)
 	{
-		return stot<uint64_t>(s.c_str() + (idx ? *idx : 0), base);
+		const char *_eptr = s.c_str(), *_ptr = _eptr;
+		
+		uint64_t _value = stot<uint64_t>(_ptr, _eptr, base);
+
+		if (_ptr == _eptr)
+			throw(std::invalid_argument("invalid stdex::stoull argument"));
+		if(!_eptr)
+			throw(std::out_of_range("stdex::stoull argument out of range"));
+
+		if (idx != 0)
+			*idx = (size_t) (_eptr - _ptr);
+
+		return (_value);
 	}
+#endif
 
 	template<class _T>
 	inline string to_string(const _T &t)
@@ -244,8 +356,6 @@ namespace stdex
 		return string(buf);
 	}
 	
-
-#ifdef LLONG_MAX
 	template<>
 	inline
 		enable_if<is_same<long double, double>::value == (false), string>::type
@@ -258,6 +368,8 @@ namespace stdex
 		return string(buf);
 	}
 
+#ifdef LLONG_MAX
+
 	template<>
 	inline
 		enable_if<is_same<long long, long>::value == (false), string>::type
@@ -266,6 +378,18 @@ namespace stdex
 		using namespace std;
 		char buf[512];
 		sprintf(buf, "%lld", value);
+
+		return string(buf);
+	}
+
+	template<>
+	inline
+		enable_if<is_same<unsigned long long, unsigned long>::value == (false), string>::type
+	to_string<unsigned long long>(const unsigned long long &value)
+	{
+		using namespace std;
+		char buf[512];
+		sprintf(buf, "%llu", value);
 
 		return string(buf);
 	}
