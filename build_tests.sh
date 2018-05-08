@@ -4,9 +4,9 @@ build_ok=1
 exclude_warn=""
 
 if [[ $COMPILER = *"clang"* ]]; then
-  exclude_warn=-Wno-c++11-long-long
+  exclude_warn="-Wno-c++11-long-long"
 else
-  exclude_warn=-Wlong-long
+  exclude_warn="-Wlong-long"
 
 for file in ./tests/*.cpp; do
   filename=$(basename -- "$file")
