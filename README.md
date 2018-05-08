@@ -12,8 +12,34 @@ A:
 
 Not all features of C++ 11 could be implemented without compiler support so I have no plans to include such features in the library.
 
+<<<<<<< HEAD
 The library is portable for any compiler that supports C++98 but as we all know there are lots of different implementations of std library in even major compilers so this library is tested on C++ Builder 6.0 Updt4, g++ 4.something, Visual Studio 2010, 2013, 2015 and thats it. If you use other compiler and decide to include my library in your project there is no guarantee that it will compile without errors. In case you will be able to fix the errors without breaking existing code for already supported compilers I would really appreciate your pull requests.
+=======
+The library is portable for any compiler that supports C++98 but as we all know there are lots of different implementations of std library in even major compilers so this library is tested on: 
+>>>>>>> work
 
-For the C++ threads (mutexes, threads) I'm using POSIX threads implementation. There is one for Windows platform and definetely should be one for every POSIX-friendly platform.
+* Borland C++ Builder 6.0 Updt4; 
+* g++ 4.9, 4.8, 5.0 with c++98 option;
+* clang 3.5, 5.0 with c++98 option;
+* Visual Studio 2010, 2013, 2015;
+
+...and thats it. If you use other compiler and decide to include my library in your project there is no guarantee that it will compile without errors. In case you will be able to fix the errors without breaking existing code for already supported compilers I would really appreciate your pull requests.
+
+For the C++ threads (mutexes, threads) I'm using POSIX threads implementation. There is [one](https://github.com/GerHobbelt/pthread-win32 "I'm using this implementation") for Windows platform and definetely should be one for every POSIX-friendly platform.
 
 The library is in development so no backward compability guaranteed with previous stdex. But one thing for sure: it will be more and more standart in the way of std library for C++ 11. 
+
+# how to build
+Build process is simple: either run a build_lib.sh script (works with gcc and clang if enviromental variable $COMPILER is set to compiler name, f.e. to 'clang++-3.5') or build by yourself static library from sources in 'stdex/src' directory.
+
+# how to include in your project
+In your project: 
+* include sources of the library or link with prebuilded static library (.lib file, f.e. 'libstdex.lib')
+* link with system libraries for POSIX-threads and realtime clocks: 'librt.lib' and 'libpthread.lib' in UNIX; 'ntdll.lib' and [POSIX-threads lib](https://github.com/GerHobbelt/pthread-win32 "I'm using this implementation") in Windows;
+* enjoy
+
+example script build for Ubuntu:
+```
+COMPILER=g++
+$COMPILER main.cpp -L./stdex/lib/ -lstdex -lrt -lpthread -o "./bin/main"
+```
