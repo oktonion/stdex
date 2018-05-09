@@ -1,5 +1,5 @@
 # stdex
-C++ 11 standart library implementation with extra features using C++98 only and POSIX threads. Minimum ugly preprocessor macro and no configuration files. 
+C++ 11 standart library implementation with extra features using C++98 only and POSIX threads. Minimum ugly preprocessor macro and no configuration files. The library itself is builded on top of C++ standart library distributed with your compiler and just extends it with C++11 features.
 
 Q: Why not boost?
 
