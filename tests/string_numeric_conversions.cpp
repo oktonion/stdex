@@ -56,7 +56,7 @@ namespace string_tests
         return 0;
     }
 
-    int test3()
+    int stod_test()
     {
         using namespace stdex;
         bool test = false;
@@ -159,6 +159,110 @@ namespace string_tests
 
         return 0;
     }
+
+    int stof_test()
+    {
+        using namespace stdex;
+
+        bool test = false;
+
+        try
+        {
+            string one;
+            stdex::stof(one);
+        }
+        catch (std::invalid_argument)
+        {
+            test = true;
+        }
+        catch (...)
+        {
+        }
+        DYNAMIC_VERIFY(test);
+
+        test = false;
+        try
+        {
+            string one("a");
+            stdex::stof(one);
+        }
+        catch (std::invalid_argument)
+        {
+            test = true;
+        }
+        catch (...)
+        {
+        }
+        DYNAMIC_VERIFY(test);
+
+        float f1 = 0.0f;
+        std::size_t idx1 = 0;
+        try
+        {
+            string one("2.0a");
+            f1 = stdex::stof(one, &idx1);
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(f1 == 2.0f);
+        DYNAMIC_VERIFY(idx1 == 3);
+
+        test = false;
+        try
+        {
+            string one("1e");
+            one.append(2 * std::numeric_limits<float>::max_exponent10, '9');
+            f1 = stdex::stof(one);
+        }
+        catch (std::out_of_range)
+        {
+            test = true;
+        }
+        catch (...)
+        {
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(f1 == 2.0f);
+
+        try
+        {
+            long double ld0 = std::numeric_limits<float>::max() / 100.0;
+            string one(to_string(ld0));
+            stdex::stof(one);
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+
+        if ((std::numeric_limits<long double>::max() / 10000.0L)> std::numeric_limits<float>::max())
+        {
+            test = false;
+            f1 = -1.0f;
+            try
+            {
+                long double ld1 = std::numeric_limits<float>::max();
+                ld1 *= 100.0;
+                string one(to_string(ld1));
+                f1 = stdex::stof(one);
+            }
+            catch (std::out_of_range)
+            {
+                test = true;
+            }
+            catch (...)
+            {
+            }
+            DYNAMIC_VERIFY(test);
+            DYNAMIC_VERIFY(f1 == -1.0f);
+        }
+
+        return 0;
+    }
 }
 
 int main(void)
@@ -168,6 +272,8 @@ int main(void)
     
     RUN_TEST(test1);
     RUN_TEST(test2);
+    RUN_TEST(stod_test);
+    RUN_TEST(stof_test);
 
     return 0;
 }
