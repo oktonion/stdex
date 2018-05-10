@@ -433,9 +433,140 @@ namespace string_tests
 
 #endif
         return 0;
-		}
+    }
 
-        
+    int stol_test()
+    {
+        using namespace stdex;
+        bool test = false;
+
+        try
+        {
+            string one;
+            stdex::stol(one);
+        }
+        catch (std::invalid_argument)
+        {
+            test = true;
+        }
+        catch (...)
+        {
+        }
+        DYNAMIC_VERIFY(test);
+
+        test = false;
+        try
+        {
+            string one("a");
+            stdex::stol(one);
+        }
+        catch (std::invalid_argument)
+        {
+            test = true;
+        }
+        catch (...)
+        {
+        }
+        DYNAMIC_VERIFY(test);
+
+        long l1 = 0;
+        try
+        {
+            string one("a");
+            l1 = stdex::stol(one, 0, 16);
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(l1 == 10);
+
+        std::size_t idx1 = 0;
+        try
+        {
+            string one("78");
+            l1 = stdex::stol(one, &idx1, 8);
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(l1 == 7);
+        DYNAMIC_VERIFY(idx1 == 1);
+
+        try
+        {
+            string one("10112");
+            l1 = stdex::stol(one, &idx1, 2);
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(l1 == 11);
+        DYNAMIC_VERIFY(idx1 == 4);
+
+        try
+        {
+            string one("0XE");
+            l1 = stdex::stol(one, &idx1, 0);
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(l1 == 14);
+        DYNAMIC_VERIFY(idx1 == 3);
+
+        test = false;
+        try
+        {
+            string one(1000, '9');
+            l1 = stdex::stol(one);
+        }
+        catch (std::out_of_range)
+        {
+            test = true;
+        }
+        catch (...)
+        {
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(l1 == 14);
+
+#ifdef LLONG_MAX
+        try
+        {
+            l1 = std::numeric_limits<long>::max();
+            string one(to_string((long long) l1));
+            l1 = stdex::stol(one);
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(l1 == std::numeric_limits<long>::max());
+
+        try
+        {
+            l1 = std::numeric_limits<long>::min();
+            string one(to_string((long long) l1));
+            l1 = stdex::stol(one);
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(l1 == std::numeric_limits<long>::min());
+#endif
+        return 0;
+    }    
 }
 
 int main(void)
@@ -448,6 +579,7 @@ int main(void)
     RUN_TEST(stod_test);
     RUN_TEST(stof_test);
     RUN_TEST(stoi_test);
+    RUN_TEST(stol_test);
 
     return 0;
 }
