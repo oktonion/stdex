@@ -263,6 +263,176 @@ namespace string_tests
 
         return 0;
     }
+
+    int stoi_test()
+    {
+        using namespace stdex;
+        bool test = false;
+
+        try
+        {
+            string one;
+            stdex::stoi(one);
+        }
+        catch (std::invalid_argument)
+        {
+            test = true;
+        }
+        catch (...)
+        {
+        }
+        DYNAMIC_VERIFY(test);
+
+        test = false;
+        try
+        {
+            string one("a");
+            stdex::stoi(one);
+        }
+        catch (std::invalid_argument)
+        {
+            test = true;
+        }
+        catch (...)
+        {
+        }
+        DYNAMIC_VERIFY(test);
+
+        int i1 = 0;
+        try
+        {
+            string one("a");
+            i1 = stdex::stoi(one, 0, 16);
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(i1 == 10);
+
+        std::size_t idx1 = 0;
+        try
+        {
+            string one("78");
+            i1 = stdex::stoi(one, &idx1, 8);
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(i1 == 7);
+        DYNAMIC_VERIFY(idx1 = 1);
+
+        try
+        {
+            string one("10112");
+            i1 = stdex::stoi(one, &idx1, 2);
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(i1 == 11);
+        DYNAMIC_VERIFY(idx1 == 4);
+
+        try
+        {
+            string one("0XE");
+            i1 = stdex::stoi(one, &idx1, 0);
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(i1 == 14);
+        DYNAMIC_VERIFY(idx1 == 3);
+
+        test = false;
+        try
+        {
+            string one(1000, '9');
+            i1 = stdex::stoi(one);
+        }
+        catch (std::out_of_range)
+        {
+            test = true;
+        }
+        catch (...)
+        {
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(i1 == 14);
+
+#ifdef LLONG_MAX
+        try
+        {
+            i1 = std::numeric_limits<int>::max();
+            string one(to_string((long long) i1));
+            i1 = stdex::stoi(one);
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(i1 == std::numeric_limits<int>::max());
+
+        try
+        {
+            i1 = std::numeric_limits<int>::min();
+            string one(to_string((long long) i1));
+            i1 = stdex::stoi(one);
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(i1 == std::numeric_limits<int>::min());
+
+        test = false;
+        i1 = 1;
+        try
+        {
+            long long ll0 = std::numeric_limits<int>::max();
+            ++ll0;
+            string one(to_string(ll0));
+            i1 = stdex::stoi(one);
+        }
+        catch (std::out_of_range)
+        {
+            test = true;
+        }
+        catch (...)
+        {
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(i1 == 1);
+
+        test = false;
+        try
+        {
+            long long ll1 = std::numeric_limits<int>::min();
+            --ll1;
+            string one(to_string(ll1));
+            i1 = stdex::stoi(one);
+        }
+        catch (std::out_of_range)
+        {
+            test = true;
+        }
+        catch (...)
+        {
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(i1 == 1);
+
+#endif
+		}
 }
 
 int main(void)
@@ -274,6 +444,7 @@ int main(void)
     RUN_TEST(test2);
     RUN_TEST(stod_test);
     RUN_TEST(stof_test);
+    RUN_TEST(stoi_test);
 
     return 0;
 }
