@@ -24,6 +24,7 @@
 #include <string>
 #include <stdint.h>
 #include <climits>
+#include <cfloat>
 #include <stdexcept>
 #include <cmath>
 #include <errno.h>
@@ -210,7 +211,7 @@ namespace stdex
 #endif
 
 		template <class _T>
-		inline double _cs_to_floating_point(const char *str, const char *&num_s_end)
+		inline long double _cs_to_floating_point(const char *str, const char *&num_s_end)
 		{
 			using namespace std;
 
@@ -235,6 +236,29 @@ namespace stdex
 
 			return _value;
 		}
+
+#ifdef HUGE_VALL
+		template <>
+		inline long double _cs_to_floating_point<long double>(const char *str, const char *&num_s_end)
+		{
+			using namespace std;
+
+			int last_errno = errno;
+			errno = 0;
+			char *endptr = 0;
+			long double _value = strtold(str, &endptr);
+
+			if ((_value == HUGE_VALL || _value == -HUGE_VALL) && errno == ERANGE)
+				num_s_end = 0;
+			else
+				num_s_end = endptr;
+
+			if (errno != last_errno)
+				errno = last_errno;
+
+			return _value;
+		}
+#endif
 	}
 
 
@@ -325,7 +349,7 @@ namespace stdex
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
-		double _value = detail::_cs_to_floating_point<double>(_ptr, _eptr);
+		double _value = static_cast<double>(detail::_cs_to_floating_point<double>(_ptr, _eptr));
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stod argument"));
@@ -342,7 +366,9 @@ namespace stdex
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
-		long double _value = detail::_cs_to_floating_point<long double>(_ptr, _eptr);
+		typedef conditional<is_same<long double, double>::value, double, long double>::type type;
+
+		long double _value = detail::_cs_to_floating_point<type>(_ptr, _eptr);
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stold argument"));
