@@ -514,7 +514,7 @@ namespace stdex
 	to_string<long double>(const long double &value)
 	{
 		using namespace std;
-		char buf[512];
+		char buf[1024];
 		sprintf(buf, "%Lf", value);
 
 		return string(buf);
@@ -528,7 +528,7 @@ namespace stdex
 	to_string<long long>(const long long &value)
 	{
 		using namespace std;
-		char buf[512];
+		char buf[1024];
 		sprintf(buf, "%lld", value);
 
 		return string(buf);
@@ -540,7 +540,7 @@ namespace stdex
 	to_string<unsigned long long>(const unsigned long long &value)
 	{
 		using namespace std;
-		char buf[512];
+		char buf[2048];
 		sprintf(buf, "%llu", value);
 
 		return string(buf);
