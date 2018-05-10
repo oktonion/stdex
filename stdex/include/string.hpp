@@ -26,6 +26,8 @@
 #include <climits>
 #include <stdexcept>
 #include <cmath>
+#include <errno.h>
+#include <limits>
 
 
 
@@ -140,7 +142,7 @@ namespace stdex
 		template <>
 		inline int _cs_to_integral<int>(const char *s, const char *&num_s_end, int base)
 		{
-			typedef typename _str_to_integral_chooser<int>::impl _str_to_integral;
+			typedef _str_to_integral_chooser<int>::impl _str_to_integral;
 
 			int last_errno = errno;
 			errno = 0;
