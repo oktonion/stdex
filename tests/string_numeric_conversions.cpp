@@ -432,9 +432,10 @@ namespace string_tests
         DYNAMIC_VERIFY(i1 == 1);
 
 #endif
+        return 0;
 		}
 
-        return 0;
+        
 }
 
 int main(void)
