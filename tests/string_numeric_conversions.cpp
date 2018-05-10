@@ -566,7 +566,88 @@ namespace string_tests
         DYNAMIC_VERIFY(l1 == std::numeric_limits<long>::min());
 #endif
         return 0;
-    }    
+    }  
+
+    int stold_test()
+    {
+        using namespace stdex;
+        bool test = false;
+
+        try
+        {
+            string one;
+            stdex::stold(one);
+        }
+        catch (std::invalid_argument)
+        {
+            test = true;
+        }
+        catch (...)
+        {
+        }
+        DYNAMIC_VERIFY(test);
+
+        test = false;
+        try
+        {
+            string one("a");
+            stdex::stold(one);
+        }
+        catch (std::invalid_argument)
+        {
+            test = true;
+        }
+        catch (...)
+        {
+        }
+        DYNAMIC_VERIFY(test);
+
+        long double ld1 = 0.0L;
+        std::size_t idx1 = 0;
+        try
+        {
+            string one("2.0a");
+            ld1 = stdex::stold(one, &idx1);
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(ld1 == 2.0L);
+        DYNAMIC_VERIFY(idx1 == 3);
+
+        test = false;
+        try
+        {
+            string one("1e");
+            one.append(2 * std::numeric_limits<long double>::max_exponent10, '9');
+            ld1 = stdex::stold(one);
+        }
+        catch (std::out_of_range)
+        {
+            test = true;
+        }
+        catch (...)
+        {
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(ld1 == 2.0L);
+
+        try
+        {
+            long double ld0 = std::numeric_limits<long double>::max() / 100.0L;
+            string one(to_string(ld0));
+            stdex::stold(one);
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+
+        return 0;
+    }  
 }
 
 int main(void)
@@ -580,6 +661,7 @@ int main(void)
     RUN_TEST(stof_test);
     RUN_TEST(stoi_test);
     RUN_TEST(stol_test);
+    RUN_TEST(stold_test);
 
     return 0;
 }
