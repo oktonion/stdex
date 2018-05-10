@@ -467,7 +467,7 @@ namespace stdex
 	inline string to_string<double>(const double &value)
 	{
 		using namespace std;
-		char buf[512];
+		char buf[3 + DBL_MANT_DIG - DBL_MIN_EXP];
 		sprintf(buf, "%f", value);
 		
 		return string(buf);
@@ -514,7 +514,7 @@ namespace stdex
 	to_string<long double>(const long double &value)
 	{
 		using namespace std;
-		char buf[1024];
+		char buf[3 + LDBL_MANT_DIG - LDBL_MIN_EXP];
 		sprintf(buf, "%Lf", value);
 
 		return string(buf);
