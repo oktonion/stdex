@@ -127,6 +127,8 @@ namespace stdex
 			if (errno == ERANGE)
 #endif
 				num_s_end = 0;
+			else if (_value > std::numeric_limits<_T>::max())
+				num_s_end = 0;
 			else
 				num_s_end = endptr;
 
