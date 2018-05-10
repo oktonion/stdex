@@ -147,7 +147,7 @@ namespace stdex
 			int last_errno = errno;
 			errno = 0;
 			char *endptr = 0;
-			typename _str_to_integral::type _value = _str_to_integral::call(s, &endptr, base);
+			_str_to_integral::type _value = _str_to_integral::call(s, &endptr, base);
 
 #ifdef LONG_MAX 
 #ifdef LONG_MIN 
