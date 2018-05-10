@@ -323,7 +323,7 @@ namespace string_tests
         }
         DYNAMIC_VERIFY(test);
         DYNAMIC_VERIFY(i1 == 7);
-        DYNAMIC_VERIFY(idx1 = 1);
+        DYNAMIC_VERIFY(idx1 == 1);
 
         try
         {
