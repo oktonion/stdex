@@ -573,6 +573,8 @@ namespace string_tests
         using namespace stdex;
         bool test = false;
 
+        std::cout << "stold_test:" << __LINE__ << std::endl;
+
         try
         {
             string one;
@@ -587,6 +589,7 @@ namespace string_tests
         }
         DYNAMIC_VERIFY(test);
 
+        std::cout << "stold_test:" << __LINE__ << std::endl;
         test = false;
         try
         {
@@ -602,6 +605,7 @@ namespace string_tests
         }
         DYNAMIC_VERIFY(test);
 
+        std::cout << "stold_test:" << __LINE__ << std::endl;
         long double ld1 = 0.0L;
         std::size_t idx1 = 0;
         try
@@ -617,6 +621,7 @@ namespace string_tests
         DYNAMIC_VERIFY(ld1 == 2.0L);
         DYNAMIC_VERIFY(idx1 == 3);
 
+        std::cout << "stold_test:" << __LINE__ << std::endl;
         test = false;
         try
         {
@@ -634,6 +639,7 @@ namespace string_tests
         DYNAMIC_VERIFY(test);
         DYNAMIC_VERIFY(ld1 == 2.0L);
 
+        std::cout << "stold_test:" << __LINE__ << std::endl;
         try
         {
             long double ld0 = std::numeric_limits<long double>::max() / 100.0L;
