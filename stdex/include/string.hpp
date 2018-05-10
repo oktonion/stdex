@@ -24,8 +24,11 @@
 #include <string>
 #include <stdint.h>
 #include <climits>
+#include <cfloat>
 #include <stdexcept>
 #include <cmath>
+#include <errno.h>
+#include <limits>
 
 
 
@@ -39,99 +42,223 @@ namespace stdex
 
 	namespace detail
 	{
-		template<bool>
-		struct minus;
-
-		template<>
-		struct minus<true>
+		template<bool _IsSigned>
+		struct _str_to_integral_chooser_impl
 		{
-			template<typename T>
-			inline static void apply(T &val)
+			typedef long int type;
+			static long int call(const char* str, char** endptr, int base)
 			{
-				val = -val;
+				using namespace std;
+
+				return strtol(str, endptr, base);
 			}
 		};
 
 		template<>
-		struct minus<false>
+		struct _str_to_integral_chooser_impl<false>
 		{
-			template<typename T>
-			inline static void apply(T &val)
+			typedef unsigned long int type;
+			static unsigned long int call(const char* str, char** endptr, int base)
 			{
+				using namespace std;
+
+				return strtoul(str, endptr, base);
 			}
 		};
+
+		template<class _T>
+		struct _str_to_integral_chooser
+		{
+			typedef _str_to_integral_chooser_impl<is_signed<_T>::value> impl;
+		};
+
+#ifdef LLONG_MAX
+		template<bool _IsSigned>
+		struct _str_to_integral_chooser_impl_ll
+		{
+			typedef long long int type;
+			static long int call(const char* str, char** endptr, int base)
+			{
+				using namespace std;
+
+				return strtoll(str, endptr, base);
+			}
+		};
+
+		template<>
+		struct _str_to_integral_chooser_impl_ll<false>
+		{
+			typedef unsigned long long int type;
+			static unsigned long int call(const char* str, char** endptr, int base)
+			{
+				using namespace std;
+
+				return strtoull(str, endptr, base);
+			}
+		};
+
+		template<class _T>
+		struct _str_to_integral_chooser_ll
+		{
+			typedef _str_to_integral_chooser_impl_ll<is_signed<_T>::value> impl;
+		};
+#endif
+
 
 		template <class _T>
 		inline _T _cs_to_integral(const char *s, const char *&num_s_end, int base = 10)
 		{
-			using namespace std;
-			_T num = 0;
-			bool negative = false;
-			static const char digits [] = "0123456789abcdefghijklmnopqrstuvwxyz";
+			typedef typename _str_to_integral_chooser<_T>::impl _str_to_integral;
 
-			while (isspace(*s)) s++;
-
-			if (*s == '-') { negative = true; s++; }
-			else if (*s == '+') { s++; }
-
-			if (*s == '0')
-			{
-				s++;
-
-				if (*s == 'x' || *s == 'X')
-				{
-					if (base == 0) base = 16;
-					else if (base != 16)
-						return 0;
-					s++;
-				}
-				else if (isdigit(*s))
-				{
-					if (base == 0) base = 8;
-				}
-				else if (*s == 0)
-					return 0;
-			}
-			else if (*s == 0) return 0;
-			else if (base == 0) base = 10;
-
-			for (int digit; *s; s++)
-			{
-				const char *where = strchr(digits, tolower(*s));
-
-				if (where == 0) break;
-				digit = where - digits;
-				if (digit >= base) break;
-
-				num = num * base + digit;
-			}
-
-			if (negative) stdex::detail::minus<stdex::is_signed<_T>::value>::apply(num);
-
-			num_s_end = s;
-
-			return num;
-		}
-
-		template <class _T>
-		inline double _cs_to_floating_point(const char *str, const char *&num_s_end)
-		{
-			using namespace std;
-
+			int last_errno = errno;
+			errno = 0;
 			char *endptr = 0;
-			double _value = strtod(str, &endptr);
+			typename _str_to_integral::type _value = _str_to_integral::call(s, &endptr, base);
 
-#ifdef HUGE_VAL
-			if (_value == HUGE_VAL || _value == -HUGE_VAL)
+#ifdef LONG_MAX 
+#ifdef LONG_MIN 
+			if ((_value == LONG_MAX || _value == LONG_MIN) && errno == ERANGE)
+#else
+			if ((_value == LONG_MAX || _value == -LONG_MAX) && errno == ERANGE)
+#endif
+#else
+#ifdef LONG_MIN
+			if ((_value == -LONG_MIN || _value == LONG_MIN) && errno == ERANGE)
 #else
 			if (errno == ERANGE)
 #endif
+#endif
+				num_s_end = 0;
+			else if (_value > std::numeric_limits<_T>::max() || _value < std::numeric_limits<_T>::min())
 				num_s_end = 0;
 			else
 				num_s_end = endptr;
 
+			if (errno != last_errno)
+				errno = last_errno;
+
 			return _value;
 		}
+
+		template <>
+		inline int _cs_to_integral<int>(const char *s, const char *&num_s_end, int base)
+		{
+			typedef _str_to_integral_chooser<int>::impl _str_to_integral;
+
+			int last_errno = errno;
+			errno = 0;
+			char *endptr = 0;
+			_str_to_integral::type _value = _str_to_integral::call(s, &endptr, base);
+
+#ifdef LONG_MAX 
+#ifdef LONG_MIN 
+			if ((_value == LONG_MAX || _value == LONG_MIN) && errno == ERANGE)
+#else
+			if ((_value == LONG_MAX || _value == -LONG_MAX) && errno == ERANGE)
+#endif
+#else
+#ifdef LONG_MIN
+			if ((_value == -LONG_MIN || _value == LONG_MIN) && errno == ERANGE)
+#endif
+#endif
+				num_s_end = 0;
+			else if (_value > std::numeric_limits<int>::max() || _value < std::numeric_limits<int>::min())
+				num_s_end = 0;
+			else
+				num_s_end = endptr;
+
+			if (errno != last_errno)
+				errno = last_errno;
+
+			return _value;
+		}
+
+#ifdef LLONG_MAX
+		template <class _T>
+		inline _T _cs_to_integral_ll(const char *s, const char *&num_s_end, int base = 10)
+		{
+			typedef typename _str_to_integral_chooser_ll<_T>::impl _str_to_integral;
+
+			int last_errno = errno;
+			errno = 0;
+			char *endptr = 0;
+			typename _str_to_integral::type _value = _str_to_integral::call(s, &endptr, base);
+
+#ifdef LLONG_MAX 
+#ifdef LLONG_MIN 
+			if ((_value == LLONG_MAX || _value == LLONG_MIN) && errno == ERANGE)
+#else
+			if ((_value == LLONG_MAX || _value == -LLONG_MAX) && errno == ERANGE)
+#endif
+#else
+#ifdef LLONG_MIN
+			if ((_value == -LLONG_MIN || _value == LLONG_MIN) && errno == ERANGE)
+#else
+			if (errno == ERANGE)
+#endif
+#endif
+				num_s_end = 0;
+			else if (_value > std::numeric_limits<_T>::max() || _value < std::numeric_limits<_T>::min())
+				num_s_end = 0;
+			else
+				num_s_end = endptr;
+
+			if (errno != last_errno)
+				errno = last_errno;
+
+			return _value;
+		}
+#endif
+
+		template <class _T>
+		inline long double _cs_to_floating_point(const char *str, const char *&num_s_end)
+		{
+			using namespace std;
+
+			int last_errno = errno;
+			errno = 0;
+			char *endptr = 0;
+			double _value = strtod(str, &endptr);
+
+#ifdef HUGE_VAL
+			if ((_value == HUGE_VAL || _value == -HUGE_VAL) && errno == ERANGE)
+#else
+			if (errno == ERANGE)
+#endif
+				num_s_end = 0;
+			else if (_value > std::numeric_limits<_T>::max() || _value < -std::numeric_limits<_T>::max())
+				num_s_end = 0;
+			else
+				num_s_end = endptr;
+
+			if (errno != last_errno)
+				errno = last_errno;
+
+			return _value;
+		}
+
+#ifdef HUGE_VALL
+		template <>
+		inline long double _cs_to_floating_point<long double>(const char *str, const char *&num_s_end)
+		{
+			using namespace std;
+
+			int last_errno = errno;
+			errno = 0;
+			char *endptr = 0;
+			long double _value = strtold(str, &endptr);
+
+			if ((_value == HUGE_VALL || _value == -HUGE_VALL) && errno == ERANGE)
+				num_s_end = 0;
+			else
+				num_s_end = endptr;
+
+			if (errno != last_errno)
+				errno = last_errno;
+
+			return _value;
+		}
+#endif
 	}
 
 
@@ -222,7 +349,7 @@ namespace stdex
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
-		double _value = detail::_cs_to_floating_point<double>(_ptr, _eptr);
+		double _value = static_cast<double>(detail::_cs_to_floating_point<double>(_ptr, _eptr));
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stod argument"));
@@ -239,7 +366,9 @@ namespace stdex
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
-		long double _value = detail::_cs_to_floating_point<long double>(_ptr, _eptr);
+		typedef conditional<is_same<long double, double>::value, double, long double>::type type;
+
+		long double _value = detail::_cs_to_floating_point<type>(_ptr, _eptr);
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stold argument"));
@@ -257,7 +386,7 @@ namespace stdex
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
-		int64_t _value = detail::_cs_to_integral<int64_t>(_ptr, _eptr, base);
+		int64_t _value = detail::_cs_to_integral_ll<int64_t>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stoll argument"));
@@ -274,7 +403,7 @@ namespace stdex
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
-		uint64_t _value = detail::_cs_to_integral<uint64_t>(_ptr, _eptr, base);
+		uint64_t _value = detail::_cs_to_integral_ll<uint64_t>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stoull argument"));
@@ -338,7 +467,7 @@ namespace stdex
 	inline string to_string<double>(const double &value)
 	{
 		using namespace std;
-		char buf[512];
+		char buf[3 + DBL_MANT_DIG - DBL_MIN_EXP];
 		sprintf(buf, "%f", value);
 		
 		return string(buf);
@@ -385,7 +514,7 @@ namespace stdex
 	to_string<long double>(const long double &value)
 	{
 		using namespace std;
-		char buf[512];
+		char buf[3 + LDBL_MANT_DIG - LDBL_MIN_EXP];
 		sprintf(buf, "%Lf", value);
 
 		return string(buf);
@@ -399,7 +528,7 @@ namespace stdex
 	to_string<long long>(const long long &value)
 	{
 		using namespace std;
-		char buf[512];
+		char buf[1024];
 		sprintf(buf, "%lld", value);
 
 		return string(buf);
@@ -411,7 +540,7 @@ namespace stdex
 	to_string<unsigned long long>(const unsigned long long &value)
 	{
 		using namespace std;
-		char buf[512];
+		char buf[2048];
 		sprintf(buf, "%llu", value);
 
 		return string(buf);
