@@ -72,6 +72,24 @@ namespace stdex
 			typedef _str_to_integral_chooser_impl<is_signed<_T>::value> impl;
 		};
 
+		template<class _T, unsigned long N>
+		struct _type_cs_len
+		{
+			enum
+			{
+				value = _type_cs_len<_T, N / (unsigned long)(10)>::value + 1
+			};
+		};
+
+		template<class _T >
+		struct _type_cs_len< _T, 0>
+		{
+			enum
+			{
+				value = 1
+			};
+		};
+
 #ifdef LLONG_MAX
 		template<bool _IsSigned>
 		struct _str_to_integral_chooser_impl_ll
@@ -101,6 +119,24 @@ namespace stdex
 		struct _str_to_integral_chooser_ll
 		{
 			typedef _str_to_integral_chooser_impl_ll<is_signed<_T>::value> impl;
+		};
+
+		template<class _T, unsigned long long N>
+		struct _type_cs_len_ll
+		{
+			enum
+			{
+				value = _type_cs_len_ll<_T, N / (unsigned long long)(10)>::value + 1
+			};
+		};
+
+		template<class _T >
+		struct _type_cs_len_ll< _T, 0>
+		{
+			enum
+			{
+				value = 1
+			};
 		};
 #endif
 
@@ -175,7 +211,7 @@ namespace stdex
 
 #ifdef LLONG_MAX
 		template <class _T>
-		inline _T _cs_to_integral_ll(const char *s, const char *&num_s_end, int base = 10)
+		inline _T _cs_to_integral_ll(const char *s, const char *&num_s_end, int base)
 		{
 			typedef typename _str_to_integral_chooser_ll<_T>::impl _str_to_integral;
 
@@ -429,7 +465,11 @@ namespace stdex
 	inline string to_string<int>(const int &value)
 	{
 		using namespace std;
-		char buf[30];
+#ifdef INT_MAX
+		char buf[detail::_type_cs_len<int, INT_MAX>::value];
+#else
+		char buf[32];
+#endif
 		sprintf(buf, "%d", value);
 		
 		return string(buf);
@@ -439,7 +479,11 @@ namespace stdex
 	inline string to_string<unsigned int>(const unsigned int &value)
 	{
 		using namespace std;
-		char buf[30];
+#ifdef UINT_MAX
+		char buf[detail::_type_cs_len<unsigned int, UINT_MAX>::value];
+#else
+		char buf[32];
+#endif
 		sprintf(buf, "%u", value);
 
 		return string(buf);
@@ -457,7 +501,11 @@ namespace stdex
 	inline string to_string<float>(const float &value)
 	{
 		using namespace std;
+#if defined(FLT_MANT_DIG) && defined(FLT_MIN_EXP)
+		char buf[3 + FLT_MANT_DIG - FLT_MIN_EXP];
+#else
 		char buf[256];
+#endif
 		sprintf(buf, "%f", value);
 
 		return string(buf);
@@ -467,7 +515,11 @@ namespace stdex
 	inline string to_string<double>(const double &value)
 	{
 		using namespace std;
+#if defined(DBL_MANT_DIG) && defined(DBL_MIN_EXP)
 		char buf[3 + DBL_MANT_DIG - DBL_MIN_EXP];
+#else
+		char buf[2048]; // strange assumption, I know
+#endif
 		sprintf(buf, "%f", value);
 		
 		return string(buf);
@@ -490,7 +542,15 @@ namespace stdex
 	to_string<long>(const long &value)
 	{
 		using namespace std;
-		char buf[512];
+#ifdef LONG_MAX
+		char buf[detail::_type_cs_len<long, LONG_MAX>::value];
+#else
+#ifdef ULONG_MAX
+		char buf[detail::_type_cs_len<long, (ULONG_MAX / 2)>::value];
+#else
+		char buf[256]; // strange assumption, I know
+#endif
+#endif
 		sprintf(buf, "%ld", value);
 
 		return string(buf);
@@ -502,7 +562,15 @@ namespace stdex
 	to_string<unsigned long>(const unsigned long &value)
 	{
 		using namespace std;
-		char buf[512];
+#ifdef ULONG_MAX
+		char buf[detail::_type_cs_len<unsigned long, ULONG_MAX>::value];
+#else
+#ifdef LONG_MAX
+		char buf[detail::_type_cs_len<unsigned long, (LONG_MAX * 2 + 1)>::value];
+#else
+		char buf[512]; // strange assumption, I know
+#endif
+#endif
 		sprintf(buf, "%lu", value);
 
 		return string(buf);
@@ -514,7 +582,11 @@ namespace stdex
 	to_string<long double>(const long double &value)
 	{
 		using namespace std;
+#if defined(LDBL_MANT_DIG) && defined(LDBL_MIN_EXP)
 		char buf[3 + LDBL_MANT_DIG - LDBL_MIN_EXP];
+#else
+		char buf[4096]; // strange assumption, I know
+#endif
 		sprintf(buf, "%Lf", value);
 
 		return string(buf);
@@ -528,7 +600,15 @@ namespace stdex
 	to_string<long long>(const long long &value)
 	{
 		using namespace std;
-		char buf[1024];
+#ifdef LLONG_MAX
+		char buf[detail::_type_cs_len_ll<long long, LLONG_MAX>::value];
+#else
+#ifdef ULLONG_MAX
+		char buf[detail::_type_cs_len_ll<long long, (ULONG_MAX / 2)>::value];
+#else
+		char buf[1024]; // strange assumption, I know
+#endif
+#endif
 		sprintf(buf, "%lld", value);
 
 		return string(buf);
@@ -540,7 +620,15 @@ namespace stdex
 	to_string<unsigned long long>(const unsigned long long &value)
 	{
 		using namespace std;
-		char buf[2048];
+#ifdef ULLONG_MAX
+		char buf[detail::_type_cs_len_ll<unsigned long long, ULLONG_MAX>::value];
+#else
+#ifdef LLONG_MAX
+		char buf[detail::_type_cs_len_ll<unsigned long long, (LLONG_MAX * 2 + 1)>::value];
+#else
+		char buf[1024]; // strange assumption, I know
+#endif
+#endif
 		sprintf(buf, "%llu", value);
 
 		return string(buf);
