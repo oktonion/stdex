@@ -639,13 +639,10 @@ namespace string_tests
         DYNAMIC_VERIFY(test);
         DYNAMIC_VERIFY(ld1 == 2.0L);
 
-        std::cout << "stold_test:" << __LINE__ << std::endl;
         try
         {
             long double ld0 = std::numeric_limits<long double>::max() / 100.0L;
-            std::cout << "stold_test:" << __LINE__ << std::endl;
             string one(to_string(ld0));
-            std::cout << "stold_test:" << __LINE__ << std::endl;
             stdex::stold(one);
         }
         catch (...)
