@@ -95,7 +95,7 @@ namespace stdex
 		struct _str_to_integral_chooser_impl_ll
 		{
 			typedef long long int type;
-			static long int call(const char* str, char** endptr, int base)
+			static long long int call(const char* str, char** endptr, int base)
 			{
 				using namespace std;
 
@@ -107,7 +107,7 @@ namespace stdex
 		struct _str_to_integral_chooser_impl_ll<false>
 		{
 			typedef unsigned long long int type;
-			static unsigned long int call(const char* str, char** endptr, int base)
+			static unsigned long long int call(const char* str, char** endptr, int base)
 			{
 				using namespace std;
 
@@ -135,7 +135,7 @@ namespace stdex
 		{
 			enum
 			{
-				value = 1
+				value = 2
 			};
 		};
 #endif
@@ -209,7 +209,7 @@ namespace stdex
 			return _value;
 		}
 
-#ifdef LLONG_MAX
+#if defined(LLONG_MAX) || defined(LLONG_MIN)
 		template <class _T>
 		inline _T _cs_to_integral_ll(const char *s, const char *&num_s_end, int base)
 		{
@@ -220,19 +220,7 @@ namespace stdex
 			char *endptr = 0;
 			typename _str_to_integral::type _value = _str_to_integral::call(s, &endptr, base);
 
-#ifdef LLONG_MAX 
-#ifdef LLONG_MIN 
-			if ((_value == LLONG_MAX || _value == LLONG_MIN) && errno == ERANGE)
-#else
-			if ((_value == LLONG_MAX || _value == -LLONG_MAX) && errno == ERANGE)
-#endif
-#else
-#ifdef LLONG_MIN
-			if ((_value == -LLONG_MIN || _value == LLONG_MIN) && errno == ERANGE)
-#else
 			if (errno == ERANGE)
-#endif
-#endif
 				num_s_end = 0;
 			else if (_value > std::numeric_limits<_T>::max() || _value < std::numeric_limits<_T>::min())
 				num_s_end = 0;
@@ -388,7 +376,7 @@ namespace stdex
 		double _value = static_cast<double>(detail::_cs_to_floating_point<double>(_ptr, _eptr));
 
 		if (_ptr == _eptr)
-			throw(std::invalid_argument("invalid stdex::stod argument"));
+ 			throw(std::invalid_argument("invalid stdex::stod argument"));
 		if(!_eptr)
 			throw(std::out_of_range("stdex::stod argument out of range"));
 
@@ -589,7 +577,18 @@ namespace stdex
 #endif
 		sprintf(buf, "%Lf", value);
 
-		return string(buf);
+		string result(buf);
+
+		// some compilers ignore 'f' flag of spintf and print large values with scientific notation, as if 'e' flag was passed
+		// so we are removing substrings like 'e-10' and trying to enforce the precision:
+
+		size_t e_pos = result.rfind('e'); 
+		if (e_pos != string::npos)
+		{
+
+		}
+
+		return result;
 	}
 
 #ifdef LLONG_MAX
