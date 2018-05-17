@@ -105,7 +105,7 @@ namespace stdex
 		template<class _T>
 		struct _not_a_number_impl<_T, false, false>
 		{
-			static _T NaN() { return (_T)(); }
+			static _T NaN() { typedef _T type; return type(); }
 		};
 
 		template<class _T>
