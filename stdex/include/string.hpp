@@ -72,12 +72,72 @@ namespace stdex
 			typedef _str_to_integral_chooser_impl<is_signed<_T>::value> impl;
 		};
 
+		template<class _T, unsigned long N>
+		struct _type_cs_len
+		{
+			enum
+			{
+				value = _type_cs_len<_T, N / (unsigned long)(10)>::value + 1
+			};
+		};
+
+		template<class _T >
+		struct _type_cs_len< _T, 0>
+		{
+			enum
+			{
+				value = 1
+			};
+		};
+
+		template<class _T, bool _HasQuietNaN, bool _HasSignalingNaN>
+		struct _not_a_number_impl
+		{
+			static _T NaN() { return std::numeric_limits<_T>::quiet_NaN();}
+		};
+
+		template<class _T>
+		struct _not_a_number_impl<_T, false, true>
+		{
+			static _T NaN() { return std::numeric_limits<_T>::signaling_NaN(); }
+		};
+
+		template<class _T>
+		struct _not_a_number_impl<_T, false, false>
+		{
+			static _T NaN() { typedef _T type; return type(); }
+		};
+
+		template<class _T>
+		struct _not_a_number
+		{
+			typedef _not_a_number_impl<_T, std::numeric_limits<_T>::has_quiet_NaN, std::numeric_limits<_T>::has_signaling_NaN> impl;
+		};
+
+		template<class _T, bool _HasInfinity>
+		struct _infinity_impl
+		{
+			static _T inf() { return std::numeric_limits<_T>::infinity(); }
+		};
+
+		template<class _T>
+		struct _infinity_impl<_T, false>
+		{
+			static _T inf() { return std::numeric_limits<_T>::max(); }
+		};
+
+		template<class _T>
+		struct _infinity
+		{
+			typedef _infinity_impl<_T, std::numeric_limits<_T>::has_infinity> impl;
+		};
+
 #ifdef LLONG_MAX
 		template<bool _IsSigned>
 		struct _str_to_integral_chooser_impl_ll
 		{
 			typedef long long int type;
-			static long int call(const char* str, char** endptr, int base)
+			static long long int call(const char* str, char** endptr, int base)
 			{
 				using namespace std;
 
@@ -89,7 +149,7 @@ namespace stdex
 		struct _str_to_integral_chooser_impl_ll<false>
 		{
 			typedef unsigned long long int type;
-			static unsigned long int call(const char* str, char** endptr, int base)
+			static unsigned long long int call(const char* str, char** endptr, int base)
 			{
 				using namespace std;
 
@@ -101,6 +161,24 @@ namespace stdex
 		struct _str_to_integral_chooser_ll
 		{
 			typedef _str_to_integral_chooser_impl_ll<is_signed<_T>::value> impl;
+		};
+
+		template<class _T, unsigned long long N>
+		struct _type_cs_len_ll
+		{
+			enum
+			{
+				value = _type_cs_len_ll<_T, N / (unsigned long long)(10)>::value + 1
+			};
+		};
+
+		template<class _T >
+		struct _type_cs_len_ll< _T, 0>
+		{
+			enum
+			{
+				value = 2
+			};
 		};
 #endif
 
@@ -173,9 +251,9 @@ namespace stdex
 			return _value;
 		}
 
-#ifdef LLONG_MAX
+#if defined(LLONG_MAX) || defined(LLONG_MIN)
 		template <class _T>
-		inline _T _cs_to_integral_ll(const char *s, const char *&num_s_end, int base = 10)
+		inline _T _cs_to_integral_ll(const char *s, const char *&num_s_end, int base)
 		{
 			typedef typename _str_to_integral_chooser_ll<_T>::impl _str_to_integral;
 
@@ -184,19 +262,7 @@ namespace stdex
 			char *endptr = 0;
 			typename _str_to_integral::type _value = _str_to_integral::call(s, &endptr, base);
 
-#ifdef LLONG_MAX 
-#ifdef LLONG_MIN 
-			if ((_value == LLONG_MAX || _value == LLONG_MIN) && errno == ERANGE)
-#else
-			if ((_value == LLONG_MAX || _value == -LLONG_MAX) && errno == ERANGE)
-#endif
-#else
-#ifdef LLONG_MIN
-			if ((_value == -LLONG_MIN || _value == LLONG_MIN) && errno == ERANGE)
-#else
 			if (errno == ERANGE)
-#endif
-#endif
 				num_s_end = 0;
 			else if (_value > std::numeric_limits<_T>::max() || _value < std::numeric_limits<_T>::min())
 				num_s_end = 0;
@@ -252,6 +318,165 @@ namespace stdex
 				num_s_end = 0;
 			else
 				num_s_end = endptr;
+
+			if (errno != last_errno)
+				errno = last_errno;
+
+			return _value;
+		}
+#else
+		long double
+			_a_to_floating_point(const char *str)
+		{
+			using namespace std;
+
+			long double value;
+
+			if (sscanf(str, "%Lf", &value) == EOF)
+			{
+
+			  long double fp_integer_part = 0.0L, fp_fractional_part = 0.0L;
+			  size_t i, length = strlen(str);
+
+			  i = 0; // Left to right
+			  while (str[i] != '.') {
+				  fp_integer_part = fp_integer_part * 10.0L + (str[i] - '0');
+				  i++;
+			  }
+
+			
+			  i = length - 1; // Right to left
+
+			  while (!isdigit(str[i]) && str[i] != '.')
+				 i--;
+
+			  while (str[i] != '.') {
+				  fp_fractional_part = (fp_fractional_part + (str[i] - '0')) / 10.0L;
+				  i--;
+			  }
+
+			  value = fp_integer_part + fp_fractional_part;
+			}
+
+			if(value > numeric_limits<long double>::max() || value < numeric_limits<long double>::min())
+			{
+			  errno = ERANGE;
+			  value = 0.0;
+			}
+
+			return value;
+		}
+
+		long double
+			_cs_to_long_double(const char *str, char const **ptr)
+		{
+			using namespace std;
+
+			const char *p;
+
+			if (!ptr)
+				return _a_to_floating_point(str);
+
+			p = str;
+
+			while (isspace(*p))
+				++p;
+
+			if (*p == '+' || *p == '-')
+				++p;
+
+			typedef _not_a_number<long double>::impl not_a_number_impl;
+			typedef _infinity<long double>::impl infinity_impl;
+
+			/* INF or INFINITY.  */
+			if ((p[0] == 'i' || p[0] == 'I')
+				&& (p[1] == 'n' || p[1] == 'N')
+				&& (p[2] == 'f' || p[2] == 'F'))
+			{
+				if ((p[3] == 'i' || p[3] == 'I')
+					&& (p[4] == 'n' || p[4] == 'N')
+					&& (p[5] == 'i' || p[5] == 'I')
+					&& (p[6] == 't' || p[6] == 'T')
+					&& (p[7] == 'y' || p[7] == 'Y'))
+				{
+					*ptr = p + 8;
+					return infinity_impl::inf();
+				}
+				else
+				{
+					*ptr = p + 3;
+					return infinity_impl::inf();
+				}
+			}
+
+			/* NAN or NAN(foo).  */
+			if ((p[0] == 'n' || p[0] == 'N')
+				&& (p[1] == 'a' || p[1] == 'A')
+				&& (p[2] == 'n' || p[2] == 'N'))
+			{
+				p += 3;
+				if (*p == '(')
+				{
+					++p;
+					while (*p != '\0' && *p != ')')
+						++p;
+					if (*p == ')')
+						++p;
+				}
+				*ptr = p;
+				return not_a_number_impl::NaN();
+			}
+
+			/* digits, with 0 or 1 periods in it.  */
+			if (isdigit(*p) || *p == '.')
+			{
+				int got_dot = 0;
+				while (isdigit(*p) || (!got_dot && *p == '.'))
+				{
+					if (*p == '.')
+						got_dot = 1;
+					++p;
+				}
+
+				/* Exponent.  */
+				if (*p == 'e' || *p == 'E')
+				{
+					int i;
+					i = 1;
+					if (p[i] == '+' || p[i] == '-')
+						++i;
+					if (isdigit(p[i]))
+					{
+						while (isdigit(p[i]))
+							++i;
+						*ptr = p + i;
+						if (std::numeric_limits<long double>::max_exponent10 < i)
+						{
+							errno = ERANGE;
+							return std::numeric_limits<long double>::max();
+						}
+						return _a_to_floating_point(str);
+					}
+				}
+				*ptr = p;
+				return _a_to_floating_point(str);
+			}
+			/* Didn't find any digits.  Doesn't look like a number.  */
+			*ptr = str;
+			return not_a_number_impl::NaN();
+		}
+
+		template <>
+		inline long double _cs_to_floating_point<long double>(const char *str, const char *&num_s_end)
+		{
+			using namespace std;
+
+			int last_errno = errno;
+			errno = 0;
+			long double _value = _cs_to_long_double(str, &num_s_end);
+
+			if (errno == ERANGE)
+				num_s_end = 0;
 
 			if (errno != last_errno)
 				errno = last_errno;
@@ -366,7 +591,7 @@ namespace stdex
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
-		typedef conditional<is_same<long double, double>::value, double, long double>::type type;
+		typedef conditional<sizeof(long double) == sizeof(double), double, long double>::type type;
 
 		long double _value = detail::_cs_to_floating_point<type>(_ptr, _eptr);
 
@@ -429,7 +654,11 @@ namespace stdex
 	inline string to_string<int>(const int &value)
 	{
 		using namespace std;
-		char buf[30];
+#ifdef INT_MAX
+		char buf[detail::_type_cs_len<int, INT_MAX>::value];
+#else
+		char buf[32];
+#endif
 		sprintf(buf, "%d", value);
 		
 		return string(buf);
@@ -439,7 +668,11 @@ namespace stdex
 	inline string to_string<unsigned int>(const unsigned int &value)
 	{
 		using namespace std;
-		char buf[30];
+#ifdef UINT_MAX
+		char buf[detail::_type_cs_len<unsigned int, UINT_MAX>::value];
+#else
+		char buf[32];
+#endif
 		sprintf(buf, "%u", value);
 
 		return string(buf);
@@ -457,7 +690,11 @@ namespace stdex
 	inline string to_string<float>(const float &value)
 	{
 		using namespace std;
+#if defined(FLT_MANT_DIG) && defined(FLT_MIN_EXP)
+		char buf[3 + FLT_MANT_DIG - FLT_MIN_EXP];
+#else
 		char buf[256];
+#endif
 		sprintf(buf, "%f", value);
 
 		return string(buf);
@@ -467,7 +704,11 @@ namespace stdex
 	inline string to_string<double>(const double &value)
 	{
 		using namespace std;
+#if defined(DBL_MANT_DIG) && defined(DBL_MIN_EXP)
 		char buf[3 + DBL_MANT_DIG - DBL_MIN_EXP];
+#else
+		char buf[2048]; // strange assumption, I know
+#endif
 		sprintf(buf, "%f", value);
 		
 		return string(buf);
@@ -490,7 +731,15 @@ namespace stdex
 	to_string<long>(const long &value)
 	{
 		using namespace std;
-		char buf[512];
+#ifdef LONG_MAX
+		char buf[detail::_type_cs_len<long, LONG_MAX>::value];
+#else
+#ifdef ULONG_MAX
+		char buf[detail::_type_cs_len<long, (ULONG_MAX / 2)>::value];
+#else
+		char buf[256]; // strange assumption, I know
+#endif
+#endif
 		sprintf(buf, "%ld", value);
 
 		return string(buf);
@@ -502,7 +751,15 @@ namespace stdex
 	to_string<unsigned long>(const unsigned long &value)
 	{
 		using namespace std;
-		char buf[512];
+#ifdef ULONG_MAX
+		char buf[detail::_type_cs_len<unsigned long, ULONG_MAX>::value];
+#else
+#ifdef LONG_MAX
+		char buf[detail::_type_cs_len<unsigned long, (LONG_MAX * 2 + 1)>::value];
+#else
+		char buf[512]; // strange assumption, I know
+#endif
+#endif
 		sprintf(buf, "%lu", value);
 
 		return string(buf);
@@ -514,10 +771,58 @@ namespace stdex
 	to_string<long double>(const long double &value)
 	{
 		using namespace std;
+#if defined(LDBL_MANT_DIG) && defined(LDBL_MIN_EXP)
 		char buf[3 + LDBL_MANT_DIG - LDBL_MIN_EXP];
+#else
+		char buf[4096]; // strange assumption, I know
+#endif
 		sprintf(buf, "%Lf", value);
 
-		return string(buf);
+		string result(buf);
+
+		// some compilers ignore 'f' flag of spintf and print large values with scientific notation, as if 'e' flag was passed
+		// so we are removing substrings like 'e-10' and trying to enforce the precision by slow and not so precise conversion:
+
+		size_t e_pos = result.rfind('e'); 
+		if (e_pos != string::npos)
+		{
+#ifdef LDBL_MAX_10_EXP
+			char str_integer_part_reverse[LDBL_MAX_10_EXP + 3];
+#else
+			char str_integer_part_reverse[sizeof(buf)];
+#endif
+			long double fp_integer_part, fp_fractional_part;
+			size_t symbols_converted_n = 0;
+			fp_fractional_part = modf(value, &fp_integer_part);
+			while (fp_integer_part > 0.0L)
+			{
+				str_integer_part_reverse[symbols_converted_n++] = '0' + (int) fmod(fp_integer_part, 10.0L);
+				fp_integer_part = floor(fp_integer_part / 10.0L);
+			}
+
+			for (size_t i = 0; i < symbols_converted_n; i++)
+				buf[i] = str_integer_part_reverse[symbols_converted_n - i - 1];
+
+			buf[symbols_converted_n++] = '.';
+
+			if (fp_fractional_part > 0.0L)
+			{
+				while (fp_fractional_part > 0.0L)
+				{
+					fp_fractional_part *= 10.0L;
+					fp_fractional_part = modf(fp_fractional_part, &fp_integer_part);
+					buf[symbols_converted_n++] = '0' + (int) fp_integer_part;
+				}
+			}
+			else
+			   buf[symbols_converted_n++] = '0';
+
+			buf[symbols_converted_n] = 0; // EOS
+
+			result = buf;
+		}
+
+		return result;
 	}
 
 #ifdef LLONG_MAX
@@ -528,7 +833,15 @@ namespace stdex
 	to_string<long long>(const long long &value)
 	{
 		using namespace std;
-		char buf[1024];
+#ifdef LLONG_MAX
+		char buf[detail::_type_cs_len_ll<long long, LLONG_MAX>::value];
+#else
+#ifdef ULLONG_MAX
+		char buf[detail::_type_cs_len_ll<long long, (ULONG_MAX / 2)>::value];
+#else
+		char buf[1024]; // strange assumption, I know
+#endif
+#endif
 		sprintf(buf, "%lld", value);
 
 		return string(buf);
@@ -540,7 +853,15 @@ namespace stdex
 	to_string<unsigned long long>(const unsigned long long &value)
 	{
 		using namespace std;
-		char buf[2048];
+#ifdef ULLONG_MAX
+		char buf[detail::_type_cs_len_ll<unsigned long long, ULLONG_MAX>::value];
+#else
+#ifdef LLONG_MAX
+		char buf[detail::_type_cs_len_ll<unsigned long long, (LLONG_MAX * 2 + 1)>::value];
+#else
+		char buf[1024]; // strange assumption, I know
+#endif
+#endif
 		sprintf(buf, "%llu", value);
 
 		return string(buf);
