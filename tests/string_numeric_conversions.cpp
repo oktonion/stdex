@@ -762,7 +762,7 @@ namespace string_tests
         {
             ll1 = std::numeric_limits<long long>::max();
             string one(stdex::to_string(ll1));
-            ll1 = std::stoll(one);
+            ll1 = stdex::stoll(one);
         }
         catch (...)
         {
