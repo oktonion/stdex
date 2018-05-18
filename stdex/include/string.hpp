@@ -52,6 +52,23 @@ namespace stdex
 
 				return strtol(str, endptr, base);
 			}
+
+			static bool check(long int _value)
+			{
+#ifdef LONG_MAX 
+#ifdef LONG_MIN 
+				return ((_value == LONG_MAX || _value == LONG_MIN));
+#else
+				return ((_value == LONG_MAX || _value == -LONG_MAX));
+#endif
+#else
+#ifdef LONG_MIN
+				return ((_value == -LONG_MIN || _value == LONG_MIN));
+#else
+				return ((_value == std::numeric_limits<long int>::min() || _value == std::numeric_limits<long int>::max()));
+#endif
+#endif
+			}
 		};
 
 		template<>
@@ -63,6 +80,15 @@ namespace stdex
 				using namespace std;
 
 				return strtoul(str, endptr, base);
+			}
+
+			static bool check(unsigned long int _value)
+			{
+#ifdef ULONG_MAX 
+				return ((_value == ULONG_MAX));
+#else
+				return ((_value == std::numeric_limits<unsigned long int>::max()));
+#endif
 			}
 		};
 
@@ -303,6 +329,23 @@ namespace stdex
 
 				return _cs_to_signed_ll(str, endptr, base);
 			}
+
+			static bool check(const long long int &_value)
+			{
+#ifdef LLONG_MAX 
+#ifdef LLONG_MIN 
+				return ((_value == LLONG_MAX || _value == LLONG_MIN));
+#else
+				return ((_value == LLONG_MAX || _value == -LLONG_MAX));
+#endif
+#else
+#ifdef LLONG_MIN
+				return ((_value == -LLONG_MIN || _value == LLONG_MIN));
+#else
+				return ((_value == std::numeric_limits<long long int>::min() || _value == std::numeric_limits<long long int>::max()));
+#endif
+#endif
+			}
 		};
 
 		template<>
@@ -314,6 +357,15 @@ namespace stdex
 				using namespace std;
 
 				return _cs_to_unsigned_ll(str, endptr, base);
+			}
+
+			static bool check(const unsigned long long int &_value)
+			{
+#ifdef ULLONG_MAX 
+				return ((_value == ULLONG_MAX));
+#else
+				return ((_value == std::numeric_limits<unsigned long long int>::max()));
+#endif
 			}
 		};
 
@@ -353,54 +405,10 @@ namespace stdex
 			char *endptr = 0;
 			typename _str_to_integral::type _value = _str_to_integral::call(s, &endptr, base);
 
-#ifdef LONG_MAX 
-#ifdef LONG_MIN 
-			if ((_value == LONG_MAX || _value == LONG_MIN) && errno == ERANGE)
-#else
-			if ((_value == LONG_MAX || _value == -LONG_MAX) && errno == ERANGE)
-#endif
-#else
-#ifdef LONG_MIN
-			if ((_value == -LONG_MIN || _value == LONG_MIN) && errno == ERANGE)
-#else
-			if (errno == ERANGE)
-#endif
-#endif
+
+			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
 			else if (_value > std::numeric_limits<_T>::max() || _value < std::numeric_limits<_T>::min())
-				num_s_end = 0;
-			else
-				num_s_end = endptr;
-
-			if (errno != last_errno)
-				errno = last_errno;
-
-			return _value;
-		}
-
-		template <>
-		inline int _cs_to_integral<int>(const char *s, const char *&num_s_end, int base)
-		{
-			typedef _str_to_integral_chooser<int>::impl _str_to_integral;
-
-			int last_errno = errno;
-			errno = 0;
-			char *endptr = 0;
-			_str_to_integral::type _value = _str_to_integral::call(s, &endptr, base);
-
-#ifdef LONG_MAX 
-#ifdef LONG_MIN 
-			if ((_value == LONG_MAX || _value == LONG_MIN) && errno == ERANGE)
-#else
-			if ((_value == LONG_MAX || _value == -LONG_MAX) && errno == ERANGE)
-#endif
-#else
-#ifdef LONG_MIN
-			if ((_value == -LONG_MIN || _value == LONG_MIN) && errno == ERANGE)
-#endif
-#endif
-				num_s_end = 0;
-			else if (_value > std::numeric_limits<int>::max() || _value < std::numeric_limits<int>::min())
 				num_s_end = 0;
 			else
 				num_s_end = endptr;
@@ -422,7 +430,7 @@ namespace stdex
 			char *endptr = 0;
 			typename _str_to_integral::type _value = _str_to_integral::call(s, &endptr, base);
 
-			if (errno == ERANGE)
+			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
 			else if (_value > std::numeric_limits<_T>::max() || _value < std::numeric_limits<_T>::min())
 				num_s_end = 0;

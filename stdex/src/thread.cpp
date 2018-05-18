@@ -370,7 +370,7 @@ unsigned thread::hardware_concurrency() NOEXCEPT_FUNCTION
 #elif defined(_SC_NPROC_ONLN)
 	return (int) sysconf(_SC_NPROC_ONLN);
 #elif defined(PTW32_VERSION)
-    return pthread_num_processors_np();
+	return pthread_num_processors_np();
 #elif defined(__GLIBC__)
 	return get_nprocs();
 #else
