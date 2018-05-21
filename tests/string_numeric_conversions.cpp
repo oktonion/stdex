@@ -1062,6 +1062,8 @@ namespace string_tests
         long double ld2 = -4.0L;
         string six(to_string(ld2));
         DYNAMIC_VERIFY(six == "-4.000000");
+
+        return 0;
     }
 }
 
