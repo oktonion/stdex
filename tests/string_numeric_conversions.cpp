@@ -1028,6 +1028,41 @@ namespace string_tests
         return 0;
     }
 #endif
+
+    int to_string_test()
+    {
+        using namespace stdex;
+
+#ifdef LLONG_MAX
+        typedef long long test_type;
+        typedef unsigned long long utest_type;
+#else
+        typedef long test_type;
+        typedef unsigned long utest_type;
+#endif
+        test_type ll1 = -2;
+        string one(to_string(ll1));
+        DYNAMIC_VERIFY(one == "-2");
+
+        test_type ll2 = 10;
+        string two(to_string(ll2));
+        DYNAMIC_VERIFY(two == "10");
+        utest_type ull1 = 2;
+        string three(to_string(ull1));
+        DYNAMIC_VERIFY(three == "2");
+
+        utest_type ull2 = 3000;
+        string four(to_string(ull2));
+        DYNAMIC_VERIFY(four == "3000");
+
+        long double ld1 = 2.0L;
+        string five(to_string(ld1));
+        DYNAMIC_VERIFY(five == "2.000000");
+
+        long double ld2 = -4.0L;
+        string six(to_string(ld2));
+        DYNAMIC_VERIFY(six == "-4.000000");
+    }
 }
 
 int main(void)
@@ -1047,6 +1082,7 @@ int main(void)
     RUN_TEST(stoull_test);
     #endif
     RUN_TEST(stoul_test);
+    RUN_TEST(to_string_test);
 
     return 0;
 }
