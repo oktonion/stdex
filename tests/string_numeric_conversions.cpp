@@ -1024,6 +1024,8 @@ namespace string_tests
         }
         DYNAMIC_VERIFY(test);
         DYNAMIC_VERIFY(ull1 == std::numeric_limits<unsigned long long>::max());
+
+        return 0;
     }
 #endif
 }
