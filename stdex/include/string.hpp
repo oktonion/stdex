@@ -1102,21 +1102,23 @@ namespace stdex
 
 			template<class RetT, class Arg2T>
 			_yes_type _has_4arg_swprintf_tester(RetT(*)(wchar_t*, Arg2T, const wchar_t*, ...));
+			template<class RetT, class Arg2T, class Arg4T>
+			_yes_type _has_4arg_swprintf_tester(RetT(*)(wchar_t*, Arg2T, const wchar_t*, Arg4T));
 			_no_type _has_4arg_swprintf_tester(...);
 
 			namespace swprintf_detail
 			{
 				using namespace std;
 
-				struct _has_std_swprintf
+				struct _has_4arg_swprintf
 				{
 					static const bool value = sizeof(string_detail::_has_4arg_swprintf_tester(&swprintf)) == sizeof(string_detail::_yes_type);
 				};
 			}
 		}
 
-		struct _has_std_swprintf:
-			public string_detail::swprintf_detail::_has_std_swprintf
+		struct _has_4arg_swprintf:
+			public string_detail::swprintf_detail::_has_4arg_swprintf
 		{};
 
 		template<bool> struct _swprintf_impl;
@@ -1146,7 +1148,7 @@ namespace stdex
 		template<class ArgT>
 		void _swprintf4_std_impl(wchar_t* ws, size_t len, const wchar_t* format, ArgT arg)
 		{
-			_swprintf_impl<_has_std_swprintf::value>::call(ws, len, format, arg);
+			_swprintf_impl<_has_4arg_swprintf::value>::call(ws, len, format, arg);
 		}
 		
 	}
