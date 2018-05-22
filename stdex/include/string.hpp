@@ -1091,6 +1091,64 @@ namespace stdex
 			return _value;
 		}
 #endif
+
+		namespace string_detail
+		{
+			typedef char _yes_type;
+			struct _no_type
+			{
+				char padding[8];
+			};
+
+			template<class RetT, class Arg2T>
+			_yes_type _has_std_swprintf_tester(RetT(*)(wchar_t*, Arg2T, const wchar_t*, ...));
+			_no_type _has_std_swprintf_tester(...);
+
+			namespace swprintf_detail
+			{
+				using namespace std;
+
+				struct _has_std_swprintf
+				{
+					static const bool value = sizeof(string_detail::_has_std_swprintf_tester(&swprintf)) == sizeof(string_detail::_yes_type);
+				};
+			}
+		}
+
+		struct _has_std_swprintf:
+			public string_detail::swprintf_detail::_has_std_swprintf
+		{};
+
+		template<bool> struct _swprintf_impl;
+
+		template<>
+		struct _swprintf_impl<true>
+		{
+			template<class T1, class T2, class T3, class T4>
+			static void call(T1 a1, T2 a2, T3 a3, T4 a4)
+			{
+				using namespace std;
+				swprintf(a1, a2, a3, a4);
+			}
+		};
+
+		template<>
+		struct _swprintf_impl<false>
+		{
+			template<class T1, class T2, class T3>
+			static void call(T1 a1, size_t, T2 a2, T3 a3)
+			{
+				using namespace std;
+				swprintf(a1, a2, a3);
+			}
+		};
+
+		template<class ArgT>
+		void _swprintf4_std_impl(wchar_t* ws, size_t len, const wchar_t* format, ArgT arg)
+		{
+			_swprintf_impl<_has_std_swprintf::value>::call(ws, len, format, arg);
+		}
+		
 	}
 
 
@@ -1440,7 +1498,7 @@ namespace stdex
 #else
 		wchar_t buf[32 * sizeof(wchar_t)];
 #endif
-		swprintf(buf, sizeof(buf) / sizeof(wchar_t), L"%d", value);
+		detail::_swprintf4_std_impl(buf, sizeof(buf) / sizeof(wchar_t), L"%d", value);
 
 		return wstring(buf);
 	}
@@ -1468,7 +1526,7 @@ namespace stdex
 #else
 		wchar_t buf[32 * sizeof(wchar_t)];
 #endif
-		swprintf(buf, sizeof(buf) / sizeof(wchar_t), L"%u", value);
+		detail::_swprintf4_std_impl(buf, sizeof(buf) / sizeof(wchar_t), L"%u", value);
 
 		return wstring(buf);
 	}
@@ -1512,7 +1570,7 @@ namespace stdex
 #else
 		wchar_t buf[256 * sizeof(wchar_t)];
 #endif
-		swprintf(buf, sizeof(buf) / sizeof(wchar_t), L"%f", value);
+		detail::_swprintf4_std_impl(buf, sizeof(buf) / sizeof(wchar_t), L"%f", value);
 
 		return wstring(buf);
 	}
@@ -1540,7 +1598,7 @@ namespace stdex
 #else
 		wchar_t buf[2048 * sizeof(wchar_t)]; // strange assumption, I know
 #endif
-		swprintf(buf, sizeof(buf) / sizeof(wchar_t), L"%f", value);
+		detail::_swprintf4_std_impl(buf, sizeof(buf) / sizeof(wchar_t), L"%f", value);
 
 		return wstring(buf);
 	}
@@ -1602,7 +1660,7 @@ namespace stdex
 		wchar_t buf[256 * sizeof(wchar_t)]; // strange assumption, I know
 #endif
 #endif
-		swprintf(buf, sizeof(buf) / sizeof(wchar_t), L"%ld", value);
+		detail::_swprintf4_std_impl(buf, sizeof(buf) / sizeof(wchar_t), L"%ld", value);
 
 		return wstring(buf);
 	}
@@ -1642,7 +1700,7 @@ namespace stdex
 		wchar_t buf[512 * sizeof(wchar_t)]; // strange assumption, I know
 #endif
 #endif
-		swprintf(buf, sizeof(buf) / sizeof(wchar_t), L"%lu", value);
+		detail::_swprintf4_std_impl(buf, sizeof(buf) / sizeof(wchar_t), L"%lu", value);
 
 		return wstring(buf);
 	}
@@ -1718,7 +1776,7 @@ namespace stdex
 #else
 		wchar_t buf[4096 * sizeof(wchar_t)]; // strange assumption, I know
 #endif
-		swprintf(buf, sizeof(buf) / sizeof(wchar_t), L"%Lf", value);
+		detail::_swprintf4_std_impl(buf, sizeof(buf) / sizeof(wchar_t), L"%Lf", value);
 
 		wstring result(buf);
 
@@ -1804,7 +1862,7 @@ namespace stdex
 		wchar_t buf[1024 * sizeof(wchar_t)]; // strange assumption, I know
 #endif
 #endif
-		swprintf(buf, sizeof(buf) / sizeof(wchar_t), L"%lld", value);
+		detail::_swprintf4_std_impl(buf, sizeof(buf) / sizeof(wchar_t), L"%lld", value);
 
 		return wstring(buf);
 	}
@@ -1844,7 +1902,7 @@ namespace stdex
 		wchar_t buf[1024 * sizeof(wchar_t)]; // strange assumption, I know
 #endif
 #endif
-		swprintf(buf, sizeof(buf) / sizeof(wchar_t), L"%llu", value);
+		detail::_swprintf4_std_impl(buf, sizeof(buf) / sizeof(wchar_t), L"%llu", value);
 
 		return wstring(buf);
 	}
