@@ -1440,7 +1440,7 @@ namespace stdex
 #else
 		wchar_t buf[32 * sizeof(wchar_t)];
 #endif
-		swprintf(buf, L"%d", value);
+		swprintf(buf, sizeof(buf) / sizeof(wchar_t), L"%d", value);
 
 		return wstring(buf);
 	}
@@ -1468,7 +1468,7 @@ namespace stdex
 #else
 		wchar_t buf[32 * sizeof(wchar_t)];
 #endif
-		swprintf(buf, L"%u", value);
+		swprintf(buf, sizeof(buf) / sizeof(wchar_t), L"%u", value);
 
 		return wstring(buf);
 	}
@@ -1512,7 +1512,7 @@ namespace stdex
 #else
 		wchar_t buf[256 * sizeof(wchar_t)];
 #endif
-		swprintf(buf, L"%f", value);
+		swprintf(buf, sizeof(buf) / sizeof(wchar_t), L"%f", value);
 
 		return wstring(buf);
 	}
@@ -1540,7 +1540,7 @@ namespace stdex
 #else
 		wchar_t buf[2048 * sizeof(wchar_t)]; // strange assumption, I know
 #endif
-		swprintf(buf, L"%f", value);
+		swprintf(buf, sizeof(buf) / sizeof(wchar_t), L"%f", value);
 
 		return wstring(buf);
 	}
@@ -1602,7 +1602,7 @@ namespace stdex
 		wchar_t buf[256 * sizeof(wchar_t)]; // strange assumption, I know
 #endif
 #endif
-		swprintf(buf, L"%ld", value);
+		swprintf(buf, sizeof(buf) / sizeof(wchar_t), L"%ld", value);
 
 		return wstring(buf);
 	}
@@ -1642,7 +1642,7 @@ namespace stdex
 		wchar_t buf[512 * sizeof(wchar_t)]; // strange assumption, I know
 #endif
 #endif
-		swprintf(buf, L"%lu", value);
+		swprintf(buf, sizeof(buf) / sizeof(wchar_t), L"%lu", value);
 
 		return wstring(buf);
 	}
@@ -1718,7 +1718,7 @@ namespace stdex
 #else
 		wchar_t buf[4096 * sizeof(wchar_t)]; // strange assumption, I know
 #endif
-		swprintf(buf, L"%Lf", value);
+		swprintf(buf, sizeof(buf) / sizeof(wchar_t), L"%Lf", value);
 
 		wstring result(buf);
 
@@ -1804,7 +1804,7 @@ namespace stdex
 		wchar_t buf[1024 * sizeof(wchar_t)]; // strange assumption, I know
 #endif
 #endif
-		swprintf(buf, L"%lld", value);
+		swprintf(buf, sizeof(buf) / sizeof(wchar_t), L"%lld", value);
 
 		return wstring(buf);
 	}
@@ -1844,7 +1844,7 @@ namespace stdex
 		wchar_t buf[1024 * sizeof(wchar_t)]; // strange assumption, I know
 #endif
 #endif
-		swprintf(buf, L"%llu", value);
+		swprintf(buf, sizeof(buf) / sizeof(wchar_t), L"%llu", value);
 
 		return wstring(buf);
 	}
