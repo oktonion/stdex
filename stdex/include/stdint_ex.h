@@ -7,7 +7,7 @@
 
 #include "./core.h"
 
-#if defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT) || defined(INT64_MAX)
+#ifdef _STDEX_NATIVE_CPP11_TYPES_SUPPORT
 	#include <stdint.h>
 #else
 	#if (defined(_MSC_VER) || defined(__BORLANDC__))
