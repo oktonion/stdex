@@ -341,6 +341,7 @@ namespace stdex
 		unsigned long long
 			_cs_to_unsigned_ll(const char *nptr, char **endptr,  int base)
 		{
+			 using namespace std;
 			 const char *s = nptr;
 			 unsigned long long acc;
 			 int c;
@@ -400,6 +401,7 @@ namespace stdex
 		unsigned long long
 			_cs_to_unsigned_ll(const wchar_t *nptr, wchar_t **endptr, int base)
 		{
+			using namespace std;
 			const wchar_t *s = nptr;
 			unsigned long long acc;
 			int c;
@@ -594,7 +596,10 @@ namespace stdex
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
 			else if (_value > std::numeric_limits<_T>::max() || _value < std::numeric_limits<_T>::min())
+			{
+				_value = std::numeric_limits<_T>::max();
 				num_s_end = 0;
+			}
 			else
 				num_s_end = endptr;
 
@@ -618,7 +623,10 @@ namespace stdex
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
 			else if (_value > std::numeric_limits<_T>::max() || _value < std::numeric_limits<_T>::min())
+			{
+				_value = std::numeric_limits<_T>::max();
 				num_s_end = 0;
+			}
 			else
 				num_s_end = endptr;
 
@@ -642,7 +650,10 @@ namespace stdex
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
 			else if (_value > std::numeric_limits<_T>::max() || _value < std::numeric_limits<_T>::min())
+			{
+				_value = std::numeric_limits<_T>::max();
 				num_s_end = 0;
+			}
 			else
 				num_s_end = endptr;
 
@@ -665,7 +676,10 @@ namespace stdex
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
 			else if (_value > std::numeric_limits<_T>::max() || _value < std::numeric_limits<_T>::min())
+			{
+				_value = std::numeric_limits<_T>::max();
 				num_s_end = 0;
+			}
 			else
 				num_s_end = endptr;
 
@@ -693,7 +707,10 @@ namespace stdex
 #endif
 				num_s_end = 0;
 			else if (_value > std::numeric_limits<_T>::max() || _value < -std::numeric_limits<_T>::max())
+			{
+				_value = std::numeric_limits<_T>::max();
 				num_s_end = 0;
+			}
 			else
 				num_s_end = endptr;
 
@@ -720,7 +737,10 @@ namespace stdex
 #endif
 				num_s_end = 0;
 			else if (_value > std::numeric_limits<_T>::max() || _value < -std::numeric_limits<_T>::max())
+			{
+				_value = std::numeric_limits<_T>::max();
 				num_s_end = 0;
+			}
 			else
 				num_s_end = endptr;
 
