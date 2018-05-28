@@ -17,13 +17,13 @@
 
 namespace stdex
 {
-#if defined(INTMAX_MAX) && defined(LLONG_MAX)
+#if defined(INTMAX_MAX) && defined(LLONG_MAX) && !defined(__CODEGEARC__) // temporary, bc Embarcadero is .....!
 #define __INTMAX_MAX INTMAX_MAX
 	typedef ::intmax_t intmax_t;
 	typedef ::uintmax_t uintmax_t;
 #else
 
-#ifdef LLONG_MAX
+#if defined(LLONG_MAX) && !defined(__CODEGEARC__)// temporary, bc Embarcadero is .....!
 	#define __INTMAX_MAX LLONG_MAX//9223372036854775807i64
 	typedef int64_t intmax_t;
 	typedef uint64_t uintmax_t;
