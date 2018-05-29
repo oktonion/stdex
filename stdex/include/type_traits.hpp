@@ -37,7 +37,6 @@
 // std includes
 #include <cstddef>
 #include <climits>
-#include <stdint.h>
 
 namespace stdex
 {

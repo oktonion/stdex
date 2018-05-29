@@ -12,7 +12,6 @@
 /*none*/
 
 // std includes
-#include <stdint.h>
 #include <climits>
 
 namespace stdex
