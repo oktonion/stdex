@@ -22,7 +22,6 @@
 
 #include <iostream>
 #include <string>
-#include <stdint.h>
 #include <climits>
 #include <cfloat>
 #include <stdexcept>
