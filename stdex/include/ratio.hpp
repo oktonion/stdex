@@ -6,7 +6,7 @@
 #endif // _MSC_VER > 1000
 
 // stdex includes
-/*none*/
+#include "stdint_ex.h"
 
 // POSIX includes
 /*none*/
