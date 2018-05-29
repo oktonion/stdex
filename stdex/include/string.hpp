@@ -750,367 +750,438 @@ namespace stdex
 			return _value;
 		}
 
+		namespace string_intern
+		{
+			using namespace std;
+
+			typedef char _yes_type;
+			struct _no_type
+			{
+				char padding[8];
+			};
+
+			template<class _FuncT, _FuncT _FuncPtr> struct _func_check;
+
+			typedef long double(*_strtold_type)(const char*, char**);
+
+			_yes_type _strtold_tester(_strtold_type);
+			_no_type _strtold_tester(...);
+
+			typedef long double(*_wcstold_type)(const wchar_t*, wchar_t**);
+
+			_yes_type _wcstold_tester(_wcstold_type);
+			_no_type _wcstold_tester(...);
+
+			void strtold(); // dummy
+			void wcstold(); // dummy
+
+			struct _strtold_present
+			{
+				static const bool value = sizeof(_strtold_tester(&strtold)) == sizeof(_yes_type);
+			};
+
+			struct _wcstold_present
+			{
+				static const bool value = sizeof(_wcstold_tester(&wcstold)) == sizeof(_yes_type);
+			};
+		}
+
+		template<bool>
+		struct _cs_to_floating_point_ld
+		{
+			template<class T>
+			static long double
+			call(const T *str, const char *&num_s_end)
+			{
+				using namespace std;
+
+				int last_errno = errno;
+				errno = 0;
+				char *endptr = 0;
+				long double _value = strtold(str, &endptr);
+
 #ifdef HUGE_VALL
-		template <>
-		inline long double _cs_to_floating_point<long double>(const char *str, const char *&num_s_end)
+				if ((_value == HUGE_VALL || _value == -HUGE_VALL) && errno == ERANGE)
+#else		
+				if(errno == ERANGE)
+#endif
+					num_s_end = 0;
+				else
+					num_s_end = endptr;
+
+				if (errno != last_errno)
+					errno = last_errno;
+
+				return _value;
+			}
+
+			template<class T>
+			static long double
+			call(const T *str, const wchar_t *&num_s_end)
+			{
+				using namespace std;
+
+				int last_errno = errno;
+				errno = 0;
+				wchar_t *endptr = 0;
+				long double _value = wcstold(str, &endptr);
+
+#ifdef HUGE_VALL
+				if ((_value == HUGE_VALL || _value == -HUGE_VALL) && errno == ERANGE)
+#else		
+				if(errno == ERANGE)
+#endif
+					num_s_end = 0;
+				else
+					num_s_end = endptr;
+
+				if (errno != last_errno)
+					errno = last_errno;
+
+				return _value;
+			}
+		};
+
+		template<>
+		struct _cs_to_floating_point_ld<false>
 		{
-			using namespace std;
-
-			int last_errno = errno;
-			errno = 0;
-			char *endptr = 0;
-			long double _value = strtold(str, &endptr);
-
-			if ((_value == HUGE_VALL || _value == -HUGE_VALL) && errno == ERANGE)
-				num_s_end = 0;
-			else
-				num_s_end = endptr;
-
-			if (errno != last_errno)
-				errno = last_errno;
-
-			return _value;
-		}
-
-		template <>
-		inline long double _cs_to_floating_point<long double>(const wchar_t *str, const wchar_t *&num_s_end)
-		{
-			using namespace std;
-
-			int last_errno = errno;
-			errno = 0;
-			wchar_t *endptr = 0;
-			long double _value = wcstold(str, &endptr);
-
-			if ((_value == HUGE_VALL || _value == -HUGE_VALL) && errno == ERANGE)
-				num_s_end = 0;
-			else
-				num_s_end = endptr;
-
-			if (errno != last_errno)
-				errno = last_errno;
-
-			return _value;
-		}
-#else
-		long double
+			static long double
 			_a_to_floating_point(const char *str)
-		{
-			using namespace std;
-
-			long double value;
-
-			if (sscanf(str, "%Lf", &value) == EOF)
 			{
+				using namespace std;
 
-			  long double fp_integer_part = 0.0L, fp_fractional_part = 0.0L;
-			  size_t i, length = strlen(str);
+				long double value;
 
-			  i = 0; // Left to right
-			  while (str[i] != '.') {
-				  fp_integer_part = fp_integer_part * 10.0L + (str[i] - '0');
-				  i++;
-			  }
-
-			
-			  i = length - 1; // Right to left
-
-			  while (!isdigit(str[i]) && str[i] != '.')
-				 i--;
-
-			  while (str[i] != '.') {
-				  fp_fractional_part = (fp_fractional_part + (str[i] - '0')) / 10.0L;
-				  i--;
-			  }
-
-			  value = fp_integer_part + fp_fractional_part;
-			}
-
-			if(value > numeric_limits<long double>::max() || value < numeric_limits<long double>::min())
-			{
-			  errno = ERANGE;
-			  value = 0.0;
-			}
-
-			return value;
-		}
-
-		long double
-			_a_to_floating_point(const wchar_t *str)
-		{
-			using namespace std;
-
-			long double value;
-
-			if (swscanf(str, L"%Lf", &value) == EOF)
-			{
+				if (sscanf(str, "%Lf", &value) == EOF)
+				{
 
 				long double fp_integer_part = 0.0L, fp_fractional_part = 0.0L;
-				size_t i, length = wcslen(str);
+				size_t i, length = strlen(str);
 
 				i = 0; // Left to right
-				while (str[i] != L'.') {
-					fp_integer_part = fp_integer_part * 10.0L + (str[i] - L'0');
+				while (str[i] != '.') {
+					fp_integer_part = fp_integer_part * 10.0L + (str[i] - '0');
 					i++;
 				}
 
-
+				
 				i = length - 1; // Right to left
 
-				while (!isdigit(str[i]) && str[i] != L'.')
+				while (!isdigit(str[i]) && str[i] != '.')
 					i--;
 
-				while (str[i] != L'.') {
-					fp_fractional_part = (fp_fractional_part + (str[i] - L'0')) / 10.0L;
+				while (str[i] != '.') {
+					fp_fractional_part = (fp_fractional_part + (str[i] - '0')) / 10.0L;
 					i--;
 				}
 
 				value = fp_integer_part + fp_fractional_part;
-			}
+				}
 
-			if (value > numeric_limits<long double>::max() || value < numeric_limits<long double>::min())
-			{
+				if(value > numeric_limits<long double>::max() || value < numeric_limits<long double>::min())
+				{
 				errno = ERANGE;
 				value = 0.0;
+				}
+
+				return value;
 			}
 
-			return value;
-		}
+			static long double
+			_a_to_floating_point(const wchar_t *str)
+			{
+				using namespace std;
 
-		long double
+				long double value;
+
+				if (swscanf(str, L"%Lf", &value) == EOF)
+				{
+
+					long double fp_integer_part = 0.0L, fp_fractional_part = 0.0L;
+					size_t i, length = wcslen(str);
+
+					i = 0; // Left to right
+					while (str[i] != L'.') {
+						fp_integer_part = fp_integer_part * 10.0L + (str[i] - L'0');
+						i++;
+					}
+
+
+					i = length - 1; // Right to left
+
+					while (!isdigit(str[i]) && str[i] != L'.')
+						i--;
+
+					while (str[i] != L'.') {
+						fp_fractional_part = (fp_fractional_part + (str[i] - L'0')) / 10.0L;
+						i--;
+					}
+
+					value = fp_integer_part + fp_fractional_part;
+				}
+
+				if (value > numeric_limits<long double>::max() || value < numeric_limits<long double>::min())
+				{
+					errno = ERANGE;
+					value = 0.0;
+				}
+
+				return value;
+			}
+
+			static long double
 			_cs_to_long_double(const char *str, char const **ptr)
-		{
-			using namespace std;
-
-			const char *p;
-
-			if (!ptr)
-				return _a_to_floating_point(str);
-
-			p = str;
-
-			while (isspace(*p))
-				++p;
-
-			if (*p == '+' || *p == '-')
-				++p;
-
-			typedef _not_a_number<long double>::impl not_a_number_impl;
-			typedef _infinity<long double>::impl infinity_impl;
-
-			/* INF or INFINITY.  */
-			if ((p[0] == 'i' || p[0] == 'I')
-				&& (p[1] == 'n' || p[1] == 'N')
-				&& (p[2] == 'f' || p[2] == 'F'))
 			{
-				if ((p[3] == 'i' || p[3] == 'I')
-					&& (p[4] == 'n' || p[4] == 'N')
-					&& (p[5] == 'i' || p[5] == 'I')
-					&& (p[6] == 't' || p[6] == 'T')
-					&& (p[7] == 'y' || p[7] == 'Y'))
-				{
-					*ptr = p + 8;
-					return infinity_impl::inf();
-				}
-				else
-				{
-					*ptr = p + 3;
-					return infinity_impl::inf();
-				}
-			}
+				using namespace std;
 
-			/* NAN or NAN(foo).  */
-			if ((p[0] == 'n' || p[0] == 'N')
-				&& (p[1] == 'a' || p[1] == 'A')
-				&& (p[2] == 'n' || p[2] == 'N'))
-			{
-				p += 3;
-				if (*p == '(')
-				{
+				const char *p;
+
+				if (!ptr)
+					return _a_to_floating_point(str);
+
+				p = str;
+
+				while (isspace(*p))
 					++p;
-					while (*p != '\0' && *p != ')')
-						++p;
-					if (*p == ')')
-						++p;
+
+				if (*p == '+' || *p == '-')
+					++p;
+
+				typedef _not_a_number<long double>::impl not_a_number_impl;
+				typedef _infinity<long double>::impl infinity_impl;
+
+				/* INF or INFINITY.  */
+				if ((p[0] == 'i' || p[0] == 'I')
+					&& (p[1] == 'n' || p[1] == 'N')
+					&& (p[2] == 'f' || p[2] == 'F'))
+				{
+					if ((p[3] == 'i' || p[3] == 'I')
+						&& (p[4] == 'n' || p[4] == 'N')
+						&& (p[5] == 'i' || p[5] == 'I')
+						&& (p[6] == 't' || p[6] == 'T')
+						&& (p[7] == 'y' || p[7] == 'Y'))
+					{
+						*ptr = p + 8;
+						return infinity_impl::inf();
+					}
+					else
+					{
+						*ptr = p + 3;
+						return infinity_impl::inf();
+					}
 				}
-				*ptr = p;
+
+				/* NAN or NAN(foo).  */
+				if ((p[0] == 'n' || p[0] == 'N')
+					&& (p[1] == 'a' || p[1] == 'A')
+					&& (p[2] == 'n' || p[2] == 'N'))
+				{
+					p += 3;
+					if (*p == '(')
+					{
+						++p;
+						while (*p != '\0' && *p != ')')
+							++p;
+						if (*p == ')')
+							++p;
+					}
+					*ptr = p;
+					return not_a_number_impl::NaN();
+				}
+
+				/* digits, with 0 or 1 periods in it.  */
+				if (isdigit(*p) || *p == '.')
+				{
+					int got_dot = 0;
+					while (isdigit(*p) || (!got_dot && *p == '.'))
+					{
+						if (*p == '.')
+							got_dot = 1;
+						++p;
+					}
+
+					/* Exponent.  */
+					if (*p == 'e' || *p == 'E')
+					{
+						int i;
+						i = 1;
+						if (p[i] == '+' || p[i] == '-')
+							++i;
+						if (isdigit(p[i]))
+						{
+							while (isdigit(p[i]))
+								++i;
+							*ptr = p + i;
+							if (std::numeric_limits<long double>::max_exponent10 < i)
+							{
+								errno = ERANGE;
+								return std::numeric_limits<long double>::max();
+							}
+							return _a_to_floating_point(str);
+						}
+					}
+					*ptr = p;
+					return _a_to_floating_point(str);
+				}
+				/* Didn't find any digits.  Doesn't look like a number.  */
+				*ptr = str;
 				return not_a_number_impl::NaN();
 			}
 
-			/* digits, with 0 or 1 periods in it.  */
-			if (isdigit(*p) || *p == '.')
-			{
-				int got_dot = 0;
-				while (isdigit(*p) || (!got_dot && *p == '.'))
-				{
-					if (*p == '.')
-						got_dot = 1;
-					++p;
-				}
-
-				/* Exponent.  */
-				if (*p == 'e' || *p == 'E')
-				{
-					int i;
-					i = 1;
-					if (p[i] == '+' || p[i] == '-')
-						++i;
-					if (isdigit(p[i]))
-					{
-						while (isdigit(p[i]))
-							++i;
-						*ptr = p + i;
-						if (std::numeric_limits<long double>::max_exponent10 < i)
-						{
-							errno = ERANGE;
-							return std::numeric_limits<long double>::max();
-						}
-						return _a_to_floating_point(str);
-					}
-				}
-				*ptr = p;
-				return _a_to_floating_point(str);
-			}
-			/* Didn't find any digits.  Doesn't look like a number.  */
-			*ptr = str;
-			return not_a_number_impl::NaN();
-		}
-
-		long double
+			static long double
 			_cs_to_long_double(const wchar_t *str, wchar_t const **ptr)
-		{
-			using namespace std;
-
-			const wchar_t *p;
-
-			if (!ptr)
-				return _a_to_floating_point(str);
-
-			p = str;
-
-			while (isspace(*p))
-				++p;
-
-			if (*p == L'+' || *p == L'-')
-				++p;
-
-			typedef _not_a_number<long double>::impl not_a_number_impl;
-			typedef _infinity<long double>::impl infinity_impl;
-
-			/* INF or INFINITY.  */
-			if ((p[0] == L'i' || p[0] == L'I')
-				&& (p[1] == L'n' || p[1] == L'N')
-				&& (p[2] == L'f' || p[2] == L'F'))
 			{
-				if ((p[3] == L'i' || p[3] == L'I')
-					&& (p[4] == L'n' || p[4] == L'N')
-					&& (p[5] == L'i' || p[5] == L'I')
-					&& (p[6] == L't' || p[6] == L'T')
-					&& (p[7] == L'y' || p[7] == L'Y'))
-				{
-					*ptr = p + 8;
-					return infinity_impl::inf();
-				}
-				else
-				{
-					*ptr = p + 3;
-					return infinity_impl::inf();
-				}
-			}
+				using namespace std;
 
-			/* NAN or NAN(foo).  */
-			if ((p[0] == L'n' || p[0] == L'N')
-				&& (p[1] == L'a' || p[1] == L'A')
-				&& (p[2] == L'n' || p[2] == L'N'))
-			{
-				p += 3;
-				if (*p == L'(')
-				{
+				const wchar_t *p;
+
+				if (!ptr)
+					return _a_to_floating_point(str);
+
+				p = str;
+
+				while (isspace(*p))
 					++p;
-					while (*p != L'\0' && *p != L')')
-						++p;
-					if (*p == L')')
-						++p;
+
+				if (*p == L'+' || *p == L'-')
+					++p;
+
+				typedef _not_a_number<long double>::impl not_a_number_impl;
+				typedef _infinity<long double>::impl infinity_impl;
+
+				/* INF or INFINITY.  */
+				if ((p[0] == L'i' || p[0] == L'I')
+					&& (p[1] == L'n' || p[1] == L'N')
+					&& (p[2] == L'f' || p[2] == L'F'))
+				{
+					if ((p[3] == L'i' || p[3] == L'I')
+						&& (p[4] == L'n' || p[4] == L'N')
+						&& (p[5] == L'i' || p[5] == L'I')
+						&& (p[6] == L't' || p[6] == L'T')
+						&& (p[7] == L'y' || p[7] == L'Y'))
+					{
+						*ptr = p + 8;
+						return infinity_impl::inf();
+					}
+					else
+					{
+						*ptr = p + 3;
+						return infinity_impl::inf();
+					}
 				}
-				*ptr = p;
+
+				/* NAN or NAN(foo).  */
+				if ((p[0] == L'n' || p[0] == L'N')
+					&& (p[1] == L'a' || p[1] == L'A')
+					&& (p[2] == L'n' || p[2] == L'N'))
+				{
+					p += 3;
+					if (*p == L'(')
+					{
+						++p;
+						while (*p != L'\0' && *p != L')')
+							++p;
+						if (*p == L')')
+							++p;
+					}
+					*ptr = p;
+					return not_a_number_impl::NaN();
+				}
+
+				/* digits, with 0 or 1 periods in it.  */
+				if (isdigit(*p) || *p == L'.')
+				{
+					int got_dot = 0;
+					while (isdigit(*p) || (!got_dot && *p == L'.'))
+					{
+						if (*p == L'.')
+							got_dot = 1;
+						++p;
+					}
+
+					/* Exponent.  */
+					if (*p == L'e' || *p == L'E')
+					{
+						int i;
+						i = 1;
+						if (p[i] == L'+' || p[i] == L'-')
+							++i;
+						if (isdigit(p[i]))
+						{
+							while (isdigit(p[i]))
+								++i;
+							*ptr = p + i;
+							if (std::numeric_limits<long double>::max_exponent10 < i)
+							{
+								errno = ERANGE;
+								return std::numeric_limits<long double>::max();
+							}
+							return _a_to_floating_point(str);
+						}
+					}
+					*ptr = p;
+					return _a_to_floating_point(str);
+				}
+				/* Didn't find any digits.  Doesn't look like a number.  */
+				*ptr = str;
 				return not_a_number_impl::NaN();
 			}
 
-			/* digits, with 0 or 1 periods in it.  */
-			if (isdigit(*p) || *p == L'.')
+			static long double
+			call(const char *str, const char *&num_s_end)
 			{
-				int got_dot = 0;
-				while (isdigit(*p) || (!got_dot && *p == L'.'))
-				{
-					if (*p == L'.')
-						got_dot = 1;
-					++p;
-				}
+				int last_errno = errno;
+				errno = 0;
+				long double _value = _cs_to_long_double(str, &num_s_end);
 
-				/* Exponent.  */
-				if (*p == L'e' || *p == L'E')
-				{
-					int i;
-					i = 1;
-					if (p[i] == L'+' || p[i] == L'-')
-						++i;
-					if (isdigit(p[i]))
-					{
-						while (isdigit(p[i]))
-							++i;
-						*ptr = p + i;
-						if (std::numeric_limits<long double>::max_exponent10 < i)
-						{
-							errno = ERANGE;
-							return std::numeric_limits<long double>::max();
-						}
-						return _a_to_floating_point(str);
-					}
-				}
-				*ptr = p;
-				return _a_to_floating_point(str);
+				if (errno == ERANGE)
+					num_s_end = 0;
+
+				if (errno != last_errno)
+					errno = last_errno;
+
+				return _value;
 			}
-			/* Didn't find any digits.  Doesn't look like a number.  */
-			*ptr = str;
-			return not_a_number_impl::NaN();
+
+			static long double
+			call(const wchar_t *str, const wchar_t *&num_s_end)
+			{
+				int last_errno = errno;
+				errno = 0;
+				long double _value = _cs_to_long_double(str, &num_s_end);
+
+				if (errno == ERANGE)
+					num_s_end = 0;
+
+				if (errno != last_errno)
+					errno = last_errno;
+
+				return _value;
+			}
+		};
+
+
+
+
+		template <>
+		inline 
+		long double
+		_cs_to_floating_point<long double>(const char *str, const char *&num_s_end)
+		{
+			typedef _cs_to_floating_point_ld<string_intern::_strtold_present::value> impl;
+
+			return impl::call(str, num_s_end);
 		}
 
 		template <>
-		inline long double _cs_to_floating_point<long double>(const char *str, const char *&num_s_end)
+		inline 
+		long double
+		_cs_to_floating_point<long double>(const wchar_t *str, const wchar_t *&num_s_end)
 		{
-			using namespace std;
+			typedef _cs_to_floating_point_ld<string_intern::_wcstold_present::value> impl;
 
-			int last_errno = errno;
-			errno = 0;
-			long double _value = _cs_to_long_double(str, &num_s_end);
-
-			if (errno == ERANGE)
-				num_s_end = 0;
-
-			if (errno != last_errno)
-				errno = last_errno;
-
-			return _value;
+			return impl::call(str, num_s_end);
 		}
-
-		template <>
-		inline long double _cs_to_floating_point<long double>(const wchar_t *str, const wchar_t *&num_s_end)
-		{
-			using namespace std;
-
-			int last_errno = errno;
-			errno = 0;
-			long double _value = _cs_to_long_double(str, &num_s_end);
-
-			if (errno == ERANGE)
-				num_s_end = 0;
-
-			if (errno != last_errno)
-				errno = last_errno;
-
-			return _value;
-		}
-#endif
 
 		namespace string_detail
 		{
