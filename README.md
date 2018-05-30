@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/oktonion/stdex.svg?branch=tests)](https://travis-ci.org/oktonion/stdex)
 
 # stdex
-C++ 11 standart library implementation with extra features using C++98 only and POSIX threads. Minimum ugly preprocessor macro and no configuration files. 
+C++ 11 standart library implementation with extra features using C++98 only and POSIX threads. Minimum ugly preprocessor macro and no configuration files. The library itself is builded on top of C++ standart library distributed with your compiler and just extends it with C++11 features.
 
 Q: Why not boost?
 
@@ -15,6 +15,7 @@ Not all features of C++ 11 could be implemented without compiler support so I ha
 The library is portable for any compiler that supports C++98 but as we all know there are lots of different implementations of std library in even major compilers so this library is tested on: 
 
 * Borland C++ Builder 6.0 Updt4; 
+* g++ 4.4.2;
 * g++ 4.9, 4.8, 5.0 with c++98 option;
 * clang 3.5, 5.0 with c++98 option;
 * Visual Studio 2010, 2013, 2015;
