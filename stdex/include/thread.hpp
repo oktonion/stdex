@@ -1377,12 +1377,6 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 		static void* wrapper_function(void *aArg);
 	};
 
-	inline void swap(stdex::thread &lhs, stdex::thread &rhs) NOEXCEPT_FUNCTION
-	{
-		lhs.swap(rhs);
-	}
-
-
 	namespace detail
 	{
 		void sleep_for_impl(const struct timespec *reltime);
@@ -1468,6 +1462,10 @@ namespace std
 	}
 }
 
+namespace stdex
+{
+	using std::swap;
+}
 
 
 #undef DELETED_FUNCTION
