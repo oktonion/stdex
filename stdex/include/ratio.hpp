@@ -6,24 +6,25 @@
 #endif // _MSC_VER > 1000
 
 // stdex includes
-/*none*/
+#include "stdint_ex.h"
 
 // POSIX includes
 /*none*/
 
 // std includes
-#include <stdint.h>
 #include <climits>
 
 namespace stdex
 {
+	namespace ratio_detail
+	{
 #if defined(INTMAX_MAX) && defined(LLONG_MAX)
 #define __INTMAX_MAX INTMAX_MAX
 	typedef ::intmax_t intmax_t;
 	typedef ::uintmax_t uintmax_t;
 #else
 
-#ifdef LLONG_MAX
+#if defined(LLONG_MAX)
 	#define __INTMAX_MAX LLONG_MAX//9223372036854775807i64
 	typedef int64_t intmax_t;
 	typedef uint64_t uintmax_t;
@@ -34,6 +35,50 @@ namespace stdex
 #endif
 
 #endif // INTMAX_MAX
+
+		typedef char _yes_type;
+		struct _no_type
+		{
+			char padding[8];
+		};
+
+		struct _dummy { _dummy( intmax_t ) {} };
+		_yes_type _is_const_tester( void* );
+		_no_type  _is_const_tester( _dummy  );
+
+		struct _is_intmax_t_const
+		{
+			static const bool value = sizeof(_is_const_tester(intmax_t(0))) == sizeof(_yes_type);
+		};
+
+		template<bool>
+		struct _intmax_t_chooser
+		{
+			typedef intmax_t signed_type;
+			typedef uintmax_t unsigned_type;
+
+			static const signed_type signed_max = __INTMAX_MAX;
+			static const signed_type signed_min = -__INTMAX_MAX;
+		};
+
+		template<>
+		struct _intmax_t_chooser<false>
+		{
+			typedef long signed_type;
+			typedef unsigned long unsigned_type;
+
+			static const signed_type signed_max = LONG_MAX;
+			static const signed_type signed_min = LONG_MIN;
+		};
+
+		struct _intmax_t_types:
+			_intmax_t_chooser<_is_intmax_t_const::value>
+		{};
+	}
+
+	typedef ratio_detail::_intmax_t_types _intmax_t_info;
+	typedef _intmax_t_info::signed_type intmax_t;
+	typedef _intmax_t_info::unsigned_type uintmax_t;
 
 	namespace detail
 	{
@@ -145,13 +190,13 @@ namespace stdex
 		template<intmax_t _Pn, intmax_t _Qn, bool>
 		struct _add_overflow_check_impl
 		{
-			static const intmax_t value = _Pn <= __INTMAX_MAX - _Qn;
+			static const intmax_t value = _Pn <= _intmax_t_info::signed_max - _Qn;
 		};
 
 		template<intmax_t _Pn, intmax_t _Qn>
 		struct _add_overflow_check_impl<_Pn, _Qn, false>
 		{
-			static const intmax_t value = _Pn >= -__INTMAX_MAX - _Qn;
+			static const intmax_t value = _Pn >= _intmax_t_info::signed_min - _Qn;
 		};
 
 		template<intmax_t _Pn, intmax_t _Qn>
@@ -211,10 +256,10 @@ namespace stdex
 			typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1 < (_safe_multiply::_c / uintmax_t(2))) >::
 				overflow_in_multiplication_assert_failed
 			check2; // if you are there means overflow in safe template multiplication occured
-			typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_b0 * _safe_multiply::_a0 <= __INTMAX_MAX) >::
+			typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_b0 * _safe_multiply::_a0 <= _intmax_t_info::signed_max) >::
 				overflow_in_multiplication_assert_failed
 			check3; // if you are there means overflow in safe template multiplication occured
-			typedef typename check::overflow_in_multiplication_assert< ((_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1) * _safe_multiply::_c <= __INTMAX_MAX - _safe_multiply::_b0 * _safe_multiply::_a0) >::
+			typedef typename check::overflow_in_multiplication_assert< ((_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1) * _safe_multiply::_c <= _intmax_t_info::signed_max - _safe_multiply::_b0 * _safe_multiply::_a0) >::
 				overflow_in_multiplication_assert_failed
 			check4; // if you are there means overflow in safe template multiplication occured
 
@@ -316,7 +361,7 @@ namespace stdex
 		typedef typename check::denominator_cant_be_zero_assert< (_Den != 0) >::
 			denominator_cant_be_zero_assert_failed
 		check1; // if you are there means you put the denominator to zero
-		typedef typename check::out_of_range< (_Num >= -__INTMAX_MAX && _Den >= -__INTMAX_MAX) >::
+		typedef typename check::out_of_range< (_Num >= _intmax_t_info::signed_min && _Den >= _intmax_t_info::signed_min) >::
 			out_of_range_failed
 		check2; // if you are there means that value is out of range
 	};

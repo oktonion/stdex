@@ -5,7 +5,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include <stdint.h>
+#include <cstddef>
 #include <climits>
 
 #ifdef NULL
@@ -20,12 +20,6 @@ namespace stdex
 	{
 		namespace nullptr_detail
 		{
-			#ifdef LLONG_MAX
-				typedef ::uintmax_t uintmax_t;
-			#else
-				typedef uint32_t uintmax_t;
-			#endif
-
 			typedef char _yes_type;
 			struct _no_type
 			{
@@ -66,12 +60,6 @@ namespace stdex
 			typename sfinae_true<((T)(STDEX_NULL) == (T)(STDEX_NULL))>::type _nullptr_can_be_ct_constant(int);
 			template<class>
 			_no_type _nullptr_can_be_ct_constant(...);*/
-
-			enum nullptr_t_as_enum
-			{
-				_nullptr_val = STDEX_NULL,
-				_max_nullptr = uintmax_t(1) << (CHAR_BIT * sizeof(void*) - 1)
-			};
 
 			class nullptr_t_as_class_impl {
 			public:
@@ -132,6 +120,27 @@ namespace stdex
 			struct nullptr_t_as_int_type<false> { typedef nullptr_t_as_short_type<sizeof(short) == sizeof(void*)>::type type; };
 
 			typedef nullptr_t_as_int_type<sizeof(int) == sizeof(void*)>::type nullptr_t_as_int;
+
+			template<bool>
+			struct nullptr_t_as_ulong_type { typedef unsigned long type; };
+			template<>
+			struct nullptr_t_as_ulong_type<false> { typedef unsigned long type; };
+			template<bool>
+			struct nullptr_t_as_ushort_type { typedef unsigned short type; };
+			template<>
+			struct nullptr_t_as_ushort_type<false> { typedef nullptr_t_as_long_type<sizeof(unsigned long) == sizeof(void*)>::type type; };
+			template<bool>
+			struct nullptr_t_as_uint_type { typedef unsigned int type; };
+			template<>
+			struct nullptr_t_as_uint_type<false> { typedef nullptr_t_as_short_type<sizeof(unsigned short) == sizeof(void*)>::type type; };
+
+			typedef nullptr_t_as_uint_type<sizeof(unsigned int) == sizeof(void*)>::type nullptr_t_as_uint;
+
+			enum nullptr_t_as_enum
+			{
+				_nullptr_val = STDEX_NULL,
+				_max_nullptr = nullptr_t_as_uint(1) << (CHAR_BIT * sizeof(void*) - 1)
+			};
 
 			typedef void* nullptr_t_as_void;
 		}

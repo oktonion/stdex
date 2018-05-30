@@ -37,7 +37,6 @@
 // std includes
 #include <cstddef>
 #include <climits>
-#include <stdint.h>
 
 namespace stdex
 {
@@ -1185,7 +1184,7 @@ namespace stdex
 		static const std::size_t value = 1 + rank<_Tp>::value;
 
 		typedef const bool value_type;
-		typedef integral_constant<std::size_t, std::size_t(rank::value)> type;
+		typedef integral_constant<std::size_t, (const std::size_t)(rank::value)> type;
 
 		operator value_type() const
 		{	// return stored value

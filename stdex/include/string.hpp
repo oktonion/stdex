@@ -22,7 +22,6 @@
 
 #include <iostream>
 #include <string>
-#include <stdint.h>
 #include <climits>
 #include <cfloat>
 #include <stdexcept>
@@ -31,7 +30,20 @@
 #include <limits>
 #include <cwchar>
 
+#define _STDEX_PLACE_DUMMY_IN_STD_NAMESPACE
 
+#ifdef _STDEX_PLACE_DUMMY_IN_STD_NAMESPACE
+namespace std
+{
+
+	void strtoll(); // dummy
+	void wcstoll(); // dummy
+	void strtoull(); // dummy
+	void wcstoull(); // dummy
+	void strtold(); // dummy
+	void wcstold(); // dummy
+}
+#endif
 
 namespace stdex
 {
@@ -43,6 +55,101 @@ namespace stdex
 
 	namespace detail
 	{
+		namespace string_detail
+		{
+
+			typedef char _yes_type;
+			struct _no_type
+			{
+				char padding[8];
+			};
+
+#if defined(LLONG_MIN) || defined(LLONG_MAX)
+			typedef long long _long_long_type;
+			typedef unsigned long long _unsigned_long_long_type;
+#else
+			typedef long _long_long_type;
+			typedef unsigned long _unsigned_long_long_type;
+#endif
+
+
+			typedef _long_long_type(*_strtoll_type)(const char*, char**, int);
+
+			_yes_type _strtoll_tester(_strtoll_type);
+			_no_type _strtoll_tester(...);
+
+			typedef _long_long_type(*_wcstoll_type)(const wchar_t*, wchar_t**, int);
+
+			_yes_type _wcstoll_tester(_wcstoll_type);
+			_no_type _wcstoll_tester(...);
+
+			typedef _unsigned_long_long_type(*_strtoull_type)(const char*, char**, int);
+
+			_yes_type _strtoull_tester(_strtoull_type);
+			_no_type _strtoull_tester(...);
+
+			typedef _unsigned_long_long_type(*_wcstoull_type)(const wchar_t*, wchar_t**, int);
+
+			_yes_type _wcstoull_tester(_wcstoull_type);
+			_no_type _wcstoull_tester(...);
+
+			typedef long double(*_strtold_type)(const char*, char**);
+
+			_yes_type _strtold_tester(_strtold_type);
+			_no_type _strtold_tester(...);
+
+			typedef long double(*_wcstold_type)(const wchar_t*, wchar_t**);
+
+			_yes_type _wcstold_tester(_wcstold_type);
+			_no_type _wcstold_tester(...);
+			
+
+			using namespace std;
+
+			struct _strtoll_present
+			{
+				static const bool value = sizeof(_strtoll_tester(&strtoll)) == sizeof(_yes_type);
+			};
+
+			struct _wcstoll_present
+			{
+				static const bool value = sizeof(_wcstoll_tester(&wcstoll)) == sizeof(_yes_type);
+			};
+
+			struct _strtoull_present
+			{
+				static const bool value = sizeof(_strtoull_tester(&strtoull)) == sizeof(_yes_type);
+			};
+
+			struct _wcstoull_present
+			{
+				static const bool value = sizeof(_wcstoull_tester(&wcstoull)) == sizeof(_yes_type);
+			};
+
+			struct _strtold_present
+			{
+				static const bool value = sizeof(_strtold_tester(&strtold)) == sizeof(_yes_type);
+			};
+
+			struct _wcstold_present
+			{
+				static const bool value = sizeof(_wcstold_tester(&wcstold)) == sizeof(_yes_type);
+			};
+
+#undef _STDEX_PLACE_DUMMY_IN_STD_NAMESPACE
+
+			template<class RetT, class Arg2T>
+			_yes_type _has_4arg_swprintf_tester(RetT(*)(wchar_t*, Arg2T, const wchar_t*, ...));
+			template<class RetT, class Arg2T, class Arg4T>
+			_yes_type _has_4arg_swprintf_tester(RetT(*)(wchar_t*, Arg2T, const wchar_t*, Arg4T));
+			_no_type _has_4arg_swprintf_tester(...);
+
+			struct _has_4arg_swprintf
+			{
+				static const bool value = sizeof(_has_4arg_swprintf_tester(&swprintf)) == sizeof(_yes_type);
+			};
+		}
+
 		template<bool _IsSigned>
 		struct _str_to_integral_chooser_impl
 		{
@@ -175,319 +282,364 @@ namespace stdex
 
 #if defined(LLONG_MAX) || defined(LLONG_MIN) 
 
-#ifndef _STDEX_NATIVE_CPP11_SUPPORT
-		long long
-			_cs_to_signed_ll(const char *nptr, char **endptr,  int base)
+		template<bool>
+		struct _cs_to_signed_ll
 		{
-			using namespace std;
-			 const char *s = nptr;
-			 unsigned long long acc;
-			 int c;
-			 unsigned long long cutoff;
-			 int neg = 0, any, cutlim;
+			static
+			long long
+			call(const char *nptr, char **endptr, int base)
+			{
+				using namespace std;
+				const char *s = nptr;
+				unsigned long long acc;
+				int c;
+				unsigned long long cutoff;
+				int neg = 0, any, cutlim;
 
-			/*
-			* Skip white space and pick up leading +/- sign if any.
-			* If base is 0, allow 0x for hex and 0 for octal, else
-			* assume decimal; if base is already 16, allow 0x.
-			*/
-			do {
-				c = *s++;
-			} while (isspace(c));
-			if (c == '-') {
-				neg = 1;
-				c = *s++;
-			}
-			else if (c == '+')
-				c = *s++;
-			if ((base == 0 || base == 16) &&
-				c == '0' && (*s == 'x' || *s == 'X')) {
-				c = s[1];
-				s += 2;
-				base = 16;
-			}
-			if (base == 0)
-				base = c == '0' ? 8 : 10;
-
-			/*
-			* Compute the cutoff value between legal numbers and illegal
-			* numbers.  That is the largest legal value, divided by the
-			* base.  An input number that is greater than this value, if
-			* followed by a legal input character, is too big.  One that
-			* is equal to this value may be valid or not; the limit
-			* between valid and invalid numbers is then based on the last
-			* digit.  For instance, if the range for longs is
-			* [-2147483648..2147483647] and the input base is 10,
-			* cutoff will be set to 214748364 and cutlim to either
-			* 7 (neg==0) or 8 (neg==1), meaning that if we have accumulated
-			* a value > 214748364, or equal but the next digit is > 7 (or 8),
-			* the number is too big, and we will return a range error.
-			*
-			* Set any if any `digits' consumed; make it negative to indicate
-			* overflow.
-			*/
-			cutoff = neg ? -(unsigned long long) LLONG_MIN : LLONG_MAX;
-			cutlim = cutoff % (unsigned long long) base;
-			cutoff /= (unsigned long long) base;
-			for (acc = 0, any = 0;; c = *s++) {
-				if (isdigit(c))
-					c -= '0';
-				else if (isalpha(c))
-					c -= isupper(c) ? 'A' - 10 : 'a' - 10;
-				else
-					break;
-				if (c >= base)
-					break;
-				if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
-					any = -1;
-				else {
-					any = 1;
-					acc *= base;
-					acc += c;
+				/*
+				* Skip white space and pick up leading +/- sign if any.
+				* If base is 0, allow 0x for hex and 0 for octal, else
+				* assume decimal; if base is already 16, allow 0x.
+				*/
+				do {
+					c = *s++;
+				} while (isspace(c));
+				if (c == '-') {
+					neg = 1;
+					c = *s++;
 				}
-			}
-			if (any < 0) {
-				acc = neg ? LLONG_MIN : LLONG_MAX;
-				errno = ERANGE;
-			}
-			else if (neg)
-				acc = -acc;
-			if (endptr != 0)
-				*endptr = (char *) (any ? s - 1 : nptr);
-			return (acc);
-		}
-
-		long long
-			_cs_to_signed_ll(const wchar_t *nptr, wchar_t **endptr, int base)
-		{
-			using namespace std;
-			const wchar_t *s = nptr;
-			unsigned long long acc;
-			int c;
-			unsigned long long cutoff;
-			int neg = 0, any, cutlim;
-
-			/*
-			* Skip white space and pick up leading +/- sign if any.
-			* If base is 0, allow 0x for hex and 0 for octal, else
-			* assume decimal; if base is already 16, allow 0x.
-			*/
-			do {
-				c = *s++;
-			} while (isspace(c));
-			if (c == L'-') {
-				neg = 1;
-				c = *s++;
-			}
-			else if (c == L'+')
-				c = *s++;
-			if ((base == 0 || base == 16) &&
-				c == L'0' && (*s == L'x' || *s == L'X')) {
-				c = s[1];
-				s += 2;
-				base = 16;
-			}
-			if (base == 0)
-				base = c == L'0' ? 8 : 10;
-
-			/*
-			* Compute the cutoff value between legal numbers and illegal
-			* numbers.  That is the largest legal value, divided by the
-			* base.  An input number that is greater than this value, if
-			* followed by a legal input character, is too big.  One that
-			* is equal to this value may be valid or not; the limit
-			* between valid and invalid numbers is then based on the last
-			* digit.  For instance, if the range for longs is
-			* [-2147483648..2147483647] and the input base is 10,
-			* cutoff will be set to 214748364 and cutlim to either
-			* 7 (neg==0) or 8 (neg==1), meaning that if we have accumulated
-			* a value > 214748364, or equal but the next digit is > 7 (or 8),
-			* the number is too big, and we will return a range error.
-			*
-			* Set any if any `digits' consumed; make it negative to indicate
-			* overflow.
-			*/
-			cutoff = neg ? -(unsigned long long) LLONG_MIN : LLONG_MAX;
-			cutlim = cutoff % (unsigned long long) base;
-			cutoff /= (unsigned long long) base;
-			for (acc = 0, any = 0;; c = *s++) {
-				if (isdigit(c))
-					c -= L'0';
-				else if (isalpha(c))
-					c -= isupper(c) ? L'A' - 10 : L'a' - 10;
-				else
-					break;
-				if (c >= base)
-					break;
-				if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
-					any = -1;
-				else {
-					any = 1;
-					acc *= base;
-					acc += c;
+				else if (c == '+')
+					c = *s++;
+				if ((base == 0 || base == 16) &&
+					c == '0' && (*s == 'x' || *s == 'X')) {
+					c = s[1];
+					s += 2;
+					base = 16;
 				}
-			}
-			if (any < 0) {
-				acc = neg ? LLONG_MIN : LLONG_MAX;
-				errno = ERANGE;
-			}
-			else if (neg)
-				acc = -acc;
-			if (endptr != 0)
-				*endptr = (wchar_t *) (any ? s - 1 : nptr);
-			return (acc);
-		}
+				if (base == 0)
+					base = c == '0' ? 8 : 10;
 
-		unsigned long long
-			_cs_to_unsigned_ll(const char *nptr, char **endptr,  int base)
-		{
-			 const char *s = nptr;
-			 unsigned long long acc;
-			 int c;
-			 unsigned long long cutoff;
-			 int neg = 0, any, cutlim;
-
-			/*
-			* See strtol for comments as to the logic used.
-			*/
-			do {
-				c = *s++;
-			} while (isspace(c));
-			if (c == '-') {
-				neg = 1;
-				c = *s++;
-			}
-			else if (c == '+')
-				c = *s++;
-			if ((base == 0 || base == 16) &&
-				c == '0' && (*s == 'x' || *s == 'X')) {
-				c = s[1];
-				s += 2;
-				base = 16;
-			}
-			if (base == 0)
-				base = c == '0' ? 8 : 10;
-			cutoff = (unsigned long long) ULLONG_MAX / (unsigned long long) base;
-			cutlim = (unsigned long long) ULLONG_MAX % (unsigned long long) base;
-			for (acc = 0, any = 0;; c = *s++) {
-				if (isdigit(c))
-					c -= '0';
-				else if (isalpha(c))
-					c -= isupper(c) ? 'A' - 10 : 'a' - 10;
-				else
-					break;
-				if (c >= base)
-					break;
-				if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
-					any = -1;
-				else {
-					any = 1;
-					acc *= base;
-					acc += c;
+				/*
+				* Compute the cutoff value between legal numbers and illegal
+				* numbers.  That is the largest legal value, divided by the
+				* base.  An input number that is greater than this value, if
+				* followed by a legal input character, is too big.  One that
+				* is equal to this value may be valid or not; the limit
+				* between valid and invalid numbers is then based on the last
+				* digit.  For instance, if the range for longs is
+				* [-2147483648..2147483647] and the input base is 10,
+				* cutoff will be set to 214748364 and cutlim to either
+				* 7 (neg==0) or 8 (neg==1), meaning that if we have accumulated
+				* a value > 214748364, or equal but the next digit is > 7 (or 8),
+				* the number is too big, and we will return a range error.
+				*
+				* Set any if any `digits' consumed; make it negative to indicate
+				* overflow.
+				*/
+				cutoff = neg ? -(unsigned long long) LLONG_MIN : LLONG_MAX;
+				cutlim = cutoff % (unsigned long long) base;
+				cutoff /= (unsigned long long) base;
+				for (acc = 0, any = 0;; c = *s++) {
+					if (isdigit(c))
+						c -= '0';
+					else if (isalpha(c))
+						c -= isupper(c) ? 'A' - 10 : 'a' - 10;
+					else
+						break;
+					if (c >= base)
+						break;
+					if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+						any = -1;
+					else {
+						any = 1;
+						acc *= base;
+						acc += c;
+					}
 				}
-			}
-			if (any < 0) {
-				acc = ULLONG_MAX;
-				errno = ERANGE;
-			}
-			else if (neg)
-				acc = -acc;
-			if (endptr != 0)
-				*endptr = (char *) (any ? s - 1 : nptr);
-			return (acc);
-		}
-
-		unsigned long long
-			_cs_to_unsigned_ll(const wchar_t *nptr, wchar_t **endptr, int base)
-		{
-			const wchar_t *s = nptr;
-			unsigned long long acc;
-			int c;
-			unsigned long long cutoff;
-			int neg = 0, any, cutlim;
-
-			/*
-			* See strtol for comments as to the logic used.
-			*/
-			do {
-				c = *s++;
-			} while (isspace(c));
-			if (c == L'-') {
-				neg = 1;
-				c = *s++;
-			}
-			else if (c == L'+')
-				c = *s++;
-			if ((base == 0 || base == 16) &&
-				c == L'0' && (*s == L'x' || *s == L'X')) {
-				c = s[1];
-				s += 2;
-				base = 16;
-			}
-			if (base == 0)
-				base = c == '0' ? 8 : 10;
-			cutoff = (unsigned long long) ULLONG_MAX / (unsigned long long) base;
-			cutlim = (unsigned long long) ULLONG_MAX % (unsigned long long) base;
-			for (acc = 0, any = 0;; c = *s++) {
-				if (isdigit(c))
-					c -= L'0';
-				else if (isalpha(c))
-					c -= isupper(c) ? L'A' - 10 : L'a' - 10;
-				else
-					break;
-				if (c >= base)
-					break;
-				if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
-					any = -1;
-				else {
-					any = 1;
-					acc *= base;
-					acc += c;
+				if (any < 0) {
+					acc = neg ? LLONG_MIN : LLONG_MAX;
+					errno = ERANGE;
 				}
+				else if (neg)
+					acc = static_cast<unsigned long long >(-acc);
+				if (endptr != 0)
+					*endptr = (char *) (any ? s - 1 : nptr);
+				return (acc);
 			}
-			if (any < 0) {
-				acc = ULLONG_MAX;
-				errno = ERANGE;
+		};
+
+		template<>
+		struct _cs_to_signed_ll<true>
+		{
+			template<class T>
+			static
+			long long
+			call(const T *nptr, char **endptr, int base)
+			{
+				using namespace std;
+
+				return strtoll(nptr, endptr, base);
 			}
-			else if (neg)
-				acc = -acc;
-			if (endptr != 0)
-				*endptr = (wchar_t *) (any ? s - 1 : nptr);
-			return (acc);
-		}
-#else
-		long long
-			_cs_to_signed_ll(const char *nptr, char **endptr,  int base)
+		};
+
+		template<bool>
+		struct _wcs_to_signed_ll
 		{
-			using namespace std;
+			static
+			long long
+			call(const wchar_t *nptr, wchar_t **endptr, int base)
+			{
+				using namespace std;
+				const wchar_t *s = nptr;
+				unsigned long long acc;
+				int c;
+				unsigned long long cutoff;
+				int neg = 0, any, cutlim;
 
-			return strtoll(nptr, endptr, base);
-		}
+				/*
+				* Skip white space and pick up leading +/- sign if any.
+				* If base is 0, allow 0x for hex and 0 for octal, else
+				* assume decimal; if base is already 16, allow 0x.
+				*/
+				do {
+					c = *s++;
+				} while (isspace(c));
+				if (c == L'-') {
+					neg = 1;
+					c = *s++;
+				}
+				else if (c == L'+')
+					c = *s++;
+				if ((base == 0 || base == 16) &&
+					c == L'0' && (*s == L'x' || *s == L'X')) {
+					c = s[1];
+					s += 2;
+					base = 16;
+				}
+				if (base == 0)
+					base = c == L'0' ? 8 : 10;
 
-		long long
-			_cs_to_signed_ll(const wchar_t *nptr, wchar_t **endptr, int base)
+				/*
+				* Compute the cutoff value between legal numbers and illegal
+				* numbers.  That is the largest legal value, divided by the
+				* base.  An input number that is greater than this value, if
+				* followed by a legal input character, is too big.  One that
+				* is equal to this value may be valid or not; the limit
+				* between valid and invalid numbers is then based on the last
+				* digit.  For instance, if the range for longs is
+				* [-2147483648..2147483647] and the input base is 10,
+				* cutoff will be set to 214748364 and cutlim to either
+				* 7 (neg==0) or 8 (neg==1), meaning that if we have accumulated
+				* a value > 214748364, or equal but the next digit is > 7 (or 8),
+				* the number is too big, and we will return a range error.
+				*
+				* Set any if any `digits' consumed; make it negative to indicate
+				* overflow.
+				*/
+				cutoff = neg ? -(unsigned long long) LLONG_MIN : LLONG_MAX;
+				cutlim = cutoff % (unsigned long long) base;
+				cutoff /= (unsigned long long) base;
+				for (acc = 0, any = 0;; c = *s++) {
+					if (isdigit(c))
+						c -= L'0';
+					else if (isalpha(c))
+						c -= isupper(c) ? L'A' - 10 : L'a' - 10;
+					else
+						break;
+					if (c >= base)
+						break;
+					if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+						any = -1;
+					else {
+						any = 1;
+						acc *= base;
+						acc += c;
+					}
+				}
+				if (any < 0) {
+					acc = neg ? LLONG_MIN : LLONG_MAX;
+					errno = ERANGE;
+				}
+				else if (neg)
+					acc = static_cast<unsigned long long >(-acc);
+				if (endptr != 0)
+					*endptr = (wchar_t *) (any ? s - 1 : nptr);
+				return (acc);
+			}
+		};
+
+		template<>
+		struct _wcs_to_signed_ll<true>
 		{
-			using namespace std;
+			template<class T>
+			static
+			long long
+			call(const T *nptr, wchar_t **endptr, int base)
+			{
+				using namespace std;
 
-			return wcstoll(nptr, endptr, base);
-		}
-
-		unsigned long long
-			_cs_to_unsigned_ll(const char *nptr, char **endptr,  int base)
+				return wcstoll(nptr, endptr, base);
+			}
+		};
+		
+		template<bool>
+		struct _cs_to_unsigned_ll
 		{
-			using namespace std;
+			static
+			unsigned long long
+			call(const char *nptr, char **endptr, int base)
+			{
+				using namespace std;
+				const char *s = nptr;
+				unsigned long long acc;
+				int c;
+				unsigned long long cutoff;
+				int neg = 0, any, cutlim;
 
-			return strtoull(nptr, endptr, base);
-		}
+				/*
+				* See strtol for comments as to the logic used.
+				*/
+				do {
+					c = *s++;
+				} while (isspace(c));
+				if (c == '-') {
+					neg = 1;
+					c = *s++;
+				}
+				else if (c == '+')
+					c = *s++;
+				if ((base == 0 || base == 16) &&
+					c == '0' && (*s == 'x' || *s == 'X')) {
+					c = s[1];
+					s += 2;
+					base = 16;
+				}
+				if (base == 0)
+					base = c == '0' ? 8 : 10;
+				cutoff = (unsigned long long) ULLONG_MAX / (unsigned long long) base;
+				cutlim = (unsigned long long) ULLONG_MAX % (unsigned long long) base;
+				for (acc = 0, any = 0;; c = *s++) {
+					if (isdigit(c))
+						c -= '0';
+					else if (isalpha(c))
+						c -= isupper(c) ? 'A' - 10 : 'a' - 10;
+					else
+						break;
+					if (c >= base)
+						break;
+					if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+						any = -1;
+					else {
+						any = 1;
+						acc *= base;
+						acc += c;
+					}
+				}
+				if (any < 0) {
+					acc = ULLONG_MAX;
+					errno = ERANGE;
+				}
+				else if (neg)
+					acc = static_cast<unsigned long long >(-acc);
+				if (endptr != 0)
+					*endptr = (char *) (any ? s - 1 : nptr);
+				return (acc);
+			}
+		};
 
-		unsigned long long
-			_cs_to_unsigned_ll(const wchar_t *nptr, wchar_t **endptr, int base)
+		template<>
+		struct _cs_to_unsigned_ll<true>
 		{
-			using namespace std;
+			template<class T>
+			static
+			unsigned long long
+			call(const T *nptr, char **endptr, int base)
+			{
+				using namespace std;
 
-			return wcstoull(nptr, endptr, base);
-		}
-#endif
+				return strtoull(nptr, endptr, base);
+			}
+		};
+
+		template<bool>
+		struct _wcs_to_unsigned_ll
+		{
+			static
+			unsigned long long
+			call(const wchar_t *nptr, wchar_t **endptr, int base)
+			{
+				using namespace std;
+				const wchar_t *s = nptr;
+				unsigned long long acc;
+				int c;
+				unsigned long long cutoff;
+				int neg = 0, any, cutlim;
+
+				/*
+				* See strtol for comments as to the logic used.
+				*/
+				do {
+					c = *s++;
+				} while (isspace(c));
+				if (c == L'-') {
+					neg = 1;
+					c = *s++;
+				}
+				else if (c == L'+')
+					c = *s++;
+				if ((base == 0 || base == 16) &&
+					c == L'0' && (*s == L'x' || *s == L'X')) {
+					c = s[1];
+					s += 2;
+					base = 16;
+				}
+				if (base == 0)
+					base = c == '0' ? 8 : 10;
+				cutoff = (unsigned long long) ULLONG_MAX / (unsigned long long) base;
+				cutlim = (unsigned long long) ULLONG_MAX % (unsigned long long) base;
+				for (acc = 0, any = 0;; c = *s++) {
+					if (isdigit(c))
+						c -= L'0';
+					else if (isalpha(c))
+						c -= isupper(c) ? L'A' - 10 : L'a' - 10;
+					else
+						break;
+					if (c >= base)
+						break;
+					if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+						any = -1;
+					else {
+						any = 1;
+						acc *= base;
+						acc += c;
+					}
+				}
+				if (any < 0) {
+					acc = ULLONG_MAX;
+					errno = ERANGE;
+				}
+				else if (neg)
+					acc = static_cast<unsigned long long >(-acc);
+				if (endptr != 0)
+					*endptr = (wchar_t *) (any ? s - 1 : nptr);
+				return (acc);
+			}
+
+		};
+
+		template<>
+		struct _wcs_to_unsigned_ll<true>
+		{
+			template<class T>
+			static
+			unsigned long long
+			call(const T *nptr, wchar_t **endptr, int base)
+			{
+				using namespace std;
+
+				return wcstoull(nptr, endptr, base);
+			}
+		};
 
 
 		template<bool _IsSigned>
@@ -496,16 +648,16 @@ namespace stdex
 			typedef long long int type;
 			static long long int call(const char* str, char** endptr, int base)
 			{
-				using namespace std;
+				typedef _cs_to_signed_ll<string_detail::_strtoll_present::value> impl;
 
-				return _cs_to_signed_ll(str, endptr, base);
+				return impl::call(str, endptr, base);
 			}
 
 			static long long int call(const wchar_t* str, wchar_t** endptr, int base)
 			{
-				using namespace std;
+				typedef _wcs_to_signed_ll<string_detail::_wcstoll_present::value> impl;
 
-				return _cs_to_signed_ll(str, endptr, base);
+				return impl::call(str, endptr, base);
 			}
 
 			static bool check(const long long int &_value)
@@ -532,16 +684,16 @@ namespace stdex
 			typedef unsigned long long int type;
 			static unsigned long long int call(const char* str, char** endptr, int base)
 			{
-				using namespace std;
+				typedef _cs_to_unsigned_ll<string_detail::_strtoull_present::value> impl;
 
-				return _cs_to_unsigned_ll(str, endptr, base);
+				return impl::call(str, endptr, base);
 			}
 
 			static unsigned long long int call(const wchar_t* str, wchar_t** endptr, int base)
 			{
-				using namespace std;
+				typedef _wcs_to_unsigned_ll<string_detail::_wcstoull_present::value> impl;
 
-				return _cs_to_unsigned_ll(str, endptr, base);
+				return impl::call(str, endptr, base);
 			}
 
 			static bool check(const unsigned long long int &_value)
@@ -594,7 +746,10 @@ namespace stdex
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
 			else if (_value > std::numeric_limits<_T>::max() || _value < std::numeric_limits<_T>::min())
+			{
+				_value = std::numeric_limits<_T>::max();
 				num_s_end = 0;
+			}
 			else
 				num_s_end = endptr;
 
@@ -618,7 +773,10 @@ namespace stdex
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
 			else if (_value > std::numeric_limits<_T>::max() || _value < std::numeric_limits<_T>::min())
+			{
+				_value = std::numeric_limits<_T>::max();
 				num_s_end = 0;
+			}
 			else
 				num_s_end = endptr;
 
@@ -642,7 +800,10 @@ namespace stdex
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
 			else if (_value > std::numeric_limits<_T>::max() || _value < std::numeric_limits<_T>::min())
+			{
+				_value = std::numeric_limits<_T>::max();
 				num_s_end = 0;
+			}
 			else
 				num_s_end = endptr;
 
@@ -665,7 +826,10 @@ namespace stdex
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
 			else if (_value > std::numeric_limits<_T>::max() || _value < std::numeric_limits<_T>::min())
+			{
+				_value = std::numeric_limits<_T>::max();
 				num_s_end = 0;
+			}
 			else
 				num_s_end = endptr;
 
@@ -693,7 +857,10 @@ namespace stdex
 #endif
 				num_s_end = 0;
 			else if (_value > std::numeric_limits<_T>::max() || _value < -std::numeric_limits<_T>::max())
+			{
+				_value = std::numeric_limits<_T>::max();
 				num_s_end = 0;
+			}
 			else
 				num_s_end = endptr;
 
@@ -720,7 +887,10 @@ namespace stdex
 #endif
 				num_s_end = 0;
 			else if (_value > std::numeric_limits<_T>::max() || _value < -std::numeric_limits<_T>::max())
+			{
+				_value = std::numeric_limits<_T>::max();
 				num_s_end = 0;
+			}
 			else
 				num_s_end = endptr;
 
@@ -729,396 +899,408 @@ namespace stdex
 
 			return _value;
 		}
+
+
+
+		template<bool>
+		struct _cs_to_floating_point_ld
+		{
+			template<class T>
+			static long double
+			call(const T *str, const char *&num_s_end)
+			{
+				using namespace std;
+
+				int last_errno = errno;
+				errno = 0;
+				char *endptr = 0;
+				long double _value = strtold(str, &endptr);
 
 #ifdef HUGE_VALL
-		template <>
-		inline long double _cs_to_floating_point<long double>(const char *str, const char *&num_s_end)
+				if ((_value == HUGE_VALL || _value == -HUGE_VALL) && errno == ERANGE)
+#else		
+				if(errno == ERANGE)
+#endif
+					num_s_end = 0;
+				else
+					num_s_end = endptr;
+
+				if (errno != last_errno)
+					errno = last_errno;
+
+				return _value;
+			}
+
+			template<class T>
+			static long double
+			call(const T *str, const wchar_t *&num_s_end)
+			{
+				using namespace std;
+
+				int last_errno = errno;
+				errno = 0;
+				wchar_t *endptr = 0;
+				long double _value = wcstold(str, &endptr);
+
+#ifdef HUGE_VALL
+				if ((_value == HUGE_VALL || _value == -HUGE_VALL) && errno == ERANGE)
+#else		
+				if(errno == ERANGE)
+#endif
+					num_s_end = 0;
+				else
+					num_s_end = endptr;
+
+				if (errno != last_errno)
+					errno = last_errno;
+
+				return _value;
+			}
+		};
+
+		template<>
+		struct _cs_to_floating_point_ld<false>
 		{
-			using namespace std;
-
-			int last_errno = errno;
-			errno = 0;
-			char *endptr = 0;
-			long double _value = strtold(str, &endptr);
-
-			if ((_value == HUGE_VALL || _value == -HUGE_VALL) && errno == ERANGE)
-				num_s_end = 0;
-			else
-				num_s_end = endptr;
-
-			if (errno != last_errno)
-				errno = last_errno;
-
-			return _value;
-		}
-
-		template <>
-		inline long double _cs_to_floating_point<long double>(const wchar_t *str, const wchar_t *&num_s_end)
-		{
-			using namespace std;
-
-			int last_errno = errno;
-			errno = 0;
-			wchar_t *endptr = 0;
-			long double _value = wcstold(str, &endptr);
-
-			if ((_value == HUGE_VALL || _value == -HUGE_VALL) && errno == ERANGE)
-				num_s_end = 0;
-			else
-				num_s_end = endptr;
-
-			if (errno != last_errno)
-				errno = last_errno;
-
-			return _value;
-		}
-#else
-		long double
+			static long double
 			_a_to_floating_point(const char *str)
-		{
-			using namespace std;
-
-			long double value;
-
-			if (sscanf(str, "%Lf", &value) == EOF)
 			{
+				using namespace std;
 
-			  long double fp_integer_part = 0.0L, fp_fractional_part = 0.0L;
-			  size_t i, length = strlen(str);
+				long double value;
 
-			  i = 0; // Left to right
-			  while (str[i] != '.') {
-				  fp_integer_part = fp_integer_part * 10.0L + (str[i] - '0');
-				  i++;
-			  }
-
-			
-			  i = length - 1; // Right to left
-
-			  while (!isdigit(str[i]) && str[i] != '.')
-				 i--;
-
-			  while (str[i] != '.') {
-				  fp_fractional_part = (fp_fractional_part + (str[i] - '0')) / 10.0L;
-				  i--;
-			  }
-
-			  value = fp_integer_part + fp_fractional_part;
-			}
-
-			if(value > numeric_limits<long double>::max() || value < numeric_limits<long double>::min())
-			{
-			  errno = ERANGE;
-			  value = 0.0;
-			}
-
-			return value;
-		}
-
-		long double
-			_a_to_floating_point(const wchar_t *str)
-		{
-			using namespace std;
-
-			long double value;
-
-			if (swscanf(str, L"%Lf", &value) == EOF)
-			{
+				if (sscanf(str, "%Lf", &value) == EOF)
+				{
 
 				long double fp_integer_part = 0.0L, fp_fractional_part = 0.0L;
-				size_t i, length = wcslen(str);
+				size_t i, length = strlen(str);
 
 				i = 0; // Left to right
-				while (str[i] != L'.') {
-					fp_integer_part = fp_integer_part * 10.0L + (str[i] - L'0');
+				while (str[i] != '.') {
+					fp_integer_part = fp_integer_part * 10.0L + (str[i] - '0');
 					i++;
 				}
 
-
+				
 				i = length - 1; // Right to left
 
-				while (!isdigit(str[i]) && str[i] != L'.')
+				while (!isdigit(str[i]) && str[i] != '.')
 					i--;
 
-				while (str[i] != L'.') {
-					fp_fractional_part = (fp_fractional_part + (str[i] - L'0')) / 10.0L;
+				while (str[i] != '.') {
+					fp_fractional_part = (fp_fractional_part + (str[i] - '0')) / 10.0L;
 					i--;
 				}
 
 				value = fp_integer_part + fp_fractional_part;
-			}
+				}
 
-			if (value > numeric_limits<long double>::max() || value < numeric_limits<long double>::min())
-			{
+				if(value > numeric_limits<long double>::max() || value < numeric_limits<long double>::min())
+				{
 				errno = ERANGE;
 				value = 0.0;
+				}
+
+				return value;
 			}
 
-			return value;
-		}
-
-		long double
-			_cs_to_long_double(const char *str, char const **ptr)
-		{
-			using namespace std;
-
-			const char *p;
-
-			if (!ptr)
-				return _a_to_floating_point(str);
-
-			p = str;
-
-			while (isspace(*p))
-				++p;
-
-			if (*p == '+' || *p == '-')
-				++p;
-
-			typedef _not_a_number<long double>::impl not_a_number_impl;
-			typedef _infinity<long double>::impl infinity_impl;
-
-			/* INF or INFINITY.  */
-			if ((p[0] == 'i' || p[0] == 'I')
-				&& (p[1] == 'n' || p[1] == 'N')
-				&& (p[2] == 'f' || p[2] == 'F'))
-			{
-				if ((p[3] == 'i' || p[3] == 'I')
-					&& (p[4] == 'n' || p[4] == 'N')
-					&& (p[5] == 'i' || p[5] == 'I')
-					&& (p[6] == 't' || p[6] == 'T')
-					&& (p[7] == 'y' || p[7] == 'Y'))
-				{
-					*ptr = p + 8;
-					return infinity_impl::inf();
-				}
-				else
-				{
-					*ptr = p + 3;
-					return infinity_impl::inf();
-				}
-			}
-
-			/* NAN or NAN(foo).  */
-			if ((p[0] == 'n' || p[0] == 'N')
-				&& (p[1] == 'a' || p[1] == 'A')
-				&& (p[2] == 'n' || p[2] == 'N'))
-			{
-				p += 3;
-				if (*p == '(')
-				{
-					++p;
-					while (*p != '\0' && *p != ')')
-						++p;
-					if (*p == ')')
-						++p;
-				}
-				*ptr = p;
-				return not_a_number_impl::NaN();
-			}
-
-			/* digits, with 0 or 1 periods in it.  */
-			if (isdigit(*p) || *p == '.')
-			{
-				int got_dot = 0;
-				while (isdigit(*p) || (!got_dot && *p == '.'))
-				{
-					if (*p == '.')
-						got_dot = 1;
-					++p;
-				}
-
-				/* Exponent.  */
-				if (*p == 'e' || *p == 'E')
-				{
-					int i;
-					i = 1;
-					if (p[i] == '+' || p[i] == '-')
-						++i;
-					if (isdigit(p[i]))
-					{
-						while (isdigit(p[i]))
-							++i;
-						*ptr = p + i;
-						if (std::numeric_limits<long double>::max_exponent10 < i)
-						{
-							errno = ERANGE;
-							return std::numeric_limits<long double>::max();
-						}
-						return _a_to_floating_point(str);
-					}
-				}
-				*ptr = p;
-				return _a_to_floating_point(str);
-			}
-			/* Didn't find any digits.  Doesn't look like a number.  */
-			*ptr = str;
-			return not_a_number_impl::NaN();
-		}
-
-		long double
-			_cs_to_long_double(const wchar_t *str, wchar_t const **ptr)
-		{
-			using namespace std;
-
-			const wchar_t *p;
-
-			if (!ptr)
-				return _a_to_floating_point(str);
-
-			p = str;
-
-			while (isspace(*p))
-				++p;
-
-			if (*p == L'+' || *p == L'-')
-				++p;
-
-			typedef _not_a_number<long double>::impl not_a_number_impl;
-			typedef _infinity<long double>::impl infinity_impl;
-
-			/* INF or INFINITY.  */
-			if ((p[0] == L'i' || p[0] == L'I')
-				&& (p[1] == L'n' || p[1] == L'N')
-				&& (p[2] == L'f' || p[2] == L'F'))
-			{
-				if ((p[3] == L'i' || p[3] == L'I')
-					&& (p[4] == L'n' || p[4] == L'N')
-					&& (p[5] == L'i' || p[5] == L'I')
-					&& (p[6] == L't' || p[6] == L'T')
-					&& (p[7] == L'y' || p[7] == L'Y'))
-				{
-					*ptr = p + 8;
-					return infinity_impl::inf();
-				}
-				else
-				{
-					*ptr = p + 3;
-					return infinity_impl::inf();
-				}
-			}
-
-			/* NAN or NAN(foo).  */
-			if ((p[0] == L'n' || p[0] == L'N')
-				&& (p[1] == L'a' || p[1] == L'A')
-				&& (p[2] == L'n' || p[2] == L'N'))
-			{
-				p += 3;
-				if (*p == L'(')
-				{
-					++p;
-					while (*p != L'\0' && *p != L')')
-						++p;
-					if (*p == L')')
-						++p;
-				}
-				*ptr = p;
-				return not_a_number_impl::NaN();
-			}
-
-			/* digits, with 0 or 1 periods in it.  */
-			if (isdigit(*p) || *p == L'.')
-			{
-				int got_dot = 0;
-				while (isdigit(*p) || (!got_dot && *p == L'.'))
-				{
-					if (*p == L'.')
-						got_dot = 1;
-					++p;
-				}
-
-				/* Exponent.  */
-				if (*p == L'e' || *p == L'E')
-				{
-					int i;
-					i = 1;
-					if (p[i] == L'+' || p[i] == L'-')
-						++i;
-					if (isdigit(p[i]))
-					{
-						while (isdigit(p[i]))
-							++i;
-						*ptr = p + i;
-						if (std::numeric_limits<long double>::max_exponent10 < i)
-						{
-							errno = ERANGE;
-							return std::numeric_limits<long double>::max();
-						}
-						return _a_to_floating_point(str);
-					}
-				}
-				*ptr = p;
-				return _a_to_floating_point(str);
-			}
-			/* Didn't find any digits.  Doesn't look like a number.  */
-			*ptr = str;
-			return not_a_number_impl::NaN();
-		}
-
-		template <>
-		inline long double _cs_to_floating_point<long double>(const char *str, const char *&num_s_end)
-		{
-			using namespace std;
-
-			int last_errno = errno;
-			errno = 0;
-			long double _value = _cs_to_long_double(str, &num_s_end);
-
-			if (errno == ERANGE)
-				num_s_end = 0;
-
-			if (errno != last_errno)
-				errno = last_errno;
-
-			return _value;
-		}
-
-		template <>
-		inline long double _cs_to_floating_point<long double>(const wchar_t *str, const wchar_t *&num_s_end)
-		{
-			using namespace std;
-
-			int last_errno = errno;
-			errno = 0;
-			long double _value = _cs_to_long_double(str, &num_s_end);
-
-			if (errno == ERANGE)
-				num_s_end = 0;
-
-			if (errno != last_errno)
-				errno = last_errno;
-
-			return _value;
-		}
-#endif
-
-		namespace string_detail
-		{
-			typedef char _yes_type;
-			struct _no_type
-			{
-				char padding[8];
-			};
-
-			template<class RetT, class Arg2T>
-			_yes_type _has_4arg_swprintf_tester(RetT(*)(wchar_t*, Arg2T, const wchar_t*, ...));
-			template<class RetT, class Arg2T, class Arg4T>
-			_yes_type _has_4arg_swprintf_tester(RetT(*)(wchar_t*, Arg2T, const wchar_t*, Arg4T));
-			_no_type _has_4arg_swprintf_tester(...);
-
-			namespace swprintf_detail
+			static long double
+			_a_to_floating_point(const wchar_t *str)
 			{
 				using namespace std;
 
-				struct _has_4arg_swprintf
+				long double value;
+
+				if (swscanf(str, L"%Lf", &value) == EOF)
 				{
-					static const bool value = sizeof(string_detail::_has_4arg_swprintf_tester(&swprintf)) == sizeof(string_detail::_yes_type);
-				};
+
+					long double fp_integer_part = 0.0L, fp_fractional_part = 0.0L;
+					size_t i, length = wcslen(str);
+
+					i = 0; // Left to right
+					while (str[i] != L'.') {
+						fp_integer_part = fp_integer_part * 10.0L + (str[i] - L'0');
+						i++;
+					}
+
+
+					i = length - 1; // Right to left
+
+					while (!isdigit(str[i]) && str[i] != L'.')
+						i--;
+
+					while (str[i] != L'.') {
+						fp_fractional_part = (fp_fractional_part + (str[i] - L'0')) / 10.0L;
+						i--;
+					}
+
+					value = fp_integer_part + fp_fractional_part;
+				}
+
+				if (value > numeric_limits<long double>::max() || value < numeric_limits<long double>::min())
+				{
+					errno = ERANGE;
+					value = 0.0;
+				}
+
+				return value;
 			}
+
+			static long double
+			_cs_to_long_double(const char *str, char const **ptr)
+			{
+				using namespace std;
+
+				const char *p;
+
+				if (!ptr)
+					return _a_to_floating_point(str);
+
+				p = str;
+
+				while (isspace(*p))
+					++p;
+
+				if (*p == '+' || *p == '-')
+					++p;
+
+				typedef _not_a_number<long double>::impl not_a_number_impl;
+				typedef _infinity<long double>::impl infinity_impl;
+
+				/* INF or INFINITY.  */
+				if ((p[0] == 'i' || p[0] == 'I')
+					&& (p[1] == 'n' || p[1] == 'N')
+					&& (p[2] == 'f' || p[2] == 'F'))
+				{
+					if ((p[3] == 'i' || p[3] == 'I')
+						&& (p[4] == 'n' || p[4] == 'N')
+						&& (p[5] == 'i' || p[5] == 'I')
+						&& (p[6] == 't' || p[6] == 'T')
+						&& (p[7] == 'y' || p[7] == 'Y'))
+					{
+						*ptr = p + 8;
+						return infinity_impl::inf();
+					}
+					else
+					{
+						*ptr = p + 3;
+						return infinity_impl::inf();
+					}
+				}
+
+				/* NAN or NAN(foo).  */
+				if ((p[0] == 'n' || p[0] == 'N')
+					&& (p[1] == 'a' || p[1] == 'A')
+					&& (p[2] == 'n' || p[2] == 'N'))
+				{
+					p += 3;
+					if (*p == '(')
+					{
+						++p;
+						while (*p != '\0' && *p != ')')
+							++p;
+						if (*p == ')')
+							++p;
+					}
+					*ptr = p;
+					return not_a_number_impl::NaN();
+				}
+
+				/* digits, with 0 or 1 periods in it.  */
+				if (isdigit(*p) || *p == '.')
+				{
+					int got_dot = 0;
+					while (isdigit(*p) || (!got_dot && *p == '.'))
+					{
+						if (*p == '.')
+							got_dot = 1;
+						++p;
+					}
+
+					/* Exponent.  */
+					if (*p == 'e' || *p == 'E')
+					{
+						int i;
+						i = 1;
+						if (p[i] == '+' || p[i] == '-')
+							++i;
+						if (isdigit(p[i]))
+						{
+							while (isdigit(p[i]))
+								++i;
+							*ptr = p + i;
+							if (std::numeric_limits<long double>::max_exponent10 < i)
+							{
+								errno = ERANGE;
+								return std::numeric_limits<long double>::max();
+							}
+							return _a_to_floating_point(str);
+						}
+					}
+					*ptr = p;
+					return _a_to_floating_point(str);
+				}
+				/* Didn't find any digits.  Doesn't look like a number.  */
+				*ptr = str;
+				return not_a_number_impl::NaN();
+			}
+
+			static long double
+			_cs_to_long_double(const wchar_t *str, wchar_t const **ptr)
+			{
+				using namespace std;
+
+				const wchar_t *p;
+
+				if (!ptr)
+					return _a_to_floating_point(str);
+
+				p = str;
+
+				while (isspace(*p))
+					++p;
+
+				if (*p == L'+' || *p == L'-')
+					++p;
+
+				typedef _not_a_number<long double>::impl not_a_number_impl;
+				typedef _infinity<long double>::impl infinity_impl;
+
+				/* INF or INFINITY.  */
+				if ((p[0] == L'i' || p[0] == L'I')
+					&& (p[1] == L'n' || p[1] == L'N')
+					&& (p[2] == L'f' || p[2] == L'F'))
+				{
+					if ((p[3] == L'i' || p[3] == L'I')
+						&& (p[4] == L'n' || p[4] == L'N')
+						&& (p[5] == L'i' || p[5] == L'I')
+						&& (p[6] == L't' || p[6] == L'T')
+						&& (p[7] == L'y' || p[7] == L'Y'))
+					{
+						*ptr = p + 8;
+						return infinity_impl::inf();
+					}
+					else
+					{
+						*ptr = p + 3;
+						return infinity_impl::inf();
+					}
+				}
+
+				/* NAN or NAN(foo).  */
+				if ((p[0] == L'n' || p[0] == L'N')
+					&& (p[1] == L'a' || p[1] == L'A')
+					&& (p[2] == L'n' || p[2] == L'N'))
+				{
+					p += 3;
+					if (*p == L'(')
+					{
+						++p;
+						while (*p != L'\0' && *p != L')')
+							++p;
+						if (*p == L')')
+							++p;
+					}
+					*ptr = p;
+					return not_a_number_impl::NaN();
+				}
+
+				/* digits, with 0 or 1 periods in it.  */
+				if (isdigit(*p) || *p == L'.')
+				{
+					int got_dot = 0;
+					while (isdigit(*p) || (!got_dot && *p == L'.'))
+					{
+						if (*p == L'.')
+							got_dot = 1;
+						++p;
+					}
+
+					/* Exponent.  */
+					if (*p == L'e' || *p == L'E')
+					{
+						int i;
+						i = 1;
+						if (p[i] == L'+' || p[i] == L'-')
+							++i;
+						if (isdigit(p[i]))
+						{
+							while (isdigit(p[i]))
+								++i;
+							*ptr = p + i;
+							if (std::numeric_limits<long double>::max_exponent10 < i)
+							{
+								errno = ERANGE;
+								return std::numeric_limits<long double>::max();
+							}
+							return _a_to_floating_point(str);
+						}
+					}
+					*ptr = p;
+					return _a_to_floating_point(str);
+				}
+				/* Didn't find any digits.  Doesn't look like a number.  */
+				*ptr = str;
+				return not_a_number_impl::NaN();
+			}
+
+			static long double
+			call(const char *str, const char *&num_s_end)
+			{
+				int last_errno = errno;
+				errno = 0;
+				long double _value = _cs_to_long_double(str, &num_s_end);
+
+				if (errno == ERANGE)
+					num_s_end = 0;
+
+				if (errno != last_errno)
+					errno = last_errno;
+
+				return _value;
+			}
+
+			static long double
+			call(const wchar_t *str, const wchar_t *&num_s_end)
+			{
+				int last_errno = errno;
+				errno = 0;
+				long double _value = _cs_to_long_double(str, &num_s_end);
+
+				if (errno == ERANGE)
+					num_s_end = 0;
+
+				if (errno != last_errno)
+					errno = last_errno;
+
+				return _value;
+			}
+		};
+
+
+
+
+		template <>
+		inline 
+		long double
+		_cs_to_floating_point<long double>(const char *str, const char *&num_s_end)
+		{
+			typedef _cs_to_floating_point_ld<string_detail::_strtold_present::value> impl;
+
+			return impl::call(str, num_s_end);
+		}
+
+		template <>
+		inline 
+		long double
+		_cs_to_floating_point<long double>(const wchar_t *str, const wchar_t *&num_s_end)
+		{
+			typedef _cs_to_floating_point_ld<string_detail::_wcstold_present::value> impl;
+
+			return impl::call(str, num_s_end);
 		}
 
 		struct _has_4arg_swprintf:
-			public string_detail::swprintf_detail::_has_4arg_swprintf
+			public string_detail::_has_4arg_swprintf
 		{};
 
 		template<bool> struct _swprintf_impl;
@@ -1289,7 +1471,7 @@ namespace stdex
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
-		float _value = detail::_cs_to_floating_point<float>(_ptr, _eptr);
+		float _value = static_cast<float>(detail::_cs_to_floating_point<float>(_ptr, _eptr));
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stof argument"));
@@ -1306,7 +1488,7 @@ namespace stdex
 	{
 		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
 
-		float _value = detail::_cs_to_floating_point<float>(_ptr, _eptr);
+		float _value = static_cast<float>(detail::_cs_to_floating_point<float>(_ptr, _eptr));
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid wide stdex::stof argument"));
@@ -1391,7 +1573,7 @@ namespace stdex
 		return (_value);
 	}
 
-#ifdef LLONG_MAX
+#if defined(LLONG_MAX) || defined(LLONG_MIN)
 	inline int64_t stoll(const string &s, size_t *idx = 0, int base = 10)
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
@@ -1827,7 +2009,7 @@ namespace stdex
 		return result;
 	}
 
-#ifdef LLONG_MAX
+#if defined(LLONG_MAX) || defined(LLONG_MIN)
 
 	template<>
 	inline

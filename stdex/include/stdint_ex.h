@@ -5,9 +5,16 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+// stdex includes
 #include "./core.h"
 
-#ifdef _STDEX_NATIVE_CPP11_TYPES_SUPPORT
+// POSIX includes
+/*none*/
+
+// std includes
+#include <climits>
+
+#if defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT) || (defined(__CODEGEARC__)) // temporary, bc Embarcadero is .....!
 	#include <stdint.h>
 #else
 	#if (defined(_MSC_VER) || defined(__BORLANDC__))
