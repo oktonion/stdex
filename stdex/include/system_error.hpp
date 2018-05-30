@@ -264,7 +264,11 @@ namespace stdex
 #else
 			stream_timeout = 137,
 #endif
+#ifdef ETXTBSY
 			text_file_busy = ETXTBSY,
+#else
+			text_file_busy = 139,
+#endif
 #ifdef ETIMEDOUT
 			timed_out = ETIMEDOUT,
 #else
