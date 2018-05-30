@@ -158,14 +158,44 @@ namespace stdex
 			{
 				using namespace std;
 
-				return strtol(str, endptr, base);
+				errno = 0;
+
+				long int value = strtol(str, endptr, base);
+
+				if (errno && !value && endptr && str)
+				{
+					for (const char *it = str; it != *endptr; it++)
+					{
+						if (isdigit(*it) && *it != '0')
+						{
+							return LONG_MAX;
+						}
+					}
+				}
+
+				return value;
 			}
 
 			static long int call(const wchar_t* str, wchar_t** endptr, int base)
 			{
 				using namespace std;
 
-				return wcstol(str, endptr, base);
+				errno = 0;
+
+				long int value = wcstol(str, endptr, base);
+
+				if (errno && !value && endptr && str)
+				{
+					for (const wchar_t *it = str; it != *endptr; it++)
+					{
+						if (iswdigit(*it) && *it != L'0')
+						{
+							return LONG_MAX;
+						}
+					}
+				}
+
+				return value;
 			}
 
 			static bool check(long int _value)
@@ -378,7 +408,15 @@ namespace stdex
 			{
 				using namespace std;
 
-				return strtoll(nptr, endptr, base);
+				errno = 0;
+				string_detail::_long_long_type value = strtoll(nptr, endptr, base);
+
+				if (errno && !value)
+				{
+					return _cs_to_signed_ll<false>::call(nptr, endptr, base);
+				}
+
+				return value;
 			}
 		};
 
@@ -478,7 +516,15 @@ namespace stdex
 			{
 				using namespace std;
 
-				return wcstoll(nptr, endptr, base);
+				errno = 0;
+				string_detail::_long_long_type value = wcstoll(nptr, endptr, base);
+
+				if (errno && !value)
+				{
+					return _wcs_to_signed_ll<false>::call(nptr, endptr, base);
+				}
+
+				return value;
 			}
 		};
 		
@@ -768,7 +814,6 @@ namespace stdex
 			errno = 0;
 			wchar_t *endptr = 0;
 			typename _str_to_integral::type _value = _str_to_integral::call(s, &endptr, base);
-
 
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
