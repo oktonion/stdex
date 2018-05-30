@@ -105,6 +105,11 @@ namespace stdex
 
 				void *_padding;
 			};
+
+			namespace ptrdiff_detail
+			{
+				using namespace std;
+			}
 			
 			template<bool>
 			struct nullptr_t_as_long_type { typedef long type; };
@@ -118,8 +123,12 @@ namespace stdex
 			struct nullptr_t_as_int_type { typedef int type; };
 			template<>
 			struct nullptr_t_as_int_type<false> { typedef nullptr_t_as_short_type<sizeof(short) == sizeof(void*)>::type type; };
+			template<bool>
+			struct nullptr_t_as_ptrdiff_type { typedef ptrdiff_detail::ptrdiff_t type; };
+			template<>
+			struct nullptr_t_as_ptrdiff_type<false> { typedef nullptr_t_as_int_type<sizeof(int) == sizeof(void*)>::type type; };
 
-			typedef nullptr_t_as_int_type<sizeof(int) == sizeof(void*)>::type nullptr_t_as_int;
+			typedef nullptr_t_as_ptrdiff_type<sizeof(ptrdiff_detail::ptrdiff_t) == sizeof(void*)>::type nullptr_t_as_int;
 
 			template<bool>
 			struct nullptr_t_as_ulong_type { typedef unsigned long type; };
