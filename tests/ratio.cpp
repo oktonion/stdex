@@ -3,7 +3,7 @@
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 
-static const stdex::intmax_t M = __INTMAX_MAX;
+static const stdex::intmax_t M = stdex::_intmax_t_info::signed_max;
 
 int main(void)
 {
