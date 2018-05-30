@@ -361,7 +361,7 @@ namespace stdex
 					errno = ERANGE;
 				}
 				else if (neg)
-					acc = -acc;
+					acc = static_cast<unsigned long long >(-acc);
 				if (endptr != 0)
 					*endptr = (char *) (any ? s - 1 : nptr);
 				return (acc);
@@ -461,7 +461,7 @@ namespace stdex
 					errno = ERANGE;
 				}
 				else if (neg)
-					acc = -acc;
+					acc = static_cast<unsigned long long >(-acc);
 				if (endptr != 0)
 					*endptr = (wchar_t *) (any ? s - 1 : nptr);
 				return (acc);
@@ -540,7 +540,7 @@ namespace stdex
 					errno = ERANGE;
 				}
 				else if (neg)
-					acc = -acc;
+					acc = static_cast<unsigned long long >(-acc);
 				if (endptr != 0)
 					*endptr = (char *) (any ? s - 1 : nptr);
 				return (acc);
@@ -619,7 +619,7 @@ namespace stdex
 					errno = ERANGE;
 				}
 				else if (neg)
-					acc = -acc;
+					acc = static_cast<unsigned long long >(-acc);
 				if (endptr != 0)
 					*endptr = (wchar_t *) (any ? s - 1 : nptr);
 				return (acc);
@@ -1471,7 +1471,7 @@ namespace stdex
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
-		float _value = detail::_cs_to_floating_point<float>(_ptr, _eptr);
+		float _value = static_cast<float>(detail::_cs_to_floating_point<float>(_ptr, _eptr));
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stof argument"));
@@ -1488,7 +1488,7 @@ namespace stdex
 	{
 		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
 
-		float _value = detail::_cs_to_floating_point<float>(_ptr, _eptr);
+		float _value = static_cast<float>(detail::_cs_to_floating_point<float>(_ptr, _eptr));
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid wide stdex::stof argument"));
