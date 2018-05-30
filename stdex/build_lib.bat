@@ -7,7 +7,7 @@ cd ..
 set INCLUDE=%INCLUDE%%cd%\pthread;
 
 echo "compiling %VisualStudioVersion% pthread-win32"
-cl -EHsc -Fo.\stdex\obj\pthread.obj -c ".\pthread-win32\pthread.c"
+cl -EHsc -Fo.\stdex\obj\pthread.obj -D HAVE_CONFIG_H -c ".\pthread-win32\pthread.c"
 if /I "%ERRORLEVEL%" NEQ "0" (
     echo failed
     return 1
