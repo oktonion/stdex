@@ -12,7 +12,7 @@ using namespace stdex;
 using namespace stdex::chrono;
 
 
-#ifndef CLOCK_REALTIME // assuming we are on windows platform and have no realtime clock
+#if defined(WIN32) || defined(_WIN32) // assuming we are on windows platform and have no realtime clock
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
