@@ -286,14 +286,14 @@ namespace stdex
 		struct _cs_to_signed_ll
 		{
 			static
-			long long
+			string_detail::_long_long_type
 			call(const char *nptr, char **endptr, int base)
 			{
 				using namespace std;
 				const char *s = nptr;
-				unsigned long long acc;
+				string_detail::_unsigned_long_long_type acc;
 				int c;
-				unsigned long long cutoff;
+				string_detail::_unsigned_long_long_type cutoff;
 				int neg = 0, any, cutlim;
 
 				/*
@@ -336,9 +336,9 @@ namespace stdex
 				* Set any if any `digits' consumed; make it negative to indicate
 				* overflow.
 				*/
-				cutoff = neg ? -(unsigned long long) LLONG_MIN : LLONG_MAX;
-				cutlim = cutoff % (unsigned long long) base;
-				cutoff /= (unsigned long long) base;
+				cutoff = neg ? -(string_detail::_unsigned_long_long_type) LLONG_MIN : LLONG_MAX;
+				cutlim = cutoff % (string_detail::_unsigned_long_long_type) base;
+				cutoff /= (string_detail::_unsigned_long_long_type) base;
 				for (acc = 0, any = 0;; c = *s++) {
 					if (isdigit(c))
 						c -= '0';
@@ -361,7 +361,7 @@ namespace stdex
 					errno = ERANGE;
 				}
 				else if (neg)
-					acc = static_cast<unsigned long long >(-acc);
+					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc);
 				if (endptr != 0)
 					*endptr = (char *) (any ? s - 1 : nptr);
 				return (acc);
@@ -373,7 +373,7 @@ namespace stdex
 		{
 			template<class T>
 			static
-			long long
+			string_detail::_long_long_type
 			call(const T *nptr, char **endptr, int base)
 			{
 				using namespace std;
@@ -386,14 +386,14 @@ namespace stdex
 		struct _wcs_to_signed_ll
 		{
 			static
-			long long
+			string_detail::_long_long_type
 			call(const wchar_t *nptr, wchar_t **endptr, int base)
 			{
 				using namespace std;
 				const wchar_t *s = nptr;
-				unsigned long long acc;
+				string_detail::_unsigned_long_long_type acc;
 				int c;
-				unsigned long long cutoff;
+				string_detail::_unsigned_long_long_type cutoff;
 				int neg = 0, any, cutlim;
 
 				/*
@@ -436,9 +436,9 @@ namespace stdex
 				* Set any if any `digits' consumed; make it negative to indicate
 				* overflow.
 				*/
-				cutoff = neg ? -(unsigned long long) LLONG_MIN : LLONG_MAX;
-				cutlim = cutoff % (unsigned long long) base;
-				cutoff /= (unsigned long long) base;
+				cutoff = neg ? -(string_detail::_unsigned_long_long_type) LLONG_MIN : LLONG_MAX;
+				cutlim = cutoff % (string_detail::_unsigned_long_long_type) base;
+				cutoff /= (string_detail::_unsigned_long_long_type) base;
 				for (acc = 0, any = 0;; c = *s++) {
 					if (isdigit(c))
 						c -= L'0';
@@ -461,7 +461,7 @@ namespace stdex
 					errno = ERANGE;
 				}
 				else if (neg)
-					acc = static_cast<unsigned long long >(-acc);
+					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc);
 				if (endptr != 0)
 					*endptr = (wchar_t *) (any ? s - 1 : nptr);
 				return (acc);
@@ -473,7 +473,7 @@ namespace stdex
 		{
 			template<class T>
 			static
-			long long
+			string_detail::_long_long_type
 			call(const T *nptr, wchar_t **endptr, int base)
 			{
 				using namespace std;
@@ -486,14 +486,14 @@ namespace stdex
 		struct _cs_to_unsigned_ll
 		{
 			static
-			unsigned long long
+			string_detail::_unsigned_long_long_type
 			call(const char *nptr, char **endptr, int base)
 			{
 				using namespace std;
 				const char *s = nptr;
-				unsigned long long acc;
+				string_detail::_unsigned_long_long_type acc;
 				int c;
-				unsigned long long cutoff;
+				string_detail::_unsigned_long_long_type cutoff;
 				int neg = 0, any, cutlim;
 
 				/*
@@ -516,8 +516,8 @@ namespace stdex
 				}
 				if (base == 0)
 					base = c == '0' ? 8 : 10;
-				cutoff = (unsigned long long) ULLONG_MAX / (unsigned long long) base;
-				cutlim = (unsigned long long) ULLONG_MAX % (unsigned long long) base;
+				cutoff = (string_detail::_unsigned_long_long_type) ULLONG_MAX / (string_detail::_unsigned_long_long_type) base;
+				cutlim = (string_detail::_unsigned_long_long_type) ULLONG_MAX % (string_detail::_unsigned_long_long_type) base;
 				for (acc = 0, any = 0;; c = *s++) {
 					if (isdigit(c))
 						c -= '0';
@@ -540,7 +540,7 @@ namespace stdex
 					errno = ERANGE;
 				}
 				else if (neg)
-					acc = static_cast<unsigned long long >(-acc);
+					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc);
 				if (endptr != 0)
 					*endptr = (char *) (any ? s - 1 : nptr);
 				return (acc);
@@ -552,7 +552,7 @@ namespace stdex
 		{
 			template<class T>
 			static
-			unsigned long long
+			string_detail::_unsigned_long_long_type
 			call(const T *nptr, char **endptr, int base)
 			{
 				using namespace std;
@@ -565,14 +565,14 @@ namespace stdex
 		struct _wcs_to_unsigned_ll
 		{
 			static
-			unsigned long long
+			string_detail::_unsigned_long_long_type
 			call(const wchar_t *nptr, wchar_t **endptr, int base)
 			{
 				using namespace std;
 				const wchar_t *s = nptr;
-				unsigned long long acc;
+				string_detail::_unsigned_long_long_type acc;
 				int c;
-				unsigned long long cutoff;
+				string_detail::_unsigned_long_long_type cutoff;
 				int neg = 0, any, cutlim;
 
 				/*
@@ -595,8 +595,8 @@ namespace stdex
 				}
 				if (base == 0)
 					base = c == '0' ? 8 : 10;
-				cutoff = (unsigned long long) ULLONG_MAX / (unsigned long long) base;
-				cutlim = (unsigned long long) ULLONG_MAX % (unsigned long long) base;
+				cutoff = (string_detail::_unsigned_long_long_type) ULLONG_MAX / (string_detail::_unsigned_long_long_type) base;
+				cutlim = (string_detail::_unsigned_long_long_type) ULLONG_MAX % (string_detail::_unsigned_long_long_type) base;
 				for (acc = 0, any = 0;; c = *s++) {
 					if (isdigit(c))
 						c -= L'0';
@@ -619,7 +619,7 @@ namespace stdex
 					errno = ERANGE;
 				}
 				else if (neg)
-					acc = static_cast<unsigned long long >(-acc);
+					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc);
 				if (endptr != 0)
 					*endptr = (wchar_t *) (any ? s - 1 : nptr);
 				return (acc);
@@ -632,7 +632,7 @@ namespace stdex
 		{
 			template<class T>
 			static
-			unsigned long long
+			string_detail::_unsigned_long_long_type
 			call(const T *nptr, wchar_t **endptr, int base)
 			{
 				using namespace std;
@@ -645,22 +645,22 @@ namespace stdex
 		template<bool _IsSigned>
 		struct _str_to_integral_chooser_impl_ll
 		{
-			typedef long long int type;
-			static long long int call(const char* str, char** endptr, int base)
+			typedef string_detail::_long_long_type type;
+			static string_detail::_long_long_type call(const char* str, char** endptr, int base)
 			{
 				typedef _cs_to_signed_ll<string_detail::_strtoll_present::value> impl;
 
 				return impl::call(str, endptr, base);
 			}
 
-			static long long int call(const wchar_t* str, wchar_t** endptr, int base)
+			static string_detail::_long_long_type call(const wchar_t* str, wchar_t** endptr, int base)
 			{
 				typedef _wcs_to_signed_ll<string_detail::_wcstoll_present::value> impl;
 
 				return impl::call(str, endptr, base);
 			}
 
-			static bool check(const long long int &_value)
+			static bool check(const string_detail::_long_long_type &_value)
 			{
 #ifdef LLONG_MAX 
 #ifdef LLONG_MIN 
@@ -672,7 +672,7 @@ namespace stdex
 #ifdef LLONG_MIN
 				return ((_value == -LLONG_MIN || _value == LLONG_MIN));
 #else
-				return ((_value == std::numeric_limits<long long int>::min() || _value == std::numeric_limits<long long int>::max()));
+				return ((_value == std::numeric_limits<string_detail::_long_long_type>::min() || _value == std::numeric_limits<string_detail::_long_long_type>::max()));
 #endif
 #endif
 			}
@@ -681,27 +681,27 @@ namespace stdex
 		template<>
 		struct _str_to_integral_chooser_impl_ll<false>
 		{
-			typedef unsigned long long int type;
-			static unsigned long long int call(const char* str, char** endptr, int base)
+			typedef string_detail::_unsigned_long_long_type type;
+			static string_detail::_unsigned_long_long_type call(const char* str, char** endptr, int base)
 			{
 				typedef _cs_to_unsigned_ll<string_detail::_strtoull_present::value> impl;
 
 				return impl::call(str, endptr, base);
 			}
 
-			static unsigned long long int call(const wchar_t* str, wchar_t** endptr, int base)
+			static string_detail::_unsigned_long_long_type call(const wchar_t* str, wchar_t** endptr, int base)
 			{
 				typedef _wcs_to_unsigned_ll<string_detail::_wcstoull_present::value> impl;
 
 				return impl::call(str, endptr, base);
 			}
 
-			static bool check(const unsigned long long int &_value)
+			static bool check(const string_detail::_unsigned_long_long_type &_value)
 			{
 #ifdef ULLONG_MAX 
 				return ((_value == ULLONG_MAX));
 #else
-				return ((_value == std::numeric_limits<unsigned long long int>::max()));
+				return ((_value == std::numeric_limits<string_detail::_unsigned_long_long_type>::max()));
 #endif
 			}
 		};
@@ -712,12 +712,12 @@ namespace stdex
 			typedef _str_to_integral_chooser_impl_ll<is_signed<_T>::value> impl;
 		};
 
-		template<class _T, unsigned long long N>
+		template<class _T, string_detail::_unsigned_long_long_type N>
 		struct _type_cs_len_ll
 		{
 			enum
 			{
-				value = _type_cs_len_ll<_T, N / (unsigned long long)(10)>::value + 1
+				value = _type_cs_len_ll<_T, N / (string_detail::_unsigned_long_long_type)(10)>::value + 1
 			};
 		};
 
@@ -2013,15 +2013,15 @@ namespace stdex
 
 	template<>
 	inline
-		enable_if<is_same<long long, long>::value == (false), string>::type
-	to_string<long long>(const long long &value)
+		enable_if<is_same<detail::string_detail::_long_long_type, long>::value == (false), string>::type
+	to_string<detail::string_detail::_long_long_type>(const detail::string_detail::_long_long_type &value)
 	{
 		using namespace std;
 #ifdef LLONG_MAX
-		char buf[detail::_type_cs_len_ll<long long, LLONG_MAX>::value];
+		char buf[detail::_type_cs_len_ll<detail::string_detail::_long_long_type, LLONG_MAX>::value];
 #else
 #ifdef ULLONG_MAX
-		char buf[detail::_type_cs_len_ll<long long, (ULONG_MAX / 2)>::value];
+		char buf[detail::_type_cs_len_ll<detail::string_detail::_long_long_type, (ULONG_MAX / 2)>::value];
 #else
 		char buf[1024]; // strange assumption, I know
 #endif
@@ -2033,15 +2033,15 @@ namespace stdex
 
 	template<>
 	inline
-		enable_if<is_same<long long, long>::value == (false), wstring>::type
-	to_wstring<long long>(const long long &value)
+		enable_if<is_same<detail::string_detail::_long_long_type, long>::value == (false), wstring>::type
+	to_wstring<detail::string_detail::_long_long_type>(const detail::string_detail::_long_long_type &value)
 	{
 		using namespace std;
 #ifdef LLONG_MAX
-		wchar_t buf[detail::_type_cs_len_ll<long long, LLONG_MAX>::value * sizeof(wchar_t)];
+		wchar_t buf[detail::_type_cs_len_ll<detail::string_detail::_long_long_type, LLONG_MAX>::value * sizeof(wchar_t)];
 #else
 #ifdef ULLONG_MAX
-		wchar_t buf[detail::_type_cs_len_ll<long long, (ULONG_MAX / 2)>::value * sizeof(wchar_t)];
+		wchar_t buf[detail::_type_cs_len_ll<detail::string_detail::_long_long_type, (ULONG_MAX / 2)>::value * sizeof(wchar_t)];
 #else
 		wchar_t buf[1024 * sizeof(wchar_t)]; // strange assumption, I know
 #endif
@@ -2053,15 +2053,15 @@ namespace stdex
 
 	template<>
 	inline
-		enable_if<is_same<unsigned long long, unsigned long>::value == (false), string>::type
-	to_string<unsigned long long>(const unsigned long long &value)
+		enable_if<is_same<detail::string_detail::_unsigned_long_long_type, unsigned long>::value == (false), string>::type
+	to_string<detail::string_detail::_unsigned_long_long_type>(const detail::string_detail::_unsigned_long_long_type &value)
 	{
 		using namespace std;
 #ifdef ULLONG_MAX
-		char buf[detail::_type_cs_len_ll<unsigned long long, ULLONG_MAX>::value];
+		char buf[detail::_type_cs_len_ll<detail::string_detail::_unsigned_long_long_type, ULLONG_MAX>::value];
 #else
 #ifdef LLONG_MAX
-		char buf[detail::_type_cs_len_ll<unsigned long long, (LLONG_MAX * 2 + 1)>::value];
+		char buf[detail::_type_cs_len_ll<detail::string_detail::_unsigned_long_long_type, (LLONG_MAX * 2 + 1)>::value];
 #else
 		char buf[1024]; // strange assumption, I know
 #endif
@@ -2073,15 +2073,15 @@ namespace stdex
 
 	template<>
 	inline
-		enable_if<is_same<unsigned long long, unsigned long>::value == (false), wstring>::type
-	to_wstring<unsigned long long>(const unsigned long long &value)
+		enable_if<is_same<detail::string_detail::_unsigned_long_long_type, unsigned long>::value == (false), wstring>::type
+	to_wstring<detail::string_detail::_unsigned_long_long_type>(const detail::string_detail::_unsigned_long_long_type &value)
 	{
 		using namespace std;
 #ifdef ULLONG_MAX
-		wchar_t buf[detail::_type_cs_len_ll<unsigned long long, ULLONG_MAX>::value * sizeof(wchar_t)];
+		wchar_t buf[detail::_type_cs_len_ll<detail::string_detail::_unsigned_long_long_type, ULLONG_MAX>::value * sizeof(wchar_t)];
 #else
 #ifdef LLONG_MAX
-		wchar_t buf[detail::_type_cs_len_ll<unsigned long long, (LLONG_MAX * 2 + 1)>::value * sizeof(wchar_t)];
+		wchar_t buf[detail::_type_cs_len_ll<detail::string_detail::_unsigned_long_long_type, (LLONG_MAX * 2 + 1)>::value * sizeof(wchar_t)];
 #else
 		wchar_t buf[1024 * sizeof(wchar_t)]; // strange assumption, I know
 #endif
