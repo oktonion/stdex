@@ -10,7 +10,7 @@ echo "compiling %VisualStudioVersion% pthread-win32"
 cl -EHsc -Fo.\stdex\obj\pthread.obj -D HAVE_CONFIG_H -c ".\pthread-win32\pthread.c"
 if /I "%ERRORLEVEL%" NEQ "0" (
     echo failed
-    return 1
+    exit 1
 )
 
 cd .\stdex
@@ -25,7 +25,7 @@ for /f %%f in ('dir /b ".\src\*.cpp"') do (
 
 if /I "%build_ok%" NEQ "1" (
   echo "stdex.lib build failed"
-  return 1
+  exit 1
 )
 
 mkdir .\lib
