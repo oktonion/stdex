@@ -14,7 +14,7 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
   )
 
   if /I "%build_ok%" NEQ "0" (
-    cl .\tests\obj\%%~nf.obj stdex.lib ntdll.lib -Fe.\tests\bin\%%~nf.exe -link -LIBPATH:.\stdex\lib -LIBPATH:"%WindowsSdkDir%Lib"
+    cl .\tests\obj\%%~nf.obj stdex.lib "%WindowsSdkDir%Lib\ntdll.lib" -Fe.\tests\bin\%%~nf.exe -link -LIBPATH:.\stdex\lib
   )
 )
 
