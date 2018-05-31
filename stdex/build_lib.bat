@@ -6,18 +6,25 @@ set build_ok=1
 cd ..
 set INCLUDE=%INCLUDE%%cd%\pthread;
 
+set build_opt="-Ox"
+
+if ["%~1"]==["debug"] (
+  build_opt=""
+  echo "debug build"
+)
+
 echo "compiling %VisualStudioVersion% pthread-win32"
-cl -EHsc -Fo.\stdex\obj\pthread.obj -D HAVE_CONFIG_H -c ".\pthread-win32\pthread.c"
+cl -EHsc -Fo.\stdex\obj\pthread.obj -D HAVE_CONFIG_H -c ".\pthread-win32\pthread.c" %build_opt%
 if /I "%ERRORLEVEL%" NEQ "0" (
     echo failed
-    exit 1
+    exit /B 1
 )
 
 cd .\stdex
 
 for /f %%f in ('dir /b ".\src\*.cpp"') do (
   echo "compiling %%~nf"
-  cl -EHsc -Fo.\obj\%%~nf.obj -c ".\src\%%f"
+  cl -EHsc -Fo.\obj\%%~nf.obj -c ".\src\%%f" %build_opt%
   if /I "%ERRORLEVEL%" NEQ "0" (
     build_ok=0
   )
@@ -25,7 +32,7 @@ for /f %%f in ('dir /b ".\src\*.cpp"') do (
 
 if /I "%build_ok%" NEQ "1" (
   echo "stdex.lib build failed"
-  exit 1
+  exit /B 1
 )
 
 mkdir .\lib
@@ -37,4 +44,4 @@ dir .\lib\
 
 echo "lib done"
 
-::del /Q .\obj\*.obj
+del /Q .\obj\*.obj
