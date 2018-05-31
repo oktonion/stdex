@@ -19,7 +19,7 @@ The library is portable for any compiler that supports C++98 but as we all know 
 * g++ 4.4.2;
 * g++ 4.9, 4.8, 5.0 with c++98 option;
 * clang 3.5, 5.0 with c++98 option;
-* Visual Studio 2010, 2013, 2015;
+* Visual Studio 2008, 2010, 2013, 2015;
 
 ...and thats it. If you use other compiler and decide to include my library in your project there is no guarantee that it will compile without errors. In case you will be able to fix the errors without breaking existing code for already supported compilers I would really appreciate your pull requests.
 
