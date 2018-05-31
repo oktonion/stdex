@@ -31,7 +31,7 @@ Build process is simple:
 
 # how to include in your project
 In your project: 
-1. include sources of the library or link with prebuilded static library (.lib file, f.e. 'libstdex.a'/'stdex.lib')
+1. include sources of the library or link with prebuilded static library ('.a'/'.lib' file, f.e. 'libstdex.a'/'stdex.lib')
 2. link with system libraries for POSIX-threads and realtime clocks: 
 * 'librt.lib' and 'libpthread.lib' in UNIX; 
 * 'ntdll.lib' and [POSIX-threads lib](https://github.com/GerHobbelt/pthread-win32 "I'm using this implementation") in Windows (if you have build stdex static library with 'pthreads-win32' sources then you do not need to link with pthreads anymore - it's already in 'stdex.lib');
