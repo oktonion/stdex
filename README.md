@@ -25,12 +25,14 @@ For the C++ threads (mutexes, threads) I'm using POSIX threads implementation. T
 The library is in development so no backward compability guaranteed with previous stdex. But one thing for sure: it will be more and more standart in the way of std library for C++ 11. 
 
 # how to build
-Build process is simple: either run a build_lib.sh script (works with gcc and clang if enviromental variable $COMPILER is set to compiler name, f.e. to 'clang++-3.5') or build by yourself static library from sources in 'stdex/src' directory.
+Build process is simple: 
+In Unix - either run a build_lib.sh script (works with gcc and clang if enviromental variable $COMPILER is set to compiler name, f.e. to 'clang++-3.5') or build by yourself static library from sources in 'stdex/src' directory.
+In Windows - either run a build_lib.bat script (works with Visual Studio if enviromental variables are set by 'vsvars32.bat' script) or build by yourself static library from sources in 'stdex/src' and 'pthreads-win32' directories.
 
 # how to include in your project
 In your project: 
-* include sources of the library or link with prebuilded static library (.lib file, f.e. 'libstdex.lib')
-* link with system libraries for POSIX-threads and realtime clocks: 'librt.lib' and 'libpthread.lib' in UNIX; 'ntdll.lib' and [POSIX-threads lib](https://github.com/GerHobbelt/pthread-win32 "I'm using this implementation") in Windows;
+* include sources of the library or link with prebuilded static library (.lib file, f.e. 'libstdex.a'/'stdex.lib')
+* link with system libraries for POSIX-threads and realtime clocks: 'librt.lib' and 'libpthread.lib' in UNIX; 'ntdll.lib' and [POSIX-threads lib](https://github.com/GerHobbelt/pthread-win32 "I'm using this implementation") in Windows (if you have build stdex static library with pthreads-win32 sources then you do not link with pthreads anymore);
 * enjoy
 
 example script build for Ubuntu:
