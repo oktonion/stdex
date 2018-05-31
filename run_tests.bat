@@ -12,4 +12,4 @@ for /f %%f in ('dir /b ".\tests\bin\*.exe"') do (
   )
 )
 
-return %run_ok%
+exit %run_ok%
