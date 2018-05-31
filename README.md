@@ -28,16 +28,28 @@ For the C++ threads (mutexes, threads) I'm using POSIX threads implementation. T
 The library is in development so no backward compability guaranteed with previous stdex. But one thing for sure: it will be more and more standart in the way of std library for C++ 11. 
 
 # how to build
-Build process is simple: either run a build_lib.sh script (works with gcc and clang if enviromental variable $COMPILER is set to compiler name, f.e. to 'clang++-3.5') or build by yourself static library from sources in 'stdex/src' directory.
+Build process is simple: 
+* In Unix - either run a 'build_lib.sh' script (works with g++ and clang if enviromental variable $COMPILER is set to compiler name, f.e. to 'clang++-3.5') or build by yourself static library from 'stdex/src' directory sources.
+* In Windows - either run a 'build_lib.bat' script (works with Visual Studio if enviromental variables are set by 'vsvars32.bat' script that is shipping with your Visual Studio distributive) or build by yourself the static library from 'stdex/src' and 'pthreads-win32' directories sources.
 
 # how to include in your project
 In your project: 
-* include sources of the library or link with prebuilded static library (.lib file, f.e. 'libstdex.lib')
-* link with system libraries for POSIX-threads and realtime clocks: 'librt.lib' and 'libpthread.lib' in UNIX; 'ntdll.lib' and [POSIX-threads lib](https://github.com/GerHobbelt/pthread-win32 "I'm using this implementation") in Windows;
-* enjoy
+1. include sources of the library or link with prebuilded static library ('.a'/'.lib' file, f.e. 'libstdex.a'/'stdex.lib')
+2. link with system libraries for POSIX-threads and realtime clocks: 
+* 'librt.lib' and 'libpthread.lib' in UNIX; 
+* 'ntdll.lib' and [POSIX-threads lib](https://github.com/GerHobbelt/pthread-win32 "I'm using this implementation") in Windows (if you have build stdex static library with 'pthreads-win32' sources then you do not need to link with pthreads anymore - it's already in 'stdex.lib');
+3. enjoy
 
-example script build for Ubuntu:
+example script build for Ubuntu (with g++ installed):
 ```
 COMPILER=g++
 $COMPILER main.cpp -L./stdex/lib/ -lstdex -lrt -lpthread -o "./bin/main"
+```
+
+example script build for Windows (with Visual Studio 2008 and Windows Kit 8.1 installed):
+```
+call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\Tools\vsvars32.bat"
+set LIB=%LIB%C:\Program Files (x86)\Windows Kits\8.1\Lib\winv6.3\um\x86\;
+cl -EHsc -Fo.\obj\main.obj -c ".\main.cpp"
+cl .\obj\main.obj stdex.lib ntdll.lib -Fe.\bin\main.exe -link -LIBPATH:.\stdex\lib
 ```
