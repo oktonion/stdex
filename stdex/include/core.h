@@ -68,12 +68,15 @@
 
 #endif
 
+#if !defined(forever)
+	#define forever for(;;)
+#endif
 
-#define forever for(;;)
+#undef stdex_assert
 
-#ifdef assert
+#if defined(assert)
 #ifndef NDEBUG
-#include <iostream>
+	#include <iostream>
 	#define stdex_assert(condition, message) \
     do { \
         if (! (condition)) { \
