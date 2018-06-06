@@ -1,3 +1,4 @@
+#define forever while(1)
 #include "../stdex/include/core.h"
 
 struct Test
