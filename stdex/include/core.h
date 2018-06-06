@@ -71,7 +71,21 @@
 
 #define forever for(;;)
 
-
+#ifdef assert
+#ifndef NDEBUG
+#include <iostream>
+	#define stdex_assert(condition, message) \
+    do { \
+        if (! (condition)) { \
+            std::cerr << "Assertion `" #condition "` failed in " << __FILE__ \
+                      << " line " << __LINE__ << ": " << message << std::endl; \
+            std::terminate(); \
+        } \
+    } while (false)
+#else
+	#define stdex_assert(condition, message) ((void)0)
+#endif
+#endif
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
@@ -80,14 +94,14 @@
 	{
 		namespace detail
 		{
-			template <typename T, size_t N>
-			constexpr size_t my_countof(T const (&)[N]) noexcept
+			template <class T, size_t N>
+			constexpr size_t _my_countof(T const (&)[N]) noexcept
 			{
 				return N;
 			}
 		} // namespace detail
 	}
-	#define countof(arr) stdex::detail::my_countof(arr)
+	#define countof(arr) stdex::detail::_my_countof(arr)
 	#define STATIC_ASSERT(expression, message) static_assert((expression), #message)
 
 	#ifdef _STDEX_NATIVE_NULLPTR_SUPPORT
