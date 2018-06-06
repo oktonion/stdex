@@ -70,6 +70,16 @@
 
 #if !defined(forever)
 	#define forever for(;;)
+#else
+	#define STRINGIZE_HELPER(x) #x
+	#define STRINGIZE(x) STRINGIZE_HELPER(x)
+	#define WARNING(desc) message(__FILE__ "(" STRINGIZE(__LINE__) ") : warning: " desc)
+
+	#pragma WARNING("stdex library - macro 'forever' was previously defined by user; ignoring stdex macro definition")
+
+	#undef STRINGIZE_HELPER
+	#undef STRINGIZE
+	#undef WARNING
 #endif
 
 #undef stdex_assert
