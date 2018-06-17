@@ -556,13 +556,13 @@ namespace stdex
 				(_alignment_logic_helper<
 					sizeof(_alignment_of_trick<_Tp>) - sizeof(_Tp),
 					__alignof(_Tp)
-				>::value));
+				>::value);
 		#else
 			static const std::size_t value =
 				(_alignment_logic_helper<
 					sizeof(_alignment_of_trick<_Tp>) - sizeof(_Tp),
 					sizeof(_Tp)
-				>::value));
+				>::value);
 		#endif
 		};
 
