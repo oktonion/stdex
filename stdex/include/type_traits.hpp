@@ -529,6 +529,64 @@ namespace stdex
 
 	namespace detail
 	{
+		template <class _Tp>
+		struct _alignment_of_trick
+		{
+			char c;
+			_Tp t;
+			_alignment_of_trick();
+		};
+
+		template <unsigned A, unsigned S>
+		struct _alignment_logic_helper
+		{
+			static const std::size_t value = A < S ? A : S;
+		};
+
+		template< class _Tp >
+		struct _alignment_of_impl
+		{
+		#if _MSC_VER > 1400
+			//
+			// With MSVC both the build in __alignof operator
+			// and following logic gets things wrong from time to time
+			// Using a combination of the two seems to make the most of a bad job:
+			//
+			static const std::size_t value =
+				(_alignment_logic_helper<
+					sizeof(_alignment_of_trick<_Tp>) - sizeof(_Tp),
+					__alignof(_Tp)
+				>::value));
+		#else
+			static const std::size_t value =
+				(_alignment_logic_helper<
+					sizeof(_alignment_of_trick<_Tp>) - sizeof(_Tp),
+					sizeof(_Tp)
+				>::value));
+		#endif
+		};
+
+		// borland compilers seem to be unable to handle long double correctly, so this will do the trick:
+		struct _long_double_wrapper{ long double value; };
+	}
+
+	template <class _Tp> 
+	struct alignment_of: 
+		public integral_constant<std::size_t, detail::_alignment_of_impl<_Tp>::value>
+	{};
+
+	template <class _Tp> 
+	struct alignment_of<_Tp&>: 
+		public alignment_of<_Tp*>
+	{};
+
+	template<> 
+	struct alignment_of<long double>: 
+		public alignment_of<detail::_long_double_wrapper>
+	{};
+
+	namespace detail
+	{
 		template<class>
 		struct _is_void_helper
 			: public false_type { };
