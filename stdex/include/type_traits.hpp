@@ -564,6 +564,7 @@ namespace stdex
 					sizeof(_Tp)
 				>::value);
 		#endif
+			typedef integral_constant<std::size_t, std::size_t(_alignment_of_impl::value)> type;
 		};
 
 		// borland compilers seem to be unable to handle long double correctly, so this will do the trick:
@@ -572,7 +573,7 @@ namespace stdex
 
 	template <class _Tp> 
 	struct alignment_of: 
-		public integral_constant<std::size_t, detail::_alignment_of_impl<_Tp>::value>
+		public detail::_alignment_of_impl<_Tp>::type
 	{};
 
 	template <class _Tp> 
