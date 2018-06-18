@@ -107,8 +107,8 @@
 	{
 		namespace detail
 		{
-			template <class T, size_t N>
-			constexpr size_t _my_countof(T const (&)[N]) noexcept
+			template <class T, std::size_t N>
+			constexpr std::size_t _my_countof(T const (&)[N]) noexcept
 			{
 				return N;
 			}

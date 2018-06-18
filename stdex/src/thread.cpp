@@ -10,9 +10,14 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <ctime>
 
 #ifdef __GLIBC__
 #include <sys/sysinfo.h>
+#endif
+
+#if defined(__QNXNTO__) || defined(__QNX__)
+#include <sys/syspage.h>
 #endif
 
 // since windows is a 'special' platform there is some macro definitions to define platform
@@ -56,6 +61,8 @@ struct _pthread_t_less
 {
 	bool operator() (const stdex::thread::native_handle_type &lhs, const stdex::thread::native_handle_type &rhs) const
 	{
+		using namespace std;
+		
 		if (&lhs == &rhs)
 			return false;
 
@@ -364,15 +371,19 @@ unsigned thread::hardware_concurrency() NOEXCEPT_FUNCTION
 #if defined(_STDEX_THREAD_WIN)
 	SYSTEM_INFO si;
 	GetSystemInfo(&si);
-	return (int) si.dwNumberOfProcessors;
+	return si.dwNumberOfProcessors > 0 ? si.dwNumberOfProcessors : 0;
 #elif defined(_SC_NPROCESSORS_ONLN)
-	return (int) sysconf(_SC_NPROCESSORS_ONLN);
+	int const count = sysconf(_SC_NPROCESSORS_ONLN);
+	return (count > 0) ? count : 0;
 #elif defined(_SC_NPROC_ONLN)
-	return (int) sysconf(_SC_NPROC_ONLN);
+	int const count = sysconf(_SC_NPROC_ONLN);
+	return (count > 0) ? count : 0;
 #elif defined(PTW32_VERSION)
 	return pthread_num_processors_np();
 #elif defined(__GLIBC__)
 	return get_nprocs();
+#elif defined(SYSPAGE_CPU_ENTRY)
+	return _syspage_ptr->num_cpu;
 #else
 	// The standard requires this function to return zero if the number of
 	// hardware cores could not be determined.
@@ -536,6 +547,7 @@ void detail::sleep_for_impl(const struct timespec *reltime)
 #else
 void detail::sleep_for_impl(const struct timespec *reltime)
 {
+	using namespace std;
 	nanosleep(reltime, NULL);
 }
 
