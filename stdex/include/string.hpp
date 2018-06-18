@@ -29,6 +29,7 @@
 #include <errno.h>
 #include <limits>
 #include <cwchar>
+#include <cwctype>
 
 #define _STDEX_PLACE_DUMMY_IN_STD_NAMESPACE
 
@@ -105,6 +106,8 @@ namespace stdex
 			
 
 			using namespace std;
+
+			typedef size_t _stdex_size_t_type;
 
 			struct _strtoll_present
 			{
@@ -1017,7 +1020,7 @@ namespace stdex
 				{
 
 				long double fp_integer_part = 0.0L, fp_fractional_part = 0.0L;
-				size_t i, length = strlen(str);
+				detail::string_detail::_stdex_size_t_type i, length = strlen(str);
 
 				i = 0; // Left to right
 				while (str[i] != '.') {
@@ -1059,7 +1062,7 @@ namespace stdex
 				{
 
 					long double fp_integer_part = 0.0L, fp_fractional_part = 0.0L;
-					size_t i, length = wcslen(str);
+					detail::string_detail::_stdex_size_t_type i, length = wcslen(str);
 
 					i = 0; // Left to right
 					while (str[i] != L'.') {
@@ -1365,7 +1368,7 @@ namespace stdex
 		struct _swprintf_impl<false>
 		{
 			template<class T1, class T2, class T3>
-			static void call(T1 a1, size_t, T2 a2, T3 a3)
+			static void call(T1 a1, detail::string_detail::_stdex_size_t_type, T2 a2, T3 a3)
 			{
 				using namespace std;
 				swprintf(a1, a2, a3);
@@ -1373,7 +1376,7 @@ namespace stdex
 		};
 
 		template<class ArgT>
-		void _swprintf4_std_impl(wchar_t* ws, size_t len, const wchar_t* format, ArgT arg)
+		void _swprintf4_std_impl(wchar_t* ws, detail::string_detail::_stdex_size_t_type len, const wchar_t* format, ArgT arg)
 		{
 			_swprintf_impl<_has_4arg_swprintf::value>::call(ws, len, format, arg);
 		}
@@ -1383,7 +1386,7 @@ namespace stdex
 
 	
 	template <class _T>
-	inline _T stot(const string &s, size_t *idx = 0, int base = 10)
+	inline _T stot(const string &s, detail::string_detail::_stdex_size_t_type *idx = 0, int base = 10)
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		_T _value = stot<_T>(_ptr, _eptr, base);
@@ -1394,13 +1397,13 @@ namespace stdex
 			throw(std::out_of_range("stdex::stot argument out of range"));
 
 		if (idx != 0)
-			*idx = (size_t) (_eptr - _ptr);
+			*idx = (detail::string_detail::_stdex_size_t_type) (_eptr - _ptr);
 
 		return (_value);
 	}
 
 	template <class _T>
-	inline _T stot(const wstring &s, size_t *idx = 0, int base = 10)
+	inline _T stot(const wstring &s, detail::string_detail::_stdex_size_t_type *idx = 0, int base = 10)
 	{
 		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
 		_T _value = stot<_T>(_ptr, _eptr, base);
@@ -1411,12 +1414,12 @@ namespace stdex
 			throw(std::out_of_range("wide stdex::stot argument out of range"));
 
 		if (idx != 0)
-			*idx = (size_t) (_eptr - _ptr);
+			*idx = (detail::string_detail::_stdex_size_t_type) (_eptr - _ptr);
 
 		return (_value);
 	}
 	
-	inline int stoi(const string &s, size_t *idx = 0, int base = 10)
+	inline int stoi(const string &s, detail::string_detail::_stdex_size_t_type *idx = 0, int base = 10)
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		int _value = detail::_cs_to_integral<int>(_ptr, _eptr, base);
@@ -1427,12 +1430,12 @@ namespace stdex
 			throw(std::out_of_range("stdex::stoi argument out of range"));
 
 		if (idx != 0)
-			*idx = (size_t) (_eptr - _ptr);
+			*idx = (detail::string_detail::_stdex_size_t_type) (_eptr - _ptr);
 
 		return (_value);
 	}
 
-	inline int stoi(const wstring &s, size_t *idx = 0, int base = 10)
+	inline int stoi(const wstring &s, detail::string_detail::_stdex_size_t_type *idx = 0, int base = 10)
 	{
 		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
 		int _value = detail::_cs_to_integral<int>(_ptr, _eptr, base);
@@ -1443,12 +1446,12 @@ namespace stdex
 			throw(std::out_of_range("wide stdex::stoi argument out of range"));
 
 		if (idx != 0)
-			*idx = (size_t) (_eptr - _ptr);
+			*idx = (detail::string_detail::_stdex_size_t_type) (_eptr - _ptr);
 
 		return (_value);
 	}
 
-	inline long stol(const string &s, size_t *idx = 0, int base = 10)
+	inline long stol(const string &s, detail::string_detail::_stdex_size_t_type *idx = 0, int base = 10)
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		long _value = detail::_cs_to_integral<long>(_ptr, _eptr, base);
@@ -1459,12 +1462,12 @@ namespace stdex
 			throw(std::out_of_range("stdex::stol argument out of range"));
 
 		if (idx != 0)
-			*idx = (size_t) (_eptr - _ptr);
+			*idx = (detail::string_detail::_stdex_size_t_type) (_eptr - _ptr);
 
 		return (_value);
 	}
 
-	inline long stol(const wstring &s, size_t *idx = 0, int base = 10)
+	inline long stol(const wstring &s, detail::string_detail::_stdex_size_t_type *idx = 0, int base = 10)
 	{
 		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
 		long _value = detail::_cs_to_integral<long>(_ptr, _eptr, base);
@@ -1475,12 +1478,12 @@ namespace stdex
 			throw(std::out_of_range("wide stdex::stol argument out of range"));
 
 		if (idx != 0)
-			*idx = (size_t) (_eptr - _ptr);
+			*idx = (detail::string_detail::_stdex_size_t_type) (_eptr - _ptr);
 
 		return (_value);
 	}
 
-	inline unsigned long stoul(const string &s, size_t *idx = 0, int base = 10)
+	inline unsigned long stoul(const string &s, detail::string_detail::_stdex_size_t_type *idx = 0, int base = 10)
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		unsigned long _value = detail::_cs_to_integral<unsigned long>(_ptr, _eptr, base);
@@ -1491,12 +1494,12 @@ namespace stdex
 			throw(std::out_of_range("stdex::stoul argument out of range"));
 
 		if (idx != 0)
-			*idx = (size_t) (_eptr - _ptr);
+			*idx = (detail::string_detail::_stdex_size_t_type) (_eptr - _ptr);
 
 		return (_value);
 	}
 
-	inline unsigned long stoul(const wstring &s, size_t *idx = 0, int base = 10)
+	inline unsigned long stoul(const wstring &s, detail::string_detail::_stdex_size_t_type *idx = 0, int base = 10)
 	{
 		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
 		unsigned long _value = detail::_cs_to_integral<unsigned long>(_ptr, _eptr, base);
@@ -1507,12 +1510,12 @@ namespace stdex
 			throw(std::out_of_range("wide stdex::stoul argument out of range"));
 
 		if (idx != 0)
-			*idx = (size_t) (_eptr - _ptr);
+			*idx = (detail::string_detail::_stdex_size_t_type) (_eptr - _ptr);
 
 		return (_value);
 	}
 	
-	inline float stof(const string &s, size_t *idx = 0)
+	inline float stof(const string &s, detail::string_detail::_stdex_size_t_type *idx = 0)
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
@@ -1524,12 +1527,12 @@ namespace stdex
 			throw(std::out_of_range("stdex::stof argument out of range"));
 
 		if (idx != 0)
-			*idx = (size_t) (_eptr - _ptr);
+			*idx = (detail::string_detail::_stdex_size_t_type) (_eptr - _ptr);
 
 		return (_value);
 	}
 
-	inline float stof(const wstring &s, size_t *idx = 0)
+	inline float stof(const wstring &s, detail::string_detail::_stdex_size_t_type *idx = 0)
 	{
 		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
 
@@ -1541,12 +1544,12 @@ namespace stdex
 			throw(std::out_of_range("wide stdex::stof argument out of range"));
 
 		if (idx != 0)
-			*idx = (size_t) (_eptr - _ptr);
+			*idx = (detail::string_detail::_stdex_size_t_type) (_eptr - _ptr);
 
 		return (_value);
 	}
 
-	inline double stod(const string &s, size_t *idx = 0)
+	inline double stod(const string &s, detail::string_detail::_stdex_size_t_type *idx = 0)
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
@@ -1558,12 +1561,12 @@ namespace stdex
 			throw(std::out_of_range("stdex::stod argument out of range"));
 
 		if (idx != 0)
-			*idx = (size_t) (_eptr - _ptr);
+			*idx = (detail::string_detail::_stdex_size_t_type) (_eptr - _ptr);
 
 		return (_value);
 	}
 
-	inline double stod(const wstring &s, size_t *idx = 0)
+	inline double stod(const wstring &s, detail::string_detail::_stdex_size_t_type *idx = 0)
 	{
 		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
 
@@ -1575,12 +1578,12 @@ namespace stdex
 			throw(std::out_of_range("wide stdex::stod argument out of range"));
 
 		if (idx != 0)
-			*idx = (size_t) (_eptr - _ptr);
+			*idx = (detail::string_detail::_stdex_size_t_type) (_eptr - _ptr);
 
 		return (_value);
 	}
 
-	inline long double stold(const string &s, size_t *idx = 0)
+	inline long double stold(const string &s, detail::string_detail::_stdex_size_t_type *idx = 0)
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
@@ -1594,12 +1597,12 @@ namespace stdex
 			throw(std::out_of_range("stdex::stold argument out of range"));
 
 		if (idx != 0)
-			*idx = (size_t) (_eptr - _ptr);
+			*idx = (detail::string_detail::_stdex_size_t_type) (_eptr - _ptr);
 
 		return (_value);
 	}
 
-	inline long double stold(const wstring &s, size_t *idx = 0)
+	inline long double stold(const wstring &s, detail::string_detail::_stdex_size_t_type *idx = 0)
 	{
 		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
 
@@ -1613,13 +1616,13 @@ namespace stdex
 			throw(std::out_of_range("wide stdex::stold argument out of range"));
 
 		if (idx != 0)
-			*idx = (size_t) (_eptr - _ptr);
+			*idx = (detail::string_detail::_stdex_size_t_type) (_eptr - _ptr);
 
 		return (_value);
 	}
 
 #if defined(LLONG_MAX) || defined(LLONG_MIN)
-	inline int64_t stoll(const string &s, size_t *idx = 0, int base = 10)
+	inline int64_t stoll(const string &s, detail::string_detail::_stdex_size_t_type *idx = 0, int base = 10)
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
@@ -1631,12 +1634,12 @@ namespace stdex
 			throw(std::out_of_range("stdex::stoll argument out of range"));
 
 		if (idx != 0)
-			*idx = (size_t) (_eptr - _ptr);
+			*idx = (detail::string_detail::_stdex_size_t_type) (_eptr - _ptr);
 
 		return (_value);
 	}
 
-	inline int64_t stoll(const wstring &s, size_t *idx = 0, int base = 10)
+	inline int64_t stoll(const wstring &s, detail::string_detail::_stdex_size_t_type *idx = 0, int base = 10)
 	{
 		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
 
@@ -1648,12 +1651,12 @@ namespace stdex
 			throw(std::out_of_range("wide stdex::stoll argument out of range"));
 
 		if (idx != 0)
-			*idx = (size_t) (_eptr - _ptr);
+			*idx = (detail::string_detail::_stdex_size_t_type) (_eptr - _ptr);
 
 		return (_value);
 	}
 
-	inline uint64_t stoull(const string &s, size_t *idx = 0, int base = 10)
+	inline uint64_t stoull(const string &s, detail::string_detail::_stdex_size_t_type *idx = 0, int base = 10)
 	{
 		const char *_eptr = s.c_str(), *_ptr = _eptr;
 		
@@ -1665,12 +1668,12 @@ namespace stdex
 			throw(std::out_of_range("stdex::stoull argument out of range"));
 
 		if (idx != 0)
-			*idx = (size_t) (_eptr - _ptr);
+			*idx = (detail::string_detail::_stdex_size_t_type) (_eptr - _ptr);
 
 		return (_value);
 	}
 
-	inline uint64_t stoull(const wstring &s, size_t *idx = 0, int base = 10)
+	inline uint64_t stoull(const wstring &s, detail::string_detail::_stdex_size_t_type *idx = 0, int base = 10)
 	{
 		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
 
@@ -1682,7 +1685,7 @@ namespace stdex
 			throw(std::out_of_range("wide stdex::stoull argument out of range"));
 
 		if (idx != 0)
-			*idx = (size_t) (_eptr - _ptr);
+			*idx = (detail::string_detail::_stdex_size_t_type) (_eptr - _ptr);
 
 		return (_value);
 	}
@@ -1952,7 +1955,7 @@ namespace stdex
 		// some compilers ignore 'f' flag of spintf and print large values with scientific notation, as if 'e' flag was passed
 		// so we are removing substrings like 'e-10' and trying to enforce the precision by slow and not so precise conversion:
 
-		size_t e_pos = result.rfind('e'); 
+		detail::string_detail::_stdex_size_t_type e_pos = result.rfind('e'); 
 		if (e_pos != string::npos)
 		{
 #ifdef LDBL_MAX_10_EXP
@@ -1961,7 +1964,7 @@ namespace stdex
 			char str_integer_part_reverse[sizeof(buf)];
 #endif
 			long double fp_integer_part, fp_fractional_part;
-			size_t symbols_converted_n = 0;
+			detail::string_detail::_stdex_size_t_type symbols_converted_n = 0;
 			fp_fractional_part = modf(value, &fp_integer_part);
 			while (fp_integer_part > 0.0L)
 			{
@@ -1969,7 +1972,7 @@ namespace stdex
 				fp_integer_part = floor(fp_integer_part / 10.0L);
 			}
 
-			for (size_t i = 0; i < symbols_converted_n; i++)
+			for (detail::string_detail::_stdex_size_t_type i = 0; i < symbols_converted_n; i++)
 				buf[i] = str_integer_part_reverse[symbols_converted_n - i - 1];
 
 			buf[symbols_converted_n++] = '.';
@@ -2012,7 +2015,7 @@ namespace stdex
 		// some compilers ignore 'f' flag of spintf and print large values with scientific notation, as if 'e' flag was passed
 		// so we are removing substrings like 'e-10' and trying to enforce the precision by slow and not so precise conversion:
 
-		size_t e_pos = result.rfind(L'e');
+		detail::string_detail::_stdex_size_t_type e_pos = result.rfind(L'e');
 		if (e_pos != string::npos)
 		{
 #ifdef LDBL_MAX_10_EXP
@@ -2021,7 +2024,7 @@ namespace stdex
 			wchar_t str_integer_part_reverse[sizeof(buf)];
 #endif
 			long double fp_integer_part, fp_fractional_part;
-			size_t symbols_converted_n = 0;
+			detail::string_detail::_stdex_size_t_type symbols_converted_n = 0;
 			fp_fractional_part = modf(value, &fp_integer_part);
 			while (fp_integer_part > 0.0L)
 			{
@@ -2029,7 +2032,7 @@ namespace stdex
 				fp_integer_part = floor(fp_integer_part / 10.0L);
 			}
 
-			for (size_t i = 0; i < symbols_converted_n; i++)
+			for (detail::string_detail::_stdex_size_t_type i = 0; i < symbols_converted_n; i++)
 				buf[i] = str_integer_part_reverse[symbols_converted_n - i - 1];
 
 			buf[symbols_converted_n++] = L'.';
