@@ -40,6 +40,49 @@
 
 namespace stdex
 {
+	namespace intern
+	{
+		// since we have no static_assert in pre-C++11 we just compile-time assert this way:
+		struct type_traits_asserts
+		{
+			template<bool>
+			struct make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert;
+
+			template<bool>
+			struct make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert;
+
+			template<bool>
+			struct not_allowed_arithmetic_type_assert;
+
+			template<bool>
+			struct alignment_of_type_can_not_be_zero_assert;
+		};
+
+		template<>
+		struct type_traits_asserts::make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert<true>
+		{
+			typedef bool make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed;
+		};
+
+		template<>
+		struct type_traits_asserts::make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert<true>
+		{
+			typedef bool make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed;
+		};
+
+		template<>
+		struct type_traits_asserts::not_allowed_arithmetic_type_assert<true>
+		{
+			typedef bool not_allowed_arithmetic_type_assert_failed;
+		};
+
+		template<>
+		struct type_traits_asserts::alignment_of_type_can_not_be_zero_assert<true>
+		{
+			typedef bool alignment_of_type_can_not_be_zero_assert_failed;
+		};
+	}
+
 	template<class _Tp, _Tp Val>
 	struct integral_constant
 	{	// convenient template for integral constant types
@@ -543,6 +586,18 @@ namespace stdex
 			static const std::size_t value = A < S ? A : S;
 		};
 
+		template <unsigned A>
+		struct _alignment_logic_helper<A, 0>
+		{
+			static const std::size_t value = A;
+		};
+
+		template <unsigned S>
+		struct _alignment_logic_helper<0, S>
+		{
+			static const std::size_t value = S;
+		};
+
 		template< class _Tp >
 		struct _alignment_of_impl
 		{
@@ -565,6 +620,12 @@ namespace stdex
 				>::value);
 		#endif
 			typedef integral_constant<std::size_t, std::size_t(_alignment_of_impl::value)> type;
+
+		private:
+			typedef intern::type_traits_asserts check;
+			typedef typename check::alignment_of_type_can_not_be_zero_assert< _alignment_of_impl::value != 0 >::
+				alignment_of_type_can_not_be_zero_assert_failed
+			check1; // if you are there means aligment of type passed can not be calculated or compiler can not handle this situation (sorry, nothing can be done there)
 		};
 
 		// borland compilers seem to be unable to handle long double correctly, so this will do the trick:
@@ -1275,39 +1336,7 @@ namespace stdex
 		public integral_constant<std::size_t, _Uint == 0 ? 0 : extent<_Tp, _Uint - 1>::value>
 	{ };*/
 
-	namespace intern
-	{
-		// since we have no static_assert in pre-C++11 we just compile-time assert this way:
-		struct type_traits_asserts
-		{
-			template<bool>
-			struct make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert;
-
-			template<bool>
-			struct make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert;
-
-			template<bool>
-			struct not_allowed_arithmetic_type_assert;
-		};
-
-		template<>
-		struct type_traits_asserts::make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert<true>
-		{
-			typedef bool make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed;
-		};
-
-		template<>
-		struct type_traits_asserts::make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert<true>
-		{
-			typedef bool make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed;
-		};
-
-		template<>
-		struct type_traits_asserts::not_allowed_arithmetic_type_assert<true>
-		{
-			typedef bool not_allowed_arithmetic_type_assert_failed;
-		};
-	}
+	
 
 	namespace detail
 	{
