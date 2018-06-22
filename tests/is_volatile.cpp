@@ -1,7 +1,9 @@
 #include "../stdex/include/core.h"
 #include "../stdex/include/type_traits.hpp"
 
-struct ClassType {};
+struct ClassType
+{
+};
 typedef const ClassType cClassType;
 typedef const volatile ClassType cvClassType;
 typedef volatile ClassType vClassType;
@@ -9,7 +11,7 @@ typedef volatile ClassType vClassType;
 int main(void)
 {
     using namespace stdex;
-    
+
     // is_volatile
     // Positive tests.
     STATIC_ASSERT(is_volatile<volatile int>::value == (true), should_be_volatile);

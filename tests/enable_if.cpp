@@ -4,7 +4,7 @@
 int main(void)
 {
     using namespace stdex;
-    
+
     // enable_if
     // Positive tests.
     {

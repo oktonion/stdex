@@ -3,37 +3,48 @@
 
 typedef void foo0_t();
 
-struct ClassType {};
+struct ClassType
+{
+};
 typedef ClassType AbstractClass;
 typedef const ClassType cClassType;
 typedef const volatile ClassType cvClassType;
 typedef volatile ClassType vClassType;
 
-struct DerivedType : ClassType {};
-
-struct ConvType 
+struct DerivedType : ClassType
 {
-	template<class T>
-	operator T() { return T(); }
+};
+
+struct ConvType
+{
+    template <class T>
+    operator T() { return T(); }
 };
 
 class PolymorphicClass
 {
-	virtual int func() { return 0; }
+    virtual int func() { return 0; }
 };
 
-class DerivedPolymorphic : PolymorphicClass {};
+class DerivedPolymorphic : PolymorphicClass
+{
+};
 
-enum EnumType {};
+enum EnumType
+{
+};
 
-struct PODType { int data; };
+struct PODType
+{
+    int data;
+};
 
 typedef PODType TType;
 
 int main(void)
 {
     using namespace stdex;
-    
+
     // is_class
     // Positive tests.
     STATIC_ASSERT(is_class<ClassType>::value == (true), should_be_class);
@@ -48,18 +59,18 @@ int main(void)
         typedef int(ClassType::*member1_t);
         typedef const int(ClassType::*member2_t);
         typedef ClassType(ClassType::*member3_t);
-        typedef int (ClassType::*member4_t) (int);
-        typedef int (ClassType::*member5_t) (int) const;
-        typedef int (ClassType::*member6_t) (float, ...);
+        typedef int (ClassType::*member4_t)(int);
+        typedef int (ClassType::*member5_t)(int) const;
+        typedef int (ClassType::*member6_t)(float, ...);
 
         //STATIC_ASSERT(is_class<UnionType>::value == (false), can_not_be_class);
         STATIC_ASSERT(is_class<void>::value == (false), can_not_be_class);
         STATIC_ASSERT(is_class<int>::value == (false), can_not_be_class);
         STATIC_ASSERT(is_class<float>::value == (false), can_not_be_class);
         STATIC_ASSERT(is_class<int[2]>::value == (false), can_not_be_class);
-        STATIC_ASSERT(is_class<int*>::value == (false), can_not_be_class);
-        STATIC_ASSERT(is_class<int(*)(int)>::value == (false), can_not_be_class);
-        STATIC_ASSERT(is_class<float&>::value == (false), can_not_be_class);
+        STATIC_ASSERT(is_class<int *>::value == (false), can_not_be_class);
+        STATIC_ASSERT(is_class<int (*)(int)>::value == (false), can_not_be_class);
+        STATIC_ASSERT(is_class<float &>::value == (false), can_not_be_class);
         STATIC_ASSERT(is_class<foo0_t>::value == (false), can_not_be_class);
         STATIC_ASSERT(is_class<member1_t>::value == (false), can_not_be_class);
         STATIC_ASSERT(is_class<member2_t>::value == (false), can_not_be_class);

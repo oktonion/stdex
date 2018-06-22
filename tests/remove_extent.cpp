@@ -1,12 +1,14 @@
 #include "../stdex/include/core.h"
 #include "../stdex/include/type_traits.hpp"
 
-struct ClassType {};
+struct ClassType
+{
+};
 
 int main(void)
 {
     using namespace stdex;
-    
+
     // remove_extent
     STATIC_ASSERT((is_same<remove_extent<int>::type, int>::value == (true)), shoud_be_same);
     STATIC_ASSERT((is_same<remove_extent<const int>::type, const int>::value == (true)), shoud_be_same);

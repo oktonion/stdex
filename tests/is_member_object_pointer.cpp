@@ -1,12 +1,14 @@
 #include "../stdex/include/core.h"
 #include "../stdex/include/type_traits.hpp"
 
-struct ClassType {};
+struct ClassType
+{
+};
 
 int main(void)
 {
     using namespace stdex;
-    
+
     // Positive tests.
     {
         typedef int(ClassType::*mobj1);
@@ -17,24 +19,23 @@ int main(void)
         STATIC_ASSERT(is_member_object_pointer<mobj2>::value == (true), should_be_a_member_object_pointer);
         STATIC_ASSERT(is_member_object_pointer<mobj3>::value == (true), should_be_a_member_object_pointer);
     }
-                                            
-    // Negative tests.	
+
+    // Negative tests.
     {
-        typedef int (ClassType::*mfunc1) ();
-        typedef int (ClassType::*mfunc2) (int) const;
-        typedef int (ClassType::*mfunc3) (float, ...);
-        typedef ClassType(ClassType::*mfunc4) (ClassType);
-        typedef float (ClassType::*mfunc5) (int, float, int [], int&);
+        typedef int (ClassType::*mfunc1)();
+        typedef int (ClassType::*mfunc2)(int) const;
+        typedef int (ClassType::*mfunc3)(float, ...);
+        typedef ClassType (ClassType::*mfunc4)(ClassType);
+        typedef float (ClassType::*mfunc5)(int, float, int[], int &);
 
         STATIC_ASSERT(is_member_object_pointer<mfunc1>::value == (false), can_not_be_a_member_object_pointer);
         STATIC_ASSERT(is_member_object_pointer<mfunc2>::value == (false), can_not_be_a_member_object_pointer);
         STATIC_ASSERT(is_member_object_pointer<mfunc3>::value == (false), can_not_be_a_member_object_pointer);
         STATIC_ASSERT(is_member_object_pointer<mfunc4>::value == (false), can_not_be_a_member_object_pointer);
         STATIC_ASSERT(is_member_object_pointer<mfunc5>::value == (false), can_not_be_a_member_object_pointer);
-        
     }
-                                            
-    // Sanity check.					  
+
+    // Sanity check.
     STATIC_ASSERT(is_member_object_pointer<ClassType>::value == (false), can_not_be_a_member_object_pointer);
     return 0;
 }

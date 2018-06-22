@@ -1,20 +1,21 @@
 #include "../stdex/include/core.h"
 #include "../stdex/include/type_traits.hpp"
 
-struct ClassType {};
+struct ClassType
+{
+};
 
 int main(void)
 {
     using namespace stdex;
-    
+
     // Positive tests.
     {
-        typedef int (ClassType::*mfunc1) ();
-        typedef int (ClassType::*mfunc2) (int) const;
-        typedef int (ClassType::*mfunc3) (float, ...);
-        typedef ClassType(ClassType::*mfunc4) (ClassType);
-        typedef float (ClassType::*mfunc5) (int, float, int [], int&);
-
+        typedef int (ClassType::*mfunc1)();
+        typedef int (ClassType::*mfunc2)(int) const;
+        typedef int (ClassType::*mfunc3)(float, ...);
+        typedef ClassType (ClassType::*mfunc4)(ClassType);
+        typedef float (ClassType::*mfunc5)(int, float, int[], int &);
 
         STATIC_ASSERT(is_member_function_pointer<mfunc1>::value == (true), should_be_a_member_function_pointer);
         STATIC_ASSERT(is_member_function_pointer<mfunc2>::value == (true), should_be_a_member_function_pointer);

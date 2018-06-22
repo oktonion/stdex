@@ -1,109 +1,111 @@
-#include "../stdex/include/core.h"
 #include "../stdex/include/chrono.hpp"
+#include "../stdex/include/core.h"
 
 #include <iostream>
-#define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
+#define DYNAMIC_VERIFY(cond)                                                                         \
+    if (!(cond))                                                                                     \
+    {                                                                                                \
+        std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; \
+        return -1;                                                                                   \
+    }
 
 class ClockTime
 {
-	typedef stdex::chrono::hours hours;
-	typedef stdex::chrono::minutes minutes;
-	typedef stdex::chrono::seconds seconds;
+    typedef stdex::chrono::hours hours;
+    typedef stdex::chrono::minutes minutes;
+    typedef stdex::chrono::seconds seconds;
 
-public:
-	hours hours_;
-	minutes minutes_;
-	seconds seconds_;
+  public:
+    hours hours_;
+    minutes minutes_;
+    seconds seconds_;
 
-	template<typename Rep, typename Period>
-	explicit
-		ClockTime(const stdex::chrono::duration<Rep, Period>& d)
-		: hours_(stdex::chrono::duration_cast<hours>  (d)),
-		minutes_(stdex::chrono::duration_cast<minutes>(d % hours(1))),
-		seconds_(stdex::chrono::duration_cast<seconds>(d % minutes(1))) { }
+    template <typename Rep, typename Period>
+    explicit ClockTime(const stdex::chrono::duration<Rep, Period> &d)
+        : hours_(stdex::chrono::duration_cast<hours>(d)),
+          minutes_(stdex::chrono::duration_cast<minutes>(d % hours(1))),
+          seconds_(stdex::chrono::duration_cast<seconds>(d % minutes(1))) {}
 };
 
-template<typename T>
+template <typename T>
 struct type_emulator
 {
-	type_emulator()
-		: i(T(0)) { }
+    type_emulator()
+        : i(T(0)) {}
 
-	type_emulator(T j)
-		: i(j) { }
+    type_emulator(T j)
+        : i(j) {}
 
-	type_emulator(const type_emulator& e)
-		: i(e.i) { }
+    type_emulator(const type_emulator &e)
+        : i(e.i) {}
 
-	type_emulator&
-		operator*=(type_emulator a)
-	{
-		i *= a.i;
-		return *this;
-	}
+    type_emulator &
+    operator*=(type_emulator a)
+    {
+        i *= a.i;
+        return *this;
+    }
 
-	type_emulator&
-		operator+=(type_emulator a)
-	{
-		i += a.i;
-		return *this;
-	}
+    type_emulator &
+    operator+=(type_emulator a)
+    {
+        i += a.i;
+        return *this;
+    }
 
-	operator T ()
-	{
-		return i;
-	}
+    operator T()
+    {
+        return i;
+    }
 
-	T i;
+    T i;
 };
 
-template<typename T>
-bool
-operator==(type_emulator<T> a, type_emulator<T> b)
+template <typename T>
+bool operator==(type_emulator<T> a, type_emulator<T> b)
 {
-	return a.i == b.i;
+    return a.i == b.i;
 }
 
-template<typename T>
-bool
-operator<(type_emulator<T> a, type_emulator<T> b)
+template <typename T>
+bool operator<(type_emulator<T> a, type_emulator<T> b)
 {
-	return a.i < b.i;
+    return a.i < b.i;
 }
 
-template<typename T>
+template <typename T>
 type_emulator<T>
 operator+(type_emulator<T> a, type_emulator<T> b)
 {
-	return a += b;
+    return a += b;
 }
 
-template<typename T>
+template <typename T>
 type_emulator<T>
 operator*(type_emulator<T> a, type_emulator<T> b)
 {
-	return a *= b;
+    return a *= b;
 }
 
 namespace stdex
 {
-	template<typename T, typename U>
-	struct common_type<type_emulator<T>, U>
-	{
-		typedef typename common_type<T, U>::type type;
-	};
+template <typename T, typename U>
+struct common_type<type_emulator<T>, U>
+{
+    typedef typename common_type<T, U>::type type;
+};
 
-	template<typename T, typename U>
-	struct common_type<U, type_emulator<T> >
-	{
-		typedef typename common_type<U, T>::type type;
-	};
+template <typename T, typename U>
+struct common_type<U, type_emulator<T>>
+{
+    typedef typename common_type<U, T>::type type;
+};
 
-	template<typename T, typename U>
-	struct common_type<type_emulator<T>, type_emulator<U> >
-	{
-		typedef typename common_type<T, U>::type type;
-	};
+template <typename T, typename U>
+struct common_type<type_emulator<T>, type_emulator<U>>
+{
+    typedef typename common_type<T, U>::type type;
+};
 }
 typedef type_emulator<int> int_emulator;
 
@@ -164,22 +166,20 @@ int main(void)
     }*/
 
     {
-        chrono::duration<long, ratio_divide<kilo, milli> >   d1;
-        chrono::duration<long, ratio_multiply<kilo, milli> > d2;
-        chrono::duration<long, ratio_add<kilo, milli> >      d3;
-        chrono::duration<long, ratio_subtract<kilo, milli> > d4;
+        chrono::duration<long, ratio_divide<kilo, milli>> d1;
+        chrono::duration<long, ratio_multiply<kilo, milli>> d2;
+        chrono::duration<long, ratio_add<kilo, milli>> d3;
+        chrono::duration<long, ratio_subtract<kilo, milli>> d4;
     }
 
     {
-        typedef duration<stdex::intmax_t, ratio<36 * 24 * 36525> > Years;
+        typedef duration<stdex::intmax_t, ratio<36 * 24 * 36525>> Years;
 
         Years years(23);
 
-        DYNAMIC_VERIFY(duration_cast<seconds>(years).count()
-            == duration_cast<minutes>(years).count() * 60);
+        DYNAMIC_VERIFY(duration_cast<seconds>(years).count() == duration_cast<minutes>(years).count() * 60);
 
-        DYNAMIC_VERIFY(duration_cast<minutes>(years).count()
-            == duration_cast<seconds>(years).count() / 60);
+        DYNAMIC_VERIFY(duration_cast<minutes>(years).count() == duration_cast<seconds>(years).count() / 60);
     }
 
     {

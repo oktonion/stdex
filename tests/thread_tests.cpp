@@ -1,92 +1,105 @@
 #include "../stdex/include/core.h"
-#include "../stdex/include/thread.hpp"
 #include "../stdex/include/system_error.hpp"
+#include "../stdex/include/thread.hpp"
 
 #include <cstdlib>
-#include <iostream>
 #include <ctime>
+#include <iostream>
 
-#define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
-#define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
+#define DYNAMIC_VERIFY(cond)                                                                         \
+    if (!(cond))                                                                                     \
+    {                                                                                                \
+        std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; \
+        return __LINE__;                                                                             \
+    }
+#define RUN_TEST(test)                                           \
+    {                                                            \
+        std::cout << #test << std::endl;                         \
+        int line = test();                                       \
+        if (line != 0)                                           \
+        {                                                        \
+            std::cout << "failed at line " << line << std::endl; \
+            return line;                                         \
+        }                                                        \
+    }
 using std::size_t;
 
 namespace thread_tests_std
 {
-	template<class T>
-	class reference_wrapper
-	{
-	public:
-		reference_wrapper(T &ref_) :
-			_ptr(&ref_)
-		{ }
+template <class T>
+class reference_wrapper
+{
+  public:
+    reference_wrapper(T &ref_) : _ptr(&ref_)
+    {
+    }
 
-		reference_wrapper(const reference_wrapper &other): 
-			_ptr(other._ptr)
-		{ }
+    reference_wrapper(const reference_wrapper &other) : _ptr(other._ptr)
+    {
+    }
 
-		reference_wrapper& operator=(const reference_wrapper &other)
-		{
-			_ptr = other._ptr;
-			return (*this);
-		}
+    reference_wrapper &operator=(const reference_wrapper &other)
+    {
+        _ptr = other._ptr;
+        return (*this);
+    }
 
-		operator T&() const
-		{
-			return *_ptr;
-		}
+    operator T &() const
+    {
+        return *_ptr;
+    }
 
-	private:
-		T *_ptr;
-	};
+  private:
+    T *_ptr;
+};
 
-	template<class T>
-	reference_wrapper<T> ref(T &ref_)
-	{
-		return reference_wrapper<T>(ref_);
-	}
+template <class T>
+reference_wrapper<T> ref(T &ref_)
+{
+    return reference_wrapper<T>(ref_);
+}
 
-	template<class T>
-	reference_wrapper<T> ref(reference_wrapper<T> &ref_)
-	{
-		return ref_;
-	}
+template <class T>
+reference_wrapper<T> ref(reference_wrapper<T> &ref_)
+{
+    return ref_;
+}
 }
 
 size_t active_thread_left = 0;
 
-void
-free_function(stdex::thread::id& id)
+void free_function(stdex::thread::id &id)
 {
-	id = stdex::this_thread::get_id();
-	std::cout << "[id]=" << id << std::endl;
-	static int i = 0;
+    id = stdex::this_thread::get_id();
+    std::cout << "[id]=" << id << std::endl;
+    static int i = 0;
 
-	++i;
+    ++i;
 
-	if (i % 4 == 0)
-	{
-		std::srand(std::time(nullptr));
+    if (i % 4 == 0)
+    {
+        std::srand(std::time(nullptr));
 
-		stdex::this_thread::sleep_for(stdex::chrono::milliseconds(1 + (std::rand() % (330 - 1 + 1))));
-	}
-	active_thread_left--;
+        stdex::this_thread::sleep_for(stdex::chrono::milliseconds(1 + (std::rand() % (330 - 1 + 1))));
+    }
+    active_thread_left--;
 }
 
 struct copyable
 {
-	copyable() {}
-	~copyable() {}
-	copyable(const copyable& c)
-	{
-		++copy_count;
-	}
+    copyable() {}
+    ~copyable() {}
+    copyable(const copyable &c)
+    {
+        ++copy_count;
+    }
 
-	void operator()(stdex::thread::id& id) const
-	{
-		free_function(id);
-	}
+    void operator()(stdex::thread::id &id) const
+    {
+        free_function(id);
+    }
 
-	static int copy_count;
+    static int copy_count;
 };
 
 int copyable::copy_count = 0;
@@ -95,29 +108,31 @@ bool f_was_called = false;
 
 void f()
 {
-	f_was_called = true;
-	active_thread_left--;
+    f_was_called = true;
+    active_thread_left--;
 }
 
-struct ClassType {};
+struct ClassType
+{
+};
 
 int thread_func1(int) { return 0; }
 int thread_func2(int, float) { return 2; }
 int thread_func3(int, double, float) { return 2; }
 double thread_func4(int, int, int, float) { return 2.0; }
 void thread_func5(int, int, int, float, int) { return; }
-void thread_func7(int, int, int, float, int, float*, void*) { return; }
-void thread_func8(float*, float*, void*, ClassType*) { return; }
+void thread_func7(int, int, int, float, int, float *, void *) { return; }
+void thread_func8(float *, float *, void *, ClassType *) { return; }
 
 int thread_func_nullptr_check_ret = 0;
 
 struct functor
 {
-	functor() {}
-	~functor() {}
+    functor() {}
+    ~functor() {}
 
-	int operator()(float *arg1, double *arg2, void(*arg3)(int, float, int*), float(functor::*arg4)(int, void*), ClassType *arg5)
-	{
+    int operator()(float *arg1, double *arg2, void (*arg3)(int, float, int *), float (functor::*arg4)(int, void *), ClassType *arg5)
+    {
         if (arg1 == nullptr)
         {
             thread_func_nullptr_check_ret = __LINE__;
@@ -150,14 +165,12 @@ struct functor
         }
 
         thread_func_nullptr_check_ret = 0;
-		return 0;
-	}
+        return 0;
+    }
 };
 
-
-
-void thread_func_nullptr_check(float *arg1, float *arg2, void *arg3, ClassType *arg4) 
-{ 
+void thread_func_nullptr_check(float *arg1, float *arg2, void *arg3, ClassType *arg4)
+{
     if (arg1 != nullptr)
     {
         thread_func_nullptr_check_ret = __LINE__;
@@ -191,17 +204,21 @@ int total = 0;
 // Functor has internal state.
 struct moveable
 {
-	int i;
+    int i;
 
-	moveable() {};
-	~moveable() {};
-	//moveable(const moveable& c) = delete;
-	//moveable& operator=(const moveable&) = delete;
+    moveable(){};
+    ~moveable(){};
+    //moveable(const moveable& c) = delete;
+    //moveable& operator=(const moveable&) = delete;
 
-	moveable(int j) : i(j) { }
-	//moveable(moveable&& m) : i(m.i) { }
+    moveable(int j) : i(j) {}
+    //moveable(moveable&& m) : i(m.i) { }
 
-	void operator()() const { total += i; active_thread_left--;}
+    void operator()() const
+    {
+        total += i;
+        active_thread_left--;
+    }
 };
 
 int test0()
@@ -221,7 +238,7 @@ int test1()
         thread t;
         DYNAMIC_VERIFY(!t.joinable());
     }
-    catch (const system_error&)
+    catch (const system_error &)
     {
         DYNAMIC_VERIFY(false);
     }
@@ -248,9 +265,8 @@ int test2()
         t.join();
         DYNAMIC_VERIFY(!t.joinable());
         DYNAMIC_VERIFY(id1 == id2);
-    
     }
-    catch (const system_error&)
+    catch (const system_error &)
     {
         DYNAMIC_VERIFY(false);
     }
@@ -299,7 +315,7 @@ int test3()
 
         tt1.join();
     }
-    catch (const system_error&)
+    catch (const system_error &)
     {
         DYNAMIC_VERIFY(false);
     }
@@ -327,7 +343,7 @@ int test4()
         DYNAMIC_VERIFY(f_was_called);
         f_was_called = false;
     }
-    catch (const system_error&)
+    catch (const system_error &)
     {
         DYNAMIC_VERIFY(false);
     }
@@ -365,7 +381,7 @@ int test5()
 
         total = 0;
     }
-    catch (const system_error&)
+    catch (const system_error &)
     {
         DYNAMIC_VERIFY(false);
     }
@@ -388,7 +404,7 @@ int test6()
     {
         thread t1;
         thread t2(thread_func1, 1);
-        swap(static_cast<thread&>(t1), static_cast<thread&>(t2));
+        swap(static_cast<thread &>(t1), static_cast<thread &>(t2));
 
         t1.join();
     }
@@ -413,18 +429,18 @@ int test7()
     using namespace stdex;
 
 #if CHECK_FOR_COMPILE_ERROR_TESTS == 1
-		{
-			typedef thread test_type;
-			test_type t1;
-			test_type t2;
-			t1 = t2;
-		}
+    {
+        typedef thread test_type;
+        test_type t1;
+        test_type t2;
+        t1 = t2;
+    }
 
-		{
-			typedef thread test_type;
-			test_type t1;
-			test_type t2(t1);
-		}
+    {
+        typedef thread test_type;
+        test_type t1;
+        test_type t2(t1);
+    }
 #endif
     return 0;
 }
@@ -462,7 +478,7 @@ int test8()
         t.detach();
         DYNAMIC_VERIFY(!t.joinable());
     }
-    catch (const system_error&)
+    catch (const system_error &)
     {
         DYNAMIC_VERIFY(false);
     }
@@ -490,7 +506,7 @@ int test9()
         t.join();
         DYNAMIC_VERIFY(t.get_id() == thread::id());
     }
-    catch (const system_error&)
+    catch (const system_error &)
     {
         DYNAMIC_VERIFY(false);
     }
@@ -509,46 +525,46 @@ int test10()
 {
     using namespace stdex;
 #if CHECK_FOR_THROW_EVENTS != 0
-		{
-			bool test = false;
+    {
+        bool test = false;
 
-			thread t;
-			try
-			{
-				t.join();
-			}
-			catch (const system_error&)
-			{
-				test = true;
-			}
-			catch (const char *msg)
-			{
-				DYNAMIC_VERIFY(false);
-			}
+        thread t;
+        try
+        {
+            t.join();
+        }
+        catch (const system_error &)
+        {
+            test = true;
+        }
+        catch (const char *msg)
+        {
+            DYNAMIC_VERIFY(false);
+        }
 
-			DYNAMIC_VERIFY(test);
-		}
+        DYNAMIC_VERIFY(test);
+    }
 
-		{
-			bool test = false;
+    {
+        bool test = false;
 
-			thread t;
+        thread t;
 
-			try
-			{
-				t.detach();
-			}
-			catch (const system_error&)
-			{
-				test = true;
-			}
-			catch (const char *msg)
-			{
-				DYNAMIC_VERIFY(false);
-			}
+        try
+        {
+            t.detach();
+        }
+        catch (const system_error &)
+        {
+            test = true;
+        }
+        catch (const char *msg)
+        {
+            DYNAMIC_VERIFY(false);
+        }
 
-			DYNAMIC_VERIFY(test);
-		}
+        DYNAMIC_VERIFY(test);
+    }
 #endif
     return 0;
 }
@@ -586,8 +602,8 @@ int test12()
 int main(void)
 {
     using namespace stdex;
-    
-    test0();    
+
+    test0();
 
     for (size_t i = 0; i < 50; ++i)
     {
@@ -607,7 +623,7 @@ int main(void)
 
         DYNAMIC_VERIFY(thread::hardware_concurrency() >= 1);
     }
-    
+
     test_thread_id();
 
     return 0;
