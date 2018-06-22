@@ -1,5 +1,5 @@
-#include "../stdex/include/chrono.hpp"
 #include "../stdex/include/core.h"
+#include "../stdex/include/chrono.hpp"
 
 int main(void)
 {

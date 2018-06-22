@@ -1,5 +1,5 @@
-#include "../stdex/include/ratio.hpp"
 #include "../stdex/include/core.h"
+#include "../stdex/include/ratio.hpp"
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 
@@ -7,82 +7,82 @@ static const stdex::intmax_t M = stdex::_intmax_t_info::signed_max;
 
 int main(void)
 {
-	using namespace stdex;
+    using namespace stdex;
 
-	// ratio
+// ratio
 	{
-		STATIC_ASSERT((ratio_equal<ratio<2, 6>, ratio<1, 3>>::value == 1), check);
-		STATIC_ASSERT((ratio_equal<ratio<2, 6>, ratio<1, 4>>::value == 0), check);
+		STATIC_ASSERT((ratio_equal<ratio<2, 6>, ratio<1, 3> >::value == 1), check);
+		STATIC_ASSERT((ratio_equal<ratio<2, 6>, ratio<1, 4> >::value == 0), check);
 
-		STATIC_ASSERT((ratio_not_equal<ratio<2, 6>, ratio<1, 3>>::value == 0), check);
-		STATIC_ASSERT((ratio_not_equal<ratio<2, 6>, ratio<1, 4>>::value == 1), check);
+		STATIC_ASSERT((ratio_not_equal<ratio<2, 6>, ratio<1, 3> >::value == 0), check);
+		STATIC_ASSERT((ratio_not_equal<ratio<2, 6>, ratio<1, 4> >::value == 1), check);
 
-		VERIFY((ratio_less<ratio<1, 4>, ratio<1, 3>>::value == true));
-		VERIFY((ratio_less<ratio<-1, 3>, ratio<1, 3>>::value == 1));
+		VERIFY((ratio_less<ratio<1, 4>, ratio<1, 3> >::value == true));
+		VERIFY((ratio_less<ratio<-1, 3>, ratio<1, 3> >::value == 1));
 
-		VERIFY((ratio_less<ratio<1, 3>, ratio<1, 4>>::value == 0));
-		VERIFY((ratio_less<ratio<1, 3>, ratio<-1, 3>>::value == 0));
+		VERIFY((ratio_less<ratio<1, 3>, ratio<1, 4> >::value == 0));
+		VERIFY((ratio_less<ratio<1, 3>, ratio<-1, 3> >::value == 0));
 
-		VERIFY((ratio_less<ratio<-1, 3>, ratio<-1, 4>>::value == 1));
-		VERIFY((ratio_less<ratio<0, 4>, ratio<0, 3>>::value == 0));
-		VERIFY((ratio_less<ratio<1, 3>, ratio<0, 3>>::value == 0));
-		VERIFY((ratio_less<ratio<0, 3>, ratio<-1, 4>>::value == 0));
+		VERIFY((ratio_less<ratio<-1, 3>, ratio<-1, 4> >::value == 1));
+		VERIFY((ratio_less<ratio<0, 4>, ratio<0, 3> >::value == 0));
+		VERIFY((ratio_less<ratio<1, 3>, ratio<0, 3> >::value == 0));
+		VERIFY((ratio_less<ratio<0, 3>, ratio<-1, 4> >::value == 0));
 
-		VERIFY((ratio_less_equal<ratio<-1, 3>, ratio<-1, 3>>::value == 1));
-		VERIFY((ratio_less_equal<ratio<1, 4>, ratio<1, 3>>::value == 1));
+		VERIFY((ratio_less_equal<ratio<-1, 3>, ratio<-1, 3> >::value == 1));
+		VERIFY((ratio_less_equal<ratio<1, 4>, ratio<1, 3> >::value == 1));
 
-		VERIFY((ratio_less_equal<ratio<1, 4>, ratio<-1, 3>>::value == 0));
-		VERIFY((ratio_less_equal<ratio<1, 3>, ratio<-1, 3>>::value == 0));
+		VERIFY((ratio_less_equal<ratio<1, 4>, ratio<-1, 3> >::value == 0));
+		VERIFY((ratio_less_equal<ratio<1, 3>, ratio<-1, 3> >::value == 0));
 
-		VERIFY((ratio_greater<ratio<1, 3>, ratio<1, 4>>::value == 1));
-		VERIFY((ratio_greater<ratio<1, 3>, ratio<-1, 3>>::value == 1));
+		VERIFY((ratio_greater<ratio<1, 3>, ratio<1, 4> >::value == 1));
+		VERIFY((ratio_greater<ratio<1, 3>, ratio<-1, 3> >::value == 1));
 
-		VERIFY((ratio_greater<ratio<1, 4>, ratio<1, 3>>::value == 0));
-		VERIFY((ratio_greater<ratio<-1, 3>, ratio<1, 3>>::value == 0));
+		VERIFY((ratio_greater<ratio<1, 4>, ratio<1, 3> >::value == 0));
+		VERIFY((ratio_greater<ratio<-1, 3>, ratio<1, 3> >::value == 0));
 
-		VERIFY((ratio_greater_equal<ratio<1, 3>, ratio<1, 3>>::value == 1));
-		VERIFY((ratio_greater_equal<ratio<1, 3>, ratio<-1, 3>>::value == 1));
+		VERIFY((ratio_greater_equal<ratio<1, 3>, ratio<1, 3> >::value == 1));
+		VERIFY((ratio_greater_equal<ratio<1, 3>, ratio<-1, 3> >::value == 1));
 
-		VERIFY((ratio_greater_equal<ratio<-1, 3>, ratio<1, 3>>::value == 0));
-		VERIFY((ratio_greater_equal<ratio<1, 4>, ratio<1, 3>>::value == 0));
+		VERIFY((ratio_greater_equal<ratio<-1, 3>, ratio<1, 3> >::value == 0));
+		VERIFY((ratio_greater_equal<ratio<1, 4>, ratio<1, 3> >::value == 0));
 
 		// No overflow with same denominator
-		VERIFY((ratio_less<ratio<M - 2, M>, ratio<M - 1, M>>::value == 1));
+		VERIFY((ratio_less<ratio<M - 2, M>, ratio<M - 1, M> >::value == 1));
 
-		VERIFY((ratio_less<ratio<M - 1, M>, ratio<M - 2, M>>::value == 0));
+		VERIFY((ratio_less<ratio<M - 1, M>, ratio<M - 2, M> >::value == 0));
 
 		// No overflow if signs differ
-		VERIFY((ratio_less<ratio<-M, M - 1>, ratio<M - 1, M - 2>>::value == 1)); // failing then no long long
+		VERIFY((ratio_less<ratio<-M, M - 1>, ratio<M - 1, M - 2> >::value == 1)); // failing then no long long
 
-		VERIFY((ratio_less<ratio<M - 1, M - 2>, ratio<-M, M - 1>>::value == 0)); // failing then no long long
+		VERIFY((ratio_less<ratio<M - 1, M - 2>, ratio<-M, M - 1> >::value == 0)); // failing then no long long
 
 		// No overflow
-		VERIFY((ratio_less<ratio<M, M - 1>, ratio<M, M - 2>>::value == 1));
+		VERIFY((ratio_less<ratio<M, M - 1>, ratio<M, M - 2> >::value == 1));
 
-		VERIFY((ratio_less<ratio<-M, M - 1>, ratio<-M, M - 2>>::value == 0));
+		VERIFY((ratio_less<ratio<-M, M - 1>, ratio<-M, M - 2> >::value == 0));
 
-		VERIFY((ratio_less<ratio<M - 2, M - 1>, ratio<M - 1, M>>::value == 1)); // failing then no long long
+		VERIFY((ratio_less<ratio<M - 2, M - 1>, ratio<M - 1, M> >::value == 1)); // failing then no long long
 
-		VERIFY((ratio_less<ratio<59, 29131>, ratio<59, 29129>>::value == 1));
-		VERIFY((ratio_less<ratio<4733, 13>, ratio<4751, 13>>::value == 1));
-		VERIFY((ratio_less<ratio<25703, 25717>, ratio<25733, 25741>>::value == 1));
-		VERIFY((ratio_less<ratio<631, 769>, ratio<673, 773>>::value == 1));
-		VERIFY((ratio_less<ratio<8353, 16903>, ratio<17891, 32099>>::value == 1));
-		VERIFY((ratio_less<ratio<2311, 18701>, ratio<18457, 19571>>::value == 1));
+		VERIFY((ratio_less<ratio<59, 29131>, ratio<59, 29129> >::value == 1));
+		VERIFY((ratio_less<ratio<4733, 13>, ratio<4751, 13> >::value == 1));
+		VERIFY((ratio_less<ratio<25703, 25717>, ratio<25733, 25741> >::value == 1));
+		VERIFY((ratio_less<ratio<631, 769>, ratio<673, 773> >::value == 1));
+		VERIFY((ratio_less<ratio<8353, 16903>, ratio<17891, 32099> >::value == 1));
+		VERIFY((ratio_less<ratio<2311, 18701>, ratio<18457, 19571> >::value == 1));
 
-		VERIFY((ratio_less<ratio<60, 29132>, ratio<60, 29130>>::value == 1));
-		VERIFY((ratio_less<ratio<4734, 14>, ratio<4752, 14>>::value == 1));
-		VERIFY((ratio_less<ratio<25704, 25718>, ratio<25732, 25742>>::value == 1));
-		VERIFY((ratio_less<ratio<632, 770>, ratio<674, 774>>::value == 1));
-		VERIFY((ratio_less<ratio<8352, 16904>, ratio<17892, 32100>>::value == 1));
-		VERIFY((ratio_less<ratio<2312, 18702>, ratio<18458, 19572>>::value == 1));
+		VERIFY((ratio_less<ratio<60, 29132>, ratio<60, 29130> >::value == 1));
+		VERIFY((ratio_less<ratio<4734, 14>, ratio<4752, 14> >::value == 1));
+		VERIFY((ratio_less<ratio<25704, 25718>, ratio<25732, 25742> >::value == 1));
+		VERIFY((ratio_less<ratio<632, 770>, ratio<674, 774> >::value == 1));
+		VERIFY((ratio_less<ratio<8352, 16904>, ratio<17892, 32100> >::value == 1));
+		VERIFY((ratio_less<ratio<2312, 18702>, ratio<18458, 19572> >::value == 1));
 
-		VERIFY((ratio_less<ratio<58, 29130>, ratio<58, 29128>>::value == 1));
-		VERIFY((ratio_less<ratio<4732, 12>, ratio<4750, 12>>::value == 1));
-		VERIFY((ratio_less<ratio<25702, 25716>, ratio<25734, 25740>>::value == 1));
-		VERIFY((ratio_less<ratio<630, 768>, ratio<672, 772>>::value == 1));
-		VERIFY((ratio_less<ratio<8354, 16902>, ratio<17890, 32102>>::value == 1));
-		VERIFY((ratio_less<ratio<2310, 18700>, ratio<18456, 19570>>::value == 1));
+		VERIFY((ratio_less<ratio<58, 29130>, ratio<58, 29128> >::value == 1));
+		VERIFY((ratio_less<ratio<4732, 12>, ratio<4750, 12> >::value == 1));
+		VERIFY((ratio_less<ratio<25702, 25716>, ratio<25734, 25740> >::value == 1));
+		VERIFY((ratio_less<ratio<630, 768>, ratio<672, 772> >::value == 1));
+		VERIFY((ratio_less<ratio<8354, 16902>, ratio<17890, 32102> >::value == 1));
+		VERIFY((ratio_less<ratio<2310, 18700>, ratio<18456, 19570> >::value == 1));
 
 		{
 			typedef ratio<1, 3> r0;
@@ -137,10 +137,9 @@ int main(void)
 		{
 			using stdex::intmax_t;
 
-			const intmax_t m1 = (intmax_t)1 << (4 * sizeof(intmax_t) - 1);
+			const intmax_t m1 = (intmax_t) 1 << (4 * sizeof(intmax_t) - 1);
 			typedef ratio_add<ratio<1, (m1 - 1) * (m1 - 2)>,
-							  ratio<1, (m1 - 3) * (m1 - 2)>>
-				ra_type1;
+				ratio<1, (m1 - 3) * (m1 - 2)> > ra_type1;
 			VERIFY(ra_type1::num == 2);
 			VERIFY(ra_type1::den == (m1 - 1) * (m1 - 3));
 
@@ -166,28 +165,30 @@ int main(void)
 		}
 
 		{
-			typedef ratio_add<ratio<3, 8>, ratio<5, 12>>::type r;
+			typedef ratio_add<ratio<3, 8>, ratio<5, 12> >::type r;
 
 			VERIFY(r::num == 19);
 			VERIFY(r::den == 24);
 		}
 
 		{
-			typedef ratio_subtract<ratio<3, 8>, ratio<5, 12>>::type r;
+			typedef ratio_subtract<ratio<3, 8>, ratio<5, 12> >::type r;
 
 			VERIFY(r::num == -1);
 			VERIFY(r::den == 24);
 		}
 
+
 		{
-			typedef ratio_multiply<ratio<3, 8>, ratio<5, 12>>::type r;
+			typedef ratio_multiply<ratio<3, 8>, ratio<5, 12> >::type r;
 
 			VERIFY(r::num == 5);
 			VERIFY(r::den == 32);
 		}
 
+
 		{
-			typedef ratio_divide<ratio<3, 8>, ratio<5, 12>>::type r;
+			typedef ratio_divide<ratio<3, 8>, ratio<5, 12> >::type r;
 
 			VERIFY(r::num == 9);
 			VERIFY(r::den == 10);
@@ -206,10 +207,12 @@ int main(void)
 
 			typedef ratio_add<
 				ratio<M / 2, M / 2>,
-				ratio<M / 2, M / 2 + 1>>::type r2;
+				ratio<M / 2, M / 2 + 1> >::type r2;
 
 			VERIFY(r2::num == M);
 			VERIFY(r2::den == (M / 2) + 1);
+
+
 
 			typedef ratio_subtract<one_over_max, one_over_max>::type r3;
 
@@ -218,7 +221,7 @@ int main(void)
 
 			typedef ratio_subtract<
 				ratio<M / 2, M / 2>,
-				ratio<M / 2, M / 2 + 1>>::type r4;
+				ratio<M / 2, M / 2 + 1> >::type r4;
 
 			VERIFY(r4::num == 1);
 			VERIFY(r4::den == (M / 2) + 1);
@@ -226,28 +229,29 @@ int main(void)
 
 		// sanity check
 		{
-			VERIFY((ratio_equal<ratio<1, 3>, ratio<2, 6>>::value == (true)));
-			VERIFY((ratio_not_equal<ratio<1, 3>, ratio<2, 5>>::value == (true)));
-			VERIFY((ratio_less<ratio<1, 4>, ratio<1, 3>>::value == (true)));
-			VERIFY((ratio_less_equal<ratio<1, 4>, ratio<1, 4>>::value && ratio_less_equal<ratio<1, 4>, ratio<1, 3>>::value == (true)));
-			VERIFY((ratio_greater<ratio<1, 3>, ratio<1, 4>>::value == (true)));
-			VERIFY((ratio_greater_equal<ratio<1, 4>, ratio<1, 4>>::value && ratio_greater_equal<ratio<1, 3>, ratio<1, 4>>::value == (true)));
+			VERIFY((ratio_equal<ratio<1, 3>, ratio<2, 6> >::value == (true) ));
+			VERIFY(( ratio_not_equal<ratio<1, 3>, ratio<2, 5> >::value == (true) ));
+			VERIFY((ratio_less<ratio<1, 4>, ratio<1, 3> >::value == (true) ));
+			VERIFY((ratio_less_equal<ratio<1, 4>, ratio<1, 4> >::value && ratio_less_equal<ratio<1, 4>, ratio<1, 3> >::value == (true) ));
+			VERIFY((ratio_greater<ratio<1, 3>, ratio<1, 4> >::value == (true) ));
+			VERIFY((ratio_greater_equal<ratio<1, 4>, ratio<1, 4> >::value && ratio_greater_equal<ratio<1, 3>, ratio<1, 4> >::value == (true)));
 		}
+
 
 #if (CHECK_FOR_COMPILE_ERROR_TESTS == 1)
 		{
 			// Negative tests:
-			volatile ratio<M, M> r1;  //??
+			volatile ratio<M, M> r1; //??
 			volatile ratio<-M, M> r2; //??
-			volatile ratio<M, 1> r3;  //??
-			volatile ratio<1, M> r4;  //??
-			volatile ratio<1, 0> r5;  // error
+			volatile ratio<M, 1> r3; //??
+			volatile ratio<1, M> r4; //??
+			volatile ratio<1, 0> r5; // error
 
-			volatile ratio_add<ratio<M, 1>, ratio<1>>::type r6;			 // error
-			volatile ratio_multiply<ratio<-M, 2>, ratio<3, 2>>::type r1; // error
-			volatile ratio_multiply<ratio<M>, ratio<M>>::type r2;		 // error
+			volatile ratio_add<ratio<M, 1>, ratio<1> >::type r6; // error
+			volatile ratio_multiply<ratio<-M, 2>, ratio<3, 2> >::type r1; // error
+			volatile ratio_multiply<ratio<M>, ratio<M> >::type r2; // error
 		}
 #endif
 	}
-	return 0;
+    return 0;
 }

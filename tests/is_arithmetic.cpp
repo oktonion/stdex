@@ -1,17 +1,15 @@
 #include "../stdex/include/core.h"
 #include "../stdex/include/type_traits.hpp"
 
-struct ClassType
-{
-};
+struct ClassType {};
 
 int main(void)
 {
     using namespace stdex;
-
+    
     // is_arithmetic
     STATIC_ASSERT(is_arithmetic<void>::value == (false), can_not_be_arithmetic);
-
+                                
     STATIC_ASSERT(is_arithmetic<char>::value == (true), should_be_arithmetic);
     STATIC_ASSERT(is_arithmetic<signed char>::value == (true), should_be_arithmetic);
     STATIC_ASSERT(is_arithmetic<unsigned char>::value == (true), should_be_arithmetic);

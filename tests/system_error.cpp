@@ -1,105 +1,80 @@
-#include "../stdex/include/system_error.hpp"
 #include "../stdex/include/core.h"
+#include "../stdex/include/system_error.hpp"
 
 #include <iostream>
 #include <string>
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
-#define DYNAMIC_VERIFY(cond)                                                                         \
-    if (!(cond))                                                                                     \
-    {                                                                                                \
-        std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; \
-        return -1;                                                                                   \
-    }
-#define RUN_TEST(test)                                           \
-    {                                                            \
-        std::cout << #test << std::endl;                         \
-        int line = test();                                       \
-        if (line != 0)                                           \
-        {                                                        \
-            std::cout << "failed at line " << line << std::endl; \
-            return line;                                         \
-        }                                                        \
-    }
+#define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
+#define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
 using std::size_t;
 
-struct ClassType
-{
-};
-enum my_errc
-{
-    my_err = 0
-};
-enum my_not_errc
-{
-    my_not_err = 0
-};
+struct ClassType {};
+enum my_errc { my_err = 0 };
+enum my_not_errc { my_not_err = 0 };
 
 class my_error_category_impl
-    : public stdex::error_category
+	: public stdex::error_category
 {
-  public:
-    const char *name() const stdex_noexcept { return ""; }
-    std::string message(int) const { return ""; }
+public:
+	const char* name() const stdex_noexcept { return ""; }
+	std::string message(int) const { return ""; }
 } my_error_category_instance;
 
 namespace stdex
 {
-stdex::error_code
-make_error_code(my_errc e)
-{
-    return stdex::error_code(static_cast<int>(e),
-                             my_error_category_instance);
-}
+	stdex::error_code
+		make_error_code(my_errc e)
+	{
+		return stdex::error_code(static_cast<int>(e),
+			my_error_category_instance);
+	}
 }
 
 using stdex::make_error_code;
 
 namespace stdex
 {
-stdex::error_condition
-make_error_condition(my_errc e)
-{
-    return stdex::error_condition(static_cast<int>(e),
-                                  my_error_category_instance);
-}
+	stdex::error_condition
+		make_error_condition(my_errc e)
+	{
+		return stdex::error_condition(static_cast<int>(e),
+			my_error_category_instance);
+	}
 }
 
 using stdex::make_error_condition;
 
 namespace stdex
 {
-template <>
-struct is_error_code_enum<my_errc>
-    : public true_type
-{
-};
+	template<>
+	struct is_error_code_enum<my_errc>
+		: public true_type {};
 }
 
 namespace stdex
 {
-template <>
-struct is_error_condition_enum<my_errc>
-    : public true_type
-{
-};
+	template<>
+	struct is_error_condition_enum<my_errc>
+		: public true_type { };
 }
 
-class fuzzy_logic : public stdex::system_error
+class fuzzy_logic :
+    public stdex::system_error
 {
-  public:
-    fuzzy_logic() : stdex::system_error(stdex::error_code(), "whoa") {}
+public:
+	fuzzy_logic() : stdex::system_error(stdex::error_code(), "whoa") { }
 };
 
 void allocate_on_stack(void)
 {
-    const size_t num = 512;
-    char array[num];
-    for (size_t i = 0; i < num; i++)
-        array[i] = 0;
-    // Suppress unused warnings.
-    for (size_t i = 0; i < num; i++)
-        array[i] = array[i];
+	const size_t num = 512;
+	char array[num];
+	for (size_t i = 0; i < num; i++)
+		array[i] = 0;
+	// Suppress unused warnings.
+	for (size_t i = 0; i < num; i++)
+		array[i] = array[i];
 }
 
 int test0()
@@ -110,8 +85,7 @@ int test0()
     ec = errc::not_supported;
     ec = my_err;
     if (ec == errc::not_supported)
-    {
-    }
+    { }
 
     return 0;
 }
@@ -180,7 +154,7 @@ int test4()
     {
         throw fuzzy_logic();
     }
-    catch (const fuzzy_logic &obj)
+    catch (const fuzzy_logic& obj)
     {
         DYNAMIC_VERIFY(std::string(obj.what()).find("whoa") != std::string::npos);
     }
@@ -191,7 +165,7 @@ int test4()
 
     {
         error_code e;
-        int i = e; // error "cannot convert"
+        int i = e;  // error "cannot convert"
     }
 
     {
@@ -209,8 +183,8 @@ int test5()
     using namespace stdex;
 
     const std::string s("CA ISO emergency once again:immediate power down");
-    const char *strlit1 = "wish I lived in Palo Alto";
-    const char *strlit2 = "...or Santa Barbara";
+    const char* strlit1 = "wish I lived in Palo Alto";
+    const char* strlit2 = "...or Santa Barbara";
     system_error obj1(error_code(), s);
 
     // block 01
@@ -259,7 +233,7 @@ int test7()
     test_type t(error_code(), xxx);
     std::string what_str = t.what();
     size_t len1 = what_str.length(),
-           len2 = xxx.length();
+    len2 = xxx.length();
     DYNAMIC_VERIFY((what_str.find(xxx) != std::string::npos));
     return 0;
 }
@@ -455,7 +429,7 @@ int test18()
 int main(void)
 {
     using namespace stdex;
-
+    
     RUN_TEST(test1);
     RUN_TEST(test2);
     RUN_TEST(test3);

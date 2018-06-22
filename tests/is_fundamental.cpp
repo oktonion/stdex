@@ -1,14 +1,12 @@
 #include "../stdex/include/core.h"
 #include "../stdex/include/type_traits.hpp"
 
-struct ClassType
-{
-};
+struct ClassType {};
 
 int main(void)
 {
     using namespace stdex;
-
+    
     // is_fundamental
     STATIC_ASSERT(is_fundamental<void>::value == (true), should_be_fundamental);
     STATIC_ASSERT(is_fundamental<char>::value == (true), should_be_fundamental);

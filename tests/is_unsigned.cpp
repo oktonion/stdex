@@ -1,14 +1,12 @@
 #include "../stdex/include/core.h"
 #include "../stdex/include/type_traits.hpp"
 
-struct ClassType
-{
-};
+struct ClassType {};
 
 int main(void)
 {
     using namespace stdex;
-
+    
     // is_unsigned
     STATIC_ASSERT(is_unsigned<void>::value == false, check);
 

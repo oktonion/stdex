@@ -1,14 +1,12 @@
 #include "../stdex/include/core.h"
 #include "../stdex/include/type_traits.hpp"
 
-struct ClassType
-{
-};
+struct ClassType {};
 
 int main(void)
 {
     using namespace stdex;
-
+    
     // rank
     STATIC_ASSERT(rank<int>::value == (0), rank_check);
     STATIC_ASSERT(rank<int[2]>::value == (1), rank_check);

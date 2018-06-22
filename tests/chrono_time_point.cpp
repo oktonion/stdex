@@ -1,13 +1,8 @@
-#include "../stdex/include/chrono.hpp"
 #include "../stdex/include/core.h"
+#include "../stdex/include/chrono.hpp"
 
 #include <iostream>
-#define DYNAMIC_VERIFY(cond)                                                                         \
-    if (!(cond))                                                                                     \
-    {                                                                                                \
-        std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; \
-        return -1;                                                                                   \
-    }
+#define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
 
 int main(void)
 {
@@ -25,7 +20,7 @@ int main(void)
         time_point<high_resolution_clock> t3;
         DYNAMIC_VERIFY(t3.time_since_epoch() == high_resolution_clock::duration::zero());
     }
-
+    
     {
         time_point<system_clock> t1, t2;
         t1 += seconds(1);
