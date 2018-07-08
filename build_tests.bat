@@ -8,7 +8,7 @@ set INCLUDE=%INCLUDE%%cd%\pthread\;
 
 for /f %%f in ('dir /b ".\tests\*.cpp"') do (
   echo "compiling test %VisualStudioVersion% %%~nf"
-  cl -EHsc -Fo.\tests\obj\%%~nf.obj -c ".\tests\%%f"
+  cl -EHsc -Wall -Fo.\tests\obj\%%~nf.obj -c ".\tests\%%f"
   if /I "%ERRORLEVEL%" NEQ "0" (
     %build_ok%=0
   )
