@@ -19,8 +19,10 @@ int main(void)
     STATIC_ASSERT(is_fundamental<unsigned int>::value == (true), should_be_fundamental);
     STATIC_ASSERT(is_fundamental<long>::value == (true), should_be_fundamental);
     STATIC_ASSERT(is_fundamental<unsigned long>::value == (true), should_be_fundamental);
+    #ifdef LLONG_MAX
     STATIC_ASSERT(is_fundamental<long long>::value == (true), should_be_fundamental);
     STATIC_ASSERT(is_fundamental<unsigned long long>::value == (true), should_be_fundamental);
+    #endif
     STATIC_ASSERT(is_fundamental<float>::value == (true), should_be_fundamental);
     STATIC_ASSERT(is_fundamental<double>::value == (true), should_be_fundamental);
     STATIC_ASSERT(is_fundamental<long double>::value == (true), should_be_fundamental);

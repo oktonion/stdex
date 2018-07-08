@@ -20,8 +20,10 @@ int main(void)
     STATIC_ASSERT(is_arithmetic<unsigned int>::value == (true), should_be_arithmetic);
     STATIC_ASSERT(is_arithmetic<long>::value == (true), should_be_arithmetic);
     STATIC_ASSERT(is_arithmetic<unsigned long>::value == (true), should_be_arithmetic);
+    #ifdef LLONG_MAX
     STATIC_ASSERT(is_arithmetic<long long>::value == (true), should_be_arithmetic);
     STATIC_ASSERT(is_arithmetic<unsigned long long>::value == (true), should_be_arithmetic);
+    #endif
     STATIC_ASSERT(is_arithmetic<float>::value == (true), should_be_arithmetic);
     STATIC_ASSERT(is_arithmetic<double>::value == (true), should_be_arithmetic);
     STATIC_ASSERT(is_arithmetic<long double>::value == (true), should_be_arithmetic);

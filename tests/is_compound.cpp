@@ -19,8 +19,10 @@ int main(void)
     STATIC_ASSERT(is_compound<unsigned int>::value == false, should_not_be_compound);
     STATIC_ASSERT(is_compound<long>::value == false, should_not_be_compound);
     STATIC_ASSERT(is_compound<unsigned long>::value == false, should_not_be_compound);
+    #ifdef LLONG_MAX
     STATIC_ASSERT(is_compound<long long>::value == false, should_not_be_compound);
     STATIC_ASSERT(is_compound<unsigned long long>::value == false, should_not_be_compound);
+    #endif
     STATIC_ASSERT(is_compound<float>::value == false, should_not_be_compound);
     STATIC_ASSERT(is_compound<double>::value == false, should_not_be_compound);
     STATIC_ASSERT(is_compound<long double>::value == false, should_not_be_compound);
