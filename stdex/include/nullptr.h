@@ -147,7 +147,7 @@ namespace stdex
 
 			enum nullptr_t_as_enum
 			{
-				_nullptr_val = nullptr_t_as_enum(STDEX_NULL),
+				_nullptr_val = ptrdiff_detail::ptrdiff_t(STDEX_NULL),
 				_max_nullptr = nullptr_t_as_uint(1) << (CHAR_BIT * sizeof(void*) - 1)
 			};
 
