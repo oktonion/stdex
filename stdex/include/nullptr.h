@@ -177,7 +177,7 @@ namespace stdex
 									  _is_convertable_to_any_ptr_impl_helper<T, volatile float>::value &&
 									  _is_convertable_to_any_ptr_impl_helper<T, volatile const double>::value &&
 									  _is_convertable_to_any_ptr_impl_helper<T, nullptr_detail::dummy_class>::value &&
-									  _is_convertable_to_any_ptr_impl_helper<T, dummy_class_f>::value,
+									  _is_convertable_to_any_ptr_impl_helper<T, dummy_class_f>::value &&
 									  _is_convertable_to_any_ptr_impl_helper<T, dummy_class_f_const>::value;
 		};
 
