@@ -33,6 +33,7 @@ namespace stdex
 
 			template<class _Tp>
 			_yes_type _is_convertable_to_ptr_tester(_Tp*);
+			template<class>
 			_no_type _is_convertable_to_ptr_tester(...);
 
 			/*template<int> struct sfinae_true
