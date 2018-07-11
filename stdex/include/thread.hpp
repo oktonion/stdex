@@ -198,8 +198,8 @@ namespace stdex
 					arg1(arg1_)
 				{ }
 
-				template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr) { fp(arg1); }
-				template<class _FuncT> void call(_FuncT &fp, eTypeNullptr) { fp(nullptr); }
+template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr) { fp(arg1); }
+template<class _FuncT> void call(_FuncT &fp, eTypeNullptr) { fp(nullptr); }
 
 				template<class _FuncT>
 				void push(_FuncT &fp)
@@ -209,14 +209,14 @@ namespace stdex
 				}
 
 				template<class _ObjectT, class _ReturnT, class _FArg1>
-				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1))
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1))
 				{
 					call(fp,
 						_type_is_nullptr<_Arg1, _FArg1>::value);
 				}
 
 				template<class _ObjectT, class _ReturnT, class _FArg1>
-				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1) const)
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1) const)
 				{
 					call(fp,
 						_type_is_nullptr<_Arg1, _FArg1>::value);
@@ -252,7 +252,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr) { fp(null
 				}
 
 				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2>
-				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2))
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2))
 				{
 					call(fp,
 						_type_is_nullptr<_Arg1, _FArg1>::value,
@@ -260,7 +260,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr) { fp(null
 				}
 
 				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2>
-				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2) const)
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2) const)
 				{
 					call(fp,
 						_type_is_nullptr<_Arg1, _FArg1>::value,
@@ -303,7 +303,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				}
 
 				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3>
-				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3))
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3))
 				{
 					call(fp,
 						_type_is_nullptr<_Arg1, _FArg1>::value,
@@ -312,7 +312,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				}
 
 				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3>
-				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3) const)
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3) const)
 				{
 					call(fp,
 						_type_is_nullptr<_Arg1, _FArg1>::value,
@@ -367,7 +367,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				}
 
 				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4>
-				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4))
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4))
 				{
 					call(fp,
 						_type_is_nullptr<_Arg1, _FArg1>::value,
@@ -377,7 +377,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				}
 
 				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4>
-				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4) const)
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4) const)
 				{
 					call(fp,
 						_type_is_nullptr<_Arg1, _FArg1>::value,
@@ -450,7 +450,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				}
 
 				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5>
-				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5))
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5))
 				{
 					call(fp,
 						_type_is_nullptr<_Arg1, _FArg1>::value,
@@ -461,7 +461,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				}
 
 				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5>
-				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5) const)
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5) const)
 				{
 					call(fp,
 						_type_is_nullptr<_Arg1, _FArg1>::value,
@@ -570,7 +570,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				}
 
 				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6>
-				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6))
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6))
 				{
 					call(fp,
 						_type_is_nullptr<_Arg1, _FArg1>::value,
@@ -582,7 +582,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				}
 
 				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6>
-				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6) const)
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6) const)
 				{
 					call(fp,
 						_type_is_nullptr<_Arg1, _FArg1>::value,
@@ -758,7 +758,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				}
 
 				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6, class _FArg7>
-				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7))
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7))
 				{
 					call(fp,
 						_type_is_nullptr<_Arg1, _FArg1>::value,
@@ -771,7 +771,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				}
 
 				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6, class _FArg7>
-				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7) const)
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7) const)
 				{
 					call(fp,
 						_type_is_nullptr<_Arg1, _FArg1>::value,
@@ -1078,7 +1078,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				}
 
 				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6, class _FArg7, class _FArg8>
-				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7, _FArg8))
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7, _FArg8))
 				{
 					call(fp,
 						_type_is_nullptr<_Arg1, _FArg1>::value,
@@ -1092,7 +1092,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				}
 
 				template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6, class _FArg7, class _FArg8>
-				void push(_ObjectT &fp, _ReturnT(_ObjectT::*mp)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7, _FArg8) const)
+				void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7, _FArg8) const)
 				{
 					call(fp,
 						_type_is_nullptr<_Arg1, _FArg1>::value,
