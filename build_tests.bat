@@ -20,6 +20,7 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
 
 if /I "%build_ok%" NEQ "1" (
   echo "tests build failed"
+  exit /B 1
 )
 
 del /Q .\tests\obj\*.obj
