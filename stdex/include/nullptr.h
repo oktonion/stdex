@@ -26,30 +26,14 @@ namespace stdex
 				char padding[8];
 			};
 
-			_no_type _is_convertable_to_void_ptr(...);
-			_yes_type _is_convertable_to_void_ptr(void*);
-			
-			
-			_no_type _is_convertable_to_int_ptr(...);
-			_yes_type _is_convertable_to_int_ptr(int*);
-			
-			_no_type _is_convertable_to_float_ptr(...);
-			_yes_type _is_convertable_to_float_ptr(float*);
-			
-			_no_type _is_convertable_to_bool_ptr(...);
-			_yes_type _is_convertable_to_bool_ptr(bool*);
-			
-			_no_type _is_convertable_to_const_bool_ptr(...);
-			_yes_type _is_convertable_to_const_bool_ptr(const bool*);
-			
-			_no_type _is_convertable_to_volatile_float_ptr(...);
-			_yes_type _is_convertable_to_volatile_float_ptr(volatile float*);
-			
-			struct tester{};
-			_no_type _is_convertable_to_class_ptr(...);
-			_yes_type _is_convertable_to_class_ptr(tester*);
-			_no_type _is_convertable_to_class_f_ptr(...);
-			_yes_type _is_convertable_to_class_f_ptr(void(tester::*)(int));
+			struct dummy_class {};
+
+			_yes_type _is_convertable_to_void_ptr_tester(void*);
+			_no_type _is_convertable_to_void_ptr_tester(...);
+
+			template<class _Tp>
+			_yes_type _is_convertable_to_ptr_tester(_Tp*);
+			_no_type _is_convertable_to_ptr_tester(...);
 
 			/*template<int> struct sfinae_true
 			{
@@ -164,39 +148,39 @@ namespace stdex
 		template<class _T>
 		struct _is_convertable_to_void_ptr_impl
 		{
-			static const bool value = (sizeof(nullptr_detail::_is_convertable_to_void_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
+			static const bool value = (sizeof(nullptr_detail::_is_convertable_to_void_ptr_tester((_T) (STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
 		};
 
-		template<class _T>
+		template<class NullPtrType, class T>
+		struct _is_convertable_to_any_ptr_impl_helper
+		{
+			static const bool value = (sizeof(nullptr_detail::_is_convertable_to_ptr_tester<T>((NullPtrType) (STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
+		};
+
+		template<class T>
 		struct _is_convertable_to_any_ptr_impl
 		{
-			static const bool to_int_ptr = (sizeof(nullptr_detail::_is_convertable_to_int_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-			static const bool to_float_ptr = (sizeof(nullptr_detail::_is_convertable_to_float_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-			static const bool to_bool_ptr = (sizeof(nullptr_detail::_is_convertable_to_bool_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-			static const bool to_const_bool_ptr = (sizeof(nullptr_detail::_is_convertable_to_const_bool_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-			static const bool to_volatile_float_ptr = (sizeof(nullptr_detail::_is_convertable_to_volatile_float_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-			static const bool to_class_ptr = (sizeof(nullptr_detail::_is_convertable_to_class_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-			static const bool to_class_f_ptr = (sizeof(nullptr_detail::_is_convertable_to_class_f_ptr((_T)(STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-			
-			static const bool value = _is_convertable_to_any_ptr_impl::to_int_ptr &&
-									  _is_convertable_to_any_ptr_impl::to_float_ptr &&
-									  _is_convertable_to_any_ptr_impl::to_bool_ptr &&
-									  _is_convertable_to_any_ptr_impl::to_const_bool_ptr &&
-									  _is_convertable_to_any_ptr_impl::to_volatile_float_ptr &&
-									  _is_convertable_to_any_ptr_impl::to_class_ptr &&
-									  _is_convertable_to_any_ptr_impl::to_class_f_ptr;
+			typedef void(nullptr_detail::dummy_class::*dummy_class_f)(int);
+
+			static const bool value = _is_convertable_to_any_ptr_impl_helper<T, int>::value &&
+									  _is_convertable_to_any_ptr_impl_helper<T, float>::value &&
+									  _is_convertable_to_any_ptr_impl_helper<T, bool>::value &&
+									  _is_convertable_to_any_ptr_impl_helper<T, const bool>::value &&
+									  _is_convertable_to_any_ptr_impl_helper<T, volatile float>::value &&
+									  _is_convertable_to_any_ptr_impl_helper<T, nullptr_detail::dummy_class>::value &&
+									  _is_convertable_to_any_ptr_impl_helper<T, dummy_class_f>::value;
 		};
 
-		template<class _T>
+		template<class T>
 		struct _is_convertable_to_ptr_impl
 		{
-			static const bool value = (_is_convertable_to_void_ptr_impl<_T>::value == bool(true) && _is_convertable_to_any_ptr_impl<_T>::value == bool(true));
+			static const bool value = (_is_convertable_to_void_ptr_impl<T>::value == bool(true) && _is_convertable_to_any_ptr_impl<T>::value == bool(true));
 		};
 
-		template<class _T>
+		template<class T>
 		struct _is_equal_size_to_void_ptr
 		{
-			static const bool value = (sizeof(_T) == sizeof(void*));
+			static const bool value = (sizeof(T) == sizeof(void*));
 		};
 
 		struct _member_ptr_is_same_as_ptr
