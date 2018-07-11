@@ -162,14 +162,17 @@ namespace stdex
 		struct _is_convertable_to_any_ptr_impl
 		{
 			typedef void(nullptr_detail::dummy_class::*dummy_class_f)(int);
+			typedef int(nullptr_detail::dummy_class::*dummy_class_f_const)(double&)const;
 
 			static const bool value = _is_convertable_to_any_ptr_impl_helper<T, int>::value &&
 									  _is_convertable_to_any_ptr_impl_helper<T, float>::value &&
 									  _is_convertable_to_any_ptr_impl_helper<T, bool>::value &&
 									  _is_convertable_to_any_ptr_impl_helper<T, const bool>::value &&
 									  _is_convertable_to_any_ptr_impl_helper<T, volatile float>::value &&
+									  _is_convertable_to_any_ptr_impl_helper<T, volatile const double>::value &&
 									  _is_convertable_to_any_ptr_impl_helper<T, nullptr_detail::dummy_class>::value &&
-									  _is_convertable_to_any_ptr_impl_helper<T, dummy_class_f>::value;
+									  _is_convertable_to_any_ptr_impl_helper<T, dummy_class_f>::value,
+									  _is_convertable_to_any_ptr_impl_helper<T, dummy_class_f_const>::value;
 		};
 
 		template<class T>
