@@ -16,7 +16,7 @@ if ["%~1"]==["debug"] (
 echo "compiling %VisualStudioVersion% pthread-win32"
 cl -EHsc -Fo.\stdex\obj\pthread.obj -D HAVE_CONFIG_H -c ".\pthread-win32\pthread.c" %build_opt%
 if /I "%ERRORLEVEL%" NEQ "0" (
-    echo failed
+    echo "failed"
     exit /B 1
 )
 
