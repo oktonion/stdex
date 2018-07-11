@@ -158,11 +158,17 @@ namespace stdex
 			static const bool value = (sizeof(nullptr_detail::_is_convertable_to_ptr_tester<T>((NullPtrType) (STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
 		};
 
+		template<class NullPtrType, class T>
+		struct _is_convertable_to_any_ptr_impl_helper<NullPtrType, T*>
+		{
+			static const bool value = (sizeof(nullptr_detail::_is_convertable_to_ptr_tester<T>((NullPtrType) (STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
+		};
+
 		template<class T>
 		struct _is_convertable_to_any_ptr_impl
 		{
 			typedef void(nullptr_detail::dummy_class::*dummy_class_f)(int);
-			typedef int(nullptr_detail::dummy_class::*dummy_class_f_const)(double&)const;
+			typedef int (nullptr_detail::dummy_class::*dummy_class_f_const)(double&) const;
 
 			static const bool value = _is_convertable_to_any_ptr_impl_helper<T, int>::value &&
 									  _is_convertable_to_any_ptr_impl_helper<T, float>::value &&
