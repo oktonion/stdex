@@ -394,7 +394,7 @@ namespace stdex
 					errno = ERANGE;
 				}
 				else if (neg)
-					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc);
+					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc); // generates WC4146 on Visual Studio and it's a bug probably (idk how to fix it yet)
 				if (endptr != 0)
 					*endptr = (char *) (any ? s - 1 : nptr);
 				return (acc);
@@ -502,7 +502,7 @@ namespace stdex
 					errno = ERANGE;
 				}
 				else if (neg)
-					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc);
+					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc); // generates WC4146 on Visual Studio and it's a bug probably (idk how to fix it yet)
 				if (endptr != 0)
 					*endptr = (wchar_t *) (any ? s - 1 : nptr);
 				return (acc);
@@ -589,7 +589,7 @@ namespace stdex
 					errno = ERANGE;
 				}
 				else if (neg)
-					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc);
+					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc); // generates WC4146 on Visual Studio and it's a bug probably (idk how to fix it yet)
 				if (endptr != 0)
 					*endptr = (char *) (any ? s - 1 : nptr);
 				return (acc);
@@ -668,7 +668,7 @@ namespace stdex
 					errno = ERANGE;
 				}
 				else if (neg)
-					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc);
+					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc); // generates WC4146 on Visual Studio and it's a bug probably (idk how to fix it yet)
 				if (endptr != 0)
 					*endptr = (wchar_t *) (any ? s - 1 : nptr);
 				return (acc);
@@ -1968,7 +1968,7 @@ namespace stdex
 			fp_fractional_part = modf(value, &fp_integer_part);
 			while (fp_integer_part > 0.0L)
 			{
-				str_integer_part_reverse[symbols_converted_n++] = '0' + (int) fmod(fp_integer_part, 10.0L);
+				str_integer_part_reverse[symbols_converted_n++] = '0' + (char) fmod(fp_integer_part, 10.0L);
 				fp_integer_part = floor(fp_integer_part / 10.0L);
 			}
 
@@ -1983,7 +1983,7 @@ namespace stdex
 				{
 					fp_fractional_part *= 10.0L;
 					fp_fractional_part = modf(fp_fractional_part, &fp_integer_part);
-					buf[symbols_converted_n++] = '0' + (int) fp_integer_part;
+					buf[symbols_converted_n++] = '0' + (char) fp_integer_part;
 				}
 			}
 			else
@@ -2028,7 +2028,7 @@ namespace stdex
 			fp_fractional_part = modf(value, &fp_integer_part);
 			while (fp_integer_part > 0.0L)
 			{
-				str_integer_part_reverse[symbols_converted_n++] = L'0' + (int) fmod(fp_integer_part, 10.0L);
+				str_integer_part_reverse[symbols_converted_n++] = L'0' + (char) fmod(fp_integer_part, 10.0L);
 				fp_integer_part = floor(fp_integer_part / 10.0L);
 			}
 
@@ -2043,7 +2043,7 @@ namespace stdex
 				{
 					fp_fractional_part *= 10.0L;
 					fp_fractional_part = modf(fp_fractional_part, &fp_integer_part);
-					buf[symbols_converted_n++] = L'0' + (int) fp_integer_part;
+					buf[symbols_converted_n++] = L'0' + (char) fp_integer_part;
 				}
 			}
 			else
