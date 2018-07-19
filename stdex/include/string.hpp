@@ -1965,7 +1965,7 @@ namespace stdex
 #endif
 			long double fp_integer_part, fp_fractional_part;
 			detail::string_detail::_stdex_size_t_type symbols_converted_n = 0;
-			fp_fractional_part = modf(value, &fp_integer_part);
+			fp_fractional_part = modfl(value, &fp_integer_part);
 			while (fp_integer_part > 0.0L)
 			{
 				str_integer_part_reverse[symbols_converted_n++] = '0' + (char) fmod(fp_integer_part, 10.0L);
@@ -1982,7 +1982,7 @@ namespace stdex
 				while (fp_fractional_part > 0.0L)
 				{
 					fp_fractional_part *= 10.0L;
-					fp_fractional_part = modf(fp_fractional_part, &fp_integer_part);
+					fp_fractional_part = modfl(fp_fractional_part, &fp_integer_part);
 					buf[symbols_converted_n++] = '0' + (char) fp_integer_part;
 				}
 			}
@@ -2025,7 +2025,7 @@ namespace stdex
 #endif
 			long double fp_integer_part, fp_fractional_part;
 			detail::string_detail::_stdex_size_t_type symbols_converted_n = 0;
-			fp_fractional_part = modf(value, &fp_integer_part);
+			fp_fractional_part = modfl(value, &fp_integer_part);
 			while (fp_integer_part > 0.0L)
 			{
 				str_integer_part_reverse[symbols_converted_n++] = L'0' + (char) fmod(fp_integer_part, 10.0L);
@@ -2042,7 +2042,7 @@ namespace stdex
 				while (fp_fractional_part > 0.0L)
 				{
 					fp_fractional_part *= 10.0L;
-					fp_fractional_part = modf(fp_fractional_part, &fp_integer_part);
+					fp_fractional_part = modfl(fp_fractional_part, &fp_integer_part);
 					buf[symbols_converted_n++] = L'0' + (char) fp_integer_part;
 				}
 			}
