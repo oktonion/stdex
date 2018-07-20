@@ -34,9 +34,9 @@
 #define _STDEX_PLACE_DUMMY_IN_STD_NAMESPACE
 
 #ifdef _STDEX_PLACE_DUMMY_IN_STD_NAMESPACE
-namespace std
+namespace std_dummy
 {
-
+	using namespace std;
 	void strtoll(); // dummy
 	void wcstoll(); // dummy
 	void strtoull(); // dummy
@@ -105,9 +105,7 @@ namespace stdex
 			_no_type _wcstold_tester(...);
 			
 
-			using namespace std;
-
-			typedef size_t _stdex_size_t_type;
+			using namespace std_dummy;
 
 			struct _strtoll_present
 			{
@@ -140,6 +138,10 @@ namespace stdex
 			};
 
 #undef _STDEX_PLACE_DUMMY_IN_STD_NAMESPACE
+
+			using namespace std;
+
+			typedef size_t _stdex_size_t_type;
 
 			template<class RetT, class Arg2T>
 			_yes_type _has_4arg_swprintf_tester(RetT(*)(wchar_t*, Arg2T, const wchar_t*, ...));
