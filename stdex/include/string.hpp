@@ -1954,7 +1954,7 @@ namespace stdex
 
 		string result(buf);
 
-		// some compilers ignore 'f' flag of spintf and print large values with scientific notation, as if 'e' flag was passed
+		// some compilers ignore 'f' flag of sprintf and print large values with scientific notation, as if 'e' flag was passed
 		// so we are removing substrings like 'e-10' and trying to enforce the precision by slow and not so precise conversion:
 
 		detail::string_detail::_stdex_size_t_type e_pos = result.rfind('e'); 
@@ -2014,7 +2014,7 @@ namespace stdex
 
 		wstring result(buf);
 
-		// some compilers ignore 'f' flag of spintf and print large values with scientific notation, as if 'e' flag was passed
+		// some compilers ignore 'f' flag of swprintf and print large values with scientific notation, as if 'e' flag was passed
 		// so we are removing substrings like 'e-10' and trying to enforce the precision by slow and not so precise conversion:
 
 		detail::string_detail::_stdex_size_t_type e_pos = result.rfind(L'e');
