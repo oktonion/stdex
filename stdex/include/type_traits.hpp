@@ -5,7 +5,7 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-// Implemented all basic standart C++11 features. 
+// Implemented all basic standard C++11 features. 
 // What can not be implemented or implemented with some limits:
 // is_class - can't detect unions
 // is_enum - ni
@@ -25,7 +25,7 @@
 // aligned_storage - ni
 // aligned_union - ni
 // underlying_type - ni
-// common_type - only for arithmetic types (compares other types by size that is not standart)
+// common_type - only for arithmetic types (compares other types by size that is not standard)
 // All type features (like is_assignable) - ni
 
 // stdex includes
@@ -625,10 +625,10 @@ namespace stdex
 			typedef intern::type_traits_asserts check;
 			typedef typename check::alignment_of_type_can_not_be_zero_assert< _alignment_of_impl::value != 0 >::
 				alignment_of_type_can_not_be_zero_assert_failed
-			check1; // if you are there means aligment of type passed can not be calculated or compiler can not handle this situation (sorry, nothing can be done there)
+			check1; // if you are there means alignment of type passed can not be calculated or compiler can not handle this situation (sorry, nothing can be done there)
 		};
 
-		// borland compilers seem to be unable to handle long double correctly, so this will do the trick:
+		// Borland compilers seem to be unable to handle long double correctly, so this will do the trick:
 		struct _long_double_wrapper{ long double value; };
 	}
 
