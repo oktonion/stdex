@@ -151,7 +151,7 @@ namespace stdex
 		template<class T>
 		struct _nullptr_can_be_ct_constant_impl
 		{
-			// idk how to check for compile time constantness of type in gerenal for any c++98 compiler, so...
+			// idk how to check for compile time constantness of type in general for any c++98 compiler, so...
 			static const bool value = false;// (sizeof(nullptr_detail::_nullptr_can_be_ct_constant<T>(0)) == sizeof(nullptr_detail::_yes_type));
 		};
 

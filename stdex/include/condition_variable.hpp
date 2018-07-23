@@ -50,7 +50,7 @@ namespace stdex
 	};
 
 	//! Condition variable class.
-	//! This is a signalling object for synchronizing the execution flow for
+	//! This is a signaling object for synchronizing the execution flow for
 	//! several threads. Example usage:
 	//! @code
 	//! // Shared data and associated mutex and condition variable objects

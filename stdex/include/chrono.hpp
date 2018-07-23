@@ -906,7 +906,7 @@ namespace stdex
 	{
 		namespace chrono_literals
 		{
-			// non-standart operator >> for literals macros to work:
+			// non-standard operator >> for literals macros to work:
 			template <class _Rep, class _Period, class _Rep2>
 			chrono::duration<_Rep, _Period> operator,(const _Rep2 &input, const chrono::duration<_Rep, _Period> &dur)
 			{
