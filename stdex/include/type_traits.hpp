@@ -393,7 +393,7 @@ namespace stdex
 		};
 
 		template<class _Tp>
-		struct UnsignedComparer
+		struct _unsigned_comparer
 		{
 			static const bool value = _Tp(0) < _Tp(-1);
 		};
@@ -409,7 +409,7 @@ namespace stdex
 
 			template<class _Tp>
 			struct _unsigned :
-				public _cat_base<UnsignedComparer<typename remove_cv<_Tp>::type>::value>
+				public _cat_base<_unsigned_comparer<typename remove_cv<_Tp>::type>::value>
 			{
 			};
 		};
@@ -474,6 +474,11 @@ namespace stdex
 
 	template<class _Tp>
 	struct is_volatile<volatile _Tp>
+		: public true_type
+	{ };
+
+	template<class _Tp>
+	struct is_volatile<const volatile _Tp>
 		: public true_type
 	{ };
 
