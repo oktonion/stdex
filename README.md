@@ -28,6 +28,7 @@ The library is in development so no backward compability guaranteed with previou
 Build process is simple: 
 * In Unix - either run a 'build_lib.sh' script (works with g++ and clang if enviromental variable $COMPILER is set to compiler name, f.e. to 'clang++-3.5') or build by yourself static library from 'stdex/src' directory sources.
 * In Windows - either run a 'build_lib.bat' script (works with Visual Studio if enviromental variables are set by 'vsvars32.bat' script that is being shipped with your Visual Studio distributive) or build by yourself the static library from 'stdex/src' and 'pthreads-win32' directories sources.
+* In QNX 6.x.x - either run a 'build_lib_qnx.sh' (using qcc compiler) or build by yourself the static library from 'stdex/src' directory sources (do not forget to link with 'stdlib' library).
 
 # how to include in your project
 In your project: 
@@ -35,6 +36,7 @@ In your project:
 2. link with system libraries for POSIX-threads and realtime clocks: 
 * 'librt.lib' and 'libpthread.lib' in UNIX; 
 * 'ntdll.lib' and [POSIX-threads lib](https://github.com/GerHobbelt/pthread-win32 "I'm using this implementation") in Windows (if you have built stdex static library with 'pthreads-win32' sources then you have no need to link with pthreads anymore - it's already in 'stdex.lib');
+* 'm.lib' in QNX 6.x.x;
 3. enjoy
 
 example script build for Ubuntu (with g++ installed):
@@ -49,4 +51,10 @@ call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\Tools\vsvars32.
 set LIB=%LIB%C:\Program Files (x86)\Windows Kits\8.1\Lib\winv6.3\um\x86\;
 cl -EHsc -Fo.\obj\main.obj -c ".\main.cpp"
 cl .\obj\main.obj stdex.lib ntdll.lib -Fe.\bin\main.exe -link -LIBPATH:.\stdex\lib
+```
+
+example script build for QNX 6.x.x (with qcc installed):
+```
+COMPILER=qcc
+$COMPILER main.cpp -L./stdex/lib/ -lstdex -lm -o "./bin/main"
 ```
