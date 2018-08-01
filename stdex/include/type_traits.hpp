@@ -695,7 +695,6 @@ namespace stdex
 
 		template<class _Tp, bool Choose = _is_incomplete_type<char[]>::value>
 		struct _is_array_impl:
-			_and_<_is_incomplete_type<_Tp>, _not_<is_function<_Tp> > >::type
 		{ };
 
 		template<class _Tp>
