@@ -131,6 +131,18 @@ namespace stdex
 
 		//typedef void void_type;
 
+		// SFINAE magic
+
+		typedef char _yes_type;
+		struct _no_type
+		{
+			char padding[8];
+		};
+
+		template <class _Tp>
+		_Tp * _declptr();
+
+		// logic templates
 		template<class _B1 = void_type, class _B2 = void_type, class _B3 = void_type, class _B4 = void_type>
 		struct _or_ :
 			public conditional<_B1::value, _B1, _or_<_B2, _or_<_B3, _B4> > >::type
@@ -662,6 +674,22 @@ namespace stdex
 		struct _is_void_helper<void>
 			: public true_type { };
 
+
+		_no_type _is_array_tester(...);
+		template<class _Tp>
+		_yes_type _is_array_tester(_Tp(*) []);
+
+		template<class _Tp>
+		struct _is_array_helper
+		{
+            static const bool value = sizeof(_is_array_tester(_declptr<_Tp>())) == sizeof(_yes_type);
+		};
+
+        template<class _Tp>
+		struct _is_array_impl
+		{
+            typedef integral_constant<bool, _is_array_helper<_Tp>::value == bool(true)> type;
+		};
 	}
 
 	// is_void
@@ -671,17 +699,15 @@ namespace stdex
 	{ };
 
 	// is_array
-	template<class>
+	template<class _Tp>
 	struct is_array :
-		public false_type { };
+		detail::_is_array_impl<_Tp>::type
+	{ };
 
 	template<class _Tp, std::size_t _Size>
 	struct is_array<_Tp[_Size]> :
 		public true_type { };
 
-	/*template<class _Tp>
-	struct is_array<_Tp[]>:
-		public true_type { }; */
 
 	namespace detail
 	{
@@ -817,14 +843,7 @@ namespace stdex
 		struct _is_function_ptr_helper<R(*)(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24)> : true_type {};
 		template <class R, class T0, class T1, class T2, class T3, class T4, class T5, class T6, class T7, class T8, class T9, class T10, class T11, class T12, class T13, class T14, class T15, class T16, class T17, class T18, class T19, class T20, class T21, class T22, class T23, class T24>
 		struct _is_function_ptr_helper<R(*)(T0, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24 ...)> : true_type {};
-		
-		// SFINAE magic
 
-		typedef char _yes_type;
-		struct _no_type
-		{
-			char padding[8];
-		};
 
 #define _IS_MEM_FUN_PTR_CLR \
 		template <class R, class T TYPES > \
