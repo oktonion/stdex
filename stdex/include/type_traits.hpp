@@ -683,9 +683,16 @@ namespace stdex
 		_no_type _is_incomplete_type_tester(_Tp(&)[1]);
 
 		template<class _Tp>
-		struct _is_incomplete_type
+		struct _is_incomplete_type_helper
 		{
 			static const bool value = sizeof(_is_incomplete_type_tester(_is_incomplete_type_tester_helper<_Tp>(0))) == sizeof(_yes_type);
+		};
+
+		template<class _Tp>
+		struct _is_incomplete_type
+		{ 
+			static const bool value = _is_incomplete_type_helper<_Tp>::value;
+			typedef integral_constant<bool, _is_incomplete_type_helper<_Tp>::value == bool(true)> type;
 		};
 
 		template<>
@@ -695,7 +702,7 @@ namespace stdex
 
 		template<class _Tp, bool ImplCh = _is_incomplete_type<char[]>::value>
 		struct _is_array_impl:
-			_and_<_is_incomplete_type<_Tp>, _not_<is_function<_Tp> > >
+			_and_<_is_incomplete_type<_Tp>, _not_<is_function<_Tp> > >::type
 		{ };
 
 		template<class _Tp>
