@@ -9,12 +9,12 @@ set INCLUDE=%INCLUDE%;%cd%\pthread;
 set build_opt="-Ox"
 
 if ["%~1"]==["debug"] (
-  build_opt=""
+  set build_opt=
   echo "debug build"
 )
 
 echo "compiling %VisualStudioVersion% pthread-win32"
-cl -EHsc -Fo.\stdex\obj\pthread.obj -D HAVE_CONFIG_H -c ".\pthread-win32\pthread.c" %build_opt%
+cl -EHsc -W4 -Fo.\stdex\obj\pthread.obj -D HAVE_CONFIG_H -c ".\pthread-win32\pthread.c" %build_opt%
 if /I "%ERRORLEVEL%" NEQ "0" (
     echo "failed"
     exit /B 1
@@ -24,9 +24,9 @@ cd .\stdex
 
 for /f %%f in ('dir /b ".\src\*.cpp"') do (
   echo "compiling %%~nf"
-  cl -EHsc -Fo.\obj\%%~nf.obj -c ".\src\%%f" %build_opt%
+  cl -EHsc -W4 -Fo.\obj\%%~nf.obj -c ".\src\%%f" %build_opt%
   if /I "%ERRORLEVEL%" NEQ "0" (
-    build_ok=0
+    set build_ok=0
   )
 )
 
