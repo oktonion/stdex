@@ -4,7 +4,7 @@ setlocal enabledelayedexpansion
 
 set build_ok=1
 cd ..
-set INCLUDE=%INCLUDE%%cd%\pthread;
+set INCLUDE=%INCLUDE%;%cd%\pthread;
 
 set build_opt="-Ox"
 
