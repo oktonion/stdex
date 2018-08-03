@@ -26,7 +26,7 @@ cd .\stdex
 for /f %%f in ('dir /b ".\src\*.cpp"') do (
   echo "compiling %%~nf"
   cl -EHsc -W4 -Fo.\obj\%%~nf.obj -c ".\src\%%f" %build_opt%
-  if /I "%ERRORLEVEL%" NEQ "1" (
+  if /I "%ERRORLEVEL%" NEQ "0" (
     set "build_ok=0"
   )
 )
