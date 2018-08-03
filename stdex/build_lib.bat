@@ -9,7 +9,7 @@ set INCLUDE=%INCLUDE%;%cd%\pthread;
 set build_opt="-Ox"
 
 if ["%~1"]==["debug"] (
-  build_opt=""
+  set build_opt=
   echo "debug build"
 )
 
@@ -26,7 +26,7 @@ for /f %%f in ('dir /b ".\src\*.cpp"') do (
   echo "compiling %%~nf"
   cl -EHsc -W4 -Fo.\obj\%%~nf.obj -c ".\src\%%f" %build_opt%
   if /I "%ERRORLEVEL%" NEQ "0" (
-    build_ok=0
+    set build_ok=0
   )
 )
 
