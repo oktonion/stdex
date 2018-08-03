@@ -104,11 +104,6 @@ namespace stdex
 			{
 				using namespace std;
 			}
-			
-			struct _nullptr_should_be_signed
-			{
-				static const bool value = (void*)(-1) < (void*)(0);
-			};
 
 			template<bool>
 			struct pointer_as_long_type { typedef long type; };
