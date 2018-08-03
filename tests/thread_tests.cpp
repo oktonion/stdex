@@ -254,7 +254,7 @@ int test2()
     {
         DYNAMIC_VERIFY(false);
     }
-    catch (const char *msg)
+    catch (const char *)
     {
         DYNAMIC_VERIFY(false);
     }
@@ -303,7 +303,7 @@ int test3()
     {
         DYNAMIC_VERIFY(false);
     }
-    catch (const char *msg)
+    catch (const char *)
     {
         DYNAMIC_VERIFY(false);
     }
@@ -331,7 +331,7 @@ int test4()
     {
         DYNAMIC_VERIFY(false);
     }
-    catch (const char *msg)
+    catch (const char *)
     {
         DYNAMIC_VERIFY(false);
     }
@@ -369,7 +369,7 @@ int test5()
     {
         DYNAMIC_VERIFY(false);
     }
-    catch (const char *msg)
+    catch (const char *)
     {
         DYNAMIC_VERIFY(false);
     }
@@ -466,7 +466,7 @@ int test8()
     {
         DYNAMIC_VERIFY(false);
     }
-    catch (const char *msg)
+    catch (const char *)
     {
         DYNAMIC_VERIFY(false);
     }
@@ -494,7 +494,7 @@ int test9()
     {
         DYNAMIC_VERIFY(false);
     }
-    catch (const char *msg)
+    catch (const char *)
     {
         DYNAMIC_VERIFY(false);
     }
@@ -521,7 +521,7 @@ int test10()
 			{
 				test = true;
 			}
-			catch (const char *msg)
+			catch (const char *)
 			{
 				DYNAMIC_VERIFY(false);
 			}
@@ -542,7 +542,7 @@ int test10()
 			{
 				test = true;
 			}
-			catch (const char *msg)
+			catch (const char *)
 			{
 				DYNAMIC_VERIFY(false);
 			}

@@ -130,7 +130,7 @@ namespace mutex_tests
             mutex_type m;
             m.lock();
         }
-        catch (const system_error& e)
+        catch (const system_error&)
         {
             // Destroying locked mutex raises system error, or undefined.
             // POSIX == may fail with EBUSY.
@@ -158,14 +158,14 @@ namespace mutex_tests
                 // XXX Will block.
                 // m.lock();
             }
-            catch (const system_error& e)
+            catch (const system_error&)
             {
                 DYNAMIC_VERIFY(false);
             }
 
             m.unlock();
         }
-        catch (const system_error& e)
+        catch (const system_error&)
         {
             DYNAMIC_VERIFY(false);
         }
@@ -187,7 +187,7 @@ namespace mutex_tests
             mutex_type::native_handle_type n = m.native_handle();
             (void) n;
         }
-        catch (const system_error& e)
+        catch (const system_error&)
         {
             DYNAMIC_VERIFY(false);
         }
@@ -210,7 +210,7 @@ namespace mutex_tests
             DYNAMIC_VERIFY(b);
             m.unlock();
         }
-        catch (const system_error& e)
+        catch (const system_error&)
         {
             DYNAMIC_VERIFY(false);
         }
@@ -238,7 +238,7 @@ namespace mutex_tests
 
             m.unlock();
         }
-        catch (const system_error& e)
+        catch (const system_error&)
         {
             DYNAMIC_VERIFY(false);
         }
@@ -260,7 +260,7 @@ namespace mutex_tests
             mutex_type m;
             m.unlock();
         }
-        catch (const system_error& e)
+        catch (const system_error&)
         {
             // POSIX == EPERM
             DYNAMIC_VERIFY(true);
