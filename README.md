@@ -1,4 +1,5 @@
-library build status
+library build status: 
+
 [![Build status](https://ci.appveyor.com/api/projects/status/3c53qm34v1j37hy5/branch/master?svg=true)](https://ci.appveyor.com/project/oktonion/stdex-a309e/branch/master)
 
 # stdex
