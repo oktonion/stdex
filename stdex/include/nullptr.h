@@ -146,9 +146,15 @@ namespace stdex
 				static const bool value = (ptrdiff_detail::ptrdiff_t)(-1) < (ptrdiff_detail::ptrdiff_t)(0);
 			};
 
+			template<class _Tp, int Value>
+			struct makeptr
+			{
+				static const _Tp *value = Value;
+			};
+
 			struct pointer_is_signed
 			{
-				static const bool value = (void*)(-1) < (void*)(0);
+				static const bool value = true;
 			};
 
 			template<bool>
