@@ -30,8 +30,8 @@ The library is in development so no backward compability guaranteed with previou
 
 # how to build
 Build process is simple: 
-* In Unix - either run a 'build_lib.sh' script (works with g++ and clang if enviromental variable $COMPILER is set to compiler name, f.e. to 'clang++-3.5') or build by yourself static library from 'stdex/src' directory sources.
-* In Windows - either run a 'build_lib.bat' script (works with Visual Studio if enviromental variables are set by 'vsvars32.bat' script that is being shipped with your Visual Studio distributive) or build by yourself the static library from 'stdex/src' and 'pthreads-win32' directories sources.
+* In Unix - either run a 'build_lib.sh' script (works with g++ and clang if environment variable $COMPILER is set to compiler name, f.e. to 'clang++-3.5') or build by yourself static library from 'stdex/src' directory sources.
+* In Windows - either run a 'build_lib.bat' script (works with Visual Studio if environment variables are set by 'vsvars32.bat' script that is being shipped with your Visual Studio distributive) or build by yourself the static library from 'stdex/src' and 'pthreads-win32' directories sources.
 * In QNX 6.x.x - either run a 'build_lib_qnx.sh' (using qcc compiler) or build by yourself the static library from 'stdex/src' directory sources (do not forget to link with 'stdlib' library).
 
 # how to include in your project
