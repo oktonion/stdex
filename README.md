@@ -61,3 +61,5 @@ example script build for QNX 6.x.x (with qcc installed):
 COMPILER=qcc
 $COMPILER main.cpp -L./stdex/lib/ -lstdex -lm -o "./bin/main"
 ```
+
+visit https://github.com/oktonion/stdex for the latest version of stdex library
