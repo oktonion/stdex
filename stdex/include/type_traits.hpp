@@ -139,6 +139,9 @@ namespace stdex
 			char padding[8];
 		};
 
+		template<class _Tp>
+		_Tp* _declptr();
+
 		template<class _B1 = void_type, class _B2 = void_type, class _B3 = void_type, class _B4 = void_type, class _B5 = void_type, class _B6 = void_type>
 		struct _or_ :
 			public conditional<_B1::value, _B1, _or_<_B2, _or_<_B3, _or_<_B4, _or_<_B5, _B6> > > > >::type
@@ -1290,7 +1293,9 @@ namespace stdex
 		template<class _Tp>
 		struct _convertable_to_any_type_dummy
 		{
-			_convertable_to_any_type_dummy(_Tp);
+			_convertable_to_any_type_dummy(_Tp&);
+			_convertable_to_any_type_dummy(const _Tp&);
+			_convertable_to_any_type_dummy(const volatile _Tp&);
 		};
 
 		template<class _Tp>
@@ -1303,7 +1308,7 @@ namespace stdex
 		template<class _Tp>
 		struct _is_convertable_to_int
 		{
-			static const bool value = (sizeof(_is_convertable_to_int_tester<_Tp>(_Tp())) == sizeof(_yes_type));
+			static const bool value = (sizeof(_is_convertable_to_int_tester<_Tp>(*_declptr<_Tp>())) == sizeof(_yes_type));
 		};
 
 		template<>
@@ -1367,6 +1372,18 @@ namespace stdex
 		};
 
 		template<class _Tp, bool>
+		struct _is_enum_helper1
+		{
+			static const bool value = false;
+		};
+
+		template<class _Tp>
+		struct _is_enum_helper1<_Tp, true>
+		{
+			static const bool value = !(_can_be_parent<_Tp>::value);
+		};
+
+		template<class _Tp, bool>
 		struct _is_enum_helper
 		{
 			static const bool value =
@@ -1377,7 +1394,7 @@ namespace stdex
 		struct _is_enum_helper<_Tp, true>
 		{ // with enum bug
 			static const bool value =
-				(_is_convertable_to_int<_Tp>::value && !(_is_constructible_from_int<_Tp>::value) && !(_can_be_parent<_Tp>::value));
+				_is_enum_helper1<_Tp, (_is_convertable_to_int<_Tp>::value && !(_is_constructible_from_int<_Tp>::value))>::value;
 		};
 
 		template<class _Tp, bool>
