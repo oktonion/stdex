@@ -1465,13 +1465,30 @@ namespace stdex
 			typedef integral_constant<bool, false> type;
 		};
 
+
+		/*template<class _Tp>
+		_derived_dummy<_Tp>* _union_can_be_parent_tester_helper(int);
+		template<class _Tp>
+		char _union_can_be_parent_tester_helper(...);
+
+
+		_yes_type _union_can_be_parent_tester(void*);
+		char _union_can_be_parent_tester(...);
+
+		template<class _Tp>
+		struct _union_can_be_parent
+		{
+			static const bool value = sizeof(_union_can_be_parent_tester(_union_can_be_parent_tester_helper<_Tp>(0))) == sizeof(_yes_type);
+		};*/
+
 		template <class _Tp>
 		struct _is_union_helper<_Tp, false>
 		{
 			typedef integral_constant<bool,
 				(is_enum<_Tp>::value == bool(false))
 				&& (_has_member_pointer_impl<_Tp>::value == bool(true))
-				/*&& (_can_be_parent<_Tp>::value == bool(false))*/> type;
+				//&& (_union_can_be_parent<_Tp>::value == bool(false))
+			> type;
 		};
 	}
 
