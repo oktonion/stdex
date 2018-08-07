@@ -9,6 +9,12 @@ struct ConvType
 };
 enum EnumType {};
 
+typedef union {
+	float a;
+	ClassType b;
+}
+UnionType;
+
 int main(void)
 {
     using namespace stdex;
