@@ -9,6 +9,29 @@ struct ConvType
 };
 enum EnumType {};
 
+struct ConvTypeInt
+{
+	ConvTypeInt(int) {}
+	template<class T>
+	operator T() { return T(); }
+};
+
+struct ClassType1 { ClassType1(int); };
+
+typedef union {
+	float a;
+	ClassType b;
+}
+UnionType;
+
+union ConvUnionType {
+	float a;
+	ClassType b;
+	template<class T>
+	operator T() { return T(); }
+	ConvUnionType(int){}
+};
+
 typedef union {
 	float a;
 	ClassType b;
@@ -34,6 +57,11 @@ int main(void)
     //STATIC_ASSERT(is_enum<int(ClassType::*)>::value == (false), should_not_be_enum);
     //STATIC_ASSERT(is_enum<int (ClassType::*) (int)>::value == (false), should_not_be_enum);
     //STATIC_ASSERT(is_enum<int(int)>::value == (false), should_not_be_enum);
+
+    //STATIC_ASSERT(is_enum<ConvType>::value == (false), should_not_be_enum);
+    //STATIC_ASSERT(is_enum<UnionType>::value == (false), should_not_be_enum);
+    //STATIC_ASSERT(is_enum<ConvUnionType>::value == (false), should_not_be_enum);
+    //STATIC_ASSERT(is_enum<ConvTypeInt>::value == (false), should_not_be_enum);
 
     STATIC_ASSERT(is_enum<ConvType>::value == (false), should_not_be_enum);
 
