@@ -1361,14 +1361,14 @@ namespace stdex
 
 
 		template<class _Tp>
-		_yes_type _can_be_parent_tester(_Tp*);
+		_yes_type _enum_can_be_parent_tester(_Tp*);
 		template<class _Tp>
-		_no_type _can_be_parent_tester(...);
+		_no_type _enum_can_be_parent_tester(...);
 
 		template<class _Tp>
-		struct _can_be_parent
+		struct _enum_can_be_parent
 		{
-			static const bool value = sizeof(_can_be_parent_tester<_Tp>(_is_enum_bug_internal<is_enum_detail::_enum_can_have_member_pointer_bug::value>::_can_be_parent_tester_helper<_Tp>(0))) == sizeof(_yes_type);
+			static const bool value = sizeof(_enum_can_be_parent_tester<_Tp>(_is_enum_bug_internal<is_enum_detail::_enum_can_have_member_pointer_bug::value>::_can_be_parent_tester_helper<_Tp>(0))) == sizeof(_yes_type);
 		};
 
 		template<class _Tp, bool>
@@ -1380,7 +1380,7 @@ namespace stdex
 		template<class _Tp>
 		struct _is_enum_helper1<_Tp, true>
 		{
-			static const bool value = !(_can_be_parent<_Tp>::value);
+			static const bool value = !(_enum_can_be_parent<_Tp>::value);
 		};
 
 		template<class _Tp, bool>
@@ -1459,6 +1459,47 @@ namespace stdex
 
 	namespace detail
 	{
+		template <class _Tp, bool>
+		struct _is_union_helper
+		{
+			typedef integral_constant<bool, false> type;
+		};
+
+
+		/*template<class _Tp>
+		_derived_dummy<_Tp>* _union_can_be_parent_tester_helper(int);
+		template<class _Tp>
+		char _union_can_be_parent_tester_helper(...);
+
+
+		_yes_type _union_can_be_parent_tester(void*);
+		char _union_can_be_parent_tester(...);
+
+		template<class _Tp>
+		struct _union_can_be_parent
+		{
+			static const bool value = sizeof(_union_can_be_parent_tester(_union_can_be_parent_tester_helper<_Tp>(0))) == sizeof(_yes_type);
+		};*/
+
+		template <class _Tp>
+		struct _is_union_helper<_Tp, false>
+		{
+			typedef integral_constant<bool,
+				(is_enum<_Tp>::value == bool(false))
+				&& (_has_member_pointer_impl<_Tp>::value == bool(true))
+				//&& (_union_can_be_parent<_Tp>::value == bool(false))
+			> type;
+		};
+	}
+
+	// is_union
+	template<class _Tp>
+	struct is_union :
+		public detail::_is_union_helper<typename remove_cv<_Tp>::type, detail::_or_<is_fundamental<_Tp>, is_pointer<_Tp>, is_function<_Tp>, is_member_pointer<_Tp>, is_array<_Tp>, is_reference<_Tp> >::value>::type
+	{ };
+
+	namespace detail
+	{
 		template <class _Tp, bool _IsReference>
 		struct _is_class_helper
 		{
@@ -1470,7 +1511,7 @@ namespace stdex
 		{
 			typedef integral_constant<bool,
 				(is_scalar<_Tp>::value == bool(false))
-				//&& !is_union<_Tp>::value >::value
+				//&& (is_union<_Tp>::value == bool(false))
 				&& (is_array<_Tp>::value == bool(false))
 				&& (is_void<_Tp>::value == bool(false))
 				&& (is_function<_Tp>::value == bool(false))> type;
