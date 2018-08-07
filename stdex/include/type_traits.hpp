@@ -139,28 +139,38 @@ namespace stdex
 			char padding[8];
 		};
 
-		template<class _B1 = void_type, class _B2 = void_type, class _B3 = void_type, class _B4 = void_type>
+		template<class _B1 = void_type, class _B2 = void_type, class _B3 = void_type, class _B4 = void_type, class _B5 = void_type, class _B6 = void_type>
 		struct _or_ :
-			public conditional<_B1::value, _B1, _or_<_B2, _or_<_B3, _B4> > >::type
+			public conditional<_B1::value, _B1, _or_<_B2, _or_<_B3, _or_<_B4, _or_<_B5, _B6> > > > >::type
 		{ };
 
 
 		template<>
-		struct _or_<void_type, void_type, void_type, void_type>;
+		struct _or_<void_type, void_type, void_type, void_type, void_type, void_type>;
 
 		template<class _B1>
-		struct _or_<_B1, void_type, void_type, void_type> :
+		struct _or_<_B1, void_type, void_type, void_type, void_type, void_type> :
 			public _B1
 		{ };
 
 		template<class _B1, class _B2>
-		struct _or_<_B1, _B2, void_type, void_type> :
+		struct _or_<_B1, _B2, void_type, void_type, void_type, void_type> :
 			public conditional<_B1::value, _B1, _B2>::type
 		{ };
 
 		template<class _B1, class _B2, class _B3>
-		struct _or_<_B1, _B2, _B3, void_type> :
+		struct _or_<_B1, _B2, _B3, void_type, void_type, void_type> :
 			public conditional<_B1::value, _B1, _or_<_B2, _B3> >::type
+		{ };
+
+		template<class _B1, class _B2, class _B3, class _B4>
+		struct _or_<_B1, _B2, _B3, _B4, void_type, void_type> :
+			public conditional<_B1::value, _B1, _or_<_B2, _or_<_B3, _B4> > >::type
+		{ };
+
+		template<class _B1, class _B2, class _B3, class _B4, class _B5>
+		struct _or_<_B1, _B2, _B3, _B4, _B5, void_type> :
+			public conditional<_B1::value, _B1, _or_<_B2, _or_<_B3, _or_<_B4, _B5> > > >::type
 		{ };
 
 		template<class _B1 = void_type, class _B2 = void_type, class _B3 = void_type, class _B4 = void_type>
@@ -1210,8 +1220,55 @@ namespace stdex
 		struct _is_member_object_pointer_helper:
 			public _and_<_is_member_object_pointer_impl1<_Tp>, _is_member_object_pointer_impl2<_Tp> >::type
 		{};
+	}
 
+	template<class>
+	struct is_member_pointer;
 
+	// is_member_function_pointer
+	template<class _Tp>
+	struct is_member_function_pointer :
+		public detail::_is_mem_function_ptr_helper<typename remove_cv<_Tp>::type>::type
+	{ };
+
+	// is_member_object_pointer
+	template<class _Tp>
+	struct is_member_object_pointer :
+		public detail::_is_member_object_pointer_helper<typename remove_cv<_Tp>::type>::type
+	{ };
+
+	// is_reference
+	template<class _Tp>
+	struct is_reference :
+		//public detail::_or_<is_lvalue_reference<_Tp>, is_rvalue_reference<_Tp> >::type
+		public false_type
+	{};
+
+	template<class _Tp>
+	struct is_reference<_Tp&> :
+		public true_type
+	{};
+
+	// is_arithmetic
+	template<class _Tp>
+	struct is_arithmetic :
+		public detail::_or_<is_integral<_Tp>, is_floating_point<_Tp> >::type
+	{ };
+
+	// is_fundamental
+	template<class _Tp>
+	struct is_fundamental :
+		public detail::_or_<is_arithmetic<_Tp>, is_void<_Tp>, is_null_pointer<_Tp> >::type
+	{};
+
+	// is_object
+	template<class _Tp>
+	struct is_object :
+		public detail::_not_< detail::_or_< is_function<_Tp>, is_reference<_Tp>, is_void<_Tp> > >::type
+	{};
+
+	namespace detail
+	{
 		template<class _Tp>
 		static _yes_type _has_member_pointer_tester(void (_Tp::*)());
 		template<class _Tp>
@@ -1228,37 +1285,6 @@ namespace stdex
 			static const bool value = sizeof(_has_member_pointer_tester<_Tp>(0)) == sizeof(_yes_type) && sizeof(_has_member_pointer_tester_helper<_Tp>(0)) != sizeof(char);
 			typedef integral_constant<bool, _has_member_pointer_impl::value == bool(true)> type;
 		};
-
-		
-
-		/*template<class _Tp>
-		struct _is_integral_constant_tests
-		{
-			template<class AA>
-			static char(&_is_integral_constant_tester_helper(int))[_Tp()];
-			template<class AA>
-			static float* _is_integral_constant_tester_helper(...);
-
-			static _no_type _is_integral_constant_tester(float);
-			static _yes_type _is_integral_constant_tester(char);
-			
-		};
-
-		template<class _Tp>
-		struct _is_integral_constant_helper
-		{
-		static const int size = sizeof(_is_integral_constant_tests<_Tp>::_is_integral_constant_tester_helper<_Tp>(0));
-		static const bool value = false;
-		};
-
-		template<class _Tp>
-		struct _is_integral_constant
-		{
-		static const bool value = _is_integral_constant_helper<_Tp>::value;
-		typedef integral_constant<bool, _is_integral_constant_helper<_Tp>::value == bool(true)> type;
-		};
-		
-		*/
 
 
 		template<class _Tp>
@@ -1342,7 +1368,7 @@ namespace stdex
 
 		template<class _Tp, bool>
 		struct _is_enum_helper
-		{ 
+		{
 			static const bool value =
 				!(_has_member_pointer_impl<_Tp>::value);
 		};
@@ -1354,64 +1380,24 @@ namespace stdex
 				(_is_convertable_to_int<_Tp>::value && !(_is_constructible_from_int<_Tp>::value) && !(_can_be_parent<_Tp>::value));
 		};
 
-		template<class _Tp>
+		template<class _Tp, bool>
 		struct _is_enum_impl
 		{
 			static const bool value =
 				_is_enum_helper<_Tp, is_enum_detail::_enum_can_have_member_pointer_bug::value>::value;
 			typedef integral_constant<bool, _is_enum_helper<_Tp, is_enum_detail::_enum_can_have_member_pointer_bug::value>::value == bool(true)> type;
 		};
+
+		template<class _Tp>
+		struct _is_enum_impl<_Tp, true> :
+			false_type
+		{ };
 	}
 
 	template<class _Tp>
 	struct is_enum :
-		detail::_is_enum_impl<_Tp>::type
+		detail::_is_enum_impl<_Tp, detail::_or_<is_fundamental<_Tp>, is_pointer<_Tp>, is_function<_Tp>, is_member_pointer<_Tp>, is_array<_Tp>, is_reference<_Tp> >::value >::type
 	{ };
-
-	template<class>
-	struct is_member_pointer;
-
-	// is_member_function_pointer
-	template<class _Tp>
-	struct is_member_function_pointer :
-		public detail::_is_mem_function_ptr_helper<typename remove_cv<_Tp>::type>::type
-	{ };
-
-	// is_member_object_pointer
-	template<class _Tp>
-	struct is_member_object_pointer :
-		public detail::_is_member_object_pointer_helper<typename remove_cv<_Tp>::type>::type
-	{ };
-
-	// is_reference
-	template<class _Tp>
-	struct is_reference :
-		//public detail::_or_<is_lvalue_reference<_Tp>, is_rvalue_reference<_Tp> >::type
-		public false_type
-	{};
-
-	template<class _Tp>
-	struct is_reference<_Tp&> :
-		public true_type
-	{};
-
-	// is_arithmetic
-	template<class _Tp>
-	struct is_arithmetic :
-		public detail::_or_<is_integral<_Tp>, is_floating_point<_Tp> >::type
-	{ };
-
-	// is_fundamental
-	template<class _Tp>
-	struct is_fundamental :
-		public detail::_or_<is_arithmetic<_Tp>, is_void<_Tp>, is_null_pointer<_Tp> >::type
-	{};
-
-	// is_object
-	template<class _Tp>
-	struct is_object :
-		public detail::_not_< detail::_or_< is_function<_Tp>, is_reference<_Tp>, is_void<_Tp> > >::type
-	{};
 
 	// is_scalar
 	template<class _Tp>
