@@ -3,6 +3,10 @@ All notable changes to stdex library project will be documented in this file.
 
 visit https://github.com/oktonion/stdex for the latest version of stdex library
 
+## [0.1.2] - ...
+### Added
+ - is_union implementation with bug for detecting class as union
+
 ## [0.1.1] - 2018-08-07
 ### Added
  - is_enum implementation
