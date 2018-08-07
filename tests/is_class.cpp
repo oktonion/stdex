@@ -68,7 +68,7 @@ int main(void)
         STATIC_ASSERT(is_class<member5_t>::value == (false), can_not_be_class);
         STATIC_ASSERT(is_class<member6_t>::value == (false), can_not_be_class);
         //STATIC_ASSERT(is_class<int(int)>::value == (false), can_not_be_class);
-        //STATIC_ASSERT(is_class<EnumType>::value == (false), can_not_be_class); // implement is_enum!!!!
+        STATIC_ASSERT(is_class<EnumType>::value == (false), can_not_be_class);
     }
     return 0;
 }
