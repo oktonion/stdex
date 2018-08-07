@@ -30,6 +30,29 @@ struct PODType { int data; };
 
 typedef PODType TType;
 
+struct ConvTypeInt
+{
+	ConvTypeInt(int) {}
+	template<class T>
+	operator T() { return T(); }
+};
+
+struct ClassType1 { ClassType1(int); };
+
+union ConvUnionType {
+	float a;
+	ClassType b;
+	template<class T>
+	operator T() { return T(); }
+	ConvUnionType(int){}
+};
+
+typedef union {
+	float a;
+	ClassType b;
+}
+UnionType;
+
 int main(void)
 {
     using namespace stdex;
@@ -42,6 +65,8 @@ int main(void)
     STATIC_ASSERT(is_class<AbstractClass>::value == (true), should_be_class);
     STATIC_ASSERT(is_class<PolymorphicClass>::value == (true), should_be_class);
     STATIC_ASSERT(is_class<DerivedPolymorphic>::value == (true), should_be_class);
+    STATIC_ASSERT(is_class<ConvTypeInt>::value == (true), should_be_class);
+    STATIC_ASSERT(is_class<ClassType1>::value == (true), should_be_class);
 
     // Negative tests.
     {
@@ -52,7 +77,6 @@ int main(void)
         typedef int (ClassType::*member5_t) (int) const;
         typedef int (ClassType::*member6_t) (float, ...);
 
-        //STATIC_ASSERT(is_class<UnionType>::value == (false), can_not_be_class);
         STATIC_ASSERT(is_class<void>::value == (false), can_not_be_class);
         STATIC_ASSERT(is_class<int>::value == (false), can_not_be_class);
         STATIC_ASSERT(is_class<float>::value == (false), can_not_be_class);
@@ -67,8 +91,10 @@ int main(void)
         STATIC_ASSERT(is_class<member4_t>::value == (false), can_not_be_class);
         STATIC_ASSERT(is_class<member5_t>::value == (false), can_not_be_class);
         STATIC_ASSERT(is_class<member6_t>::value == (false), can_not_be_class);
-        //STATIC_ASSERT(is_class<int(int)>::value == (false), can_not_be_class);
         STATIC_ASSERT(is_class<EnumType>::value == (false), can_not_be_class);
+        // when bug is fixed uncomment this:
+        //STATIC_ASSERT(is_class<UnionType>::value == (false), can_not_be_class);
+        //STATIC_ASSERT(is_class<ConvUnionType>::value == (false), can_not_be_class);
     }
     return 0;
 }
