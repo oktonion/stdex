@@ -23,6 +23,7 @@ The library is portable for any compiler that supports C++98 but as we all know 
 * g++ 4.4.2, 4.4, 4.6;
 * g++ 4.8, 4.9, 5.0 with c++98 option;
 * clang 3.5, 5.0 with c++98 option;
+* clang-900.0.37 with c++98 option (Mac OS);
 * Visual Studio 2008, 2010, 2013, 2015;
 
 ...and thats it. If you use other compilers and decide to include this library in your project there is no guarantee that it will compile without errors. In case you will be able to fix the errors without breaking existing code for already supported compilers I would really appreciate your pull requests.
@@ -36,14 +37,16 @@ Build process is simple:
 * In Unix - either run a 'build_lib.sh' script (works with g++ and clang if environment variable $COMPILER is set to compiler name, f.e. to 'clang++-3.5') or build by yourself static library from 'stdex/src' directory sources.
 * In Windows - either run a 'build_lib.bat' script (works with Visual Studio if environment variables are set by 'vsvars32.bat' script that is being shipped with your Visual Studio distributive) or build by yourself the static library from 'stdex/src' and 'pthreads-win32' directories sources.
 * In QNX 6.x.x - either run a 'build_lib_qnx.sh' (using qcc compiler) or build by yourself the static library from 'stdex/src' directory sources (do not forget to link with 'stdlib' library).
+* In Mac OS - either run a 'build_lib.sh' script (works with clang if environment variable $COMPILER is set to compiler name, f.e. to 'clang++-3.5') or build by yourself static library from 'stdex/src' directory sources.
 
 # how to include in your project
 In your project: 
 1. include sources of the library or link with prebuilded static library ('.a'/'.lib' file, f.e. 'libstdex.a'/'stdex.lib')
 2. link with system libraries for POSIX-threads and realtime clocks: 
-* 'librt.lib' and 'libpthread.lib' in UNIX; 
+* 'librt.lib' and 'libpthread.lib' in UNIX;
 * 'ntdll.lib' and [POSIX-threads lib](https://github.com/GerHobbelt/pthread-win32 "I'm using this implementation") in Windows (if you have built stdex static library with 'pthreads-win32' sources then you have no need to link with pthreads anymore - it's already in 'stdex.lib');
 * 'm.lib' in QNX 6.x.x;
+* 'libpthread.lib' in Mac OS;
 3. enjoy
 
 example script build for Ubuntu (with g++ installed):
@@ -64,6 +67,12 @@ example script build for QNX 6.x.x (with qcc installed):
 ```
 COMPILER=qcc
 $COMPILER main.cpp -L./stdex/lib/ -lstdex -lm -o "./bin/main"
+```
+
+example script build for Mac OS (with clang installed):
+```
+COMPILER=clang
+$COMPILER main.cpp -L./stdex/lib/ -lstdex -lpthread -o "./bin/main"
 ```
 
 visit https://github.com/oktonion/stdex for the latest version of stdex library
