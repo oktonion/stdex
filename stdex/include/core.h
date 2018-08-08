@@ -22,13 +22,13 @@
 
 #if !defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT)
 
-	#if ((__cplusplus > 199711L) || defined(__CODEGEARC__))
+	#if ((__cplusplus > 199711L) || defined(__CODEGEARC__) || defined(__INT16_TYPE__))
 		#define _STDEX_NATIVE_CPP11_TYPES_SUPPORT
 	#endif
 
 #endif
 
-#if ((!defined(_MSC_VER) || _MSC_VER < 1600) && !defined(_STDEX_NATIVE_CPP11_SUPPORT))
+#if ((!defined(_MSC_VER) || _MSC_VER < 1600) && !defined(_STDEX_NATIVE_CPP11_SUPPORT) && !(__has_feature(cxx_nullptr)))
 
 	#define _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
 
