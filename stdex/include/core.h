@@ -23,7 +23,7 @@
 
 #endif
 
-#if !defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT)
+#if !defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT) && !defined(_LIBCPP_HAS_NO_UNICODE_CHARS)
 
 	#if ((__cplusplus > 199711L) || defined(__CODEGEARC__) || defined(__GXX_EXPERIMENTAL_CXX0X__))
 		#define _STDEX_NATIVE_CPP11_TYPES_SUPPORT
