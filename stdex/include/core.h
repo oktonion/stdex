@@ -16,14 +16,14 @@
 //#define STDEX_FORCE_CPP11_TYPES_SUPPORT //uncomment to force support of char16_t and char32_t in C++03
 
 // Any compiler claiming C++11 supports, Visual C++ 2015 and Clang version supporting constexpr
-#if ((__cplusplus >= 201103L) || (_MSC_VER >= 1900) || (__has_feature(cxx_constexpr))) // C++ 11 implementation
+#if ((__cplusplus >= 201103L) || (_MSC_VER >= 1900) || (__has_feature(cxx_constexpr) || (__has_extension(cxx_constexpr)))) // C++ 11 implementation
 
 	#define _STDEX_NATIVE_CPP11_SUPPORT
 	#define _STDEX_NATIVE_CPP11_TYPES_SUPPORT
 
 #endif
 
-#if !defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT) && !defined(_LIBCPP_HAS_NO_UNICODE_CHARS)
+#if !defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT)
 
 	#if ((__cplusplus > 199711L) || defined(__CODEGEARC__) || defined(__GXX_EXPERIMENTAL_CXX0X__))
 		#define _STDEX_NATIVE_CPP11_TYPES_SUPPORT
