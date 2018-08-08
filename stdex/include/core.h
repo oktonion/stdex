@@ -22,7 +22,7 @@
 
 #if !defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT)
 
-	#if ((__cplusplus > 199711L) || defined(__CODEGEARC__) || defined(__INT16_TYPE__))
+	#if ((__cplusplus > 199711L) || defined(__CODEGEARC__) || defined(__GXX_EXPERIMENTAL_CXX0X__))
 		#define _STDEX_NATIVE_CPP11_TYPES_SUPPORT
 	#endif
 
