@@ -65,7 +65,6 @@ matrix:
 
 script:
   - echo "script started"
-  - dpkg --list | grep compile
   - cd ./stdex
   - chmod +x ./build_lib.sh
   - ./build_lib.sh
