@@ -14,6 +14,9 @@
 
 #ifdef __GLIBC__
 #include <sys/sysinfo.h>
+#elif defined(__APPLE__) || defined(__FreeBSD__)
+#include <sys/types.h>
+#include <sys/sysctl.h>
 #endif
 
 #if defined(__QNXNTO__) || defined(__QNX__)
@@ -384,6 +387,10 @@ unsigned thread::hardware_concurrency() NOEXCEPT_FUNCTION
 	return get_nprocs();
 #elif defined(SYSPAGE_CPU_ENTRY)
 	return _syspage_ptr->num_cpu;
+#elif defined(__APPLE__) || defined(__FreeBSD__)
+    int count;
+    size_t size=sizeof(count);
+	return sysctlbyname("hw.ncpu", &count, &size, NULL, 0) ? 0 : count;
 #else
 	// The standard requires this function to return zero if the number of
 	// hardware cores could not be determined.
