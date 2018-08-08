@@ -180,6 +180,8 @@ const bool steady_clock::is_steady = false;
 #define CLOCK_REALTIME 0
 int(*clock_gettime_func_pointer)(int X, mytimespec *tv) = &clock_gettime_impl::clock_gettime;
 #elif defined(__MACH__)
+#include <time.h>
+#include <sys/time.h>       /* gettimeofday */
 #include <mach/mach_time.h> /* mach_absolute_time */
 
 #define BILLION 1000000000L
@@ -215,7 +217,7 @@ void init()
 
 static struct _init_inittime
 {
-	init_inittime()
+	_init_inittime()
 	{
 		init();
 	}
