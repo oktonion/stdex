@@ -2,6 +2,7 @@ mkdir ./tests/bin
 
 build_ok=1
 exclude_warn=""
+build_libs="-lrt"
 
 $COMPILER -v
 
@@ -11,6 +12,32 @@ else
   exclude_warn="-Wno-long-long"
 fi
 
+case "$(uname -s)" in
+
+   Darwin)
+     echo 'Mac OS X'
+     build_libs="-lpthread"
+     ;;
+
+   Linux)
+     echo 'Linux'
+     build_libs="-lrt -lpthread"
+     ;;
+
+   CYGWIN*|MINGW32*|MSYS*)
+     echo 'MS Windows'
+     exit 13
+     ;;
+
+   # Add here more strings to compare
+   # See correspondence table at the bottom of this answer
+
+   *)
+     echo 'other OS' 
+     exit 13
+     ;;
+esac
+
 if [[ $COMPILER = *"g++-4."* ]]; then
   echo "c++03 option is not supported"
 else
@@ -18,7 +45,7 @@ else
     filename=$(basename -- "$file")
     filename="${filename%.*}"
     echo "compiling test c++03 $filename"
-    if ! $COMPILER -std=c++03 -pedantic $exclude_warn $file -L./stdex/lib/ -lstdex -lrt -lpthread -o "./tests/bin/$filename"; then
+    if ! $COMPILER -std=c++03 -pedantic $exclude_warn $file -L./stdex/lib/ -lstdex $build_libs -o "./tests/bin/$filename"; then
       build_ok=0
     fi
   done
@@ -33,7 +60,7 @@ for file in ./tests/*.cpp; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
   echo "compiling test c++98 $filename"
-  if ! $COMPILER -std=c++98 -pedantic $exclude_warn $file -L./stdex/lib/ -lstdex -lrt -lpthread -o "./tests/bin/$filename"; then
+  if ! $COMPILER -std=c++98 -pedantic $exclude_warn $file -L./stdex/lib/ -lstdex $build_libs -o "./tests/bin/$filename"; then
     build_ok=0
   fi
 done
