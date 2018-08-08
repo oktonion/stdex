@@ -3,6 +3,8 @@ mkdir ./tests/bin
 build_ok=1
 exclude_warn=""
 
+$COMPILER -v
+
 if [[ $COMPILER = *"clang"* ]]; then
   exclude_warn="-Wno-c++11-long-long -Wno-non-literal-null-conversion"
 else
