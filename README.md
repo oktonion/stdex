@@ -71,7 +71,7 @@ $COMPILER main.cpp -L./stdex/lib/ -lstdex -lm -o "./bin/main"
 
 example script build for Mac OS (with clang installed):
 ```
-COMPILER=clang
+COMPILER=clang++
 $COMPILER main.cpp -L./stdex/lib/ -lstdex -lpthread -o "./bin/main"
 ```
 
