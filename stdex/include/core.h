@@ -29,6 +29,12 @@
 		#define _STDEX_NATIVE_CPP11_TYPES_SUPPORT
 	#endif
 
+	#if (defined(__apple_build_version__) && (__clang_major__ >= 3))
+		#ifndef _STDEX_NATIVE_CPP11_TYPES_SUPPORT
+			#define _STDEX_NATIVE_CPP11_TYPES_SUPPORT
+		#endif
+	#endif
+
 #endif
 
 #if ((!defined(_MSC_VER) || _MSC_VER < 1600) && !defined(_STDEX_NATIVE_CPP11_SUPPORT))
