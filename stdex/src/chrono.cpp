@@ -235,6 +235,12 @@ struct timespec get_abs_future_time_fine(unsigned milli)
     NORMALISE_TIMESPEC( future, milli );
     return future;
 }
+struct mytimespec:
+	public timespec
+{};
+
+const bool system_clock::is_steady = true;
+const bool steady_clock::is_steady = true;
 
 int clock_gettime(int X, timespec *tv)
 {
