@@ -59,6 +59,10 @@ matrix:
       compiler: gcc
       env: COMPILER=g++
 
+    - os: osx
+      osx_image: xcode9
+      env: COMPILER=clang++
+
 script:
   - echo "script started"
   - dpkg --list | grep compile
