@@ -6,14 +6,17 @@
 #endif // _MSC_VER > 1000
 
 
-#ifndef __has_feature
-	#define __has_feature(x) 0 // Compatibility with non-clang compilers.
+#ifndef __has_feature         // Optional of course.
+  #define __has_feature(x) 0  // Compatibility with non-clang compilers.
+#endif
+#ifndef __has_extension
+  #define __has_extension __has_feature // Compatibility with pre-3.0 compilers.
 #endif
 
 //#define STDEX_FORCE_CPP11_TYPES_SUPPORT //uncomment to force support of char16_t and char32_t in C++03
 
 // Any compiler claiming C++11 supports, Visual C++ 2015 and Clang version supporting constexpr
-#if ((__cplusplus >= 201103L) || (_MSC_VER >= 1900) || (__has_feature(cxx_constexpr))) // C++ 11 implementation
+#if ((__cplusplus >= 201103L) || (_MSC_VER >= 1900) || (__has_feature(cxx_constexpr) || (__has_extension(cxx_constexpr)))) // C++ 11 implementation
 
 	#define _STDEX_NATIVE_CPP11_SUPPORT
 	#define _STDEX_NATIVE_CPP11_TYPES_SUPPORT
@@ -22,19 +25,60 @@
 
 #if !defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT)
 
-	#if ((__cplusplus > 199711L) || defined(__CODEGEARC__))
+	#if ((__cplusplus > 199711L) || defined(__CODEGEARC__) || defined(__GXX_EXPERIMENTAL_CXX0X__) || defined(__cpp_unicode_characters) || __has_feature(cxx_unicode_literals))
 		#define _STDEX_NATIVE_CPP11_TYPES_SUPPORT
+	#endif
+
+	#if (defined(__apple_build_version__) && (__clang_major__ >= 3))
+		#ifndef _STDEX_NATIVE_CPP11_TYPES_SUPPORT
+			#define _STDEX_NATIVE_CPP11_TYPES_SUPPORT
+		#endif
 	#endif
 
 #endif
 
 #if ((!defined(_MSC_VER) || _MSC_VER < 1600) && !defined(_STDEX_NATIVE_CPP11_SUPPORT))
 
-	#define _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
+	#if (__has_feature(cxx_nullptr) || __has_extension(cxx_nullptr))
+		#define _STDEX_NATIVE_NULLPTR_SUPPORT
+	#else
+		#if !defined(nullptr)
+			#define _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
+		#else
+			#define STRINGIZE_HELPER(x) #x
+			#define STRINGIZE(x) STRINGIZE_HELPER(x)
+			#define WARNING(desc) message(__FILE__ "(" STRINGIZE(__LINE__) ") : warning: " desc)
+
+			#pragma WARNING("stdex library - macro 'nullptr' was previously defined by user; ignoring stdex macro definition")
+
+			#undef STRINGIZE_HELPER
+			#undef STRINGIZE
+			#undef WARNING
+		#endif
+	#endif
+
+	#if (__has_feature(cxx_static_assert) || __has_extension(cxx_static_assert))
+		#define _STDEX_NATIVE_STATIC_ASSERT_SUPPORT
+	#else
+		#if !defined(static_assert)
+			#define _STDEX_IMPLEMENTS_STATIC_ASSERT_SUPPORT
+		#else
+			#define STRINGIZE_HELPER(x) #x
+			#define STRINGIZE(x) STRINGIZE_HELPER(x)
+			#define WARNING(desc) message(__FILE__ "(" STRINGIZE(__LINE__) ") : warning: " desc)
+
+			#pragma WARNING("stdex library - macro 'static_assert' was previously defined by user; ignoring stdex macro definition")
+
+			#undef STRINGIZE_HELPER
+			#undef STRINGIZE
+			#undef WARNING
+		#endif
+	#endif
 
 #else
 
 	#define _STDEX_NATIVE_NULLPTR_SUPPORT
+	#define _STDEX_NATIVE_STATIC_ASSERT_SUPPORT
 
 #endif
 
@@ -127,14 +171,14 @@
 #else //no C++11 support
 
 	// nullptr and nullptr_t implementation
-	#ifndef _STDEX_NATIVE_NULLPTR_SUPPORT
+	#ifdef _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
 		#include "nullptr.h"
 	#else
 	namespace stdex
 	{
 		typedef std::nullptr_t nullptr_t;
 	}
-	#endif // _STDEX_NATIVE_NULLPTR_SUPPORT
+	#endif // _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
 
 	namespace stdex
 	{
@@ -166,7 +210,7 @@
 	  };\
 	  typedef stdex::detail::StaticAssertionTest<sizeof(CONCATENATE(__static_assertion_at_line_, __LINE__))> CONCATENATE(__static_assertion_test_at_line_, __LINE__)
 
-#ifndef _STDEX_NATIVE_NULLPTR_SUPPORT
+#ifdef _STDEX_IMPLEMENTS_STATIC_ASSERT_SUPPORT
 	#define static_assert(expression, message) STATIC_ASSERT(expression, ERROR_MESSAGE_STRING)
 #endif
 

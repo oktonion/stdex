@@ -3,6 +3,12 @@ All notable changes to stdex library project will be documented in this file.
 
 visit https://github.com/oktonion/stdex for the latest version of stdex library
 
+## [0.1.2] - ...
+### Added
+ - is_union implementation with bug for detecting class as union
+ - Mac OS build added to CI (with xcode9 and clang-900.0.37)
+ - Mac OS implementation for thread::hardware_concurrency and chrono
+
 ## [0.1.1] - 2018-08-07
 ### Added
  - is_enum implementation

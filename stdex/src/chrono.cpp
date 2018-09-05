@@ -179,7 +179,80 @@ const bool steady_clock::is_steady = false;
 
 #define CLOCK_REALTIME 0
 int(*clock_gettime_func_pointer)(int X, mytimespec *tv) = &clock_gettime_impl::clock_gettime;
+#elif defined(__MACH__)
+#include <time.h>
+#include <sys/time.h>       /* gettimeofday */
+#include <mach/mach_time.h> /* mach_absolute_time */
+
+#define BILLION 1000000000L
+#define MILLION 1000000L
+
+#define NORMALISE_TIMESPEC( ts, uint_milli )            \
+    {                                                \
+        ts.tv_sec += uint_milli / 1000u;                \
+        ts.tv_nsec += (uint_milli % 1000u) * MILLION;   \
+        ts.tv_sec += ts.tv_nsec / BILLION;              \
+        ts.tv_nsec = ts.tv_nsec % BILLION;              \
+    }
+
+static mach_timebase_info_data_t timebase = { 0, 0 }; /* numer = 0, denom = 0 */
+static struct timespec           inittime = { 0, 0 }; /* nanoseconds since 1-Jan-1970 to init() */
+static uint64_t                  initclock;           /* ticks since boot to init() */
+
+void init()
+{
+    struct timeval  micro;      /* microseconds since 1 Jan 1970 */
+
+    if (mach_timebase_info(&timebase) != 0)
+        abort();                            /* very unlikely error */
+
+    if (gettimeofday(&micro, NULL) != 0)
+        abort();                            /* very unlikely error */
+
+    initclock = mach_absolute_time();
+
+    inittime.tv_sec = micro.tv_sec;
+    inittime.tv_nsec = micro.tv_usec * 1000;
+}
+
+static struct _init_inittime
+{
+	_init_inittime()
+	{
+		init();
+	}
+} init_inittime;
+
+struct timespec get_abs_future_time_fine(unsigned milli)
+{
+    struct timespec future;     /* ns since 1 Jan 1970 to 1500 ms in future */
+    uint64_t        clock;      /* ticks since init */
+    uint64_t        nano;       /* nanoseconds since init */
+
+    clock = mach_absolute_time() - initclock;
+    nano = clock * (uint64_t)timebase.numer / (uint64_t)timebase.denom;
+    future = inittime;
+    future.tv_sec += nano / BILLION;
+    future.tv_nsec += nano % BILLION;
+    NORMALISE_TIMESPEC( future, milli );
+    return future;
+}
+struct mytimespec:
+	public timespec
+{};
+
+const bool system_clock::is_steady = true;
+const bool steady_clock::is_steady = true;
+
+int clock_gettime(int X, timespec *tv)
+{
+	*tv = get_abs_future_time_fine(1500);
+
+	return (0);
+}
+int(*clock_gettime_func_pointer)(int X, timespec *tv) = &clock_gettime;
 #else
+
 struct mytimespec:
 	public timespec
 {};
