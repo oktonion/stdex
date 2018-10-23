@@ -56,14 +56,14 @@ namespace stdex
 
     template<class T, std::size_t Size>
     inline
-    T *begin(T(&value)[Size]) throw()
+    T *begin(T(&value)[Size]) NOEXCEPT_FUNCTION
     {	// get beginning of array
         return (value);
     }
 
     template<class T, std::size_t Size>
     inline
-    T *end(T(&value)[Size]) throw()
+    T *end(T(&value)[Size]) NOEXCEPT_FUNCTION
     {	// get end of array
         return (value + Size);
     }
@@ -75,20 +75,6 @@ namespace stdex
     {
         std::advance(it, n);
         return it;
-    }
-
-    template<class ForwardIt, class T>
-    inline
-    ForwardIt remove(ForwardIt first, ForwardIt last,
-        const T& value)
-    {
-        ForwardIt result = first;
-        for (; first != last; ++first) {
-            if (!(*first == value)) {
-                *result++ = *first;
-            }
-        }
-        return result;
     }
 }
 
