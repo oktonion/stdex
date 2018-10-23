@@ -69,19 +69,55 @@ namespace stdex
         return (value + Size);
     }
 
+    namespace detail
+    {
+        template <bool, class _Tp>
+        struct _iterator_enable_if
+        { };
+
+        template <class _Tp>
+        struct _iterator_enable_if<true, _Tp>
+        {
+            typedef _Tp type;
+        };
+
+        template<class, class>
+        struct _iterator_is_same
+        { 
+            static const bool value = false;
+        };
+
+        template<class _Tp>
+        struct _iterator_is_same<_Tp, _Tp>
+        { 
+            static const bool value = true;
+        };
+    }
     template<class ForwardIt>
     inline
-    ForwardIt next(ForwardIt it,
+    detail::_iterator_enable_if<
+        detail::_iterator_is_same<
+            typename ForwardIt::iterator_category, 
+            std::forward_iterator_tag
+        >::value == bool(true), 
+        ForwardIt
+    >::type next(ForwardIt it,
     typename std::iterator_traits<ForwardIt>::difference_type n = 1)
     {
         std::advance(it, n);
         return it;
     }
 
-    template<class ForwardIt>
+    template<class BidirIt>
     inline
-    ForwardIt prev(ForwardIt it,
-    typename std::iterator_traits<ForwardIt>::difference_type n = 1)
+    detail::_iterator_enable_if<
+        detail::_iterator_is_same<
+            typename BidirIt::iterator_category, 
+            std::bidirectional_iterator_tag
+        >::value == bool(true), 
+        BidirIt
+    >::type prev(BidirIt it,
+    typename std::iterator_traits<BidirIt>::difference_type n = 1)
     {
         std::advance(it, -n);
         return it;
