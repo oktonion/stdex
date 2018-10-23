@@ -16,6 +16,8 @@ int test01()
   j = stdex::prev(i, 3);
   DYNAMIC_VERIFY( i == c.end() );
   DYNAMIC_VERIFY( j == c.begin() );
+
+  return 0;
 }
 
 int test02()
@@ -26,6 +28,8 @@ int test02()
   j = stdex::prev(i, 3);
   DYNAMIC_VERIFY( i == c.end() );
   DYNAMIC_VERIFY( j == c.begin() );
+
+  return 0;
 }
 
 int main()
