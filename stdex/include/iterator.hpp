@@ -81,22 +81,52 @@ namespace stdex
             typedef _Tp type;
         };
 
-        template<class, class>
-        struct _iterator_is_same
+        typedef char _iterator_yes_type;
+		struct _iterator_no_type
+		{
+			char padding[8];
+		};
+
+        _iterator_yes_type _input_iterator_cat_tester(std::input_iterator_tag*);
+        _iterator_no_type _input_iterator_cat_tester(...);
+        _iterator_yes_type _forward_iterator_cat_tester(std::forward_iterator_tag*);
+        _iterator_no_type _forward_iterator_cat_tester(...);
+        _iterator_yes_type _bidirectional_iterator_cat_tester(std::bidirectional_iterator_tag*);
+        _iterator_no_type _bidirectional_iterator_cat_tester(...);
+        _iterator_yes_type _random_access_iterator_cat_tester(std::random_access_iterator_tag*);
+        _iterator_no_type _random_access_iterator_cat_tester(...);
+        
+        template<class _ItCategory, class>
+        struct _iterator_cat_is;
+
+        template<class _ItCategory>
+        struct _iterator_cat_is<_ItCategory, std::input_iterator_tag>
         { 
-            static const bool value = false;
+            static const bool value = sizeof(_input_iterator_cat_tester(0)) == sizeof(_iterator_yes_type);
         };
 
-        template<class _Tp>
-        struct _iterator_is_same<_Tp, _Tp>
+        template<class _ItCategory>
+        struct _iterator_cat_is<_ItCategory, std::forward_iterator_tag>
         { 
-            static const bool value = true;
+            static const bool value = sizeof(_forward_iterator_cat_tester(0)) == sizeof(_iterator_yes_type);
+        };
+
+        template<class _ItCategory>
+        struct _iterator_cat_is<_ItCategory, std::bidirectional_iterator_tag>
+        { 
+            static const bool value = sizeof(_bidirectional_iterator_cat_tester(0)) == sizeof(_iterator_yes_type);
+        };
+
+        template<class _ItCategory>
+        struct _iterator_cat_is<_ItCategory, std::random_access_iterator_tag>
+        { 
+            static const bool value = sizeof(_random_access_iterator_cat_tester(0)) == sizeof(_iterator_yes_type);
         };
     }
     template<class ForwardIt>
     inline
     detail::_iterator_enable_if<
-        detail::_iterator_is_same<
+        detail::_iterator_cat_is<
             typename ForwardIt::iterator_category, 
             std::forward_iterator_tag
         >::value == bool(true), 
@@ -111,7 +141,7 @@ namespace stdex
     template<class BidirIt>
     inline
     detail::_iterator_enable_if<
-        detail::_iterator_is_same<
+        detail::_iterator_cat_is<
             typename BidirIt::iterator_category, 
             std::bidirectional_iterator_tag
         >::value == bool(true), 
