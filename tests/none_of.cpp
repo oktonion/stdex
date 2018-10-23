@@ -2,7 +2,7 @@
 #include "../stdex/include/algorithm.hpp"
 
 #include <cstdlib>
-#include <algorithm>
+#include <iterator>
 #include <iostream>
 
 #define THROW_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; throw(__LINE__);}
