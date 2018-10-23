@@ -163,11 +163,13 @@ namespace stdex
 			{
 				using namespace std;
 
+				if(!str)
+					return 0;
 				errno = 0;
 
 				long int value = strtol(str, endptr, base);
 
-				if (errno && !value && endptr && str)
+				if (errno && !value && endptr)
 				{
 					for (const char *it = str; it != *endptr; it++)
 					{
@@ -185,11 +187,13 @@ namespace stdex
 			{
 				using namespace std;
 
+				if(!str)
+					return 0;
 				errno = 0;
 
 				long int value = wcstol(str, endptr, base);
 
-				if (errno && !value && endptr && str)
+				if (errno && !value && endptr)
 				{
 					for (const wchar_t *it = str; it != *endptr; it++)
 					{
