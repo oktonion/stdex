@@ -153,7 +153,7 @@ int test1()
   try
   {
     Container con(array, array);
-    DYNAMIC_VERIFY( std::none_of(con.begin(), con.end(), predicate) );
+    DYNAMIC_VERIFY( stdex::none_of(con.begin(), con.end(), predicate) );
   }
   catch(int line)
   {
@@ -168,7 +168,7 @@ int test2()
   try
   {
     Container con(array, array + 1);
-    DYNAMIC_VERIFY( std::none_of(con.begin(), con.end(), predicate) );
+    DYNAMIC_VERIFY( stdex::none_of(con.begin(), con.end(), predicate) );
   }
   catch(int line)
   {
@@ -183,7 +183,7 @@ int test3()
   try
   {
     Container con(array, array + 6);
-    DYNAMIC_VERIFY( !std::none_of(con.begin(), con.end(), predicate) );
+    DYNAMIC_VERIFY( !stdex::none_of(con.begin(), con.end(), predicate) );
   }
   catch(int line)
   {
