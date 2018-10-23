@@ -77,6 +77,15 @@ namespace stdex
         std::advance(it, n);
         return it;
     }
+
+    template<class ForwardIt>
+    inline
+    ForwardIt prev(ForwardIt it,
+    typename std::iterator_traits<ForwardIt>::difference_type n = 1)
+    {
+        std::advance(it, -n);
+        return it;
+    }
 }
 
 #endif // _STDEX_ITERATOR_H
