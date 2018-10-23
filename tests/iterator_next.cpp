@@ -14,8 +14,8 @@ int test01()
   std::vector<int>::iterator i = c.begin(), j;
 
   j = stdex::next(i, 3);
-  DYNAMIC_VERIFY( i == c.begin() );
-  DYNAMIC_VERIFY( j == c.end() );
+  DYNAMIC_VERIFY( (i == c.begin()) );
+  DYNAMIC_VERIFY( (j == c.end()) );
 
   return 0;
 }
@@ -26,8 +26,8 @@ int test02()
   std::list<int>::iterator i = c.begin(), j;
 
   j = stdex::next(i, 3);
-  DYNAMIC_VERIFY( i == c.begin() );
-  DYNAMIC_VERIFY( j == c.end() );
+  DYNAMIC_VERIFY( (i == c.begin()) );
+  DYNAMIC_VERIFY( (j == c.end()) );
 
   return 0;
 }
