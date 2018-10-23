@@ -11,6 +11,7 @@
 
 // std includes
 #include <iterator>
+#include <cstddef> //std::size_t
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
