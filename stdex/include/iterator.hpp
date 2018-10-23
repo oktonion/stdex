@@ -90,16 +90,6 @@ namespace stdex
         }
         return result;
     }
-
-    template< class InputIt, class UnaryPredicate >
-    inline
-    bool none_of(InputIt first, InputIt last, UnaryPredicate p)
-    {
-        for (; first != last; ++first) {
-            if (p(*first)) return false;
-        }
-        return true;
-    }
 }
 
 #endif // _STDEX_ITERATOR_H
