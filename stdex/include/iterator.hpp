@@ -122,17 +122,36 @@ namespace stdex
 		{ 
 			static const bool value = sizeof(_random_access_iterator_cat_tester((_ItCategory*)(0))) == sizeof(_iterator_yes_type);
 		};
+
+		template<class ForwardIt>
+		struct _iterator_cat_is_forward:
+			_iterator_enable_if<
+				_iterator_cat_is<
+					typename std::iterator_traits<ForwardIt>::iterator_category,
+					std::forward_iterator_tag
+					>::value == bool(true),
+				ForwardIt
+			>
+		{};
+
+		template<class BidirIt>
+		struct _iterator_cat_is_bi:
+			_iterator_enable_if<
+				_iterator_cat_is<
+					typename std::iterator_traits<BidirIt>::iterator_category,
+					std::bidirectional_iterator_tag
+					>::value == bool(true),
+				BidirIt
+			>
+		{};
 	}
+
 	template<class ForwardIt>
 	inline
-	typename detail::_iterator_enable_if<
-		detail::_iterator_cat_is<
-			typename ForwardIt::iterator_category, 
-			std::forward_iterator_tag
-		>::value == bool(true), 
-		ForwardIt
-	>::type next(ForwardIt it,
-	typename std::iterator_traits<ForwardIt>::difference_type n = 1)
+	typename 
+		detail::_iterator_cat_is_forward<ForwardIt>::
+	type next(ForwardIt it,
+		typename std::iterator_traits<ForwardIt>::difference_type n = 1)
 	{
 		std::advance(it, n);
 		return it;
@@ -140,13 +159,9 @@ namespace stdex
 
 	template<class BidirIt>
 	inline
-	typename detail::_iterator_enable_if<
-		detail::_iterator_cat_is<
-			typename BidirIt::iterator_category, 
-			std::bidirectional_iterator_tag
-		>::value == bool(true), 
-		BidirIt
-	>::type prev(BidirIt it,
+	typename 
+		detail::_iterator_cat_is_bi<BidirIt>::
+	type prev(BidirIt it,
 	typename std::iterator_traits<BidirIt>::difference_type n = 1)
 	{
 		std::advance(it, -n);
