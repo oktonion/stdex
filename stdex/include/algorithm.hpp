@@ -26,6 +26,13 @@
 
 namespace stdex
 {
+    // Non-modifying sequence operations
+
+    //<TODO>: all_of (C++11)       checks if a predicate is true for all, any or none of the elements in a range
+    //<TODO>: any_of (C++11)       (function template)
+
+    // none_of (C++11)
+    // checks if a predicate is true for none of the elements in a range
     template< class InputIt, class UnaryPredicate >
     inline
     bool none_of(InputIt first, InputIt last, UnaryPredicate p)
@@ -35,6 +42,36 @@ namespace stdex
         }
         return true;
     }
+
+    using std::for_each; // applies a function to a range of elements
+                         // (function template)
+    //<TODO>: using std::for_each_n; // (C++17) applies a function object to the first n elements of a sequence
+                      // (function template)
+    using std::count; // returns the number of elements
+    using std::count_if; // returns the number of elements satisfying specific criteria
+                         // (function template)
+    using std::mismatch; // finds the first position where two ranges differ
+                         // (function template)
+    using std::equal; // determines if two sets of elements are the same
+                      // (function template)
+                      
+    //<TODO>: find; // (C++11)
+    //<TODO>: find_if; // finds the first element satisfying specific criteria
+    //<TODO>: find_if_not; // (function template)
+
+    using std::find_end; // finds the last sequence of elements in a certain range
+                         // (function template)
+    using std::find_first_of; // searches for any one of a set of elements
+                              // (function template)
+    using std::adjacent_find; // finds the first two adjacent items that are equal (or satisfy a given predicate)
+                              // (function template)
+    using std::search; // searches for a range of elements
+                       // (function template)
+    using std::search_n; // searches a range for a number of consecutive copies of an element
+                         // (function template)
+
+    // Modifying sequence operations 
+
 }
 
 #endif // _STDEX_ALGORITHM_H
