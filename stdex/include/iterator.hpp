@@ -138,25 +138,36 @@ namespace stdex
 			static const bool value = sizeof(_random_access_iterator_cat_tester((_ItCategory*)(0))) == sizeof(_iterator_yes_type);
 		};
 
-		template<class ForwardIt>
-		struct _iterator_cat_is_forward:
+		template<class _InputIt>
+		struct _iterator_cat_is_input:
 			_iterator_enable_if<
 				_iterator_cat_is<
-					typename std::iterator_traits<ForwardIt>::iterator_category,
-					std::forward_iterator_tag
+					typename std::iterator_traits<_InputIt>::iterator_category,
+					std::input_iterator_tag
 					>::value == bool(true),
-				ForwardIt
+				_InputIt
 			>
 		{};
 
-		template<class BidirIt>
+		template<class _ForwardIt>
+		struct _iterator_cat_is_forward:
+			_iterator_enable_if<
+				_iterator_cat_is<
+					typename std::iterator_traits<_ForwardIt>::iterator_category,
+					std::forward_iterator_tag
+					>::value == bool(true),
+				_ForwardIt
+			>
+		{};
+
+		template<class _BidirIt>
 		struct _iterator_cat_is_bi:
 			_iterator_enable_if<
 				_iterator_cat_is<
-					typename std::iterator_traits<BidirIt>::iterator_category,
+					typename std::iterator_traits<_BidirIt>::iterator_category,
 					std::bidirectional_iterator_tag
 					>::value == bool(true),
-				BidirIt
+				_BidirIt
 			>
 		{};
 	}
