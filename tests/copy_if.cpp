@@ -219,13 +219,13 @@ output_iterator_wrapper<Z>
 test1(input_iterator_wrapper<X>& begin,
       input_iterator_wrapper<X>& end,
       output_iterator_wrapper<Z>& output)
-{ return std::copy_if(begin, end, output, pred_function); }
+{ return stdex::copy_if(begin, end, output, pred_function); }
 
 output_iterator_wrapper<Z>
 test2(input_iterator_wrapper<X>& begin,
       input_iterator_wrapper<X>& end,
       output_iterator_wrapper<Z>& output)
-{ return std::copy_if(begin, end, output, pred_obj()); }
+{ return stdex::copy_if(begin, end, output, pred_obj()); }
 
 int 
 main()
