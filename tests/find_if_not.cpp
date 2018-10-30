@@ -147,7 +147,7 @@ int array[] = {0, 0, 0, 1, 0, 1};
 
 bool
 predicate(const int& i) 
-{ return i == 1; }
+{ return i == 0; }
 
 int test1()
 {
