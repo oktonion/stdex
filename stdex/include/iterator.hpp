@@ -149,6 +149,17 @@ namespace stdex
 			>
 		{};
 
+		template<class _OutputIt>
+		struct _iterator_cat_is_output:
+			_iterator_enable_if<
+				_iterator_cat_is<
+					typename std::iterator_traits<_OutputIt>::iterator_category,
+					std::output_iterator_tag
+					>::value == bool(true),
+				_OutputIt
+			>
+		{};
+
 		template<class _ForwardIt>
 		struct _iterator_cat_is_forward:
 			_iterator_enable_if<
