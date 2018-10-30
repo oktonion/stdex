@@ -6,6 +6,7 @@
 #endif // _MSC_VER > 1000
 
 // stdex includes
+#include "./iterator.hpp"
 
 // POSIX includes
 
@@ -33,9 +34,10 @@ namespace stdex
 
     // none_of (C++11)
     // checks if a predicate is true for none of the elements in a range
-    template< class InputIt, class UnaryPredicate >
+    template<class _InputIt, class _UnaryPredicate>
     inline
-    bool none_of(InputIt first, InputIt last, UnaryPredicate p)
+    bool none_of(_InputIt first, 
+        typename detail::_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
     {
         for (; first != last; ++first) {
             if (p(*first)) return false;
@@ -54,10 +56,23 @@ namespace stdex
                          // (function template)
     using std::equal; // determines if two sets of elements are the same
                       // (function template)
-                      
-    //<TODO>: find; // (C++11)
-    //<TODO>: find_if; // finds the first element satisfying specific criteria
-    //<TODO>: find_if_not; // (function template)
+
+    // finds the first element satisfying specific criteria                  
+    using std::find;
+    using std::find_if; 
+    // (C++11)
+    template<class _InputIt, class _UnaryPredicate>
+    inline 
+	_InputIt find_if_not(_InputIt first, 
+        typename detail::_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
+    {
+        for (; first != last; ++first) {
+            if (!p(*first)) {
+                return first;
+            }
+        }
+        return last;
+    }
 
     using std::find_end; // finds the last sequence of elements in a certain range
                          // (function template)
