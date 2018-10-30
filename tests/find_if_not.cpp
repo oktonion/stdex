@@ -184,7 +184,7 @@ int test3()
   try
   {
     Container con(array, array + 6);
-    DYNAMIC_VERIFY( std::find_if_not(con.begin(), con.end(), predicate).ptr == array + 3 );
+    DYNAMIC_VERIFY( stdex::find_if_not(con.begin(), con.end(), predicate).ptr == array + 3 );
   }
   catch(int line)
   {
@@ -205,7 +205,7 @@ int test4()
     v.push_back(false);
     v.push_back(true);
     v.push_back(false);
-    DYNAMIC_VERIFY( (std::find_if_not(v.begin(), v.end(), &pred) == v.begin() + 2) );
+    DYNAMIC_VERIFY( (stdex::find_if_not(v.begin(), v.end(), &pred) == v.begin() + 2) );
   }
   catch(int line)
   {
