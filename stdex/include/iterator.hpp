@@ -104,6 +104,8 @@ namespace stdex
 
 		_iterator_yes_type _input_iterator_cat_tester(std::input_iterator_tag*);
 		_iterator_no_type _input_iterator_cat_tester(...);
+		_iterator_yes_type _output_iterator_cat_tester(std::output_iterator_tag*);
+		_iterator_no_type _output_iterator_cat_tester(...);
 		_iterator_yes_type _forward_iterator_cat_tester(std::forward_iterator_tag*);
 		_iterator_no_type _forward_iterator_cat_tester(...);
 		_iterator_yes_type _bidirectional_iterator_cat_tester(std::bidirectional_iterator_tag*);
@@ -118,6 +120,12 @@ namespace stdex
 		struct _iterator_cat_is<_ItCategory, std::input_iterator_tag>
 		{ 
 			static const bool value = sizeof(_input_iterator_cat_tester((_ItCategory*)(0))) == sizeof(_iterator_yes_type);
+		};
+
+		template<class _ItCategory>
+		struct _iterator_cat_is<_ItCategory, std::output_iterator_tag>
+		{ 
+			static const bool value = sizeof(_output_iterator_cat_tester((_ItCategory*)(0))) == sizeof(_iterator_yes_type);
 		};
 
 		template<class _ItCategory>
