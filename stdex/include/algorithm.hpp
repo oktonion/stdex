@@ -87,6 +87,23 @@ namespace stdex
 
     // Modifying sequence operations 
 
+    // copies a range of elements to a new location
+    using std::copy;
+    // (C++11)
+    template<class _InputIt, class _OutputIt, class _UnaryPredicate>
+    inline
+	typename 
+		detail::_iterator_cat_is_output<_OutputIt>::
+	type  copy_if(_InputIt first, 
+        typename detail::_iterator_cat_is_input<_InputIt>::type last, _OutputIt d_first, _UnaryPredicate p)
+    {
+        while (first != last) {
+            if (p(*first))
+                *d_first++ = *first;
+            first++;
+        }
+        return d_first;
+    }
 }
 
 #endif // _STDEX_ALGORITHM_H
