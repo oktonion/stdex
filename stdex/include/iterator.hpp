@@ -138,46 +138,57 @@ namespace stdex
 			static const bool value = sizeof(_random_access_iterator_cat_tester((_ItCategory*)(0))) == sizeof(_iterator_yes_type);
 		};
 
-		template<class ForwardIt>
-		struct _iterator_cat_is_forward:
+		template<class _InputIt>
+		struct _iterator_cat_is_input:
 			_iterator_enable_if<
 				_iterator_cat_is<
-					typename std::iterator_traits<ForwardIt>::iterator_category,
-					std::forward_iterator_tag
+					typename std::iterator_traits<_InputIt>::iterator_category,
+					std::input_iterator_tag
 					>::value == bool(true),
-				ForwardIt
+				_InputIt
 			>
 		{};
 
-		template<class BidirIt>
+		template<class _ForwardIt>
+		struct _iterator_cat_is_forward:
+			_iterator_enable_if<
+				_iterator_cat_is<
+					typename std::iterator_traits<_ForwardIt>::iterator_category,
+					std::forward_iterator_tag
+					>::value == bool(true),
+				_ForwardIt
+			>
+		{};
+
+		template<class _BidirIt>
 		struct _iterator_cat_is_bi:
 			_iterator_enable_if<
 				_iterator_cat_is<
-					typename std::iterator_traits<BidirIt>::iterator_category,
+					typename std::iterator_traits<_BidirIt>::iterator_category,
 					std::bidirectional_iterator_tag
 					>::value == bool(true),
-				BidirIt
+				_BidirIt
 			>
 		{};
 	}
 
-	template<class ForwardIt>
+	template<class _ForwardIt>
 	inline
 	typename 
-		detail::_iterator_cat_is_forward<ForwardIt>::
-	type next(ForwardIt it,
-		typename std::iterator_traits<ForwardIt>::difference_type n = 1) // increment an iterator 
+		detail::_iterator_cat_is_forward<_ForwardIt>::
+	type next(_ForwardIt it,
+		typename std::iterator_traits<_ForwardIt>::difference_type n = 1) // increment an iterator 
 	{
 		std::advance(it, n);
 		return it;
 	}
 
-	template<class BidirIt>
+	template<class _BidirIt>
 	inline
 	typename 
-		detail::_iterator_cat_is_bi<BidirIt>::
-	type prev(BidirIt it,
-	typename std::iterator_traits<BidirIt>::difference_type n = 1) // decrement an iterator 
+		detail::_iterator_cat_is_bi<_BidirIt>::
+	type prev(_BidirIt it,
+		typename std::iterator_traits<_BidirIt>::difference_type n = 1) // decrement an iterator 
 	{
 		std::advance(it, -n);
 		return it;
@@ -187,46 +198,46 @@ namespace stdex
 
 	// begin (C++11)
 	// returns an iterator to the beginning of a container or array 
-	template<class ContainerType>
+	template<class _ContainerType>
 	inline
-	typename ContainerType::iterator begin(ContainerType &value)
+	typename _ContainerType::iterator begin(_ContainerType &value)
 	{	// get beginning of sequence
 		return (value.begin());
 	}
 	
-	template<class ContainerType>
+	template<class _ContainerType>
 	inline
-	typename ContainerType::iterator begin(const ContainerType &value)
+	typename _ContainerType::iterator begin(const _ContainerType &value)
 	{	// get beginning of sequence
 		return (value.begin());
 	}
 
-	template<class T, std::size_t Size>
+	template<class _T, std::size_t Size>
 	inline
-	T *begin(T(&value)[Size]) NOEXCEPT_FUNCTION
+	_T *begin(_T(&value)[Size]) NOEXCEPT_FUNCTION
 	{	// get beginning of array
 		return (value);
 	}
 
 	// end (C++11)
 	// returns an iterator to the end of a container or array 
-	template<class ContainerType>
+	template<class _ContainerType>
 	inline
-	typename ContainerType::iterator end(ContainerType &value)
+	typename _ContainerType::iterator end(_ContainerType &value)
 	{	// get end of sequence
 		return (value.end());
 	}
 
-	template<class ContainerType>
+	template<class _ContainerType>
 	inline
-	typename ContainerType::iterator end(const ContainerType &value)
+	typename _ContainerType::iterator end(const _ContainerType &value)
 	{	// get end of sequence
 		return (value.end());
 	}
 
-	template<class T, std::size_t Size>
+	template<class _T, std::size_t Size>
 	inline
-	T *end(T(&value)[Size]) NOEXCEPT_FUNCTION
+	_T *end(_T(&value)[Size]) NOEXCEPT_FUNCTION
 	{	// get end of array
 		return (value + Size);
 	}

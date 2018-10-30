@@ -13,6 +13,7 @@ visit https://github.com/oktonion/stdex for the latest version of stdex library
 - - next
 - algorithm header
 - - none_of
+- - find_if_not
 
 ## [0.1.2] - 2018-05-08
 
