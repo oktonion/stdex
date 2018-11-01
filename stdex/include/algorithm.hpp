@@ -82,7 +82,7 @@ namespace stdex
     // finds the first element satisfying specific criteria                  
     using std::find;
     using std::find_if; 
-    // (C++11)
+    // find_if_not (C++11)
     template<class _InputIt, class _UnaryPredicate>
     inline 
 	_InputIt find_if_not(_InputIt first, 
@@ -111,7 +111,7 @@ namespace stdex
 
     // copies a range of elements to a new location
     using std::copy;
-    // (C++11)
+    // copy_if (C++11)
     template<class _InputIt, class _OutputIt, class _UnaryPredicate>
     inline
 	typename 
@@ -125,6 +125,43 @@ namespace stdex
             first++;
         }
         return d_first;
+    }
+
+    namespace detail
+    {
+        template<class _InputIt, class _OutputIt>
+        struct _copy_n_args_check:
+            _iterator_enable_if<
+				_iterator_cat_is<
+					typename std::iterator_traits<_InputIt>::iterator_category,
+					std::input_iterator_tag
+					>::value == bool(true) &&
+                _iterator_cat_is<
+					typename std::iterator_traits<_OutputIt>::iterator_category,
+					std::output_iterator_tag
+					>::value == bool(true),
+				_OutputIt
+			>
+        {
+
+        };
+    }
+
+    // copy_n (C++11)
+    // copies a number of elements to a new location
+    template<class _InputIt, class _Size, class _OutputIt>
+    inline
+	typename 
+		detail::_copy_n_args_check<_InputIt, _OutputIt>::
+	type copy_n(_InputIt first, _Size count, _OutputIt result)
+    {
+        if (count > 0) {
+            *result++ = *first;
+            for (_Size i = 1; i < count; ++i) {
+                *result++ = *++first;
+            }
+        }
+        return result;
     }
 }
 
