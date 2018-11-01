@@ -189,7 +189,7 @@ namespace stdex
 		detail::_iterator_is_valid_output<_OutputIt>::
 	type copy_n(_InputT(&first_arr)[_InputSize], _Diff count, _OutputIt result)
 	{
-		assert(count > _InputSize);
+		assert(count <= _InputSize);
 
         _InputT *first = first_arr;
 
@@ -208,7 +208,7 @@ namespace stdex
 		detail::_copy_n_input_it_check<_InputIt, _OutputT>::
 	type copy_n(_InputIt first, _Diff count, _OutputT(&result_arr)[_OutputSize])
 	{
-		assert(count > _OutputSize);
+		assert(count <= _OutputSize);
 
         _OutputT *result = result_arr;
 
@@ -225,8 +225,8 @@ namespace stdex
 	inline
 	_OutputT* copy_n(_InputT(&first_arr)[_InputSize], _Diff count, _OutputT(&result_arr)[_OutputSize])
 	{
-		assert(count > _OutputSize);
-		assert(count > _InputSize);
+		assert(count <= _OutputSize);
+		assert(count <= _InputSize);
 
         _InputT *first = first_arr;
         _OutputT *result = result_arr;
