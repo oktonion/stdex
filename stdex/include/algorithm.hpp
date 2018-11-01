@@ -183,9 +183,11 @@ namespace stdex
 	inline
 	typename 
 		detail::_iterator_cat_is_output<_OutputIt>::
-	type copy_n(_InputT(&first)[_InputSize], _Diff count, _OutputIt result)
+	type copy_n(_InputT(&first_arr)[_InputSize], _Diff count, _OutputIt result)
 	{
 		assert(count > _InputSize);
+
+        _InputT *first = first_arr;
 
 		if (count > 0) {
 			*result++ = *first;
@@ -200,9 +202,11 @@ namespace stdex
 	inline
 	typename 
 		detail::_copy_n_input_it_check<_InputIt, _OutputT>::
-	type copy_n(_InputIt first, _Diff count, _OutputT(&result)[_OutputSize])
+	type copy_n(_InputIt first, _Diff count, _OutputT(&result_arr)[_OutputSize])
 	{
 		assert(count > _OutputSize);
+
+        _OutputT *result = result_arr;
 
 		if (count > 0) {
 			*result++ = *first;
@@ -215,10 +219,13 @@ namespace stdex
 
 	template<class _InputT, std::size_t _InputSize, class _Diff, class _OutputT, std::size_t _OutputSize>
 	inline
-	_OutputT* copy_n(_InputT(&first)[_InputSize], _Diff count, _OutputT(&result)[_OutputSize])
+	_OutputT* copy_n(_InputT(&first_arr)[_InputSize], _Diff count, _OutputT(&result_arr)[_OutputSize])
 	{
 		assert(count > _OutputSize);
 		assert(count > _InputSize);
+
+        _InputT *first = first_arr;
+        _OutputT *result = result_arr;
 
 		if (count > 0) {
 			*result++ = *first;
