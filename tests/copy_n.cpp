@@ -22,15 +22,15 @@ test1()
 
   int i1[N];
   copy_n(A, N, i1);
-  DYNAMIC_VERIFY( equal(i1, i1 + N, A) );
+  DYNAMIC_VERIFY( (equal(i1, i1 + N, A)) );
 
   std::vector<int> v1(N);
   copy_n(A, N, v1.begin());
-  DYNAMIC_VERIFY( equal(v1.begin(), v1.end(), A) );
+  DYNAMIC_VERIFY( (equal(v1.begin(), v1.end(), A)) );
 
   short s1[N];
   copy_n(A, N, s1);
-  DYNAMIC_VERIFY( equal(s1, s1 + N, A) );
+  DYNAMIC_VERIFY( (equal(s1, s1 + N, A)) );
 
   return 0;
 }
@@ -46,15 +46,15 @@ test2()
 
   int i1[N];
   copy_n(a.begin(), N, i1);
-  DYNAMIC_VERIFY( equal(i1, i1 + N, a.begin()) );
+  DYNAMIC_VERIFY( (equal(i1, i1 + N, a.begin())) );
 
   std::vector<int> v1(N);
   copy_n(a.begin(), N, v1.begin());
-  DYNAMIC_VERIFY( equal(v1.begin(), v1.end(), a.begin()) );
+  DYNAMIC_VERIFY( (equal(v1.begin(), v1.end(), a.begin())) );
 
   short s1[N];
   copy_n(a.begin(), N, s1);
-  DYNAMIC_VERIFY( equal(s1, s1 + N, a.begin()) );
+  DYNAMIC_VERIFY( (equal(s1, s1 + N, a.begin())) );
   
   return 0;
 }
