@@ -146,6 +146,19 @@ namespace stdex
 			static const bool value = sizeof(_random_access_iterator_cat_tester((_ItCategory*)(0))) == sizeof(_iterator_yes_type);
 		};
 
+		template<class _ItCategory, class _CheckCategory>
+		struct _iterator_cat_is_valid:
+			_iterator_cat_is<_ItCategory, _CheckCategory>
+		{ };
+
+		template<class _ItCategory>
+		struct _iterator_cat_is_valid<_ItCategory, std::output_iterator_tag>:
+		{ 
+			static const bool value = 
+				_iterator_cat_is<_ItCategory, std::forward_iterator_tag>::value ||
+				_iterator_cat_is<_ItCategory, std::output_iterator_tag>;
+		};
+
 		template<class _InputIt>
 		struct _iterator_cat_is_input:
 			_iterator_enable_if<
@@ -156,16 +169,20 @@ namespace stdex
 				_InputIt
 			>
 		{};
-
+		
 		template<class _OutputIt>
-		struct _iterator_cat_is_output:
+		struct _iterator_is_valid_output:
 			_iterator_enable_if<
-				_iterator_cat_is<
+				_iterator_cat_is_valid<
 					typename std::iterator_traits<_OutputIt>::iterator_category,
 					std::output_iterator_tag
 					>::value == bool(true),
 				_OutputIt
 			>
+		{};
+
+		template<class _OutputIt>
+		struct _iterator_is_valid_output<const _OutputIt>
 		{};
 
 		template<class _ForwardIt>
