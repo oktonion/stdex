@@ -117,7 +117,7 @@ namespace stdex
 	template<class _InputIt, class _OutputIt, class _UnaryPredicate>
 	inline
 	typename 
-		detail::_iterator_cat_is_output<_OutputIt>::
+		detail::_iterator_is_valid_output<_OutputIt>::
 	type  copy_if(_InputIt first, 
 		typename detail::_iterator_cat_is_input<_InputIt>::type last, _OutputIt d_first, _UnaryPredicate p)
 	{
@@ -138,15 +138,17 @@ namespace stdex
 					typename std::iterator_traits<_InputIt>::iterator_category,
 					std::input_iterator_tag
 					>::value == bool(true) &&
-				_iterator_cat_is<
+				_iterator_cat_is_valid<
 					typename std::iterator_traits<_OutputIt>::iterator_category,
 					std::output_iterator_tag
 					>::value == bool(true),
 				_OutputIt
 			>
-		{
+		{ };
 
-		};
+        template<class _InputIt, class _OutputIt>
+		struct _copy_n_args_check<_InputIt, const _OutputIt>
+        { };
 
 		template<class _InputIt, class _OutputT>
 		struct _copy_n_input_it_check :
@@ -157,9 +159,11 @@ namespace stdex
 					>::value == bool(true),
 				_OutputT*
 			>
-		{
+		{ };
 
-		};
+        template<class _InputIt, class _OutputT>
+		struct _copy_n_input_it_check<_InputIt, const _OutputT>
+        { };
 	}
 
 	// copy_n (C++11)
@@ -182,7 +186,7 @@ namespace stdex
 	template<class _InputT, std::size_t _InputSize, class _Diff, class _OutputIt> 
 	inline
 	typename 
-		detail::_iterator_cat_is_output<_OutputIt>::
+		detail::_iterator_is_valid_output<_OutputIt>::
 	type copy_n(_InputT(&first_arr)[_InputSize], _Diff count, _OutputIt result)
 	{
 		assert(count > _InputSize);
