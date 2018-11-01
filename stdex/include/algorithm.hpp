@@ -29,8 +29,30 @@ namespace stdex
 {
     // Non-modifying sequence operations
 
-    //<TODO>: all_of (C++11)       checks if a predicate is true for all, any or none of the elements in a range
-    //<TODO>: any_of (C++11)       (function template)
+    // all_of (C++11)  
+    // checks if a predicate is true for all of the elements in a range     
+    template<class _InputIt, class _UnaryPredicate>
+    inline
+    bool all_of(_InputIt first, 
+        typename detail::_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
+    {
+        for (; first != last; ++first) {
+            if (!p(*first)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // any_of (C++11)
+    // checks if a predicate is true for any of the elements in a range
+    template<class _InputIt, class _UnaryPredicate>
+    inline
+    bool any_of(_InputIt first, 
+        typename detail::_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
+    {
+        return std::find_if(first, last, p) != last;
+    }
 
     // none_of (C++11)
     // checks if a predicate is true for none of the elements in a range

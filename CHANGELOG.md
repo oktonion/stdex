@@ -14,6 +14,7 @@ visit https://github.com/oktonion/stdex for the latest version of stdex library
 - algorithm header
 - - none_of
 - - find_if_not
+- - copy_if
 
 ## [0.1.2] - 2018-05-08
 
