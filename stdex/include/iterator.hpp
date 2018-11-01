@@ -152,11 +152,11 @@ namespace stdex
 		{ };
 
 		template<class _ItCategory>
-		struct _iterator_cat_is_valid<_ItCategory, std::output_iterator_tag>:
+		struct _iterator_cat_is_valid<_ItCategory, std::output_iterator_tag>
 		{ 
 			static const bool value = 
 				_iterator_cat_is<_ItCategory, std::forward_iterator_tag>::value ||
-				_iterator_cat_is<_ItCategory, std::output_iterator_tag>;
+				_iterator_cat_is<_ItCategory, std::output_iterator_tag>::value;
 		};
 
 		template<class _InputIt>
