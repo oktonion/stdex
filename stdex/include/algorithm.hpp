@@ -16,6 +16,7 @@
 #include <cassert> // assert
 #include <cstdlib> // std::rand
 #include <map> // std::pair
+#include <functional> // std::less
 
 namespace stdex
 {
@@ -708,7 +709,8 @@ namespace stdex
 		minmax_element(_ForwardIt first, 
 			typename detail::_iterator_cat_is_forward<_ForwardIt>::type last)
 	{
-		return stdex::minmax_element(first, last, std::less<>());
+		typedef std::iterator_traits<_ForwardIt>::value_type value_type;
+		return stdex::minmax_element(first, last, std::less<value_type>());
 	}
 
 	// returns true if one range is lexicographically less than another
