@@ -725,7 +725,7 @@ namespace stdex
 				_iterator_cat_is<
 					typename std::iterator_traits<_ForwardIt2>::iterator_category,
 					std::forward_iterator_tag
-					>::value == bool(true) 
+					>::value == bool(true), 
 				bool
 			>
 		{ };

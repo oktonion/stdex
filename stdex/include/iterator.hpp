@@ -253,9 +253,9 @@ namespace stdex
 		return (value.begin());
 	}
 
-	template<class _T, std::size_t Size>
+	template<class _Tp, std::size_t Size>
 	inline
-	_T *begin(_T(&value)[Size]) NOEXCEPT_FUNCTION
+	_Tp *begin(_Tp(&value)[Size]) NOEXCEPT_FUNCTION
 	{	// get beginning of array
 		return (value);
 	}
@@ -276,9 +276,9 @@ namespace stdex
 		return (value.end());
 	}
 
-	template<class _T, std::size_t Size>
+	template<class _Tp, std::size_t Size>
 	inline
-	_T *end(_T(&value)[Size]) NOEXCEPT_FUNCTION
+	_Tp *end(_Tp(&value)[Size]) NOEXCEPT_FUNCTION
 	{	// get end of array
 		return (value + Size);
 	}
