@@ -453,7 +453,6 @@ namespace stdex
 	// (function template)
 	using std::stable_partition;
 	
-	// (C++11)
 	// locates the partition point of a partitioned range
 	// (function template)
 	// <TODO>: partition_point()
@@ -709,7 +708,7 @@ namespace stdex
 		minmax_element(_ForwardIt first, 
 			typename detail::_iterator_cat_is_forward<_ForwardIt>::type last)
 	{
-		return std::minmax_element(first, last, std::less<>());
+		return stdex::minmax_element(first, last, std::less<>());
 	}
 
 	// returns true if one range is lexicographically less than another
