@@ -146,9 +146,9 @@ namespace stdex
 			>
 		{ };
 
-        template<class _InputIt, class _OutputIt>
+		template<class _InputIt, class _OutputIt>
 		struct _copy_n_args_check<_InputIt, const _OutputIt>
-        { };
+		{ };
 
 		template<class _InputIt, class _OutputT>
 		struct _copy_n_input_it_check :
@@ -161,9 +161,9 @@ namespace stdex
 			>
 		{ };
 
-        template<class _InputIt, class _OutputT>
+		template<class _InputIt, class _OutputT>
 		struct _copy_n_input_it_check<_InputIt, const _OutputT>
-        { };
+		{ };
 	}
 
 	// copy_n (C++11)
@@ -191,7 +191,7 @@ namespace stdex
 	{
 		assert(count <= _InputSize);
 
-        _InputT *first = first_arr;
+		_InputT *first = first_arr;
 
 		if (count > 0) {
 			*result++ = *first;
@@ -210,7 +210,7 @@ namespace stdex
 	{
 		assert(count <= _OutputSize);
 
-        _OutputT *result = result_arr;
+		_OutputT *result = result_arr;
 
 		if (count > 0) {
 			*result++ = *first;
@@ -223,13 +223,15 @@ namespace stdex
 
 	template<class _InputT, std::size_t _InputSize, class _Diff, class _OutputT, std::size_t _OutputSize>
 	inline
-	_OutputT* copy_n(_InputT(&first_arr)[_InputSize], _Diff count, _OutputT(&result_arr)[_OutputSize])
+	typename 
+		detail::_copy_n_input_it_check<_InputT*, _OutputT>::
+	type copy_n(_InputT(&first_arr)[_InputSize], _Diff count, _OutputT(&result_arr)[_OutputSize])
 	{
 		assert(count <= _OutputSize);
 		assert(count <= _InputSize);
 
-        _InputT *first = first_arr;
-        _OutputT *result = result_arr;
+		_InputT *first = first_arr;
+		_OutputT *result = result_arr;
 
 		if (count > 0) {
 			*result++ = *first;
