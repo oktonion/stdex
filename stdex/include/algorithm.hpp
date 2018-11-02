@@ -709,7 +709,7 @@ namespace stdex
 		minmax_element(_ForwardIt first, 
 			typename detail::_iterator_cat_is_forward<_ForwardIt>::type last)
 	{
-		typedef std::iterator_traits<_ForwardIt>::value_type value_type;
+		typedef typename std::iterator_traits<_ForwardIt>::value_type value_type;
 		return stdex::minmax_element(first, last, std::less<value_type>());
 	}
 
