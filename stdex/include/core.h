@@ -211,6 +211,9 @@
 	  typedef stdex::detail::StaticAssertionTest<sizeof(CONCATENATE(__static_assertion_at_line_, __LINE__))> CONCATENATE(__static_assertion_test_at_line_, __LINE__)
 
 #ifdef _STDEX_IMPLEMENTS_STATIC_ASSERT_SUPPORT
+	#ifdef static_assert
+		#undef static_assert
+	#endif
 	#define static_assert(expression, message) STATIC_ASSERT(expression, ERROR_MESSAGE_STRING)
 #endif
 

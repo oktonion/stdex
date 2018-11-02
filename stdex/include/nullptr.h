@@ -342,6 +342,10 @@ typedef detail::_nullptr_chooser::type nullptr_t;
 
 }
 
+#ifdef nullptr
+	#undef nullptr
+#endif
+
 #define nullptr (stdex::nullptr_t)(STDEX_NULL)
 
 
