@@ -206,6 +206,11 @@ namespace stdex
 				_BidirIt
 			>
 		{};
+
+		template<class _RandomIt>
+		struct _iterator_cat_is_rand_access:
+			_iterator_cat_is_bi<_RandomIt>
+		{};
 	}
 
 	template<class _ForwardIt>
