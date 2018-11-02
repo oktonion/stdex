@@ -381,7 +381,7 @@ namespace stdex
 	void random_shuffle(_RandomIt first,
 		typename detail::_iterator_cat_is_rand_access<_RandomIt>::type last, _RandomFunc &r)
 	{
-		typename std::iterator_traits<RandomIt>::difference_type i, n;
+		typename std::iterator_traits<_RandomIt>::difference_type i, n;
 		n = last - first;
 		for (i = n-1; i > 0; --i) {
 			swap(first[i], first[r(i+1)]);
@@ -446,7 +446,7 @@ namespace stdex
 			}
 			++first;
 		}
-		return std::pair<OutputIt1, OutputIt2>(d_first_true, d_first_false);
+		return std::pair<_OutputIt1, _OutputIt2>(d_first_true, d_first_false);
 	}
 
 	// divides elements into two groups while preserving their relative order
@@ -462,28 +462,6 @@ namespace stdex
 	// Sorting operations
 
 	// (C++11)
-	// checks whether a range is sorted into ascending order
-	// (function template)
-	template<class _ForwardIt>
-	inline
-	bool is_sorted(_ForwardIt first, 
-		typename detail::_iterator_cat_is_forward<_ForwardIt>::type last)
-	{
-		return std::is_sorted_until(first, last) == last;
-	}
-
-	// (C++11)
-	// checks with given binary comparison function comp whether a range is sorted into ascending order
-	// (function template)
-	template<class _ForwardIt, class _Compare>
-	inline
-	bool is_sorted(_ForwardIt first, 
-		typename detail::_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp)
-	{
-		return std::is_sorted_until(first, last, comp) == last;
-	}
-
-	// (C++11)
 	// finds the largest sorted subrange
 	// (function template)
 	template<class _ForwardIt>
@@ -492,7 +470,7 @@ namespace stdex
 		typename detail::_iterator_cat_is_forward<_ForwardIt>::type last)
 	{
 		if (first != last) {
-			ForwardIt next = first;
+			_ForwardIt next = first;
 			while (++next != last) {
 				if (*next < *first)
 					return next;
@@ -511,7 +489,7 @@ namespace stdex
 		typename detail::_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp) 
 	{
 		if (first != last) {
-			ForwardIt next = first;
+			_ForwardIt next = first;
 			while (++next != last) {
 				if (true == comp(*next, *first))
 					return next;
@@ -519,6 +497,28 @@ namespace stdex
 			}
 		}
 		return last;
+	}
+
+	// (C++11)
+	// checks whether a range is sorted into ascending order
+	// (function template)
+	template<class _ForwardIt>
+	inline
+	bool is_sorted(_ForwardIt first, 
+		typename detail::_iterator_cat_is_forward<_ForwardIt>::type last)
+	{
+		return stdex::is_sorted_until(first, last) == last;
+	}
+
+	// (C++11)
+	// checks with given binary comparison function comp whether a range is sorted into ascending order
+	// (function template)
+	template<class _ForwardIt, class _Compare>
+	inline
+	bool is_sorted(_ForwardIt first, 
+		typename detail::_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp)
+	{
+		return stdex::is_sorted_until(first, last, comp) == last;
 	}
 
 	// sorts a range into ascending order
