@@ -17,18 +17,6 @@
 #include <cstdlib> // std::rand
 #include <map> // std::pair
 
-#ifdef _STDEX_NATIVE_CPP11_SUPPORT
-
-#define DELETED_FUNCTION =delete
-#define NOEXCEPT_FUNCTION noexcept
-
-#else
-
-#define DELETED_FUNCTION 
-#define NOEXCEPT_FUNCTION throw()
-
-#endif
-
 namespace stdex
 {
 	// Non-modifying sequence operations
