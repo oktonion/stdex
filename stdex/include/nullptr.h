@@ -193,6 +193,19 @@ namespace stdex
 			typedef void* nullptr_t_as_void;
 		}
 
+		namespace nullptr_comparison_detail
+		{
+			template<class T1, class T2>
+			nullptr_detail::_no_type operator==(T1, T2);
+
+			template<class T>
+			struct _nullptr_can_be_compared_to_ptr
+			{
+				static const int *ptr;
+				static const bool value = sizeof(((T) (STDEX_NULL)) == ptr) != sizeof(nullptr_detail::_no_type);
+			};
+		}
+
 		template<class T>
 		struct _nullptr_can_be_ct_constant_impl
 		{
@@ -302,9 +315,10 @@ namespace stdex
 
 				static const bool _is_convertable_to_ptr = _is_convertable_to_ptr_impl<nullptr_t_as_integral>::value;
 				static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<nullptr_t_as_integral>::value;
+				static const bool _can_be_compared_to_ptr = nullptr_comparison_detail::_nullptr_can_be_compared_to_ptr<nullptr_t_as_integral>::value;
 			};
 
-			typedef _nullptr_choose_as_int<as_int::_is_convertable_to_ptr == bool(true) && as_int::_equal_void_ptr == bool(true)>::type type;
+			typedef _nullptr_choose_as_int<as_int::_is_convertable_to_ptr == bool(true) && as_int::_equal_void_ptr == bool(true) && as_int::_can_be_compared_to_ptr == bool(true)>::type type;
 		};
 
 		template<>

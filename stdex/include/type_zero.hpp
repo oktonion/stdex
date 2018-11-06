@@ -1,3 +1,6 @@
+#ifndef _STDEX_TYPE_ZERO_H
+#define _STDEX_TYPE_ZERO_H
+
 #include <memory.h>
 #include <cstddef>
 
@@ -104,3 +107,4 @@ namespace stdex
         operator const array_t&() const { return data; }
 	};
 }
+#endif
