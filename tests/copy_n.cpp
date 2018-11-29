@@ -38,6 +38,14 @@ test1()
 int
 test2()
 {
+  {
+    const int A[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17};
+    const int N = sizeof(A) / sizeof(int);
+    const std::vector<int> a(A, A + N);
+    int i1[N];
+
+    copy_n(a.begin(), N, i1);
+  }
   using namespace stdex;
 
   const int A[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17};
