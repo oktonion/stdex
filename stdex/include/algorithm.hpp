@@ -148,6 +148,18 @@ namespace stdex
 
 	namespace detail
 	{
+		template<class _1T, class _2T, class _3T>
+		_iterator_no_type copy_n_dummy(_1T, _2T, _3T);
+
+		_iterator_no_type copy_n_tester(_iterator_no_type);
+		_iterator_yes_type copy_n_tester(...);
+
+		template<class _1T, class _2T, class _3T>
+		struct _has_buggy_copy_n
+		{
+			static const bool value = false;
+		};
+
 		template<class _InputIt, class _OutputIt>
 		struct _copy_n_args_check:
 			_iterator_enable_if<
