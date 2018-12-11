@@ -186,6 +186,12 @@ namespace stdex
 				static const bool value = sizeof(copy_n(stdex::begin(A), sizeof(A) / sizeof(int), A), _iterator_no_type()) == sizeof(_iterator_yes_type);
 			};
 
+			struct _has_buggy_copy_n3
+			{
+				static int A[20];
+				static const bool value = sizeof(copy_n(A, sizeof(A) / sizeof(int), A), _iterator_no_type()) == sizeof(_iterator_yes_type);
+			};
+
 			#undef _STDEX_PLACE_DUMMY_IN_STD_NAMESPACE
 		}
 
@@ -223,6 +229,22 @@ namespace stdex
 
 		template<class _InputIt, class _OutputT>
 		struct _copy_n_input_it_check<_InputIt, const _OutputT>
+		{ };
+
+		template<class _InputIt, class _OutputT>
+		struct _copy_n_input_it_check1 :
+			_iterator_enable_if<
+				_iterator_cat_is<
+					typename std::iterator_traits<_InputIt>::iterator_category,
+					std::input_iterator_tag
+					>::value == bool(true) &&
+				algorithm_detail::_has_buggy_copy_n3::value == bool(false),
+				_OutputT*
+			>
+		{ };
+
+		template<class _InputIt, class _OutputT>
+		struct _copy_n_input_it_check1<_InputIt, const _OutputT>
 		{ };
 
 		template<class _OutputIt>
@@ -304,7 +326,7 @@ namespace stdex
 		>
 	inline
 	typename 
-		detail::_copy_n_input_it_check<_InputT*, _OutputT>::
+		detail::_copy_n_input_it_check1<_InputT*, _OutputT>::
 	type copy_n(_InputT(&first_arr)[_InputSize], _Diff count, _OutputT(&result_arr)[_OutputSize])
 	{
 		assert(count <= _OutputSize);
