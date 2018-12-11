@@ -155,28 +155,40 @@ namespace stdex
 			template<class T>
 			_iterator_yes_type operator,(T, _iterator_no_type);
 
+			struct dummy_input_iterator:
+				public std::iterator<std::input_iterator_tag, int>
+			{};
+
+			struct dummy_output_iterator:
+				public std::iterator<std::input_iterator_tag, int>
+			{};
+
 			struct _has_buggy_copy_n
 			{
 				static int A[20];
-				static const bool value = sizeof(copy_n(stdex::begin(A), sizeof(A) / sizeof(int), stdex::begin(A)), _iterator_no_type()) == sizeof(_iterator_yes_type);
+				static const int B[20];
+				static const bool value = sizeof(copy_n(dummy_input_iterator(), sizeof(A) / sizeof(int), dummy_output_iterator()), _iterator_no_type()) == sizeof(_iterator_yes_type);
 			};
 
 			struct _has_buggy_copy_n1
 			{
 				static int A[20];
-				static const bool value = sizeof(copy_n(A, sizeof(A) / sizeof(int), stdex::begin(A)), _iterator_no_type()) == sizeof(_iterator_yes_type);
+				static const int B[20];
+				static const bool value = sizeof(copy_n(B, sizeof(A) / sizeof(int), dummy_output_iterator()), _iterator_no_type()) == sizeof(_iterator_yes_type);
 			};
 
 			struct _has_buggy_copy_n2
 			{
 				static int A[20];
-				static const bool value = sizeof(copy_n(stdex::begin(A), sizeof(A) / sizeof(int), A), _iterator_no_type()) == sizeof(_iterator_yes_type);
+				static const int B[20];
+				static const bool value = sizeof(copy_n(dummy_input_iterator(), sizeof(A) / sizeof(int), A), _iterator_no_type()) == sizeof(_iterator_yes_type);
 			};
 
 			struct _has_buggy_copy_n3
 			{
-				static int A[20];
-				static const bool value = sizeof(copy_n(A, sizeof(A) / sizeof(int), A), _iterator_no_type()) == sizeof(_iterator_yes_type);
+				static int (&A)[20];
+				static const int (&B)[20];
+				static const bool value = sizeof(copy_n(B, sizeof(A) / sizeof(int), A), _iterator_no_type()) == sizeof(_iterator_yes_type);
 			};
 		}
 
