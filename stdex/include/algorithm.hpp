@@ -145,25 +145,12 @@ namespace stdex
 		}
 		return d_first;
 	}
-}
 
-#define _STDEX_PLACE_DUMMY_IN_STD_NAMESPACE
-
-#ifdef _STDEX_PLACE_DUMMY_IN_STD_NAMESPACE
-namespace std_dummy
-{
-	using namespace std;
-	void copy_n(...); // dummy
-}
-#endif
-
-namespace stdex
-{
 	namespace detail
 	{
 		namespace algorithm_detail
 		{
-			using namespace std_dummy;
+			void copy_n(...); // dummy
 
 			template<class T>
 			_iterator_yes_type operator,(T, _iterator_no_type);
@@ -191,8 +178,6 @@ namespace stdex
 				static int A[20];
 				static const bool value = sizeof(copy_n(A, sizeof(A) / sizeof(int), A), _iterator_no_type()) == sizeof(_iterator_yes_type);
 			};
-
-			#undef _STDEX_PLACE_DUMMY_IN_STD_NAMESPACE
 		}
 
 		template<class _InputIt, class _OutputIt>
