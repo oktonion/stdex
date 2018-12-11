@@ -171,7 +171,19 @@ namespace stdex
 			struct _has_buggy_copy_n
 			{
 				static int A[20];
+				static const bool value = sizeof(copy_n(stdex::begin(A), sizeof(A) / sizeof(int), stdex::begin(A)), _iterator_no_type()) == sizeof(_iterator_yes_type);
+			};
+
+			struct _has_buggy_copy_n1
+			{
+				static int A[20];
 				static const bool value = sizeof(copy_n(A, sizeof(A) / sizeof(int), stdex::begin(A)), _iterator_no_type()) == sizeof(_iterator_yes_type);
+			};
+
+			struct _has_buggy_copy_n2
+			{
+				static int A[20];
+				static const bool value = sizeof(copy_n(stdex::begin(A), sizeof(A) / sizeof(int), A), _iterator_no_type()) == sizeof(_iterator_yes_type);
 			};
 
 			#undef _STDEX_PLACE_DUMMY_IN_STD_NAMESPACE
@@ -204,7 +216,7 @@ namespace stdex
 					typename std::iterator_traits<_InputIt>::iterator_category,
 					std::input_iterator_tag
 					>::value == bool(true) &&
-				algorithm_detail::_has_buggy_copy_n::value == bool(false),
+				algorithm_detail::_has_buggy_copy_n2::value == bool(false),
 				_OutputT*
 			>
 		{ };
@@ -220,7 +232,7 @@ namespace stdex
 					typename std::iterator_traits<_OutputIt>::iterator_category,
 					std::output_iterator_tag
 					>::value == bool(true) &&
-				algorithm_detail::_has_buggy_copy_n::value == bool(false),
+				algorithm_detail::_has_buggy_copy_n1::value == bool(false),
 				_OutputIt
 			>
 		{ };
