@@ -145,20 +145,37 @@ namespace stdex
 		}
 		return d_first;
 	}
+}
 
+#define _STDEX_PLACE_DUMMY_IN_STD_NAMESPACE
+
+#ifdef _STDEX_PLACE_DUMMY_IN_STD_NAMESPACE
+namespace std_dummy
+{
+	using namespace std;
+	void copy_n(...); // dummy
+}
+#endif
+
+namespace stdex
+{
 	namespace detail
 	{
-		template<class _1T, class _2T, class _3T>
-		_iterator_no_type copy_n_dummy(_1T, _2T, _3T);
-
-		_iterator_no_type copy_n_tester(_iterator_no_type);
-		_iterator_yes_type copy_n_tester(...);
-
-		template<class _1T, class _2T, class _3T>
-		struct _has_buggy_copy_n
+		namespace algorithm_detail
 		{
-			static const bool value = false;
-		};
+			using namespace std_dummy;
+
+			template<class T>
+			_iterator_yes_type operator,(T, _iterator_no_type);
+
+			struct _has_buggy_copy_n
+			{
+				static int A[20];
+				static const bool value = sizeof(copy_n(A, sizeof(A) / sizeof(int), stdex::begin(A)), _iterator_no_type()) == sizeof(_iterator_yes_type);
+			};
+
+			#undef _STDEX_PLACE_DUMMY_IN_STD_NAMESPACE
+		}
 
 		template<class _InputIt, class _OutputIt>
 		struct _copy_n_args_check:
@@ -170,7 +187,8 @@ namespace stdex
 				_iterator_cat_is_valid<
 					typename std::iterator_traits<_OutputIt>::iterator_category,
 					std::output_iterator_tag
-					>::value == bool(true),
+					>::value == bool(true) &&
+				algorithm_detail::_has_buggy_copy_n::value == bool(false),
 				_OutputIt
 			>
 		{ };
@@ -185,13 +203,30 @@ namespace stdex
 				_iterator_cat_is<
 					typename std::iterator_traits<_InputIt>::iterator_category,
 					std::input_iterator_tag
-					>::value == bool(true),
+					>::value == bool(true) &&
+				algorithm_detail::_has_buggy_copy_n::value == bool(false),
 				_OutputT*
 			>
 		{ };
 
 		template<class _InputIt, class _OutputT>
 		struct _copy_n_input_it_check<_InputIt, const _OutputT>
+		{ };
+
+		template<class _OutputIt>
+		struct _copy_n_output_it_check :
+			_iterator_enable_if<
+				_iterator_cat_is<
+					typename std::iterator_traits<_OutputIt>::iterator_category,
+					std::output_iterator_tag
+					>::value == bool(true) &&
+				algorithm_detail::_has_buggy_copy_n::value == bool(false),
+				_OutputIt
+			>
+		{ };
+
+		template<class _OutputIt>
+		struct _copy_n_output_it_check<const _OutputIt>
 		{ };
 	}
 
@@ -215,7 +250,7 @@ namespace stdex
 	template<class _InputT, std::size_t _InputSize, class _Diff, class _OutputIt> 
 	inline
 	typename 
-		detail::_iterator_is_valid_output<_OutputIt>::
+		detail::_copy_n_output_it_check<_OutputIt>::
 	type copy_n(_InputT(&first_arr)[_InputSize], _Diff count, _OutputIt result)
 	{
 		assert(count <= _InputSize);
