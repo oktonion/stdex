@@ -150,10 +150,10 @@ namespace stdex
 	{
 		namespace algorithm_detail
 		{
-			void copy_n(...); // dummy
+			_iterator_no_type copy_n(...); // dummy
 
-			template<class T>
-			_iterator_yes_type operator,(T, _iterator_no_type);
+			_iterator_no_type copy_n_check(_iterator_no_type);
+			_iterator_yes_type copy_n_check(...);
 
 			struct dummy_input_iterator:
 				public std::iterator<std::input_iterator_tag, int>
@@ -167,28 +167,28 @@ namespace stdex
 			{
 				static int A[20];
 				static const int B[20];
-				static const bool value = sizeof(copy_n(dummy_input_iterator(), sizeof(A) / sizeof(int), dummy_output_iterator()), _iterator_no_type()) == sizeof(_iterator_yes_type);
+				static const bool value = sizeof(copy_n_check(copy_n(dummy_input_iterator(), sizeof(A) / sizeof(int), dummy_output_iterator()))) == sizeof(_iterator_yes_type);
 			};
 
 			struct _has_buggy_copy_n1
 			{
 				static int A[20];
 				static const int B[20];
-				static const bool value = sizeof(copy_n(B, sizeof(A) / sizeof(int), dummy_output_iterator()), _iterator_no_type()) == sizeof(_iterator_yes_type);
+				static const bool value = sizeof(copy_n_check(copy_n(B, sizeof(A) / sizeof(int), dummy_output_iterator()))) == sizeof(_iterator_yes_type);
 			};
 
 			struct _has_buggy_copy_n2
 			{
 				static int A[20];
 				static const int B[20];
-				static const bool value = sizeof(copy_n(dummy_input_iterator(), sizeof(A) / sizeof(int), A), _iterator_no_type()) == sizeof(_iterator_yes_type);
+				static const bool value = sizeof(copy_n_check(copy_n(dummy_input_iterator(), sizeof(A) / sizeof(int), A))) == sizeof(_iterator_yes_type);
 			};
 
 			struct _has_buggy_copy_n3
 			{
-				static int (&A)[20];
-				static const int (&B)[20];
-				static const bool value = sizeof(copy_n(B, sizeof(A) / sizeof(int), A), _iterator_no_type()) == sizeof(_iterator_yes_type);
+				static int A[20];
+				static const int B[20];
+				static const bool value = sizeof(copy_n_check(copy_n(B, sizeof(A) / sizeof(int), A))) == sizeof(_iterator_yes_type);
 			};
 		}
 
