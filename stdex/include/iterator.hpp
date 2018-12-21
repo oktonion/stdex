@@ -188,7 +188,7 @@ namespace stdex
 		{};
 
 		template<class _ForwardIt>
-		struct _iterator_cat_is_forward:
+		struct _if_iterator_cat_is_forward:
 			_iterator_enable_if<
 				_iterator_cat_is<
 					typename std::iterator_traits<_ForwardIt>::iterator_category,
@@ -218,7 +218,7 @@ namespace stdex
 	template<class _ForwardIt>
 	inline
 	typename 
-		detail::_iterator_cat_is_forward<_ForwardIt>::
+		detail::_if_iterator_cat_is_forward<_ForwardIt>::
 	type next(_ForwardIt it,
 		typename std::iterator_traits<_ForwardIt>::difference_type n = 1) // increment an iterator 
 	{
