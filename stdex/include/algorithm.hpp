@@ -540,7 +540,7 @@ namespace stdex
 	template<class _ForwardIt>
 	inline
 	_ForwardIt is_sorted_until(_ForwardIt first, 
-		typename detail::_iterator_cat_is_forward<_ForwardIt>::type last)
+		typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last)
 	{
 		if (first != last) {
 			_ForwardIt next = first;
@@ -559,7 +559,7 @@ namespace stdex
 	template <class _ForwardIt, class _Compare>
 	inline
 	_ForwardIt is_sorted_until(_ForwardIt first, 
-		typename detail::_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp) 
+		typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp) 
 	{
 		if (first != last) {
 			_ForwardIt next = first;
@@ -578,7 +578,7 @@ namespace stdex
 	template<class _ForwardIt>
 	inline
 	bool is_sorted(_ForwardIt first, 
-		typename detail::_iterator_cat_is_forward<_ForwardIt>::type last)
+		typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last)
 	{
 		return stdex::is_sorted_until(first, last) == last;
 	}
@@ -589,7 +589,7 @@ namespace stdex
 	template<class _ForwardIt, class _Compare>
 	inline
 	bool is_sorted(_ForwardIt first, 
-		typename detail::_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp)
+		typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp)
 	{
 		return stdex::is_sorted_until(first, last, comp) == last;
 	}
@@ -742,7 +742,7 @@ namespace stdex
 	inline
 	std::pair<_ForwardIt, _ForwardIt> 
 		minmax_element(_ForwardIt first, 
-			typename detail::_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp)
+			typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp)
 	{
 		std::pair<_ForwardIt, _ForwardIt> result(first, first);
 	
@@ -780,7 +780,7 @@ namespace stdex
 	inline
 	std::pair<_ForwardIt, _ForwardIt> 
 		minmax_element(_ForwardIt first, 
-			typename detail::_iterator_cat_is_forward<_ForwardIt>::type last)
+			typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last)
 	{
 		typedef typename std::iterator_traits<_ForwardIt>::value_type value_type;
 		return stdex::minmax_element(first, last, std::less<value_type>());
@@ -812,7 +812,7 @@ namespace stdex
 	typename 
 		detail::_is_permutation_arg3_check<_ForwardIt2>::
 	type is_permutation(_ForwardIt1 first, 
-		typename detail::_iterator_cat_is_forward<_ForwardIt1>::type last, _ForwardIt2 d_first)
+		typename detail::_if_iterator_cat_is_forward<_ForwardIt1>::type last, _ForwardIt2 d_first)
 	{
 		// skip common prefix
 		std::pair<_ForwardIt1, _ForwardIt2> tie = std::mismatch(first, last, d_first);
