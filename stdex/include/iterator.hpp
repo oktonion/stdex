@@ -184,7 +184,8 @@ namespace stdex
 		{};
 
 		template<class _OutputIt>
-		struct _if_iterator_is_valid_output<const _OutputIt>
+		struct _if_iterator_is_valid_output<const _OutputIt>:
+			_iterator_enable_if<false, void>
 		{};
 
 		template<class _ForwardIt>

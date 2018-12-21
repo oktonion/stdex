@@ -209,7 +209,8 @@ namespace stdex
 		{ };
 
 		template<class _InputIt, class _OutputIt>
-		struct _copy_n_args_check<_InputIt, const _OutputIt>
+		struct _copy_n_args_check<_InputIt, const _OutputIt> :
+			_iterator_enable_if<false, void>
 		{ };
 
 		template<class _InputIt, class _OutputT>
@@ -225,7 +226,8 @@ namespace stdex
 		{ };
 
 		template<class _InputIt, class _OutputT>
-		struct _copy_n_input_it_check<_InputIt, const _OutputT>
+		struct _copy_n_input_it_check<_InputIt, const _OutputT> :
+			_iterator_enable_if<false, void>
 		{ };
 
 		template<class _InputIt, class _OutputT>
@@ -241,7 +243,8 @@ namespace stdex
 		{ };
 
 		template<class _InputIt, class _OutputT>
-		struct _copy_n_input_it_check1<_InputIt, const _OutputT>
+		struct _copy_n_input_it_check1<_InputIt, const _OutputT> :
+			_iterator_enable_if<false, void>
 		{ };
 
 		template<class _OutputIt>
@@ -257,7 +260,8 @@ namespace stdex
 		{ };
 
 		template<class _OutputIt>
-		struct _copy_n_output_it_check<const _OutputIt>
+		struct _copy_n_output_it_check<const _OutputIt> :
+			_iterator_enable_if<false, void>
 		{ };
 	}
 
