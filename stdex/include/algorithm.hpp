@@ -27,7 +27,7 @@ namespace stdex
 	template<class _InputIt, class _UnaryPredicate>
 	inline
 	bool all_of(_InputIt first, 
-		typename detail::_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
+		typename detail::_if_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
 	{
 		for (; first != last; ++first) {
 			if (!p(*first)) {
@@ -42,7 +42,7 @@ namespace stdex
 	template<class _InputIt, class _UnaryPredicate>
 	inline
 	bool any_of(_InputIt first, 
-		typename detail::_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
+		typename detail::_if_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
 	{
 		return std::find_if(first, last, p) != last;
 	}
@@ -52,7 +52,7 @@ namespace stdex
 	template<class _InputIt, class _UnaryPredicate>
 	inline
 	bool none_of(_InputIt first, 
-		typename detail::_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
+		typename detail::_if_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
 	{
 		for (; first != last; ++first) {
 			if (p(*first)) return false;
@@ -93,7 +93,7 @@ namespace stdex
 	template<class _InputIt, class _UnaryPredicate>
 	inline 
 	_InputIt find_if_not(_InputIt first, 
-		typename detail::_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
+		typename detail::_if_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
 	{
 		for (; first != last; ++first) {
 			if (!p(*first)) {
@@ -131,10 +131,10 @@ namespace stdex
 	template<class _InputIt, class _OutputIt, class _UnaryPredicate>
 	inline
 	typename 
-		detail::_iterator_is_valid_output<_OutputIt>::
+		detail::_if_iterator_is_valid_output<_OutputIt>::
 	type  copy_if(
 		_InputIt first, 
-		typename detail::_iterator_cat_is_input<_InputIt>::type last, 
+		typename detail::_if_iterator_cat_is_input<_InputIt>::type last, 
 		_OutputIt d_first, 
 		_UnaryPredicate p)
 	{
@@ -150,10 +150,10 @@ namespace stdex
 	{
 		namespace algorithm_detail
 		{
-			void copy_n(...); // dummy
+			_iterator_no_type copy_n(...); // dummy
 
-			template<class T>
-			_iterator_yes_type operator,(T, _iterator_no_type);
+			_iterator_no_type copy_n_check(_iterator_no_type);
+			_iterator_yes_type copy_n_check(...);
 
 			struct dummy_input_iterator:
 				public std::iterator<std::input_iterator_tag, int>
@@ -167,28 +167,28 @@ namespace stdex
 			{
 				static int A[20];
 				static const int B[20];
-				static const bool value = sizeof(copy_n(dummy_input_iterator(), sizeof(A) / sizeof(int), dummy_output_iterator()), _iterator_no_type()) == sizeof(_iterator_yes_type);
+				static const bool value = sizeof(copy_n_check(copy_n(dummy_input_iterator(), sizeof(A) / sizeof(int), dummy_output_iterator()))) == sizeof(_iterator_yes_type);
 			};
 
 			struct _has_buggy_copy_n1
 			{
 				static int A[20];
 				static const int B[20];
-				static const bool value = sizeof(copy_n(B, sizeof(A) / sizeof(int), dummy_output_iterator()), _iterator_no_type()) == sizeof(_iterator_yes_type);
+				static const bool value = sizeof(copy_n_check(copy_n(B, sizeof(A) / sizeof(int), dummy_output_iterator()))) == sizeof(_iterator_yes_type);
 			};
 
 			struct _has_buggy_copy_n2
 			{
 				static int A[20];
 				static const int B[20];
-				static const bool value = sizeof(copy_n(dummy_input_iterator(), sizeof(A) / sizeof(int), A), _iterator_no_type()) == sizeof(_iterator_yes_type);
+				static const bool value = sizeof(copy_n_check(copy_n(dummy_input_iterator(), sizeof(A) / sizeof(int), A))) == sizeof(_iterator_yes_type);
 			};
 
 			struct _has_buggy_copy_n3
 			{
-				static int (&A)[20];
-				static const int (&B)[20];
-				static const bool value = sizeof(copy_n(B, sizeof(A) / sizeof(int), A), _iterator_no_type()) == sizeof(_iterator_yes_type);
+				static int A[20];
+				static const int B[20];
+				static const bool value = sizeof(copy_n_check(copy_n(B, sizeof(A) / sizeof(int), A))) == sizeof(_iterator_yes_type);
 			};
 		}
 
@@ -204,7 +204,7 @@ namespace stdex
 					std::output_iterator_tag
 					>::value == bool(true) &&
 				algorithm_detail::_has_buggy_copy_n::value == bool(false),
-				_OutputIt
+				std::size_t
 			>
 		{ };
 
@@ -220,7 +220,7 @@ namespace stdex
 					std::input_iterator_tag
 					>::value == bool(true) &&
 				algorithm_detail::_has_buggy_copy_n2::value == bool(false),
-				_OutputT*
+				std::size_t
 			>
 		{ };
 
@@ -236,7 +236,7 @@ namespace stdex
 					std::input_iterator_tag
 					>::value == bool(true) &&
 				algorithm_detail::_has_buggy_copy_n3::value == bool(false),
-				_OutputT*
+				std::size_t
 			>
 		{ };
 
@@ -252,7 +252,7 @@ namespace stdex
 					std::output_iterator_tag
 					>::value == bool(true) &&
 				algorithm_detail::_has_buggy_copy_n1::value == bool(false),
-				_OutputIt
+				std::size_t
 			>
 		{ };
 
@@ -263,26 +263,24 @@ namespace stdex
 
 	// copy_n (C++11)
 	// copies a number of elements to a new location
-	template<class _InputIt, class _Diff, class _OutputIt>
+	template<class _InputIt, class _OutputIt>
 	inline
-	typename 
-		detail::_copy_n_args_check<_InputIt, _OutputIt>::
-	type copy_n(_InputIt first, _Diff count, _OutputIt result)
+	_OutputIt copy_n(_InputIt first,
+		 typename detail::_copy_n_args_check<_InputIt, _OutputIt>::type count, _OutputIt result)
 	{
 		if (count > 0) {
 			*result++ = *first;
-			for (_Diff i = 1; i < count; ++i) {
+			for (std::size_t i = 1; i < count; ++i) {
 				*result++ = *++first;
 			}
 		}
 		return result;
 	}
 
-	template<class _InputT, std::size_t _InputSize, class _Diff, class _OutputIt> 
+	template<class _InputT, std::size_t _InputSize, class _OutputIt> 
 	inline
-	typename 
-		detail::_copy_n_output_it_check<_OutputIt>::
-	type copy_n(_InputT(&first_arr)[_InputSize], _Diff count, _OutputIt result)
+	_OutputIt copy_n(_InputT(&first_arr)[_InputSize],
+		 typename detail::_copy_n_output_it_check<_OutputIt>::type count, _OutputIt result)
 	{
 		assert(count <= _InputSize);
 
@@ -290,18 +288,17 @@ namespace stdex
 
 		if (count > 0) {
 			*result++ = *first;
-			for (_Diff i = 1; i < count; ++i) {
+			for (std::size_t i = 1; i < count; ++i) {
 				*result++ = *++first;
 			}
 		}
 		return result;
 	}
 
-	template<class _InputIt, class _Diff, class _OutputT, std::size_t _OutputSize>
+	template<class _InputIt, class _OutputT, std::size_t _OutputSize>
 	inline
-	typename 
-		detail::_copy_n_input_it_check<_InputIt, _OutputT>::
-	type copy_n(_InputIt first, _Diff count, _OutputT(&result_arr)[_OutputSize])
+	_OutputT* copy_n(_InputIt first, 
+		 typename detail::_copy_n_input_it_check<_InputIt, _OutputT>::type count, _OutputT(&result_arr)[_OutputSize])
 	{
 		assert(count <= _OutputSize);
 
@@ -309,7 +306,7 @@ namespace stdex
 
 		if (count > 0) {
 			*result++ = *first;
-			for (_Diff i = 1; i < count; ++i) {
+			for (std::size_t i = 1; i < count; ++i) {
 				*result++ = *++first;
 			}
 		}
@@ -318,13 +315,11 @@ namespace stdex
 
 	template<
 		class _InputT, std::size_t _InputSize, 
-		class _Diff, 
 		class _OutputT, std::size_t _OutputSize
 		>
 	inline
-	typename 
-		detail::_copy_n_input_it_check1<_InputT*, _OutputT>::
-	type copy_n(_InputT(&first_arr)[_InputSize], _Diff count, _OutputT(&result_arr)[_OutputSize])
+	_OutputT* copy_n(_InputT(&first_arr)[_InputSize], 
+		 typename detail::_copy_n_input_it_check1<_InputT*, _OutputT>::type count, _OutputT(&result_arr)[_OutputSize])
 	{
 		assert(count <= _OutputSize);
 		assert(count <= _InputSize);
@@ -334,7 +329,7 @@ namespace stdex
 
 		if (count > 0) {
 			*result++ = *first;
-			for (_Diff i = 1; i < count; ++i) {
+			for (std::size_t i = 1; i < count; ++i) {
 				*result++ = *++first;
 			}
 		}
@@ -440,7 +435,7 @@ namespace stdex
 	template<class _RandomIt>
 	inline
 	void random_shuffle(_RandomIt first, 
-		typename detail::_iterator_cat_is_rand_access<_RandomIt>::type last)
+		typename detail::_if_iterator_cat_is_rand_access<_RandomIt>::type last)
 	{
 		typename std::iterator_traits<_RandomIt>::difference_type i, n;
 		n = last - first;
@@ -458,7 +453,7 @@ namespace stdex
 	template<class _RandomIt, class _RandomFunc>
 	inline
 	void random_shuffle(_RandomIt first,
-		typename detail::_iterator_cat_is_rand_access<_RandomIt>::type last, _RandomFunc &r)
+		typename detail::_if_iterator_cat_is_rand_access<_RandomIt>::type last, _RandomFunc &r)
 	{
 		typename std::iterator_traits<_RandomIt>::difference_type i, n;
 		n = last - first;
@@ -487,7 +482,7 @@ namespace stdex
 	template<class _InputIt, class _UnaryPredicate>
 	inline
 	bool is_partitioned(_InputIt first, 
-		typename detail::_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
+		typename detail::_if_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
 	{
 		for (; first != last; ++first)
 			if (!p(*first))
@@ -510,9 +505,9 @@ namespace stdex
 	std::pair<_OutputIt1, _OutputIt2>
 		partition_copy(
 			_InputIt first, 
-			typename detail::_iterator_cat_is_input<_InputIt>::type last, 
+			typename detail::_if_iterator_cat_is_input<_InputIt>::type last, 
 			_OutputIt1 d_first_true, 
-			typename detail::_iterator_is_valid_output<_OutputIt2>::type d_first_false,
+			typename detail::_if_iterator_is_valid_output<_OutputIt2>::type d_first_false,
 		_UnaryPredicate p)
 	{
 		while (first != last) {

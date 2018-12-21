@@ -88,7 +88,9 @@ namespace stdex
 	{
 		template <bool, class _Tp>
 		struct _iterator_enable_if
-		{ };
+		{ 
+			//typedef int(&type)[-sizeof(_Tp)];
+		};
 
 		template <class _Tp>
 		struct _iterator_enable_if<true, _Tp>
@@ -160,7 +162,7 @@ namespace stdex
 		};
 
 		template<class _InputIt>
-		struct _iterator_cat_is_input:
+		struct _if_iterator_cat_is_input:
 			_iterator_enable_if<
 				_iterator_cat_is<
 					typename std::iterator_traits<_InputIt>::iterator_category,
@@ -171,7 +173,7 @@ namespace stdex
 		{};
 		
 		template<class _OutputIt>
-		struct _iterator_is_valid_output:
+		struct _if_iterator_is_valid_output:
 			_iterator_enable_if<
 				_iterator_cat_is_valid<
 					typename std::iterator_traits<_OutputIt>::iterator_category,
@@ -182,7 +184,7 @@ namespace stdex
 		{};
 
 		template<class _OutputIt>
-		struct _iterator_is_valid_output<const _OutputIt>
+		struct _if_iterator_is_valid_output<const _OutputIt>
 		{};
 
 		template<class _ForwardIt>
@@ -197,7 +199,7 @@ namespace stdex
 		{};
 
 		template<class _BidirIt>
-		struct _iterator_cat_is_bi:
+		struct _if_iterator_cat_is_bi:
 			_iterator_enable_if<
 				_iterator_cat_is<
 					typename std::iterator_traits<_BidirIt>::iterator_category,
@@ -208,8 +210,8 @@ namespace stdex
 		{};
 
 		template<class _RandomIt>
-		struct _iterator_cat_is_rand_access:
-			_iterator_cat_is_bi<_RandomIt>
+		struct _if_iterator_cat_is_rand_access:
+			_if_iterator_cat_is_bi<_RandomIt>
 		{};
 	}
 
@@ -227,7 +229,7 @@ namespace stdex
 	template<class _BidirIt>
 	inline
 	typename 
-		detail::_iterator_cat_is_bi<_BidirIt>::
+		detail::_if_iterator_cat_is_bi<_BidirIt>::
 	type prev(_BidirIt it,
 		typename std::iterator_traits<_BidirIt>::difference_type n = 1) // decrement an iterator 
 	{
