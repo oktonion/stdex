@@ -137,14 +137,36 @@ namespace stdex
 
 	// copies a range of elements to a new location
 	using std::copy;
+
+	namespace detail
+	{
+		template<class _InputIt, class _OutputIt>
+		struct _copy_if_args_check:
+			_iterator_enable_if<
+				_iterator_cat_is<
+					typename std::iterator_traits<_InputIt>::iterator_category,
+					std::input_iterator_tag
+					>::value == bool(true) &&
+				_iterator_cat_is_valid<
+					typename std::iterator_traits<_OutputIt>::iterator_category,
+					std::output_iterator_tag
+					>::value == bool(true),
+				_InputIt
+			>
+		{ };
+
+		template<class _InputIt, class _OutputIt>
+		struct _copy_if_args_check<_InputIt, const _OutputIt>:
+			_iterator_enable_if<false, void>
+		{};
+	}
+
 	// copy_if (C++11)
 	template<class _InputIt, class _OutputIt, class _UnaryPredicate>
 	inline
-	typename 
-		detail::_if_iterator_is_valid_output<_OutputIt>::
-	type  copy_if(
+	_OutputIt  copy_if(
 		_InputIt first, 
-		typename detail::_if_iterator_cat_is_input<_InputIt>::type last, 
+		typename detail::_copy_if_args_check<_InputIt, _OutputIt>::type last,
 		_OutputIt d_first, 
 		_UnaryPredicate p)
 	{
@@ -511,6 +533,43 @@ namespace stdex
 	// (function template)
 	using std::partition;
 
+	namespace detail
+	{
+		template<class _InputIt, class _OutputIt1, class _OutputIt2>
+		struct _partition_copy_args_check:
+			_iterator_enable_if<
+				_iterator_cat_is<
+					typename std::iterator_traits<_InputIt>::iterator_category,
+					std::input_iterator_tag
+					>::value == bool(true) &&
+				_iterator_cat_is_valid<
+					typename std::iterator_traits<_OutputIt1>::iterator_category,
+					std::output_iterator_tag
+					>::value == bool(true) &&
+				_iterator_cat_is_valid<
+					typename std::iterator_traits<_OutputIt2>::iterator_category,
+					std::output_iterator_tag
+					>::value == bool(true),
+				_InputIt
+			>
+		{};
+
+		template<class _InputIt, class _OutputIt1, class _OutputIt2>
+		struct _if_iterators_are_valid_output<_InputIt, const _OutputIt1, _OutputIt2>:
+			_iterator_traits_enable_if<false, void>
+		{};
+
+		template<class _InputIt, class _OutputIt1, class _OutputIt2>
+		struct _if_iterators_are_valid_output<_InputIt, _OutputIt1, const _OutputIt2> :
+			_iterator_traits_enable_if<false, void>
+		{};
+
+		template<class _InputIt, class _OutputIt1, class _OutputIt2>
+		struct _if_iterators_are_valid_output<_InputIt, const _OutputIt1, const _OutputIt2> :
+			_iterator_traits_enable_if<false, void>
+		{};
+	}
+
 	// (C++11)
 	// copies a range dividing the elements into two groups
 	// (function template)
@@ -519,9 +578,9 @@ namespace stdex
 	std::pair<_OutputIt1, _OutputIt2>
 		partition_copy(
 			_InputIt first, 
-			typename detail::_if_iterator_cat_is_input<_InputIt>::type last, 
+			typename detail::_partition_copy_args_check<_InputIt, _OutputIt1, _OutputIt2>::type last,
 			_OutputIt1 d_first_true, 
-			typename detail::_if_iterator_is_valid_output<_OutputIt2>::type d_first_false,
+			_OutputIt2 d_first_false,
 		_UnaryPredicate p)
 	{
 		while (first != last) {
@@ -806,16 +865,20 @@ namespace stdex
 
 	namespace detail
 	{
-		template<class _ForwardIt2>
-		struct _is_permutation_arg3_check:
-			_iterator_enable_if<
+		template<class _ForwardIt1, class _ForwardIt2>
+		struct _if_iterators_cat_are_forward:
+			_iterator_traits_enable_if<
+				_iterator_cat_is<
+					typename std::iterator_traits<_ForwardIt1>::iterator_category,
+					std::forward_iterator_tag
+					>::value == bool(true) &&
 				_iterator_cat_is<
 					typename std::iterator_traits<_ForwardIt2>::iterator_category,
 					std::forward_iterator_tag
-					>::value == bool(true), 
-				bool
+					>::value == bool(true),
+				_ForwardIt1
 			>
-		{ };
+		{};
 	}
 
 	// (C++11)
@@ -823,10 +886,8 @@ namespace stdex
 	// (function template)
 	template<class _ForwardIt1, class _ForwardIt2>
 	inline
-	typename 
-		detail::_is_permutation_arg3_check<_ForwardIt2>::
-	type is_permutation(_ForwardIt1 first, 
-		typename detail::_if_iterator_cat_is_forward<_ForwardIt1>::type last, _ForwardIt2 d_first)
+	bool is_permutation(_ForwardIt1 first, 
+		typename detail::_if_iterators_cat_are_forward<_ForwardIt1, _ForwardIt2>::type last, _ForwardIt2 d_first)
 	{
 		// skip common prefix
 		std::pair<_ForwardIt1, _ForwardIt2> tie = std::mismatch(first, last, d_first);
