@@ -89,7 +89,7 @@ namespace stdex
 		template <bool, class _Tp>
 		struct _iterator_enable_if
 		{ 
-			//typedef int(&type)[-sizeof(_Tp)];
+			//typedef int(&type)[sizeof(_Tp) - sizeof(_Tp) - 1];
 		};
 
 		template <class _Tp>
@@ -97,6 +97,23 @@ namespace stdex
 		{
 			typedef _Tp type;
 		};
+
+		template<bool, class _ItType>
+		struct _iterator_traits_enable_if
+		{
+			//typedef _iterator_enable_if<false, void>::type type;
+			//typedef _iterator_enable_if<false, void>::type iterator_category;
+			//typedef _iterator_enable_if<false, void>::type value_type;
+			//typedef _iterator_enable_if<false, void>::type difference_type;
+			//typedef _iterator_enable_if<false, void>::type pointer;
+			//typedef _iterator_enable_if<false, void>::type reference;
+		};
+
+		template<class _ItType>
+		struct _iterator_traits_enable_if<true, _ItType>:
+			std::iterator_traits<_ItType>,
+			_iterator_enable_if<true, _ItType>
+		{ };
 
 		typedef char _iterator_yes_type;
 		struct _iterator_no_type
@@ -163,7 +180,7 @@ namespace stdex
 
 		template<class _InputIt>
 		struct _if_iterator_cat_is_input:
-			_iterator_enable_if<
+			_iterator_traits_enable_if<
 				_iterator_cat_is<
 					typename std::iterator_traits<_InputIt>::iterator_category,
 					std::input_iterator_tag
@@ -174,7 +191,7 @@ namespace stdex
 		
 		template<class _OutputIt>
 		struct _if_iterator_is_valid_output:
-			_iterator_enable_if<
+			_iterator_traits_enable_if<
 				_iterator_cat_is_valid<
 					typename std::iterator_traits<_OutputIt>::iterator_category,
 					std::output_iterator_tag
@@ -185,12 +202,12 @@ namespace stdex
 
 		template<class _OutputIt>
 		struct _if_iterator_is_valid_output<const _OutputIt>:
-			_iterator_enable_if<false, void>
+			_iterator_traits_enable_if<false, void>
 		{};
 
 		template<class _ForwardIt>
 		struct _if_iterator_cat_is_forward:
-			_iterator_enable_if<
+			_iterator_traits_enable_if<
 				_iterator_cat_is<
 					typename std::iterator_traits<_ForwardIt>::iterator_category,
 					std::forward_iterator_tag
@@ -201,7 +218,7 @@ namespace stdex
 
 		template<class _BidirIt>
 		struct _if_iterator_cat_is_bi:
-			_iterator_enable_if<
+			_iterator_traits_enable_if<
 				_iterator_cat_is<
 					typename std::iterator_traits<_BidirIt>::iterator_category,
 					std::bidirectional_iterator_tag
@@ -218,24 +235,34 @@ namespace stdex
 
 	template<class _ForwardIt>
 	inline
-	typename 
-		detail::_if_iterator_cat_is_forward<_ForwardIt>::
-	type next(_ForwardIt it,
-		typename std::iterator_traits<_ForwardIt>::difference_type n = 1) // increment an iterator 
+	_ForwardIt next(_ForwardIt it,
+		typename detail::_if_iterator_cat_is_forward<_ForwardIt>::difference_type n) // increment an iterator 
 	{
 		std::advance(it, n);
 		return it;
 	}
 
+	template<class _ForwardIt>
+	inline
+	_ForwardIt next(_ForwardIt it) // increment an iterator by one
+	{
+		return next(it, 1);
+	}
+
 	template<class _BidirIt>
 	inline
-	typename 
-		detail::_if_iterator_cat_is_bi<_BidirIt>::
-	type prev(_BidirIt it,
-		typename std::iterator_traits<_BidirIt>::difference_type n = 1) // decrement an iterator 
+	_BidirIt prev(_BidirIt it,
+		typename detail::_if_iterator_cat_is_bi<_BidirIt>::difference_type n) // decrement an iterator 
 	{
 		std::advance(it, -n);
 		return it;
+	}
+
+	template<class _BidirIt>
+	inline
+	_BidirIt prev(_BidirIt it) // decrement an iterator by 1
+	{
+		return prev(it, 1);
 	}
 
 	// Range access 
