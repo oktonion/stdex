@@ -246,7 +246,7 @@ namespace stdex
 	inline
 	_ForwardIt next(_ForwardIt it) // increment an iterator by one
 	{
-		return next(it, 1);
+		return stdex::next(it, 1);
 	}
 
 	template<class _BidirIt>
@@ -262,7 +262,7 @@ namespace stdex
 	inline
 	_BidirIt prev(_BidirIt it) // decrement an iterator by 1
 	{
-		return prev(it, 1);
+		return stdex::prev(it, 1);
 	}
 
 	// Range access 
