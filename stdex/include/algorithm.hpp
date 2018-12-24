@@ -555,17 +555,17 @@ namespace stdex
 		{};
 
 		template<class _InputIt, class _OutputIt1, class _OutputIt2>
-		struct _if_iterators_are_valid_output<_InputIt, const _OutputIt1, _OutputIt2>:
+		struct _partition_copy_args_check<_InputIt, const _OutputIt1, _OutputIt2>:
 			_iterator_traits_enable_if<false, void>
 		{};
 
 		template<class _InputIt, class _OutputIt1, class _OutputIt2>
-		struct _if_iterators_are_valid_output<_InputIt, _OutputIt1, const _OutputIt2> :
+		struct _partition_copy_args_check<_InputIt, _OutputIt1, const _OutputIt2> :
 			_iterator_traits_enable_if<false, void>
 		{};
 
 		template<class _InputIt, class _OutputIt1, class _OutputIt2>
-		struct _if_iterators_are_valid_output<_InputIt, const _OutputIt1, const _OutputIt2> :
+		struct _partition_copy_args_check<_InputIt, const _OutputIt1, const _OutputIt2> :
 			_iterator_traits_enable_if<false, void>
 		{};
 	}
