@@ -32,9 +32,22 @@ int test02()
   return 0;
 }
 
+int test03()
+{
+  std::list<int> c(1);    
+  std::list<int>::iterator i = c.end(), j;
+
+  j = stdex::prev(i);
+  DYNAMIC_VERIFY( (i == c.end()) );
+  DYNAMIC_VERIFY( (j == c.begin()) );
+
+  return 0;
+}
+
 int main()
 {
   RUN_TEST(test01);
   RUN_TEST(test02);
+  RUN_TEST(test03);
   return 0;
 }
