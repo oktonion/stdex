@@ -20,6 +20,16 @@
 
 namespace stdex
 {
+	namespace cstddef
+	{
+		namespace std_dummy
+		{
+			using namespace std;
+			typedef size_t size_t;
+		}
+
+		using std_dummy::size_t;
+	}
 	// Non-modifying sequence operations
 
 	// all_of (C++11)  
@@ -204,7 +214,7 @@ namespace stdex
 					std::output_iterator_tag
 					>::value == bool(true) &&
 				algorithm_detail::_has_buggy_copy_n::value == bool(false),
-				std::size_t
+				cstddef::size_t
 			>
 		{ };
 
@@ -221,7 +231,7 @@ namespace stdex
 					std::input_iterator_tag
 					>::value == bool(true) &&
 				algorithm_detail::_has_buggy_copy_n2::value == bool(false),
-				std::size_t
+				cstddef::size_t
 			>
 		{ };
 
@@ -238,7 +248,7 @@ namespace stdex
 					std::input_iterator_tag
 					>::value == bool(true) &&
 				algorithm_detail::_has_buggy_copy_n3::value == bool(false),
-				std::size_t
+				cstddef::size_t
 			>
 		{ };
 
@@ -255,7 +265,7 @@ namespace stdex
 					std::output_iterator_tag
 					>::value == bool(true) &&
 				algorithm_detail::_has_buggy_copy_n1::value == bool(false),
-				std::size_t
+				cstddef::size_t
 			>
 		{ };
 
@@ -274,14 +284,14 @@ namespace stdex
 	{
 		if (count > 0) {
 			*result++ = *first;
-			for (std::size_t i = 1; i < count; ++i) {
+			for (cstddef::size_t i = 1; i < count; ++i) {
 				*result++ = *++first;
 			}
 		}
 		return result;
 	}
 
-	template<class _InputT, std::size_t _InputSize, class _OutputIt> 
+	template<class _InputT, cstddef::size_t _InputSize, class _OutputIt> 
 	inline
 	_OutputIt copy_n(_InputT(&first_arr)[_InputSize],
 		 typename detail::_copy_n_output_it_check<_OutputIt>::type count, _OutputIt result)
@@ -292,14 +302,14 @@ namespace stdex
 
 		if (count > 0) {
 			*result++ = *first;
-			for (std::size_t i = 1; i < count; ++i) {
+			for (cstddef::size_t i = 1; i < count; ++i) {
 				*result++ = *++first;
 			}
 		}
 		return result;
 	}
 
-	template<class _InputIt, class _OutputT, std::size_t _OutputSize>
+	template<class _InputIt, class _OutputT, cstddef::size_t _OutputSize>
 	inline
 	_OutputT* copy_n(_InputIt first, 
 		 typename detail::_copy_n_input_it_check<_InputIt, _OutputT>::type count, _OutputT(&result_arr)[_OutputSize])
@@ -310,7 +320,7 @@ namespace stdex
 
 		if (count > 0) {
 			*result++ = *first;
-			for (std::size_t i = 1; i < count; ++i) {
+			for (cstddef::size_t i = 1; i < count; ++i) {
 				*result++ = *++first;
 			}
 		}
@@ -318,8 +328,8 @@ namespace stdex
 	}
 
 	template<
-		class _InputT, std::size_t _InputSize, 
-		class _OutputT, std::size_t _OutputSize
+		class _InputT, cstddef::size_t _InputSize, 
+		class _OutputT, cstddef::size_t _OutputSize
 		>
 	inline
 	_OutputT* copy_n(_InputT(&first_arr)[_InputSize], 
@@ -333,7 +343,7 @@ namespace stdex
 
 		if (count > 0) {
 			*result++ = *first;
-			for (std::size_t i = 1; i < count; ++i) {
+			for (cstddef::size_t i = 1; i < count; ++i) {
 				*result++ = *++first;
 			}
 		}
