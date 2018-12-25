@@ -10,10 +10,11 @@
 
 int test01()
 {
+  using namespace stdex;
   std::vector<int> c(3);
   std::vector<int>::iterator i = c.begin(), j;
 
-  j = stdex::next(i, 3);
+  j = next(i, 3);
   DYNAMIC_VERIFY( (i == c.begin()) );
   DYNAMIC_VERIFY( (j == c.end()) );
 
