@@ -88,8 +88,11 @@ namespace stdex
 	{
 		template <bool, class _Tp>
 		struct _iterator_enable_if
-		{ 
-			//typedef int(&type)[sizeof(_Tp) - sizeof(_Tp) - 1];
+		{
+		private:
+			struct _iterator_enable_if_dummy;
+		public:
+			typedef _iterator_enable_if_dummy(&type)[1];
 		};
 
 		template <class _Tp>
@@ -101,12 +104,12 @@ namespace stdex
 		template<bool, class _ItType>
 		struct _iterator_traits_enable_if
 		{
-			//typedef _iterator_enable_if<false, void>::type type;
-			//typedef _iterator_enable_if<false, void>::type iterator_category;
-			//typedef _iterator_enable_if<false, void>::type value_type;
-			//typedef _iterator_enable_if<false, void>::type difference_type;
-			//typedef _iterator_enable_if<false, void>::type pointer;
-			//typedef _iterator_enable_if<false, void>::type reference;
+			typedef _iterator_enable_if<false, void>::type type;
+			typedef _iterator_enable_if<false, void>::type iterator_category;
+			typedef _iterator_enable_if<false, void>::type value_type;
+			typedef _iterator_enable_if<false, void>::type difference_type;
+			typedef _iterator_enable_if<false, void>::type pointer;
+			typedef _iterator_enable_if<false, void>::type reference;
 		};
 
 		template<class _ItType>
