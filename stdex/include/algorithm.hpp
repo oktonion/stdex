@@ -191,8 +191,8 @@ namespace stdex
 				public std::iterator<std::input_iterator_tag, int>
 			{};
 
-			struct dummy_output_iterator:
-				public std::iterator<std::input_iterator_tag, int>
+			struct dummy_output_iterator :
+				public std::iterator<std::output_iterator_tag, int>
 			{};
 
 			struct _has_buggy_copy_n
@@ -240,11 +240,6 @@ namespace stdex
 			>
 		{ };
 
-		template<class _InputIt, class _OutputIt>
-		struct _copy_n_args_check<_InputIt, const _OutputIt> :
-			_iterator_enable_if<false, void>
-		{ };
-
 		template<class _InputIt, class _OutputT>
 		struct _copy_n_input_it_check :
 			_iterator_enable_if<
@@ -290,87 +285,92 @@ namespace stdex
 				cstddef::size_t
 			>
 		{ };
+	}
 
-		template<class _OutputIt>
-		struct _copy_n_output_it_check<const _OutputIt> :
-			_iterator_enable_if<false, void>
-		{ };
+	namespace std_injection
+	{
+		namespace impl
+		{
+			template<class _InputIt, class _OutputIt>
+			inline
+			_OutputIt copy_n(_InputIt first,
+				 typename detail::_copy_n_args_check<_InputIt, _OutputIt>::type count, _OutputIt result)
+			{
+				if (count > 0) {
+					*result++ = *first;
+					for (cstddef::size_t i = 1; i < count; ++i) {
+						*result++ = *++first;
+					}
+				}
+				return result;
+			}
+
+			template<class _InputT, cstddef::size_t _InputSize, class _OutputIt> 
+			inline
+			_OutputIt copy_n(_InputT(&first_arr)[_InputSize],
+				 typename detail::_copy_n_output_it_check<_OutputIt>::type count, _OutputIt result)
+			{
+				assert(count <= _InputSize);
+
+				_InputT *first = first_arr;
+
+				if (count > 0) {
+					*result++ = *first;
+					for (cstddef::size_t i = 1; i < count; ++i) {
+						*result++ = *++first;
+					}
+				}
+				return result;
+			}
+
+			template<class _InputIt, class _OutputT, cstddef::size_t _OutputSize>
+			inline
+			_OutputT* copy_n(_InputIt first, 
+				 typename detail::_copy_n_input_it_check<_InputIt, _OutputT>::type count, _OutputT(&result_arr)[_OutputSize])
+			{
+				assert(count <= _OutputSize);
+
+				_OutputT *result = result_arr;
+
+				if (count > 0) {
+					*result++ = *first;
+					for (cstddef::size_t i = 1; i < count; ++i) {
+						*result++ = *++first;
+					}
+				}
+				return result;
+			}
+
+			template<
+				class _InputT, cstddef::size_t _InputSize, 
+				class _OutputT, cstddef::size_t _OutputSize
+				>
+			inline
+			_OutputT* copy_n(_InputT(&first_arr)[_InputSize], 
+				 cstddef::size_t count, _OutputT(&result_arr)[_OutputSize])
+			{
+				assert(count <= _OutputSize);
+				assert(count <= _InputSize);
+
+				_InputT *first = first_arr;
+				_OutputT *result = result_arr;
+
+				if (count > 0) {
+					*result++ = *first;
+					for (cstddef::size_t i = 1; i < count; ++i) {
+						*result++ = *++first;
+					}
+				}
+				return result;
+			}
+		}
+		using namespace impl;	
+		using namespace std;
 	}
 
 	// copy_n (C++11)
 	// copies a number of elements to a new location
-	template<class _InputIt, class _OutputIt>
-	inline
-	_OutputIt copy_n(_InputIt first,
-		 typename detail::_copy_n_args_check<_InputIt, _OutputIt>::type count, _OutputIt result)
-	{
-		if (count > 0) {
-			*result++ = *first;
-			for (cstddef::size_t i = 1; i < count; ++i) {
-				*result++ = *++first;
-			}
-		}
-		return result;
-	}
-
-	template<class _InputT, cstddef::size_t _InputSize, class _OutputIt> 
-	inline
-	_OutputIt copy_n(_InputT(&first_arr)[_InputSize],
-		 typename detail::_copy_n_output_it_check<_OutputIt>::type count, _OutputIt result)
-	{
-		assert(count <= _InputSize);
-
-		_InputT *first = first_arr;
-
-		if (count > 0) {
-			*result++ = *first;
-			for (cstddef::size_t i = 1; i < count; ++i) {
-				*result++ = *++first;
-			}
-		}
-		return result;
-	}
-
-	template<class _InputIt, class _OutputT, cstddef::size_t _OutputSize>
-	inline
-	_OutputT* copy_n(_InputIt first, 
-		 typename detail::_copy_n_input_it_check<_InputIt, _OutputT>::type count, _OutputT(&result_arr)[_OutputSize])
-	{
-		assert(count <= _OutputSize);
-
-		_OutputT *result = result_arr;
-
-		if (count > 0) {
-			*result++ = *first;
-			for (cstddef::size_t i = 1; i < count; ++i) {
-				*result++ = *++first;
-			}
-		}
-		return result;
-	}
-
-	template<
-		class _InputT, cstddef::size_t _InputSize, 
-		class _OutputT, cstddef::size_t _OutputSize
-		>
-	inline
-	_OutputT* copy_n(_InputT(&first_arr)[_InputSize], 
-		 typename detail::_copy_n_input_it_check1<_InputT*, _OutputT>::type count, _OutputT(&result_arr)[_OutputSize])
-	{
-		assert(count <= _OutputSize);
-		assert(count <= _InputSize);
-
-		_InputT *first = first_arr;
-		_OutputT *result = result_arr;
-
-		if (count > 0) {
-			*result++ = *first;
-			for (cstddef::size_t i = 1; i < count; ++i) {
-				*result++ = *++first;
-			}
-		}
-		return result;
-	}
+	using std_injection::copy_n;
 
 	// copies a range of elements in backwards order
 	// (function template)
