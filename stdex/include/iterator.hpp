@@ -254,85 +254,131 @@ namespace stdex
 		{};
 	}
 
-	template<class _ForwardIt>
-	inline
-	_ForwardIt next(_ForwardIt it,
-		typename detail::_if_iterator_cat_is_forward<_ForwardIt>::difference_type n) // increment an iterator 
+	namespace std_cpp11
 	{
-		std::advance(it, n);
-		return it;
+		namespace impl
+		{
+			// next (C++11)
+			// increment an iterator 
+			template<class _ForwardIt>
+			inline
+			_ForwardIt next(_ForwardIt it,
+				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::difference_type n) 
+			{
+				std::advance(it, n);
+				return it;
+			}
+
+			// next (C++11)
+			// increment an iterator by one
+			template<class _ForwardIt>
+			inline
+			_ForwardIt next(_ForwardIt it) 
+			{
+				return stdex::next(it, 1);
+			}
+
+			// prev (C++11)
+			// decrement an iterator 
+			template<class _BidirIt>
+			inline
+			_BidirIt prev(_BidirIt it,
+				typename detail::_if_iterator_cat_is_bi<_BidirIt>::difference_type n) 
+			{
+				std::advance(it, -n);
+				return it;
+			}
+			
+			// prev (C++11)
+			// decrement an iterator by 1
+			template<class _BidirIt>
+			inline
+			_BidirIt prev(_BidirIt it) 
+			{
+				return stdex::prev(it, 1);
+			}
+		}
+
+		using namespace impl;
 	}
 
-	template<class _ForwardIt>
-	inline
-	_ForwardIt next(_ForwardIt it) // increment an iterator by one
-	{
-		return stdex::next(it, 1);
-	}
+	// next (C++11)
+	// increment an iterator 
+	using std_cpp11::next;
 
-	template<class _BidirIt>
-	inline
-	_BidirIt prev(_BidirIt it,
-		typename detail::_if_iterator_cat_is_bi<_BidirIt>::difference_type n) // decrement an iterator 
-	{
-		std::advance(it, -n);
-		return it;
-	}
-
-	template<class _BidirIt>
-	inline
-	_BidirIt prev(_BidirIt it) // decrement an iterator by 1
-	{
-		return stdex::prev(it, 1);
-	}
+	// prev (C++11)
+	// decrement an iterator
+	using std_cpp11::prev;
 
 	// Range access 
 
-	// begin (C++11)
-	// returns an iterator to the beginning of a container or array 
-	template<class _ContainerType>
-	inline
-	typename _ContainerType::iterator begin(_ContainerType &value)
-	{	// get beginning of sequence
-		return (value.begin());
-	}
+	namespace std_cpp11
+	{
+		namespace impl
+		{
+			// begin (C++11)
+			// returns an iterator to the beginning of a container or array 
+			template<class _ContainerType>
+			inline
+			typename _ContainerType::iterator begin(_ContainerType &value)
+			{	// get beginning of sequence
+				return (value.begin());
+			}
 	
-	template<class _ContainerType>
-	inline
-	typename _ContainerType::iterator begin(const _ContainerType &value)
-	{	// get beginning of sequence
-		return (value.begin());
+			// begin (C++11)
+			// returns an iterator to the beginning of a container or array 
+			template<class _ContainerType>
+			inline
+			typename _ContainerType::iterator begin(const _ContainerType &value)
+			{	// get beginning of sequence
+				return (value.begin());
+			}
+
+			// begin (C++11)
+			// returns an iterator to the beginning of a container or array 
+			template<class _Tp, cstddef::size_t Size>
+			inline
+			_Tp *begin(_Tp(&value)[Size]) NOEXCEPT_FUNCTION
+			{	// get beginning of array
+				return (value);
+			}
+
+			// end (C++11)
+			// returns an iterator to the end of a container or array 
+			template<class _ContainerType>
+			inline
+			typename _ContainerType::iterator end(_ContainerType &value)
+			{	// get end of sequence
+				return (value.end());
+			}
+
+			// end (C++11)
+			// returns an iterator to the end of a container or array 
+			template<class _ContainerType>
+			inline
+			typename _ContainerType::iterator end(const _ContainerType &value)
+			{	// get end of sequence
+				return (value.end());
+			}
+
+			// end (C++11)
+			// returns an iterator to the end of a container or array 
+			template<class _Tp, cstddef::size_t Size>
+			inline
+			_Tp *end(_Tp(&value)[Size]) NOEXCEPT_FUNCTION
+			{	// get end of array
+				return (value + Size);
+			}
+		}
 	}
 
-	template<class _Tp, cstddef::size_t Size>
-	inline
-	_Tp *begin(_Tp(&value)[Size]) NOEXCEPT_FUNCTION
-	{	// get beginning of array
-		return (value);
-	}
+	// begin (C++11)
+	// returns an iterator to the beginning of a container or array
+	using std_cpp11::begin;
 
 	// end (C++11)
 	// returns an iterator to the end of a container or array 
-	template<class _ContainerType>
-	inline
-	typename _ContainerType::iterator end(_ContainerType &value)
-	{	// get end of sequence
-		return (value.end());
-	}
-
-	template<class _ContainerType>
-	inline
-	typename _ContainerType::iterator end(const _ContainerType &value)
-	{	// get end of sequence
-		return (value.end());
-	}
-
-	template<class _Tp, cstddef::size_t Size>
-	inline
-	_Tp *end(_Tp(&value)[Size]) NOEXCEPT_FUNCTION
-	{	// get end of array
-		return (value + Size);
-	}
+	using std_cpp11::end;
 
 	// Container access (C++ 17)
 }
