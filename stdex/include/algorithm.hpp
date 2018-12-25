@@ -20,16 +20,22 @@
 
 namespace stdex
 {
+	namespace std_injection
+	{
+		using namespace std;
+	}
+
 	namespace cstddef
 	{
-		namespace std_dummy
+		namespace std_types
 		{
 			using namespace std;
 			typedef size_t size_t;
 		}
 
-		using std_dummy::size_t;
+		using std_types::size_t;
 	}
+
 	// Non-modifying sequence operations
 
 	// all_of (C++11)  
@@ -365,7 +371,7 @@ namespace stdex
 			}
 		}
 		using namespace impl;	
-		using namespace std;
+		
 	}
 
 	// copy_n (C++11)
@@ -466,37 +472,48 @@ namespace stdex
 	// (function template)
 	using std::rotate_copy;
 
-	// randomly re-orders elements in a range
-	// (function template)
-	template<class _RandomIt>
-	inline
-	void random_shuffle(_RandomIt first, 
-		typename detail::_if_iterator_cat_is_rand_access<_RandomIt>::type last)
+	namespace std_injection
 	{
-		typename std::iterator_traits<_RandomIt>::difference_type i, n;
-		n = last - first;
-		for (i = n-1; i > 0; --i) {
-			swap(first[i], first[std::rand() % (i+1)]);
-			// rand() % (i+1) isn't actually correct, because the generated number
-			// is not uniformly distributed for most values of i. A correct implementation
-			// will need to essentially reimplement C++11 std::uniform_int_distribution,
-			// which is not implemented (yet).
+		namespace impl
+		{
+			template<class _RandomIt>
+			inline
+			void random_shuffle(_RandomIt first, 
+				typename detail::_if_iterator_cat_is_rand_access<_RandomIt>::type last)
+			{
+				typename std::iterator_traits<_RandomIt>::difference_type i, n;
+				n = last - first;
+				for (i = n-1; i > 0; --i) {
+					swap(first[i], first[std::rand() % (i+1)]);
+					// rand() % (i+1) isn't actually correct, because the generated number
+					// is not uniformly distributed for most values of i. A correct implementation
+					// will need to essentially reimplement C++11 std::uniform_int_distribution,
+					// which is not implemented (yet).
+				}
+			}
+
+			// randomly re-orders elements in a range with user random number generator func
+			// (function template)
+			template<class _RandomIt, class _RandomFunc>
+			inline
+			void random_shuffle(_RandomIt first,
+				typename detail::_if_iterator_cat_is_rand_access<_RandomIt>::type last, _RandomFunc &r)
+			{
+				typename std::iterator_traits<_RandomIt>::difference_type i, n;
+				n = last - first;
+				for (i = n-1; i > 0; --i) {
+					swap(first[i], first[r(i+1)]);
+				}
+			}
 		}
+		using namespace impl;
+		
 	}
 
-	// randomly re-orders elements in a range with user random number generator func
+	// randomly re-orders elements in a range
 	// (function template)
-	template<class _RandomIt, class _RandomFunc>
-	inline
-	void random_shuffle(_RandomIt first,
-		typename detail::_if_iterator_cat_is_rand_access<_RandomIt>::type last, _RandomFunc &r)
-	{
-		typename std::iterator_traits<_RandomIt>::difference_type i, n;
-		n = last - first;
-		for (i = n-1; i > 0; --i) {
-			swap(first[i], first[r(i+1)]);
-		}
-	}
+	using std_injection::random_shuffle;
+
 	// (C++11)
 	// randomly re-orders elements in a range
 	// (function template)
@@ -512,22 +529,31 @@ namespace stdex
 
 	// Partitioning operations
 
+	namespace std_injection
+	{
+		namespace impl
+		{
+			template<class _InputIt, class _UnaryPredicate>
+			inline
+			bool is_partitioned(_InputIt first, 
+				typename detail::_if_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
+			{
+				for (; first != last; ++first)
+					if (!p(*first))
+						break;
+				for (; first != last; ++first)
+					if (p(*first))
+						return false;
+				return true;
+			}
+		}
+		using namespace impl;
+		
+	}
 	// (C++11)
 	// determines if the range is partitioned by the given predicate
 	// (function template)
-	template<class _InputIt, class _UnaryPredicate>
-	inline
-	bool is_partitioned(_InputIt first, 
-		typename detail::_if_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
-	{
-		for (; first != last; ++first)
-			if (!p(*first))
-				break;
-		for (; first != last; ++first)
-			if (p(*first))
-				return false;
-		return true;
-	}
+	using std_injection::is_partitioned;
 
 	// divides a range of elements into two groups
 	// (function template)
@@ -570,31 +596,41 @@ namespace stdex
 		{};
 	}
 
+	namespace std_injection
+	{
+		namespace impl
+		{
+			template<class _InputIt, class _OutputIt1, class _OutputIt2, class _UnaryPredicate>
+			inline
+			std::pair<_OutputIt1, _OutputIt2>
+				partition_copy(
+					_InputIt first, 
+					typename detail::_partition_copy_args_check<_InputIt, _OutputIt1, _OutputIt2>::type last,
+					_OutputIt1 d_first_true, 
+					_OutputIt2 d_first_false,
+				_UnaryPredicate p)
+			{
+				while (first != last) {
+					if (p(*first)) {
+						*d_first_true = *first;
+						++d_first_true;
+					} else {
+						*d_first_false = *first;
+						++d_first_false;
+					}
+					++first;
+				}
+				return std::pair<_OutputIt1, _OutputIt2>(d_first_true, d_first_false);
+			}
+		}
+		using namespace impl;
+		
+	}
+
 	// (C++11)
 	// copies a range dividing the elements into two groups
 	// (function template)
-	template<class _InputIt, class _OutputIt1, class _OutputIt2, class _UnaryPredicate>
-	inline
-	std::pair<_OutputIt1, _OutputIt2>
-		partition_copy(
-			_InputIt first, 
-			typename detail::_partition_copy_args_check<_InputIt, _OutputIt1, _OutputIt2>::type last,
-			_OutputIt1 d_first_true, 
-			_OutputIt2 d_first_false,
-		_UnaryPredicate p)
-	{
-		while (first != last) {
-			if (p(*first)) {
-				*d_first_true = *first;
-				++d_first_true;
-			} else {
-				*d_first_false = *first;
-				++d_first_false;
-			}
-			++first;
-		}
-		return std::pair<_OutputIt1, _OutputIt2>(d_first_true, d_first_false);
-	}
+	using std_injection::partition_copy;
 
 	// divides elements into two groups while preserving their relative order
 	// (function template)
@@ -607,65 +643,83 @@ namespace stdex
 
 	// Sorting operations
 
-	// (C++11)
-	// finds the largest sorted subrange
-	// (function template)
-	template<class _ForwardIt>
-	inline
-	_ForwardIt is_sorted_until(_ForwardIt first, 
-		typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last)
+	namespace std_injection
 	{
-		if (first != last) {
-			_ForwardIt next = first;
-			while (++next != last) {
-				if (*next < *first)
-					return next;
-				first = next;
+		namespace impl
+		{
+			// (C++11)
+			// finds the largest sorted subrange
+			// (function template)
+			template<class _ForwardIt>
+			inline
+			_ForwardIt is_sorted_until(_ForwardIt first, 
+				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last)
+			{
+				if (first != last) {
+					_ForwardIt next = first;
+					while (++next != last) {
+						if (*next < *first)
+							return next;
+						first = next;
+					}
+				}
+				return last;
+			}
+
+			// (C++11)
+			// finds the largest sorted subrange given binary comparison function comp
+			// (function template)
+			template <class _ForwardIt, class _Compare>
+			inline
+			_ForwardIt is_sorted_until(_ForwardIt first, 
+				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp) 
+			{
+				if (first != last) {
+					_ForwardIt next = first;
+					while (++next != last) {
+						if (true == comp(*next, *first))
+							return next;
+						first = next;
+					}
+				}
+				return last;
+			}
+
+			// (C++11)
+			// checks whether a range is sorted into ascending order
+			// (function template)
+			template<class _ForwardIt>
+			inline
+			bool is_sorted(_ForwardIt first, 
+				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last)
+			{
+				return stdex::is_sorted_until(first, last) == last;
+			}
+
+			// (C++11)
+			// checks with given binary comparison function comp whether a range is sorted into ascending order
+			// (function template)
+			template<class _ForwardIt, class _Compare>
+			inline
+			bool is_sorted(_ForwardIt first, 
+				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp)
+			{
+				return stdex::is_sorted_until(first, last, comp) == last;
 			}
 		}
-		return last;
+		using namespace impl;
+		
 	}
 
 	// (C++11)
-	// finds the largest sorted subrange given binary comparison function comp
+	// finds the largest sorted subrange
 	// (function template)
-	template <class _ForwardIt, class _Compare>
-	inline
-	_ForwardIt is_sorted_until(_ForwardIt first, 
-		typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp) 
-	{
-		if (first != last) {
-			_ForwardIt next = first;
-			while (++next != last) {
-				if (true == comp(*next, *first))
-					return next;
-				first = next;
-			}
-		}
-		return last;
-	}
+	using std_injection::is_sorted_until;
 
 	// (C++11)
 	// checks whether a range is sorted into ascending order
 	// (function template)
-	template<class _ForwardIt>
-	inline
-	bool is_sorted(_ForwardIt first, 
-		typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last)
-	{
-		return stdex::is_sorted_until(first, last) == last;
-	}
-
-	// (C++11)
-	// checks with given binary comparison function comp whether a range is sorted into ascending order
-	// (function template)
-	template<class _ForwardIt, class _Compare>
-	inline
-	bool is_sorted(_ForwardIt first, 
-		typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp)
-	{
-		return stdex::is_sorted_until(first, last, comp) == last;
-	}
+	using std_injection::is_sorted;
 
 	// sorts a range into ascending order
 	// (function template)
@@ -786,78 +840,95 @@ namespace stdex
 	// (function template)
 	using std::min_element;
 
+	namespace std_injection
+	{
+		namespace impl
+		{
+			// (C++11)
+			// returns the smaller and larger of two elements
+			// (function template)
+			template<class _Tp> 
+			inline
+			std::pair<const _Tp&, const _Tp&> minmax( const _Tp& a, const _Tp& b )
+			{
+				return (b < a) ? std::pair<const _Tp&, const _Tp&>(b, a)
+							: std::pair<const _Tp&, const _Tp&>(a, b);
+			}
+
+			// (C++11)
+			// returns the smaller and larger of two elements using the given comparison function comp
+			// (function template)
+			template<class _Tp, class _Compare> 
+			inline
+			std::pair<const _Tp&, const _Tp&> minmax( const _Tp& a, const _Tp& b, _Compare comp )
+			{
+				return comp(b, a) ? std::pair<const _Tp&, const _Tp&>(b, a)
+								: std::pair<const _Tp&, const _Tp&>(a, b);
+			}
+
+			// (C++11)
+			// returns the smallest and the largest elements in a range 
+			// using the given binary comparison function comp
+			template<class _ForwardIt, class _Compare>
+			inline
+			std::pair<_ForwardIt, _ForwardIt> 
+				minmax_element(_ForwardIt first, 
+					typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp)
+			{
+				std::pair<_ForwardIt, _ForwardIt> result(first, first);
+	
+				if (first == last) return result;
+				if (++first == last) return result;
+	
+				if (comp(*first, *result.first)) {
+					result.first = first;
+				} else {
+					result.second = first;
+				}
+				while (++first != last) {
+					_ForwardIt i = first;
+					if (++first == last) {
+						if (comp(*i, *result.first)) result.first = i;
+						else if (!(comp(*i, *result.second))) result.second = i;
+						break;
+					} else {
+						if (comp(*first, *i)) {
+							if (comp(*first, *result.first)) result.first = first;
+							if (!(comp(*i, *result.second))) result.second = i;
+						} else {
+							if (comp(*i, *result.first)) result.first = i;
+							if (!(comp(*first, *result.second))) result.second = first;
+						}
+					}
+				}
+				return result;
+			}
+
+			// (C++11)
+			// returns the smallest and the largest elements in a range
+			// (function template)
+			template<class _ForwardIt>
+			inline
+			std::pair<_ForwardIt, _ForwardIt> 
+				minmax_element(_ForwardIt first, 
+					typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last)
+			{
+				typedef typename std::iterator_traits<_ForwardIt>::value_type value_type;
+				return stdex::minmax_element(first, last, std::less<value_type>());
+			}
+		}
+		using namespace impl;
+		
+	}
+
 	// (C++11)
 	// returns the smaller and larger of two elements
 	// (function template)
-	template<class _Tp> 
-	inline
-	std::pair<const _Tp&, const _Tp&> minmax( const _Tp& a, const _Tp& b )
-	{
-		return (b < a) ? std::pair<const _Tp&, const _Tp&>(b, a)
-					: std::pair<const _Tp&, const _Tp&>(a, b);
-	}
-
-	// (C++11)
-	// returns the smaller and larger of two elements using the given comparison function comp
-	// (function template)
-	template<class _Tp, class _Compare> 
-	inline
-	std::pair<const _Tp&, const _Tp&> minmax( const _Tp& a, const _Tp& b, _Compare comp )
-	{
-		return comp(b, a) ? std::pair<const _Tp&, const _Tp&>(b, a)
-						: std::pair<const _Tp&, const _Tp&>(a, b);
-	}
-
-	// (C++11)
-	// returns the smallest and the largest elements in a range 
-	// using the given binary comparison function comp
-	template<class _ForwardIt, class _Compare>
-	inline
-	std::pair<_ForwardIt, _ForwardIt> 
-		minmax_element(_ForwardIt first, 
-			typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp)
-	{
-		std::pair<_ForwardIt, _ForwardIt> result(first, first);
-	
-		if (first == last) return result;
-		if (++first == last) return result;
-	
-		if (comp(*first, *result.first)) {
-			result.first = first;
-		} else {
-			result.second = first;
-		}
-		while (++first != last) {
-			_ForwardIt i = first;
-			if (++first == last) {
-				if (comp(*i, *result.first)) result.first = i;
-				else if (!(comp(*i, *result.second))) result.second = i;
-				break;
-			} else {
-				if (comp(*first, *i)) {
-					if (comp(*first, *result.first)) result.first = first;
-					if (!(comp(*i, *result.second))) result.second = i;
-				} else {
-					if (comp(*i, *result.first)) result.first = i;
-					if (!(comp(*first, *result.second))) result.second = first;
-				}
-			}
-		}
-		return result;
-	}
+	using std_injection::minmax;
 
 	// (C++11)
 	// returns the smallest and the largest elements in a range
-	// (function template)
-	template<class _ForwardIt>
-	inline
-	std::pair<_ForwardIt, _ForwardIt> 
-		minmax_element(_ForwardIt first, 
-			typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last)
-	{
-		typedef typename std::iterator_traits<_ForwardIt>::value_type value_type;
-		return stdex::minmax_element(first, last, std::less<value_type>());
-	}
+	using std_injection::minmax_element;
 
 	// returns true if one range is lexicographically less than another
 	// (function template)
@@ -881,33 +952,46 @@ namespace stdex
 		{};
 	}
 
+	namespace std_injection
+	{
+		namespace impl
+		{
+			// (C++11)
+			// determines if a sequence is a permutation of another sequence
+			// (function template)
+			template<class _ForwardIt1, class _ForwardIt2>
+			inline
+			bool is_permutation(_ForwardIt1 first, 
+				typename detail::_if_iterators_cat_are_forward<_ForwardIt1, _ForwardIt2>::type last, _ForwardIt2 d_first)
+			{
+				// skip common prefix
+				std::pair<_ForwardIt1, _ForwardIt2> tie = std::mismatch(first, last, d_first);
+				first = tie.first;
+				d_first = tie.second;
+				// iterate over the rest, counting how many times each element
+				// from [first, last) appears in [d_first, d_last)
+				if (first != last) {
+					_ForwardIt2 d_last = d_first;
+					std::advance(d_last, std::distance(first, last));
+					for (_ForwardIt1 i = first; i != last; ++i) {
+							if (i != std::find(first, i, *i)) continue; // already counted this *i
+							typename iterator_traits<_ForwardIt2>::difference_type m = std::count(d_first, d_last, *i);
+							if (m==0 || std::count(i, last, *i) != m) {
+								return false;
+							}
+						}
+					}
+				return true;
+			}
+		}
+		using namespace impl;
+		
+	}
+
 	// (C++11)
 	// determines if a sequence is a permutation of another sequence
 	// (function template)
-	template<class _ForwardIt1, class _ForwardIt2>
-	inline
-	bool is_permutation(_ForwardIt1 first, 
-		typename detail::_if_iterators_cat_are_forward<_ForwardIt1, _ForwardIt2>::type last, _ForwardIt2 d_first)
-	{
-		// skip common prefix
-		std::pair<_ForwardIt1, _ForwardIt2> tie = std::mismatch(first, last, d_first);
-		first = tie.first;
-		d_first = tie.second;
-		// iterate over the rest, counting how many times each element
-		// from [first, last) appears in [d_first, d_last)
-		if (first != last) {
-			_ForwardIt2 d_last = d_first;
-			std::advance(d_last, std::distance(first, last));
-			for (_ForwardIt1 i = first; i != last; ++i) {
-					if (i != std::find(first, i, *i)) continue; // already counted this *i
-					typename iterator_traits<_ForwardIt2>::difference_type m = std::count(d_first, d_last, *i);
-					if (m==0 || std::count(i, last, *i) != m) {
-						return false;
-					}
-				}
-			}
-		return true;
-	}
+	using std_injection::is_permutation;
 
 	// generates the next greater lexicographic permutation of a range of elements
 	// (function template)
