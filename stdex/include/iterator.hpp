@@ -11,7 +11,7 @@
 
 // std includes
 #include <iterator>
-#include <cstddef> //std::size_t
+#include <cstddef> //cstddef::size_t
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
@@ -27,6 +27,24 @@
 
 namespace stdex
 {
+	namespace std_cpp11
+	{
+#ifndef STDEX_DO_NOT_ADD_CPP11_STD // define to exclude std implementations
+		using namespace std;
+#endif
+	}
+
+	namespace cstddef
+	{
+		namespace std_types
+		{
+			using namespace std;
+			typedef size_t size_t;
+		}
+
+		using std_types::size_t;
+	}
+
 	// Iterator primitives 
 
 	using std::iterator_traits; // provides uniform interface to the properties of an iterator
@@ -286,7 +304,7 @@ namespace stdex
 		return (value.begin());
 	}
 
-	template<class _Tp, std::size_t Size>
+	template<class _Tp, cstddef::size_t Size>
 	inline
 	_Tp *begin(_Tp(&value)[Size]) NOEXCEPT_FUNCTION
 	{	// get beginning of array
@@ -309,7 +327,7 @@ namespace stdex
 		return (value.end());
 	}
 
-	template<class _Tp, std::size_t Size>
+	template<class _Tp, cstddef::size_t Size>
 	inline
 	_Tp *end(_Tp(&value)[Size]) NOEXCEPT_FUNCTION
 	{	// get end of array
