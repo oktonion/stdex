@@ -693,7 +693,7 @@ namespace stdex
 			bool is_sorted(_ForwardIt first, 
 				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last)
 			{
-				return stdex::is_sorted_until(first, last) == last;
+				return impl::is_sorted_until(first, last) == last;
 			}
 
 			// (C++11)
@@ -704,7 +704,7 @@ namespace stdex
 			bool is_sorted(_ForwardIt first, 
 				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp)
 			{
-				return stdex::is_sorted_until(first, last, comp) == last;
+				return impl::is_sorted_until(first, last, comp) == last;
 			}
 		}
 		using namespace impl;
@@ -914,7 +914,7 @@ namespace stdex
 					typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last)
 			{
 				typedef typename std::iterator_traits<_ForwardIt>::value_type value_type;
-				return stdex::minmax_element(first, last, std::less<value_type>());
+				return impl::minmax_element(first, last, std::less<value_type>());
 			}
 		}
 		using namespace impl;
