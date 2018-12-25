@@ -20,9 +20,11 @@
 
 namespace stdex
 {
-	namespace std_injection
+	namespace std_cpp11
 	{
+#ifndef STDEX_DO_NOT_ADD_CPP11_STD // define to exclude std implementations
 		using namespace std;
+#endif
 	}
 
 	namespace cstddef
@@ -293,7 +295,7 @@ namespace stdex
 		{ };
 	}
 
-	namespace std_injection
+	namespace std_cpp11
 	{
 		namespace impl
 		{
@@ -376,7 +378,7 @@ namespace stdex
 
 	// copy_n (C++11)
 	// copies a number of elements to a new location
-	using std_injection::copy_n;
+	using std_cpp11::copy_n;
 
 	// copies a range of elements in backwards order
 	// (function template)
@@ -472,7 +474,7 @@ namespace stdex
 	// (function template)
 	using std::rotate_copy;
 
-	namespace std_injection
+	namespace std_cpp11
 	{
 		namespace impl
 		{
@@ -512,7 +514,7 @@ namespace stdex
 
 	// randomly re-orders elements in a range
 	// (function template)
-	using std_injection::random_shuffle;
+	using std_cpp11::random_shuffle;
 
 	// (C++11)
 	// randomly re-orders elements in a range
@@ -529,7 +531,7 @@ namespace stdex
 
 	// Partitioning operations
 
-	namespace std_injection
+	namespace std_cpp11
 	{
 		namespace impl
 		{
@@ -553,7 +555,7 @@ namespace stdex
 	// (C++11)
 	// determines if the range is partitioned by the given predicate
 	// (function template)
-	using std_injection::is_partitioned;
+	using std_cpp11::is_partitioned;
 
 	// divides a range of elements into two groups
 	// (function template)
@@ -596,7 +598,7 @@ namespace stdex
 		{};
 	}
 
-	namespace std_injection
+	namespace std_cpp11
 	{
 		namespace impl
 		{
@@ -630,7 +632,7 @@ namespace stdex
 	// (C++11)
 	// copies a range dividing the elements into two groups
 	// (function template)
-	using std_injection::partition_copy;
+	using std_cpp11::partition_copy;
 
 	// divides elements into two groups while preserving their relative order
 	// (function template)
@@ -643,7 +645,7 @@ namespace stdex
 
 	// Sorting operations
 
-	namespace std_injection
+	namespace std_cpp11
 	{
 		namespace impl
 		{
@@ -714,12 +716,12 @@ namespace stdex
 	// (C++11)
 	// finds the largest sorted subrange
 	// (function template)
-	using std_injection::is_sorted_until;
+	using std_cpp11::is_sorted_until;
 
 	// (C++11)
 	// checks whether a range is sorted into ascending order
 	// (function template)
-	using std_injection::is_sorted;
+	using std_cpp11::is_sorted;
 
 	// sorts a range into ascending order
 	// (function template)
@@ -840,7 +842,7 @@ namespace stdex
 	// (function template)
 	using std::min_element;
 
-	namespace std_injection
+	namespace std_cpp11
 	{
 		namespace impl
 		{
@@ -924,11 +926,11 @@ namespace stdex
 	// (C++11)
 	// returns the smaller and larger of two elements
 	// (function template)
-	using std_injection::minmax;
+	using std_cpp11::minmax;
 
 	// (C++11)
 	// returns the smallest and the largest elements in a range
-	using std_injection::minmax_element;
+	using std_cpp11::minmax_element;
 
 	// returns true if one range is lexicographically less than another
 	// (function template)
@@ -952,7 +954,7 @@ namespace stdex
 		{};
 	}
 
-	namespace std_injection
+	namespace std_cpp11
 	{
 		namespace impl
 		{
@@ -991,7 +993,7 @@ namespace stdex
 	// (C++11)
 	// determines if a sequence is a permutation of another sequence
 	// (function template)
-	using std_injection::is_permutation;
+	using std_cpp11::is_permutation;
 
 	// generates the next greater lexicographic permutation of a range of elements
 	// (function template)
