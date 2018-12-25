@@ -275,7 +275,7 @@ namespace stdex
 			inline
 			_ForwardIt next(_ForwardIt it) 
 			{
-				return stdex::next(it, 1);
+				return impl::next(it, 1);
 			}
 
 			// prev (C++11)
@@ -295,7 +295,7 @@ namespace stdex
 			inline
 			_BidirIt prev(_BidirIt it) 
 			{
-				return stdex::prev(it, 1);
+				return impl::prev(it, 1);
 			}
 		}
 
