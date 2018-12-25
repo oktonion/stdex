@@ -299,6 +299,8 @@ namespace stdex
 	{
 		namespace impl
 		{
+			// copy_n (C++11)
+			// copies a number of elements to a new location
 			template<class _InputIt, class _OutputIt>
 			inline
 			_OutputIt copy_n(_InputIt first,
@@ -313,6 +315,8 @@ namespace stdex
 				return result;
 			}
 
+			// copy_n (C++11)
+			// copies a number of elements to a new location
 			template<class _InputT, cstddef::size_t _InputSize, class _OutputIt> 
 			inline
 			_OutputIt copy_n(_InputT(&first_arr)[_InputSize],
@@ -331,6 +335,8 @@ namespace stdex
 				return result;
 			}
 
+			// copy_n (C++11)
+			// copies a number of elements to a new location
 			template<class _InputIt, class _OutputT, cstddef::size_t _OutputSize>
 			inline
 			_OutputT* copy_n(_InputIt first, 
@@ -349,6 +355,8 @@ namespace stdex
 				return result;
 			}
 
+			// copy_n (C++11)
+			// copies a number of elements to a new location
 			template<
 				class _InputT, cstddef::size_t _InputSize, 
 				class _OutputT, cstddef::size_t _OutputSize
