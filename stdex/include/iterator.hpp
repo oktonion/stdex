@@ -36,13 +36,7 @@ namespace stdex
 
 	namespace cstddef
 	{
-		namespace std_types
-		{
-			using namespace std;
-			typedef size_t size_t;
-		}
-
-		using std_types::size_t;
+		typedef std::size_t size_t;
 	}
 
 	// Iterator primitives 
@@ -221,11 +215,6 @@ namespace stdex
 			>
 		{};
 
-		template<class _OutputIt>
-		struct _if_iterator_is_valid_output<const _OutputIt>:
-			_iterator_traits_enable_if<false, void>
-		{};
-
 		template<class _ForwardIt>
 		struct _if_iterator_cat_is_forward:
 			_iterator_traits_enable_if<
@@ -299,7 +288,8 @@ namespace stdex
 			}
 		}
 
-		using namespace impl;
+		using impl::next; // to avoid ambiguity with std::next function
+		using impl::prev; // to avoid ambiguity with std::prev function
 	}
 
 	// next (C++11)
@@ -370,6 +360,8 @@ namespace stdex
 				return (value + Size);
 			}
 		}
+		using impl::begin;// to avoid ambiguity with std::begin function
+		using impl::end;  // to avoid ambiguity with std::end function
 	}
 
 	// begin (C++11)
