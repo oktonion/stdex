@@ -29,13 +29,7 @@ namespace stdex
 
 	namespace cstddef
 	{
-		namespace std_types
-		{
-			using namespace std;
-			typedef size_t size_t;
-		}
-
-		using std_types::size_t;
+		typedef std::size_t size_t;
 	}
 
 	// Non-modifying sequence operations
