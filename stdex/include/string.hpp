@@ -31,21 +31,6 @@
 #include <cwchar>
 #include <cwctype>
 
-#define _STDEX_PLACE_DUMMY_IN_STD_NAMESPACE
-
-#ifdef _STDEX_PLACE_DUMMY_IN_STD_NAMESPACE
-namespace std_dummy
-{
-	using namespace std;
-	void strtoll(); // dummy
-	void wcstoll(); // dummy
-	void strtoull(); // dummy
-	void wcstoull(); // dummy
-	void strtold(); // dummy
-	void wcstold(); // dummy
-}
-#endif
-
 namespace stdex
 {
 	using std::basic_string;
@@ -58,6 +43,16 @@ namespace stdex
 	{
 		namespace string_detail
 		{
+			namespace std_dummy
+			{
+				using namespace std;
+				void strtoll(); // dummy
+				void wcstoll(); // dummy
+				void strtoull(); // dummy
+				void wcstoull(); // dummy
+				void strtold(); // dummy
+				void wcstold(); // dummy
+			}
 
 			typedef char _yes_type;
 			struct _no_type
@@ -136,8 +131,6 @@ namespace stdex
 			{
 				static const bool value = sizeof(_wcstold_tester(&wcstold)) == sizeof(_yes_type);
 			};
-
-#undef _STDEX_PLACE_DUMMY_IN_STD_NAMESPACE
 
 			using namespace std;
 
