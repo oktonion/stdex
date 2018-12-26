@@ -228,7 +228,7 @@ namespace stdex
 		condition_variable& operator=(const condition_variable&) DELETED_FUNCTION;
 	};
 
-	void notify_all_at_thread_exit(condition_variable& cond, unique_lock<mutex> &lk); 
+	void notify_all_at_thread_exit(condition_variable &cond, unique_lock<mutex> &lk); 
 } // namespace stdex
 
 #undef DELETED_FUNCTION
