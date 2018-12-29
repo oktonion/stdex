@@ -191,11 +191,19 @@ namespace stdex
 
 			struct dummy_input_iterator:
 				public std::iterator<std::input_iterator_tag, int>
-			{};
+			{
+				reference operator*();
+				dummy_input_iterator& operator++ ();
+				dummy_input_iterator operator++ (int);
+			};
 
 			struct dummy_output_iterator :
 				public std::iterator<std::output_iterator_tag, int>
-			{};
+			{
+				reference operator*();
+				dummy_output_iterator& operator++ ();
+				dummy_output_iterator operator++ (int);
+			};
 
 			struct _has_buggy_copy_n
 			{
@@ -309,70 +317,7 @@ namespace stdex
 				return result;
 			}
 
-			// copy_n (C++11)
-			// copies a number of elements to a new location
-			template<class _InputT, cstddef::size_t _InputSize, class _OutputIt> 
-			inline
-			_OutputIt copy_n(_InputT(&first_arr)[_InputSize],
-				 typename detail::_copy_n_output_it_check<_OutputIt>::type count, _OutputIt result)
-			{
-				assert(count <= _InputSize);
-
-				_InputT *first = first_arr;
-
-				if (count > 0) {
-					*result++ = *first;
-					for (cstddef::size_t i = 1; i < count; ++i) {
-						*result++ = *++first;
-					}
-				}
-				return result;
-			}
-
-			// copy_n (C++11)
-			// copies a number of elements to a new location
-			template<class _InputIt, class _OutputT, cstddef::size_t _OutputSize>
-			inline
-			_OutputT* copy_n(_InputIt first, 
-				 typename detail::_copy_n_input_it_check<_InputIt, _OutputT>::type count, _OutputT(&result_arr)[_OutputSize])
-			{
-				assert(count <= _OutputSize);
-
-				_OutputT *result = result_arr;
-
-				if (count > 0) {
-					*result++ = *first;
-					for (cstddef::size_t i = 1; i < count; ++i) {
-						*result++ = *++first;
-					}
-				}
-				return result;
-			}
-
-			// copy_n (C++11)
-			// copies a number of elements to a new location
-			template<
-				class _InputT, cstddef::size_t _InputSize, 
-				class _OutputT, cstddef::size_t _OutputSize
-				>
-			inline
-			_OutputT* copy_n(_InputT(&first_arr)[_InputSize], 
-				 cstddef::size_t count, _OutputT(&result_arr)[_OutputSize])
-			{
-				assert(count <= _OutputSize);
-				assert(count <= _InputSize);
-
-				_InputT *first = first_arr;
-				_OutputT *result = result_arr;
-
-				if (count > 0) {
-					*result++ = *first;
-					for (cstddef::size_t i = 1; i < count; ++i) {
-						*result++ = *++first;
-					}
-				}
-				return result;
-			}
+			
 		}
 		using namespace impl;	
 		
@@ -381,6 +326,71 @@ namespace stdex
 	// copy_n (C++11)
 	// copies a number of elements to a new location
 	using std_cpp11::copy_n;
+
+	// copy_n (C++11)
+	// copies a number of elements to a new location
+	template<class _InputT, cstddef::size_t _InputSize, class _OutputIt> 
+	inline
+	_OutputIt copy_n(_InputT(&first_arr)[_InputSize],
+			typename detail::_copy_n_output_it_check<_OutputIt>::type count, _OutputIt result)
+	{
+		assert(count <= _InputSize);
+
+		_InputT *first = first_arr;
+
+		if (count > 0) {
+			*result++ = *first;
+			for (cstddef::size_t i = 1; i < count; ++i) {
+				*result++ = *++first;
+			}
+		}
+		return result;
+	}
+
+	// copy_n (C++11)
+	// copies a number of elements to a new location
+	template<class _InputIt, class _OutputT, cstddef::size_t _OutputSize>
+	inline
+	_OutputT* copy_n(_InputIt first, 
+			typename detail::_copy_n_input_it_check<_InputIt, _OutputT>::type count, _OutputT(&result_arr)[_OutputSize])
+	{
+		assert(count <= _OutputSize);
+
+		_OutputT *result = result_arr;
+
+		if (count > 0) {
+			*result++ = *first;
+			for (cstddef::size_t i = 1; i < count; ++i) {
+				*result++ = *++first;
+			}
+		}
+		return result;
+	}
+
+	// copy_n (C++11)
+	// copies a number of elements to a new location
+	template<
+		class _InputT, cstddef::size_t _InputSize, 
+		class _OutputT, cstddef::size_t _OutputSize
+		>
+	inline
+	_OutputT* copy_n(_InputT(&first_arr)[_InputSize], 
+			cstddef::size_t count, _OutputT(&result_arr)[_OutputSize])
+	{
+		assert(count <= _OutputSize);
+		assert(count <= _InputSize);
+
+		_InputT *first = first_arr;
+		_OutputT *result = result_arr;
+
+		if (count > 0) {
+			*result++ = *first;
+			for (cstddef::size_t i = 1; i < count; ++i) {
+				*result++ = *++first;
+			}
+		}
+		return result;
+	}
 
 	// copies a range of elements in backwards order
 	// (function template)

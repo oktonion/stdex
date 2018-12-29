@@ -324,15 +324,6 @@ namespace stdex
 				return (value.begin());
 			}
 
-			// begin (C++11)
-			// returns an iterator to the beginning of a container or array 
-			template<class _Tp, cstddef::size_t Size>
-			inline
-			_Tp *begin(_Tp(&value)[Size]) NOEXCEPT_FUNCTION
-			{	// get beginning of array
-				return (value);
-			}
-
 			// end (C++11)
 			// returns an iterator to the end of a container or array 
 			template<class _ContainerType>
@@ -350,15 +341,6 @@ namespace stdex
 			{	// get end of sequence
 				return (value.end());
 			}
-
-			// end (C++11)
-			// returns an iterator to the end of a container or array 
-			template<class _Tp, cstddef::size_t Size>
-			inline
-			_Tp *end(_Tp(&value)[Size]) NOEXCEPT_FUNCTION
-			{	// get end of array
-				return (value + Size);
-			}
 		}
 		using impl::begin;// to avoid ambiguity with std::begin function
 		using impl::end;  // to avoid ambiguity with std::end function
@@ -368,9 +350,45 @@ namespace stdex
 	// returns an iterator to the beginning of a container or array
 	using std_cpp11::begin;
 
+	// begin (C++11)
+	// returns an iterator to the beginning of a container or array 
+	template<class _Tp, cstddef::size_t Size>
+	inline
+	_Tp *begin(_Tp(&value)[Size]) NOEXCEPT_FUNCTION
+	{	// get beginning of array
+		return (value);
+	}
+
+	// begin (C++11)
+	// returns an iterator to the beginning of a container or array 
+	template<class _Tp, cstddef::size_t Size>
+	inline
+	const _Tp *begin(const _Tp(&value)[Size]) NOEXCEPT_FUNCTION
+	{	// get beginning of array
+		return (value);
+	}
+
 	// end (C++11)
 	// returns an iterator to the end of a container or array 
 	using std_cpp11::end;
+
+	// end (C++11)
+	// returns an iterator to the end of a container or array 
+	template<class _Tp, cstddef::size_t Size>
+	inline
+	_Tp *end(_Tp(&value)[Size]) NOEXCEPT_FUNCTION
+	{	// get end of array
+		return (value + Size);
+	}
+
+	// end (C++11)
+	// returns an iterator to the end of a container or array 
+	template<class _Tp, cstddef::size_t Size>
+	inline
+	const _Tp *end(const _Tp(&value)[Size]) NOEXCEPT_FUNCTION
+	{	// get end of array
+		return (value + Size);
+	}
 
 	// Container access (C++ 17)
 }
