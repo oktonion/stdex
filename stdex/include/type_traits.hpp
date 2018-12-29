@@ -1273,14 +1273,14 @@ namespace stdex
 	namespace detail
 	{
 		template<class _Tp>
-		static _yes_type _has_member_pointer_tester(void (_Tp::*)());
+		_yes_type _has_member_pointer_tester(void (_Tp::*)());
 		template<class _Tp>
-		static _no_type _has_member_pointer_tester(...);
+		_no_type _has_member_pointer_tester(...);
 
 		template<class _Tp>
-		static void (_Tp::* (_has_member_pointer_tester_helper(int)))();
+		void (_Tp::* (_has_member_pointer_tester_helper(int)))();
 		template<class _Tp>
-		static char _has_member_pointer_tester_helper(...);
+		char _has_member_pointer_tester_helper(...);
 
 		template<class _Tp>
 		struct _has_member_pointer_impl
@@ -1291,17 +1291,17 @@ namespace stdex
 
 
 		template<class _Tp>
-		struct _convertable_to_any_type_dummy
+		struct _constructable_from_type_dummy
 		{
-			_convertable_to_any_type_dummy(_Tp&);
-			_convertable_to_any_type_dummy(const _Tp&);
-			_convertable_to_any_type_dummy(const volatile _Tp&);
+			_constructable_from_type_dummy(_Tp&);
+			_constructable_from_type_dummy(const _Tp&);
+			_constructable_from_type_dummy(const volatile _Tp&);
 		};
 
 		template<class _Tp>
 		static _yes_type _is_convertable_to_int_tester(int);
 		template<class _Tp>
-		static _no_type _is_convertable_to_int_tester(_convertable_to_any_type_dummy<_Tp>);
+		static _no_type _is_convertable_to_int_tester(_constructable_from_type_dummy<_Tp>);
 		template<class _Tp>
 		static _no_type _is_convertable_to_int_tester(...);
 
@@ -1341,20 +1341,17 @@ namespace stdex
 			public _Tp
 		{ };
 
-		template<bool>
+		template<class _Tp, bool>
 		struct _is_enum_bug_internal
 		{
-			template<class _Tp>
 			static _derived_dummy<_Tp>* _can_be_parent_tester_helper(_derived_dummy<_Tp>*);
 
-			template<class _Tp>
 			static char _can_be_parent_tester_helper(...);
 		};
 
-		template<>
-		struct _is_enum_bug_internal<false>
+		template<class _Tp>
+		struct _is_enum_bug_internal<_Tp, false>
 		{
-			template<class _Tp>
 			static char _can_be_parent_tester_helper(...);
 		};
 
@@ -1368,7 +1365,8 @@ namespace stdex
 		template<class _Tp>
 		struct _enum_can_be_parent
 		{
-			static const bool value = sizeof(_enum_can_be_parent_tester<_Tp>(_is_enum_bug_internal<is_enum_detail::_enum_can_have_member_pointer_bug::value>::_can_be_parent_tester_helper<_Tp>(0))) == sizeof(_yes_type);
+			static const bool value = 
+				sizeof(_enum_can_be_parent_tester<_Tp>(_is_enum_bug_internal<_Tp, is_enum_detail::_enum_can_have_member_pointer_bug::value>::_can_be_parent_tester_helper(0))) == sizeof(_yes_type);
 		};
 
 		template<class _Tp, bool>
@@ -1380,28 +1378,28 @@ namespace stdex
 		template<class _Tp>
 		struct _is_enum_helper1<_Tp, true>
 		{
-			static const bool value = !(_enum_can_be_parent<_Tp>::value);
+			static const bool value = _enum_can_be_parent<_Tp>::value == bool(false);
 		};
 
 		template<class _Tp, bool>
 		struct _is_enum_helper
 		{
 			static const bool value =
-				!(_has_member_pointer_impl<_Tp>::value);
+				_has_member_pointer_impl<_Tp>::value == bool(false);
 		};
 
 		template<class _Tp>
 		struct _is_enum_helper<_Tp, true>
 		{ // with enum bug
 			static const bool value =
-				_is_enum_helper1<_Tp, (_is_convertable_to_int<_Tp>::value && !(_is_constructible_from_int<_Tp>::value))>::value;
+				_is_enum_helper1<_Tp, (_is_convertable_to_int<_Tp>::value == bool(true) && _is_constructible_from_int<_Tp>::value == bool(false))>::value;
 		};
 
 		template<class _Tp, bool>
 		struct _is_enum_impl
 		{
 			static const bool value =
-				_is_enum_helper<_Tp, is_enum_detail::_enum_can_have_member_pointer_bug::value>::value;
+				_is_enum_helper<_Tp, is_enum_detail::_enum_can_have_member_pointer_bug::value == bool(true)>::value;
 			typedef integral_constant<bool, _is_enum_helper<_Tp, is_enum_detail::_enum_can_have_member_pointer_bug::value>::value == bool(true)> type;
 		};
 
@@ -1465,21 +1463,30 @@ namespace stdex
 			typedef integral_constant<bool, false> type;
 		};
 
+		template<class _Tp>
+		struct _derivered_constructible_from_type_dummy
+		{
+			_derivered_constructible_from_type_dummy(int);
+			//typedef _derived_dummy<_Tp> type;
+			//int a[sizeof(type)];
+		};
 
-		/*template<class _Tp>
-		_derived_dummy<_Tp>* _union_can_be_parent_tester_helper(int);
+		template<class _Tp>
+		_derivered_constructible_from_type_dummy<_Tp>* _union_can_be_parent_tester_helper(_derivered_constructible_from_type_dummy<_Tp>);
 		template<class _Tp>
 		char _union_can_be_parent_tester_helper(...);
 
 
-		_yes_type _union_can_be_parent_tester(void*);
-		char _union_can_be_parent_tester(...);
+		template<class _Tp>
+		_yes_type _union_can_be_parent_tester(_Tp*);
+		//template<class _Tp>
+		_no_type _union_can_be_parent_tester(...);
 
 		template<class _Tp>
 		struct _union_can_be_parent
 		{
 			static const bool value = sizeof(_union_can_be_parent_tester(_union_can_be_parent_tester_helper<_Tp>(0))) == sizeof(_yes_type);
-		};*/
+		};
 
 		template <class _Tp>
 		struct _is_union_helper<_Tp, false>
