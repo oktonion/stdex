@@ -4,17 +4,37 @@ All notable changes to stdex library project will be documented in this file.
 
 visit https://github.com/oktonion/stdex for the latest version of stdex library
 
-## [0.1.3] - 2018-00-00
+## [0.1.3] - 2018-12-29
 
 ### Added
 
 - iterator header
 - - prev
 - - next
+- - begin
+- - end
+- - all of C++ 98 std functions
 - algorithm header
+- - all_of
+- - any_of
 - - none_of
 - - find_if_not
 - - copy_if
+- - copy_n
+- - random_shuffle
+- - is_partitioned
+- - partition_copy
+- - is_sorted_until
+- - is_sorted
+- - minmax
+- - minmax_element
+- - is_permutation
+- - all of C++ 98 std functions
+
+### Changed
+
+- fixed lots of micro bugs
+- reimplemented is_enum and is_union (unions are still not distinguishable from classes)
 
 ## [0.1.2] - 2018-05-08
 
