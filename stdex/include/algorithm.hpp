@@ -191,11 +191,19 @@ namespace stdex
 
 			struct dummy_input_iterator:
 				public std::iterator<std::input_iterator_tag, int>
-			{};
+			{
+				reference operator*();
+				dummy_input_iterator& operator++ ();
+				dummy_input_iterator operator++ (int);
+			};
 
 			struct dummy_output_iterator :
 				public std::iterator<std::output_iterator_tag, int>
-			{};
+			{
+				reference operator*();
+				dummy_output_iterator& operator++ ();
+				dummy_output_iterator operator++ (int);
+			};
 
 			struct _has_buggy_copy_n
 			{
