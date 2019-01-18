@@ -7,7 +7,7 @@
 
 // stdex includes
 /*none*/
-#include "./type_traits"
+#include "./type_traits.hpp"
 
 // POSIX includes
 /*none*/
