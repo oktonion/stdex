@@ -37,3 +37,6 @@
 .vscode
 .vscode/*
 *.~cpp
+tests/bin/*
+pthread-win32
+>>>>>>> work
