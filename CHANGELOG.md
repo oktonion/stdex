@@ -4,6 +4,12 @@ All notable changes to stdex library project will be documented in this file.
 
 visit https://github.com/oktonion/stdex for the latest version of stdex library
 
+## [0.1.2] - 2019-xx-xx
+
+### Changed
+
+- fixed bugs with `to_string` and `to_wstring` for (w)c-strings and (w)stringstream implementation
+
 ## [0.1.3] - 2018-12-29
 
 ### Added
