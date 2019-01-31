@@ -1404,6 +1404,11 @@ namespace stdex
 			}
 		};
 
+		template<int _Size>
+		struct _to_string_impl<char[_Size]>:
+			struct _to_string_impl<char*>
+		{ };
+
 		template<class _Tp>
 		struct _to_wstring_impl
 		{
@@ -1423,6 +1428,11 @@ namespace stdex
 				return value;
 			}
 		};
+
+		template<int _Size>
+		struct _to_wstring_impl<wchar_t[_Size]>:
+			struct _to_wstring_impl<wchar_t*>
+		{ };
 
 
 	}
