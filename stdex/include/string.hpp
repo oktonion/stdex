@@ -1384,6 +1384,47 @@ namespace stdex
 			_swprintf_impl<_has_4arg_swprintf::value>::call(ws, len, format, arg);
 		}
 		
+		template<class _Tp>
+		struct _to_string_impl
+		{
+			static std::string call(const _Tp &value)
+			{
+				stringstream ss;
+				ss << value;
+				return ss.str();
+			}
+		};
+
+		template<>
+		struct _to_string_impl<char*>
+		{
+			static std::string call(const char *value)
+			{
+				return value;
+			}
+		};
+
+		template<class _Tp>
+		struct _to_wstring_impl
+		{
+			static std::wstring call(const _Tp &value)
+			{
+				wstringstream ss;
+				ss << value;
+				return ss.str();
+			}
+		};
+
+		template<>
+		struct _to_wstring_impl<wchar_t*>
+		{
+			static std::wstring call(const wchar_t *value)
+			{
+				return value;
+			}
+		};
+
+
 	}
 
 
@@ -1697,17 +1738,13 @@ namespace stdex
 	template<class _T>
 	inline string to_string(const _T &t)
 	{
-		stringstream ss;
-		ss << t;
-		return ss.str();
+		return detail::_to_string_impl<_T>::call(t);
 	}
 
 	template<class _T>
 	inline wstring to_wstring(const _T &t)
 	{
-		wstringstream ss;
-		ss << t;
-		return ss.str();
+		return detail::_to_wstring_impl<_T>::call(t);
 	}
 	
 	template<>
@@ -1836,16 +1873,6 @@ namespace stdex
 		detail::_swprintf4_std_impl(buf, sizeof(buf) / sizeof(wchar_t), L"%f", value);
 
 		return wstring(buf);
-	}
-
-	inline string to_string(const char *x)
-	{
-		return x;
-	}
-
-	inline wstring to_wstring(const wchar_t *x)
-	{
-		return x;
 	}
 
 	template<>
