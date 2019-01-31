@@ -1064,6 +1064,9 @@ namespace string_tests
         string six(to_string(ld2));
         DYNAMIC_VERIFY(six == "-4.000000");
 
+        string str = to_string("testtesttest");
+        DYNAMIC_VERIFY(str == "testtesttest");
+
         return 0;
     }
 }

@@ -1064,6 +1064,9 @@ namespace wstring_tests
         wstring six(to_wstring(ld2));
         DYNAMIC_VERIFY(six == L"-4.000000");
 
+        wstring str = to_wstring(L"testtesttest");
+        DYNAMIC_VERIFY(str == L"testtesttest");
+
         return 0;
     }
 }
