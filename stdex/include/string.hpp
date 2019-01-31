@@ -1391,7 +1391,8 @@ namespace stdex
 			{
 				stringstream ss;
 				ss << value;
-				return ss.str();
+				string str(ss.str());
+				return str;
 			}
 		};
 
@@ -1416,7 +1417,8 @@ namespace stdex
 			{
 				wstringstream ss;
 				ss << value;
-				return ss.str();
+				wstring str(ss.str());
+				return str;
 			}
 		};
 
