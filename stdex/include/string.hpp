@@ -1387,7 +1387,7 @@ namespace stdex
 		template<class _Tp>
 		struct _to_string_impl
 		{
-			static std::string call(const _Tp &value)
+			static string call(const _Tp &value)
 			{
 				stringstream ss;
 				ss << value;
@@ -1398,7 +1398,7 @@ namespace stdex
 		template<>
 		struct _to_string_impl<char*>
 		{
-			static std::string call(const char *value)
+			static string call(const char *value)
 			{
 				return value;
 			}
@@ -1407,7 +1407,7 @@ namespace stdex
 		template<class _Tp>
 		struct _to_wstring_impl
 		{
-			static std::wstring call(const _Tp &value)
+			static wstring call(const _Tp &value)
 			{
 				wstringstream ss;
 				ss << value;
@@ -1418,7 +1418,7 @@ namespace stdex
 		template<>
 		struct _to_wstring_impl<wchar_t*>
 		{
-			static std::wstring call(const wchar_t *value)
+			static wstring call(const wchar_t *value)
 			{
 				return value;
 			}
