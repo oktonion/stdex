@@ -40,3 +40,5 @@
 tests/bin/*
 pthread-win32
 
+#visual studio
+.vs/*
