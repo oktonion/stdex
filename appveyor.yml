@@ -14,7 +14,7 @@ image:
 - Visual Studio 2019 Preview
 init:
 - cmd: >-
-    if "%APPVEYOR_JOB_NUMBER%"=="1" (call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\Tools\vsvars32.bat") else if "%APPVEYOR_JOB_NUMBER%"=="2" (call "C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\Tools\vsvars32.bat") else if "%APPVEYOR_JOB_NUMBER%"=="3" (call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\vsvars32.bat") else if "%APPVEYOR_JOB_NUMBER%"=="4" (call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32.bat") else (cd "C:\Program Files (x86)\Microsoft Visual Studio\" && dir)
+    if "%APPVEYOR_JOB_NUMBER%"=="1" (call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\Tools\vsvars32.bat") else if "%APPVEYOR_JOB_NUMBER%"=="2" (call "C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\Tools\vsvars32.bat") else if "%APPVEYOR_JOB_NUMBER%"=="3" (call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\vsvars32.bat") else if "%APPVEYOR_JOB_NUMBER%"=="4" (call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32.bat") else (call "C:\Program Files (x86)\Microsoft Visual Studio\2019\VC\Auxiliary\Build\vcvars32.bat")
 
 
     set LIB=%LIB%C:\Program Files (x86)\Windows Kits\8.1\Lib\winv6.3\um\x86\;
