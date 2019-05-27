@@ -1,15 +1,20 @@
 setlocal enabledelayedexpansion
 
-set run_ok=0
+set "run_ok=true"
 for /f %%f in ('dir /b ".\tests\bin\*.exe"') do (
   echo "running test %%~nf..."
-  .\tests\bin\%%f
-  if /I "%ERRORLEVEL%" NEQ "0" (
-    %run_ok%=-1
+  
+  .\tests\bin\%%f --duration
+
+  IF ERRORLEVEL 1 (
+    set "run_ok=false"
     echo "...failed with %ERRORLEVEL%."
   ) else (
     echo "...ok."
   )
 )
 
-exit %run_ok%
+if "%run_ok%" == "false" (
+  echo "tests run failed"
+  exit /B 1
+)
