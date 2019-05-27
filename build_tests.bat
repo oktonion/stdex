@@ -14,7 +14,7 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
   )
 
   if /I "%build_ok%" NEQ "0" (
-    cl /I "%cd%\pthread\" .\tests\obj\%%~nf.obj stdex.lib ntdll.lib -Fe.\tests\bin\%%~nf.exe -link -LIBPATH:.\stdex\lib
+    cl /I %cd%\pthread\ .\tests\obj\%%~nf.obj stdex.lib ntdll.lib -Fe.\tests\bin\%%~nf.exe -link -LIBPATH:.\stdex\lib
     IF ERRORLEVEL 1 (
       set "build_ok=false"
     )
