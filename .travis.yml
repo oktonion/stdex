@@ -56,7 +56,6 @@ matrix:
     - os: linux
       compiler: gcc
       dist: precise
-      compiler: gcc
       env: COMPILER=g++
 
     - os: osx
@@ -73,4 +72,7 @@ script:
   - ./build_tests.sh
   - chmod +x ./run_tests.sh
   - ./run_tests.sh
+  - chmod +x ./get_code_cov.sh
+  - ./get_code_cov.sh
+  - codecov
 #make CXX=$COMPILER -j3
