@@ -7,16 +7,7 @@ matrix:
         apt:
           sources: ['ubuntu-toolchain-r-test']
           packages: ['g++-4.4']
-      env: 
-      - COMPILER=g++-4.4
-      - CODE_COVERAGE_LIBS=-lgcov
-      - CODE_COVERAGE_FLAGS=--coverage -fprofile-arcs -ftest-coverage
-      before_install: 
-      - sudo pip install codecov
-      after_script:
-      - chmod +x ./get_code_cov.sh
-      - ./get_code_cov.sh
-      - codecov
+      env: COMPILER=g++-4.4
 
     - os: linux
       compiler: gcc
@@ -65,7 +56,16 @@ matrix:
     - os: linux
       compiler: gcc
       dist: precise
-      env: COMPILER=g++
+      env:
+      - COMPILER=g++
+      - CODE_COVERAGE_LIBS=-lgcov
+      - CODE_COVERAGE_FLAGS=--coverage -fprofile-arcs -ftest-coverage
+      before_install: 
+      - sudo pip install codecov
+      after_script:
+      - chmod +x ./get_code_cov.sh
+      - ./get_code_cov.sh
+      - codecov
 
     - os: osx
       osx_image: xcode9
