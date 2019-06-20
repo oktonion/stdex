@@ -1,6 +1,4 @@
 language: cpp
-before_install: 
-- sudo pip install codecov
 matrix:
   include:
     - os: linux
@@ -9,7 +7,16 @@ matrix:
         apt:
           sources: ['ubuntu-toolchain-r-test']
           packages: ['g++-4.4']
-      env: COMPILER=g++-4.4
+      env: 
+      - COMPILER=g++-4.4
+      - CODE_COVERAGE_LIBS=-lgcov
+      - CODE_COVERAGE_FLAGS="-fprofile-arcs -ftest-coverage"
+      before_install: 
+      - sudo pip install codecov
+      after_script:
+      - chmod +x ./get_code_cov.sh
+      - ./get_code_cov.sh
+      - codecov
 
     - os: linux
       compiler: gcc
@@ -74,7 +81,4 @@ script:
   - ./build_tests.sh
   - chmod +x ./run_tests.sh
   - ./run_tests.sh
-  - chmod +x ./get_code_cov.sh
-  - ./get_code_cov.sh
-  - codecov
 #make CXX=$COMPILER -j3
