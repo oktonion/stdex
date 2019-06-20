@@ -1,4 +1,6 @@
 language: cpp
+before_install: 
+- sudo pip install codecov
 matrix:
   include:
     - os: linux
