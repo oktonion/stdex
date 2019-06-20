@@ -60,7 +60,7 @@ for file in ./tests/*.cpp; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
   echo "compiling test c++98 $filename"
-  if ! $COMPILER -std=c++98 -pedantic $exclude_warn $file -L./stdex/lib/ -lstdex $build_libs -o "./tests/bin/$filename"; then
+  if ! $COMPILER -std=c++98 -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename"; then
     build_ok=0
   fi
 done
