@@ -10,7 +10,7 @@ matrix:
       env: 
       - COMPILER=g++-4.4
       - CODE_COVERAGE_LIBS=-lgcov
-      - CODE_COVERAGE_FLAGS="-fprofile-arcs -ftest-coverage"
+      - CODE_COVERAGE_FLAGS=--coverage
       before_install: 
       - sudo pip install codecov
       after_script:
