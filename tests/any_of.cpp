@@ -102,10 +102,12 @@ private:
     void operator,(const U&) const;
 };
 
-template <class T, template<class TT> class ItType>
+template <class T>
 struct test_container
 {
-  typename ItType<T>::ContainerType bounds;
+  typedef input_iterator_wrapper<T> it_type_t;
+
+  typename it_type_t::ContainerType bounds;
   test_container(T* _first, T* _last) : bounds(_first, _last)
   { }
 
@@ -114,34 +116,34 @@ struct test_container
   test_container(T (&arr)[N]) : test_container(arr, arr+N)
   { }
 
-  ItType<T>
+  it_type_t
   it(int pos)
   {
     THROW_VERIFY(pos >= 0 && pos <= (bounds.last - bounds.first));
-    return ItType<T>(bounds.first + pos, &bounds);
+    return it_type_t(bounds.first + pos, &bounds);
   }
 
-  ItType<T>
+  it_type_t
   it(T* pos)
   {
     THROW_VERIFY(pos >= bounds.first && pos <= bounds.last);
-    return ItType<T>(pos, &bounds);
+    return it_type_t(pos, &bounds);
   }
 
   const T&
   val(int pos)
   { return (bounds.first)[pos]; }
 
-  ItType<T>
+  it_type_t
   begin()
   { return it(bounds.first); }
 
-  ItType<T>
+  it_type_t
   end()
   { return it(bounds.last); }
 };
 
-typedef test_container<int, input_iterator_wrapper> Container;
+typedef test_container<int> Container;
 int array[] = {0, 0, 0, 1, 0, 1};
 
 bool
