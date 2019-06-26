@@ -6,9 +6,15 @@ visit https://github.com/oktonion/stdex for the latest version of stdex library
 
 ## [0.1.4] - 2019-xx-xx
 
+### Added
+- `to_string` and `to_wstring` now accept static arrays
+- build script for Borland C++ Builder compiler
+
 ### Changed
 
 - fixed bugs with `to_string` and `to_wstring` for (w)c-strings and (w)stringstream implementation
+- fixed `is_union` implementation with nasty compiler-specific intrinsic
+- changed pthread-win32 submodule dependency to my fork (origin have not been updated since forever)
 
 ## [0.1.3] - 2018-12-29
 
