@@ -49,3 +49,6 @@ tests/bin/*
 
 #c++ builder
 *.tds
+
+#object files
+stdex/obj/*
