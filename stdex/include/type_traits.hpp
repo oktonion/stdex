@@ -1457,35 +1457,25 @@ namespace stdex
 
 	namespace detail
 	{
+		template<class _Tp>
+		struct _is_union_intrinsic // ugly hack that cannot be done without compiler support
+		{
+			static const bool value = 
+				#if defined(__is_union)
+					__is_union(_Tp)
+				#elif defined(__oracle_is_union)
+					__oracle_is_union(_Tp)
+				#elif defined(__typeinfo)
+					(__typeinfo(T) & 0x400)
+				#else
+					false
+				#endif
+			;
+		};
 		template <class _Tp, bool>
 		struct _is_union_helper
 		{
 			typedef integral_constant<bool, false> type;
-		};
-
-		template<class _Tp>
-		struct _derivered_constructible_from_type_dummy
-		{
-			_derivered_constructible_from_type_dummy(int);
-			//typedef _derived_dummy<_Tp> type;
-			//int a[sizeof(type)];
-		};
-
-		template<class _Tp>
-		_derivered_constructible_from_type_dummy<_Tp>* _union_can_be_parent_tester_helper(_derivered_constructible_from_type_dummy<_Tp>);
-		template<class _Tp>
-		char _union_can_be_parent_tester_helper(...);
-
-
-		template<class _Tp>
-		_yes_type _union_can_be_parent_tester(_Tp*);
-		//template<class _Tp>
-		_no_type _union_can_be_parent_tester(...);
-
-		template<class _Tp>
-		struct _union_can_be_parent
-		{
-			static const bool value = sizeof(_union_can_be_parent_tester(_union_can_be_parent_tester_helper<_Tp>(0))) == sizeof(_yes_type);
 		};
 
 		template <class _Tp>
@@ -1494,7 +1484,7 @@ namespace stdex
 			typedef integral_constant<bool,
 				(is_enum<_Tp>::value == bool(false))
 				&& (_has_member_pointer_impl<_Tp>::value == bool(true))
-				//&& (_union_can_be_parent<_Tp>::value == bool(false))
+				&& (_is_union_intrinsic<_Tp>::value == bool(true))
 			> type;
 		};
 	}
