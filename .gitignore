@@ -43,7 +43,6 @@
 *.~cpp
 >>>>>>> 568d6eb454841ff2fbeab31206e045cb0532e9fa
 tests/bin/*
-pthread-win32
 
 #visual studio
 .vs/*
