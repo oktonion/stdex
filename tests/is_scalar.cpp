@@ -11,7 +11,7 @@ int main(void)
     // is_scalar
     STATIC_ASSERT(is_scalar<int>::value == (true), should_be_scalar);
     STATIC_ASSERT(is_scalar<float>::value == (true), should_be_scalar);
-    //STATIC_ASSERT(is_scalar<EnumType>::value == (true), should_be_scalar); // implement is_enum!
+    STATIC_ASSERT(is_scalar<EnumType>::value == (true), should_be_scalar); // implement is_enum!
     STATIC_ASSERT(is_scalar<int*>::value == (true), should_be_scalar);
     STATIC_ASSERT(is_scalar<int(*)(int)>::value == (true), should_be_scalar);
     STATIC_ASSERT(is_scalar<stdex::nullptr_t>::value == (true), should_be_scalar);
