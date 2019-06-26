@@ -46,3 +46,6 @@ tests/bin/*
 
 #visual studio
 .vs/*
+
+#c++ builder
+*.tds
