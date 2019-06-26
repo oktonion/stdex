@@ -14,7 +14,7 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
   )
 
   if "%build_ok%"=="1" (
-    bcc32 -w-inl -w-ccc -tWM -Q -L.\stdex\lib\ -lap -I%cd%\pthread\ stdex.lib cw32mt.lib ntdll.lib -o.\tests\bin\%%~nf.exe .\tests\obj\%%~nf.obj
+    bcc32 -w-inl -w-ccc -tWM -Q -L.\stdex\lib\ -lap -I%cd%\pthread\ -e.\tests\bin\%%~nf.exe stdex.lib cw32mt.lib ntdll.lib .\tests\obj\%%~nf.obj
     IF ERRORLEVEL 1 (
       set "build_ok=0"
     )
