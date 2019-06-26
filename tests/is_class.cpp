@@ -53,20 +53,16 @@ typedef union {
 }
 UnionType;
 
-template<bool>
+template<bool EnableTests>
 struct UnionTestsImpl
-{
-    static void test(){}
-};
-
-template<>
-struct UnionTestsImpl<true>
 {
     static void test()
     {
         using namespace stdex;
-        STATIC_ASSERT(is_class<UnionType>::value == (false), can_not_be_class);
-        STATIC_ASSERT(is_class<ConvUnionType>::value == (false), can_not_be_class);
+
+        // Negative tests.
+        STATIC_ASSERT((is_class<UnionType>::value == (false)) || (EnableTests == (false)), can_not_be_class);
+        STATIC_ASSERT((is_class<ConvUnionType>::value == (false)) || (EnableTests == (false)), can_not_be_class);
     }
 };
 
