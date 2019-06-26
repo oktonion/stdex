@@ -1457,6 +1457,25 @@ namespace stdex
 
 	namespace detail
 	{
+		template <class _Tp, bool _IsReference>
+		struct _is_class_or_union_helper
+		{
+			typedef integral_constant<bool, false> type;
+		};
+
+		template <class _Tp>
+		struct _is_class_or_union_helper<_Tp, false>
+		{
+			typedef integral_constant<bool,
+				(is_scalar<_Tp>::value == bool(false))
+				&& (is_array<_Tp>::value == bool(false))
+				&& (is_void<_Tp>::value == bool(false))
+				&& (is_function<_Tp>::value == bool(false))> type;
+		};
+	}
+
+	namespace detail
+	{
 		template<class _Tp>
 		struct _is_union_intrinsic // ugly hack that cannot be done without compiler support
 		{
@@ -1466,7 +1485,7 @@ namespace stdex
 				#elif defined(__oracle_is_union)
 					__oracle_is_union(_Tp)
 				#elif defined(__typeinfo)
-					(__typeinfo(T) & 0x400)
+					(__typeinfo(_Tp) & 0x400)
 				#else
 					false
 				#endif
@@ -1481,9 +1500,9 @@ namespace stdex
 		template <class _Tp>
 		struct _is_union_helper<_Tp, false>
 		{
+			typedef typename _is_class_or_union_helper<_Tp, false>::type is_class_or_union;
 			typedef integral_constant<bool,
-				(is_enum<_Tp>::value == bool(false))
-				&& (_has_member_pointer_impl<_Tp>::value == bool(true))
+				(is_class_or_union::value == bool(true))
 				&& (_is_union_intrinsic<_Tp>::value == bool(true))
 			> type;
 		};
@@ -1506,12 +1525,11 @@ namespace stdex
 		template <class _Tp>
 		struct _is_class_helper<_Tp, false>
 		{
+			typedef typename _is_class_or_union_helper<_Tp, false>::type is_class_or_union;
 			typedef integral_constant<bool,
-				(is_scalar<_Tp>::value == bool(false))
-				//&& (is_union<_Tp>::value == bool(false))
-				&& (is_array<_Tp>::value == bool(false))
-				&& (is_void<_Tp>::value == bool(false))
-				&& (is_function<_Tp>::value == bool(false))> type;
+				(is_class_or_union::value == bool(true))
+				&& (_is_union_intrinsic<_Tp>::value == bool(false))
+			> type;
 		};
 	}
 
