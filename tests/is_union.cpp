@@ -53,14 +53,35 @@ typedef union {
 }
 UnionType;
 
+template<bool>
+struct UnionTestsImpl
+{
+    static void test(){}
+};
+
+template<>
+struct UnionTestsImpl<true>
+{
+    static void test()
+    {
+        using namespace stdex;
+
+        STATIC_ASSERT(is_union<UnionType>::value == (true), should_be_union);
+        STATIC_ASSERT(is_union<ConvUnionType>::value == (true), should_be_union);
+    }
+};
+
+struct UnionTests:
+    UnionTestsImpl<stdex::detail::_is_union_intrinsic<UnionType>::value>
+{};
+
 int main(void)
 {
     using namespace stdex;
     
     // is_class
     // Positive tests.
-    STATIC_ASSERT(is_union<UnionType>::value == (true), should_be_union);
-    STATIC_ASSERT(is_union<ConvUnionType>::value == (true), should_be_union);
+
 
     // Negative tests.
     {
@@ -86,15 +107,15 @@ int main(void)
         STATIC_ASSERT(is_union<member5_t>::value == (false), can_not_be_union);
         STATIC_ASSERT(is_union<member6_t>::value == (false), can_not_be_union);
         STATIC_ASSERT(is_class<EnumType>::value == (false), can_not_be_class);
-        // when bug is fixed uncomment this:
-        //STATIC_ASSERT(is_union<ClassType>::value == (false), can_not_be_union);
-        //STATIC_ASSERT(is_union<DerivedType>::value == (false), can_not_be_union);
-        //STATIC_ASSERT(is_union<ConvType>::value == (false), can_not_be_union);
-        //STATIC_ASSERT(is_union<AbstractClass>::value == (false), can_not_be_union);
-        //STATIC_ASSERT(is_union<PolymorphicClass>::value == (false), can_not_be_union);
-        //STATIC_ASSERT(is_union<DerivedPolymorphic>::value == (false), can_not_be_union);
-        //STATIC_ASSERT(is_union<ConvTypeInt>::value == (false), can_not_be_union);
-        //STATIC_ASSERT(is_union<ClassType1>::value == (false), can_not_be_union);
+
+        STATIC_ASSERT(is_union<ClassType>::value == (false), can_not_be_union);
+        STATIC_ASSERT(is_union<DerivedType>::value == (false), can_not_be_union);
+        STATIC_ASSERT(is_union<ConvType>::value == (false), can_not_be_union);
+        STATIC_ASSERT(is_union<AbstractClass>::value == (false), can_not_be_union);
+        STATIC_ASSERT(is_union<PolymorphicClass>::value == (false), can_not_be_union);
+        STATIC_ASSERT(is_union<DerivedPolymorphic>::value == (false), can_not_be_union);
+        STATIC_ASSERT(is_union<ConvTypeInt>::value == (false), can_not_be_union);
+        STATIC_ASSERT(is_union<ClassType1>::value == (false), can_not_be_union);
     }
     return 0;
 }

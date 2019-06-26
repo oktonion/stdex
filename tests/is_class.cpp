@@ -53,6 +53,27 @@ typedef union {
 }
 UnionType;
 
+template<bool>
+struct UnionTestsImpl
+{
+    static void test(){}
+};
+
+template<>
+struct UnionTestsImpl<true>
+{
+    static void test()
+    {
+        using namespace stdex;
+        STATIC_ASSERT(is_class<UnionType>::value == (false), can_not_be_class);
+        STATIC_ASSERT(is_class<ConvUnionType>::value == (false), can_not_be_class);
+    }
+};
+
+struct UnionTests:
+    UnionTestsImpl<stdex::detail::_is_union_intrinsic<UnionType>::value>
+{};
+
 int main(void)
 {
     using namespace stdex;
@@ -92,9 +113,8 @@ int main(void)
         STATIC_ASSERT(is_class<member5_t>::value == (false), can_not_be_class);
         STATIC_ASSERT(is_class<member6_t>::value == (false), can_not_be_class);
         STATIC_ASSERT(is_class<EnumType>::value == (false), can_not_be_class);
-        // when bug is fixed uncomment this:
-        //STATIC_ASSERT(is_class<UnionType>::value == (false), can_not_be_class);
-        //STATIC_ASSERT(is_class<ConvUnionType>::value == (false), can_not_be_class);
+
+        UnionTests::test();
     }
     return 0;
 }
