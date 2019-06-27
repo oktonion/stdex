@@ -19,13 +19,22 @@
 // maximum possible range of N-bit signed integers is from {-2^(N-1)} to {+2^(N-1)} 
 // (from {-(2^(N-1))} to {+2^(N-1) - 1} or (prior to C++20) from {-(2^(N-1) - 1)} to {+2^(N-1)})
 
+// checking if two's-complement representation is used
+#define _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED ( (SCHAR_MAX + SCHAR_MIN) == -1 )
+
+#if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
+    #define _STDEX_MINUS_ONE -1
+#else
+    #define _STDEX_MINUS_ONE 0
+#endif
+
 // defining minimum rages for 16 and 32 bit types
-#define _STDEX_MIN_RANGE_INT16_LOWER_BOUND -32767 // {-(2^15 - 1)}
+#define _STDEX_MIN_RANGE_INT16_LOWER_BOUND (-32767 + _STDEX_MINUS_ONE) // {-(2^15 + _STDEX_MINUS_ONE)}
 #define _STDEX_MIN_RANGE_INT16_UPPER_BOUND 32767 // {+2^15 - 1}
-#define _STDEX_MIN_RANGE_INT32_LOWER_BOUND -2147483647 // {-(2^31 - 1)}
+#define _STDEX_MIN_RANGE_INT32_LOWER_BOUND (-2147483647 + _STDEX_MINUS_ONE) // {-(2^31 + _STDEX_MINUS_ONE)}
 #define _STDEX_MIN_RANGE_INT32_UPPER_BOUND 2147483647 // {+2^31 - 1}
 #if defined(LLONG_MIN) && defined(LLONG_MAX)
-    #define _STDEX_MIN_RANGE_INT64_LOWER_BOUND -9223372036854775807ll // {-(2^63 - 1)}
+    #define _STDEX_MIN_RANGE_INT64_LOWER_BOUND (-9223372036854775807ll + _STDEX_MINUS_ONE) // {-(2^63 + _STDEX_MINUS_ONE)}
     #define _STDEX_MIN_RANGE_INT64_UPPER_BOUND 9223372036854775807ll // {+2^63 - 1}
 #endif
 
@@ -63,6 +72,7 @@
      
 #define _STDEX_PLATFORM_CAN_HAVE_STD_64_BIT_INT \
      ( _STDEX_PLATFORM_CAN_HAVE_STD_8_BIT_MULTIPLE_INT && ( _STDEX_LLONG_IS_IN_INT64_MAX_RANGE || _STDEX_LONG_IS_IN_INT64_MAX_RANGE || _STDEX_INT_IS_IN_INT64_MAX_RANGE || _STDEX_SHRT_IS_IN_INT64_MAX_RANGE || (CHAR_BIT == 64) ) )
+
 
 namespace stdex
 {
@@ -147,16 +157,128 @@ namespace stdex
             _exact_sized_integer_step<_Size>
         {};
 
-        template<int _AtLeast>
-        struct _least_sized_integer:
-            _least_sized_integer_step<_AtLeast>
-        {};
+        template<class _Signed, int _Size>
+        struct _sized_integer_min_impl
+        {
+            static const _Signed min_value;
+        };
+
+        template<class _Signed, int _Size>
+        struct _sized_integer_max_impl
+        {
+            static const _Signed max_value;
+        };
+
+        template<class _Unsigned, int _Size>
+        struct _sized_integer_umax_impl
+        {
+            static const _Unsigned umax_value;
+        };
+
+        template<class _Signed, class _Unsigned, int _Size>
+        struct _max_sized_integer_min_max_impl:
+            _sized_integer_min_impl<_Signed, _Size>,
+            _sized_integer_max_impl<_Signed, _Size>,
+            _sized_integer_umax_impl<_Unsigned, _Size>
+        { };
+
+        struct _max_sized_integer_impl
+        {
+            typedef _max_sized_integer_step<> base_type;
+            typedef base_type::signed_type signed_type;
+            typedef base_type::unsigned_type unsigned_type;
+
+            struct type:
+                _max_sized_integer_step<>,
+                _max_sized_integer_min_max_impl<signed_type, unsigned_type, sizeof(base_type::size)>
+            {};
+        };
 
         struct _max_sized_integer:
-            _max_sized_integer_step<>
-        {};
-    }
+            _max_sized_integer_impl::type
+        { };
+        
+        namespace
+        {
+            typedef detail::_max_sized_integer::signed_type _cstdint_intmax_t;
+            typedef detail::_max_sized_integer::unsigned_type _cstdint_uintmax_t;
+        }
 
+        template<class _Signed, class _Unsigned, int _Size>
+        struct _least_sized_integer_min_max_impl:
+            _sized_integer_min_impl<_Signed, _Size>,
+            _sized_integer_max_impl<_Signed, _Size>,
+            _sized_integer_umax_impl<_Unsigned, _Size>
+        { };
+
+        template<class _Unsigned, int _Size>
+        struct _least_sized_integer_min_max_impl<_cstdint_invalid_type, _Unsigned, _Size>:
+            _sized_integer_umax_impl<_Unsigned, _Size>
+        {
+            typedef _cstdint_invalid_type min_value;
+            typedef _cstdint_invalid_type max_value;
+        };
+
+        template<class _Signed, int _Size>
+        struct _least_sized_integer_min_max_impl<_Signed, _cstdint_invalid_type, _Size>:
+            _sized_integer_min_impl<_Signed, _Size>,
+            _sized_integer_max_impl<_Signed, _Size>
+        {
+        #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
+            static const _Signed min_value = -(1 << _Size);
+        #else
+            static const _Signed min_value = -(1 << _Size) + 1;
+        #endif
+            static const _Signed max_value = (1 << _Size);
+            typedef _cstdint_invalid_type umax_value;
+        };
+
+        template<int _Size>
+        struct _least_sized_integer_min_max_impl<_cstdint_invalid_type, _cstdint_invalid_type, _Size>
+        {
+            typedef _cstdint_invalid_type min_value;
+            typedef _cstdint_invalid_type max_value;
+            typedef _cstdint_invalid_type umax_value;
+        };
+
+        template<int _AtLeast>
+        struct _least_sized_integer_impl
+        {
+            typedef _least_sized_integer_step<_AtLeast> base_type;
+            typedef base_type::signed_type signed_type;
+            typedef base_type::unsigned_type unsigned_type;
+
+            struct type:
+                _least_sized_integer_step<_AtLeast>,
+                _least_sized_integer_min_max_impl<signed_type, unsigned_type, sizeof(base_type::size)>
+            {};
+        };
+
+        template<int _AtLeast>
+        struct _least_sized_integer:
+            _least_sized_integer_impl<_AtLeast>::type
+        {};
+    } // namespace detail
+} // namespace stdex
+
+#if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
+    template<class _Signed, int _Size>
+    const _Signed 
+        stdex::detail::_sized_integer_min_impl<_Signed, _Size>::min_value = -(1 << _Size);
+#else
+    template<class _Signed, int _Size>
+    const _Signed 
+        stdex::detail::_sized_integer_min_impl<_Signed, _Size>::min_value = (-(1 << _Size) + 1);
+#endif
+    template<class _Signed, int _Size>
+    const _Signed 
+        stdex::detail::_sized_integer_max_impl<_Signed, _Size>::max_value = (1 << _Size);
+    template<class _Unsigned, int _Size>
+    const _Unsigned 
+        stdex::detail::_sized_integer_umax_impl<_Unsigned, _Size>::umax_value = (1 << _Size) * 2;
+
+namespace stdex
+{
     typedef detail::_least_sized_integer<8>::signed_type    int_least8_t;
     typedef detail::_least_sized_integer<8>::unsigned_type  uint_least8_t;
     typedef detail::_least_sized_integer<16>::signed_type   int_least16_t;
@@ -175,8 +297,8 @@ namespace stdex
     typedef uint_least32_t   uint_fast32_t;
     typedef uint_least64_t   uint_fast64_t;
  
-    typedef detail::_max_sized_integer::signed_type intmax_t;
-    typedef detail::_max_sized_integer::unsigned_type uintmax_t;
+    typedef detail::_cstdint_intmax_t intmax_t;
+    typedef detail::_cstdint_uintmax_t uintmax_t;
 
     // optional
 #if _STDEX_PLATFORM_CAN_HAVE_STD_8_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_8_BIT_INT
@@ -201,42 +323,40 @@ namespace stdex
 };
 
 // Macro constants
-#define INT_FAST8_MIN
-#define INT_FAST16_MIN
-#define INT_FAST32_MIN
-#define INT_FAST64_MIN
-#define INT_LEAST8_MIN
-#define INT_LEAST16_MIN
-#define INT_LEAST32_MIN
-#define INT_LEAST64_MIN
-#define INTPTR_MIN
-#define INTMAX_MIN
+#define INT_LEAST8_MIN  (detail::_least_sized_integer<8>::min_value)
+#define INT_LEAST16_MIN (detail::_least_sized_integer<16>::min_value)
+#define INT_LEAST32_MIN (detail::_least_sized_integer<32>::min_value)
+#define INT_LEAST64_MIN (detail::_least_sized_integer<64>::min_value)
+#define INT_FAST8_MIN INT_LEAST8_MIN
+#define INT_FAST16_MIN INT_LEAST16_MIN
+#define INT_FAST32_MIN INT_LEAST32_MIN
+#define INT_FAST64_MIN INT_LEAST64_MIN
+#define INTPTR_MIN (detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::min_value)
+#define INTMAX_MIN (detail::_max_sized_integer::min_value)
  
 
-
-#define INT_FAST8_MAX
-#define INT_FAST16_MAX
-#define INT_FAST32_MAX
-#define INT_FAST64_MAX
-#define INT_LEAST8_MAX
-#define INT_LEAST16_MAX
-#define INT_LEAST32_MAX
-#define INT_LEAST64_MAX
-#define INTPTR_MAX
-#define INTMAX_MAX
-
+#define INT_LEAST8_MAX  (detail::_least_sized_integer<8>::max_value)
+#define INT_LEAST16_MAX (detail::_least_sized_integer<16>::max_value)
+#define INT_LEAST32_MAX (detail::_least_sized_integer<32>::max_value)
+#define INT_LEAST64_MAX (detail::_least_sized_integer<64>::max_value)
+#define INT_FAST8_MAX INT_LEAST8_MAX
+#define INT_FAST16_MAX INT_LEAST16_MAX
+#define INT_FAST32_MAX INT_LEAST32_MAX
+#define INT_FAST64_MAX INT_LEAST64_MAX
+#define INTPTR_MAX (detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::max_value)
+#define INTMAX_MAX (detail::_max_sized_integer::max_value)
 
 
-#define UINT_FAST8_MAX
-#define UINT_FAST16_MAX
-#define UINT_FAST32_MAX
-#define UINT_FAST64_MAX
-#define UINT_LEAST8_MAX
-#define UINT_LEAST16_MAX
-#define UINT_LEAST32_MAX
-#define UINT_LEAST64_MAX
-#define UINTPTR_MAX
-#define UINTMAX_MAX
+#define UINT_LEAST8_MAX  (detail::_least_sized_integer<8>::umax_value)
+#define UINT_LEAST16_MAX (detail::_least_sized_integer<16>::umax_value)
+#define UINT_LEAST32_MAX (detail::_least_sized_integer<32>::umax_value)
+#define UINT_LEAST64_MAX (detail::_least_sized_integer<64>::umax_value)
+#define UINT_FAST8_MAX UINT_LEAST8_MAX
+#define UINT_FAST16_MAX UINT_LEAST16_MAX
+#define UINT_FAST32_MAX UINT_LEAST32_MAX
+#define UINT_FAST64_MAX UINT_LEAST64_MAX
+#define UINTPTR_MAX (detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::umax_value)
+#define UINTMAX_MAX (detail::_max_sized_integer::umax_value)
 
 // optional
 #if _STDEX_PLATFORM_CAN_HAVE_STD_8_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_8_BIT_INT
@@ -244,39 +364,56 @@ namespace stdex
     #define INT8_C(value) static_cast<stdex::int8_t>(value)
     #define UINT8_C(value) static_cast<stdex::uint8_t>(value)
     // Macro constants
-    #define INT8_MIN 
-    #define INT8_MAX 
-    #define UINT8_MAX 
+    #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
+        #define INT8_MIN -128
+    #else
+        #define INT8_MIN -127
+    #endif
+    #define INT8_MAX 127
+    #define UINT8_MAX 255
 #endif
 #if _STDEX_PLATFORM_CAN_HAVE_STD_16_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_16_BIT_INT
     // Function macros for minimum-width integer constants
     #define INT16_C(value) static_cast<stdex::int16_t>(value)
     #define UINT16_C(value) static_cast<stdex::uint16_t>(value)
     // Macro constants
-    #define INT16_MIN
-    #define INT16_MAX
-    #define UINT16_MAX
+    #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
+        #define INT16_MIN -32768
+    #else
+        #define INT16_MIN -32767
+    #endif
+    #define INT16_MAX 32767
+    #define UINT16_MAX 65535
 #endif
 #if _STDEX_PLATFORM_CAN_HAVE_STD_32_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_32_BIT_INT
     // Function macros for minimum-width integer constants
     #define INT32_C(value) static_cast<stdex::int32_t>(value)
     #define UINT32_C(value) static_cast<stdex::uint32_t>(value)
     // Macro constants
-    #define INT32_MIN
-    #define INT32_MAX
-    #define UINT32_MAX
+    #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
+        #define INT32_MIN -2147483648
+    #else
+        #define INT32_MIN -2147483647
+    #endif
+    #define INT32_MAX 2147483647
+    #define UINT32_MAX 4294967295
 #endif
 #if _STDEX_PLATFORM_CAN_HAVE_STD_64_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_64_BIT_INT
     // Function macros for minimum-width integer constants
     #define INT64_C(value) static_cast<stdex::int64_t>(value)
     #define UINT64_C(value) static_cast<stdex::uint64_t>(value)
     // Macro constants
-    #define INT64_MIN
-    #define INT64_MAX
-    #define UINT64_MAX
+    #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
+        #define INT64_MIN -9223372036854775808
+    #else
+        #define INT64_MIN -9223372036854775807
+    #endif
+    #define INT64_MAX 9223372036854775807
+    #define UINT64_MAX 18446744073709551615
 #endif
 
 // clear from defines
+#undef _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
 #undef _STDEX_MIN_RANGE_INT16_LOWER_BOUND
 #undef _STDEX_MIN_RANGE_INT16_UPPER_BOUND
 #undef _STDEX_MIN_RANGE_INT32_LOWER_BOUND
@@ -299,8 +436,12 @@ namespace stdex
 #undef _STDEX_PLATFORM_CAN_HAVE_STD_8_BIT_MULTIPLE_INT
 
 #undef _STDEX_PLATFORM_CAN_HAVE_STD_8_BIT_INT
+#undef _STDEX_PLATFORM_CAN_HAVE_NON_STD_8_BIT_INT
 #undef _STDEX_PLATFORM_CAN_HAVE_STD_16_BIT_INT
+#undef _STDEX_PLATFORM_CAN_HAVE_NON_STD_16_BIT_INT
 #undef _STDEX_PLATFORM_CAN_HAVE_STD_32_BIT_INT
+#undef _STDEX_PLATFORM_CAN_HAVE_NON_STD_32_BIT_INT
 #undef _STDEX_PLATFORM_CAN_HAVE_STD_64_BIT_INT
+#undef _STDEX_PLATFORM_CAN_HAVE_NON_STD_64_BIT_INT
 
 #endif // _STDEX_CSTDINT_H
