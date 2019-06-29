@@ -6,16 +6,17 @@
 #endif // _MSC_VER > 1000
 
 // stdex includes
-#include "./ratio"
-#include "./type_traits"
+#include "./cstdint.hpp" // stdex::intmax_t, INTMAX_MAX, INTMAX_MIN
+#include "./ratio" // all ratio
+//#include "./type_traits" //???
 
 // POSIX includes
 /*none*/
 
 // std includes
-#include <time.h>
-#include <climits>
-#include <limits>
+#include <time.h> // ::time_t - need to be changed
+//#include <climits> //???
+#include <limits> // std::numeric_limit
 
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
@@ -180,7 +181,7 @@ namespace stdex
 			typedef typename _ToDur::period				_to_period;
 			typedef typename _ToDur::rep				_to_rep;
 			typedef ratio_divide<_Period, _to_period> 		_cf;
-			typedef typename common_type<_to_rep, _Rep, intmax_t>::type
+			typedef typename common_type<_to_rep, _Rep, stdex::intmax_t>::type
 				_cr;
 			typedef  _duration_cast_impl<_ToDur, _cf, _cr,
 				_cf::num == 1, _cf::den == 1> _dc;
@@ -225,26 +226,26 @@ namespace stdex
 		};
 
 		template<>
-		struct duration_values<intmax_t>
+		struct duration_values<stdex::intmax_t>
 		{
-			static intmax_t zero()
+			static stdex::intmax_t zero()
 			{
-				return intmax_t(0);
+				return stdex::intmax_t(0);
 			}
 
 			#ifdef max
-			static intmax_t(max)()
+			static stdex::intmax_t(max)()
 			#else
-			static intmax_t max()
+			static stdex::intmax_t max()
 			#endif
 			{
 				return INTMAX_MAX;
 			}
 
 			#ifdef min
-			static intmax_t(min)()
+			static stdex::intmax_t(min)()
 			#else
-			static intmax_t min()
+			static stdex::intmax_t min()
 			#endif
 			{
 				return INTMAX_MIN;
@@ -253,33 +254,33 @@ namespace stdex
 			// since we have no constexpr use this in template params
 			struct template_constants
 			{
-				static const intmax_t zero = 0;
-				static const intmax_t max = INTMAX_MAX;
-				static const intmax_t min = INTMAX_MIN;
+				static const stdex::intmax_t zero = 0;
+				static const stdex::intmax_t max = INTMAX_MAX;
+				static const stdex::intmax_t min = INTMAX_MIN;
 			};
 		};
 
 		template<>
-		struct duration_values<uintmax_t>
+		struct duration_values<stdex::uintmax_t>
 		{
-			static uintmax_t zero()
+			static stdex::uintmax_t zero()
 			{
-				return uintmax_t(0);
+				return stdex::uintmax_t(0);
 			}
 
 			#ifdef max
-			static uintmax_t(max)()
+			static stdex::uintmax_t(max)()
 			#else
-			static uintmax_t max()
+			static stdex::uintmax_t max()
 			#endif
 			{
 				return UINTMAX_MAX;
 			}
 
 			#ifdef min
-			static uintmax_t(min)()
+			static stdex::uintmax_t(min)()
 			#else
-			static uintmax_t min()
+			static stdex::uintmax_t min()
 			#endif
 			{
 				return 0;
@@ -288,9 +289,9 @@ namespace stdex
 			// since we have no constexpr use this in template params
 			struct template_constants
 			{
-				static const uintmax_t zero = 0;
-				static const uintmax_t max = UINTMAX_MAX;
-				static const uintmax_t min = 0;
+				static const stdex::uintmax_t zero = 0;
+				static const stdex::uintmax_t max = UINTMAX_MAX;
+				static const stdex::uintmax_t min = 0;
 			};
 		};
 
@@ -300,7 +301,7 @@ namespace stdex
 			static const bool value = false;
 		};
 
-		template<intmax_t _Num, intmax_t _Den>
+		template<stdex::intmax_t _Num, stdex::intmax_t _Den>
 		struct _is_ratio< ratio<_Num, _Den> >
 		{ 
 			static const bool value = true;
@@ -658,12 +659,12 @@ namespace stdex
 		}
 
 		// Standard duration types.
-		typedef duration<intmax_t, ratio<1, 1000000000> > nanoseconds; //!< Duration with the unit nanoseconds.
-		typedef duration<intmax_t, ratio<1, 1000000> > microseconds;   //!< Duration with the unit microseconds.
-		typedef duration<intmax_t, ratio<1, 1000> > milliseconds;      //!< Duration with the unit milliseconds.
-		typedef duration<intmax_t> seconds;                            //!< Duration with the unit seconds.
-		typedef duration<intmax_t, ratio<60> > minutes;                //!< Duration with the unit minutes.
-		typedef duration<intmax_t, ratio<3600> > hours;                //!< Duration with the unit hours.
+		typedef duration<stdex::intmax_t, ratio<1, 1000000000> > nanoseconds; //!< Duration with the unit nanoseconds.
+		typedef duration<stdex::intmax_t, ratio<1, 1000000> > microseconds;   //!< Duration with the unit microseconds.
+		typedef duration<stdex::intmax_t, ratio<1, 1000> > milliseconds;      //!< Duration with the unit milliseconds.
+		typedef duration<stdex::intmax_t> seconds;                            //!< Duration with the unit seconds.
+		typedef duration<stdex::intmax_t, ratio<60> > minutes;                //!< Duration with the unit minutes.
+		typedef duration<stdex::intmax_t, ratio<3600> > hours;                //!< Duration with the unit hours.
 
 		template<class _Clock, class _Duration>
 		class time_point
