@@ -1,9 +1,10 @@
 #include "../stdex/include/core.h"
 #include "../stdex/include/ratio.hpp"
+#include "../stdex/include/cstdint.hpp"
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 
-static const stdex::intmax_t M = stdex::_intmax_t_info::signed_max;
+static const stdex::intmax_t M = INTMAX_MAX;
 
 int main(void)
 {
