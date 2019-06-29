@@ -5,7 +5,17 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include <cstddef>
+// stdex includes
+/*none*/
+
+// POSIX includes
+/*none*/
+
+// std includes
+#include <cstddef> // ptrdiff_t, size_t, NULL
+#include <cwchar> // wchar_t, wint_t, WCHAR_MAX, WCHAR_MIN
+#include <cwctype> // wctype_t
+
 #if !defined(CHAR_BIT)
     #include <climits> // CHAR_BIT, {TYPE}_MIN, {TYPE}_MAX
 #endif
@@ -93,7 +103,7 @@ namespace stdex
             struct _is_integral_constant
             {
                 static const bool value = 
-                    sizeof(_is_integral_constant_helper::check(_Tp(0))) == sizeof(cstdint_detail::_yes_type) &&
+                    sizeof(_is_integral_constant_helper::check(_Tp(NULL))) == sizeof(cstdint_detail::_yes_type) &&
                     sizeof(_is_integral_constant_helper::check(_Tp(1))) == sizeof(cstdint_detail::_no_type);
             };
 
@@ -121,7 +131,51 @@ namespace stdex
                 static const bool value = false;
             };
 
+            template<class _Tp>
+            struct _is_signed
+            {
+                static const bool value = _Tp(-1) < _Tp(0);
+            };
+
+            template<class _Tp>
+            struct _is_unsigned
+            {
+                static const bool value = _Tp(0) < _Tp(-1);
+            };
+
             typedef void _cstdint_invalid_type;
+
+            template<class _Tp, bool>
+            struct _signed_definer
+            {
+                typedef _Tp signed signed_type;  
+            };
+
+            template<class _Tp>
+            struct _signed_definer<_Tp, true>
+            {
+                typedef _Tp signed_type;  
+            };
+
+            template<class _Tp, bool>
+            struct _unsigned_definer
+            {
+                typedef _Tp unsigned unsigned_type;  
+            };
+
+            template<class _Tp>
+            struct _unsigned_definer<_Tp, true>
+            {
+                typedef _Tp unsigned_type;  
+            };
+
+            template<class _Tp>
+            struct _signed_unsigned:
+                _signed_definer<_Tp, cstdint_detail::_is_signed<_Tp>::value>,
+                _unsigned_definer<_Tp, cstdint_detail::_is_unsigned<_Tp>::value>
+            { };
+
+            
             enum {_cstdint_invalid_size = 9999};
             template<int> struct _sized_integer_map_impl {static const char size[_cstdint_invalid_size]; typedef _cstdint_invalid_type signed_type;  typedef _cstdint_invalid_type unsigned_type;};
             enum {_sized_integer_rank = __LINE__};
@@ -137,7 +191,11 @@ namespace stdex
         #if defined(LLONG_MIN) && defined(LLONG_MAX) && defined(ULLONG_MAX)
             template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)> {static const char size[int(sizeof(long long int) * CHAR_BIT)]; typedef long long int signed_type;  typedef unsigned long long int unsigned_type; };
         #endif
-            template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)> {static const char size[int(sizeof(std::ptrdiff_t) * CHAR_BIT)]; typedef std::ptrdiff_t signed_type;  typedef _cstdint_invalid_type unsigned_type; };
+        #if defined(WCHAR_MAX) && defined(WCHAR_MIN)
+            template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)>: _signed_unsigned<wchar_t> { static const char size[int(sizeof(wchar_t) * CHAR_BIT)]; };
+        #endif
+            template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)>: _signed_unsigned<std::ptrdiff_t> { static const char size[int(sizeof(std::ptrdiff_t) * CHAR_BIT)]; };
+            template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)>: _signed_unsigned<std::wint_t> { static const char size[int(sizeof(std::wint_t) * CHAR_BIT)]; };
             enum {_sized_integer_max_rank = __LINE__ - _sized_integer_rank};
 
             template<int _Rank, bool _IsIntConst> 
