@@ -5,7 +5,17 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include <cstddef>
+// stdex includes
+/*none*/
+
+// POSIX includes
+/*none*/
+
+// std includes
+#include <cstddef> // ptrdiff_t, size_t, NULL
+#include <cwchar> // wchar_t, wint_t, WCHAR_MAX, WCHAR_MIN
+#include <cwctype> // wctype_t
+
 #if !defined(CHAR_BIT)
     #include <climits> // CHAR_BIT, {TYPE}_MIN, {TYPE}_MAX
 #endif
@@ -93,7 +103,7 @@ namespace stdex
             struct _is_integral_constant
             {
                 static const bool value = 
-                    sizeof(_is_integral_constant_helper::check(_Tp(0))) == sizeof(cstdint_detail::_yes_type) &&
+                    sizeof(_is_integral_constant_helper::check(_Tp(NULL))) == sizeof(cstdint_detail::_yes_type) &&
                     sizeof(_is_integral_constant_helper::check(_Tp(1))) == sizeof(cstdint_detail::_no_type);
             };
 
@@ -121,7 +131,51 @@ namespace stdex
                 static const bool value = false;
             };
 
+            template<class _Tp>
+            struct _is_signed
+            {
+                static const bool value = _Tp(-1) < _Tp(0);
+            };
+
+            template<class _Tp>
+            struct _is_unsigned
+            {
+                static const bool value = _Tp(0) < _Tp(-1);
+            };
+
             typedef void _cstdint_invalid_type;
+
+            template<class _Tp, bool>
+            struct _signed_definer
+            {
+                typedef _Tp signed signed_type;  
+            };
+
+            template<class _Tp>
+            struct _signed_definer<_Tp, true>
+            {
+                typedef _Tp signed_type;  
+            };
+
+            template<class _Tp, bool>
+            struct _unsigned_definer
+            {
+                typedef _Tp unsigned unsigned_type;  
+            };
+
+            template<class _Tp>
+            struct _unsigned_definer<_Tp, true>
+            {
+                typedef _Tp unsigned_type;  
+            };
+
+            template<class _Tp>
+            struct _signed_unsigned:
+                _signed_definer<_Tp, cstdint_detail::_is_signed<_Tp>::value>,
+                _unsigned_definer<_Tp, cstdint_detail::_is_unsigned<_Tp>::value>
+            { };
+
+            
             enum {_cstdint_invalid_size = 9999};
             template<int> struct _sized_integer_map_impl {static const char size[_cstdint_invalid_size]; typedef _cstdint_invalid_type signed_type;  typedef _cstdint_invalid_type unsigned_type;};
             enum {_sized_integer_rank = __LINE__};
@@ -137,7 +191,11 @@ namespace stdex
         #if defined(LLONG_MIN) && defined(LLONG_MAX) && defined(ULLONG_MAX)
             template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)> {static const char size[int(sizeof(long long int) * CHAR_BIT)]; typedef long long int signed_type;  typedef unsigned long long int unsigned_type; };
         #endif
-            template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)> {static const char size[int(sizeof(std::ptrdiff_t) * CHAR_BIT)]; typedef std::ptrdiff_t signed_type;  typedef _cstdint_invalid_type unsigned_type; };
+        #if defined(WCHAR_MAX) && defined(WCHAR_MIN)
+            template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)>: _signed_unsigned<wchar_t> { static const char size[int(sizeof(wchar_t) * CHAR_BIT)]; };
+        #endif
+            template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)>: _signed_unsigned<std::ptrdiff_t> { static const char size[int(sizeof(std::ptrdiff_t) * CHAR_BIT)]; };
+            template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)>: _signed_unsigned<std::wint_t> { static const char size[int(sizeof(std::wint_t) * CHAR_BIT)]; };
             enum {_sized_integer_max_rank = __LINE__ - _sized_integer_rank};
 
             template<int _Rank, bool _IsIntConst> 
@@ -356,10 +414,18 @@ namespace stdex
     typedef detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::unsigned_type uintptr_t;
 } // namespace stdex
 
-// Macro constants
+// undef any std macros
 
 #undef INTMAX_C
 #undef UINTMAX_C
+#undef INT8_C
+#undef UINT8_C
+#undef INT16_C
+#undef UINT16_C
+#undef INT32_C
+#undef UINT32_C
+#undef INT64_C
+#undef UINT64_C
 
 #undef INT_LEAST8_MIN  
 #undef INT_LEAST16_MIN 
@@ -396,9 +462,20 @@ namespace stdex
 #undef UINTPTR_MAX 
 #undef UINTMAX_MAX 
 
+// Function macros for minimum-width integer constants
 #define INTMAX_C(value) static_cast<stdex::intmax_t>(value)
 #define UINTMAX_C(value) static_cast<stdex::uintmax_t>(value)
 
+#define INT8_C(value) static_cast<stdex::int_least8_t>(value)
+#define UINT8_C(value) static_cast<stdex::uint_least8_t>(value)
+#define INT16_C(value) static_cast<stdex::int16_t>(value)
+#define UINT16_C(value) static_cast<stdex::uint16_t>(value)   
+#define INT32_C(value) static_cast<stdex::int32_t>(value)
+#define UINT32_C(value) static_cast<stdex::uint32_t>(value)
+#define INT64_C(value) static_cast<stdex::int64_t>(value)
+#define UINT64_C(value) static_cast<stdex::uint64_t>(value)
+
+// Macro constants
 #define INT_LEAST8_MIN  (stdex::detail::_least_sized_integer<8>::min_value)
 #define INT_LEAST16_MIN (stdex::detail::_least_sized_integer<16>::min_value)
 #define INT_LEAST32_MIN (stdex::detail::_least_sized_integer<32>::min_value)
@@ -436,80 +513,56 @@ namespace stdex
 
 // optional
 #if _STDEX_PLATFORM_CAN_HAVE_STD_8_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_8_BIT_INT
-    #undef INT8_C
-    #undef UINT8_C
     #undef INT8_MIN
     #undef INT8_MAX
     #undef UINT8_MAX
 
-    // Function macros for minimum-width integer constants
-    #define INT8_C(value) static_cast<stdex::int8_t>(value)
-    #define UINT8_C(value) static_cast<stdex::uint8_t>(value)
-    // Macro constants
     #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
-        #define INT8_MIN -128
+        #define INT8_MIN static_cast<stdex::int8_t>(-128)
     #else
-        #define INT8_MIN -127
+        #define INT8_MIN static_cast<stdex::int8_t>(-127)
     #endif
-    #define INT8_MAX 127
-    #define UINT8_MAX 255
+    #define INT8_MAX static_cast<stdex::int8_t>(127)
+    #define UINT8_MAX static_cast<stdex::uint8_t>(255)
 #endif
 #if _STDEX_PLATFORM_CAN_HAVE_STD_16_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_16_BIT_INT
-    #undef INT16_C
-    #undef UINT16_C
     #undef INT16_MIN
     #undef INT16_MAX
     #undef UINT16_MAX
     
-    // Function macros for minimum-width integer constants
-    #define INT16_C(value) static_cast<stdex::int16_t>(value)
-    #define UINT16_C(value) static_cast<stdex::uint16_t>(value)
-    // Macro constants
     #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
-        #define INT16_MIN -32768
+        #define INT16_MIN static_cast<stdex::int16_t>(-32768)
     #else
-        #define INT16_MIN -32767
+        #define INT16_MIN static_cast<stdex::int16_t>(-32767)
     #endif
-    #define INT16_MAX 32767
-    #define UINT16_MAX 65535
+    #define INT16_MAX static_cast<stdex::int16_t>(32767)
+    #define UINT16_MAX static_cast<stdex::uint16_t>(65535)
 #endif
 #if _STDEX_PLATFORM_CAN_HAVE_STD_32_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_32_BIT_INT
-    #undef INT32_C
-    #undef UINT32_C
     #undef INT32_MIN
     #undef INT32_MAX
     #undef UINT32_MAX
     
-    // Function macros for minimum-width integer constants
-    #define INT32_C(value) static_cast<stdex::int32_t>(value)
-    #define UINT32_C(value) static_cast<stdex::uint32_t>(value)
-    // Macro constants
     #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
-        #define INT32_MIN -2147483648
+        #define INT32_MIN static_cast<stdex::int32_t>(-2147483648)
     #else
-        #define INT32_MIN -2147483647
+        #define INT32_MIN static_cast<stdex::int32_t>(-2147483647)
     #endif
-    #define INT32_MAX 2147483647
-    #define UINT32_MAX 4294967295
+    #define INT32_MAX static_cast<stdex::int32_t>(2147483647)
+    #define UINT32_MAX static_cast<stdex::uint32_t>(4294967295)
 #endif
 #if _STDEX_PLATFORM_CAN_HAVE_STD_64_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_64_BIT_INT
-    #undef INT64_C
-    #undef UINT64_C
     #undef INT64_MIN
     #undef INT64_MAX
     #undef UINT64_MAX
     
-    // Function macros for minimum-width integer constants
-    #define INT64_C(value) static_cast<stdex::int64_t>(value)
-    #define UINT64_C(value) static_cast<stdex::uint64_t>(value)
-    // Macro constants
     #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
-        #define INT64_MIN -9223372036854775808
+        #define INT64_MIN static_cast<stdex::int64_t>(-9223372036854775808)
     #else
-        #define INT64_MIN -9223372036854775807
+        #define INT64_MIN static_cast<stdex::int64_t>(-9223372036854775807)
     #endif
-    #define INT64_MAX 9223372036854775807
-    #define UINT64_MAX 18446744073709551615
+    #define INT64_MAX static_cast<stdex::int64_t>(9223372036854775807)
+    #define UINT64_MAX static_cast<stdex::uint64_t>(18446744073709551615)
 #endif
 
 // clean from defines
