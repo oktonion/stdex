@@ -25,7 +25,9 @@ cd .\stdex
 for /f %%f in ('dir /b ".\src\*.cpp"') do (
   echo "compiling %%~nf"
   bcc32 -w -tWM -Q -n.\obj\ -I%cd%\..\pthread\ -c ".\src\%%f" %build_opt%
-  if ERRORLEVEL 1 set "build_ok=0"
+  if ERRORLEVEL 1 (
+    set "build_ok=0"
+  )
 )
 
 if /I "%build_ok%" NEQ "1" (
