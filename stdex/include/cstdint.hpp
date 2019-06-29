@@ -67,26 +67,94 @@ namespace stdex
 {
     namespace detail
     {
-        namespace
+        namespace cstdint_detail
         {
+            struct _constructible_from_any
+            {
+                template<class T>
+                _constructible_from_any(T);
+            };
+
+            typedef char _yes_type;
+            struct _no_type
+            {
+                char padding[8];
+            };
+
+            class _is_integral_constant_helper
+            {
+                class type;
+            public:
+                static cstdint_detail::_yes_type check(type*);
+                static cstdint_detail::_no_type check(_constructible_from_any);
+            };
+
+            template<class _Tp>
+            struct _is_integral_constant
+            {
+                static const bool value = 
+                    sizeof(_is_integral_constant_helper::check(_Tp(0))) == sizeof(cstdint_detail::_yes_type) &&
+                    sizeof(_is_integral_constant_helper::check(_Tp(1))) == sizeof(cstdint_detail::_no_type);
+            };
+
+            template<class _Tp>
+            struct _is_integral_constant<_Tp&>
+            {
+                static const bool value = false;
+            };
+
+            template<class _Tp>
+            struct _is_integral_constant<_Tp*>
+            {
+                static const bool value = false;
+            };
+
+            template<class _Tp, class _Cp>
+            struct _is_integral_constant<_Tp _Cp::*>
+            {
+                static const bool value = false;
+            };
+
+            template<>
+            struct _is_integral_constant<void>
+            {
+                static const bool value = false;
+            };
+
             typedef void _cstdint_invalid_type;
             enum {_cstdint_invalid_size = 9999};
-            template<int> struct _sized_integer_map {static const char size[_cstdint_invalid_size]; typedef _cstdint_invalid_type signed_type;  typedef _cstdint_invalid_type unsigned_type;};
+            template<int> struct _sized_integer_map_impl {static const char size[_cstdint_invalid_size]; typedef _cstdint_invalid_type signed_type;  typedef _cstdint_invalid_type unsigned_type;};
             enum {_sized_integer_rank = __LINE__};
-            template<> struct _sized_integer_map<(__LINE__ - _sized_integer_rank)> {static const char size[int(sizeof(char) * CHAR_BIT)]; typedef signed char signed_type;  typedef unsigned char unsigned_type; };
-            template<> struct _sized_integer_map<(__LINE__ - _sized_integer_rank)> {static const char size[int(sizeof(short int) * CHAR_BIT)]; typedef short int signed_type;  typedef unsigned short int unsigned_type; };
-            template<> struct _sized_integer_map<(__LINE__ - _sized_integer_rank)> {static const char size[int(sizeof(int) * CHAR_BIT)]; typedef int signed_type;  typedef unsigned int unsigned_type; };
-            template<> struct _sized_integer_map<(__LINE__ - _sized_integer_rank)> {static const char size[int(sizeof(long int) * CHAR_BIT)]; typedef long int signed_type;  typedef unsigned long int unsigned_type; };
+            template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)> {static const char size[int(sizeof(char) * CHAR_BIT)]; typedef signed char signed_type;  typedef unsigned char unsigned_type; };
+            template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)> {static const char size[int(sizeof(short int) * CHAR_BIT)]; typedef short int signed_type;  typedef unsigned short int unsigned_type; };
+            template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)> {static const char size[int(sizeof(int) * CHAR_BIT)]; typedef int signed_type;  typedef unsigned int unsigned_type; };
+            template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)> {static const char size[int(sizeof(long int) * CHAR_BIT)]; typedef long int signed_type;  typedef unsigned long int unsigned_type; };
 
         #if (_INTEGRAL_MAX_BITS == 64) // hack for MSVC and Borland C++ compilers
             #define _STDEX_PLATFORM_CAN_HAVE_NON_STD_64_BIT_INT 1
-            template<> struct _sized_integer_map<(__LINE__ - _sized_integer_rank)> {static const char size[int(sizeof(__int64) * CHAR_BIT)]; typedef __int64 signed_type;  typedef unsigned __int64 unsigned_type; };
+            template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)> {static const char size[int(sizeof(__int64) * CHAR_BIT)]; typedef __int64 signed_type;  typedef unsigned __int64 unsigned_type; };
         #endif
         #if defined(LLONG_MIN) && defined(LLONG_MAX) && defined(ULLONG_MAX)
-            template<> struct _sized_integer_map<(__LINE__ - _sized_integer_rank)> {static const char size[int(sizeof(long long int) * CHAR_BIT)]; typedef long long int signed_type;  typedef unsigned long long int unsigned_type; };
+            template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)> {static const char size[int(sizeof(long long int) * CHAR_BIT)]; typedef long long int signed_type;  typedef unsigned long long int unsigned_type; };
         #endif
-            template<> struct _sized_integer_map<(__LINE__ - _sized_integer_rank)> {static const char size[int(sizeof(std::ptrdiff_t) * CHAR_BIT)]; typedef std::ptrdiff_t signed_type;  typedef _cstdint_invalid_type unsigned_type; };
+            template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)> {static const char size[int(sizeof(std::ptrdiff_t) * CHAR_BIT)]; typedef std::ptrdiff_t signed_type;  typedef _cstdint_invalid_type unsigned_type; };
             enum {_sized_integer_max_rank = __LINE__ - _sized_integer_rank};
+
+            template<int _Rank, bool _IsIntConst> 
+            struct _sized_integer_map_helper:
+                _sized_integer_map_impl<_sized_integer_max_rank>
+            { };
+
+            template<int _Rank> 
+            struct _sized_integer_map_helper<_Rank, true>:
+                _sized_integer_map_impl<_Rank>
+            { };
+
+            template<int _Rank> 
+            struct _sized_integer_map:
+                _sized_integer_map_helper<_Rank, _is_integral_constant<typename _sized_integer_map_impl<_Rank>::signed_type>::value>
+            { };
+
 
             template<int _BitsCount, int _RankIt = 0, int _Found = sizeof(_sized_integer_map<_RankIt>::size)>
             struct _exact_sized_integer_step:
@@ -139,29 +207,33 @@ namespace stdex
             template<int _FoundRank>
             struct _max_sized_integer_step<_sized_integer_max_rank, _FoundRank>:
                 _sized_integer_map<_FoundRank>{};
-        }
+        } // namespace cstdint_detail
 
         template<int _Size>
         struct _exact_sized_integer:
-            _exact_sized_integer_step<_Size>
+            cstdint_detail::_exact_sized_integer_step<_Size>
         {};
 
         template<class _Signed, int _Size>
         struct _sized_integer_min_impl
         {
-            static const _Signed min_value;
+        #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
+            static const _Signed min_value = -(_Signed(1) << (_Size - 1));
+        #else
+            static const _Signed min_value = (-((_Signed(1) << (_Size - 1)) - _Signed(1)));
+        #endif
         };
 
         template<class _Signed, int _Size>
         struct _sized_integer_max_impl
         {
-            static const _Signed max_value;
+            static const _Signed max_value = ((_Signed(1) << (_Size - 2)) + ((_Signed(1) << (_Size - 2)) - _Signed(1)));
         };
 
         template<class _Unsigned, int _Size>
         struct _sized_integer_umax_impl
         {
-            static const _Unsigned umax_value;
+            static const _Unsigned umax_value = (((_Unsigned(1) << (_Size - 1)) - 1) * _Unsigned(2) + _Unsigned(1));
         };
 
         template<class _Signed, class _Unsigned, int _Size>
@@ -173,25 +245,20 @@ namespace stdex
 
         struct _max_sized_integer_impl
         {
-            typedef _max_sized_integer_step<> base_type;
+            typedef cstdint_detail::_max_sized_integer_step<> base_type;
             typedef base_type::signed_type signed_type;
             typedef base_type::unsigned_type unsigned_type;
+            typedef _max_sized_integer_min_max_impl<signed_type, unsigned_type, sizeof(base_type::size)> min_max_impl;
 
             struct type:
-                _max_sized_integer_step<>,
-                _max_sized_integer_min_max_impl<signed_type, unsigned_type, sizeof(base_type::size)>
-            {};
+                base_type,
+                min_max_impl
+            { };
         };
 
         struct _max_sized_integer:
             _max_sized_integer_impl::type
         { };
-        
-        namespace
-        {
-            typedef detail::_max_sized_integer::signed_type _cstdint_intmax_t;
-            typedef detail::_max_sized_integer::unsigned_type _cstdint_uintmax_t;
-        }
 
         template<class _Signed, class _Unsigned, int _Size>
         struct _least_sized_integer_min_max_impl:
@@ -201,44 +268,38 @@ namespace stdex
         { };
 
         template<class _Unsigned, int _Size>
-        struct _least_sized_integer_min_max_impl<_cstdint_invalid_type, _Unsigned, _Size>:
+        struct _least_sized_integer_min_max_impl<cstdint_detail::_cstdint_invalid_type, _Unsigned, _Size>:
             _sized_integer_umax_impl<_Unsigned, _Size>
         {
-            typedef _cstdint_invalid_type min_value;
-            typedef _cstdint_invalid_type max_value;
+            typedef cstdint_detail::_cstdint_invalid_type min_value;
+            typedef cstdint_detail::_cstdint_invalid_type max_value;
         };
 
         template<class _Signed, int _Size>
-        struct _least_sized_integer_min_max_impl<_Signed, _cstdint_invalid_type, _Size>:
+        struct _least_sized_integer_min_max_impl<_Signed, cstdint_detail::_cstdint_invalid_type, _Size>:
             _sized_integer_min_impl<_Signed, _Size>,
             _sized_integer_max_impl<_Signed, _Size>
         {
-        #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
-            static const _Signed min_value = -(1 << _Size);
-        #else
-            static const _Signed min_value = -(1 << _Size) + 1;
-        #endif
-            static const _Signed max_value = (1 << _Size);
-            typedef _cstdint_invalid_type umax_value;
+            typedef cstdint_detail::_cstdint_invalid_type umax_value;
         };
 
         template<int _Size>
-        struct _least_sized_integer_min_max_impl<_cstdint_invalid_type, _cstdint_invalid_type, _Size>
+        struct _least_sized_integer_min_max_impl<cstdint_detail::_cstdint_invalid_type, cstdint_detail::_cstdint_invalid_type, _Size>
         {
-            typedef _cstdint_invalid_type min_value;
-            typedef _cstdint_invalid_type max_value;
-            typedef _cstdint_invalid_type umax_value;
+            typedef cstdint_detail::_cstdint_invalid_type min_value;
+            typedef cstdint_detail::_cstdint_invalid_type max_value;
+            typedef cstdint_detail::_cstdint_invalid_type umax_value;
         };
 
         template<int _AtLeast>
         struct _least_sized_integer_impl
         {
-            typedef _least_sized_integer_step<_AtLeast> base_type;
-            typedef base_type::signed_type signed_type;
-            typedef base_type::unsigned_type unsigned_type;
+            typedef cstdint_detail::_least_sized_integer_step<_AtLeast> base_type;
+            typedef typename base_type::signed_type signed_type;
+            typedef typename base_type::unsigned_type unsigned_type;
 
             struct type:
-                _least_sized_integer_step<_AtLeast>,
+                base_type,
                 _least_sized_integer_min_max_impl<signed_type, unsigned_type, sizeof(base_type::size)>
             {};
         };
@@ -249,22 +310,6 @@ namespace stdex
         {};
     } // namespace detail
 } // namespace stdex
-
-#if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
-    template<class _Signed, int _Size>
-    const _Signed 
-        stdex::detail::_sized_integer_min_impl<_Signed, _Size>::min_value = -(1 << _Size);
-#else
-    template<class _Signed, int _Size>
-    const _Signed 
-        stdex::detail::_sized_integer_min_impl<_Signed, _Size>::min_value = (-(1 << _Size) + 1);
-#endif
-    template<class _Signed, int _Size>
-    const _Signed 
-        stdex::detail::_sized_integer_max_impl<_Signed, _Size>::max_value = (1 << _Size);
-    template<class _Unsigned, int _Size>
-    const _Unsigned 
-        stdex::detail::_sized_integer_umax_impl<_Unsigned, _Size>::umax_value = (1 << _Size) * 2;
 
 namespace stdex
 {
@@ -286,8 +331,8 @@ namespace stdex
     typedef uint_least32_t   uint_fast32_t;
     typedef uint_least64_t   uint_fast64_t;
  
-    typedef detail::_cstdint_intmax_t intmax_t;
-    typedef detail::_cstdint_uintmax_t uintmax_t;
+    typedef detail::_max_sized_integer::signed_type intmax_t;
+    typedef detail::_max_sized_integer::unsigned_type uintmax_t;
 
     // optional
 #if _STDEX_PLATFORM_CAN_HAVE_STD_8_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_8_BIT_INT
@@ -309,9 +354,12 @@ namespace stdex
  
     typedef detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::signed_type intptr_t;
     typedef detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::unsigned_type uintptr_t;
-};
+} // namespace stdex
 
 // Macro constants
+
+#undef INTMAX_C
+#undef UINTMAX_C
 
 #undef INT_LEAST8_MIN  
 #undef INT_LEAST16_MIN 
@@ -348,40 +396,43 @@ namespace stdex
 #undef UINTPTR_MAX 
 #undef UINTMAX_MAX 
 
-#define INT_LEAST8_MIN  (detail::_least_sized_integer<8>::min_value)
-#define INT_LEAST16_MIN (detail::_least_sized_integer<16>::min_value)
-#define INT_LEAST32_MIN (detail::_least_sized_integer<32>::min_value)
-#define INT_LEAST64_MIN (detail::_least_sized_integer<64>::min_value)
+#define INTMAX_C(value) static_cast<stdex::intmax_t>(value)
+#define UINTMAX_C(value) static_cast<stdex::uintmax_t>(value)
+
+#define INT_LEAST8_MIN  (stdex::detail::_least_sized_integer<8>::min_value)
+#define INT_LEAST16_MIN (stdex::detail::_least_sized_integer<16>::min_value)
+#define INT_LEAST32_MIN (stdex::detail::_least_sized_integer<32>::min_value)
+#define INT_LEAST64_MIN (stdex::detail::_least_sized_integer<64>::min_value)
 #define INT_FAST8_MIN INT_LEAST8_MIN
 #define INT_FAST16_MIN INT_LEAST16_MIN
 #define INT_FAST32_MIN INT_LEAST32_MIN
 #define INT_FAST64_MIN INT_LEAST64_MIN
-#define INTPTR_MIN (detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::min_value)
-#define INTMAX_MIN (detail::_max_sized_integer::min_value)
+#define INTPTR_MIN (stdex::detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::min_value)
+#define INTMAX_MIN (stdex::detail::_max_sized_integer::min_value)
  
 
-#define INT_LEAST8_MAX  (detail::_least_sized_integer<8>::max_value)
-#define INT_LEAST16_MAX (detail::_least_sized_integer<16>::max_value)
-#define INT_LEAST32_MAX (detail::_least_sized_integer<32>::max_value)
-#define INT_LEAST64_MAX (detail::_least_sized_integer<64>::max_value)
+#define INT_LEAST8_MAX  (stdex::detail::_least_sized_integer<8>::max_value)
+#define INT_LEAST16_MAX (stdex::detail::_least_sized_integer<16>::max_value)
+#define INT_LEAST32_MAX (stdex::detail::_least_sized_integer<32>::max_value)
+#define INT_LEAST64_MAX (stdex::detail::_least_sized_integer<64>::max_value)
 #define INT_FAST8_MAX INT_LEAST8_MAX
 #define INT_FAST16_MAX INT_LEAST16_MAX
 #define INT_FAST32_MAX INT_LEAST32_MAX
 #define INT_FAST64_MAX INT_LEAST64_MAX
-#define INTPTR_MAX (detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::max_value)
-#define INTMAX_MAX (detail::_max_sized_integer::max_value)
+#define INTPTR_MAX (stdex::detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::max_value)
+#define INTMAX_MAX (stdex::detail::_max_sized_integer::max_value)
 
 
-#define UINT_LEAST8_MAX  (detail::_least_sized_integer<8>::umax_value)
-#define UINT_LEAST16_MAX (detail::_least_sized_integer<16>::umax_value)
-#define UINT_LEAST32_MAX (detail::_least_sized_integer<32>::umax_value)
-#define UINT_LEAST64_MAX (detail::_least_sized_integer<64>::umax_value)
+#define UINT_LEAST8_MAX  (stdex::detail::_least_sized_integer<8>::umax_value)
+#define UINT_LEAST16_MAX (stdex::detail::_least_sized_integer<16>::umax_value)
+#define UINT_LEAST32_MAX (stdex::detail::_least_sized_integer<32>::umax_value)
+#define UINT_LEAST64_MAX (stdex::detail::_least_sized_integer<64>::umax_value)
 #define UINT_FAST8_MAX UINT_LEAST8_MAX
 #define UINT_FAST16_MAX UINT_LEAST16_MAX
 #define UINT_FAST32_MAX UINT_LEAST32_MAX
 #define UINT_FAST64_MAX UINT_LEAST64_MAX
-#define UINTPTR_MAX (detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::umax_value)
-#define UINTMAX_MAX (detail::_max_sized_integer::umax_value)
+#define UINTPTR_MAX (stdex::detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::umax_value)
+#define UINTMAX_MAX (stdex::detail::_max_sized_integer::umax_value)
 
 // optional
 #if _STDEX_PLATFORM_CAN_HAVE_STD_8_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_8_BIT_INT
