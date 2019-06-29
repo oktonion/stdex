@@ -238,7 +238,7 @@ namespace stdex
 			static intmax_t max()
 			#endif
 			{
-				return _intmax_t_info::signed_max;
+				return INTMAX_MAX;
 			}
 
 			#ifdef min
@@ -247,15 +247,15 @@ namespace stdex
 			static intmax_t min()
 			#endif
 			{
-				return _intmax_t_info::signed_min;
+				return INTMAX_MIN;
 			}
 
 			// since we have no constexpr use this in template params
 			struct template_constants
 			{
 				static const intmax_t zero = 0;
-				static const intmax_t max = _intmax_t_info::signed_max;
-				static const intmax_t min = _intmax_t_info::signed_min;
+				static const intmax_t max = INTMAX_MAX;
+				static const intmax_t min = INTMAX_MIN;
 			};
 		};
 
@@ -273,7 +273,7 @@ namespace stdex
 			static uintmax_t max()
 			#endif
 			{
-				return _intmax_t_info::signed_max * uintmax_t(2) + uintmax_t(1);
+				return UINTMAX_MAX;
 			}
 
 			#ifdef min
@@ -289,7 +289,7 @@ namespace stdex
 			struct template_constants
 			{
 				static const uintmax_t zero = 0;
-				static const uintmax_t max = _intmax_t_info::signed_max * uintmax_t(2) + uintmax_t(1);
+				static const uintmax_t max = UINTMAX_MAX;
 				static const uintmax_t min = 0;
 			};
 		};
