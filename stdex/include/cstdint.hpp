@@ -356,10 +356,18 @@ namespace stdex
     typedef detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::unsigned_type uintptr_t;
 } // namespace stdex
 
-// Macro constants
+// undef any std macros
 
 #undef INTMAX_C
 #undef UINTMAX_C
+#undef INT8_C
+#undef UINT8_C
+#undef INT16_C
+#undef UINT16_C
+#undef INT32_C
+#undef UINT32_C
+#undef INT64_C
+#undef UINT64_C
 
 #undef INT_LEAST8_MIN  
 #undef INT_LEAST16_MIN 
@@ -396,9 +404,20 @@ namespace stdex
 #undef UINTPTR_MAX 
 #undef UINTMAX_MAX 
 
+// Function macros for minimum-width integer constants
 #define INTMAX_C(value) static_cast<stdex::intmax_t>(value)
 #define UINTMAX_C(value) static_cast<stdex::uintmax_t>(value)
 
+#define INT8_C(value) static_cast<stdex::int_least8_t>(value)
+#define UINT8_C(value) static_cast<stdex::uint_least8_t>(value)
+#define INT16_C(value) static_cast<stdex::int16_t>(value)
+#define UINT16_C(value) static_cast<stdex::uint16_t>(value)   
+#define INT32_C(value) static_cast<stdex::int32_t>(value)
+#define UINT32_C(value) static_cast<stdex::uint32_t>(value)
+#define INT64_C(value) static_cast<stdex::int64_t>(value)
+#define UINT64_C(value) static_cast<stdex::uint64_t>(value)
+
+// Macro constants
 #define INT_LEAST8_MIN  (stdex::detail::_least_sized_integer<8>::min_value)
 #define INT_LEAST16_MIN (stdex::detail::_least_sized_integer<16>::min_value)
 #define INT_LEAST32_MIN (stdex::detail::_least_sized_integer<32>::min_value)
@@ -436,80 +455,56 @@ namespace stdex
 
 // optional
 #if _STDEX_PLATFORM_CAN_HAVE_STD_8_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_8_BIT_INT
-    #undef INT8_C
-    #undef UINT8_C
     #undef INT8_MIN
     #undef INT8_MAX
     #undef UINT8_MAX
 
-    // Function macros for minimum-width integer constants
-    #define INT8_C(value) static_cast<stdex::int8_t>(value)
-    #define UINT8_C(value) static_cast<stdex::uint8_t>(value)
-    // Macro constants
     #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
-        #define INT8_MIN -128
+        #define INT8_MIN static_cast<stdex::int8_t>(-128)
     #else
-        #define INT8_MIN -127
+        #define INT8_MIN static_cast<stdex::int8_t>(-127)
     #endif
-    #define INT8_MAX 127
-    #define UINT8_MAX 255
+    #define INT8_MAX static_cast<stdex::int8_t>(127)
+    #define UINT8_MAX static_cast<stdex::uint8_t>(255)
 #endif
 #if _STDEX_PLATFORM_CAN_HAVE_STD_16_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_16_BIT_INT
-    #undef INT16_C
-    #undef UINT16_C
     #undef INT16_MIN
     #undef INT16_MAX
     #undef UINT16_MAX
     
-    // Function macros for minimum-width integer constants
-    #define INT16_C(value) static_cast<stdex::int16_t>(value)
-    #define UINT16_C(value) static_cast<stdex::uint16_t>(value)
-    // Macro constants
     #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
-        #define INT16_MIN -32768
+        #define INT16_MIN static_cast<stdex::int16_t>(-32768)
     #else
-        #define INT16_MIN -32767
+        #define INT16_MIN static_cast<stdex::int16_t>(-32767)
     #endif
-    #define INT16_MAX 32767
-    #define UINT16_MAX 65535
+    #define INT16_MAX static_cast<stdex::int16_t>(32767)
+    #define UINT16_MAX static_cast<stdex::uint16_t>(65535)
 #endif
 #if _STDEX_PLATFORM_CAN_HAVE_STD_32_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_32_BIT_INT
-    #undef INT32_C
-    #undef UINT32_C
     #undef INT32_MIN
     #undef INT32_MAX
     #undef UINT32_MAX
     
-    // Function macros for minimum-width integer constants
-    #define INT32_C(value) static_cast<stdex::int32_t>(value)
-    #define UINT32_C(value) static_cast<stdex::uint32_t>(value)
-    // Macro constants
     #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
-        #define INT32_MIN -2147483648
+        #define INT32_MIN static_cast<stdex::int32_t>(-2147483648)
     #else
-        #define INT32_MIN -2147483647
+        #define INT32_MIN static_cast<stdex::int32_t>(-2147483647)
     #endif
-    #define INT32_MAX 2147483647
-    #define UINT32_MAX 4294967295
+    #define INT32_MAX static_cast<stdex::int32_t>(2147483647)
+    #define UINT32_MAX static_cast<stdex::uint32_t>(4294967295)
 #endif
 #if _STDEX_PLATFORM_CAN_HAVE_STD_64_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_64_BIT_INT
-    #undef INT64_C
-    #undef UINT64_C
     #undef INT64_MIN
     #undef INT64_MAX
     #undef UINT64_MAX
     
-    // Function macros for minimum-width integer constants
-    #define INT64_C(value) static_cast<stdex::int64_t>(value)
-    #define UINT64_C(value) static_cast<stdex::uint64_t>(value)
-    // Macro constants
     #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
-        #define INT64_MIN -9223372036854775808
+        #define INT64_MIN static_cast<stdex::int64_t>(-9223372036854775808)
     #else
-        #define INT64_MIN -9223372036854775807
+        #define INT64_MIN static_cast<stdex::int64_t>(-9223372036854775807)
     #endif
-    #define INT64_MAX 9223372036854775807
-    #define UINT64_MAX 18446744073709551615
+    #define INT64_MAX static_cast<stdex::int64_t>(9223372036854775807)
+    #define UINT64_MAX static_cast<stdex::uint64_t>(18446744073709551615)
 #endif
 
 // clean from defines
