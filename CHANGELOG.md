@@ -48,7 +48,7 @@ visit https://github.com/oktonion/stdex for the latest version of stdex library
 
 ### Removed
 
-- `stdint_ex.h` (use `cstdint.hpp`/`cstdint` instead)
+- `<stdint_ex.h>` for `<cstdint.hpp>`/`<cstdint>`
 
 ## [0.1.3] - 2018-12-29
 
@@ -60,6 +60,7 @@ visit https://github.com/oktonion/stdex for the latest version of stdex library
 - - `begin`
 - - `end`
 - - all of C++ 98 std functions
+
 - `<algorithm>` header:
 - - `all_of`
 - - `any_of`
