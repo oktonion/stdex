@@ -556,7 +556,7 @@ namespace stdex
 				} while (isspace(_c));
 				if (_c == '-') {
 					neg = 1;
-					_c = *s++;
+					_c = *_s++;
 				}
 				else if (_c == '+')
 					_c = *_s++;
@@ -567,7 +567,7 @@ namespace stdex
 					base = 16;
 				}
 				if (base == 0)
-					base = c == '0' ? 8 : 10;
+					base = _c == '0' ? 8 : 10;
 				cutoff = (string_detail::_unsigned_long_long_type) ULLONG_MAX / (string_detail::_unsigned_long_long_type) base;
 				cutlim = (string_detail::_unsigned_long_long_type) ULLONG_MAX % (string_detail::_unsigned_long_long_type) base;
 				for (acc = 0, any = 0;; _c = *_s++) {
