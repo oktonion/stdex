@@ -128,7 +128,7 @@ namespace mutex_tests
         try
         {
             mutex_type mmm;
-            mmmm.lock();
+            mmm.lock();
         }
         catch (const system_error&)
         {
@@ -149,8 +149,8 @@ namespace mutex_tests
 
         try
         {
-            mutex_type m;
-            m.lock();
+            mutex_type mmm;
+            mmm.lock();
 
             // Lock already locked mutex.
             try
@@ -183,8 +183,8 @@ namespace mutex_tests
 
         try
         {
-            mutex_type m;
-            mutex_type::native_handle_type n = m.native_handle();
+            mutex_type mmm;
+            mutex_type::native_handle_type n = mmm.native_handle();
             (void) n;
         }
         catch (const system_error&)
@@ -228,11 +228,11 @@ namespace mutex_tests
         
         try
         {
-            mutex_type m;
-            m.lock();
+            mutex_type mmm;
+            mmm.lock();
             bool b;
 
-            thread t(mutex_tests::try_lock_func, mutex_tests::ref(m), mutex_tests::ref(b));
+            thread t(mutex_tests::try_lock_func, mutex_tests::ref(mmm), mutex_tests::ref(b));
             t.join();
             DYNAMIC_VERIFY(!b);
 
@@ -257,8 +257,8 @@ namespace mutex_tests
         try
         {
             // Unlock mutex that hasn't been locked.
-            mutex_type m;
-            m.unlock();
+            mutex_type mmm;
+            mmm.unlock();
         }
         catch (const system_error&)
         {
