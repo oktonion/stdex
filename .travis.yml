@@ -112,16 +112,13 @@ matrix:
       - BUILD_SCRIPT="./build_tests.bat"
       - RUN_SCRIPT="./run_tests.bat"
       script:
-        cmd //C;
-        echo "script started";
-        "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\vcvars32.bat\"";
-        cd ./stdex;
-        chmod +x $BUILD_LIB_SCRIPT;
-        $BUILD_LIB_SCRIPT;
-        cd ..;
-        chmod +x $BUILD_SCRIPT;
-        $BUILD_SCRIPT;
-        chmod +x $RUN_SCRIPT;
+        cmd //C 
+        echo "script started" &&
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vcvars32.bat" &&
+        cd ./stdex &&
+        $BUILD_LIB_SCRIPT &&
+        cd .. &&
+        $BUILD_SCRIPT &&
         $RUN_SCRIPT
 
     - os: windows
@@ -130,16 +127,13 @@ matrix:
       - BUILD_SCRIPT="./build_tests.bat"
       - RUN_SCRIPT="./run_tests.bat"
       script:
-        cmd //C;
-        echo "script started";
-        "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\vcvars64.bat\"";
-        cd ./stdex;
-        chmod +x $BUILD_LIB_SCRIPT;
-        $BUILD_LIB_SCRIPT;
-        cd ..;
-        chmod +x $BUILD_SCRIPT;
-        $BUILD_SCRIPT;
-        chmod +x $RUN_SCRIPT;
+        cmd //C 
+        echo "script started" &&
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat" &&
+        cd ./stdex &&
+        $BUILD_LIB_SCRIPT &&
+        cd .. &&
+        $BUILD_SCRIPT &&
         $RUN_SCRIPT
 
 script:
