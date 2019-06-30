@@ -108,7 +108,7 @@ matrix:
 
     - os: windows
       before_script:
-      - cd "C:\Program Files (x86)\" && dir
+      - cd "C:\\Program Files (x86)\\" && dir
       #- "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\Community\\VC\\Auxiliary\\Build\\vsvars32.bat"
       env: 
       - BUILD_LIB_SCRIPT="./build_lib.bat"
