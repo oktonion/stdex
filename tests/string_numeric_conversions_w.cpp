@@ -1067,6 +1067,10 @@ namespace wstring_tests
         wstring str = to_wstring(L"testtesttest");
         DYNAMIC_VERIFY(str == L"testtesttest");
 
+        wchar_t test_arr[]= {L't', L'e', L's', L't', L'\0'};
+        wstring str_arr = to_wstring(test_arr);
+        DYNAMIC_VERIFY(str_arr == test_arr);
+
         return 0;
     }
 }

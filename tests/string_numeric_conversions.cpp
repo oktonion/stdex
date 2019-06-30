@@ -1067,6 +1067,10 @@ namespace string_tests
         string str = to_string("testtesttest");
         DYNAMIC_VERIFY(str == "testtesttest");
 
+        char test_arr[]= {'t', 'e', 's', 't', '\0'};
+        string str_arr = to_string(test_arr);
+        DYNAMIC_VERIFY(str_arr == test_arr);
+
         return 0;
     }
 }
