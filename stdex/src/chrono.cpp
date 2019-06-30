@@ -8,9 +8,6 @@
 // std includes
 #include <exception>
 
-using namespace stdex;
-using namespace stdex::chrono;
-
 
 #if defined(WIN32) || defined(_WIN32) // assuming we are on windows platform and have no realtime clock
 
@@ -170,11 +167,11 @@ namespace clock_gettime_impl
 #ifdef LLONG_MAX
 LARGE_INTEGER performanceFrequency;
 
-const bool system_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency);
-const bool steady_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency);
+const bool stdex::chrono::system_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency);
+const bool stdex::chrono::steady_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency);
 #else
-const bool system_clock::is_steady = false;
-const bool steady_clock::is_steady = false;
+const bool stdex::chrono::system_clock::is_steady = false;
+const bool stdex::chrono::steady_clock::is_steady = false;
 #endif
 
 #define CLOCK_REALTIME 0
@@ -197,7 +194,7 @@ int(*clock_gettime_func_pointer)(int X, mytimespec *tv) = &clock_gettime_impl::c
 
 static mach_timebase_info_data_t timebase = { 0, 0 }; /* numer = 0, denom = 0 */
 static struct timespec           inittime = { 0, 0 }; /* nanoseconds since 1-Jan-1970 to init() */
-static uint64_t                  initclock;           /* ticks since boot to init() */
+static ::uint64_t                initclock;           /* ticks since boot to init() */
 
 void init()
 {
@@ -226,11 +223,11 @@ static struct _init_inittime
 struct timespec get_abs_future_time_fine(unsigned milli)
 {
     struct timespec future;     /* ns since 1 Jan 1970 to 1500 ms in future */
-    uint64_t        clock;      /* ticks since init */
-    uint64_t        nano;       /* nanoseconds since init */
+    ::uint64_t      clock;      /* ticks since init */
+    ::uint64_t      nano;       /* nanoseconds since init */
 
     clock = mach_absolute_time() - initclock;
-    nano = clock * (uint64_t)timebase.numer / (uint64_t)timebase.denom;
+    nano = clock * (::uint64_t)timebase.numer / (uint64_t)timebase.denom;
     future = inittime;
     future.tv_sec += nano / BILLION;
     future.tv_nsec += nano % BILLION;
@@ -241,8 +238,8 @@ struct mytimespec:
 	public timespec
 {};
 
-const bool system_clock::is_steady = true;
-const bool steady_clock::is_steady = true;
+const bool stdex::chrono::system_clock::is_steady = true;
+const bool stdex::chrono::steady_clock::is_steady = true;
 
 int clock_gettime(int X, timespec *tv)
 {
@@ -257,8 +254,8 @@ struct mytimespec:
 	public timespec
 {};
 
-const bool system_clock::is_steady = true;
-const bool steady_clock::is_steady = true;
+const bool stdex::chrono::system_clock::is_steady = true;
+const bool stdex::chrono::steady_clock::is_steady = true;
 
 int clock_gettime(int X, timespec *tv);
 int(*clock_gettime_func_pointer)(int X, timespec *tv) = &clock_gettime;
@@ -274,7 +271,7 @@ int(*clock_gettime_func_pointer)(int X, timespec *tv) = &clock_gettime;
 
 #endif
 
-system_clock::time_point system_clock::now() NOEXCEPT_FUNCTION
+stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() NOEXCEPT_FUNCTION
 {	// get current time
 	{
 		mytimespec ts;
@@ -289,7 +286,7 @@ system_clock::time_point system_clock::now() NOEXCEPT_FUNCTION
 	}
 }
 
-steady_clock::time_point steady_clock::now() NOEXCEPT_FUNCTION
+stdex::chrono::steady_clock::time_point stdex::chrono::steady_clock::now() NOEXCEPT_FUNCTION
 {	// get current time
 	{
 		mytimespec ts;
