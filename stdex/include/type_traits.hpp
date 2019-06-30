@@ -953,55 +953,55 @@ namespace stdex
 #undef _IS_MEM_FUN_FASTCALL_PTR
 
 #define _IS_MEM_FUN_PTR_CLR \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R ( _T::*const volatile*)(ARGS)); \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R ( _T::*const volatile*)(ARGS...)); \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R ( _T::*const volatile*)(ARGS) const); \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R ( _T::*const volatile*)(ARGS) volatile); \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R ( _T::*const volatile*)(ARGS) const volatile); \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R ( _T::*const volatile*)(ARGS...) const); \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R ( _T::*const volatile*)(ARGS...) volatile); \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R ( _T::*const volatile*)(ARGS...) const volatile);
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(ARGS)); \
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(ARGS...)); \
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(ARGS) const); \
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(ARGS) volatile); \
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(ARGS) const volatile); \
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(ARGS...) const); \
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(ARGS...) volatile); \
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(ARGS...) const volatile);
 
 #ifdef _STDEX_CDECL
 		_no_type _STDEX_CDECL _is_mem_function_ptr(...);
 
 #define _IS_MEM_FUN_CDECL_PTR \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__cdecl _T::*const volatile*)(ARGS)); \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__cdecl _T::*const volatile*)(ARGS) const); \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__cdecl _T::*const volatile*)(ARGS) volatile); \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__cdecl _T::*const volatile*)(ARGS) const volatile);
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__cdecl _Tp::*const volatile*)(ARGS)); \
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__cdecl _Tp::*const volatile*)(ARGS) const); \
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__cdecl _Tp::*const volatile*)(ARGS) volatile); \
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__cdecl _Tp::*const volatile*)(ARGS) const volatile);
 
 #define _IS_MEM_FUN_STDCALL_PTR \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__stdcall _T::*const volatile*)(ARGS)); \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__stdcall _T::*const volatile*)(ARGS) const); \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__stdcall _T::*const volatile*)(ARGS) volatile); \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__stdcall _T::*const volatile*)(ARGS) const volatile);
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__stdcall _Tp::*const volatile*)(ARGS)); \
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__stdcall _Tp::*const volatile*)(ARGS) const); \
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__stdcall _Tp::*const volatile*)(ARGS) volatile); \
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__stdcall _Tp::*const volatile*)(ARGS) const volatile);
 
 #define _IS_MEM_FUN_FASTCALL_PTR \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__fastcall _T::*const volatile*)(ARGS)); \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__fastcall _T::*const volatile*)(ARGS) const); \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__fastcall _T::*const volatile*)(ARGS) volatile); \
-		template <class _R, class _T _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__fastcall _T::*const volatile*)(ARGS) const volatile);
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__fastcall _Tp::*const volatile*)(ARGS)); \
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__fastcall _Tp::*const volatile*)(ARGS) const); \
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__fastcall _Tp::*const volatile*)(ARGS) volatile); \
+		template <class _R, class _Tp _TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__fastcall _Tp::*const volatile*)(ARGS) const volatile);
 #else
 		_no_type _is_mem_function_ptr(...);
 #define _IS_MEM_FUN_CDECL_PTR

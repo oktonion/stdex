@@ -250,23 +250,23 @@ namespace stdex
 			}
 		};
 
-		template<class _T>
+		template<class _Tp>
 		struct _str_to_integral_chooser
 		{
-			typedef _str_to_integral_chooser_impl<is_signed<_T>::value> impl;
+			typedef _str_to_integral_chooser_impl<is_signed<_Tp>::value> impl;
 		};
 
-		template<class _T, unsigned long _N>
+		template<class _Tp, unsigned long _N>
 		struct _type_cs_len
 		{
 			enum
 			{
-				value = _type_cs_len<_T, _N / (unsigned long)(10)>::value + 1
+				value = _type_cs_len<_Tp, _N / (unsigned long)(10)>::value + 1
 			};
 		};
 
-		template<class _T >
-		struct _type_cs_len< _T, 0>
+		template<class _Tp>
+		struct _type_cs_len<_Tp, 0>
 		{
 			enum
 			{
@@ -274,46 +274,46 @@ namespace stdex
 			};
 		};
 
-		template<class _T, bool _HasQuietNaN, bool _HasSignalingNaN>
+		template<class _Tp, bool _HasQuietNaN, bool _HasSignalingNaN>
 		struct _not_a_number_impl
 		{
-			static _T NaN() { return std::numeric_limits<_T>::quiet_NaN();}
+			static _Tp NaN() { return std::numeric_limits<_Tp>::quiet_NaN();}
 		};
 
-		template<class _T>
-		struct _not_a_number_impl<_T, false, true>
+		template<class _Tp>
+		struct _not_a_number_impl<_Tp, false, true>
 		{
-			static _T NaN() { return std::numeric_limits<_T>::signaling_NaN(); }
+			static _Tp NaN() { return std::numeric_limits<_Tp>::signaling_NaN(); }
 		};
 
-		template<class _T>
-		struct _not_a_number_impl<_T, false, false>
+		template<class _Tp>
+		struct _not_a_number_impl<_Tp, false, false>
 		{
-			static _T NaN() { typedef _T type; return type(); }
+			static _Tp NaN() { typedef _Tp type; return type(); }
 		};
 
-		template<class _T>
+		template<class _Tp>
 		struct _not_a_number
 		{
-			typedef _not_a_number_impl<_T, std::numeric_limits<_T>::has_quiet_NaN, std::numeric_limits<_T>::has_signaling_NaN> impl;
+			typedef _not_a_number_impl<_Tp, std::numeric_limits<_Tp>::has_quiet_NaN, std::numeric_limits<_Tp>::has_signaling_NaN> impl;
 		};
 
-		template<class _T, bool _HasInfinity>
+		template<class _Tp, bool _HasInfinity>
 		struct _infinity_impl
 		{
-			static _T inf() { return std::numeric_limits<_T>::infinity(); }
+			static _Tp inf() { return std::numeric_limits<_Tp>::infinity(); }
 		};
 
-		template<class _T>
-		struct _infinity_impl<_T, false>
+		template<class _Tp>
+		struct _infinity_impl<_Tp, false>
 		{
-			static _T inf() { return std::numeric_limits<_T>::max(); }
+			static _Tp inf() { return std::numeric_limits<_Tp>::max(); }
 		};
 
-		template<class _T>
+		template<class _Tp>
 		struct _infinity
 		{
-			typedef _infinity_impl<_T, std::numeric_limits<_T>::has_infinity> impl;
+			typedef _infinity_impl<_Tp, std::numeric_limits<_Tp>::has_infinity> impl;
 		};
 
 #if defined(LLONG_MAX) || defined(LLONG_MIN) 
@@ -758,23 +758,23 @@ namespace stdex
 			}
 		};
 
-		template<class _T>
+		template<class _Tp>
 		struct _str_to_integral_chooser_ll
 		{
-			typedef _str_to_integral_chooser_impl_ll<is_signed<_T>::value> impl;
+			typedef _str_to_integral_chooser_impl_ll<is_signed<_Tp>::value> impl;
 		};
 
-		template<class _T, string_detail::_unsigned_long_long_type N>
+		template<class _Tp, string_detail::_unsigned_long_long_type N>
 		struct _type_cs_len_ll
 		{
 			enum
 			{
-				value = _type_cs_len_ll<_T, N / (string_detail::_unsigned_long_long_type)(10)>::value + 1
+				value = _type_cs_len_ll<_Tp, N / (string_detail::_unsigned_long_long_type)(10)>::value + 1
 			};
 		};
 
-		template<class _T >
-		struct _type_cs_len_ll< _T, 0>
+		template<class _Tp>
+		struct _type_cs_len_ll<_Tp, 0>
 		{
 			enum
 			{
@@ -784,10 +784,10 @@ namespace stdex
 #endif
 
 
-		template <class _T>
-		inline _T _cs_to_integral(const char *_str, const char *&num_s_end, int base = 10)
+		template <class _Tp>
+		inline _Tp _cs_to_integral(const char *_str, const char *&num_s_end, int base = 10)
 		{
-			typedef typename _str_to_integral_chooser<_T>::impl _str_to_integral;
+			typedef typename _str_to_integral_chooser<_Tp>::impl _str_to_integral;
 
 			int last_errno = errno;
 			errno = 0;
@@ -797,9 +797,9 @@ namespace stdex
 
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
-			else if (_value > std::numeric_limits<_T>::max() || _value < std::numeric_limits<_T>::min())
+			else if (_value > std::numeric_limits<_Tp>::max() || _value < std::numeric_limits<_Tp>::min())
 			{
-				_value = std::numeric_limits<_T>::max();
+				_value = std::numeric_limits<_Tp>::max();
 				num_s_end = 0;
 			}
 			else
@@ -811,10 +811,10 @@ namespace stdex
 			return _value;
 		}
 
-		template <class _T>
-		inline _T _cs_to_integral(const wchar_t *_str, const wchar_t *&num_s_end, int base = 10)
+		template <class _Tp>
+		inline _Tp _cs_to_integral(const wchar_t *_str, const wchar_t *&num_s_end, int base = 10)
 		{
-			typedef typename _str_to_integral_chooser<_T>::impl _str_to_integral;
+			typedef typename _str_to_integral_chooser<_Tp>::impl _str_to_integral;
 
 			int last_errno = errno;
 			errno = 0;
@@ -823,9 +823,9 @@ namespace stdex
 
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
-			else if (_value > std::numeric_limits<_T>::max() || _value < std::numeric_limits<_T>::min())
+			else if (_value > std::numeric_limits<_Tp>::max() || _value < std::numeric_limits<_Tp>::min())
 			{
-				_value = std::numeric_limits<_T>::max();
+				_value = std::numeric_limits<_Tp>::max();
 				num_s_end = 0;
 			}
 			else
@@ -838,10 +838,10 @@ namespace stdex
 		}
 
 #if defined(LLONG_MAX) || defined(LLONG_MIN)
-		template <class _T>
-		inline _T _cs_to_integral_ll(const char *_str, const char *&num_s_end, int base)
+		template <class _Tp>
+		inline _Tp _cs_to_integral_ll(const char *_str, const char *&num_s_end, int base)
 		{
-			typedef typename _str_to_integral_chooser_ll<_T>::impl _str_to_integral;
+			typedef typename _str_to_integral_chooser_ll<_Tp>::impl _str_to_integral;
 
 			int last_errno = errno;
 			errno = 0;
@@ -850,9 +850,9 @@ namespace stdex
 
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
-			else if (_value > std::numeric_limits<_T>::max() || _value < std::numeric_limits<_T>::min())
+			else if (_value > std::numeric_limits<_Tp>::max() || _value < std::numeric_limits<_Tp>::min())
 			{
-				_value = std::numeric_limits<_T>::max();
+				_value = std::numeric_limits<_Tp>::max();
 				num_s_end = 0;
 			}
 			else
@@ -864,10 +864,10 @@ namespace stdex
 			return _value;
 		}
 
-		template <class _T>
-		inline _T _cs_to_integral_ll(const wchar_t *_str, const wchar_t *&num_s_end, int base)
+		template <class _Tp>
+		inline _Tp _cs_to_integral_ll(const wchar_t *_str, const wchar_t *&num_s_end, int base)
 		{
-			typedef typename _str_to_integral_chooser_ll<_T>::impl _str_to_integral;
+			typedef typename _str_to_integral_chooser_ll<_Tp>::impl _str_to_integral;
 
 			int last_errno = errno;
 			errno = 0;
@@ -876,9 +876,9 @@ namespace stdex
 
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
-			else if (_value > std::numeric_limits<_T>::max() || _value < std::numeric_limits<_T>::min())
+			else if (_value > std::numeric_limits<_Tp>::max() || _value < std::numeric_limits<_Tp>::min())
 			{
-				_value = std::numeric_limits<_T>::max();
+				_value = std::numeric_limits<_Tp>::max();
 				num_s_end = 0;
 			}
 			else
@@ -891,7 +891,7 @@ namespace stdex
 		}
 #endif
 
-		template <class _T>
+		template <class _Tp>
 		inline long double _cs_to_floating_point(const char *_str, const char *&num_s_end)
 		{
 			using namespace std;
@@ -907,9 +907,9 @@ namespace stdex
 			if (errno == ERANGE)
 #endif
 				num_s_end = 0;
-			else if (_value > std::numeric_limits<_T>::max() || _value < -std::numeric_limits<_T>::max())
+			else if (_value > std::numeric_limits<_Tp>::max() || _value < -std::numeric_limits<_Tp>::max())
 			{
-				_value = std::numeric_limits<_T>::max();
+				_value = std::numeric_limits<_Tp>::max();
 				num_s_end = 0;
 			}
 			else
@@ -921,7 +921,7 @@ namespace stdex
 			return _value;
 		}
 
-		template <class _T>
+		template <class _Tp>
 		inline long double _cs_to_floating_point(const wchar_t *_str, const wchar_t *&num_s_end)
 		{
 			using namespace std;
@@ -937,9 +937,9 @@ namespace stdex
 			if (errno == ERANGE)
 #endif
 				num_s_end = 0;
-			else if (_value > std::numeric_limits<_T>::max() || _value < -std::numeric_limits<_T>::max())
+			else if (_value > std::numeric_limits<_Tp>::max() || _value < -std::numeric_limits<_Tp>::max())
 			{
-				_value = std::numeric_limits<_T>::max();
+				_value = std::numeric_limits<_Tp>::max();
 				num_s_end = 0;
 			}
 			else
@@ -1441,11 +1441,11 @@ namespace stdex
 
 
 	
-	template <class _T>
-	inline _T stot(const string &_str, cstddef::size_t *idx = 0, int base = 10)
+	template <class _Tp>
+	inline _Tp stot(const string &_str, cstddef::size_t *idx = 0, int base = 10)
 	{
 		const char *_eptr = _str.c_str(), *_ptr = _eptr;
-		_T _value = stot<_T>(_ptr, _eptr, base);
+		_Tp _value = stot<_Tp>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stot argument"));
@@ -1458,11 +1458,11 @@ namespace stdex
 		return (_value);
 	}
 
-	template <class _T>
-	inline _T stot(const wstring &_str, cstddef::size_t *idx = 0, int base = 10)
+	template <class _Tp>
+	inline _Tp stot(const wstring &_str, cstddef::size_t *idx = 0, int base = 10)
 	{
 		const wchar_t *_eptr = _str.c_str(), *_ptr = _eptr;
-		_T _value = stot<_T>(_ptr, _eptr, base);
+		_Tp _value = stot<_Tp>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid wide stdex::stot argument"));
