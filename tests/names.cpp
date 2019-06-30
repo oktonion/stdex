@@ -3,6 +3,9 @@
 
 #ifdef __BORLANDC__ // borland c++ uses ptr, v in <new.h> and n in <_iterator.h>, etc.
     #include <iterator> // + <new.h>
+#elif defined(__APPLE__) // xcode use n in <wchar.h> and s in <stdexcept>
+    #include <iterator>
+    #include <algorithm>
 #endif
 
 // testing common names that should not be defined in stdex lib
