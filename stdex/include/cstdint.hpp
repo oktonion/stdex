@@ -281,9 +281,9 @@ namespace stdex
         struct _sized_integer_min_impl
         {
         #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
-            static const _Signed min_value = (-(_sized_integer_max_impl::max_value) - 1);
+            static const _Signed min_value = (-(_sized_integer_max_impl<_Signed, _Size>::max_value) - 1);
         #else
-            static const _Signed min_value = (-(_sized_integer_max_impl::max_value));
+            static const _Signed min_value = (-(_sized_integer_max_impl<_Signed, _Size>::max_value));
         #endif
         };
 
