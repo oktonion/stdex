@@ -102,13 +102,13 @@ matrix:
       osx_image: xcode9
       env: 
       - COMPILER=clang++
-      - BUILD_LIB_SCRIPT="./build_lib.sh"
-      - BUILD_SCRIPT="./build_tests.sh"
-      - RUN_SCRIPT="./run_tests.sh"
+      - BUILD_LIB_SCRIPT=./build_lib.sh
+      - BUILD_SCRIPT=./build_tests.sh
+      - RUN_SCRIPT=./run_tests.sh
 
     - os: windows
       before_script:
-      - "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32.bat"
+      - "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\Common7\\Tools\\vsvars32.bat"
       env: 
       - BUILD_LIB_SCRIPT="./build_lib.bat"
       - BUILD_SCRIPT="./build_tests.bat"
