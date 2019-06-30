@@ -64,13 +64,13 @@ namespace mutex_tests
 
     int try_lock_func_res = 0;
 
-	int try_lock_func(mutex_type &m, bool &b)
+	int try_lock_func(mutex_type &mmm, bool &b)
 	{
 		try
 		{
-			b = m.try_lock();
+			b = mmm.try_lock();
 		}
-		catch (const stdex::system_error& e)
+		catch (const stdex::system_error&)
 		{
             try_lock_func_res = -1;
 			DYNAMIC_VERIFY(false);
@@ -87,7 +87,7 @@ namespace mutex_tests
         {
             mutex_type m1;
         }
-        catch (const stdex::system_error& e)
+        catch (const stdex::system_error&)
         {
             DYNAMIC_VERIFY(false);
         }
@@ -127,8 +127,8 @@ namespace mutex_tests
 
         try
         {
-            mutex_type m;
-            m.lock();
+            mutex_type mmm;
+            mmmm.lock();
         }
         catch (const system_error&)
         {
