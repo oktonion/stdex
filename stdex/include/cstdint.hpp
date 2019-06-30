@@ -12,9 +12,9 @@
 /*none*/
 
 // std includes
-#include <cstddef> // ptrdiff_t, size_t, NULL
-#include <cwchar> // wchar_t, wint_t, WCHAR_MAX, WCHAR_MIN
-#include <cwctype> // wctype_t
+#include <cstddef> // std::ptrdiff_t, std::size_t, NULL
+#include <cwchar> // std::wchar_t, std::wint_t, WCHAR_MAX, WCHAR_MIN
+#include <cwctype> // std::wctype_t
 
 #if !defined(CHAR_BIT)
     #include <climits> // CHAR_BIT, {TYPE}_MIN, {TYPE}_MAX
@@ -210,7 +210,7 @@ namespace stdex
 
             template<int _Rank> 
             struct _sized_integer_map:
-                _sized_integer_map_helper<_Rank, _is_integral_constant<typename _sized_integer_map_impl<_Rank>::signed_type>::value>
+                _sized_integer_map_helper<_Rank, cstdint_detail::_is_integral_constant<typename _sized_integer_map_impl<_Rank>::signed_type>::value>
             { };
 
 
@@ -368,6 +368,7 @@ namespace stdex
         {};
     } // namespace detail
 } // namespace stdex
+
 
 namespace stdex
 {
