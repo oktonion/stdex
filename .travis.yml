@@ -108,7 +108,7 @@ matrix:
 
     - os: windows
       before_script:
-      - cd "C:\\" && "dir /s *vsvars*"
+      - C:\\Program\\ Files\ \(x86\)\\Microsoft\ Visual\ Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vcvarsall.bat
       #- C:\\Program\\ Files\ \(x86\)\\Microsoft\ Visual\ Studio\\14.0\\Common7\\Tools\\vsvars32.bat
       env: 
       - BUILD_LIB_SCRIPT="./build_lib.bat"
