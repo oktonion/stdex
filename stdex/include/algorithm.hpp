@@ -625,7 +625,7 @@ namespace stdex
 				_UnaryPredicate _p)
 			{
 				while (_first != _last) {
-					if (p(*_first)) {
+					if (_p(*_first)) {
 						*_d_first_true = *_first;
 						++_d_first_true;
 					} else {
