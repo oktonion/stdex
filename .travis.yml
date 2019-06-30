@@ -108,33 +108,44 @@ matrix:
 
     - os: windows
       env: 
-      - BUILD_LIB_SCRIPT="./build_lib.bat"
-      - BUILD_SCRIPT="./build_tests.bat"
-      - RUN_SCRIPT="./run_tests.bat"
+      - BUILD_LIB_SCRIPT=build_lib.bat
+      - BUILD_SCRIPT=build_tests.bat
+      - RUN_SCRIPT=run_tests.bat
       script:
-        cmd //C 
-        "echo "script started" &&
-        call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vcvars32.bat" &&
-        cd ./stdex &&
-        $BUILD_LIB_SCRIPT &&
-        cd .. &&
-        $BUILD_SCRIPT";
-        $RUN_SCRIPT
+      - echo "script started"
+      - cd ./stdex
+      - echo "call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32.bat"" >> ~$BUILD_LIB_SCRIPT
+      - cat $BUILD_LIB_SCRIPT >> ~$BUILD_LIB_SCRIPT
+      - chmod +x ./~$BUILD_LIB_SCRIPT
+      - ./~$BUILD_LIB_SCRIPT
+      - cd ..
+      - echo "call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32.bat"" >> ~$BUILD_SCRIPT
+      - cat $BUILD_SCRIPT >> ~$BUILD_SCRIPT
+      - chmod +x ./~$BUILD_SCRIPT
+      - ./~$BUILD_SCRIPT
+      - chmod +x ./$RUN_SCRIPT
+      - ./$RUN_SCRIPT
 
     - os: windows
       env: 
-      - BUILD_LIB_SCRIPT="./build_lib.bat"
-      - BUILD_SCRIPT="./build_tests.bat"
-      - RUN_SCRIPT="./run_tests.bat"
+      - BUILD_LIB_SCRIPT=build_lib.bat
+      - BUILD_SCRIPT=build_tests.bat
+      - RUN_SCRIPT=run_tests.bat
       script:
-        cmd //C 
-        "echo "script started" &&
-        call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat" &&
-        cd ./stdex &&
-        $BUILD_LIB_SCRIPT &&
-        cd .. &&
-        $BUILD_SCRIPT";
-        $RUN_SCRIPT
+        #call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat" &&
+      - echo "script started"
+      - cd ./stdex
+      - echo "call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32.bat"" >> ~$BUILD_LIB_SCRIPT
+      - cat $BUILD_LIB_SCRIPT >> ~$BUILD_LIB_SCRIPT
+      - chmod +x ./~$BUILD_LIB_SCRIPT
+      - ./~$BUILD_LIB_SCRIPT
+      - cd ..
+      - echo "call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32.bat"" >> ~$BUILD_SCRIPT
+      - cat $BUILD_SCRIPT >> ~$BUILD_SCRIPT
+      - chmod +x ./~$BUILD_SCRIPT
+      - ./~$BUILD_SCRIPT
+      - chmod +x ./$RUN_SCRIPT
+      - ./$RUN_SCRIPT
 
 script:
   - echo "script started"
