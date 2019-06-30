@@ -8,7 +8,7 @@
 // stdex includes
 #include "./cstdint.hpp" // stdex::intmax_t, INTMAX_MAX, INTMAX_MIN
 #include "./ratio" // all ratio
-//#include "./type_traits" //???
+#include "./type_traits" // stdex::common_type
 
 // POSIX includes
 /*none*/
