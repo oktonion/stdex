@@ -113,12 +113,12 @@ matrix:
       - RUN_SCRIPT="./run_tests.bat"
       script:
         cmd //C 
-        echo "script started" &&
+        "echo "script started" &&
         call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vcvars32.bat" &&
         cd ./stdex &&
         $BUILD_LIB_SCRIPT &&
         cd .. &&
-        $BUILD_SCRIPT &&
+        $BUILD_SCRIPT";
         $RUN_SCRIPT
 
     - os: windows
@@ -128,12 +128,12 @@ matrix:
       - RUN_SCRIPT="./run_tests.bat"
       script:
         cmd //C 
-        echo "script started" &&
+        "echo "script started" &&
         call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat" &&
         cd ./stdex &&
         $BUILD_LIB_SCRIPT &&
         cd .. &&
-        $BUILD_SCRIPT &&
+        $BUILD_SCRIPT";
         $RUN_SCRIPT
 
 script:
