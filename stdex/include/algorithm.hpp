@@ -38,11 +38,11 @@ namespace stdex
 	// checks if a predicate is true for all of the elements in a range     
 	template<class _InputIt, class _UnaryPredicate>
 	inline
-	bool all_of(_InputIt first, 
-		typename detail::_if_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
+	bool all_of(_InputIt _first, 
+		typename detail::_if_iterator_cat_is_input<_InputIt>::type _last, _UnaryPredicate _p)
 	{
-		for (; first != last; ++first) {
-			if (!p(*first)) {
+		for (; _first != _last; ++_first) {
+			if (!_p(*_first)) {
 				return false;
 			}
 		}
@@ -53,21 +53,21 @@ namespace stdex
 	// checks if a predicate is true for any of the elements in a range
 	template<class _InputIt, class _UnaryPredicate>
 	inline
-	bool any_of(_InputIt first, 
-		typename detail::_if_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
+	bool any_of(_InputIt _first, 
+		typename detail::_if_iterator_cat_is_input<_InputIt>::type _last, _UnaryPredicate _p)
 	{
-		return std::find_if(first, last, p) != last;
+		return std::find_if(_first, _last, _p) != _last;
 	}
 
 	// none_of (C++11)
 	// checks if a predicate is true for none of the elements in a range
 	template<class _InputIt, class _UnaryPredicate>
 	inline
-	bool none_of(_InputIt first, 
-		typename detail::_if_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
+	bool none_of(_InputIt _first, 
+		typename detail::_if_iterator_cat_is_input<_InputIt>::type _last, _UnaryPredicate _p)
 	{
-		for (; first != last; ++first) {
-			if (p(*first)) return false;
+		for (; _first != _last; ++_first) {
+			if (_p(*_first)) return false;
 		}
 		return true;
 	}
@@ -104,15 +104,15 @@ namespace stdex
 	// find_if_not (C++11)
 	template<class _InputIt, class _UnaryPredicate>
 	inline 
-	_InputIt find_if_not(_InputIt first, 
-		typename detail::_if_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
+	_InputIt find_if_not(_InputIt _first, 
+		typename detail::_if_iterator_cat_is_input<_InputIt>::type _last, _UnaryPredicate _p)
 	{
-		for (; first != last; ++first) {
-			if (!p(*first)) {
-				return first;
+		for (; _first != _last; ++_first) {
+			if (!_p(*_first)) {
+				return _first;
 			}
 		}
-		return last;
+		return _last;
 	}
 
 	// finds the last sequence of elements in a certain range
@@ -167,17 +167,17 @@ namespace stdex
 	template<class _InputIt, class _OutputIt, class _UnaryPredicate>
 	inline
 	_OutputIt  copy_if(
-		_InputIt first, 
-		typename detail::_copy_if_args_check<_InputIt, _OutputIt>::type last,
-		_OutputIt d_first, 
-		_UnaryPredicate p)
+		_InputIt _first, 
+		typename detail::_copy_if_args_check<_InputIt, _OutputIt>::type _last,
+		_OutputIt _d_first, 
+		_UnaryPredicate _p)
 	{
-		while (first != last) {
-			if (p(*first))
-				*d_first++ = *first;
-			first++;
+		while (_first != _last) {
+			if (_p(*_first))
+				*_d_first++ = *_first;
+			_first++;
 		}
-		return d_first;
+		return _d_first;
 	}
 
 	namespace detail
@@ -186,51 +186,51 @@ namespace stdex
 		{
 			_iterator_no_type copy_n(...); // dummy
 
-			_iterator_no_type copy_n_check(_iterator_no_type);
-			_iterator_yes_type copy_n_check(...);
+			_iterator_no_type _copy_n_check(_iterator_no_type);
+			_iterator_yes_type _copy_n_check(...);
 
-			struct dummy_input_iterator:
+			struct _dummy_input_iterator:
 				public std::iterator<std::input_iterator_tag, int>
 			{
 				reference operator*();
-				dummy_input_iterator& operator++ ();
-				dummy_input_iterator operator++ (int);
+				_dummy_input_iterator& operator++ ();
+				_dummy_input_iterator operator++ (int);
 			};
 
-			struct dummy_output_iterator :
+			struct _dummy_output_iterator :
 				public std::iterator<std::output_iterator_tag, int>
 			{
 				reference operator*();
-				dummy_output_iterator& operator++ ();
-				dummy_output_iterator operator++ (int);
+				_dummy_output_iterator& operator++ ();
+				_dummy_output_iterator operator++ (int);
 			};
 
 			struct _has_buggy_copy_n
 			{
-				static int A[20];
-				static const int B[20];
-				static const bool value = sizeof(copy_n_check(copy_n(dummy_input_iterator(), sizeof(A) / sizeof(int), dummy_output_iterator()))) == sizeof(_iterator_yes_type);
+				static int _A[20];
+				static const int _B[20];
+				static const bool value = sizeof(_copy_n_check(copy_n(_dummy_input_iterator(), sizeof(_A) / sizeof(int), _dummy_output_iterator()))) == sizeof(_iterator_yes_type);
 			};
 
 			struct _has_buggy_copy_n1
 			{
-				static int A[20];
-				static const int B[20];
-				static const bool value = sizeof(copy_n_check(copy_n(B, sizeof(A) / sizeof(int), dummy_output_iterator()))) == sizeof(_iterator_yes_type);
+				static int _A[20];
+				static const int _B[20];
+				static const bool value = sizeof(_copy_n_check(copy_n(_B, sizeof(_A) / sizeof(int), _dummy_output_iterator()))) == sizeof(_iterator_yes_type);
 			};
 
 			struct _has_buggy_copy_n2
 			{
-				static int A[20];
-				static const int B[20];
-				static const bool value = sizeof(copy_n_check(copy_n(dummy_input_iterator(), sizeof(A) / sizeof(int), A))) == sizeof(_iterator_yes_type);
+				static int _A[20];
+				static const int _B[20];
+				static const bool value = sizeof(_copy_n_check(copy_n(_dummy_input_iterator(), sizeof(_A) / sizeof(int), _A))) == sizeof(_iterator_yes_type);
 			};
 
 			struct _has_buggy_copy_n3
 			{
-				static int A[20];
-				static const int B[20];
-				static const bool value = sizeof(copy_n_check(copy_n(B, sizeof(A) / sizeof(int), A))) == sizeof(_iterator_yes_type);
+				static int _A[20];
+				static const int _B[20];
+				static const bool value = sizeof(_copy_n_check(copy_n(_B, sizeof(_A) / sizeof(int), _A))) == sizeof(_iterator_yes_type);
 			};
 		}
 
@@ -305,16 +305,16 @@ namespace stdex
 			// copies a number of elements to a new location
 			template<class _InputIt, class _OutputIt>
 			inline
-			_OutputIt copy_n(_InputIt first,
-				 typename detail::_copy_n_args_check<_InputIt, _OutputIt>::type count, _OutputIt result)
+			_OutputIt copy_n(_InputIt _first,
+				 typename detail::_copy_n_args_check<_InputIt, _OutputIt>::type _count, _OutputIt _result)
 			{
-				if (count > 0) {
-					*result++ = *first;
-					for (cstddef::size_t i = 1; i < count; ++i) {
-						*result++ = *++first;
+				if (_count > 0) {
+					*_result++ = *_first;
+					for (cstddef::size_t _i = 1; _i < _count; ++_i) {
+						*_result++ = *++_first;
 					}
 				}
-				return result;
+				return _result;
 			}
 
 			
@@ -331,40 +331,40 @@ namespace stdex
 	// copies a number of elements to a new location
 	template<class _InputT, cstddef::size_t _InputSize, class _OutputIt> 
 	inline
-	_OutputIt copy_n(_InputT(&first_arr)[_InputSize],
-			typename detail::_copy_n_output_it_check<_OutputIt>::type count, _OutputIt result)
+	_OutputIt copy_n(_InputT(&_first_arr)[_InputSize],
+			typename detail::_copy_n_output_it_check<_OutputIt>::type _count, _OutputIt _result)
 	{
-		assert(count <= _InputSize);
+		assert(_count <= _InputSize);
 
-		_InputT *first = first_arr;
+		_InputT *_first = _first_arr;
 
-		if (count > 0) {
-			*result++ = *first;
-			for (cstddef::size_t i = 1; i < count; ++i) {
-				*result++ = *++first;
+		if (_count > 0) {
+			*_result++ = *_first;
+			for (cstddef::size_t _i = 1; _i < _count; ++_i) {
+				*_result++ = *++_first;
 			}
 		}
-		return result;
+		return _result;
 	}
 
 	// copy_n (C++11)
 	// copies a number of elements to a new location
 	template<class _InputIt, class _OutputT, cstddef::size_t _OutputSize>
 	inline
-	_OutputT* copy_n(_InputIt first, 
-			typename detail::_copy_n_input_it_check<_InputIt, _OutputT>::type count, _OutputT(&result_arr)[_OutputSize])
+	_OutputT* copy_n(_InputIt _first, 
+			typename detail::_copy_n_input_it_check<_InputIt, _OutputT>::type _count, _OutputT(&_result_arr)[_OutputSize])
 	{
-		assert(count <= _OutputSize);
+		assert(_count <= _OutputSize);
 
-		_OutputT *result = result_arr;
+		_OutputT *_result = _result_arr;
 
-		if (count > 0) {
-			*result++ = *first;
-			for (cstddef::size_t i = 1; i < count; ++i) {
-				*result++ = *++first;
+		if (_count > 0) {
+			*_result++ = *_first;
+			for (cstddef::size_t _i = 1; _i < _count; ++_i) {
+				*_result++ = *++_first;
 			}
 		}
-		return result;
+		return _result;
 	}
 
 	// copy_n (C++11)
@@ -374,22 +374,22 @@ namespace stdex
 		class _OutputT, cstddef::size_t _OutputSize
 		>
 	inline
-	_OutputT* copy_n(_InputT(&first_arr)[_InputSize], 
-			cstddef::size_t count, _OutputT(&result_arr)[_OutputSize])
+	_OutputT* copy_n(_InputT(&_first_arr)[_InputSize], 
+			cstddef::size_t _count, _OutputT(&_result_arr)[_OutputSize])
 	{
-		assert(count <= _OutputSize);
-		assert(count <= _InputSize);
+		assert(_count <= _OutputSize);
+		assert(_count <= _InputSize);
 
-		_InputT *first = first_arr;
-		_OutputT *result = result_arr;
+		_InputT *_first = _first_arr;
+		_OutputT *_result = _result_arr;
 
-		if (count > 0) {
-			*result++ = *first;
-			for (cstddef::size_t i = 1; i < count; ++i) {
-				*result++ = *++first;
+		if (_count > 0) {
+			*_result++ = *_first;
+			for (cstddef::size_t _i = 1; _i < count; ++_i) {
+				*_result++ = *++_first;
 			}
 		}
-		return result;
+		return _result;
 	}
 
 	// copies a range of elements in backwards order
@@ -492,13 +492,13 @@ namespace stdex
 		{
 			template<class _RandomIt>
 			inline
-			void random_shuffle(_RandomIt first, 
-				typename detail::_if_iterator_cat_is_rand_access<_RandomIt>::type last)
+			void random_shuffle(_RandomIt _first, 
+				typename detail::_if_iterator_cat_is_rand_access<_RandomIt>::type _last)
 			{
-				typename std::iterator_traits<_RandomIt>::difference_type i, n;
-				n = last - first;
-				for (i = n-1; i > 0; --i) {
-					swap(first[i], first[std::rand() % (i+1)]);
+				typename std::iterator_traits<_RandomIt>::difference_type _i, _n;
+				_n = _last - _first;
+				for (_i = _n - 1; _i > 0; --_i) {
+					swap(_first[_i], _first[std::rand() % (_i + 1)]);
 					// rand() % (i+1) isn't actually correct, because the generated number
 					// is not uniformly distributed for most values of i. A correct implementation
 					// will need to essentially reimplement C++11 std::uniform_int_distribution,
@@ -510,13 +510,13 @@ namespace stdex
 			// (function template)
 			template<class _RandomIt, class _RandomFunc>
 			inline
-			void random_shuffle(_RandomIt first,
-				typename detail::_if_iterator_cat_is_rand_access<_RandomIt>::type last, _RandomFunc &r)
+			void random_shuffle(_RandomIt _first,
+				typename detail::_if_iterator_cat_is_rand_access<_RandomIt>::type _last, _RandomFunc &_r)
 			{
-				typename std::iterator_traits<_RandomIt>::difference_type i, n;
-				n = last - first;
-				for (i = n-1; i > 0; --i) {
-					swap(first[i], first[r(i+1)]);
+				typename std::iterator_traits<_RandomIt>::difference_type _i, _n;
+				_n = _last - _first;
+				for (_i = _n - 1; _i > 0; --_i) {
+					swap(_first[_i], _first[_r(_i + 1)]);
 				}
 			}
 		}
@@ -549,14 +549,14 @@ namespace stdex
 		{
 			template<class _InputIt, class _UnaryPredicate>
 			inline
-			bool is_partitioned(_InputIt first, 
-				typename detail::_if_iterator_cat_is_input<_InputIt>::type last, _UnaryPredicate p)
+			bool is_partitioned(_InputIt _first, 
+				typename detail::_if_iterator_cat_is_input<_InputIt>::type _last, _UnaryPredicate _p)
 			{
-				for (; first != last; ++first)
-					if (!p(*first))
+				for (; _first != _last; ++_first)
+					if (!_p(*_first))
 						break;
-				for (; first != last; ++first)
-					if (p(*first))
+				for (; _first != _last; ++_first)
+					if (_p(*_first))
 						return false;
 				return true;
 			}
@@ -618,23 +618,23 @@ namespace stdex
 			inline
 			std::pair<_OutputIt1, _OutputIt2>
 				partition_copy(
-					_InputIt first, 
-					typename detail::_partition_copy_args_check<_InputIt, _OutputIt1, _OutputIt2>::type last,
-					_OutputIt1 d_first_true, 
-					_OutputIt2 d_first_false,
-				_UnaryPredicate p)
+					_InputIt _first, 
+					typename detail::_partition_copy_args_check<_InputIt, _OutputIt1, _OutputIt2>::type _last,
+					_OutputIt1 _d_first_true, 
+					_OutputIt2 _d_first_false,
+				_UnaryPredicate _p)
 			{
-				while (first != last) {
-					if (p(*first)) {
-						*d_first_true = *first;
-						++d_first_true;
+				while (_first != _last) {
+					if (p(*_first)) {
+						*_d_first_true = *_first;
+						++_d_first_true;
 					} else {
-						*d_first_false = *first;
-						++d_first_false;
+						*_d_first_false = *_first;
+						++_d_first_false;
 					}
-					++first;
+					++_first;
 				}
-				return std::pair<_OutputIt1, _OutputIt2>(d_first_true, d_first_false);
+				return std::pair<_OutputIt1, _OutputIt2>(_d_first_true, _d_first_false);
 			}
 		}
 		using namespace impl;
@@ -666,18 +666,18 @@ namespace stdex
 			// (function template)
 			template<class _ForwardIt>
 			inline
-			_ForwardIt is_sorted_until(_ForwardIt first, 
-				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last)
+			_ForwardIt is_sorted_until(_ForwardIt _first, 
+				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type _last)
 			{
-				if (first != last) {
-					_ForwardIt next = first;
-					while (++next != last) {
-						if (*next < *first)
-							return next;
-						first = next;
+				if (_first != _last) {
+					_ForwardIt _next = _first;
+					while (++_next != _last) {
+						if (*_next < *_first)
+							return _next;
+						_first = _next;
 					}
 				}
-				return last;
+				return _last;
 			}
 
 			// (C++11)
@@ -685,18 +685,18 @@ namespace stdex
 			// (function template)
 			template <class _ForwardIt, class _Compare>
 			inline
-			_ForwardIt is_sorted_until(_ForwardIt first, 
-				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp) 
+			_ForwardIt is_sorted_until(_ForwardIt _first, 
+				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type _last, _Compare _comp) 
 			{
-				if (first != last) {
-					_ForwardIt next = first;
-					while (++next != last) {
-						if (true == comp(*next, *first))
-							return next;
-						first = next;
+				if (_first != _last) {
+					_ForwardIt _next = _first;
+					while (++_next != _last) {
+						if (true == comp(*_next, *_first))
+							return _next;
+						_first = _next;
 					}
 				}
-				return last;
+				return _last;
 			}
 
 			// (C++11)
@@ -704,10 +704,10 @@ namespace stdex
 			// (function template)
 			template<class _ForwardIt>
 			inline
-			bool is_sorted(_ForwardIt first, 
-				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last)
+			bool is_sorted(_ForwardIt _first, 
+				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type _last)
 			{
-				return impl::is_sorted_until(first, last) == last;
+				return impl::is_sorted_until(_first, _last) == _last;
 			}
 
 			// (C++11)
@@ -715,10 +715,10 @@ namespace stdex
 			// (function template)
 			template<class _ForwardIt, class _Compare>
 			inline
-			bool is_sorted(_ForwardIt first, 
-				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp)
+			bool is_sorted(_ForwardIt _first, 
+				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type _last, _Compare _comp)
 			{
-				return impl::is_sorted_until(first, last, comp) == last;
+				return impl::is_sorted_until(_first, _last, _comp) == _last;
 			}
 		}
 		using namespace impl;
@@ -863,10 +863,10 @@ namespace stdex
 			// (function template)
 			template<class _Tp> 
 			inline
-			std::pair<const _Tp&, const _Tp&> minmax( const _Tp& a, const _Tp& b )
+			std::pair<const _Tp&, const _Tp&> minmax( const _Tp& _a, const _Tp& _b )
 			{
-				return (b < a) ? std::pair<const _Tp&, const _Tp&>(b, a)
-							: std::pair<const _Tp&, const _Tp&>(a, b);
+				return (_b < _a) ? std::pair<const _Tp&, const _Tp&>(_b, _a)
+							: std::pair<const _Tp&, const _Tp&>(_a, _b);
 			}
 
 			// (C++11)
@@ -874,10 +874,10 @@ namespace stdex
 			// (function template)
 			template<class _Tp, class _Compare> 
 			inline
-			std::pair<const _Tp&, const _Tp&> minmax( const _Tp& a, const _Tp& b, _Compare comp )
+			std::pair<const _Tp&, const _Tp&> minmax( const _Tp& _a, const _Tp& _b, _Compare _comp )
 			{
-				return comp(b, a) ? std::pair<const _Tp&, const _Tp&>(b, a)
-								: std::pair<const _Tp&, const _Tp&>(a, b);
+				return comp(_b, _a) ? std::pair<const _Tp&, const _Tp&>(_b, _a)
+								: std::pair<const _Tp&, const _Tp&>(_a, _b);
 			}
 
 			// (C++11)
@@ -886,36 +886,36 @@ namespace stdex
 			template<class _ForwardIt, class _Compare>
 			inline
 			std::pair<_ForwardIt, _ForwardIt> 
-				minmax_element(_ForwardIt first, 
-					typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last, _Compare comp)
+				minmax_element(_ForwardIt _first, 
+					typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type _last, _Compare _comp)
 			{
-				std::pair<_ForwardIt, _ForwardIt> result(first, first);
+				std::pair<_ForwardIt, _ForwardIt> _result(_first, _first);
 	
-				if (first == last) return result;
-				if (++first == last) return result;
+				if (_first == _last) return _result;
+				if (++_first == _last) return _result;
 	
-				if (comp(*first, *result.first)) {
-					result.first = first;
+				if (_comp(*_first, *_result.first)) {
+					_result.first = _first;
 				} else {
-					result.second = first;
+					_result.second = _first;
 				}
-				while (++first != last) {
-					_ForwardIt i = first;
-					if (++first == last) {
-						if (comp(*i, *result.first)) result.first = i;
-						else if (!(comp(*i, *result.second))) result.second = i;
+				while (++_first != _last) {
+					_ForwardIt _i = _first;
+					if (++_first == _last) {
+						if (_comp(*_i, *_result.first)) _result.first = _i;
+						else if (!(_comp(*_i, *_result.second))) _result.second = _i;
 						break;
 					} else {
-						if (comp(*first, *i)) {
-							if (comp(*first, *result.first)) result.first = first;
-							if (!(comp(*i, *result.second))) result.second = i;
+						if (_comp(*_first, *_i)) {
+							if (_comp(*_first, *_result.first)) _result.first = _first;
+							if (!(_comp(*_i, *_result.second))) _result.second = _i;
 						} else {
-							if (comp(*i, *result.first)) result.first = i;
-							if (!(comp(*first, *result.second))) result.second = first;
+							if (_comp(*_i, *_result.first)) _result.first = _i;
+							if (!(_comp(*_first, *_result.second))) _result.second = _first;
 						}
 					}
 				}
-				return result;
+				return _result;
 			}
 
 			// (C++11)
@@ -924,11 +924,11 @@ namespace stdex
 			template<class _ForwardIt>
 			inline
 			std::pair<_ForwardIt, _ForwardIt> 
-				minmax_element(_ForwardIt first, 
-					typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type last)
+				minmax_element(_ForwardIt _first, 
+					typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type _last)
 			{
-				typedef typename std::iterator_traits<_ForwardIt>::value_type value_type;
-				return impl::minmax_element(first, last, std::less<value_type>());
+				typedef typename std::iterator_traits<_ForwardIt>::value_type _value_type;
+				return impl::minmax_element(_first, _last, std::less<_value_type>());
 			}
 		}
 		using namespace impl;
@@ -975,22 +975,22 @@ namespace stdex
 			// (function template)
 			template<class _ForwardIt1, class _ForwardIt2>
 			inline
-			bool is_permutation(_ForwardIt1 first, 
-				typename detail::_if_iterators_cat_are_forward<_ForwardIt1, _ForwardIt2>::type last, _ForwardIt2 d_first)
+			bool is_permutation(_ForwardIt1 _first, 
+				typename detail::_if_iterators_cat_are_forward<_ForwardIt1, _ForwardIt2>::type _last, _ForwardIt2 _d_first)
 			{
 				// skip common prefix
-				std::pair<_ForwardIt1, _ForwardIt2> tie = std::mismatch(first, last, d_first);
-				first = tie.first;
-				d_first = tie.second;
+				std::pair<_ForwardIt1, _ForwardIt2> _tie = std::mismatch(_first, _last, _d_first);
+				_first = _tie.first;
+				_d_first = _tie.second;
 				// iterate over the rest, counting how many times each element
 				// from [first, last) appears in [d_first, d_last)
-				if (first != last) {
-					_ForwardIt2 d_last = d_first;
-					std::advance(d_last, std::distance(first, last));
-					for (_ForwardIt1 i = first; i != last; ++i) {
-							if (i != std::find(first, i, *i)) continue; // already counted this *i
-							typename iterator_traits<_ForwardIt2>::difference_type m = std::count(d_first, d_last, *i);
-							if (m==0 || std::count(i, last, *i) != m) {
+				if (_first != _last) {
+					_ForwardIt2 _d_last = _d_first;
+					std::advance(_d_last, std::distance(_first, _last));
+					for (_ForwardIt1 _i = _first; _i != _last; ++_i) {
+							if (_i != std::find(_first, _i, *_i)) continue; // already counted this *i
+							typename iterator_traits<_ForwardIt2>::difference_type _m = std::count(_d_first, _d_last, *_i);
+							if (_m==0 || std::count(_i, _last, *_i) != _m) {
 								return false;
 							}
 						}

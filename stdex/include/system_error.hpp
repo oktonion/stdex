@@ -398,11 +398,11 @@ namespace stdex
 		virtual std::string message(int) const = 0;
 
 	public:
-		virtual error_condition default_error_condition(int i) const NOEXCEPT_FUNCTION;
+		virtual error_condition default_error_condition(int val) const NOEXCEPT_FUNCTION;
 
-		virtual bool equivalent(int i, const error_condition &cond) const NOEXCEPT_FUNCTION;
+		virtual bool equivalent(int val, const error_condition &cond) const NOEXCEPT_FUNCTION;
 
-		virtual bool equivalent(const error_code& code, int i) const NOEXCEPT_FUNCTION;
+		virtual bool equivalent(const error_code& code, int) const NOEXCEPT_FUNCTION;
 
 		inline bool operator<(const error_category &other) const NOEXCEPT_FUNCTION
 		{
@@ -436,28 +436,28 @@ namespace stdex
 			_cat(&generic_category()) 
 		{}
 
-		error_condition(int v, const error_category &cat) NOEXCEPT_FUNCTION: 
-			_value(v), 
+		error_condition(int val, const error_category &cat) NOEXCEPT_FUNCTION: 
+			_value(val), 
 			_cat(&cat) 
 		{}
 
 		template<class _ErrorCondEnum>
-		explicit error_condition(const _ErrorCondEnum& e) NOEXCEPT_FUNCTION
+		explicit error_condition(const _ErrorCondEnum& val) NOEXCEPT_FUNCTION
 		{
-			*this = e;
+			*this = val;
 		}
 
-		void assign(int v, const error_category &cat) NOEXCEPT_FUNCTION
+		void assign(int val, const error_category &cat) NOEXCEPT_FUNCTION
 		{
-			_value = v;
+			_value = val;
 			_cat = &cat;
 		}
 
 		template<class _ErrorCondEnum>
 		typename enable_if<detail::_or_<is_error_condition_enum<_ErrorCondEnum>, is_same<error_condition, _ErrorCondEnum> >::value, error_condition&>::type
-			operator=(const _ErrorCondEnum& e) NOEXCEPT_FUNCTION
+			operator=(const _ErrorCondEnum& val) NOEXCEPT_FUNCTION
 		{
-			return (*this = make_error_condition(e));
+			return (*this = make_error_condition(val));
 		}
 
 		void clear() NOEXCEPT_FUNCTION
@@ -502,20 +502,20 @@ namespace stdex
 			_cat(&system_category()) 
 		{ }
 
-		error_code(int v, const error_category& cat) NOEXCEPT_FUNCTION: 
-			_value(v), 
+		error_code(int val, const error_category& cat) NOEXCEPT_FUNCTION: 
+			_value(val), 
 			_cat(&cat) 
 		{ }
 
 		template<class _ErrorCodeEnum>
-		error_code(const _ErrorCodeEnum &e) NOEXCEPT_FUNCTION
+		error_code(const _ErrorCodeEnum &val) NOEXCEPT_FUNCTION
 		{
-			*this = e;
+			*this = val;
 		}
 
-		void assign(int v, const error_category& cat) NOEXCEPT_FUNCTION
+		void assign(int val, const error_category& cat) NOEXCEPT_FUNCTION
 		{
-			_value = v;
+			_value = val;
 			_cat = &cat;
 		}
 
@@ -527,9 +527,9 @@ namespace stdex
 
 		template<class _ErrorCodeEnum>
 		typename enable_if<detail::_or_<is_error_code_enum<_ErrorCodeEnum>, is_same<error_code, _ErrorCodeEnum> >::value, error_code&>::type
-			operator=(const _ErrorCodeEnum& e) NOEXCEPT_FUNCTION
+			operator=(const _ErrorCodeEnum& val) NOEXCEPT_FUNCTION
 		{
-			return (*this = make_error_code(e));
+			return (*this = make_error_code(val));
 		}
 
 		int value() const NOEXCEPT_FUNCTION { return _value; }
@@ -564,34 +564,34 @@ namespace stdex
 		error_code 	_code;
 
 	public:
-		system_error(error_code ec = error_code()): 
-			std::runtime_error(ec.message()), 
-			_code(ec)
+		system_error(error_code ecode = error_code()): 
+			std::runtime_error(ecode.message()), 
+			_code(ecode)
 		{}
 
-		system_error(error_code ec, const std::string &what): 
-			std::runtime_error(what + ": " + ec.message()),
-			_code(ec)
+		system_error(error_code ecode, const std::string &what): 
+			std::runtime_error(what + ": " + ecode.message()),
+			_code(ecode)
 		{}
 
-		system_error(error_code ec, const char *what): 
-			std::runtime_error(std::string(what) + (": " + ec.message())),
-			_code(ec)
+		system_error(error_code ecode, const char *what): 
+			std::runtime_error(std::string(what) + (": " + ecode.message())),
+			_code(ecode)
 		{}
 
-		system_error(int v, const error_category &ecat, const char *what): 
-			std::runtime_error(std::string(what) + (": " + error_code(v, ecat).message())),
-			_code(v, ecat)
+		system_error(int val, const error_category &ecat, const char *what): 
+			std::runtime_error(std::string(what) + (": " + error_code(val, ecat).message())),
+			_code(val, ecat)
 		{}
 
-		system_error(int v, const error_category &ecat): 
-			std::runtime_error(error_code(v, ecat).message()),
-			_code(v, ecat) 
+		system_error(int val, const error_category &ecat): 
+			std::runtime_error(error_code(val, ecat).message()),
+			_code(val, ecat) 
 		{}
 
-		system_error(int v, const error_category &ecat, const std::string &what): 
-			std::runtime_error(what + ": " + error_code(v, ecat).message()),
-			_code(v, ecat) 
+		system_error(int val, const error_category &ecat, const std::string &what): 
+			std::runtime_error(what + ": " + error_code(val, ecat).message()),
+			_code(val, ecat) 
 		{}
 
 		const error_code& code() const NOEXCEPT_FUNCTION { return _code; }

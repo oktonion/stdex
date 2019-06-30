@@ -77,11 +77,11 @@ namespace stdex
 		//! @throws system_error
 		inline void lock()
 		{
-			int e = pthread_mutex_lock(&_mutex_handle);
+			int _err = pthread_mutex_lock(&_mutex_handle);
 
 			// EINVAL, EAGAIN, EBUSY, EINVAL, EDEADLK(may)
-			if (e)
-				throw system_error( error_code(errc::errc_t(e)) );
+			if (_err)
+				throw system_error( error_code(errc::errc_t(_err)) );
 		}
 
 		//! Try to lock the mutex.
@@ -165,11 +165,11 @@ namespace stdex
 		//! @see lock_guard
 		inline void lock()
 		{
-			int e = pthread_mutex_lock(&_mutex_handle);
+			int _err = pthread_mutex_lock(&_mutex_handle);
 
 			// EINVAL, EAGAIN, EBUSY, EINVAL, EDEADLK(may)
-			if (e)
-				throw system_error(error_code(errc::errc_t(e)));
+			if (_err)
+				throw system_error(error_code(errc::errc_t(_err)));
 		}
 
 		//! Try to lock the mutex.
@@ -234,22 +234,22 @@ namespace stdex
 	//! }
 	//! @endcode
 
-	template <class T>
+	template <class _Tp>
 	class lock_guard {
 	public:
-		typedef T mutex_type;
+		typedef _Tp mutex_type;
 
 		lock_guard() : _device(0) {}
 
 		//! The constructor locks the mutex.
-		explicit lock_guard(mutex_type &m):
-			_device(m)
+		explicit lock_guard(mutex_type &_m):
+			_device(_m)
 		{
 			_device.lock();
 		}
 
 		//! The constructor does not lock the mutex because calling thread owns it
-		lock_guard(mutex_type &m, adopt_lock_t) NOEXCEPT_FUNCTION:
+		lock_guard(mutex_type &_m, adopt_lock_t) NOEXCEPT_FUNCTION:
 			_device(m)
 		{}
 
@@ -274,51 +274,51 @@ namespace stdex
 	* to another unique_lock by move construction or move assignment. If a
 	* mutex lock is owned when the destructor runs ownership will be released.
 	*/
-	template<class T>
+	template<class _Tp>
 	class unique_lock
 	{
 	public:
-		typedef T mutex_type;
+		typedef _Tp mutex_type;
 
 		unique_lock() NOEXCEPT_FUNCTION : 
 			_device(0), 
 			_owns(false)
 		{ }
 
-		explicit unique_lock(mutex_type &m): 
-			_device(&(m)),
+		explicit unique_lock(mutex_type &_m): 
+			_device(&(_m)),
 			_owns(false)
 		{
 			lock();
 			_owns = true;
 		}
 
-		unique_lock(mutex_type &m, defer_lock_t) NOEXCEPT_FUNCTION: 
-			_device(&(m)), 
+		unique_lock(mutex_type &_m, defer_lock_t) NOEXCEPT_FUNCTION: 
+			_device(&(_m)), 
 			_owns(false)
 		{ }
 
-		unique_lock(mutex_type &m, try_to_lock_t): 
-			_device(&(m)), 
+		unique_lock(mutex_type &_m, try_to_lock_t): 
+			_device(&(_m)), 
 			_owns(_device->try_lock())
 		{ }
 
-		unique_lock(mutex_type &m, adopt_lock_t) NOEXCEPT_FUNCTION: 
-			_device(&(m)), 
+		unique_lock(mutex_type &_m, adopt_lock_t) NOEXCEPT_FUNCTION: 
+			_device(&(_m)), 
 			_owns(true)
 		{
 			// XXX calling thread owns mutex
 		}
 
 		template<class _Clock, class _Duration>
-		unique_lock(mutex_type &m, const chrono::time_point<_Clock, _Duration> &atime): 
-			_device(&(m)),
+		unique_lock(mutex_type &_m, const chrono::time_point<_Clock, _Duration> &atime): 
+			_device(&(_m)),
 			_owns(_device->try_lock_until(atime))
 		{ }
 
 		template<class _Rep, class _Period>
-		unique_lock(mutex_type &m, const chrono::duration<_Rep, _Period> &rtime):
-			_device(&(m)),
+		unique_lock(mutex_type &_m, const chrono::duration<_Rep, _Period> &rtime):
+			_device(&(_m)),
 			_owns(_device->try_lock_for(rtime))
 		{ }
 

@@ -105,9 +105,9 @@ namespace stdex
 		}
 
 		template<class _Predicate>
-		void wait(unique_lock<mutex>& lock, _Predicate p)
+		void wait(unique_lock<mutex>& lock, _Predicate _p)
 		{
-			while (!p())
+			while (!_p())
 				wait(lock);
 		}
 
@@ -128,11 +128,11 @@ namespace stdex
 		}
 
 		template<class _Clock, class _Duration, class _Predicate>
-		bool wait_until(unique_lock<mutex> &lock, const chrono::time_point<_Clock, _Duration> &atime, _Predicate p)
+		bool wait_until(unique_lock<mutex> &lock, const chrono::time_point<_Clock, _Duration> &atime, _Predicate _p)
 		{
-			while (!p())
+			while (!_p())
 				if (wait_until(lock, atime) == cv_status::timeout)
-					return p();
+					return _p();
 			return true;
 		}
 
@@ -143,9 +143,9 @@ namespace stdex
 		}
 
 		template<class _Rep, class _Period, class _Predicate>
-		bool wait_for(unique_lock<mutex> &lock, const chrono::duration<_Rep, _Period> &rtime, _Predicate p)
+		bool wait_for(unique_lock<mutex> &lock, const chrono::duration<_Rep, _Period> &rtime, _Predicate _p)
 		{
-			return wait_until(lock, clock_t::now() + chrono::duration_cast<clock_t::duration>(rtime), p);
+			return wait_until(lock, clock_t::now() + chrono::duration_cast<clock_t::duration>(rtime), _p);
 		}
 
 		native_handle_type native_handle()
@@ -181,12 +181,12 @@ namespace stdex
 			if (!lock.owns_lock())
 				std::terminate();
 
-			chrono::time_point<clock_t, chrono::seconds> s = chrono::time_point_cast<chrono::seconds>(atime);
-			chrono::nanoseconds ns = chrono::duration_cast<chrono::nanoseconds>(atime - s);
+			chrono::time_point<clock_t, chrono::seconds> _s = chrono::time_point_cast<chrono::seconds>(atime);
+			chrono::nanoseconds _ns = chrono::duration_cast<chrono::nanoseconds>(atime - _s);
 
 			timespec ts;
-			ts.tv_sec = static_cast<stdex::time_t>(s.time_since_epoch().count());
-			ts.tv_nsec = static_cast<long>(ns.count());
+			ts.tv_sec = static_cast<stdex::time_t>(_s.time_since_epoch().count());
+			ts.tv_nsec = static_cast<long>(_ns.count());
 
 			int res = pthread_cond_timedwait(&_condition_handle, lock.mutex()->native_handle(), &ts);
 

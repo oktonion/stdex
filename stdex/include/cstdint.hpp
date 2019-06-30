@@ -80,21 +80,21 @@ namespace stdex
         {
             struct _constructible_from_any
             {
-                template<class T>
-                _constructible_from_any(T);
+                template<class _Tp>
+                _constructible_from_any(_Tp);
             };
 
             typedef char _yes_type;
             struct _no_type
             {
-                char padding[8];
+                char _padding[8];
             };
 
             class _is_integral_constant_helper
             {
-                class type;
+                class _type;
             public:
-                static cstdint_detail::_yes_type check(type*);
+                static cstdint_detail::_yes_type check(_type*);
                 static cstdint_detail::_no_type check(_constructible_from_any);
             };
 

@@ -251,40 +251,40 @@ namespace stdex
 			// increment an iterator 
 			template<class _ForwardIt>
 			inline
-			_ForwardIt next(_ForwardIt it,
-				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::difference_type n) 
+			_ForwardIt next(_ForwardIt _it,
+				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::difference_type _n) 
 			{
-				std::advance(it, n);
-				return it;
+				std::advance(_it, _n);
+				return _it;
 			}
 
 			// next (C++11)
 			// increment an iterator by one
 			template<class _ForwardIt>
 			inline
-			_ForwardIt next(_ForwardIt it) 
+			_ForwardIt next(_ForwardIt _it) 
 			{
-				return impl::next(it, 1);
+				return impl::next(_it, 1);
 			}
 
 			// prev (C++11)
 			// decrement an iterator 
 			template<class _BidirIt>
 			inline
-			_BidirIt prev(_BidirIt it,
-				typename detail::_if_iterator_cat_is_bi<_BidirIt>::difference_type n) 
+			_BidirIt prev(_BidirIt _it,
+				typename detail::_if_iterator_cat_is_bi<_BidirIt>::difference_type _n) 
 			{
-				std::advance(it, -n);
-				return it;
+				std::advance(_it, -_n);
+				return _it;
 			}
 			
 			// prev (C++11)
 			// decrement an iterator by 1
 			template<class _BidirIt>
 			inline
-			_BidirIt prev(_BidirIt it) 
+			_BidirIt prev(_BidirIt _it) 
 			{
-				return impl::prev(it, 1);
+				return impl::prev(_it, 1);
 			}
 		}
 
