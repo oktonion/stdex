@@ -243,7 +243,7 @@
 
 #endif
 
-#ifndef _STDEX_NATIVE_CPP11_SUPPORT
+#ifndef _STDEX_NATIVE_CPP11_TYPES_SUPPORT
 	#ifndef __CHAR16_TYPE__
 		#define char16_t stdex::uint_least16_t
 	#endif
