@@ -108,7 +108,16 @@ matrix:
 
     - os: windows
       script:
+      - echo "script started"
       - C:\\Program\ Files\ \(x86\)\\Microsoft\ Visual\ Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vcvars32.bat
+      - cd ./stdex
+      - chmod +x $BUILD_LIB_SCRIPT
+      - $BUILD_LIB_SCRIPT
+      - cd ..
+      - chmod +x $BUILD_SCRIPT
+      - $BUILD_SCRIPT
+      - chmod +x $RUN_SCRIPT
+      - $RUN_SCRIPT
       env: 
       - BUILD_LIB_SCRIPT="./build_lib.bat"
       - BUILD_SCRIPT="./build_tests.bat"
@@ -116,7 +125,16 @@ matrix:
 
     - os: windows
       script:
+      - echo "script started"
       - C:\\Program\ Files\ \(x86\)\\Microsoft\ Visual\ Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat
+      - cd ./stdex
+      - chmod +x $BUILD_LIB_SCRIPT
+      - $BUILD_LIB_SCRIPT
+      - cd ..
+      - chmod +x $BUILD_SCRIPT
+      - $BUILD_SCRIPT
+      - chmod +x $RUN_SCRIPT
+      - $RUN_SCRIPT
       env: 
       - BUILD_LIB_SCRIPT="./build_lib.bat"
       - BUILD_SCRIPT="./build_tests.bat"
