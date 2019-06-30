@@ -178,7 +178,7 @@ namespace stdex
 				}
 
 				template<class _ObjectT, class _FuncT>
-				void push(_ObjectT &fp, _FuncT mp)
+				void push(_ObjectT &fp, _FuncT /*unused*/)
 				{
 					push(fp);
 				}
