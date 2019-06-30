@@ -29,6 +29,12 @@ int main(void)
 
     // Sanity check.
     STATIC_ASSERT(is_integral<ClassType>::value == (false), can_not_be_integral);
+    STATIC_ASSERT(is_integral<int ClassType::*>::value == (false), can_not_be_integral);
+    STATIC_ASSERT(is_integral<int*>::value == (false), can_not_be_integral);
+    STATIC_ASSERT(is_integral<int&>::value == (false), can_not_be_integral);
+
+    typedef int (ClassType::*member_t) (int);
+    STATIC_ASSERT(is_integral<member_t>::value == (false), can_not_be_integral);
 
     return 0;
 }
