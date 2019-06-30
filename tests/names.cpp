@@ -8,6 +8,8 @@
     #include <algorithm> // + <stdexcept>
     #include <sstream> // + <__mutex_base>
     #include <string>
+#elif defined(_MSC_VER) // vstudio 
+    #include <string>
 #endif
 
 // testing common names that should not be defined in stdex lib
