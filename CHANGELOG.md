@@ -42,7 +42,7 @@ visit https://github.com/oktonion/stdex for the latest version of stdex library
 - fixed bugs with `to_string` and `to_wstring` for (w)c-strings and (w)stringstream implementation
 - fixed `is_union` implementation with nasty compiler-specific intrinsic
 - changed pthread-win32 submodule dependency to my fork (origin have not been updated since forever)
-- predefined types for ratio (like `yocto`, `milli`, `kilo`, `exa` etc.) are now incomplete if are not supported (too large or too small)
+- predefined types for `ratio` (like `yocto`, `milli`, `kilo`, `exa` etc.) are now incomplete if are not supported (too large or too small)
 - all build scripts now works correctly
 
 ## [0.1.3] - 2018-12-29
