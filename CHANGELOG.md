@@ -4,13 +4,14 @@ All notable changes to stdex library project will be documented in this file.
 
 visit https://github.com/oktonion/stdex for the latest version of stdex library
 
-## [0.1.4] - 2019-xx-xx
+## [0.2.0] - 2019-xx-xx
 
 ### Added
 
 - `to_string` and `to_wstring` now accept static arrays
 - build script for Borland C++ Builder compiler
-- `<cstdint>` header
+
+- `<cstdint>` header:
 - - `intmax_t`, `uintmax_t`
 - - `int8_t`, `uint8_t`
 - - `int16_t`, `uint16_t`
@@ -29,13 +30,13 @@ visit https://github.com/oktonion/stdex for the latest version of stdex library
 > All types are only in `stdex` namespace. Type is incomplete or absent if it is not supported.
 
 - - STDEX_INTMAX_MIN, STDEX_INTMAX_MAX, STDEX_UINTMAX_MAX
-- - STDEX_INT*N*_MIN, STDEX_INT*N*_MAX, STDEX_UINT*N*_MAX
-- - STDEX_INT_LEAST*N*_MIN, STDEX_INT_LEAST*N*_MAX, STDEX_UINT_LEAST*N*MAX
-- - STDEX_INT_FAST*N*_MIN, STDEX_INT_FAST*N*_MAX, STDEX_UINT_FAST*N*_MAX
+- - STDEX_INT{*N*}_MIN, STDEX_INT{*N*}_MAX, STDEX_UINT{*N*}_MAX
+- - STDEX_INT_LEAST{*N*}_MIN, STDEX_INT_LEAST{*N*}_MAX, STDEX_UINT_LEAST{*N*}MAX
+- - STDEX_INT_FAST{*N*}_MIN, STDEX_INT_FAST{*N*}_MAX, STDEX_UINT_FAST{*N*}_MAX
 - - STDEX_INTPTR_MIN, STDEX_INTPTR_MAX, STDEX_UINTPTR_MAX
-- - STDEX_INTMAX_C(), STDEX_UINTMAX_C(), STDEX_INT*N*_C(), STDEX_UINT*N*_C()
+- - STDEX_INTMAX_C(), STDEX_UINTMAX_C(), STDEX_INT{*N*}_C(), STDEX_UINT{*N*}_C()
 
-> Where *N* is one in 8, 16, 32, 64 (if present). Defines are invalid or absent if type is not supported.
+> Where {*N*} is one in 8, 16, 32, 64 (if present). Defines are invalid or absent if type is not supported.
 
 ### Changed
 
@@ -43,19 +44,23 @@ visit https://github.com/oktonion/stdex for the latest version of stdex library
 - fixed `is_union` implementation with nasty compiler-specific intrinsic
 - changed pthread-win32 submodule dependency to my fork (origin have not been updated since forever)
 - predefined types for `ratio` (like `yocto`, `milli`, `kilo`, `exa` etc.) are now incomplete if are not supported (too large or too small)
-- all build scripts now works correctly
+- all build scripts now work correctly
+
+### Removed
+
+- `stdint_ex.h` (use `cstdint.hpp`/`cstdint` instead)
 
 ## [0.1.3] - 2018-12-29
 
 ### Added
 
-- `<iterator>` header
+- `<iterator>` header:
 - - `prev`
 - - `next`
 - - `begin`
 - - `end`
 - - all of C++ 98 std functions
-- `<algorithm>` header
+- `<algorithm>` header:
 - - `all_of`
 - - `any_of`
 - - `none_of`
@@ -99,7 +104,7 @@ visit https://github.com/oktonion/stdex for the latest version of stdex library
 
 ### Removed
 
-- rudimentary code for nullptr implementation
+- rudimentary code for `nullptr` implementation
  
 ### Changed
 
