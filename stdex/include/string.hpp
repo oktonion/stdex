@@ -9,7 +9,7 @@
 #include "./core.h"
 #include "./type_traits.hpp"
 #include "./sstream.hpp"
-#include "./stdint_ex.h"
+#include "./cstdint.hpp"
 
 // POSIX includes
 /*none*/
