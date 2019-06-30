@@ -188,7 +188,7 @@ namespace stdex
 			ts.tv_sec = static_cast<stdex::time_t>(_s.time_since_epoch().count());
 			ts.tv_nsec = static_cast<long>(_ns.count());
 
-			int res = pthread_cond_timedwait(&_condition_handle, lock.mutex()->native_handle(), &ts);
+			/*int res = */pthread_cond_timedwait(&_condition_handle, lock.mutex()->native_handle(), &ts);
 
 			return (clock_t::now() < atime
 				? cv_status::no_timeout : cv_status::timeout);
