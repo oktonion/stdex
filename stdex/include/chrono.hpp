@@ -6,7 +6,7 @@
 #endif // _MSC_VER > 1000
 
 // stdex includes
-#include "./cstdint.hpp" // stdex::intmax_t, INTMAX_MAX, INTMAX_MIN
+#include "./cstdint.hpp" // stdex::intmax_t, STDEX_INTMAX_MAX, STDEX_INTMAX_MIN
 #include "./ratio" // all ratio
 #include "./type_traits" // stdex::common_type
 
@@ -239,7 +239,7 @@ namespace stdex
 			static stdex::intmax_t max()
 			#endif
 			{
-				return INTMAX_MAX;
+				return STDEX_INTMAX_MAX;
 			}
 
 			#ifdef min
@@ -248,15 +248,15 @@ namespace stdex
 			static stdex::intmax_t min()
 			#endif
 			{
-				return INTMAX_MIN;
+				return STDEX_INTMAX_MIN;
 			}
 
 			// since we have no constexpr use this in template params
 			struct template_constants
 			{
 				static const stdex::intmax_t zero = 0;
-				static const stdex::intmax_t max = INTMAX_MAX;
-				static const stdex::intmax_t min = INTMAX_MIN;
+				static const stdex::intmax_t max = STDEX_INTMAX_MAX;
+				static const stdex::intmax_t min = STDEX_INTMAX_MIN;
 			};
 		};
 
@@ -274,7 +274,7 @@ namespace stdex
 			static stdex::uintmax_t max()
 			#endif
 			{
-				return UINTMAX_MAX;
+				return STDEX_UINTMAX_MAX;
 			}
 
 			#ifdef min
@@ -290,7 +290,7 @@ namespace stdex
 			struct template_constants
 			{
 				static const stdex::uintmax_t zero = 0;
-				static const stdex::uintmax_t max = UINTMAX_MAX;
+				static const stdex::uintmax_t max = STDEX_UINTMAX_MAX;
 				static const stdex::uintmax_t min = 0;
 			};
 		};

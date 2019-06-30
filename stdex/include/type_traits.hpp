@@ -386,8 +386,8 @@ namespace stdex
 			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), long long int> : public true_type {};
 		#endif
 
-			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), char16_t> : public true_type {};
-			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), char32_t> : public true_type {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex_char16_t> : public true_type {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex_char32_t> : public true_type {};
 
 			// types from stdex/cstdint.hpp
 			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::int_least8_t> : _is_integral_cstdint_type<stdex::int_least8_t> {};
@@ -400,19 +400,19 @@ namespace stdex
 			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::uint_least64_t> : _is_integral_cstdint_type<stdex::uint_least64_t> {};
 			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::intmax_t> : _is_integral_cstdint_type<stdex::intmax_t> {};
 			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::uintmax_t> : _is_integral_cstdint_type<stdex::uintmax_t> {};
-		#if defined(INT8_MIN) && defined(INT8_MAX) && defined(UINT8_MAX)
+		#if defined(STDEX_INT8_MIN) && defined(STDEX_INT8_MAX) && defined(STDEX_UINT8_MAX)
 			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::int8_t> : _is_integral_cstdint_type<stdex::int8_t> {};
 			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::uint8_t> : _is_integral_cstdint_type<stdex::uint8_t> {};
 		#endif
-		#if defined(INT16_MIN) && defined(INT16_MAX) && defined(UINT16_MAX)
+		#if defined(STDEX_INT16_MIN) && defined(STDEX_INT16_MAX) && defined(STDEX_UINT16_MAX)
 			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::int16_t> : _is_integral_cstdint_type<stdex::int16_t> {};
 			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::uint16_t> : _is_integral_cstdint_type<stdex::uint16_t> {};
 		#endif
-		#if defined(INT32_MIN) && defined(INT32_MAX) && defined(UINT32_MAX)
+		#if defined(STDEX_INT32_MIN) && defined(STDEX_INT32_MAX) && defined(STDEX_UINT32_MAX)
 			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::int32_t> : _is_integral_cstdint_type<stdex::int32_t> {};
 			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::uint32_t> : _is_integral_cstdint_type<stdex::uint32_t> {};
 		#endif
-		#if defined(INT64_MIN) && defined(INT64_MAX) && defined(UINT64_MAX)
+		#if defined(STDEX_INT64_MIN) && defined(STDEX_INT64_MAX) && defined(STDEX_UINT64_MAX)
 			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::int64_t> : _is_integral_cstdint_type<stdex::int64_t> {};
 			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::uint64_t> : _is_integral_cstdint_type<stdex::uint64_t> {};
 		#endif
@@ -2199,13 +2199,13 @@ namespace stdex
 
 		template<> struct _arithmetic_type<17>
 		{
-			typedef char16_t type;
+			typedef stdex_char16_t type;
 			typedef char(&result_type)[17];
 		};
 
 		template<> struct _arithmetic_type<18>
 		{
-			typedef char32_t type;
+			typedef stdex_char32_t type;
 			typedef char(&result_type)[18];
 		};
 

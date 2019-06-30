@@ -416,153 +416,153 @@ namespace stdex
 
 // undef any std macros
 
-#undef INTMAX_C
-#undef UINTMAX_C
-#undef INT8_C
-#undef UINT8_C
-#undef INT16_C
-#undef UINT16_C
-#undef INT32_C
-#undef UINT32_C
-#undef INT64_C
-#undef UINT64_C
-
-#undef INT_LEAST8_MIN  
-#undef INT_LEAST16_MIN 
-#undef INT_LEAST32_MIN 
-#undef INT_LEAST64_MIN 
-#undef INT_FAST8_MIN
-#undef INT_FAST16_MIN
-#undef INT_FAST32_MIN
-#undef INT_FAST64_MIN
-#undef INTPTR_MIN 
-#undef INTMAX_MIN 
- 
-
-#undef INT_LEAST8_MAX  
-#undef INT_LEAST16_MAX 
-#undef INT_LEAST32_MAX 
-#undef INT_LEAST64_MAX 
-#undef INT_FAST8_MAX
-#undef INT_FAST16_MAX
-#undef INT_FAST32_MAX
-#undef INT_FAST64_MAX
-#undef INTPTR_MAX 
-#undef INTMAX_MAX 
-
-
-#undef UINT_LEAST8_MAX  
-#undef UINT_LEAST16_MAX 
-#undef UINT_LEAST32_MAX 
-#undef UINT_LEAST64_MAX 
-#undef UINT_FAST8_MAX
-#undef UINT_FAST16_MAX
-#undef UINT_FAST32_MAX
-#undef UINT_FAST64_MAX
-#undef UINTPTR_MAX 
-#undef UINTMAX_MAX 
+//#undef INTMAX_C
+//#undef UINTMAX_C
+//#undef INT8_C
+//#undef UINT8_C
+//#undef INT16_C
+//#undef UINT16_C
+//#undef INT32_C
+//#undef UINT32_C
+//#undef INT64_C
+//#undef UINT64_C
+//
+//#undef INT_LEAST8_MIN  
+//#undef INT_LEAST16_MIN 
+//#undef INT_LEAST32_MIN 
+//#undef INT_LEAST64_MIN 
+//#undef INT_FAST8_MIN
+//#undef INT_FAST16_MIN
+//#undef INT_FAST32_MIN
+//#undef INT_FAST64_MIN
+//#undef INTPTR_MIN 
+//#undef INTMAX_MIN 
+// 
+//
+//#undef INT_LEAST8_MAX  
+//#undef INT_LEAST16_MAX 
+//#undef INT_LEAST32_MAX 
+//#undef INT_LEAST64_MAX 
+//#undef INT_FAST8_MAX
+//#undef INT_FAST16_MAX
+//#undef INT_FAST32_MAX
+//#undef INT_FAST64_MAX
+//#undef INTPTR_MAX 
+//#undef INTMAX_MAX 
+//
+//
+//#undef UINT_LEAST8_MAX  
+//#undef UINT_LEAST16_MAX 
+//#undef UINT_LEAST32_MAX 
+//#undef UINT_LEAST64_MAX 
+//#undef UINT_FAST8_MAX
+//#undef UINT_FAST16_MAX
+//#undef UINT_FAST32_MAX
+//#undef UINT_FAST64_MAX
+//#undef UINTPTR_MAX 
+//#undef UINTMAX_MAX 
 
 // Function macros for minimum-width integer constants
-#define INTMAX_C(value) static_cast<stdex::intmax_t>(value)
-#define UINTMAX_C(value) static_cast<stdex::uintmax_t>(value)
+#define STDEX_INTMAX_C(value) static_cast<stdex::intmax_t>(value)
+#define STDEX_UINTMAX_C(value) static_cast<stdex::uintmax_t>(value)
 
-#define INT8_C(value) static_cast<stdex::int_least8_t>(value)
-#define UINT8_C(value) static_cast<stdex::uint_least8_t>(value)
-#define INT16_C(value) static_cast<stdex::int16_t>(value)
-#define UINT16_C(value) static_cast<stdex::uint16_t>(value)   
-#define INT32_C(value) static_cast<stdex::int32_t>(value)
-#define UINT32_C(value) static_cast<stdex::uint32_t>(value)
-#define INT64_C(value) static_cast<stdex::int64_t>(value)
-#define UINT64_C(value) static_cast<stdex::uint64_t>(value)
+#define STDEX_INT8_C(value) static_cast<stdex::int_least8_t>(value)
+#define STDEX_UINT8_C(value) static_cast<stdex::uint_least8_t>(value)
+#define STDEX_INT16_C(value) static_cast<stdex::int16_t>(value)
+#define STDEX_UINT16_C(value) static_cast<stdex::uint16_t>(value)   
+#define STDEX_INT32_C(value) static_cast<stdex::int32_t>(value)
+#define STDEX_UINT32_C(value) static_cast<stdex::uint32_t>(value)
+#define STDEX_INT64_C(value) static_cast<stdex::int64_t>(value)
+#define STDEX_UINT64_C(value) static_cast<stdex::uint64_t>(value)
 
 // Macro constants
-#define INT_LEAST8_MIN  (stdex::detail::_least_sized_integer<8>::min_value)
-#define INT_LEAST16_MIN (stdex::detail::_least_sized_integer<16>::min_value)
-#define INT_LEAST32_MIN (stdex::detail::_least_sized_integer<32>::min_value)
-#define INT_LEAST64_MIN (stdex::detail::_least_sized_integer<64>::min_value)
-#define INT_FAST8_MIN INT_LEAST8_MIN
-#define INT_FAST16_MIN INT_LEAST16_MIN
-#define INT_FAST32_MIN INT_LEAST32_MIN
-#define INT_FAST64_MIN INT_LEAST64_MIN
-#define INTPTR_MIN (stdex::detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::min_value)
-#define INTMAX_MIN (stdex::detail::_max_sized_integer::min_value)
+#define STDEX_INT_LEAST8_MIN  (stdex::detail::_least_sized_integer<8>::min_value)
+#define STDEX_INT_LEAST16_MIN (stdex::detail::_least_sized_integer<16>::min_value)
+#define STDEX_INT_LEAST32_MIN (stdex::detail::_least_sized_integer<32>::min_value)
+#define STDEX_INT_LEAST64_MIN (stdex::detail::_least_sized_integer<64>::min_value)
+#define STDEX_INT_FAST8_MIN INT_LEAST8_MIN
+#define STDEX_INT_FAST16_MIN INT_LEAST16_MIN
+#define STDEX_INT_FAST32_MIN INT_LEAST32_MIN
+#define STDEX_INT_FAST64_MIN INT_LEAST64_MIN
+#define STDEX_INTPTR_MIN (stdex::detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::min_value)
+#define STDEX_INTMAX_MIN (stdex::detail::_max_sized_integer::min_value)
  
 
-#define INT_LEAST8_MAX  (stdex::detail::_least_sized_integer<8>::max_value)
-#define INT_LEAST16_MAX (stdex::detail::_least_sized_integer<16>::max_value)
-#define INT_LEAST32_MAX (stdex::detail::_least_sized_integer<32>::max_value)
-#define INT_LEAST64_MAX (stdex::detail::_least_sized_integer<64>::max_value)
-#define INT_FAST8_MAX INT_LEAST8_MAX
-#define INT_FAST16_MAX INT_LEAST16_MAX
-#define INT_FAST32_MAX INT_LEAST32_MAX
-#define INT_FAST64_MAX INT_LEAST64_MAX
-#define INTPTR_MAX (stdex::detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::max_value)
-#define INTMAX_MAX (stdex::detail::_max_sized_integer::max_value)
+#define STDEX_INT_LEAST8_MAX  (stdex::detail::_least_sized_integer<8>::max_value)
+#define STDEX_INT_LEAST16_MAX (stdex::detail::_least_sized_integer<16>::max_value)
+#define STDEX_INT_LEAST32_MAX (stdex::detail::_least_sized_integer<32>::max_value)
+#define STDEX_INT_LEAST64_MAX (stdex::detail::_least_sized_integer<64>::max_value)
+#define STDEX_INT_FAST8_MAX INT_LEAST8_MAX
+#define STDEX_INT_FAST16_MAX INT_LEAST16_MAX
+#define STDEX_INT_FAST32_MAX INT_LEAST32_MAX
+#define STDEX_INT_FAST64_MAX INT_LEAST64_MAX
+#define STDEX_INTPTR_MAX (stdex::detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::max_value)
+#define STDEX_INTMAX_MAX (stdex::detail::_max_sized_integer::max_value)
 
 
-#define UINT_LEAST8_MAX  (stdex::detail::_least_sized_integer<8>::umax_value)
-#define UINT_LEAST16_MAX (stdex::detail::_least_sized_integer<16>::umax_value)
-#define UINT_LEAST32_MAX (stdex::detail::_least_sized_integer<32>::umax_value)
-#define UINT_LEAST64_MAX (stdex::detail::_least_sized_integer<64>::umax_value)
-#define UINT_FAST8_MAX UINT_LEAST8_MAX
-#define UINT_FAST16_MAX UINT_LEAST16_MAX
-#define UINT_FAST32_MAX UINT_LEAST32_MAX
-#define UINT_FAST64_MAX UINT_LEAST64_MAX
-#define UINTPTR_MAX (stdex::detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::umax_value)
-#define UINTMAX_MAX (stdex::detail::_max_sized_integer::umax_value)
+#define STDEX_UINT_LEAST8_MAX  (stdex::detail::_least_sized_integer<8>::umax_value)
+#define STDEX_UINT_LEAST16_MAX (stdex::detail::_least_sized_integer<16>::umax_value)
+#define STDEX_UINT_LEAST32_MAX (stdex::detail::_least_sized_integer<32>::umax_value)
+#define STDEX_UINT_LEAST64_MAX (stdex::detail::_least_sized_integer<64>::umax_value)
+#define STDEX_UINT_FAST8_MAX UINT_LEAST8_MAX
+#define STDEX_UINT_FAST16_MAX UINT_LEAST16_MAX
+#define STDEX_UINT_FAST32_MAX UINT_LEAST32_MAX
+#define STDEX_UINT_FAST64_MAX UINT_LEAST64_MAX
+#define STDEX_UINTPTR_MAX (stdex::detail::_least_sized_integer<sizeof(void*) * CHAR_BIT>::umax_value)
+#define STDEX_UINTMAX_MAX (stdex::detail::_max_sized_integer::umax_value)
 
 // optional
 #if _STDEX_PLATFORM_CAN_HAVE_STD_8_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_8_BIT_INT
-    #undef INT8_MIN
-    #undef INT8_MAX
-    #undef UINT8_MAX
+    //#undef INT8_MIN
+    //#undef INT8_MAX
+    //#undef UINT8_MAX
 
     #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
-        #define INT8_MIN static_cast<stdex::int8_t>(-128)
+        #define STDEX_INT8_MIN static_cast<stdex::int8_t>(-128)
     #else
-        #define INT8_MIN static_cast<stdex::int8_t>(-127)
+        #define STDEX_INT8_MIN static_cast<stdex::int8_t>(-127)
     #endif
-    #define INT8_MAX static_cast<stdex::int8_t>(127)
-    #define UINT8_MAX static_cast<stdex::uint8_t>(255)
+    #define STDEX_INT8_MAX static_cast<stdex::int8_t>(127)
+    #define STDEX_UINT8_MAX static_cast<stdex::uint8_t>(255)
 #endif
 #if _STDEX_PLATFORM_CAN_HAVE_STD_16_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_16_BIT_INT
-    #undef INT16_MIN
-    #undef INT16_MAX
-    #undef UINT16_MAX
+    //#undef INT16_MIN
+    //#undef INT16_MAX
+    //#undef UINT16_MAX
     
     #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
-        #define INT16_MIN static_cast<stdex::int16_t>(-32768)
+        #define STDEX_INT16_MIN static_cast<stdex::int16_t>(-32768)
     #else
-        #define INT16_MIN static_cast<stdex::int16_t>(-32767)
+        #define STDEX_INT16_MIN static_cast<stdex::int16_t>(-32767)
     #endif
-    #define INT16_MAX static_cast<stdex::int16_t>(32767)
-    #define UINT16_MAX static_cast<stdex::uint16_t>(65535)
+    #define STDEX_INT16_MAX static_cast<stdex::int16_t>(32767)
+    #define STDEX_UINT16_MAX static_cast<stdex::uint16_t>(65535)
 #endif
 #if _STDEX_PLATFORM_CAN_HAVE_STD_32_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_32_BIT_INT
-    #undef INT32_MIN
-    #undef INT32_MAX
-    #undef UINT32_MAX
+    //#undef INT32_MIN
+    //#undef INT32_MAX
+    //#undef UINT32_MAX
     
     #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
-        #define INT32_MIN static_cast<stdex::int32_t>(-2147483648)
+        #define STDEX_INT32_MIN static_cast<stdex::int32_t>(-2147483648)
     #else
-        #define INT32_MIN static_cast<stdex::int32_t>(-2147483647)
+        #define STDEX_INT32_MIN static_cast<stdex::int32_t>(-2147483647)
     #endif
-    #define INT32_MAX static_cast<stdex::int32_t>(2147483647)
-    #define UINT32_MAX static_cast<stdex::uint32_t>(4294967295)
+    #define STDEX_INT32_MAX static_cast<stdex::int32_t>(2147483647)
+    #define STDEX_UINT32_MAX static_cast<stdex::uint32_t>(4294967295)
 #endif
 #if _STDEX_PLATFORM_CAN_HAVE_STD_64_BIT_INT || _STDEX_PLATFORM_CAN_HAVE_NON_STD_64_BIT_INT
-    #undef INT64_MIN
-    #undef INT64_MAX
-    #undef UINT64_MAX
+    //#undef INT64_MIN
+    //#undef INT64_MAX
+    //#undef UINT64_MAX
     
     #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
-        #define INT64_MIN static_cast<stdex::int64_t>(-9223372036854775808)
+        #define STDEX_INT64_MIN static_cast<stdex::int64_t>(-9223372036854775808)
     #else
-        #define INT64_MIN static_cast<stdex::int64_t>(-9223372036854775807)
+        #define STDEX_INT64_MIN static_cast<stdex::int64_t>(-9223372036854775807)
     #endif
-    #define INT64_MAX static_cast<stdex::int64_t>(9223372036854775807)
-    #define UINT64_MAX static_cast<stdex::uint64_t>(18446744073709551615)
+    #define STDEX_INT64_MAX static_cast<stdex::int64_t>(9223372036854775807)
+    #define STDEX_UINT64_MAX static_cast<stdex::uint64_t>(18446744073709551615)
 #endif
 
 // clean from defines
