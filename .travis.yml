@@ -111,8 +111,8 @@ matrix:
       - BUILD_LIB_SCRIPT="./build_lib.bat"
       - BUILD_SCRIPT="./build_tests.bat"
       - RUN_SCRIPT="./run_tests.bat"
-      before_script: powershell
       script:
+        cmd //C;
         echo "script started";
         "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\vcvars32.bat\"";
         cd ./stdex;
@@ -129,8 +129,8 @@ matrix:
       - BUILD_LIB_SCRIPT="./build_lib.bat"
       - BUILD_SCRIPT="./build_tests.bat"
       - RUN_SCRIPT="./run_tests.bat"
-      before_script: powershell
       script:
+        cmd //C;
         echo "script started";
         "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\vcvars64.bat\"";
         cd ./stdex;
