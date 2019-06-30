@@ -256,12 +256,12 @@ namespace stdex
 			typedef _str_to_integral_chooser_impl<is_signed<_T>::value> impl;
 		};
 
-		template<class _T, unsigned long N>
+		template<class _T, unsigned long _N>
 		struct _type_cs_len
 		{
 			enum
 			{
-				value = _type_cs_len<_T, N / (unsigned long)(10)>::value + 1
+				value = _type_cs_len<_T, _N / (unsigned long)(10)>::value + 1
 			};
 		};
 
@@ -785,14 +785,14 @@ namespace stdex
 
 
 		template <class _T>
-		inline _T _cs_to_integral(const char *s, const char *&num_s_end, int base = 10)
+		inline _T _cs_to_integral(const char *_str, const char *&num_s_end, int base = 10)
 		{
 			typedef typename _str_to_integral_chooser<_T>::impl _str_to_integral;
 
 			int last_errno = errno;
 			errno = 0;
 			char *endptr = 0;
-			typename _str_to_integral::type _value = _str_to_integral::call(s, &endptr, base);
+			typename _str_to_integral::type _value = _str_to_integral::call(_str, &endptr, base);
 
 
 			if (_str_to_integral::check(_value) && errno == ERANGE)
@@ -812,14 +812,14 @@ namespace stdex
 		}
 
 		template <class _T>
-		inline _T _cs_to_integral(const wchar_t *s, const wchar_t *&num_s_end, int base = 10)
+		inline _T _cs_to_integral(const wchar_t *_str, const wchar_t *&num_s_end, int base = 10)
 		{
 			typedef typename _str_to_integral_chooser<_T>::impl _str_to_integral;
 
 			int last_errno = errno;
 			errno = 0;
 			wchar_t *endptr = 0;
-			typename _str_to_integral::type _value = _str_to_integral::call(s, &endptr, base);
+			typename _str_to_integral::type _value = _str_to_integral::call(_str, &endptr, base);
 
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
@@ -839,14 +839,14 @@ namespace stdex
 
 #if defined(LLONG_MAX) || defined(LLONG_MIN)
 		template <class _T>
-		inline _T _cs_to_integral_ll(const char *s, const char *&num_s_end, int base)
+		inline _T _cs_to_integral_ll(const char *_str, const char *&num_s_end, int base)
 		{
 			typedef typename _str_to_integral_chooser_ll<_T>::impl _str_to_integral;
 
 			int last_errno = errno;
 			errno = 0;
 			char *endptr = 0;
-			typename _str_to_integral::type _value = _str_to_integral::call(s, &endptr, base);
+			typename _str_to_integral::type _value = _str_to_integral::call(_str, &endptr, base);
 
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
@@ -865,14 +865,14 @@ namespace stdex
 		}
 
 		template <class _T>
-		inline _T _cs_to_integral_ll(const wchar_t *s, const wchar_t *&num_s_end, int base)
+		inline _T _cs_to_integral_ll(const wchar_t *_str, const wchar_t *&num_s_end, int base)
 		{
 			typedef typename _str_to_integral_chooser_ll<_T>::impl _str_to_integral;
 
 			int last_errno = errno;
 			errno = 0;
 			wchar_t *endptr = 0;
-			typename _str_to_integral::type _value = _str_to_integral::call(s, &endptr, base);
+			typename _str_to_integral::type _value = _str_to_integral::call(_str, &endptr, base);
 
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
@@ -892,14 +892,14 @@ namespace stdex
 #endif
 
 		template <class _T>
-		inline long double _cs_to_floating_point(const char *str, const char *&num_s_end)
+		inline long double _cs_to_floating_point(const char *_str, const char *&num_s_end)
 		{
 			using namespace std;
 
 			int last_errno = errno;
 			errno = 0;
 			char *endptr = 0;
-			double _value = strtod(str, &endptr);
+			double _value = strtod(_str, &endptr);
 
 #ifdef HUGE_VAL
 			if ((_value == HUGE_VAL || _value == -HUGE_VAL) && errno == ERANGE)
@@ -922,14 +922,14 @@ namespace stdex
 		}
 
 		template <class _T>
-		inline long double _cs_to_floating_point(const wchar_t *str, const wchar_t *&num_s_end)
+		inline long double _cs_to_floating_point(const wchar_t *_str, const wchar_t *&num_s_end)
 		{
 			using namespace std;
 
 			int last_errno = errno;
 			errno = 0;
 			wchar_t *endptr = 0;
-			double _value = wcstod(str, &endptr);
+			double _value = wcstod(_str, &endptr);
 
 #ifdef HUGE_VAL
 			if ((_value == HUGE_VAL || _value == -HUGE_VAL) && errno == ERANGE)
@@ -956,16 +956,16 @@ namespace stdex
 		template<bool>
 		struct _cs_to_floating_point_ld
 		{
-			template<class T>
+			template<class _Tp>
 			static long double
-			call(const T *str, const char *&num_s_end)
+			call(const _Tp *_str, const char *&num_s_end)
 			{
 				using namespace std;
 
 				int last_errno = errno;
 				errno = 0;
 				char *endptr = 0;
-				long double _value = strtold(str, &endptr);
+				long double _value = strtold(_str, &endptr);
 
 #ifdef HUGE_VALL
 				if ((_value == HUGE_VALL || _value == -HUGE_VALL) && errno == ERANGE)
@@ -982,16 +982,16 @@ namespace stdex
 				return _value;
 			}
 
-			template<class T>
+			template<class _Tp>
 			static long double
-			call(const T *str, const wchar_t *&num_s_end)
+			call(const _Tp *_str, const wchar_t *&num_s_end)
 			{
 				using namespace std;
 
 				int last_errno = errno;
 				errno = 0;
 				wchar_t *endptr = 0;
-				long double _value = wcstold(str, &endptr);
+				long double _value = wcstold(_str, &endptr);
 
 #ifdef HUGE_VALL
 				if ((_value == HUGE_VALL || _value == -HUGE_VALL) && errno == ERANGE)
@@ -1013,33 +1013,33 @@ namespace stdex
 		struct _cs_to_floating_point_ld<false>
 		{
 			static long double
-			_a_to_floating_point(const char *str)
+			_a_to_floating_point(const char *_str)
 			{
 				using namespace std;
 
 				long double value;
 
-				if (sscanf(str, "%Lf", &value) == EOF)
+				if (sscanf(_str, "%Lf", &value) == EOF)
 				{
 
 				long double fp_integer_part = 0.0L, fp_fractional_part = 0.0L;
-				cstddef::size_t i, length = strlen(str);
+				cstddef::size_t _i, length = strlen(_str);
 
-				i = 0; // Left to right
-				while (str[i] != '.') {
-					fp_integer_part = fp_integer_part * 10.0L + (str[i] - '0');
-					i++;
+				_i = 0; // Left to right
+				while (_str[_i] != '.') {
+					fp_integer_part = fp_integer_part * 10.0L + (_str[_i] - '0');
+					_i++;
 				}
 
 				
-				i = length - 1; // Right to left
+				_i = length - 1; // Right to left
 
-				while (!isdigit(str[i]) && str[i] != '.')
-					i--;
+				while (!isdigit(_str[_i]) && _str[_i] != '.')
+					_i--;
 
-				while (str[i] != '.') {
-					fp_fractional_part = (fp_fractional_part + (str[i] - '0')) / 10.0L;
-					i--;
+				while (_str[_i] != '.') {
+					fp_fractional_part = (fp_fractional_part + (_str[_i] - '0')) / 10.0L;
+					_i--;
 				}
 
 				value = fp_integer_part + fp_fractional_part;
@@ -1055,33 +1055,33 @@ namespace stdex
 			}
 
 			static long double
-			_a_to_floating_point(const wchar_t *str)
+			_a_to_floating_point(const wchar_t *_str)
 			{
 				using namespace std;
 
 				long double value;
 
-				if (swscanf(str, L"%Lf", &value) == EOF)
+				if (swscanf(_str, L"%Lf", &value) == EOF)
 				{
 
 					long double fp_integer_part = 0.0L, fp_fractional_part = 0.0L;
-					cstddef::size_t i, length = wcslen(str);
+					cstddef::size_t _i, length = wcslen(_str);
 
-					i = 0; // Left to right
-					while (str[i] != L'.') {
-						fp_integer_part = fp_integer_part * 10.0L + (str[i] - L'0');
-						i++;
+					_i = 0; // Left to right
+					while (_str[_i] != L'.') {
+						fp_integer_part = fp_integer_part * 10.0L + (_str[_i] - L'0');
+						_i++;
 					}
 
 
-					i = length - 1; // Right to left
+					_i = length - 1; // Right to left
 
-					while (!isdigit(str[i]) && str[i] != L'.')
-						i--;
+					while (!isdigit(_str[_i]) && _str[_i] != L'.')
+						_i--;
 
-					while (str[i] != L'.') {
-						fp_fractional_part = (fp_fractional_part + (str[i] - L'0')) / 10.0L;
-						i--;
+					while (_str[_i] != L'.') {
+						fp_fractional_part = (fp_fractional_part + (_str[_i] - L'0')) / 10.0L;
+						_i--;
 					}
 
 					value = fp_integer_part + fp_fractional_part;
@@ -1097,209 +1097,209 @@ namespace stdex
 			}
 
 			static long double
-			_cs_to_long_double(const char *str, char const **ptr)
+			_cs_to_long_double(const char *_str, char const **_ptr)
 			{
 				using namespace std;
 
-				const char *p;
+				const char *_p;
 
-				if (!ptr)
-					return _a_to_floating_point(str);
+				if (!_ptr)
+					return _a_to_floating_point(_str);
 
-				p = str;
+				_p = _str;
 
-				while (isspace(*p))
-					++p;
+				while (isspace(*_p))
+					++_p;
 
-				if (*p == '+' || *p == '-')
-					++p;
+				if (*_p == '+' || *_p == '-')
+					++_p;
 
 				typedef _not_a_number<long double>::impl not_a_number_impl;
 				typedef _infinity<long double>::impl infinity_impl;
 
 				/* INF or INFINITY.  */
-				if ((p[0] == 'i' || p[0] == 'I')
-					&& (p[1] == 'n' || p[1] == 'N')
-					&& (p[2] == 'f' || p[2] == 'F'))
+				if ((_p[0] == 'i' || _p[0] == 'I')
+					&& (_p[1] == 'n' || _p[1] == 'N')
+					&& (_p[2] == 'f' || _p[2] == 'F'))
 				{
-					if ((p[3] == 'i' || p[3] == 'I')
-						&& (p[4] == 'n' || p[4] == 'N')
-						&& (p[5] == 'i' || p[5] == 'I')
-						&& (p[6] == 't' || p[6] == 'T')
-						&& (p[7] == 'y' || p[7] == 'Y'))
+					if ((_p[3] == 'i' || _p[3] == 'I')
+						&& (_p[4] == 'n' || _p[4] == 'N')
+						&& (_p[5] == 'i' || _p[5] == 'I')
+						&& (_p[6] == 't' || _p[6] == 'T')
+						&& (_p[7] == 'y' || _p[7] == 'Y'))
 					{
-						*ptr = p + 8;
+						*_ptr = _p + 8;
 						return infinity_impl::inf();
 					}
 					else
 					{
-						*ptr = p + 3;
+						*_ptr = _p + 3;
 						return infinity_impl::inf();
 					}
 				}
 
 				/* NAN or NAN(foo).  */
-				if ((p[0] == 'n' || p[0] == 'N')
-					&& (p[1] == 'a' || p[1] == 'A')
-					&& (p[2] == 'n' || p[2] == 'N'))
+				if ((_p[0] == 'n' || _p[0] == 'N')
+					&& (_p[1] == 'a' || _p[1] == 'A')
+					&& (_p[2] == 'n' || _p[2] == 'N'))
 				{
-					p += 3;
-					if (*p == '(')
+					_p += 3;
+					if (*_p == '(')
 					{
-						++p;
-						while (*p != '\0' && *p != ')')
-							++p;
-						if (*p == ')')
-							++p;
+						++_p;
+						while (*_p != '\0' && *_p != ')')
+							++_p;
+						if (*_p == ')')
+							++_p;
 					}
-					*ptr = p;
+					*_ptr = _p;
 					return not_a_number_impl::NaN();
 				}
 
 				/* digits, with 0 or 1 periods in it.  */
-				if (isdigit(*p) || *p == '.')
+				if (isdigit(*_p) || *_p == '.')
 				{
 					int got_dot = 0;
-					while (isdigit(*p) || (!got_dot && *p == '.'))
+					while (isdigit(*_p) || (!got_dot && *_p == '.'))
 					{
-						if (*p == '.')
+						if (*_p == '.')
 							got_dot = 1;
-						++p;
+						++_p;
 					}
 
 					/* Exponent.  */
-					if (*p == 'e' || *p == 'E')
+					if (*_p == 'e' || *_p == 'E')
 					{
-						int i;
-						i = 1;
-						if (p[i] == '+' || p[i] == '-')
-							++i;
-						if (isdigit(p[i]))
+						int _i;
+						_i = 1;
+						if (_p[_i] == '+' || _p[_i] == '-')
+							++_i;
+						if (isdigit(_p[_i]))
 						{
-							while (isdigit(p[i]))
-								++i;
-							*ptr = p + i;
-							if (std::numeric_limits<long double>::max_exponent10 < i)
+							while (isdigit(_p[_i]))
+								++_i;
+							*_ptr = _p + _i;
+							if (std::numeric_limits<long double>::max_exponent10 < _i)
 							{
 								errno = ERANGE;
 								return std::numeric_limits<long double>::max();
 							}
-							return _a_to_floating_point(str);
+							return _a_to_floating_point(_str);
 						}
 					}
-					*ptr = p;
-					return _a_to_floating_point(str);
+					*_ptr = _p;
+					return _a_to_floating_point(_str);
 				}
 				/* Didn't find any digits.  Doesn't look like a number.  */
-				*ptr = str;
+				*_ptr = _str;
 				return not_a_number_impl::NaN();
 			}
 
 			static long double
-			_cs_to_long_double(const wchar_t *str, wchar_t const **ptr)
+			_cs_to_long_double(const wchar_t *_str, wchar_t const **_ptr)
 			{
 				using namespace std;
 
-				const wchar_t *p;
+				const wchar_t *_p;
 
-				if (!ptr)
-					return _a_to_floating_point(str);
+				if (!_ptr)
+					return _a_to_floating_point(_str);
 
-				p = str;
+				_p = _str;
 
-				while (isspace(*p))
-					++p;
+				while (isspace(*_p))
+					++_p;
 
-				if (*p == L'+' || *p == L'-')
-					++p;
+				if (*_p == L'+' || *_p == L'-')
+					++_p;
 
 				typedef _not_a_number<long double>::impl not_a_number_impl;
 				typedef _infinity<long double>::impl infinity_impl;
 
 				/* INF or INFINITY.  */
-				if ((p[0] == L'i' || p[0] == L'I')
-					&& (p[1] == L'n' || p[1] == L'N')
-					&& (p[2] == L'f' || p[2] == L'F'))
+				if ((_p[0] == L'i' || _p[0] == L'I')
+					&& (_p[1] == L'n' || _p[1] == L'N')
+					&& (_p[2] == L'f' || _p[2] == L'F'))
 				{
-					if ((p[3] == L'i' || p[3] == L'I')
-						&& (p[4] == L'n' || p[4] == L'N')
-						&& (p[5] == L'i' || p[5] == L'I')
-						&& (p[6] == L't' || p[6] == L'T')
-						&& (p[7] == L'y' || p[7] == L'Y'))
+					if ((_p[3] == L'i' || _p[3] == L'I')
+						&& (_p[4] == L'n' || _p[4] == L'N')
+						&& (_p[5] == L'i' || _p[5] == L'I')
+						&& (_p[6] == L't' || _p[6] == L'T')
+						&& (_p[7] == L'y' || _p[7] == L'Y'))
 					{
-						*ptr = p + 8;
+						*_ptr = _p + 8;
 						return infinity_impl::inf();
 					}
 					else
 					{
-						*ptr = p + 3;
+						*_ptr = _p + 3;
 						return infinity_impl::inf();
 					}
 				}
 
 				/* NAN or NAN(foo).  */
-				if ((p[0] == L'n' || p[0] == L'N')
-					&& (p[1] == L'a' || p[1] == L'A')
-					&& (p[2] == L'n' || p[2] == L'N'))
+				if ((_p[0] == L'n' || _p[0] == L'N')
+					&& (_p[1] == L'a' || _p[1] == L'A')
+					&& (_p[2] == L'n' || _p[2] == L'N'))
 				{
-					p += 3;
-					if (*p == L'(')
+					_p += 3;
+					if (*_p == L'(')
 					{
-						++p;
-						while (*p != L'\0' && *p != L')')
-							++p;
-						if (*p == L')')
-							++p;
+						++_p;
+						while (*_p != L'\0' && *_p != L')')
+							++_p;
+						if (*_p == L')')
+							++_p;
 					}
-					*ptr = p;
+					*_ptr = _p;
 					return not_a_number_impl::NaN();
 				}
 
 				/* digits, with 0 or 1 periods in it.  */
-				if (isdigit(*p) || *p == L'.')
+				if (isdigit(*_p) || *_p == L'.')
 				{
 					int got_dot = 0;
-					while (isdigit(*p) || (!got_dot && *p == L'.'))
+					while (isdigit(*_p) || (!got_dot && *_p == L'.'))
 					{
-						if (*p == L'.')
+						if (*_p == L'.')
 							got_dot = 1;
-						++p;
+						++_p;
 					}
 
 					/* Exponent.  */
-					if (*p == L'e' || *p == L'E')
+					if (*_p == L'e' || *_p == L'E')
 					{
-						int i;
-						i = 1;
-						if (p[i] == L'+' || p[i] == L'-')
-							++i;
-						if (isdigit(p[i]))
+						int _i;
+						_i = 1;
+						if (_p[_i] == L'+' || _p[_i] == L'-')
+							++_i;
+						if (isdigit(_p[_i]))
 						{
-							while (isdigit(p[i]))
-								++i;
-							*ptr = p + i;
-							if (std::numeric_limits<long double>::max_exponent10 < i)
+							while (isdigit(_p[_i]))
+								++_i;
+							*_ptr = _p + _i;
+							if (std::numeric_limits<long double>::max_exponent10 < _i)
 							{
 								errno = ERANGE;
 								return std::numeric_limits<long double>::max();
 							}
-							return _a_to_floating_point(str);
+							return _a_to_floating_point(_str);
 						}
 					}
-					*ptr = p;
-					return _a_to_floating_point(str);
+					*_ptr = _p;
+					return _a_to_floating_point(_str);
 				}
 				/* Didn't find any digits.  Doesn't look like a number.  */
-				*ptr = str;
+				*_ptr = _str;
 				return not_a_number_impl::NaN();
 			}
 
 			static long double
-			call(const char *str, const char *&num_s_end)
+			call(const char *_str, const char *&num_s_end)
 			{
 				int last_errno = errno;
 				errno = 0;
-				long double _value = _cs_to_long_double(str, &num_s_end);
+				long double _value = _cs_to_long_double(_str, &num_s_end);
 
 				if (errno == ERANGE)
 					num_s_end = 0;
@@ -1311,11 +1311,11 @@ namespace stdex
 			}
 
 			static long double
-			call(const wchar_t *str, const wchar_t *&num_s_end)
+			call(const wchar_t *_str, const wchar_t *&num_s_end)
 			{
 				int last_errno = errno;
 				errno = 0;
-				long double _value = _cs_to_long_double(str, &num_s_end);
+				long double _value = _cs_to_long_double(_str, &num_s_end);
 
 				if (errno == ERANGE)
 					num_s_end = 0;
@@ -1333,21 +1333,21 @@ namespace stdex
 		template <>
 		inline 
 		long double
-		_cs_to_floating_point<long double>(const char *str, const char *&num_s_end)
+		_cs_to_floating_point<long double>(const char *_str, const char *&num_s_end)
 		{
 			typedef _cs_to_floating_point_ld<string_detail::_strtold_present::value> impl;
 
-			return impl::call(str, num_s_end);
+			return impl::call(_str, num_s_end);
 		}
 
 		template <>
 		inline 
 		long double
-		_cs_to_floating_point<long double>(const wchar_t *str, const wchar_t *&num_s_end)
+		_cs_to_floating_point<long double>(const wchar_t *_str, const wchar_t *&num_s_end)
 		{
 			typedef _cs_to_floating_point_ld<string_detail::_wcstold_present::value> impl;
 
-			return impl::call(str, num_s_end);
+			return impl::call(_str, num_s_end);
 		}
 
 		struct _has_4arg_swprintf:
@@ -1359,27 +1359,27 @@ namespace stdex
 		template<>
 		struct _swprintf_impl<true>
 		{
-			template<class T1, class T2, class T3, class T4>
-			static void call(T1 a1, T2 a2, T3 a3, T4 a4)
+			template<class _T1, class _T2, class _T3, class _T4>
+			static void call(_T1 _a1, _T2 _a2, _T3 _a3, _T4 _a4)
 			{
 				using namespace std;
-				swprintf(a1, a2, a3, a4);
+				swprintf(_a1, _a2, _a3, _a4);
 			}
 		};
 
 		template<>
 		struct _swprintf_impl<false>
 		{
-			template<class T1, class T2, class T3>
-			static void call(T1 a1, cstddef::size_t, T2 a2, T3 a3)
+			template<class _T1, class _T2, class _T3>
+			static void call(_T1 _a1, cstddef::size_t, _T2 _a2, _T3 _a3)
 			{
 				using namespace std;
-				swprintf(a1, a2, a3);
+				swprintf(_a1, _a2, _a3);
 			}
 		};
 
-		template<class ArgT>
-		void _swprintf4_std_impl(wchar_t* ws, cstddef::size_t len, const wchar_t* format, ArgT arg)
+		template<class _ArgT>
+		void _swprintf4_std_impl(wchar_t* ws, cstddef::size_t len, const wchar_t* format, _ArgT arg)
 		{
 			_swprintf_impl<_has_4arg_swprintf::value>::call(ws, len, format, arg);
 		}
@@ -1389,10 +1389,10 @@ namespace stdex
 		{
 			static string call(const _Tp &value)
 			{
-				stringstream ss;
-				ss << value;
-				string str(ss.str());
-				return str;
+				stringstream _ss;
+				_ss << value;
+				string _str(_ss.str());
+				return _str;
 			}
 		};
 
@@ -1415,10 +1415,10 @@ namespace stdex
 		{
 			static wstring call(const _Tp &value)
 			{
-				wstringstream ss;
-				ss << value;
-				wstring str(ss.str());
-				return str;
+				wstringstream _ss;
+				_ss << value;
+				wstring _str(_ss.str());
+				return _str;
 			}
 		};
 
@@ -1442,9 +1442,9 @@ namespace stdex
 
 	
 	template <class _T>
-	inline _T stot(const string &s, cstddef::size_t *idx = 0, int base = 10)
+	inline _T stot(const string &_str, cstddef::size_t *idx = 0, int base = 10)
 	{
-		const char *_eptr = s.c_str(), *_ptr = _eptr;
+		const char *_eptr = _str.c_str(), *_ptr = _eptr;
 		_T _value = stot<_T>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
@@ -1459,9 +1459,9 @@ namespace stdex
 	}
 
 	template <class _T>
-	inline _T stot(const wstring &s, cstddef::size_t *idx = 0, int base = 10)
+	inline _T stot(const wstring &_str, cstddef::size_t *idx = 0, int base = 10)
 	{
-		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
+		const wchar_t *_eptr = _str.c_str(), *_ptr = _eptr;
 		_T _value = stot<_T>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
@@ -1475,9 +1475,9 @@ namespace stdex
 		return (_value);
 	}
 	
-	inline int stoi(const string &s, cstddef::size_t *idx = 0, int base = 10)
+	inline int stoi(const string &_str, cstddef::size_t *idx = 0, int base = 10)
 	{
-		const char *_eptr = s.c_str(), *_ptr = _eptr;
+		const char *_eptr = _str.c_str(), *_ptr = _eptr;
 		int _value = detail::_cs_to_integral<int>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
@@ -1491,9 +1491,9 @@ namespace stdex
 		return (_value);
 	}
 
-	inline int stoi(const wstring &s, cstddef::size_t *idx = 0, int base = 10)
+	inline int stoi(const wstring &_str, cstddef::size_t *idx = 0, int base = 10)
 	{
-		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
+		const wchar_t *_eptr = _str.c_str(), *_ptr = _eptr;
 		int _value = detail::_cs_to_integral<int>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
@@ -1507,9 +1507,9 @@ namespace stdex
 		return (_value);
 	}
 
-	inline long stol(const string &s, cstddef::size_t *idx = 0, int base = 10)
+	inline long stol(const string &_str, cstddef::size_t *idx = 0, int base = 10)
 	{
-		const char *_eptr = s.c_str(), *_ptr = _eptr;
+		const char *_eptr = _str.c_str(), *_ptr = _eptr;
 		long _value = detail::_cs_to_integral<long>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
@@ -1523,9 +1523,9 @@ namespace stdex
 		return (_value);
 	}
 
-	inline long stol(const wstring &s, cstddef::size_t *idx = 0, int base = 10)
+	inline long stol(const wstring &_str, cstddef::size_t *idx = 0, int base = 10)
 	{
-		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
+		const wchar_t *_eptr = _str.c_str(), *_ptr = _eptr;
 		long _value = detail::_cs_to_integral<long>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
@@ -1539,9 +1539,9 @@ namespace stdex
 		return (_value);
 	}
 
-	inline unsigned long stoul(const string &s, cstddef::size_t *idx = 0, int base = 10)
+	inline unsigned long stoul(const string &_str, cstddef::size_t *idx = 0, int base = 10)
 	{
-		const char *_eptr = s.c_str(), *_ptr = _eptr;
+		const char *_eptr = _str.c_str(), *_ptr = _eptr;
 		unsigned long _value = detail::_cs_to_integral<unsigned long>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
@@ -1555,9 +1555,9 @@ namespace stdex
 		return (_value);
 	}
 
-	inline unsigned long stoul(const wstring &s, cstddef::size_t *idx = 0, int base = 10)
+	inline unsigned long stoul(const wstring &_str, cstddef::size_t *idx = 0, int base = 10)
 	{
-		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
+		const wchar_t *_eptr = _str.c_str(), *_ptr = _eptr;
 		unsigned long _value = detail::_cs_to_integral<unsigned long>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
@@ -1571,9 +1571,9 @@ namespace stdex
 		return (_value);
 	}
 	
-	inline float stof(const string &s, cstddef::size_t *idx = 0)
+	inline float stof(const string &_str, cstddef::size_t *idx = 0)
 	{
-		const char *_eptr = s.c_str(), *_ptr = _eptr;
+		const char *_eptr = _str.c_str(), *_ptr = _eptr;
 		
 		float _value = static_cast<float>(detail::_cs_to_floating_point<float>(_ptr, _eptr));
 
@@ -1588,9 +1588,9 @@ namespace stdex
 		return (_value);
 	}
 
-	inline float stof(const wstring &s, cstddef::size_t *idx = 0)
+	inline float stof(const wstring &_str, cstddef::size_t *idx = 0)
 	{
-		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
+		const wchar_t *_eptr = _str.c_str(), *_ptr = _eptr;
 
 		float _value = static_cast<float>(detail::_cs_to_floating_point<float>(_ptr, _eptr));
 
@@ -1605,9 +1605,9 @@ namespace stdex
 		return (_value);
 	}
 
-	inline double stod(const string &s, cstddef::size_t *idx = 0)
+	inline double stod(const string &_str, cstddef::size_t *idx = 0)
 	{
-		const char *_eptr = s.c_str(), *_ptr = _eptr;
+		const char *_eptr = _str.c_str(), *_ptr = _eptr;
 		
 		double _value = static_cast<double>(detail::_cs_to_floating_point<double>(_ptr, _eptr));
 
@@ -1622,9 +1622,9 @@ namespace stdex
 		return (_value);
 	}
 
-	inline double stod(const wstring &s, cstddef::size_t *idx = 0)
+	inline double stod(const wstring &_str, cstddef::size_t *idx = 0)
 	{
-		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
+		const wchar_t *_eptr = _str.c_str(), *_ptr = _eptr;
 
 		double _value = static_cast<double>(detail::_cs_to_floating_point<double>(_ptr, _eptr));
 
@@ -1639,9 +1639,9 @@ namespace stdex
 		return (_value);
 	}
 
-	inline long double stold(const string &s, cstddef::size_t *idx = 0)
+	inline long double stold(const string &_str, cstddef::size_t *idx = 0)
 	{
-		const char *_eptr = s.c_str(), *_ptr = _eptr;
+		const char *_eptr = _str.c_str(), *_ptr = _eptr;
 		
 		typedef conditional<sizeof(long double) == sizeof(double), double, long double>::type type;
 
@@ -1658,9 +1658,9 @@ namespace stdex
 		return (_value);
 	}
 
-	inline long double stold(const wstring &s, cstddef::size_t *idx = 0)
+	inline long double stold(const wstring &_str, cstddef::size_t *idx = 0)
 	{
-		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
+		const wchar_t *_eptr = _str.c_str(), *_ptr = _eptr;
 
 		typedef conditional<sizeof(long double) == sizeof(double), double, long double>::type type;
 
@@ -1678,9 +1678,9 @@ namespace stdex
 	}
 
 #if defined(LLONG_MAX) || defined(LLONG_MIN)
-	inline int64_t stoll(const string &s, cstddef::size_t *idx = 0, int base = 10)
+	inline int64_t stoll(const string &_str, cstddef::size_t *idx = 0, int base = 10)
 	{
-		const char *_eptr = s.c_str(), *_ptr = _eptr;
+		const char *_eptr = _str.c_str(), *_ptr = _eptr;
 		
 		int64_t _value = detail::_cs_to_integral_ll<int64_t>(_ptr, _eptr, base);
 
@@ -1695,9 +1695,9 @@ namespace stdex
 		return (_value);
 	}
 
-	inline int64_t stoll(const wstring &s, cstddef::size_t *idx = 0, int base = 10)
+	inline int64_t stoll(const wstring &_str, cstddef::size_t *idx = 0, int base = 10)
 	{
-		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
+		const wchar_t *_eptr = _str.c_str(), *_ptr = _eptr;
 
 		int64_t _value = detail::_cs_to_integral_ll<int64_t>(_ptr, _eptr, base);
 
@@ -1712,9 +1712,9 @@ namespace stdex
 		return (_value);
 	}
 
-	inline uint64_t stoull(const string &s, cstddef::size_t *idx = 0, int base = 10)
+	inline uint64_t stoull(const string &_str, cstddef::size_t *idx = 0, int base = 10)
 	{
-		const char *_eptr = s.c_str(), *_ptr = _eptr;
+		const char *_eptr = _str.c_str(), *_ptr = _eptr;
 		
 		uint64_t _value = detail::_cs_to_integral_ll<uint64_t>(_ptr, _eptr, base);
 
@@ -1729,9 +1729,9 @@ namespace stdex
 		return (_value);
 	}
 
-	inline uint64_t stoull(const wstring &s, cstddef::size_t *idx = 0, int base = 10)
+	inline uint64_t stoull(const wstring &_str, cstddef::size_t *idx = 0, int base = 10)
 	{
-		const wchar_t *_eptr = s.c_str(), *_ptr = _eptr;
+		const wchar_t *_eptr = _str.c_str(), *_ptr = _eptr;
 
 		uint64_t _value = detail::_cs_to_integral_ll<uint64_t>(_ptr, _eptr, base);
 
@@ -1747,16 +1747,16 @@ namespace stdex
 	}
 #endif
 
-	template<class _T>
-	inline string to_string(const _T &t)
+	template<class _Tp>
+	inline string to_string(const _Tp &value)
 	{
-		return detail::_to_string_impl<_T>::call(t);
+		return detail::_to_string_impl<_Tp>::call(value);
 	}
 
-	template<class _T>
-	inline wstring to_wstring(const _T &t)
+	template<class _Tp>
+	inline wstring to_wstring(const _Tp &value)
 	{
-		return detail::_to_wstring_impl<_T>::call(t);
+		return detail::_to_wstring_impl<_Tp>::call(value);
 	}
 	
 	template<>
@@ -1888,15 +1888,15 @@ namespace stdex
 	}
 
 	template<>
-	inline string to_string<std::string>(const std::string &x)
+	inline string to_string<std::string>(const std::string &_str)
 	{
-		return x;
+		return _str;
 	}
 
 	template<>
-	inline wstring to_wstring<std::wstring>(const std::wstring &x)
+	inline wstring to_wstring<std::wstring>(const std::wstring &_str)
 	{
-		return x;
+		return _str;
 	}
 
 	template<>
@@ -2014,8 +2014,8 @@ namespace stdex
 				fp_integer_part = floor(fp_integer_part / 10.0L);
 			}
 
-			for (cstddef::size_t i = 0; i < symbols_converted_n; i++)
-				buf[i] = str_integer_part_reverse[symbols_converted_n - i - 1];
+			for (cstddef::size_t _i = 0; _i < symbols_converted_n; _i++)
+				buf[_i] = str_integer_part_reverse[symbols_converted_n - _i - 1];
 
 			buf[symbols_converted_n++] = '.';
 
@@ -2074,8 +2074,8 @@ namespace stdex
 				fp_integer_part = floor(fp_integer_part / 10.0L);
 			}
 
-			for (cstddef::size_t i = 0; i < symbols_converted_n; i++)
-				buf[i] = str_integer_part_reverse[symbols_converted_n - i - 1];
+			for (cstddef::size_t _i = 0; _i < symbols_converted_n; _i++)
+				buf[_i] = str_integer_part_reverse[symbols_converted_n - _i - 1];
 
 			buf[symbols_converted_n++] = L'.';
 

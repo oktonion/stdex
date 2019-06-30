@@ -192,7 +192,7 @@
 			{
 			}; // StaticAssertion<true>
 
-			template<int i>
+			template<int>
 			struct StaticAssertionTest
 			{
 			}; // StaticAssertionTest<int>

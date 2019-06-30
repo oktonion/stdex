@@ -42,101 +42,101 @@ namespace stdex
 
 		template<class _FuncT> struct _function_traits;
 
-		template<class R>
-		struct _function_traits<R(*)(void)>
+		template<class _R>
+		struct _function_traits<_R(*)(void)>
 		{
-			typedef R result_type;
+			typedef _R result_type;
 		};
 
-		template<class R, class T1>
-		struct _function_traits<R(*)(T1)>
+		template<class _R, class _T1>
+		struct _function_traits<_R(*)(_T1)>
 		{
-			typedef R result_type;
-			typedef T1 arg1_type;
-			typedef T1 argument_type;
+			typedef _R result_type;
+			typedef _T1 arg1_type;
+			typedef _T1 argument_type;
 		};
 
-		template<class R, class T1, class T2>
-		struct _function_traits<R(*)(T1, T2)>
+		template<class _R, class _T1, class _T2>
+		struct _function_traits<_R(*)(_T1, _T2)>
 		{
-			typedef R result_type;
-			typedef T1 arg1_type;
-			typedef T2 arg2_type;
+			typedef _R result_type;
+			typedef _T1 arg1_type;
+			typedef _T2 arg2_type;
 			
 			
 		};
 
-		template<class R, class T1, class T2, class T3>
-		struct _function_traits<R(*)(T1, T2, T3)>
+		template<class _R, class _T1, class _T2, class _T3>
+		struct _function_traits<_R(*)(_T1, _T2, _T3)>
 		{
-			typedef R result_type;
-			typedef T1 arg1_type;
-			typedef T2 arg2_type;
-			typedef T3 arg3_type;
+			typedef _R result_type;
+			typedef _T1 arg1_type;
+			typedef _T2 arg2_type;
+			typedef _T3 arg3_type;
 		};
 
-		template<class R, class T1, class T2, class T3, class T4>
-		struct _function_traits<R(*)(T1, T2, T3, T4)>
+		template<class _R, class _T1, class _T2, class _T3, class _T4>
+		struct _function_traits<_R(*)(_T1, _T2, _T3, _T4)>
 		{
-			typedef R result_type;
-			typedef T1 arg1_type;
-			typedef T2 arg2_type;
-			typedef T3 arg3_type;
-			typedef T4 arg4_type;
+			typedef _R result_type;
+			typedef _T1 arg1_type;
+			typedef _T2 arg2_type;
+			typedef _T3 arg3_type;
+			typedef _T4 arg4_type;
 		};
 
-		template<class R, class T1, class T2, class T3, class T4,
-			class T5>
-		struct _function_traits<R(*)(T1, T2, T3, T4, T5)>
+		template<class _R, class _T1, class _T2, class _T3, class _T4,
+			class _T5>
+		struct _function_traits<_R(*)(_T1, _T2, _T3, _T4, _T5)>
 		{
-			typedef R result_type;
-			typedef T1 arg1_type;
-			typedef T2 arg2_type;
-			typedef T3 arg3_type;
-			typedef T4 arg4_type;
-			typedef T5 arg5_type;
+			typedef _R result_type;
+			typedef _T1 arg1_type;
+			typedef _T2 arg2_type;
+			typedef _T3 arg3_type;
+			typedef _T4 arg4_type;
+			typedef _T5 arg5_type;
 		};
 
-		template<class R, class T1, class T2, class T3, class T4,
-			class T5, class T6>
-		struct _function_traits<R(*)(T1, T2, T3, T4, T5, T6)>
+		template<class _R, class _T1, class _T2, class _T3, class _T4,
+			class _T5, class _T6>
+		struct _function_traits<_R(*)(_T1, _T2, _T3, _T4, _T5, _T6)>
 		{
-			typedef R result_type;
-			typedef T1 arg1_type;
-			typedef T2 arg2_type;
-			typedef T3 arg3_type;
-			typedef T4 arg4_type;
-			typedef T5 arg5_type;
-			typedef T6 arg6_type;
+			typedef _R result_type;
+			typedef _T1 arg1_type;
+			typedef _T2 arg2_type;
+			typedef _T3 arg3_type;
+			typedef _T4 arg4_type;
+			typedef _T5 arg5_type;
+			typedef _T6 arg6_type;
 		};
 
-		template<class R, class T1, class T2, class T3, class T4,
-			class T5, class T6, class T7>
-		struct _function_traits<R(*)(T1, T2, T3, T4, T5, T6, T7)>
+		template<class _R, class _T1, class _T2, class _T3, class _T4,
+			class _T5, class _T6, class _T7>
+		struct _function_traits<_R(*)(_T1, _T2, _T3, _T4, _T5, _T6, _T7)>
 		{
-			typedef R result_type;
-			typedef T1 arg1_type;
-			typedef T2 arg2_type;
-			typedef T3 arg3_type;
-			typedef T4 arg4_type;
-			typedef T5 arg5_type;
-			typedef T6 arg6_type;
-			typedef T7 arg7_type;
+			typedef _R result_type;
+			typedef _T1 arg1_type;
+			typedef _T2 arg2_type;
+			typedef _T3 arg3_type;
+			typedef _T4 arg4_type;
+			typedef _T5 arg5_type;
+			typedef _T6 arg6_type;
+			typedef _T7 arg7_type;
 		};
 
-		template<class R, class T1, class T2, class T3, class T4,
-			class T5, class T6, class T7, class T8>
-		struct _function_traits<R(*)(T1, T2, T3, T4, T5, T6, T7, T8)>
+		template<class _R, class _T1, class _T2, class _T3, class _T4,
+			class _T5, class _T6, class _T7, class _T8>
+		struct _function_traits<_R(*)(_T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8)>
 		{
-			typedef R result_type;
-			typedef T1 arg1_type;
-			typedef T2 arg2_type;
-			typedef T3 arg3_type;
-			typedef T4 arg4_type;
-			typedef T5 arg5_type;
-			typedef T6 arg6_type;
-			typedef T7 arg7_type;
-			typedef T8 arg8_type;
+			typedef _R result_type;
+			typedef _T1 arg1_type;
+			typedef _T2 arg2_type;
+			typedef _T3 arg3_type;
+			typedef _T4 arg4_type;
+			typedef _T5 arg5_type;
+			typedef _T6 arg6_type;
+			typedef _T7 arg7_type;
+			typedef _T8 arg8_type;
 		};
 
 
@@ -1340,7 +1340,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 		bool joinable() const NOEXCEPT_FUNCTION;
 
 		//! Detach from the thread.
-		//! After calling @c detach(), the thread object is no longer assicated with
+		//! After calling @c detach(), the thread object is no longer associated with
 		//! a thread of execution (i.e. it is not joinable). The thread continues
 		//! execution without the calling thread blocking, and when the thread
 		//! ends execution, any owned resources are released.
@@ -1409,34 +1409,34 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 		//! milliseconds, seconds, minutes and hours.
 
 		template <class _Rep, class _Period>
-		inline void sleep_for(const chrono::duration<_Rep, _Period> &d)
+		inline void sleep_for(const chrono::duration<_Rep, _Period> &_dur)
 		{
-			chrono::seconds s = chrono::duration_cast<chrono::seconds>(d);
-			chrono::nanoseconds ns = chrono::duration_cast<chrono::nanoseconds>(d - s);
+			chrono::seconds _sec = chrono::duration_cast<chrono::seconds>(_dur);
+			chrono::nanoseconds _ns = chrono::duration_cast<chrono::nanoseconds>(_dur - _sec);
 			
 			timespec ts;
-			ts.tv_sec = static_cast<stdex::time_t>(s.count());
-			ts.tv_nsec = static_cast<long>(ns.count());
+			ts.tv_sec = static_cast<stdex::time_t>(_sec.count());
+			ts.tv_nsec = static_cast<long>(_ns.count());
 
 			detail::sleep_for_impl(&ts);
 		}
 
 		template <class _Clock, class _Duration>
-		inline void sleep_until(const chrono::time_point<_Clock, _Duration> &t)
+		inline void sleep_until(const chrono::time_point<_Clock, _Duration> &_tp)
 		{
-			chrono::time_point<_Clock> now = _Clock::now();
+			chrono::time_point<_Clock> _now = _Clock::now();
 
 			if (_Clock::is_steady)
 			{
-				if (now < t)
-					sleep_for(t - now);
+				if (_now < _tp)
+					sleep_for(_tp - _now);
 				return;
 			}
 
-			while (now < t)
+			while (_now < _tp)
 			{
-				sleep_for(t - now);
-				now = _Clock::now();
+				sleep_for(_tp - _now);
+				_now = _Clock::now();
 			}
 
 		}
