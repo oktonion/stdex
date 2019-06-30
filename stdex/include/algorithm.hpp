@@ -385,7 +385,7 @@ namespace stdex
 
 		if (_count > 0) {
 			*_result++ = *_first;
-			for (cstddef::size_t _i = 1; _i < count; ++_i) {
+			for (cstddef::size_t _i = 1; _i < _count; ++_i) {
 				*_result++ = *++_first;
 			}
 		}

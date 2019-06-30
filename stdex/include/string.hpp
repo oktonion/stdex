@@ -326,9 +326,9 @@ namespace stdex
 			call(const char *nptr, char **endptr, int base)
 			{
 				using namespace std;
-				const char *s = nptr;
+				const char *_s = nptr;
 				string_detail::_unsigned_long_long_type acc;
-				int c;
+				int _c;
 				string_detail::_unsigned_long_long_type cutoff;
 				int neg = 0, any, cutlim;
 
@@ -338,22 +338,22 @@ namespace stdex
 				* assume decimal; if base is already 16, allow 0x.
 				*/
 				do {
-					c = *s++;
-				} while (isspace(c));
-				if (c == '-') {
+					_c = *_s++;
+				} while (isspace(_c));
+				if (_c == '-') {
 					neg = 1;
-					c = *s++;
+					_c = *_s++;
 				}
-				else if (c == '+')
-					c = *s++;
+				else if (_c == '+')
+					_c = *_s++;
 				if ((base == 0 || base == 16) &&
-					c == '0' && (*s == 'x' || *s == 'X')) {
-					c = s[1];
-					s += 2;
+					_c == '0' && (*_s == 'x' || *_s == 'X')) {
+					_c = _s[1];
+					_s += 2;
 					base = 16;
 				}
 				if (base == 0)
-					base = c == '0' ? 8 : 10;
+					base = _c == '0' ? 8 : 10;
 
 				/*
 				* Compute the cutoff value between legal numbers and illegal
@@ -375,21 +375,21 @@ namespace stdex
 				cutoff = neg ? -(string_detail::_unsigned_long_long_type) LLONG_MIN : LLONG_MAX;
 				cutlim = cutoff % (string_detail::_unsigned_long_long_type) base;
 				cutoff /= (string_detail::_unsigned_long_long_type) base;
-				for (acc = 0, any = 0;; c = *s++) {
-					if (isdigit(c))
-						c -= '0';
-					else if (isalpha(c))
-						c -= isupper(c) ? 'A' - 10 : 'a' - 10;
+				for (acc = 0, any = 0;; _c = *_s++) {
+					if (isdigit(_c))
+						_c -= '0';
+					else if (isalpha(_c))
+						_c -= isupper(_c) ? 'A' - 10 : 'a' - 10;
 					else
 						break;
-					if (c >= base)
+					if (_c >= base)
 						break;
-					if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+					if (any < 0 || acc > cutoff || (acc == cutoff && _c > cutlim))
 						any = -1;
 					else {
 						any = 1;
 						acc *= base;
-						acc += c;
+						acc += _c;
 					}
 				}
 				if (any < 0) {
@@ -399,7 +399,7 @@ namespace stdex
 				else if (neg)
 					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc); // generates WC4146 on Visual Studio and it's a bug probably (idk how to fix it yet)
 				if (endptr != 0)
-					*endptr = (char *) (any ? s - 1 : nptr);
+					*endptr = (char *) (any ? _s - 1 : nptr);
 				return (acc);
 			}
 		};
@@ -407,10 +407,10 @@ namespace stdex
 		template<>
 		struct _cs_to_signed_ll<true>
 		{
-			template<class T>
+			template<class _Tp>
 			static
 			string_detail::_long_long_type
-			call(const T *nptr, char **endptr, int base)
+			call(const _Tp *nptr, char **endptr, int base)
 			{
 				using namespace std;
 
@@ -434,9 +434,9 @@ namespace stdex
 			call(const wchar_t *nptr, wchar_t **endptr, int base)
 			{
 				using namespace std;
-				const wchar_t *s = nptr;
+				const wchar_t *_s = nptr;
 				string_detail::_unsigned_long_long_type acc;
-				int c;
+				int _c;
 				string_detail::_unsigned_long_long_type cutoff;
 				int neg = 0, any, cutlim;
 
@@ -446,22 +446,22 @@ namespace stdex
 				* assume decimal; if base is already 16, allow 0x.
 				*/
 				do {
-					c = *s++;
-				} while (isspace(c));
-				if (c == L'-') {
+					_c = *_s++;
+				} while (isspace(_c));
+				if (_c == L'-') {
 					neg = 1;
-					c = *s++;
+					_c = *_s++;
 				}
-				else if (c == L'+')
-					c = *s++;
+				else if (_c == L'+')
+					_c = *_s++;
 				if ((base == 0 || base == 16) &&
-					c == L'0' && (*s == L'x' || *s == L'X')) {
-					c = s[1];
-					s += 2;
+					_c == L'0' && (*_s == L'x' || *_s == L'X')) {
+					_c = _s[1];
+					_s += 2;
 					base = 16;
 				}
 				if (base == 0)
-					base = c == L'0' ? 8 : 10;
+					base = _c == L'0' ? 8 : 10;
 
 				/*
 				* Compute the cutoff value between legal numbers and illegal
@@ -483,21 +483,21 @@ namespace stdex
 				cutoff = neg ? -(string_detail::_unsigned_long_long_type) LLONG_MIN : LLONG_MAX;
 				cutlim = cutoff % (string_detail::_unsigned_long_long_type) base;
 				cutoff /= (string_detail::_unsigned_long_long_type) base;
-				for (acc = 0, any = 0;; c = *s++) {
-					if (isdigit(c))
-						c -= L'0';
-					else if (isalpha(c))
-						c -= isupper(c) ? L'A' - 10 : L'a' - 10;
+				for (acc = 0, any = 0;; _c = *_s++) {
+					if (isdigit(_c))
+						_c -= L'0';
+					else if (isalpha(_c))
+						_c -= isupper(_c) ? L'A' - 10 : L'a' - 10;
 					else
 						break;
-					if (c >= base)
+					if (_c >= base)
 						break;
-					if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+					if (any < 0 || acc > cutoff || (acc == cutoff && _c > cutlim))
 						any = -1;
 					else {
 						any = 1;
 						acc *= base;
-						acc += c;
+						acc += _c;
 					}
 				}
 				if (any < 0) {
@@ -507,7 +507,7 @@ namespace stdex
 				else if (neg)
 					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc); // generates WC4146 on Visual Studio and it's a bug probably (idk how to fix it yet)
 				if (endptr != 0)
-					*endptr = (wchar_t *) (any ? s - 1 : nptr);
+					*endptr = (wchar_t *) (any ? _s - 1 : nptr);
 				return (acc);
 			}
 		};
@@ -515,10 +515,10 @@ namespace stdex
 		template<>
 		struct _wcs_to_signed_ll<true>
 		{
-			template<class T>
+			template<class _Tp>
 			static
 			string_detail::_long_long_type
-			call(const T *nptr, wchar_t **endptr, int base)
+			call(const _Tp *nptr, wchar_t **endptr, int base)
 			{
 				using namespace std;
 
@@ -542,9 +542,9 @@ namespace stdex
 			call(const char *nptr, char **endptr, int base)
 			{
 				using namespace std;
-				const char *s = nptr;
+				const char *_s = nptr;
 				string_detail::_unsigned_long_long_type acc;
-				int c;
+				int _c;
 				string_detail::_unsigned_long_long_type cutoff;
 				int neg = 0, any, cutlim;
 
@@ -552,39 +552,39 @@ namespace stdex
 				* See strtol for comments as to the logic used.
 				*/
 				do {
-					c = *s++;
-				} while (isspace(c));
-				if (c == '-') {
+					_c = *_s++;
+				} while (isspace(_c));
+				if (_c == '-') {
 					neg = 1;
-					c = *s++;
+					_c = *s++;
 				}
-				else if (c == '+')
-					c = *s++;
+				else if (_c == '+')
+					_c = *_s++;
 				if ((base == 0 || base == 16) &&
-					c == '0' && (*s == 'x' || *s == 'X')) {
-					c = s[1];
-					s += 2;
+					_c == '0' && (*_s == 'x' || *_s == 'X')) {
+					_c = _s[1];
+					_s += 2;
 					base = 16;
 				}
 				if (base == 0)
 					base = c == '0' ? 8 : 10;
 				cutoff = (string_detail::_unsigned_long_long_type) ULLONG_MAX / (string_detail::_unsigned_long_long_type) base;
 				cutlim = (string_detail::_unsigned_long_long_type) ULLONG_MAX % (string_detail::_unsigned_long_long_type) base;
-				for (acc = 0, any = 0;; c = *s++) {
-					if (isdigit(c))
-						c -= '0';
-					else if (isalpha(c))
-						c -= isupper(c) ? 'A' - 10 : 'a' - 10;
+				for (acc = 0, any = 0;; _c = *_s++) {
+					if (isdigit(_c))
+						_c -= '0';
+					else if (isalpha(_c))
+						_c -= isupper(_c) ? 'A' - 10 : 'a' - 10;
 					else
 						break;
-					if (c >= base)
+					if (_c >= base)
 						break;
-					if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+					if (any < 0 || acc > cutoff || (acc == cutoff && _c > cutlim))
 						any = -1;
 					else {
 						any = 1;
 						acc *= base;
-						acc += c;
+						acc += _c;
 					}
 				}
 				if (any < 0) {
@@ -594,7 +594,7 @@ namespace stdex
 				else if (neg)
 					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc); // generates WC4146 on Visual Studio and it's a bug probably (idk how to fix it yet)
 				if (endptr != 0)
-					*endptr = (char *) (any ? s - 1 : nptr);
+					*endptr = (char *) (any ? _s - 1 : nptr);
 				return (acc);
 			}
 		};
@@ -602,10 +602,10 @@ namespace stdex
 		template<>
 		struct _cs_to_unsigned_ll<true>
 		{
-			template<class T>
+			template<class _Tp>
 			static
 			string_detail::_unsigned_long_long_type
-			call(const T *nptr, char **endptr, int base)
+			call(const _Tp *nptr, char **endptr, int base)
 			{
 				using namespace std;
 
@@ -621,9 +621,9 @@ namespace stdex
 			call(const wchar_t *nptr, wchar_t **endptr, int base)
 			{
 				using namespace std;
-				const wchar_t *s = nptr;
+				const wchar_t *_s = nptr;
 				string_detail::_unsigned_long_long_type acc;
-				int c;
+				int _c;
 				string_detail::_unsigned_long_long_type cutoff;
 				int neg = 0, any, cutlim;
 
@@ -631,39 +631,39 @@ namespace stdex
 				* See strtol for comments as to the logic used.
 				*/
 				do {
-					c = *s++;
-				} while (isspace(c));
-				if (c == L'-') {
+					_c = *_s++;
+				} while (isspace(_c));
+				if (_c == L'-') {
 					neg = 1;
-					c = *s++;
+					_c = *_s++;
 				}
-				else if (c == L'+')
-					c = *s++;
+				else if (_c == L'+')
+					_c = *_s++;
 				if ((base == 0 || base == 16) &&
-					c == L'0' && (*s == L'x' || *s == L'X')) {
-					c = s[1];
-					s += 2;
+					_c == L'0' && (*_s == L'x' || *_s == L'X')) {
+					_c = _s[1];
+					_s += 2;
 					base = 16;
 				}
 				if (base == 0)
-					base = c == '0' ? 8 : 10;
+					base = _c == '0' ? 8 : 10;
 				cutoff = (string_detail::_unsigned_long_long_type) ULLONG_MAX / (string_detail::_unsigned_long_long_type) base;
 				cutlim = (string_detail::_unsigned_long_long_type) ULLONG_MAX % (string_detail::_unsigned_long_long_type) base;
-				for (acc = 0, any = 0;; c = *s++) {
-					if (isdigit(c))
-						c -= L'0';
-					else if (isalpha(c))
-						c -= isupper(c) ? L'A' - 10 : L'a' - 10;
+				for (acc = 0, any = 0;; _c = *_s++) {
+					if (isdigit(_c))
+						_c -= L'0';
+					else if (isalpha(_c))
+						_c -= isupper(_c) ? L'A' - 10 : L'a' - 10;
 					else
 						break;
-					if (c >= base)
+					if (_c >= base)
 						break;
-					if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim))
+					if (any < 0 || acc > cutoff || (acc == cutoff && _c > cutlim))
 						any = -1;
 					else {
 						any = 1;
 						acc *= base;
-						acc += c;
+						acc += _c;
 					}
 				}
 				if (any < 0) {
@@ -673,7 +673,7 @@ namespace stdex
 				else if (neg)
 					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc); // generates WC4146 on Visual Studio and it's a bug probably (idk how to fix it yet)
 				if (endptr != 0)
-					*endptr = (wchar_t *) (any ? s - 1 : nptr);
+					*endptr = (wchar_t *) (any ? _s - 1 : nptr);
 				return (acc);
 			}
 
@@ -682,10 +682,10 @@ namespace stdex
 		template<>
 		struct _wcs_to_unsigned_ll<true>
 		{
-			template<class T>
+			template<class _Tp>
 			static
 			string_detail::_unsigned_long_long_type
-			call(const T *nptr, wchar_t **endptr, int base)
+			call(const _Tp *nptr, wchar_t **endptr, int base)
 			{
 				using namespace std;
 
@@ -698,18 +698,18 @@ namespace stdex
 		struct _str_to_integral_chooser_impl_ll
 		{
 			typedef string_detail::_long_long_type type;
-			static string_detail::_long_long_type call(const char* str, char** endptr, int base)
+			static string_detail::_long_long_type call(const char* _str, char** endptr, int base)
 			{
 				typedef _cs_to_signed_ll<string_detail::_strtoll_present::value> impl;
 
-				return impl::call(str, endptr, base);
+				return impl::call(_str, endptr, base);
 			}
 
-			static string_detail::_long_long_type call(const wchar_t* str, wchar_t** endptr, int base)
+			static string_detail::_long_long_type call(const wchar_t* _str, wchar_t** endptr, int base)
 			{
 				typedef _wcs_to_signed_ll<string_detail::_wcstoll_present::value> impl;
 
-				return impl::call(str, endptr, base);
+				return impl::call(_str, endptr, base);
 			}
 
 			static bool check(const string_detail::_long_long_type &_value)
@@ -734,18 +734,18 @@ namespace stdex
 		struct _str_to_integral_chooser_impl_ll<false>
 		{
 			typedef string_detail::_unsigned_long_long_type type;
-			static string_detail::_unsigned_long_long_type call(const char* str, char** endptr, int base)
+			static string_detail::_unsigned_long_long_type call(const char* _str, char** endptr, int base)
 			{
 				typedef _cs_to_unsigned_ll<string_detail::_strtoull_present::value> impl;
 
-				return impl::call(str, endptr, base);
+				return impl::call(_str, endptr, base);
 			}
 
-			static string_detail::_unsigned_long_long_type call(const wchar_t* str, wchar_t** endptr, int base)
+			static string_detail::_unsigned_long_long_type call(const wchar_t* _str, wchar_t** endptr, int base)
 			{
 				typedef _wcs_to_unsigned_ll<string_detail::_wcstoull_present::value> impl;
 
-				return impl::call(str, endptr, base);
+				return impl::call(_str, endptr, base);
 			}
 
 			static bool check(const string_detail::_unsigned_long_long_type &_value)
@@ -764,12 +764,12 @@ namespace stdex
 			typedef _str_to_integral_chooser_impl_ll<is_signed<_Tp>::value> impl;
 		};
 
-		template<class _Tp, string_detail::_unsigned_long_long_type N>
+		template<class _Tp, string_detail::_unsigned_long_long_type _N>
 		struct _type_cs_len_ll
 		{
 			enum
 			{
-				value = _type_cs_len_ll<_Tp, N / (string_detail::_unsigned_long_long_type)(10)>::value + 1
+				value = _type_cs_len_ll<_Tp, _N / (string_detail::_unsigned_long_long_type)(10)>::value + 1
 			};
 		};
 

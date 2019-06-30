@@ -210,11 +210,11 @@ namespace stdex
 			ts.tv_sec = static_cast<stdex::time_t>(rs.count());
 			ts.tv_nsec = static_cast<long>(rns.count());
 
-			chrono::time_point<clock_t, chrono::seconds> s = chrono::time_point_cast<chrono::seconds>(start_time_point);
-			chrono::nanoseconds ns = chrono::duration_cast<chrono::nanoseconds>(start_time_point - s);
+			chrono::time_point<clock_t, chrono::seconds> _sec = chrono::time_point_cast<chrono::seconds>(start_time_point);
+			chrono::nanoseconds _nsec = chrono::duration_cast<chrono::nanoseconds>(start_time_point - _sec);
 
-			ts.tv_sec += static_cast<stdex::time_t>(s.time_since_epoch().count());
-			ts.tv_nsec += static_cast<long>(ns.count());
+			ts.tv_sec += static_cast<stdex::time_t>(_sec.time_since_epoch().count());
+			ts.tv_nsec += static_cast<long>(_nsec.count());
 
 			int res = pthread_cond_timedwait(&_condition_handle, lock.mutex()->native_handle(), &ts);
 
