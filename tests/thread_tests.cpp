@@ -76,7 +76,7 @@ struct copyable
 {
 	copyable() {}
 	~copyable() {}
-	copyable(const copyable& c)
+	copyable(const copyable&)
 	{
 		++copy_count;
 	}
