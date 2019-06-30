@@ -6,7 +6,7 @@
 #endif // _MSC_VER > 1000
 
 // stdex includes
-#include "./cstdint.hpp" // stdex::intmax_t, INTMAX_MAX, INTMAX_MIN
+#include "./cstdint.hpp" // stdex::intmax_t, STDEX_INTMAX_MAX, STDEX_INTMAX_MIN
 
 // POSIX includes
 /*none*/
@@ -126,13 +126,13 @@ namespace stdex
 		template<stdex::intmax_t _Pn, stdex::intmax_t _Qn, bool>
 		struct _add_overflow_check_impl
 		{
-			static const stdex::intmax_t value = _Pn <= (INTMAX_MAX - _Qn);
+			static const stdex::intmax_t value = _Pn <= (STDEX_INTMAX_MAX - _Qn);
 		};
 
 		template<stdex::intmax_t _Pn, stdex::intmax_t _Qn>
 		struct _add_overflow_check_impl<_Pn, _Qn, false>
 		{
-			static const stdex::intmax_t value = _Pn >= (INTMAX_MIN - _Qn);
+			static const stdex::intmax_t value = _Pn >= (STDEX_INTMAX_MIN - _Qn);
 		};
 
 		template<stdex::intmax_t _Pn, stdex::intmax_t _Qn>
@@ -191,10 +191,10 @@ namespace stdex
 			typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1 < (_safe_multiply::_c / stdex::uintmax_t(2))) >::
 				overflow_in_multiplication_assert_failed
 			check2; // if you are there means overflow in safe template multiplication occurred
-			typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_b0 * _safe_multiply::_a0 <= INTMAX_MAX) >::
+			typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_b0 * _safe_multiply::_a0 <= STDEX_INTMAX_MAX) >::
 				overflow_in_multiplication_assert_failed
 			check3; // if you are there means overflow in safe template multiplication occurred
-			typedef typename check::overflow_in_multiplication_assert< ((_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1) * _safe_multiply::_c <= INTMAX_MAX - _safe_multiply::_b0 * _safe_multiply::_a0) >::
+			typedef typename check::overflow_in_multiplication_assert< ((_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1) * _safe_multiply::_c <= STDEX_INTMAX_MAX - _safe_multiply::_b0 * _safe_multiply::_a0) >::
 				overflow_in_multiplication_assert_failed
 			check4; // if you are there means overflow in safe template multiplication occurred
 
@@ -296,7 +296,7 @@ namespace stdex
 		typedef typename check::denominator_cant_be_zero_assert< (_Den != 0) >::
 			denominator_cant_be_zero_assert_failed
 		check1; // if you are there means you put the denominator to zero
-		typedef typename check::out_of_range<( (_Num >= INTMAX_MIN) && (_Den >= INTMAX_MIN) )>::
+		typedef typename check::out_of_range<( (_Num >= STDEX_INTMAX_MIN) && (_Den >= STDEX_INTMAX_MIN) )>::
 			out_of_range_failed
 		check2; // if you are there means that value is out of range
 	};
@@ -490,7 +490,7 @@ namespace stdex
 			_ratio_predefined_impl<_MaxBitsN - 1>
 		{ };
 
-		#define _STDEX_10_POW_01 UINTMAX_C(10)
+		#define _STDEX_10_POW_01 STDEX_UINTMAX_C(10)
 		#define _STDEX_10_POW_02 (_STDEX_10_POW_01 * _STDEX_10_POW_01)
 		#define _STDEX_10_POW_03 (_STDEX_10_POW_01 * _STDEX_10_POW_02)
 		#define _STDEX_10_POW_06 (_STDEX_10_POW_03 * _STDEX_10_POW_03)
@@ -530,10 +530,10 @@ namespace stdex
 			typedef type_cannot_be_implemented nano;
 			typedef type_cannot_be_implemented micro;
 			typedef type_cannot_be_implemented milli;
-			typedef ratio<INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_02)> centi;
-			typedef ratio<INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_01)> deci;
-			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_01), INTMAX_C(1)> deca;
-			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_02), INTMAX_C(1)> hecto;
+			typedef ratio<STDEX_INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_02)> centi;
+			typedef ratio<STDEX_INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_01)> deci;
+			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_01), STDEX_INTMAX_C(1)> deca;
+			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_02), STDEX_INTMAX_C(1)> hecto;
 			typedef type_cannot_be_implemented kilo;
 			typedef type_cannot_be_implemented mega;
 			typedef type_cannot_be_implemented giga;
@@ -548,64 +548,64 @@ namespace stdex
 		struct _ratio_predefined_impl<_10_pow_03_bit_n>:
 			_ratio_predefined_impl<_10_pow_02_bit_n>
 		{
-			typedef ratio<INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_03)> milli;
-			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_03), INTMAX_C(1)> kilo;
+			typedef ratio<STDEX_INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_03)> milli;
+			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_03), STDEX_INTMAX_C(1)> kilo;
 		};
 
 		template<>
 		struct _ratio_predefined_impl<_10_pow_06_bit_n>:
 			_ratio_predefined_impl<_10_pow_03_bit_n>
 		{
-			typedef ratio<INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_06)> micro;
-			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_06), INTMAX_C(1)> mega;
+			typedef ratio<STDEX_INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_06)> micro;
+			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_06), STDEX_INTMAX_C(1)> mega;
 		};
 
 		template<>
 		struct _ratio_predefined_impl<_10_pow_09_bit_n>:
 			_ratio_predefined_impl<_10_pow_06_bit_n>
 		{
-			typedef ratio<INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_09)> nano;
-			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_09), INTMAX_C(1)> giga;
+			typedef ratio<STDEX_INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_09)> nano;
+			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_09), STDEX_INTMAX_C(1)> giga;
 		};
 
 		template<>
 		struct _ratio_predefined_impl<_10_pow_12_bit_n>:
 			_ratio_predefined_impl<_10_pow_09_bit_n>
 		{
-			typedef ratio<INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_12)> pico;
-			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_12), INTMAX_C(1)> tera;
+			typedef ratio<STDEX_INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_12)> pico;
+			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_12), STDEX_INTMAX_C(1)> tera;
 		};
 
 		template<>
 		struct _ratio_predefined_impl<_10_pow_15_bit_n>:
 			_ratio_predefined_impl<_10_pow_12_bit_n>
 		{
-			typedef ratio<INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_15)> femto;
-			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_15), INTMAX_C(1)> peta;
+			typedef ratio<STDEX_INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_15)> femto;
+			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_15), STDEX_INTMAX_C(1)> peta;
 		};
 
 		template<>
 		struct _ratio_predefined_impl<_10_pow_18_bit_n>:
 			_ratio_predefined_impl<_10_pow_15_bit_n>
 		{
-			typedef ratio<INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_18)> atto;
-			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_18), INTMAX_C(1)> exa;
+			typedef ratio<STDEX_INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_18)> atto;
+			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_18), STDEX_INTMAX_C(1)> exa;
 		};
 
 		template<>
 		struct _ratio_predefined_impl<_10_pow_21_bit_n>:
 			_ratio_predefined_impl<_10_pow_18_bit_n>
 		{
-			typedef ratio<INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_21)> zepto;
-			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_21), INTMAX_C(1)> zetta;
+			typedef ratio<STDEX_INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_21)> zepto;
+			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_21), STDEX_INTMAX_C(1)> zetta;
 		};
 
 		template<>
 		struct _ratio_predefined_impl<_10_pow_24_bit_n>:
 			_ratio_predefined_impl<_10_pow_21_bit_n>
 		{
-			typedef ratio<INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_24)> yocto;
-			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_24), INTMAX_C(1)> yotta;
+			typedef ratio<STDEX_INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_24)> yocto;
+			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_24), STDEX_INTMAX_C(1)> yotta;
 		};
 
 		#undef _STDEX_10_POW_01

@@ -245,10 +245,10 @@
 
 //#ifndef _STDEX_NATIVE_CPP11_TYPES_SUPPORT
 	//#ifndef __CHAR16_TYPE__
-		#define char16_t stdex::uint_least16_t
+		#define stdex_char16_t stdex::uint_least16_t
 	//#endif
 	//#ifndef __CHAR32_TYPE__
-		#define char32_t stdex::uint_least32_t
+		#define stdex_char32_t stdex::uint_least32_t
 	//#endif
 //#endif
 
