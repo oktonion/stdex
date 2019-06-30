@@ -108,8 +108,15 @@ matrix:
 
     - os: windows
       before_script:
-      - C:\\Program\ Files\ \(x86\)\\Microsoft\ Visual\ Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vcvarsall.bat
-      #- C:\\Program\\ Files\ \(x86\)\\Microsoft\ Visual\ Studio\\14.0\\Common7\\Tools\\vsvars32.bat
+      - C:\\Program\ Files\ \(x86\)\\Microsoft\ Visual\ Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vsvars32.bat
+      env: 
+      - BUILD_LIB_SCRIPT="./build_lib.bat"
+      - BUILD_SCRIPT="./build_tests.bat"
+      - RUN_SCRIPT="./run_tests.bat"
+
+    - os: windows
+      before_script:
+      - C:\\Program\ Files\ \(x86\)\\Microsoft\ Visual\ Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vsvars64.bat
       env: 
       - BUILD_LIB_SCRIPT="./build_lib.bat"
       - BUILD_SCRIPT="./build_tests.bat"
