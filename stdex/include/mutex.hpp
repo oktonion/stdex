@@ -419,15 +419,15 @@ namespace stdex
 		void swap(unique_lock &other) NOEXCEPT_FUNCTION
 		{
 			{
-				mutex_type *tmp = _device;
+				mutex_type *tmp_value = _device;
 				_device = other._device;
-				other._device = tmp;
+				other._device = tmp_value;
 			}
 
 			{
-				bool tmp = _owns;
+				bool tmp_value = _owns;
 				_owns = other._owns;
-				other._owns = tmp;
+				other._owns = tmp_value;
 			}
 		}
 

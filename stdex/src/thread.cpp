@@ -403,17 +403,17 @@ void thread::swap(thread & other) NOEXCEPT_FUNCTION
 	if (&other == this)
 		return;
 	{
-	   native_handle_type tmp;
-	   tmp = _handle;
+	   native_handle_type tmp_value;
+	   tmp_value = _handle;
 	   _handle = other._handle;
-	   other._handle = tmp;
+	   other._handle = tmp_value;
 	}
 
 	{
-	   id tmp;
-	   tmp = _id;
+	   id tmp_value;
+	   tmp_value = _id;
 	   _id = other._id;
-	   other._id = tmp;
+	   other._id = tmp_value;
 	}
 }
 
