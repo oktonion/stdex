@@ -29,13 +29,14 @@
 // All type features (like is_assignable) - ni
 
 // stdex includes
-#include "./stdint_ex.h"
+#include "./core.h"
+#include "./cstdint.hpp"
 
 // POSIX includes
 /*none*/
 
 // std includes
-#include <cstddef>
+#include <cstddef> // std::ptrdiff_t, std::size_t, NULL
 #include <climits>
 
 namespace stdex
@@ -318,7 +319,7 @@ namespace stdex
 	template<class _Tp>
 	struct add_const<_Tp&>
 	{
-		typedef _Tp &     type;
+		typedef _Tp & type;
 	};
 
 	// add_volatile
@@ -331,7 +332,7 @@ namespace stdex
 	template<class _Tp>
 	struct add_volatile<_Tp&>
 	{
-		typedef _Tp &     type;
+		typedef _Tp & type;
 	};
 
 	// add_cv
@@ -344,51 +345,110 @@ namespace stdex
 	template<class _Tp>
 	struct add_cv<_Tp&>
 	{
-		typedef _Tp &     type;
+		typedef _Tp & type;
 	};
 
 	namespace detail
 	{
 		template <class> struct _is_floating_point : public false_type {};
-
+		
 		template<> struct _is_floating_point<float> : public true_type {};
 		template<> struct _is_floating_point<double> : public true_type {};
 		template<> struct _is_floating_point<long double> : public true_type {};
 
-		template <class> struct _is_integral_impl : public false_type {};
+		namespace type_traits_detail
+		{
+			template<class _Tp> struct _is_integral_cstdint_type: public true_type {};
+			template<> struct _is_integral_cstdint_type<cstdint_detail::_cstdint_invalid_type>: public false_type {};
 
-		template<> struct _is_integral_impl<bool> : public true_type {};
-		template<> struct _is_integral_impl<char> : public true_type {};
-		template<> struct _is_integral_impl<wchar_t> : public true_type {};
+			enum {_is_integral_rank = __LINE__};
+			template <int, class> struct _is_integral_map : public false_type {};
 
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), bool> : public true_type {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), char> : public true_type {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), wchar_t> : public true_type {};
 
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), unsigned char> : public true_type {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), unsigned short int> : public true_type {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), unsigned int> : public true_type {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), unsigned long int> : public true_type {};
 
-		template<> struct _is_integral_impl<unsigned char> : public true_type {};
-		template<> struct _is_integral_impl<unsigned short int> : public true_type {};
-		template<> struct _is_integral_impl<unsigned int> : public true_type {};
-		template<> struct _is_integral_impl<unsigned long int> : public true_type {};
+		#if defined(ULLONG_MAX)
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), unsigned long long int> : public true_type {};
+		#endif
 
-#ifdef LLONG_MAX
-		template<> struct _is_integral_impl<unsigned long long int> : public true_type {};
-#endif
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), signed char> : public true_type {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), short int> : public true_type {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), int> : public true_type {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), long int> : public true_type {};
 
-		template<> struct _is_integral_impl<signed char> : public true_type {};
-		template<> struct _is_integral_impl<short int> : public true_type {};
-		template<> struct _is_integral_impl<int> : public true_type {};
-		template<> struct _is_integral_impl<long int> : public true_type {};
+		#if defined(LLONG_MIN) && defined(LLONG_MAX)
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), long long int> : public true_type {};
+		#endif
 
-#ifdef LLONG_MAX
-		template<> struct _is_integral_impl<long long int> : public true_type {};
-#endif
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), char16_t> : public true_type {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), char32_t> : public true_type {};
 
-		template <class _Tp> struct _is_integral : public _is_integral_impl<_Tp> {};
+			// types from stdex/cstdint.hpp
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::int_least8_t> : _is_integral_cstdint_type<stdex::int_least8_t> {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::uint_least8_t> : _is_integral_cstdint_type<stdex::uint_least8_t> {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::int_least16_t> : _is_integral_cstdint_type<stdex::int_least16_t> {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::uint_least16_t> : _is_integral_cstdint_type<stdex::uint_least16_t> {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::int_least32_t> : _is_integral_cstdint_type<stdex::int_least32_t> {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::uint_least32_t> : _is_integral_cstdint_type<stdex::uint_least32_t> {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::int_least64_t> : _is_integral_cstdint_type<stdex::int_least64_t> {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::uint_least64_t> : _is_integral_cstdint_type<stdex::uint_least64_t> {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::intmax_t> : _is_integral_cstdint_type<stdex::intmax_t> {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::uintmax_t> : _is_integral_cstdint_type<stdex::uintmax_t> {};
+		#if defined(INT8_MIN) && defined(INT8_MAX) && defined(UINT8_MAX)
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::int8_t> : _is_integral_cstdint_type<stdex::int8_t> {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::uint8_t> : _is_integral_cstdint_type<stdex::uint8_t> {};
+		#endif
+		#if defined(INT16_MIN) && defined(INT16_MAX) && defined(UINT16_MAX)
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::int16_t> : _is_integral_cstdint_type<stdex::int16_t> {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::uint16_t> : _is_integral_cstdint_type<stdex::uint16_t> {};
+		#endif
+		#if defined(INT32_MIN) && defined(INT32_MAX) && defined(UINT32_MAX)
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::int32_t> : _is_integral_cstdint_type<stdex::int32_t> {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::uint32_t> : _is_integral_cstdint_type<stdex::uint32_t> {};
+		#endif
+		#if defined(INT64_MIN) && defined(INT64_MAX) && defined(UINT64_MAX)
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::int64_t> : _is_integral_cstdint_type<stdex::int64_t> {};
+			template<> struct _is_integral_map<(__LINE__ - _is_integral_rank), stdex::uint64_t> : _is_integral_cstdint_type<stdex::uint64_t> {};
+		#endif
 
-		//#if defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT) || defined(STDEX_FORCE_CPP11_TYPES_SUPPORT)
-		template<> struct _is_integral<char16_t> : public true_type {};
-		template<> struct _is_integral<char32_t> : public true_type {};
-		//#endif
-		template<> struct _is_integral<int64_t> : public true_type {};
-		template<> struct _is_integral<uint64_t> : public true_type {};
+			enum {_is_integral_max_rank = (__LINE__ - _is_integral_rank + 1)};
+
+			template<class _Tp, int _RankIt = 0, bool _IsFound = _is_integral_map<0, _Tp>::value>
+            struct _is_integral_search:
+                _is_integral_search<_Tp, _RankIt + 1, _is_integral_map<_RankIt + 1, _Tp>::value>{};
+
+            template<class _Tp>
+            struct _is_integral_search<_Tp, _is_integral_max_rank, false>:
+                _is_integral_map<_is_integral_max_rank, _Tp>{};
+
+            template<class _Tp, int _RankIt>
+            struct _is_integral_search<_Tp, _RankIt, true>:
+                _is_integral_map<_RankIt, _Tp>{};
+
+			template <class _Tp> 
+			struct _is_integral_constant:
+				bool_constant<cstdint_detail::_is_integral_constant<_Tp>::value>
+			{ };
+			
+			template <class _Tp, bool _IsFound> 
+			struct _is_integral_impl:
+				false_type
+			{ };
+
+			template <class _Tp> 
+			struct _is_integral_impl<_Tp, true>:
+				_is_integral_constant<_Tp>
+			{ };
+		}
+
+		template <class _Tp> struct _is_integral : 
+			public type_traits_detail::_is_integral_impl<_Tp, type_traits_detail::_is_integral_search<_Tp>::value> {};
 	}
 
 
@@ -534,13 +594,13 @@ namespace stdex
 		template<class _Tp, bool = _is_referenceable<_Tp>::value>//_and_<_is_referenceable<_Tp>, _not_< _and_<is_const<_Tp>, is_volatile<_Tp> > > >::value>
 		struct _add_lvalue_reference_helper
 		{
-			typedef _Tp   type;
+			typedef _Tp type;
 		};
 
 		template<class _Tp>
 		struct _add_lvalue_reference_helper<_Tp, true>
 		{
-			typedef _Tp&   type;
+			typedef _Tp& type;
 		};
 	}
 
@@ -553,7 +613,7 @@ namespace stdex
 	template<class _Tp>
 	struct add_lvalue_reference<_Tp&>
 	{
-		typedef _Tp&   type;
+		typedef _Tp& type;
 	};
 
 	template<class T>
@@ -1680,7 +1740,7 @@ namespace stdex
 			typedef unsigned long _type;
 		};
 
-#ifdef LLONG_MAX
+#if defined(LLONG_MIN) && defined(LLONG_MAX)
 		template<>
 		struct _make_unsigned<long long>
 		{
@@ -1704,7 +1764,7 @@ namespace stdex
 			static const bool _b1 = sizeof(_Tp) <= sizeof(unsigned short);
 			static const bool _b2 = sizeof(_Tp) <= sizeof(unsigned int);
 			static const bool _b3 = sizeof(_Tp) <= sizeof(unsigned long);
-#ifdef LLONG_MAX
+#if defined(ULLONG_MAX)
 			typedef conditional<_make_unsigned_selector<_Tp>::_b3, unsigned long, unsigned long long> _cond3;
 #else
 			typedef conditional<_make_unsigned_selector<_Tp>::_b3, unsigned long, unsigned long> _cond3;
@@ -1792,7 +1852,7 @@ namespace stdex
 			typedef signed long _type;
 		};
 
-#ifdef LLONG_MAX
+#if defined(ULLONG_MAX)
 		template<>
 		struct _make_signed<unsigned long long>
 		{
@@ -2079,7 +2139,7 @@ namespace stdex
 			typedef char(&result_type)[7];
 		};
 
-#ifdef LLONG_MAX
+#if defined(LLONG_MIN) && defined(LLONG_MAX)
 		template<> struct _arithmetic_type<8>
 		{
 			typedef long long type;
@@ -2111,7 +2171,7 @@ namespace stdex
 			typedef char(&result_type)[12];
 		};
 
-#ifdef LLONG_MAX
+#if defined(ULLONG_MAX)
 		template<> struct _arithmetic_type<13>
 		{
 			typedef unsigned long long type;
@@ -2156,14 +2216,14 @@ namespace stdex
 		 _arithmetic_type<5>::result_type select(_arithmetic_type<5>::type);
 		 _arithmetic_type<6>::result_type select(_arithmetic_type<6>::type);
 		 _arithmetic_type<7>::result_type select(_arithmetic_type<7>::type);
-#ifdef LLONG_MAX
+#if defined(LLONG_MIN) && defined(LLONG_MAX)
 		 _arithmetic_type<8>::result_type select(_arithmetic_type<8>::type);
 #endif
 		 _arithmetic_type<9>::result_type select(_arithmetic_type<9>::type);
 		 _arithmetic_type<10>::result_type select(_arithmetic_type<10>::type);
 		 _arithmetic_type<11>::result_type select(_arithmetic_type<11>::type);
 		 _arithmetic_type<12>::result_type select(_arithmetic_type<12>::type);
-#ifdef LLONG_MAX
+#if defined(ULLONG_MAX)
 		 _arithmetic_type<13>::result_type select(_arithmetic_type<13>::type);
 #endif
 		 _arithmetic_type<14>::result_type select(_arithmetic_type<14>::type);
