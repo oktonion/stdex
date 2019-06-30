@@ -62,7 +62,7 @@ matrix:
       - CODE_COVERAGE_FLAGS=--coverage -fprofile-arcs -ftest-coverage
       before_install: 
       - sudo pip install codecov
-      after_script:
+      after_success:
       - chmod +x ./get_code_cov.sh
       - ./get_code_cov.sh
       - codecov
