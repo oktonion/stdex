@@ -1,3 +1,10 @@
+
+#include <pthread.h> // pthread for Windows sadly doesn't satisfy this checks
+
+#ifdef __BORLANDC__ // borland c++ uses ptr, v in <new.h> and n in <_iterator.h>, etc.
+    #include <iterator> // + <new.h>
+#endif
+
 // testing common names that should not be defined in stdex lib
 #define A (
 #define B (
@@ -25,6 +32,7 @@
 #define X (
 #define Y (
 #define Z (
+
 #if __cplusplus >= 201103L
 // <random> defines member functions called a() and b()
 #else
@@ -83,8 +91,10 @@
 #if __cplusplus < 201703L
 // <charconv> defines to_chars_result::ptr and to_chars_result::ec
 #define ec (
+
 #define ptr (
 #endif
+
 
 // Common template parameter names
 #define OutputIterator		OutputIterator should not be a reserved name
