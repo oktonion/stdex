@@ -66,7 +66,7 @@ int test1()
     {
         condition_variable c1;
     }
-    catch (const system_error& e)
+    catch (const system_error&)
     {
         DYNAMIC_VERIFY(false);
     }
@@ -115,7 +115,7 @@ int test3()
         DYNAMIC_VERIFY((chrono::system_clock::now() - then) >= ms);
         DYNAMIC_VERIFY(l.owns_lock());
     }
-    catch (const system_error& e)
+    catch (const system_error&)
     {
         DYNAMIC_VERIFY(false);
     }
@@ -144,7 +144,7 @@ int test4()
         DYNAMIC_VERIFY((chrono::steady_clock::now() - then) >= ms);
         DYNAMIC_VERIFY(l.owns_lock());
     }
-    catch (const system_error& e)
+    catch (const system_error&)
     {
         DYNAMIC_VERIFY(false);
     }
