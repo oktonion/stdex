@@ -7,7 +7,7 @@
 
 
 #ifndef __has_feature         // Optional of course.
-  #define __has_feature(x) 0  // Compatibility with non-clang compilers.
+  #define __has_feature(xxx) 0  // Compatibility with non-clang compilers.
 #endif
 #ifndef __has_extension
   #define __has_extension __has_feature // Compatibility with pre-3.0 compilers.
@@ -45,8 +45,8 @@
 		#if !defined(nullptr)
 			#define _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
 		#else
-			#define STRINGIZE_HELPER(x) #x
-			#define STRINGIZE(x) STRINGIZE_HELPER(x)
+			#define STRINGIZE_HELPER(xxx) #xxx
+			#define STRINGIZE(xxx) STRINGIZE_HELPER(xxx)
 			#define WARNING(desc) message(__FILE__ "(" STRINGIZE(__LINE__) ") : warning: " desc)
 
 			#pragma WARNING("stdex library - macro 'nullptr' was previously defined by user; ignoring stdex macro definition")
@@ -115,8 +115,8 @@
 #if !defined(forever)
 	#define forever for(;;)
 #else
-	#define STRINGIZE_HELPER(x) #x
-	#define STRINGIZE(x) STRINGIZE_HELPER(x)
+	#define STRINGIZE_HELPER(xxx) #xxx
+	#define STRINGIZE(xxx) STRINGIZE_HELPER(xxx)
 	#define WARNING(desc) message(__FILE__ "(" STRINGIZE(__LINE__) ") : warning: " desc)
 
 	#pragma WARNING("stdex library - macro 'forever' was previously defined by user; ignoring stdex macro definition")
@@ -151,10 +151,10 @@
 	{
 		namespace detail
 		{
-			template <class T, std::size_t N>
-			constexpr std::size_t _my_countof(T const (&)[N]) noexcept
+			template <class _Tp, std::size_t _Count>
+			constexpr std::size_t _my_countof(_Tp const (&)[_Count]) noexcept
 			{
-				return N;
+				return _Count;
 			}
 		} // namespace detail
 	}
@@ -224,10 +224,10 @@
 
 	#elif defined(_STDEX_NATIVE_CPP_98_SUPPORT)// C++ 98 trick
 		#include <cstddef>
-		template <typename T, std::size_t N>
-		char(&COUNTOF_REQUIRES_ARRAY_ARGUMENT(T(&)[N]))[N];
+		template <class _Tp, std::size_t _Count>
+		char(&COUNTOF_REQUIRES_ARRAY_ARGUMENT(_Tp(&)[_Count]))[_Count];
 			
-		#define countof(x) sizeof(COUNTOF_REQUIRES_ARRAY_ARGUMENT(x))
+		#define countof(xxx) sizeof(COUNTOF_REQUIRES_ARRAY_ARGUMENT(xxx))
 	#else
 		#define countof(arr) sizeof(arr) / sizeof(arr[0])
 	#endif
