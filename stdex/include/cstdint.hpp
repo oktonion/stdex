@@ -272,19 +272,19 @@ namespace stdex
         {};
 
         template<class _Signed, int _Size>
-        struct _sized_integer_min_impl
-        {
-        #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
-            static const _Signed min_value = -(_Signed(1) << (_Size - 1));
-        #else
-            static const _Signed min_value = (-((_Signed(1) << (_Size - 1)) - _Signed(1)));
-        #endif
-        };
-
-        template<class _Signed, int _Size>
         struct _sized_integer_max_impl
         {
             static const _Signed max_value = ((_Signed(1) << (_Size - 2)) + ((_Signed(1) << (_Size - 2)) - _Signed(1)));
+        };
+
+        template<class _Signed, int _Size>
+        struct _sized_integer_min_impl
+        {
+        #if _STDEX_TWO_COMPLEMENT_REPRESENTATION_IS_USED
+            static const _Signed min_value = (-(_sized_integer_max_impl::max_value) - 1);
+        #else
+            static const _Signed min_value = (-(_sized_integer_max_impl::max_value));
+        #endif
         };
 
         template<class _Unsigned, int _Size>
