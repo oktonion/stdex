@@ -250,7 +250,7 @@ namespace stdex
 
 		//! The constructor does not lock the mutex because calling thread owns it
 		lock_guard(mutex_type &_m, adopt_lock_t) NOEXCEPT_FUNCTION:
-			_device(m)
+			_device(_m)
 		{}
 
 		//! The destructor unlocks the mutex.
