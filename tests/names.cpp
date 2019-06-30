@@ -184,3 +184,8 @@
 #include "../stdex/include/system_error.hpp"
 #include "../stdex/include/thread.hpp"
 #include "../stdex/include/type_traits.hpp"
+
+int main(void)
+{
+    return 0;
+}
