@@ -110,7 +110,7 @@ matrix:
       script:
       - echo "script started"
       - cmd
-      - "call \"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vcvars32.bat\""
+      - "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vcvars32.bat\""
       - cd ./stdex
       - chmod +x $BUILD_LIB_SCRIPT
       - $BUILD_LIB_SCRIPT
@@ -128,7 +128,7 @@ matrix:
       script:
       - echo "script started"
       - cmd
-      - "call \"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\vcvars64.bat\""
+      - "\"C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\vcvars64.bat\""
       - cd ./stdex
       - chmod +x $BUILD_LIB_SCRIPT
       - $BUILD_LIB_SCRIPT
