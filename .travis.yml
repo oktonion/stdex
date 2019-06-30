@@ -136,7 +136,7 @@ matrix:
       - echo "script started"
       - cd ./stdex
       #- echo "call \"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\vcvarsall.bat x64\"" > ~$BUILD_LIB_SCRIPT
-      - echo "cd \"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\ && dir\"" > ~$BUILD_LIB_SCRIPT
+      - echo "cd \"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\\" && dir" > ~$BUILD_LIB_SCRIPT
       - cat $BUILD_LIB_SCRIPT >> ~$BUILD_LIB_SCRIPT
       - chmod +x ./~$BUILD_LIB_SCRIPT
       - ./~$BUILD_LIB_SCRIPT
