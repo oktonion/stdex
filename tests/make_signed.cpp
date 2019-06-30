@@ -50,8 +50,8 @@ int main(void)
         typedef make_signed<wchar_t>::type wchar_signed;
         typedef make_unsigned<wchar_t>::type wchar_unsigned;
         STATIC_ASSERT((!is_same<wchar_signed, wchar_unsigned>::value == (true)), make_signed_t_wchar_t);
-        STATIC_ASSERT((is_signed<make_signed<char16_t>::type>::value == (true)), make_signed_t_char16_t);
-        STATIC_ASSERT((is_signed<make_signed<char32_t>::type>::value == (true)), make_signed_t_char32_t);
+        STATIC_ASSERT((is_signed<make_signed<stdex_char16_t>::type>::value == (true)), make_signed_t_stdex_char16_t);
+        STATIC_ASSERT((is_signed<make_signed<stdex_char32_t>::type>::value == (true)), make_signed_t_stdex_char32_t);
     }
 
 #if (CHECK_FOR_COMPILE_ERROR_TESTS == 1)

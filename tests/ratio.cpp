@@ -4,7 +4,7 @@
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 
-static const stdex::intmax_t M = INTMAX_MAX;
+static const stdex::intmax_t M = STDEX_INTMAX_MAX;
 
 int main(void)
 {

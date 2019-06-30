@@ -14,8 +14,8 @@ int main(void)
     STATIC_ASSERT(is_integral<signed char>::value == (true), should_be_integral);
     STATIC_ASSERT(is_integral<unsigned char>::value == (true), should_be_integral);
     STATIC_ASSERT(is_integral<wchar_t>::value == (true), should_be_integral);
-    STATIC_ASSERT(is_integral<char16_t>::value == (true), should_be_integral);
-    STATIC_ASSERT(is_integral<char32_t>::value == (true), should_be_integral);
+    STATIC_ASSERT(is_integral<stdex_char16_t>::value == (true), should_be_integral);
+    STATIC_ASSERT(is_integral<stdex_char32_t>::value == (true), should_be_integral);
     STATIC_ASSERT(is_integral<short>::value == (true), should_be_integral);
     STATIC_ASSERT(is_integral<unsigned short>::value == (true), should_be_integral);
     STATIC_ASSERT(is_integral<int>::value == (true), should_be_integral);
