@@ -50,7 +50,6 @@
 #define _STDEX_LONG_IS_IN_INT32_MAX_RANGE ( ((LONG_MIN - _STDEX_MIN_RANGE_INT32_LOWER_BOUND) >= -1) && ((LONG_MAX - _STDEX_MIN_RANGE_INT32_UPPER_BOUND) <= 1) )
 
 #if defined(LLONG_MIN) && defined(LLONG_MAX)
-    #define test (11 - _STDEX_MIN_RANGE_INT64_UPPER_BOUND)
     #define _STDEX_SHRT_IS_IN_INT64_MAX_RANGE ( ((SHRT_MIN - _STDEX_MIN_RANGE_INT64_LOWER_BOUND) >= -1ll) && ((SHRT_MAX - _STDEX_MIN_RANGE_INT64_UPPER_BOUND) <= 1ll) )
     #define _STDEX_INT_IS_IN_INT64_MAX_RANGE  ( ((INT_MIN - _STDEX_MIN_RANGE_INT64_LOWER_BOUND) >= -1ll) && ((INT_MAX - _STDEX_MIN_RANGE_INT64_UPPER_BOUND) <= 1ll) )
     #define _STDEX_LONG_IS_IN_INT64_MAX_RANGE  ( ((LONG_MIN - _STDEX_MIN_RANGE_INT64_LOWER_BOUND) >= -1ll) && ((LONG_MAX - _STDEX_MIN_RANGE_INT64_UPPER_BOUND) <= 1ll) )
@@ -148,7 +147,7 @@ namespace stdex
             template<class _Tp, bool>
             struct _signed_definer
             {
-                typedef _Tp signed signed_type;  
+                typedef _cstdint_invalid_type signed_type;  
             };
 
             template<class _Tp>
@@ -160,7 +159,7 @@ namespace stdex
             template<class _Tp, bool>
             struct _unsigned_definer
             {
-                typedef _Tp unsigned unsigned_type;  
+                typedef _cstdint_invalid_type unsigned_type;  
             };
 
             template<class _Tp>
