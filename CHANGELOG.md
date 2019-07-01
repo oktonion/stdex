@@ -8,6 +8,10 @@ visit https://github.com/oktonion/stdex for the latest version of stdex library
 
 ### Added
 
+- `<typeindex>` header:
+- - `type_index` class
+- - `type_info` defined in `stdex` namespace
+
 ### Changed
 
 ### Removed
