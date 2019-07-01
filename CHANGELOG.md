@@ -4,7 +4,15 @@ All notable changes to stdex library project will be documented in this file.
 
 visit https://github.com/oktonion/stdex for the latest version of stdex library
 
-## [0.2.0] - 2019-xx-xx
+## [0.2.1] - 2019-xx-xx
+
+### Added
+
+### Changed
+
+### Removed
+
+## [0.2.0] - 2019-07-01
 
 ### Added
 
@@ -45,6 +53,7 @@ visit https://github.com/oktonion/stdex for the latest version of stdex library
 - changed pthread-win32 submodule dependency to my fork (origin have not been updated since forever)
 - predefined types for `ratio` (like `yocto`, `milli`, `kilo`, `exa` etc.) are now incomplete if are not supported (too large or too small)
 - all build scripts now work correctly
+- fixed internal variables names with underscores
 
 ### Removed
 
