@@ -7,7 +7,6 @@
 
 // stdex includes
 /*none*/
-#include "./type_traits.hpp"
 
 // POSIX includes
 /*none*/
@@ -15,10 +14,10 @@
 // std includes
 #include <errno.h>
 #include <cerrno>
-#include <cstdlib>		// for std::strerror
-#include <cstring>		// for std::strerror
-#include <stdexcept>	// for std::runtime_error
-#include <string>
+#include <cstdlib>		// std::strerror
+#include <cstring>		// std::strerror
+#include <stdexcept>	// std::runtime_error
+#include <string> 		// std::string
 #include <functional>
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
