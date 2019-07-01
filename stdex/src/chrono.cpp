@@ -13,12 +13,12 @@
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
-#define __UNDEF_LEAN_AND_MEAN
+#define _STDEX_UNDEF_LEAN_AND_MEAN
 #endif
 #include <windows.h>
-#ifdef __UNDEF_LEAN_AND_MEAN
+#ifdef _STDEX_UNDEF_LEAN_AND_MEAN
 #undef WIN32_LEAN_AND_MEAN
-#undef __UNDEF_LEAN_AND_MEAN
+#undef _STDEX_UNDEF_LEAN_AND_MEAN
 #endif
 
 #include <process.h>
