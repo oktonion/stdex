@@ -135,13 +135,13 @@ matrix:
         #call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat" &&
       - echo "script started"
       - cd ./stdex
-      #- echo "call \"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\vcvarsall.bat x64\"" > ~$BUILD_LIB_SCRIPT
+      - echo "call \"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat\"" > ~$BUILD_LIB_SCRIPT
       - echo "cd \"C:\\\" && dir /b/s vcvars*.bat" > ~$BUILD_LIB_SCRIPT
       - cat $BUILD_LIB_SCRIPT >> ~$BUILD_LIB_SCRIPT
       - chmod +x ./~$BUILD_LIB_SCRIPT
       - ./~$BUILD_LIB_SCRIPT
       - cd ..
-      - echo "call \"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\vcvarsall.bat x64\"" > ~$BUILD_SCRIPT
+      - echo "call \"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat\"" > ~$BUILD_SCRIPT
       - cat $BUILD_SCRIPT >> ~$BUILD_SCRIPT
       - chmod +x ./~$BUILD_SCRIPT
       - ./~$BUILD_SCRIPT
