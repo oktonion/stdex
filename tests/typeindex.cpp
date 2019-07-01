@@ -101,6 +101,8 @@ int test02()
     const type_info& to7 = typeid(a2);
     const type_index ti7(to7);
     DYNAMIC_VERIFY( ti7.name() == to7.name() );
+
+    return 0;
 }
 
 int main()
