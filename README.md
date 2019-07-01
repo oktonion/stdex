@@ -26,7 +26,7 @@ A:
 3. Because I want all of basic little helpful classes and tricks (as `countof` f.e.) be in one place with power of C++ 11 threads handling and template-programming.
 
 <details>
-<summary>## C++ 11 implemented features list</summary>
+<summary>**C++ 11 implemented features list**</summary>
 
 ### Utilities library
 
