@@ -25,17 +25,104 @@ A:
 2. Because I need something without such overhead and ugliness (ugliness and beauty actually, I am really amazed by how Boost handles some features of C++).
 3. Because I want all of basic little helpful classes and tricks (as `countof` f.e.) be in one place with power of C++ 11 threads handling and template-programming.
 
-## C++ 11 feature list
+## C++ 11 implemented features list
+#
+<details>
+<summary>List of headers</summary>
 
 ### Utilities library
 
-| name                 | purpose                                | feature % | final |
-|----------------------|----------------------------------------|:---------:|-------|
-| `<typeindex>`        | stdex::type_index                      |     -     | no    |
-| `<type_traits>`      | Compile-time type information          | 70%       | no    |
-| `<chrono>`           | C++ time utilities                     | 100%      | yes   |
-| `<initializer_list>` | stdex::initializer_list class template |     -     | yes   |
-| `<tuple>`            | stdex::tuple class template            |     -     | no    |
+| name                 | purpose                                |  implemented | is final |
+|----------------------|----------------------------------------|:------------:|----------|
+| `<typeindex>`        | stdex::type_index                      | no           | no       |
+| `<type_traits>`      | Compile-time type information          | 70%          | no       |
+| `<chrono>`           | C++ time utilities                     | 100%         | yes      |
+| `<initializer_list>` | stdex::initializer_list class template | no and never | yes      |
+| `<tuple>`            | stdex::tuple class template            | no           | no       |
+
+### Dynamic memory management
+
+| name                 | purpose                |  implemented | is final |
+|----------------------|------------------------|:------------:|----------|
+| `<scoped_allocator>` | Nested allocator class | no           | maybe    |
+
+### Numeric limits
+
+| name                 | purpose                                                        |  implemented | is final |
+|----------------------|----------------------------------------------------------------|:------------:|----------|
+| `<cstdint>`          | fixed-size types and limits of other types                     | 99%          | maybe    |
+| `<cinttypes>`        | formatting macros, intmax_t and uintmax_t math and conversions | no           | maybe    |
+
+### Error handling
+
+| name                 | purpose                                                    |  implemented | is final |
+|----------------------|------------------------------------------------------------|:------------:|----------|
+| `<system_error>`     | defines stdex::error_code, a platform-dependent error code | 100%         | yes      |
+
+### Strings library
+
+| name                 | purpose                                                 |  implemented | is final |
+|----------------------|---------------------------------------------------------|:------------:|----------|
+| `<cuchar>`           | C-style  Unicode character conversion functions         | no           | maybe    |
+| `<string>`           | stdex::basic_string, stdex::stoi, stdex::to_string etc. | 50%          | no       |
+
+### Containers library
+
+| name              | purpose                                | implemented | is final |
+|-------------------|----------------------------------------|:-----------:|----------|
+| `<array>`         | stdex::array container                 | no          | maybe    |
+| `<forward_list>`  | stdex::forward_list container          | no          | maybe    |
+| `<unordered_set>` | unordered associative `set` containers | no          | maybe    |
+| `<unordered_map>` | unordered associative `map` containers | no          | maybe    |
+
+### Iterators library
+
+| name              | purpose         | implemented | is final |
+|-------------------|-----------------|:-----------:|----------|
+| `<iterator>`      | Range iterators | 100%        | yes      |
+
+### Algorithms library
+
+| name              | purpose                           | implemented | is final |
+|-------------------|-----------------------------------|:-----------:|----------|
+| `<algorithm>`     | Algorithms that operate on ranges | 100%        | yes      |
+
+### Numerics library
+
+| name              | purpose                                     | implemented | is final |
+|-------------------|---------------------------------------------|:-----------:|----------|
+| `<random>`        | Random number generators and distributions  | no          | maybe    |
+| `<ratio>`         | Compile-time rational arithmetic            | 99%         | maybe    |
+| `<cfenv>`         | Floating-point environment access functions | no          | maybe    |
+
+### Input/output library
+
+| name              | purpose                                                                                                                | implemented | is final |
+|-------------------|------------------------------------------------------------------------------------------------------------------------|:-----------:|----------|
+| `<sstream>`       | stdex::basic_stringstream, stdex::basic_istringstream, stdex::basic_ostringstream class templates and several typedefs | 30%         | maybe    |
+
+### Regular Expressions library
+
+| name              | purpose                                                                    | implemented | is final |
+|-------------------|----------------------------------------------------------------------------|:-----------:|----------|
+| `<regex>`         | Classes, algorithms and iterators to support regular expression processing | no          | maybe    |
+
+### Atomic Operations library
+
+| name              | purpose                   | implemented | is final |
+|-------------------|---------------------------|:-----------:|----------|
+| `<atomic>`        | Atomic operations library | no          | no       |
+
+### Thread support library
+
+| name                   | purpose                                       | implemented | is final |
+|------------------------|-----------------------------------------------|:-----------:|----------|
+| `<thread>`             | stdex::thread class and  supporting functions | 90%         | no       |
+| `<mutex>`              | mutual exclusion primitives                   | 100%        | yes      |
+| `<future>`             | primitives for asynchronous computations      | no          | maybe    |
+| `<condition_variable>` | thread waiting conditions                     | 100%        | yes      |
+
+</details>
 
 Not all features of C++ 11 can be implemented without compiler support so I have no plans to include such features in the library.
 
