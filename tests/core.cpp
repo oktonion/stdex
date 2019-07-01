@@ -17,12 +17,13 @@ int main(void)
 {// core
 
 		volatile const bool* p = nullptr;
+		((void)(p));
 
 		// static_assert check:
 		STATIC_ASSERT(1 < 2, one_is_less_than_two);
 
 		// nullptr checks:
-		volatile void *ptr = nullptr;
+		volatile void *ptr = nullptr; ((void)(ptr)); 
 		STATIC_ASSERT(nullptr == nullptr && !(nullptr != nullptr), nullptr_should_be_equal_itself);
 		STATIC_ASSERT(0 == nullptr && nullptr == 0, nullptr_should_be_equal_zero);
 		//STATIC_ASSERT(!(nullptr > nullptr), nullptr_should_not_be_more_than_itself);
@@ -54,7 +55,7 @@ int main(void)
 			char carr[20];
 			int iarr[20];
 			float farr[20];
-			volatile static const int i = countof(carr);
+			volatile static const int i = int(countof(carr));
 			carr[0] = char();
 			iarr[0] = int();
 			farr[0] = float();

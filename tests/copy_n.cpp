@@ -28,7 +28,7 @@ test1()
   copy_n(A, N, v1.begin());
   DYNAMIC_VERIFY( (equal(v1.begin(), v1.end(), A)) );
 
-  short s1[N];
+  int s1[N];
   copy_n(A, N, s1);
   DYNAMIC_VERIFY( (equal(s1, s1 + N, A)) );
 
