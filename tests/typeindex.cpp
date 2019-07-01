@@ -27,7 +27,7 @@
 int test01()
 {
     using namespace stdex;
-    
+
     using std::type_info;
 
     class Cadabra { };
@@ -70,9 +70,9 @@ int test02()
 {
     using namespace stdex;
 
-    class Cadabra { };
-    Cadabra a1, a2_;
-    const Cadabra a2 = a2_;
+    class Alakazam { };
+    Alakazam a1, a2_;
+    const Alakazam a2 = a2_;
 
     const type_info& to1 = typeid(int);
     const type_index ti1(to1);
@@ -82,15 +82,15 @@ int test02()
     const type_index ti2(to2);
     DYNAMIC_VERIFY( ti2.name() == to2.name() );
 
-    const type_info& to3 = typeid(Cadabra);
+    const type_info& to3 = typeid(Alakazam);
     const type_index ti3(to3);
     DYNAMIC_VERIFY( ti3.name() == to3.name() );
 
-    const type_info& to4 = typeid(const Cadabra);
+    const type_info& to4 = typeid(const Alakazam);
     const type_index ti4(to4);
     DYNAMIC_VERIFY( ti4.name() == to4.name() );
 
-    const type_info& to5 = typeid(const Cadabra&);
+    const type_info& to5 = typeid(const Alakazam&);
     const type_index ti5(to5);
     DYNAMIC_VERIFY( ti5.name() == to5.name() );
 
