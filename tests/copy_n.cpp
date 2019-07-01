@@ -52,7 +52,7 @@ test2()
   copy_n(a.begin(), N, v1.begin());
   DYNAMIC_VERIFY( (equal(v1.begin(), v1.end(), a.begin())) );
 
-  short s1[N];
+  int s1[N];
   copy_n(a.begin(), N, s1);
   DYNAMIC_VERIFY( (equal(s1, s1 + N, a.begin())) );
   
@@ -76,7 +76,7 @@ test3()
   copy_n(a.begin(), N, v1.begin());
   DYNAMIC_VERIFY( equal(v1.begin(), v1.end(), a.begin()) );
 
-  short s1[N];
+  int s1[N];
   copy_n(a.begin(), N, s1);
   DYNAMIC_VERIFY( equal(s1, s1 + N, a.begin()) );
     
@@ -100,7 +100,7 @@ test4()
   copy_n(a.begin(), N, v1.begin());
   DYNAMIC_VERIFY( equal(v1.begin(), v1.end(), a.begin()) );
 
-  short s1[N];
+  int s1[N];
   copy_n(a.begin(), N, s1);
   DYNAMIC_VERIFY( equal(s1, s1 + N, a.begin()) );
 
