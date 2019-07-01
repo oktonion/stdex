@@ -8,13 +8,13 @@ set INCLUDE=%INCLUDE%;%cd%\pthread\;
 
 for /f %%f in ('dir /b ".\tests\*.cpp"') do (
   echo "compiling test %VisualStudioVersion% %%~nf"
-  cl -EHsc -W4 -Fo.\tests\obj\%%~nf.obj -c ".\tests\%%f"
+  cl -EHsc -W4 -Fo.\tests\obj\%%~nf.obj -D _CRT_SECURE_NO_WARNINGS -c ".\tests\%%f"
   IF ERRORLEVEL 1 (
     set "build_ok=0"
   )
 
   if "%build_ok%"=="1" (
-    cl /I %cd%\pthread\ .\tests\obj\%%~nf.obj stdex.lib ntdll.lib -Fe.\tests\bin\%%~nf.exe -link -LIBPATH:.\stdex\lib
+    cl /I %cd%\pthread\ .\tests\obj\%%~nf.obj stdex.lib ntdll.lib -D _CRT_SECURE_NO_WARNINGS -Fe.\tests\bin\%%~nf.exe -link -LIBPATH:.\stdex\lib
     IF ERRORLEVEL 1 (
       set "build_ok=0"
     )
