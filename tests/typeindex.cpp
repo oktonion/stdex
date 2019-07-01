@@ -34,6 +34,9 @@ int test01()
     Cadabra a1, a2_;
     const Cadabra a2 = a2_;
 
+    ((void)(a2));
+    ((void)(a2_));
+
     const type_info& to1 = typeid(int);
     const type_index ti1(to1);
 
@@ -73,6 +76,9 @@ int test02()
     class Alakazam { };
     Alakazam a1, a2_;
     const Alakazam a2 = a2_;
+
+    ((void)(a2));
+    ((void)(a2_));
 
     const type_info& to1 = typeid(int);
     const type_index ti1(to1);
