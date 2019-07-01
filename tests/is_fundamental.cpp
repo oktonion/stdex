@@ -2,6 +2,29 @@
 #include "../stdex/include/type_traits.hpp"
 
 struct ClassType {};
+enum EnumType {};
+
+struct PODType { int data; };
+
+struct ConvTypeInt
+{
+	ConvTypeInt(int) {}
+	template<class T>
+	operator T() { return T(); }
+};
+
+struct ClassType1 { ClassType1(int); };
+
+struct ConvClassPtrLike { 
+    ConvClassPtrLike(int); 
+    template<class T>
+    ConvClassPtrLike(T*);
+
+    template<class T>
+    operator T*();
+
+    int &operator *() const;
+};
 
 int main(void)
 {
@@ -32,5 +55,10 @@ int main(void)
 
     // Sanity check.
     STATIC_ASSERT(is_fundamental<ClassType>::value == (false), can_not_be_fundamental);
+    STATIC_ASSERT(is_fundamental<EnumType>::value == (false), can_not_be_fundamental);
+    STATIC_ASSERT(is_fundamental<PODType>::value == (false), can_not_be_fundamental);
+    STATIC_ASSERT(is_fundamental<ConvTypeInt>::value == (false), can_not_be_fundamental);
+    STATIC_ASSERT(is_fundamental<ClassType1>::value == (false), can_not_be_fundamental);
+    STATIC_ASSERT(is_fundamental<ConvClassPtrLike>::value == (false), can_not_be_fundamental);
     return 0;
 }

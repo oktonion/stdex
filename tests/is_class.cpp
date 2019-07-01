@@ -39,6 +39,17 @@ struct ConvTypeInt
 
 struct ClassType1 { ClassType1(int); };
 
+struct ConvClassPtrLike { 
+    ConvClassPtrLike(int); 
+    template<class T>
+    ConvClassPtrLike(T*);
+
+    template<class T>
+    operator T*();
+
+    int &operator *() const;
+};
+
 union ConvUnionType {
 	float a;
 	ClassType b;
@@ -84,6 +95,7 @@ int main(void)
     STATIC_ASSERT(is_class<DerivedPolymorphic>::value == (true), should_be_class);
     STATIC_ASSERT(is_class<ConvTypeInt>::value == (true), should_be_class);
     STATIC_ASSERT(is_class<ClassType1>::value == (true), should_be_class);
+    STATIC_ASSERT(is_class<ConvClassPtrLike>::value == (true), should_be_class);
 
     // Negative tests.
     {
