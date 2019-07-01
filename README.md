@@ -1,4 +1,4 @@
-### CI Status ans tests coverage
+### CI Status and tests coverage
 
 Branch   | Travis | Appveyor| Codecov
 ---------|--------|---------|---------
@@ -9,6 +9,14 @@ master   | [![Build Status](https://travis-ci.org/oktonion/stdex.svg?branch=mast
 
 C++ 11 standard library implementation with extra features using C++98 only and POSIX threads. Minimum ugly preprocessor macro and no configuration files. The library itself is built on top of C++ standard library distributed with your compiler and just extends it with C++11 features.
 
+## Supported platforms
+
+* Windows (from XP to 10)
+* Unix (any with `glibc` and `pthread`)
+* MacOS (any)
+* QNX 6.x.x
+* QNX 4 (partly)
+
 Q: Why not [Boost](https://github.com/boostorg)?
 
 A:
@@ -16,6 +24,18 @@ A:
 1. Because I can.
 2. Because I need something without such overhead and ugliness (ugliness and beauty actually, I am really amazed by how Boost handles some features of C++).
 3. Because I want all of basic little helpful classes and tricks (as `countof` f.e.) be in one place with power of C++ 11 threads handling and template-programming.
+
+## C++ 11 feature list
+
+### Utilities library
+
+| name                 | purpose                                | feature % | final |
+|----------------------|----------------------------------------|:---------:|-------|
+| `<typeindex>`        | stdex::type_index                      |     -     | no    |
+| `<type_traits>`      | Compile-time type information          | 70%       | no    |
+| `<chrono>`           | C++ time utilities                     | 100%      | yes   |
+| `<initializer_list>` | stdex::initializer_list class template |     -     | yes   |
+| `<tuple>`            | stdex::tuple class template            |     -     | no    |
 
 Not all features of C++ 11 can be implemented without compiler support so I have no plans to include such features in the library.
 
@@ -40,9 +60,9 @@ Build process is simple:
 
 * For Unix - either run a `build_lib.sh` script (works with `g++` and `clang` if environment variable `$COMPILER` is set to compiler name, f.e. to `clang++-3.5`) or build by yourself static library from `stdex/src` directory sources.
 * For Windows
-    - run a `build_lib.bat` script (works with Visual Studio's `cl` if environment variables are set by `v{s/c}vars{32/64/all}.bat` script that is being in your Visual Studio distributive);
-    - run a `build_lib_bcc32.bat` script for Borland C++ Builder 6.0 Updt4 `bcc32` build;
-    - ...or build by yourself the static library from `stdex/src` and `pthreads-win32` directories sources.
+* * run a `build_lib.bat` script (works with Visual Studio's `cl` if environment variables are set by `v{s/c}vars{32/64/all}.bat` script that is being in your Visual Studio distributive);
+* * run a `build_lib_bcc32.bat` script for Borland C++ Builder 6.0 Updt4 `bcc32` build;
+* * ...or build by yourself the static library from `stdex/src` and `pthreads-win32` directories sources.
 * For QNX 6.x.x - either run a `build_lib_qnx.sh` (using `qcc` compiler) or build by yourself the static library from `stdex/src` directory sources (do not forget to link with `stdlib` library).
 * For Mac OS - either run a `build_lib.sh` script (works with clang if environment variable `$COMPILER` is set to compiler name, f.e. to `clang++-3.5`) or build by yourself static library from `stdex/src` directory sources.
 
