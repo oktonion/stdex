@@ -77,6 +77,13 @@ cl -EHsc -Fo.\obj\main.obj -c ".\main.cpp"
 cl .\obj\main.obj stdex.lib ntdll.lib -Fe.\bin\main.exe -link -LIBPATH:.\stdex\lib
 ```
 
+example script build for Windows (with Borland C++ Builder 6.0 Updt4 and generated `ntdll.lib` with `coff2omf.exe`):
+
+```bat
+bcc32 -w-inl -w-ccc -tWM -Q -n.\obj\ -I%cd%\pthread\ -c ".\main.cpp"
+bcc32 -w-inl -w-ccc -tWM -Q -L.\stdex\lib\ -lap -I%cd%\pthread\ -e.\bin\main.exe stdex.lib cw32mt.lib ntdll.lib .\obj\main.obj
+```
+
 example script build for QNX 6.x.x (with `qcc` installed):
 
 ```sh
@@ -84,7 +91,7 @@ COMPILER=qcc
 $COMPILER main.cpp -L./stdex/lib/ -lstdex -lm -o "./bin/main"
 ```
 
-example script build for Mac OS (with clang installed):
+example script build for Mac OS (with `clang` installed):
 
 ```sh
 COMPILER=clang++
