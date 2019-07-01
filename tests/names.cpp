@@ -10,6 +10,7 @@
     #include <string>
 #elif defined(_MSC_VER) // vstudio 
     #include <string>
+    #include <cmath>
 #endif
 
 // testing common names that should not be defined in stdex lib
