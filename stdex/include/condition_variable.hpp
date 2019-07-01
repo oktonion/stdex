@@ -17,13 +17,13 @@
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
-#define DELETED_FUNCTION =delete
-#define NOEXCEPT_FUNCTION noexcept
+#define _STDEX_DELETED_FUNCTION =delete
+#define _STDEX_NOEXCEPT_FUNCTION noexcept
 
 #else
 
-#define DELETED_FUNCTION 
-#define NOEXCEPT_FUNCTION throw()
+#define _STDEX_DELETED_FUNCTION 
+#define _STDEX_NOEXCEPT_FUNCTION throw()
 
 #endif
 
@@ -82,13 +82,13 @@ namespace stdex
 		typedef pthread_cond_t* native_handle_type;
 
 		//! Constructor.
-		condition_variable() NOEXCEPT_FUNCTION
+		condition_variable() _STDEX_NOEXCEPT_FUNCTION
 		{
 			pthread_cond_init(&_condition_handle, NULL);
 		}
 
 		//! Destructor.
-		~condition_variable() NOEXCEPT_FUNCTION
+		~condition_variable() _STDEX_NOEXCEPT_FUNCTION
 		{
 			pthread_cond_destroy(&_condition_handle);
 		}
@@ -96,7 +96,7 @@ namespace stdex
 		//! Wait for the condition.
 		//! The function will block the calling thread until the condition variable
 		//! is woken by @c notify_one(), @c notify_all() or a spurious wake up.
-		inline void wait(unique_lock<mutex> &lock) NOEXCEPT_FUNCTION
+		inline void wait(unique_lock<mutex> &lock) _STDEX_NOEXCEPT_FUNCTION
 		{
 			int _e = pthread_cond_wait(&_condition_handle, lock.mutex()->native_handle());
 
@@ -158,7 +158,7 @@ namespace stdex
 		//! one will be woken up.
 		//! @note Only threads that started waiting prior to this call will be
 		//! woken up.
-		inline void notify_one() NOEXCEPT_FUNCTION
+		inline void notify_one() _STDEX_NOEXCEPT_FUNCTION
 		{
 			pthread_cond_signal(&_condition_handle);
 		}
@@ -168,7 +168,7 @@ namespace stdex
 		//! be woken up.
 		//! @note Only threads that started waiting prior to this call will be
 		//! woken up.
-		inline void notify_all() NOEXCEPT_FUNCTION
+		inline void notify_all() _STDEX_NOEXCEPT_FUNCTION
 		{
 			pthread_cond_broadcast(&_condition_handle);
 		}
@@ -224,14 +224,14 @@ namespace stdex
 
 		pthread_cond_t _condition_handle;
 
-		condition_variable(const condition_variable&) DELETED_FUNCTION;
-		condition_variable& operator=(const condition_variable&) DELETED_FUNCTION;
+		condition_variable(const condition_variable&) _STDEX_DELETED_FUNCTION;
+		condition_variable& operator=(const condition_variable&) _STDEX_DELETED_FUNCTION;
 	};
 
 	void notify_all_at_thread_exit(condition_variable &cond, unique_lock<mutex> &lk); 
 } // namespace stdex
 
-#undef DELETED_FUNCTION
-#undef NOEXCEPT_FUNCTION
+#undef _STDEX_DELETED_FUNCTION
+#undef _STDEX_NOEXCEPT_FUNCTION
 
 #endif // _STDEX_CONDITION_VARIABLE_H

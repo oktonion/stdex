@@ -263,15 +263,15 @@ int(*clock_gettime_func_pointer)(int X, timespec *tv) = &clock_gettime;
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
-#define NOEXCEPT_FUNCTION noexcept
+#define _STDEX_NOEXCEPT_FUNCTION noexcept
 
 #else
 
-#define NOEXCEPT_FUNCTION throw()
+#define _STDEX_NOEXCEPT_FUNCTION throw()
 
 #endif
 
-stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() NOEXCEPT_FUNCTION
+stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDEX_NOEXCEPT_FUNCTION
 {	// get current time
 	{
 		mytimespec ts;
@@ -286,7 +286,7 @@ stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() NOEXC
 	}
 }
 
-stdex::chrono::steady_clock::time_point stdex::chrono::steady_clock::now() NOEXCEPT_FUNCTION
+stdex::chrono::steady_clock::time_point stdex::chrono::steady_clock::now() _STDEX_NOEXCEPT_FUNCTION
 {	// get current time
 	{
 		mytimespec ts;

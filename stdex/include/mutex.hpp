@@ -17,13 +17,13 @@
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
-#define DELETED_FUNCTION =delete
-#define NOEXCEPT_FUNCTION noexcept
+#define _STDEX_DELETED_FUNCTION =delete
+#define _STDEX_NOEXCEPT_FUNCTION noexcept
 
 #else
 
-#define DELETED_FUNCTION 
-#define NOEXCEPT_FUNCTION throw()
+#define _STDEX_DELETED_FUNCTION 
+#define _STDEX_NOEXCEPT_FUNCTION throw()
 
 #endif
 
@@ -36,17 +36,17 @@ namespace stdex
 
 		pthread_mutex_t  _mutex_handle;
 
-		mutex_base() NOEXCEPT_FUNCTION
+		mutex_base() _STDEX_NOEXCEPT_FUNCTION
 		{
 			// XXX EAGAIN, ENOMEM, EPERM, EBUSY(may), EINVAL(may)
 			pthread_mutex_init(&_mutex_handle, NULL);
 		}
 
-		~mutex_base() NOEXCEPT_FUNCTION { pthread_mutex_destroy(&_mutex_handle); }
+		~mutex_base() _STDEX_NOEXCEPT_FUNCTION { pthread_mutex_destroy(&_mutex_handle); }
 
 	private:
-		mutex_base(const mutex_base&) DELETED_FUNCTION;
-		mutex_base& operator=(const mutex_base&) DELETED_FUNCTION;
+		mutex_base(const mutex_base&) _STDEX_DELETED_FUNCTION;
+		mutex_base& operator=(const mutex_base&) _STDEX_DELETED_FUNCTION;
 	};
 
 	//! Mutex class.
@@ -62,12 +62,12 @@ namespace stdex
 		typedef pthread_mutex_t* native_handle_type;
 
 		//! Constructor.
-		mutex() NOEXCEPT_FUNCTION
+		mutex() _STDEX_NOEXCEPT_FUNCTION
 		{}
 
 
 		//! Destructor.
-		~mutex() NOEXCEPT_FUNCTION
+		~mutex() _STDEX_NOEXCEPT_FUNCTION
 		{}
 
 		//! Lock the mutex.
@@ -89,7 +89,7 @@ namespace stdex
 		//! return immediately (non-blocking).
 		//! @return @c true if the lock was acquired, or @c false if the lock could
 		//! not be acquired.
-		inline bool try_lock() NOEXCEPT_FUNCTION
+		inline bool try_lock() _STDEX_NOEXCEPT_FUNCTION
 		{
 			// XXX EINVAL, EAGAIN, EBUSY
 			return (pthread_mutex_trylock(&_mutex_handle) == 0) ? true : false;
@@ -103,14 +103,14 @@ namespace stdex
 			pthread_mutex_unlock(&_mutex_handle);
 		}
 
-		native_handle_type native_handle() NOEXCEPT_FUNCTION
+		native_handle_type native_handle() _STDEX_NOEXCEPT_FUNCTION
 		{
 			return &_mutex_handle;
 		}
 
 	private:
-		mutex(const mutex&) DELETED_FUNCTION;
-		mutex& operator=(const mutex&) DELETED_FUNCTION;
+		mutex(const mutex&) _STDEX_DELETED_FUNCTION;
+		mutex& operator=(const mutex&) _STDEX_DELETED_FUNCTION;
 
 		//friend class condition_variable;
 	};
@@ -135,8 +135,8 @@ namespace stdex
 		}
 
 	private:
-		recursive_mutex_base(const recursive_mutex_base&) DELETED_FUNCTION;
-		recursive_mutex_base& operator=(const recursive_mutex_base&) DELETED_FUNCTION;
+		recursive_mutex_base(const recursive_mutex_base&) _STDEX_DELETED_FUNCTION;
+		recursive_mutex_base& operator=(const recursive_mutex_base&) _STDEX_DELETED_FUNCTION;
 	};
 
 	//! Recursive mutex class.
@@ -192,7 +192,7 @@ namespace stdex
 			pthread_mutex_unlock(&_mutex_handle);
 		}
 
-		native_handle_type native_handle() NOEXCEPT_FUNCTION
+		native_handle_type native_handle() _STDEX_NOEXCEPT_FUNCTION
 		{
 			return &_mutex_handle;
 		}
@@ -201,8 +201,8 @@ namespace stdex
 
 		//friend class condition_variable;
 
-		recursive_mutex(const recursive_mutex&) DELETED_FUNCTION;
-		recursive_mutex& operator=(const recursive_mutex&) DELETED_FUNCTION;
+		recursive_mutex(const recursive_mutex&) _STDEX_DELETED_FUNCTION;
+		recursive_mutex& operator=(const recursive_mutex&) _STDEX_DELETED_FUNCTION;
 	};
 
 	// LOCK PROPERTIES
@@ -249,7 +249,7 @@ namespace stdex
 		}
 
 		//! The constructor does not lock the mutex because calling thread owns it
-		lock_guard(mutex_type &_m, adopt_lock_t) NOEXCEPT_FUNCTION:
+		lock_guard(mutex_type &_m, adopt_lock_t) _STDEX_NOEXCEPT_FUNCTION:
 			_device(_m)
 		{}
 
@@ -263,8 +263,8 @@ namespace stdex
 	private:
 		mutex_type &_device;
 
-		lock_guard(const lock_guard&) DELETED_FUNCTION;
-		lock_guard& operator=(const lock_guard&) DELETED_FUNCTION;
+		lock_guard(const lock_guard&) _STDEX_DELETED_FUNCTION;
+		lock_guard& operator=(const lock_guard&) _STDEX_DELETED_FUNCTION;
 	};
 
 	/** @brief A movable scoped lock type.
@@ -280,7 +280,7 @@ namespace stdex
 	public:
 		typedef _Tp mutex_type;
 
-		unique_lock() NOEXCEPT_FUNCTION : 
+		unique_lock() _STDEX_NOEXCEPT_FUNCTION : 
 			_device(0), 
 			_owns(false)
 		{ }
@@ -293,7 +293,7 @@ namespace stdex
 			_owns = true;
 		}
 
-		unique_lock(mutex_type &_m, defer_lock_t) NOEXCEPT_FUNCTION: 
+		unique_lock(mutex_type &_m, defer_lock_t) _STDEX_NOEXCEPT_FUNCTION: 
 			_device(&(_m)), 
 			_owns(false)
 		{ }
@@ -303,7 +303,7 @@ namespace stdex
 			_owns(_device->try_lock())
 		{ }
 
-		unique_lock(mutex_type &_m, adopt_lock_t) NOEXCEPT_FUNCTION: 
+		unique_lock(mutex_type &_m, adopt_lock_t) _STDEX_NOEXCEPT_FUNCTION: 
 			_device(&(_m)), 
 			_owns(true)
 		{
@@ -329,7 +329,7 @@ namespace stdex
 		}
 
 		/* move move move, no move in pre-C++11
-		unique_lock(unique_lock &&u) NOEXCEPT_FUNCTION: 
+		unique_lock(unique_lock &&u) _STDEX_NOEXCEPT_FUNCTION: 
 			_device(u._device), 
 			_owns(u._owns)
 		{
@@ -337,7 +337,7 @@ namespace stdex
 			u._owns = false;
 		}
 
-		unique_lock& operator=(unique_lock &&u) NOEXCEPT_FUNCTION
+		unique_lock& operator=(unique_lock &&u) _STDEX_NOEXCEPT_FUNCTION
 		{
 			if (_owns)
 				unlock();
@@ -416,7 +416,7 @@ namespace stdex
 			}
 		}
 
-		void swap(unique_lock &other) NOEXCEPT_FUNCTION
+		void swap(unique_lock &other) _STDEX_NOEXCEPT_FUNCTION
 		{
 			{
 				mutex_type *tmp_value = _device;
@@ -431,7 +431,7 @@ namespace stdex
 			}
 		}
 
-		mutex_type* release() NOEXCEPT_FUNCTION
+		mutex_type* release() _STDEX_NOEXCEPT_FUNCTION
 		{
 			mutex_type *ret = _device;
 			_device = 0;
@@ -439,17 +439,17 @@ namespace stdex
 			return ret;
 		}
 
-		bool owns_lock() const NOEXCEPT_FUNCTION
+		bool owns_lock() const _STDEX_NOEXCEPT_FUNCTION
 		{
 			return _owns;
 		}
 
-		operator bool() const NOEXCEPT_FUNCTION
+		operator bool() const _STDEX_NOEXCEPT_FUNCTION
 		{
 			return owns_lock();
 		}
 
-		mutex_type* mutex() const NOEXCEPT_FUNCTION
+		mutex_type* mutex() const _STDEX_NOEXCEPT_FUNCTION
 		{
 			return _device;
 		}
@@ -458,21 +458,21 @@ namespace stdex
 		mutex_type *_device;
 		bool _owns; // XXX use atomic_bool
 
-		unique_lock(const unique_lock&) DELETED_FUNCTION;
-		unique_lock& operator=(const unique_lock&) DELETED_FUNCTION;
+		unique_lock(const unique_lock&) _STDEX_DELETED_FUNCTION;
+		unique_lock& operator=(const unique_lock&) _STDEX_DELETED_FUNCTION;
 	};
 
 	/// Swap overload for unique_lock objects.
 	template<class _Mutex>
-	inline void swap(stdex::unique_lock<_Mutex> &lhs, stdex::unique_lock<_Mutex> &rhs) NOEXCEPT_FUNCTION
+	inline void swap(stdex::unique_lock<_Mutex> &lhs, stdex::unique_lock<_Mutex> &rhs) _STDEX_NOEXCEPT_FUNCTION
 	{
 		lhs.swap(rhs);
 	}
 
 } // namespace stdex
 
-#undef DELETED_FUNCTION
-#undef NOEXCEPT_FUNCTION
+#undef _STDEX_DELETED_FUNCTION
+#undef _STDEX_NOEXCEPT_FUNCTION
 
 
 #endif // _STDEX_MUTEX_H

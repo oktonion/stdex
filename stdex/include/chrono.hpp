@@ -21,13 +21,13 @@
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
-#define DELETED_FUNCTION =delete
-#define NOEXCEPT_FUNCTION noexcept
+#define _STDEX_DELETED_FUNCTION =delete
+#define _STDEX_NOEXCEPT_FUNCTION noexcept
 
 #else
 
-#define DELETED_FUNCTION 
-#define NOEXCEPT_FUNCTION throw()
+#define _STDEX_DELETED_FUNCTION 
+#define _STDEX_NOEXCEPT_FUNCTION throw()
 
 #endif
 
@@ -844,18 +844,18 @@ namespace stdex
 			static const bool is_steady;
 
 			static time_point
-				now() NOEXCEPT_FUNCTION;
+				now() _STDEX_NOEXCEPT_FUNCTION;
 
 			// Map to C API
 			static time_t
-				to_time_t(const time_point &_t) NOEXCEPT_FUNCTION
+				to_time_t(const time_point &_t) _STDEX_NOEXCEPT_FUNCTION
 			{
 				return time_t(duration_cast<chrono::seconds>
 					(_t.time_since_epoch()).count());
 			}
 
 			static time_point
-				from_time_t(time_t _t) NOEXCEPT_FUNCTION
+				from_time_t(time_t _t) _STDEX_NOEXCEPT_FUNCTION
 			{
 				typedef chrono::time_point<system_clock, seconds>	_from;
 
@@ -888,7 +888,7 @@ namespace stdex
 			static const bool is_steady;
 
 			static time_point
-				now() NOEXCEPT_FUNCTION;
+				now() _STDEX_NOEXCEPT_FUNCTION;
 		};
 
 
@@ -938,7 +938,7 @@ namespace stdex
 
 } // namespace stdex
 
-#undef DELETED_FUNCTION
-#undef NOEXCEPT_FUNCTION
+#undef _STDEX_DELETED_FUNCTION
+#undef _STDEX_NOEXCEPT_FUNCTION
 
 #endif // _STDEX_CHRONO_H

@@ -45,11 +45,11 @@
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
-#define NOEXCEPT_FUNCTION noexcept
+#define _STDEX_NOEXCEPT_FUNCTION noexcept
 
 #else
 
-#define NOEXCEPT_FUNCTION throw()
+#define _STDEX_NOEXCEPT_FUNCTION throw()
 
 #endif
 
@@ -340,7 +340,7 @@ void thread::join()
 	_id = id();
 }
 
-bool thread::joinable() const NOEXCEPT_FUNCTION
+bool thread::joinable() const _STDEX_NOEXCEPT_FUNCTION
 {
 	return _id != id();
 }
@@ -361,7 +361,7 @@ void thread::detach()
 	_id = id();
 }
 
-thread::id thread::get_id() const NOEXCEPT_FUNCTION
+thread::id thread::get_id() const _STDEX_NOEXCEPT_FUNCTION
 {
 	if (!joinable())
 		return id();
@@ -369,7 +369,7 @@ thread::id thread::get_id() const NOEXCEPT_FUNCTION
 	return _id;
 }
 
-unsigned thread::hardware_concurrency() NOEXCEPT_FUNCTION
+unsigned thread::hardware_concurrency() _STDEX_NOEXCEPT_FUNCTION
 {
 #if defined(_STDEX_THREAD_WIN)
 	SYSTEM_INFO si;
@@ -398,7 +398,7 @@ unsigned thread::hardware_concurrency() NOEXCEPT_FUNCTION
 #endif
 }
 
-void thread::swap(thread & other) NOEXCEPT_FUNCTION
+void thread::swap(thread & other) _STDEX_NOEXCEPT_FUNCTION
 {
 	if (&other == this)
 		return;
@@ -417,7 +417,7 @@ void thread::swap(thread & other) NOEXCEPT_FUNCTION
 	}
 }
 
-thread::id this_thread::get_id() NOEXCEPT_FUNCTION
+thread::id this_thread::get_id() _STDEX_NOEXCEPT_FUNCTION
 {
 	stdex::uintmax_t uid;
 
@@ -573,6 +573,6 @@ namespace stdex
 }
 
 
-#undef NOEXCEPT_FUNCTION
+#undef _STDEX_NOEXCEPT_FUNCTION
 
 

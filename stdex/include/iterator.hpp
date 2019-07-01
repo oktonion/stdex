@@ -15,13 +15,13 @@
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
-#define DELETED_FUNCTION =delete
-#define NOEXCEPT_FUNCTION noexcept
+#define _STDEX_DELETED_FUNCTION =delete
+#define _STDEX_NOEXCEPT_FUNCTION noexcept
 
 #else
 
-#define DELETED_FUNCTION 
-#define NOEXCEPT_FUNCTION throw()
+#define _STDEX_DELETED_FUNCTION 
+#define _STDEX_NOEXCEPT_FUNCTION throw()
 
 #endif
 
@@ -241,7 +241,7 @@ namespace stdex
 		struct _if_iterator_cat_is_rand_access:
 			_if_iterator_cat_is_bi<_RandomIt>
 		{};
-	}
+	} // namespace detail
 
 	namespace std_cpp11
 	{
@@ -286,11 +286,11 @@ namespace stdex
 			{
 				return impl::prev(_it, 1);
 			}
-		}
+		} // namespace impl
 
 		using impl::next; // to avoid ambiguity with std::next function
 		using impl::prev; // to avoid ambiguity with std::prev function
-	}
+	} // namespace std_cpp11
 
 	// next (C++11)
 	// increment an iterator 
@@ -341,10 +341,11 @@ namespace stdex
 			{	// get end of sequence
 				return (value.end());
 			}
-		}
+		} // namespace impl
+
 		using impl::begin;// to avoid ambiguity with std::begin function
 		using impl::end;  // to avoid ambiguity with std::end function
-	}
+	} // namespace std_cpp11
 
 	// begin (C++11)
 	// returns an iterator to the beginning of a container or array
@@ -354,7 +355,7 @@ namespace stdex
 	// returns an iterator to the beginning of a container or array 
 	template<class _Tp, cstddef::size_t Size>
 	inline
-	_Tp *begin(_Tp(&value)[Size]) NOEXCEPT_FUNCTION
+	_Tp *begin(_Tp(&value)[Size]) _STDEX_NOEXCEPT_FUNCTION
 	{	// get beginning of array
 		return (value);
 	}
@@ -363,7 +364,7 @@ namespace stdex
 	// returns an iterator to the beginning of a container or array 
 	template<class _Tp, cstddef::size_t Size>
 	inline
-	const _Tp *begin(const _Tp(&value)[Size]) NOEXCEPT_FUNCTION
+	const _Tp *begin(const _Tp(&value)[Size]) _STDEX_NOEXCEPT_FUNCTION
 	{	// get beginning of array
 		return (value);
 	}
@@ -376,7 +377,7 @@ namespace stdex
 	// returns an iterator to the end of a container or array 
 	template<class _Tp, cstddef::size_t Size>
 	inline
-	_Tp *end(_Tp(&value)[Size]) NOEXCEPT_FUNCTION
+	_Tp *end(_Tp(&value)[Size]) _STDEX_NOEXCEPT_FUNCTION
 	{	// get end of array
 		return (value + Size);
 	}
@@ -385,12 +386,15 @@ namespace stdex
 	// returns an iterator to the end of a container or array 
 	template<class _Tp, cstddef::size_t Size>
 	inline
-	const _Tp *end(const _Tp(&value)[Size]) NOEXCEPT_FUNCTION
+	const _Tp *end(const _Tp(&value)[Size]) _STDEX_NOEXCEPT_FUNCTION
 	{	// get end of array
 		return (value + Size);
 	}
 
 	// Container access (C++ 17)
-}
+} // namespace stdex
+
+#undef _STDEX_DELETED_FUNCTION
+#undef _STDEX_NOEXCEPT_FUNCTION
 
 #endif // _STDEX_ITERATOR_H
