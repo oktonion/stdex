@@ -65,7 +65,7 @@ free_function(stdex::thread::id& id)
 
 	if (i % 4 == 0)
 	{
-		std::srand(std::time(nullptr));
+		std::srand( (unsigned int)(std::time(nullptr)) );
 
 		stdex::this_thread::sleep_for(stdex::chrono::milliseconds(1 + (std::rand() % (330 - 1 + 1))));
 	}

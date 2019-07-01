@@ -205,10 +205,10 @@ namespace mutex_tests
         
         try
         {
-            mutex_type m;
-            bool b = m.try_lock();
+            mutex_type mmm;
+            bool b = mmm.try_lock();
             DYNAMIC_VERIFY(b);
-            m.unlock();
+            mmm.unlock();
         }
         catch (const system_error&)
         {
