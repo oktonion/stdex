@@ -17,13 +17,13 @@
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
-#define DELETED_FUNCTION =delete
-#define NOEXCEPT_FUNCTION noexcept
+#define _STDEX_DELETED_FUNCTION =delete
+#define _STDEX_NOEXCEPT_FUNCTION noexcept
 
 #else
 
-#define DELETED_FUNCTION 
-#define NOEXCEPT_FUNCTION throw()
+#define _STDEX_DELETED_FUNCTION 
+#define _STDEX_NOEXCEPT_FUNCTION throw()
 
 #endif 
 
@@ -31,40 +31,40 @@ namespace stdex
 {
     struct type_index
     {
-        type_index(const type_info& _tinfo) NOEXCEPT_FUNCTION
+        type_index(const type_info& _tinfo) _STDEX_NOEXCEPT_FUNCTION
             : _type_info_obj(&_tinfo) 
         { }
 
         bool
-        operator==(const type_index& _other) const NOEXCEPT_FUNCTION
+        operator==(const type_index& _other) const _STDEX_NOEXCEPT_FUNCTION
             { return *_type_info_obj == *_other._type_info_obj; }
 
         bool
-        operator!=(const type_index& _other) const NOEXCEPT_FUNCTION
+        operator!=(const type_index& _other) const _STDEX_NOEXCEPT_FUNCTION
             { return *_type_info_obj != *_other._type_info_obj; }
 
         bool
-        operator<(const type_index& _other) const NOEXCEPT_FUNCTION
+        operator<(const type_index& _other) const _STDEX_NOEXCEPT_FUNCTION
             { return _type_info_obj->before(*_other._type_info_obj); }
 
         bool
-        operator<=(const type_index& _other) const NOEXCEPT_FUNCTION
+        operator<=(const type_index& _other) const _STDEX_NOEXCEPT_FUNCTION
             { return !_other._type_info_obj->before(*_type_info_obj); }
 
         bool
-        operator>(const type_index& _other) const NOEXCEPT_FUNCTION
+        operator>(const type_index& _other) const _STDEX_NOEXCEPT_FUNCTION
             { return _other._type_info_obj->before(*_type_info_obj); }
 
         bool
-        operator>=(const type_index& _other) const NOEXCEPT_FUNCTION
+        operator>=(const type_index& _other) const _STDEX_NOEXCEPT_FUNCTION
             { return !_type_info_obj->before(*_other._type_info_obj); }
 
         const char*
-        name() const NOEXCEPT_FUNCTION
+        name() const _STDEX_NOEXCEPT_FUNCTION
             { return _type_info_obj->name(); }
         
         /*std::size_t
-        hash_code() const NOEXCEPT_FUNCTION
+        hash_code() const _STDEX_NOEXCEPT_FUNCTION
             { return _type_info_obj->hash_code(); }*/
 
     private:
@@ -81,13 +81,13 @@ namespace stdex
         typedef stdex::type_index  argument_type;
 
         std::size_t
-        operator()(const type_index& _tinfo) const NOEXCEPT_FUNCTION
+        operator()(const type_index& _tinfo) const _STDEX_NOEXCEPT_FUNCTION
         { return _tinfo.hash_code(); }
     };*/
 
 } // namespace stdex
 
-#undef DELETED_FUNCTION
-#undef NOEXCEPT_FUNCTION
+#undef _STDEX_DELETED_FUNCTION
+#undef _STDEX_NOEXCEPT_FUNCTION
 
 #endif // _STDEX_TYPEINDEX_H

@@ -19,13 +19,13 @@
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
-#define DELETED_FUNCTION =delete
-#define NOEXCEPT_FUNCTION noexcept 
+#define _STDEX_DELETED_FUNCTION =delete
+#define _STDEX_NOEXCEPT_FUNCTION noexcept 
 
 #else
 
-#define DELETED_FUNCTION 
-#define NOEXCEPT_FUNCTION throw()
+#define _STDEX_DELETED_FUNCTION 
+#define _STDEX_NOEXCEPT_FUNCTION throw()
 
 #endif
 
@@ -1183,7 +1183,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 			//! Default constructor.
 			//! The default constructed ID is that of thread without a thread of
 			//! execution.
-			id() NOEXCEPT_FUNCTION :
+			id() _STDEX_NOEXCEPT_FUNCTION :
 				_uid()
 			{ }
 
@@ -1202,32 +1202,32 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 				return *this;
 			}
 
-			bool operator==(const id &other) const NOEXCEPT_FUNCTION
+			bool operator==(const id &other) const _STDEX_NOEXCEPT_FUNCTION
 			{
 				return _uid == other._uid;
 			}
 
-			inline friend bool operator!=(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
+			inline friend bool operator!=(const id &aId1, const id &aId2) _STDEX_NOEXCEPT_FUNCTION
 			{
 				return !(aId1 == aId2);
 			}
 
-			inline friend bool operator<=(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
+			inline friend bool operator<=(const id &aId1, const id &aId2) _STDEX_NOEXCEPT_FUNCTION
 			{
 				return aId1._uid <= aId2._uid;
 			}
 
-			bool operator<(const id &other) const NOEXCEPT_FUNCTION
+			bool operator<(const id &other) const _STDEX_NOEXCEPT_FUNCTION
 			{
 				return _uid < other._uid;
 			}
 
-			inline friend bool operator>=(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
+			inline friend bool operator>=(const id &aId1, const id &aId2) _STDEX_NOEXCEPT_FUNCTION
 			{
 				return aId1._uid >= aId2._uid;
 			}
 
-			inline friend bool operator>(const id &aId1, const id &aId2) NOEXCEPT_FUNCTION
+			inline friend bool operator>(const id &aId1, const id &aId2) _STDEX_NOEXCEPT_FUNCTION
 			{
 				return aId1._uid > aId2._uid;
 			}
@@ -1248,7 +1248,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 		//! Default constructor.
 		//! Construct a @c thread object without an associated thread of execution
 		//! (i.e. non-joinable).
-		thread() NOEXCEPT_FUNCTION
+		thread() _STDEX_NOEXCEPT_FUNCTION
 		{ }
 
 		template<class _FuncT>
@@ -1337,7 +1337,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 
 		//! Check if the thread is joinable.
 		//! A thread object is joinable if it has an associated thread of execution.
-		bool joinable() const NOEXCEPT_FUNCTION;
+		bool joinable() const _STDEX_NOEXCEPT_FUNCTION;
 
 		//! Detach from the thread.
 		//! After calling @c detach(), the thread object is no longer associated with
@@ -1347,7 +1347,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 		void detach();
 
 		//! Return the thread ID of a thread object.
-		id get_id() const NOEXCEPT_FUNCTION;
+		id get_id() const _STDEX_NOEXCEPT_FUNCTION;
 
 		//! Get the native handle for this thread.
 		inline native_handle_type native_handle()
@@ -1360,18 +1360,18 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 		//! use for a task.
 		//! @return The number of hardware thread contexts in the system.
 		//! @note If this value is not defined, the function returns zero (0).
-		static unsigned hardware_concurrency() NOEXCEPT_FUNCTION;
+		static unsigned hardware_concurrency() _STDEX_NOEXCEPT_FUNCTION;
 
-		void swap(thread &other) NOEXCEPT_FUNCTION;
+		void swap(thread &other) _STDEX_NOEXCEPT_FUNCTION;
 
 	private:
 
 		id _id;
 		native_handle_type _handle;
 
-		//thread(thread&) DELETED_FUNCTION;
-		thread(const thread&) DELETED_FUNCTION;
-		thread& operator=(const thread&) DELETED_FUNCTION;
+		//thread(thread&) _STDEX_DELETED_FUNCTION;
+		thread(const thread&) _STDEX_DELETED_FUNCTION;
+		thread& operator=(const thread&) _STDEX_DELETED_FUNCTION;
 
 		// This is the internal thread wrapper function.
 		static void* wrapper_function(void *aArg);
@@ -1387,12 +1387,12 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 	namespace this_thread 
 	{
 		//! Return the thread ID of the calling thread.
-		thread::id get_id() NOEXCEPT_FUNCTION;
+		thread::id get_id() _STDEX_NOEXCEPT_FUNCTION;
 
 		//! Yield execution to another thread.
 		//! Offers the operating system the opportunity to schedule another thread
 		//! that is ready to run on the current processor.
-		inline static void yield() NOEXCEPT_FUNCTION
+		inline static void yield() _STDEX_NOEXCEPT_FUNCTION
 		{
 			sched_yield();
 		}
@@ -1460,15 +1460,15 @@ namespace std
 
 		lhs.swap(rhs);
 	}
-}
+} // namespace std
 
 namespace stdex
 {
 	using std::swap;
-}
+} // namespace stdex
 
 
-#undef DELETED_FUNCTION
-#undef NOEXCEPT_FUNCTION
+#undef _STDEX_DELETED_FUNCTION
+#undef _STDEX_NOEXCEPT_FUNCTION
 
 #endif // _STDEX_THREAD_H

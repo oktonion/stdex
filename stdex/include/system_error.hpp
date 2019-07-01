@@ -22,13 +22,13 @@
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
-#define DELETED_FUNCTION =delete
-#define NOEXCEPT_FUNCTION noexcept
+#define _STDEX_DELETED_FUNCTION =delete
+#define _STDEX_NOEXCEPT_FUNCTION noexcept
 
 #else
 
-#define DELETED_FUNCTION 
-#define NOEXCEPT_FUNCTION throw()
+#define _STDEX_DELETED_FUNCTION 
+#define _STDEX_NOEXCEPT_FUNCTION throw()
 
 #endif 
 
@@ -367,27 +367,27 @@ namespace stdex
 
 	class error_code;
 	class error_condition;
-	error_code make_error_code(errc::errc_t) NOEXCEPT_FUNCTION;
-	error_code make_error_code(io_errc) NOEXCEPT_FUNCTION;
-	error_condition make_error_condition(errc::errc_t) NOEXCEPT_FUNCTION;
-	error_condition make_error_condition(io_errc) NOEXCEPT_FUNCTION;
+	error_code make_error_code(errc::errc_t) _STDEX_NOEXCEPT_FUNCTION;
+	error_code make_error_code(io_errc) _STDEX_NOEXCEPT_FUNCTION;
+	error_condition make_error_condition(errc::errc_t) _STDEX_NOEXCEPT_FUNCTION;
+	error_condition make_error_condition(io_errc) _STDEX_NOEXCEPT_FUNCTION;
 
 	class error_category;
 
-	const error_category& generic_category() NOEXCEPT_FUNCTION;
-	const error_category& iostream_category() NOEXCEPT_FUNCTION;
-	const error_category& system_category() NOEXCEPT_FUNCTION;
+	const error_category& generic_category() _STDEX_NOEXCEPT_FUNCTION;
+	const error_category& iostream_category() _STDEX_NOEXCEPT_FUNCTION;
+	const error_category& system_category() _STDEX_NOEXCEPT_FUNCTION;
 
 	class error_category
 	{
 	public:
-		error_category() NOEXCEPT_FUNCTION
+		error_category() _STDEX_NOEXCEPT_FUNCTION
 		{}
 
-		virtual ~error_category() NOEXCEPT_FUNCTION
+		virtual ~error_category() _STDEX_NOEXCEPT_FUNCTION
 		{}
 
-		virtual const char* name() const NOEXCEPT_FUNCTION = 0;
+		virtual const char* name() const _STDEX_NOEXCEPT_FUNCTION = 0;
 
 		// We need two different virtual functions here, one returning a
 		// COW string and one returning an SSO string. Their positions in the
@@ -397,30 +397,30 @@ namespace stdex
 		virtual std::string message(int) const = 0;
 
 	public:
-		virtual error_condition default_error_condition(int val) const NOEXCEPT_FUNCTION;
+		virtual error_condition default_error_condition(int val) const _STDEX_NOEXCEPT_FUNCTION;
 
-		virtual bool equivalent(int val, const error_condition &cond) const NOEXCEPT_FUNCTION;
+		virtual bool equivalent(int val, const error_condition &cond) const _STDEX_NOEXCEPT_FUNCTION;
 
-		virtual bool equivalent(const error_code& code, int) const NOEXCEPT_FUNCTION;
+		virtual bool equivalent(const error_code& code, int) const _STDEX_NOEXCEPT_FUNCTION;
 
-		inline bool operator<(const error_category &other) const NOEXCEPT_FUNCTION
+		inline bool operator<(const error_category &other) const _STDEX_NOEXCEPT_FUNCTION
 		{
 			return std::less<const error_category*>()(this, &other);
 		}
 
-		inline bool operator==(const error_category &other) const NOEXCEPT_FUNCTION
+		inline bool operator==(const error_category &other) const _STDEX_NOEXCEPT_FUNCTION
 		{
 			return this == &other;
 		}
 
-		inline bool operator!=(const error_category &other) const NOEXCEPT_FUNCTION
+		inline bool operator!=(const error_category &other) const _STDEX_NOEXCEPT_FUNCTION
 		{
 			return this != &other;
 		}
 
 	private:
-		error_category(const error_category&) DELETED_FUNCTION;
-		error_category& operator=(const error_category&) DELETED_FUNCTION;
+		error_category(const error_category&) _STDEX_DELETED_FUNCTION;
+		error_category& operator=(const error_category&) _STDEX_DELETED_FUNCTION;
 	};
 
 	class error_condition
@@ -430,23 +430,23 @@ namespace stdex
 		const error_category *_cat;
 
 	public:
-		error_condition() NOEXCEPT_FUNCTION: 
+		error_condition() _STDEX_NOEXCEPT_FUNCTION: 
 			_value(0), 
 			_cat(&generic_category()) 
 		{}
 
-		error_condition(int val, const error_category &cat) NOEXCEPT_FUNCTION: 
+		error_condition(int val, const error_category &cat) _STDEX_NOEXCEPT_FUNCTION: 
 			_value(val), 
 			_cat(&cat) 
 		{}
 
 		template<class _ErrorCondEnum>
-		explicit error_condition(const _ErrorCondEnum& val) NOEXCEPT_FUNCTION
+		explicit error_condition(const _ErrorCondEnum& val) _STDEX_NOEXCEPT_FUNCTION
 		{
 			*this = val;
 		}
 
-		void assign(int val, const error_category &cat) NOEXCEPT_FUNCTION
+		void assign(int val, const error_category &cat) _STDEX_NOEXCEPT_FUNCTION
 		{
 			_value = val;
 			_cat = &cat;
@@ -454,19 +454,19 @@ namespace stdex
 
 		template<class _ErrorCondEnum>
 		typename enable_if<detail::_or_<is_error_condition_enum<_ErrorCondEnum>, is_same<error_condition, _ErrorCondEnum> >::value, error_condition&>::type
-			operator=(const _ErrorCondEnum& val) NOEXCEPT_FUNCTION
+			operator=(const _ErrorCondEnum& val) _STDEX_NOEXCEPT_FUNCTION
 		{
 			return (*this = make_error_condition(val));
 		}
 
-		void clear() NOEXCEPT_FUNCTION
+		void clear() _STDEX_NOEXCEPT_FUNCTION
 		{
 			assign(0, generic_category());
 		}
 
-		int value() const NOEXCEPT_FUNCTION { return _value; }
+		int value() const _STDEX_NOEXCEPT_FUNCTION { return _value; }
 
-		const error_category& category() const NOEXCEPT_FUNCTION { return *_cat; }
+		const error_category& category() const _STDEX_NOEXCEPT_FUNCTION { return *_cat; }
 
 		
 		std::string message() const
@@ -477,12 +477,12 @@ namespace stdex
 		typedef void(*unspecified_bool_type)();
 		static void unspecified_bool_true() {}
 
-		operator unspecified_bool_type() const NOEXCEPT_FUNCTION  // true if error
+		operator unspecified_bool_type() const _STDEX_NOEXCEPT_FUNCTION  // true if error
 		{
 			return _value == 0 ? 0 : unspecified_bool_true;
 		}
 
-		bool operator!() const NOEXCEPT_FUNCTION  // true if no error
+		bool operator!() const _STDEX_NOEXCEPT_FUNCTION  // true if no error
 		{
 			return _value == 0;
 		}
@@ -496,29 +496,29 @@ namespace stdex
 		const error_category *_cat;
 
 	public:
-		error_code() NOEXCEPT_FUNCTION: 
+		error_code() _STDEX_NOEXCEPT_FUNCTION: 
 			_value(0), 
 			_cat(&system_category()) 
 		{ }
 
-		error_code(int val, const error_category& cat) NOEXCEPT_FUNCTION: 
+		error_code(int val, const error_category& cat) _STDEX_NOEXCEPT_FUNCTION: 
 			_value(val), 
 			_cat(&cat) 
 		{ }
 
 		template<class _ErrorCodeEnum>
-		error_code(const _ErrorCodeEnum &val) NOEXCEPT_FUNCTION
+		error_code(const _ErrorCodeEnum &val) _STDEX_NOEXCEPT_FUNCTION
 		{
 			*this = val;
 		}
 
-		void assign(int val, const error_category& cat) NOEXCEPT_FUNCTION
+		void assign(int val, const error_category& cat) _STDEX_NOEXCEPT_FUNCTION
 		{
 			_value = val;
 			_cat = &cat;
 		}
 
-		void clear() NOEXCEPT_FUNCTION
+		void clear() _STDEX_NOEXCEPT_FUNCTION
 		{
 			assign(0, system_category());
 		}
@@ -526,16 +526,16 @@ namespace stdex
 
 		template<class _ErrorCodeEnum>
 		typename enable_if<detail::_or_<is_error_code_enum<_ErrorCodeEnum>, is_same<error_code, _ErrorCodeEnum> >::value, error_code&>::type
-			operator=(const _ErrorCodeEnum& val) NOEXCEPT_FUNCTION
+			operator=(const _ErrorCodeEnum& val) _STDEX_NOEXCEPT_FUNCTION
 		{
 			return (*this = make_error_code(val));
 		}
 
-		int value() const NOEXCEPT_FUNCTION { return _value; }
+		int value() const _STDEX_NOEXCEPT_FUNCTION { return _value; }
 
-		const error_category& category() const NOEXCEPT_FUNCTION { return *_cat; }
+		const error_category& category() const _STDEX_NOEXCEPT_FUNCTION { return *_cat; }
 
-		error_condition default_error_condition() const NOEXCEPT_FUNCTION;
+		error_condition default_error_condition() const _STDEX_NOEXCEPT_FUNCTION;
 
 		std::string message() const
 		{
@@ -545,12 +545,12 @@ namespace stdex
 		typedef void(*unspecified_bool_type)();
 		static void unspecified_bool_true() {}
 
-		operator unspecified_bool_type() const  NOEXCEPT_FUNCTION // true if error
+		operator unspecified_bool_type() const  _STDEX_NOEXCEPT_FUNCTION // true if error
 		{
 			return _value == 0 ? 0 : unspecified_bool_true;
 		}
 
-		bool operator!() const  NOEXCEPT_FUNCTION // true if no error
+		bool operator!() const  _STDEX_NOEXCEPT_FUNCTION // true if no error
 		{
 			return _value == 0;
 		}
@@ -593,11 +593,11 @@ namespace stdex
 			_code(val, ecat) 
 		{}
 
-		const error_code& code() const NOEXCEPT_FUNCTION { return _code; }
+		const error_code& code() const _STDEX_NOEXCEPT_FUNCTION { return _code; }
 	};
 
 	inline bool
-		operator<(const error_code& _lhs, const error_code& _rhs) NOEXCEPT_FUNCTION
+		operator<(const error_code& _lhs, const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
 	{
 		return (_lhs.category() < _rhs.category()
 			|| (_lhs.category() == _rhs.category()
@@ -606,7 +606,7 @@ namespace stdex
 
 	inline bool
 		operator<(const error_condition& _lhs,
-			const error_condition& _rhs) NOEXCEPT_FUNCTION
+			const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
 	{
 		return (_lhs.category() < _rhs.category()
 			|| (_lhs.category() == _rhs.category()
@@ -615,34 +615,34 @@ namespace stdex
 
 	// VIRTUALS FOR error_category
 	inline error_condition
-		error_category::default_error_condition(int _Errval) const NOEXCEPT_FUNCTION
+		error_category::default_error_condition(int _Errval) const _STDEX_NOEXCEPT_FUNCTION
 	{	// make error_condition for error code
 		return (error_condition(_Errval, *this));
 	}
 
 	inline bool
 		error_category::equivalent(int _Errval,
-			const error_condition& _Cond) const NOEXCEPT_FUNCTION
+			const error_condition& _Cond) const _STDEX_NOEXCEPT_FUNCTION
 	{	// test if error code same condition
 		return (default_error_condition(_Errval) == _Cond);
 	}
 
 	inline bool
 		error_category::equivalent(const error_code& _Code,
-			int _Errval) const NOEXCEPT_FUNCTION
+			int _Errval) const _STDEX_NOEXCEPT_FUNCTION
 	{	// test if conditions same for this category
 		return (*this == _Code.category() && _Code.value() == _Errval);
 	}
 
 	// MEMBER FUNCTIONS for error_code
-	inline error_condition error_code::default_error_condition() const NOEXCEPT_FUNCTION
+	inline error_condition error_code::default_error_condition() const _STDEX_NOEXCEPT_FUNCTION
 	{	// make error_condition for error code
 		return (category().default_error_condition(value()));
 	}
 
 	// OPERATOR== FOR error_code/error_condition
 	inline bool
-		operator==(const error_code& _lhs, const error_code& _rhs) NOEXCEPT_FUNCTION
+		operator==(const error_code& _lhs, const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
 	{
 		return (_lhs.category() == _rhs.category()
 			&& _lhs.value() == _rhs.value());
@@ -650,7 +650,7 @@ namespace stdex
 
 	inline bool operator==(
 		const error_code& _lhs,
-		const error_condition& _rhs) NOEXCEPT_FUNCTION
+		const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
 	{	// test errors for equality
 		return (_lhs.category().equivalent(_lhs.value(), _rhs)
 			|| _rhs.category().equivalent(_lhs, _rhs.value()));
@@ -658,7 +658,7 @@ namespace stdex
 
 	inline bool operator==(
 		const error_condition& _lhs,
-		const error_code& _rhs) NOEXCEPT_FUNCTION
+		const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
 	{	// test errors for equality
 		return (_rhs.category().equivalent(_rhs.value(), _lhs)
 			|| _lhs.category().equivalent(_rhs, _lhs.value()));
@@ -666,7 +666,7 @@ namespace stdex
 
 	inline bool
 		operator==(const error_condition& _lhs,
-			const error_condition& _rhs) NOEXCEPT_FUNCTION
+			const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
 	{
 		return (_lhs.category() == _rhs.category()
 			&& _lhs.value() == _rhs.value());
@@ -674,50 +674,50 @@ namespace stdex
 
 	// OPERATOR!= FOR error_code/error_condition
 	inline bool
-		operator!=(const error_code& _lhs, const error_code& _rhs) NOEXCEPT_FUNCTION
+		operator!=(const error_code& _lhs, const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
 	{
 		return (!(_lhs == _rhs));
 	}
 
 	inline bool operator!=(
 		const error_code& _lhs,
-		const error_condition& _rhs) NOEXCEPT_FUNCTION
+		const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
 	{	// test errors for inequality
 		return (!(_lhs == _rhs));
 	}
 
 	inline bool operator!=(
 		const error_condition& _lhs,
-		const error_code& _rhs) NOEXCEPT_FUNCTION
+		const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
 	{	// test errors for inequality
 		return (!(_lhs == _rhs));
 	}
 
 	inline bool
 		operator!=(const error_condition& _lhs,
-			const error_condition& _rhs) NOEXCEPT_FUNCTION
+			const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
 	{
 		return (!(_lhs == _rhs));
 	}
 
 	// FUNCTION make_error_code
-	inline error_code make_error_code(errc::errc_t _Errno) NOEXCEPT_FUNCTION
+	inline error_code make_error_code(errc::errc_t _Errno) _STDEX_NOEXCEPT_FUNCTION
 	{	// make an error_code
 		return (error_code((int) _Errno, generic_category()));
 	}
 
-	inline error_code make_error_code(io_errc _Errno) NOEXCEPT_FUNCTION
+	inline error_code make_error_code(io_errc _Errno) _STDEX_NOEXCEPT_FUNCTION
 	{	// make an error_code
 		return (error_code((int) _Errno, iostream_category()));
 	}
 
 	// FUNCTION make_error_condition
-	inline error_condition make_error_condition(errc::errc_t _Errno) NOEXCEPT_FUNCTION
+	inline error_condition make_error_condition(errc::errc_t _Errno) _STDEX_NOEXCEPT_FUNCTION
 	{	// make an error_condition
 		return (error_condition((int) _Errno, generic_category()));
 	}
 
-	inline error_condition make_error_condition(io_errc _Errno) NOEXCEPT_FUNCTION
+	inline error_condition make_error_condition(io_errc _Errno) _STDEX_NOEXCEPT_FUNCTION
 	{	// make an error_condition
 		return (error_condition((int) _Errno, iostream_category()));
 	}
@@ -732,7 +732,7 @@ namespace stdex
 			{	// default constructor
 			}
 
-			virtual const char *name() const NOEXCEPT_FUNCTION
+			virtual const char *name() const _STDEX_NOEXCEPT_FUNCTION
 			{	// get name of category
 				return ("generic");
 			}
@@ -752,7 +752,7 @@ namespace stdex
 			{	// default constructor
 			}
 
-			virtual const char *name() const NOEXCEPT_FUNCTION
+			virtual const char *name() const _STDEX_NOEXCEPT_FUNCTION
 			{	// get name of category
 				return ("iostream");
 			}
@@ -774,7 +774,7 @@ namespace stdex
 			{	// default constructor
 			}
 
-			virtual const char *name() const NOEXCEPT_FUNCTION
+			virtual const char *name() const _STDEX_NOEXCEPT_FUNCTION
 			{	// get name of category
 				return ("system");
 			}
@@ -786,7 +786,7 @@ namespace stdex
 			}
 
 			virtual error_condition
-				default_error_condition(int _Errval) const NOEXCEPT_FUNCTION
+				default_error_condition(int _Errval) const _STDEX_NOEXCEPT_FUNCTION
 			{	// make error_condition for error code (generic if possible)
 				if (std::strerror(_Errval))
 					return (error_condition(_Errval, generic_category()));
@@ -820,23 +820,23 @@ namespace stdex
 		};
 	}
 
-	inline const error_category& generic_category() NOEXCEPT_FUNCTION
+	inline const error_category& generic_category() _STDEX_NOEXCEPT_FUNCTION
 	{	// get generic_category
 		return (detail::_error_objects<int>::_generic_object());
 	}
 
-	inline const error_category& iostream_category() NOEXCEPT_FUNCTION
+	inline const error_category& iostream_category() _STDEX_NOEXCEPT_FUNCTION
 	{	// get iostream_category
 		return (detail::_error_objects<int>::_io_stream_object());
 	}
 
-	inline const error_category& system_category() NOEXCEPT_FUNCTION
+	inline const error_category& system_category() _STDEX_NOEXCEPT_FUNCTION
 	{	// get system_category
 		return (detail::_error_objects<int>::_system_object());
 	}
 } // namespace stdex
 
-#undef DELETED_FUNCTION
-#undef NOEXCEPT_FUNCTION
+#undef _STDEX_DELETED_FUNCTION
+#undef _STDEX_NOEXCEPT_FUNCTION
 
 #endif // _STDEX_SYSTEM_ERROR_H
