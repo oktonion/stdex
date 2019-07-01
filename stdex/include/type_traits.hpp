@@ -945,237 +945,238 @@ namespace stdex
 		struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23, _T24 ...)> : true_type {};
 		
 
-#undef _TYPES
-#undef _IS_MEM_FUN_PTR
-#undef _IS_MEM_FUN_PTR_CLR 		
-#undef _IS_MEM_FUN_CDECL_PTR
-#undef _IS_MEM_FUN_STDCALL_PTR
-#undef _IS_MEM_FUN_FASTCALL_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
+#undef _STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_IS_MEM_FUN_PTR_CLR 		
+#undef _STDEX_IS_MEM_FUN_CDECL_PTR
+#undef _STDEX_IS_MEM_FUN_STDCALL_PTR
+#undef _STDEX_IS_MEM_FUN_FASTCALL_PTR
 
-#define _IS_MEM_FUN_PTR_CLR \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(ARGS)); \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(ARGS...)); \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(ARGS) const); \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(ARGS) volatile); \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(ARGS) const volatile); \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(ARGS...) const); \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(ARGS...) volatile); \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(ARGS...) const volatile);
+#define _STDEX_IS_MEM_FUN_PTR_CLR \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(_STDEX_ARGS)); \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(_STDEX_ARGS...)); \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(_STDEX_ARGS) const); \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(_STDEX_ARGS) volatile); \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(_STDEX_ARGS) const volatile); \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(_STDEX_ARGS...) const); \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(_STDEX_ARGS...) volatile); \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R ( _Tp::*const volatile*)(_STDEX_ARGS...) const volatile);
 
 #ifdef _STDEX_CDECL
 		_no_type _STDEX_CDECL _is_mem_function_ptr(...);
 
-#define _IS_MEM_FUN_CDECL_PTR \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__cdecl _Tp::*const volatile*)(ARGS)); \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__cdecl _Tp::*const volatile*)(ARGS) const); \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__cdecl _Tp::*const volatile*)(ARGS) volatile); \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__cdecl _Tp::*const volatile*)(ARGS) const volatile);
+#define _STDEX_IS_MEM_FUN_CDECL_PTR \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__cdecl _Tp::*const volatile*)(_STDEX_ARGS)); \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__cdecl _Tp::*const volatile*)(_STDEX_ARGS) const); \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__cdecl _Tp::*const volatile*)(_STDEX_ARGS) volatile); \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__cdecl _Tp::*const volatile*)(_STDEX_ARGS) const volatile);
 
-#define _IS_MEM_FUN_STDCALL_PTR \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__stdcall _Tp::*const volatile*)(ARGS)); \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__stdcall _Tp::*const volatile*)(ARGS) const); \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__stdcall _Tp::*const volatile*)(ARGS) volatile); \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__stdcall _Tp::*const volatile*)(ARGS) const volatile);
+#define _STDEX_IS_MEM_FUN_STDCALL_PTR \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__stdcall _Tp::*const volatile*)(_STDEX_ARGS)); \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__stdcall _Tp::*const volatile*)(_STDEX_ARGS) const); \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__stdcall _Tp::*const volatile*)(_STDEX_ARGS) volatile); \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__stdcall _Tp::*const volatile*)(_STDEX_ARGS) const volatile);
 
-#define _IS_MEM_FUN_FASTCALL_PTR \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__fastcall _Tp::*const volatile*)(ARGS)); \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__fastcall _Tp::*const volatile*)(ARGS) const); \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__fastcall _Tp::*const volatile*)(ARGS) volatile); \
-		template <class _R, class _Tp _TYPES > \
-		_yes_type _is_mem_function_ptr( _R(__fastcall _Tp::*const volatile*)(ARGS) const volatile);
+#define _STDEX_IS_MEM_FUN_FASTCALL_PTR \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__fastcall _Tp::*const volatile*)(_STDEX_ARGS)); \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__fastcall _Tp::*const volatile*)(_STDEX_ARGS) const); \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__fastcall _Tp::*const volatile*)(_STDEX_ARGS) volatile); \
+		template <class _R, class _Tp _STDEX_TYPES > \
+		_yes_type _is_mem_function_ptr( _R(__fastcall _Tp::*const volatile*)(_STDEX_ARGS) const volatile);
 #else
 		_no_type _is_mem_function_ptr(...);
-#define _IS_MEM_FUN_CDECL_PTR
-#define _IS_MEM_FUN_STDCALL_PTR
-#define _IS_MEM_FUN_FASTCALL_PTR
+#define _STDEX_IS_MEM_FUN_CDECL_PTR
+#define _STDEX_IS_MEM_FUN_STDCALL_PTR
+#define _STDEX_IS_MEM_FUN_FASTCALL_PTR
 #endif
 
-#define _IS_MEM_FUN_PTR \
-		_IS_MEM_FUN_PTR_CLR \
-		_IS_MEM_FUN_CDECL_PTR \
-		_IS_MEM_FUN_STDCALL_PTR \
-		_IS_MEM_FUN_FASTCALL_PTR
+#define _STDEX_IS_MEM_FUN_PTR \
+		_STDEX_IS_MEM_FUN_PTR_CLR \
+		_STDEX_IS_MEM_FUN_CDECL_PTR \
+		_STDEX_IS_MEM_FUN_STDCALL_PTR \
+		_STDEX_IS_MEM_FUN_FASTCALL_PTR
 
-		#define _TYPES
-		#define ARGS
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES
+		#define _STDEX_ARGS
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 
-		#define _TYPES , class _T0
-		#define ARGS _T0
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0
+		#define _STDEX_ARGS _T0
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1
-		#define ARGS _T0, _T1
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1
+		#define _STDEX_ARGS _T0, _T1
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2
-		#define ARGS _T0, _T1, _T2
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2
+		#define _STDEX_ARGS _T0, _T1, _T2
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3
-		#define ARGS _T0, _T1, _T2, _T3
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4
-		#define ARGS _T0, _T1, _T2, _T3, _T4
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 		
-		#define _TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23, class _T24
-		#define ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23, _T24
-		_IS_MEM_FUN_PTR
-#undef _TYPES
-#undef ARGS
+		#define _STDEX_TYPES , class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23, class _T24
+		#define _STDEX_ARGS _T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23, _T24
+		_STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
 
-#undef _IS_MEM_FUN_PTR
-#undef _IS_MEM_FUN_PTR_CLR 		
-#undef _IS_MEM_FUN_CDECL_PTR
-#undef _IS_MEM_FUN_STDCALL_PTR
-#undef _IS_MEM_FUN_FASTCALL_PTR
+#undef _STDEX_IS_MEM_FUN_PTR
+#undef _STDEX_IS_MEM_FUN_PTR_CLR 		
+#undef _STDEX_IS_MEM_FUN_CDECL_PTR
+#undef _STDEX_IS_MEM_FUN_STDCALL_PTR
+#undef _STDEX_IS_MEM_FUN_FASTCALL_PTR
 
 
 		template <class _Tp, bool _IsRef>

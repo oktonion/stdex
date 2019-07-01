@@ -7,16 +7,20 @@
 
 
 #ifndef __has_feature         // Optional of course.
-  #define __has_feature(xxx) 0  // Compatibility with non-clang compilers.
+	#define _STDEX_HAS_FEATURE_BUILTIN(xxx) 0  // Compatibility with non-clang compilers.
+#else
+	#define _STDEX_HAS_FEATURE_BUILTIN(xxx) __has_feature(xxx)
 #endif
 #ifndef __has_extension
-  #define __has_extension __has_feature // Compatibility with pre-3.0 compilers.
+	#define _STDEX_HAS_EXTENSION_BUILTIN(xxx) _STDEX_HAS_FEATURE_BUILTIN(xxx) // Compatibility with pre-3.0 compilers.
+#else
+	#define _STDEX_HAS_EXTENSION_BUILTIN(xxx) __has_extension(xxx)
 #endif
 
 //#define STDEX_FORCE_CPP11_TYPES_SUPPORT //uncomment to force support of char16_t and char32_t in C++03
 
 // Any compiler claiming C++11 supports, Visual C++ 2015 and Clang version supporting constexpr
-#if ((__cplusplus >= 201103L) || (_MSC_VER >= 1900) || (__has_feature(cxx_constexpr) || (__has_extension(cxx_constexpr)))) // C++ 11 implementation
+#if ((__cplusplus >= 201103L) || (_MSC_VER >= 1900) || (_STDEX_HAS_FEATURE_BUILTIN(cxx_constexpr) || (_STDEX_HAS_EXTENSION_BUILTIN(cxx_constexpr)))) // C++ 11 implementation
 
 	#define _STDEX_NATIVE_CPP11_SUPPORT
 	#define _STDEX_NATIVE_CPP11_TYPES_SUPPORT
@@ -25,7 +29,7 @@
 
 #if !defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT)
 
-	#if ((__cplusplus > 199711L) || defined(__CODEGEARC__) || defined(__GXX_EXPERIMENTAL_CXX0X__) || defined(__cpp_unicode_characters) || __has_feature(cxx_unicode_literals))
+	#if ((__cplusplus > 199711L) || defined(__CODEGEARC__) || defined(__GXX_EXPERIMENTAL_CXX0X__) || defined(__cpp_unicode_characters) || _STDEX_HAS_FEATURE_BUILTIN(cxx_unicode_literals))
 		#define _STDEX_NATIVE_CPP11_TYPES_SUPPORT
 	#endif
 
@@ -39,7 +43,7 @@
 
 #if ((!defined(_MSC_VER) || _MSC_VER < 1600) && !defined(_STDEX_NATIVE_CPP11_SUPPORT))
 
-	#if (__has_feature(cxx_nullptr) || __has_extension(cxx_nullptr))
+	#if (_STDEX_HAS_FEATURE_BUILTIN(cxx_nullptr) || _STDEX_HAS_EXTENSION_BUILTIN(cxx_nullptr))
 		#define _STDEX_NATIVE_NULLPTR_SUPPORT
 	#else
 		#if !defined(nullptr)
@@ -57,7 +61,7 @@
 		#endif
 	#endif
 
-	#if (__has_feature(cxx_static_assert) || __has_extension(cxx_static_assert))
+	#if (_STDEX_HAS_FEATURE_BUILTIN(cxx_static_assert) || _STDEX_HAS_EXTENSION_BUILTIN(cxx_static_assert))
 		#define _STDEX_NATIVE_STATIC_ASSERT_SUPPORT
 	#else
 		#if !defined(static_assert)
@@ -251,5 +255,8 @@
 		#define stdex_char32_t stdex::uint_least32_t
 	//#endif
 //#endif
+
+#undef _STDEX_HAS_FEATURE_BUILTIN
+#undef _STDEX_HAS_EXTENSION_BUILTIN
 
 #endif // _STDEX_CORE_H
