@@ -232,8 +232,11 @@ int test7()
     const std::string xxx(255, 'x');
     test_type t(error_code(), xxx);
     std::string what_str = t.what();
-    size_t len1 = what_str.length(),
-    len2 = xxx.length();
+    size_t 
+        len1 = what_str.length(),
+        len2 = xxx.length();
+    ((void)(len1));
+    ((void)(len2));
     DYNAMIC_VERIFY((what_str.find(xxx) != std::string::npos));
     return 0;
 }
