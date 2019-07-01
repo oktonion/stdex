@@ -11,6 +11,7 @@
 #elif defined(_MSC_VER) // vstudio 
     #include <string>
     #include <cmath>
+    #include <intrin.h>
 #endif
 
 // testing common names that should not be defined in stdex lib
