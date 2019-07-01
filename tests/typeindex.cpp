@@ -27,6 +27,8 @@
 int test01()
 {
     using namespace stdex;
+    
+    using std::type_info;
 
     class Cadabra { };
     Cadabra a1, a2_;
