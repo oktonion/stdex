@@ -196,13 +196,14 @@
 #include "../stdex/include/cstdint.hpp"
 #include "../stdex/include/iterator.hpp"
 #include "../stdex/include/mutex.hpp"
-#include "../stdex/include/mutex.hpp"
 #include "../stdex/include/ratio.hpp"
 #include "../stdex/include/sstream.hpp"
 #include "../stdex/include/string.hpp"
 #include "../stdex/include/system_error.hpp"
 #include "../stdex/include/thread.hpp"
 #include "../stdex/include/type_traits.hpp"
+#include "../stdex/include/typeindex.hpp"
+
 
 int main(void)
 {
