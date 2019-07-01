@@ -25,10 +25,8 @@ A:
 2. Because I need something without such overhead and ugliness (ugliness and beauty actually, I am really amazed by how Boost handles some features of C++).
 3. Because I want all of basic little helpful classes and tricks (as `countof` f.e.) be in one place with power of C++ 11 threads handling and template-programming.
 
-## C++ 11 implemented features list
-#
 <details>
-<summary>List of headers</summary>
+<summary>## C++ 11 implemented features list</summary>
 
 ### Utilities library
 
