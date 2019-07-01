@@ -30,13 +30,14 @@ A:
 
 ### Utilities library
 
-| name                 | purpose                                |  implemented | is final |
-|----------------------|----------------------------------------|:------------:|----------|
-| `<typeindex>`        | stdex::type_index                      | 100%         | maybe    |
-| `<type_traits>`      | Compile-time type information          | 70%          | no       |
-| `<chrono>`           | C++ time utilities                     | 100%         | yes      |
-| `<initializer_list>` | stdex::initializer_list class template | no and never | yes      |
-| `<tuple>`            | stdex::tuple class template            | no           | no       |
+| name                 | purpose                                                                        |  implemented | is final |
+|----------------------|--------------------------------------------------------------------------------|:------------:|----------|
+| `<typeindex>`        | stdex::type_index                                                              | 100%         | maybe    |
+| `<type_traits>`      | Compile-time type information                                                  | 70%          | no       |
+| `<functional>`       | Function objects, Function invocations, Bind operations and Reference wrappers | no           | no       |
+| `<chrono>`           | C++ time utilities                                                             | 100%         | yes      |
+| `<initializer_list>` | stdex::initializer_list class template                                         | no and never | yes      |
+| `<tuple>`            | stdex::tuple class template                                                    | no           | no       |
 
 ### Dynamic memory management
 
