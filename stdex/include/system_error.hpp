@@ -6,7 +6,7 @@
 #endif // _MSC_VER > 1000
 
 // stdex includes
-/*none*/
+#include "./type_traits.hpp" // stdex::enable_if
 
 // POSIX includes
 /*none*/
