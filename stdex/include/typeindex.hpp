@@ -29,9 +29,11 @@
 
 namespace stdex
 {
+    using std::type_info;
+
     struct type_index
     {
-        type_index(const type_info& _tinfo) _STDEX_NOEXCEPT_FUNCTION
+        type_index(const stdex::type_info& _tinfo) _STDEX_NOEXCEPT_FUNCTION
             : _type_info_obj(&_tinfo) 
         { }
 
@@ -68,7 +70,7 @@ namespace stdex
             { return _type_info_obj->hash_code(); }*/
 
     private:
-        const type_info* _type_info_obj;
+        const stdex::type_info* _type_info_obj;
     };
 
     //template<class _Tp> struct hash;
