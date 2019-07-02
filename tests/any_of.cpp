@@ -113,7 +113,7 @@ struct test_container
 
   template<int N>
   explicit
-  test_container(T (&arr)[N]) : test_container(arr, arr+N)
+  test_container(T (&arr)[N]) : bounds(arr, arr+N)
   { }
 
   it_type_t
