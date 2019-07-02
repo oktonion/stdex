@@ -12,6 +12,8 @@
     #include <string>
     #include <cmath>
     #include <intrin.h>
+#elif defined(__GNUC__) && (__GNUC__ <= 4) // g++ 4 use something in <cstdlib>
+    #include <iterator> // + <cstdlib>
 #endif
 
 // testing common names that should not be defined in stdex lib
