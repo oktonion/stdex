@@ -2,7 +2,7 @@
 #define _STDEX_TESTS_STRINGIZE(A) _STDEX_TESTS_STRINGIZE_NX(A)
 
 #define _STDEX_TESTS_MAKE_INCLUDE_HEADER_NAME1(name)\
-    ../stdex/include/##name##.hpp
+    ../stdex/include/name.hpp
 #define _STDEX_TESTS_MAKE_INCLUDE_HEADER_NAME(name)\
     _STDEX_TESTS_STRINGIZE(_STDEX_TESTS_MAKE_INCLUDE_HEADER_NAME1(name))
 
