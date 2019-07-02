@@ -146,7 +146,7 @@ Build process is simple:
 
 * For Unix - either run a `build_lib.sh` script (works with `g++` and `clang` if environment variable `$COMPILER` is set to compiler name, f.e. to `clang++-3.5`) or build by yourself static library from `stdex/src` directory sources.
 * For Windows
-* * run a `build_lib.bat` script (works with Visual Studio's `cl` if environment variables are set by `v{s/c}vars{32/64/all}.bat` script that is being in your Visual Studio distributive);
+* * run a `build_lib.bat` script that works with Visual Studio's `cl` if environment variables are set by `v{s/c}vars{32/64/all}.bat` (`vcvars32.bat`, `vsvars32.bat` etc.) script that is in your Visual Studio distributive;
 * * run a `build_lib_bcc32.bat` script for Borland C++ Builder 6.0 Updt4 `bcc32` build;
 * * ...or build by yourself the static library from `stdex/src` and `pthreads-win32` directories sources.
 * For QNX 6.x.x - either run a `build_lib_qnx.sh` (using `qcc` compiler) or build by yourself the static library from `stdex/src` directory sources (do not forget to link with `stdlib` library).
@@ -160,7 +160,7 @@ In your project:
 2. link with system libraries for POSIX-threads and real-time clocks:
 
     * `librt.lib` and `libpthread.lib` for UNIX;
-    * `ntdll.lib` and [POSIX-threads lib](https://github.com/oktonion/pthread-win32 "I'm using this implementation") in Windows (if you have built stdex static library with `pthreads-win32` sources then you have no need to link with pthreads anymore - it's already in `stdex.lib`);
+    * `ntdll.lib` and [POSIX-threads lib](https://github.com/oktonion/pthread-win32 "I'm using this implementation") for Windows (if you have built stdex static library with `pthreads-win32` sources then you have no need to link with pthreads anymore - it's already in `stdex.lib`);
     > Note: `ntdll.lib` is not present in Borland C++ Builder 6.0 Updt4 so you should make one with `coff2omf.exe` utility (located in "Borland\CBuilder6\Bin" folder) from Windows SDK/Windows Kit version of `ntdll.lib`.
     * `m.lib` for QNX 6.x.x;
     * `libpthread.lib` for Mac OS;
