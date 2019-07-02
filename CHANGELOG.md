@@ -4,7 +4,13 @@ All notable changes to stdex library project will be documented in this file.
 
 visit https://github.com/oktonion/stdex for the latest version of stdex library
 
-## [0.2.1] - 2019-xx-xx
+## [0.2.2] - 2019-xx-xx
+
+### Added
+
+### Changed
+
+## [0.2.1] - 2019-07-03
 
 ### Added
 
@@ -15,8 +21,6 @@ visit https://github.com/oktonion/stdex for the latest version of stdex library
 ### Changed
 
 - clean internal macros
-
-### Removed
 
 ## [0.2.0] - 2019-07-01
 
