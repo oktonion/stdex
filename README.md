@@ -17,6 +17,8 @@ C++ 11 standard library implementation with extra features using C++98 only and 
 * QNX 6.x.x
 * QNX 4 (partly)
 
+[Wiki](https://github.com/oktonion/stdex/wiki) for more details.
+
 Q: Why not [Boost](https://github.com/boostorg)?
 
 A:
@@ -27,6 +29,14 @@ A:
 
 <details>
 <summary><b>C++ 11 implemented features list</b></summary>
+
+### Language core
+
+* **nullptr** and `stdex::nullptr_t`
+* **static_assert** or `STATIC_ASSERT` macro
+* **stdex_char16_t** and **stdex_char32_t** (as equivalent to **char16_t**, **char32_t**)
+* **stdex_noexcept** (as partial equivalent to **noexcept**)
+* `stdex_assert` macro (as equivalent to `cassert` macro)
 
 ### Utilities library
 

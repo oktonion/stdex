@@ -14,6 +14,8 @@ visit https://github.com/oktonion/stdex for the latest version of stdex library
 
 ### Changed
 
+- clean internal macros
+
 ### Removed
 
 ## [0.2.0] - 2019-07-01
