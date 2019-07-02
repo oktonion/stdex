@@ -2,6 +2,7 @@ mkdir ./tests/bin
 
 build_ok=1
 exclude_warn=""
+tests_failed="failed tests:"
 build_libs="-lrt"
 
 $COMPILER -v
@@ -47,14 +48,17 @@ else
     echo "compiling test c++03 $filename"
     if ! $COMPILER -std=c++03 -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename"; then
       build_ok=0
+      tests_failed="$tests_failed $filename;"
     fi
   done
 fi
 
 if [ $build_ok -eq 0 ]; then
-  echo "tests build failed"
+  echo "$tests_failed"
   exit 3
 fi
+
+tests_failed="failed tests for c++98:"
 
 for file in ./tests/*.cpp; do
   filename=$(basename -- "$file")
@@ -62,10 +66,11 @@ for file in ./tests/*.cpp; do
   echo "compiling test c++98 $filename"
   if ! $COMPILER -std=c++98 -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename"; then
     build_ok=0
+    tests_failed="$tests_failed $filename;"
   fi
 done
 
 if [ $build_ok -eq 0 ]; then
-  echo "tests build failed for c++98"
+  echo "$tests_failed"
   exit 98
 fi
