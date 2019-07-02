@@ -17,7 +17,6 @@
 #include "../stdex/include/core.h"
 #include "./testsuit/macro_defines_check.h"
 
-#define STRINGIZE
 #undef _STDEX_TESTS_CHECK_HEADER_NAME
 #define _STDEX_TESTS_CHECK_HEADER_NAME algorithm
 #include _STDEX_TESTS_INCLUDE_HPP_NAME
