@@ -17,6 +17,8 @@ C++ 11 standard library implementation with extra features using C++98 only and 
 * QNX 6.x.x
 * QNX 4 (partly)
 
+[Wiki](https://github.com/oktonion/stdex/wiki) for more details.
+
 Q: Why not [Boost](https://github.com/boostorg)?
 
 A:
