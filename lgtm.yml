@@ -11,16 +11,13 @@ extraction:
       - ln -s /usr/bin/g++-6 $LGTM_WORKSPACE/latest-gcc-symlinks/g++
       - ln -s /usr/bin/gcc-6 $LGTM_WORKSPACE/latest-gcc-symlinks/gcc
       - export PATH=$LGTM_WORKSPACE/latest-gcc-symlinks:$PATH
-      - export COMPILER=g++
-      - export BUILD_LIB_SCRIPT="./build_lib.sh"
-      - export BUILD_SCRIPT="./build_tests.sh"
-      - export RUN_SCRIPT="./run_tests.sh"
-      - export GIT=true
-    configure:    # Customizable step used only by C/C++ extraction.
-      command:
-        - ./prepare_deps
     index:    # Customizable step used by all languages.
       build_command:
+        - export COMPILER=g++
+        - export BUILD_LIB_SCRIPT="./build_lib.sh"
+        - export BUILD_SCRIPT="./build_tests.sh"
+        - export RUN_SCRIPT="./run_tests.sh"
+        - export GIT=true
         - echo "script started"
         - cd ./stdex
         - chmod +x $BUILD_LIB_SCRIPT
