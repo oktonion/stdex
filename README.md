@@ -2,6 +2,7 @@
 
 Branch   | Travis | Appveyor| Codecov
 ---------|--------|---------|---------
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/fcca9de5ab024e7aae64df9461379687)](https://app.codacy.com/app/oktonion/stdex?utm_source=github.com&utm_medium=referral&utm_content=oktonion/stdex&utm_campaign=Badge_Grade_Dashboard)
 tests (development)    | [![Build Status](https://travis-ci.org/oktonion/stdex.svg?branch=tests)](https://travis-ci.org/oktonion/stdex) | [![Build Status](https://ci.appveyor.com/api/projects/status/hu8800gu31xldj25?svg=true)](https://ci.appveyor.com/project/oktonion/stdex) | [![codecov](https://codecov.io/gh/oktonion/stdex/branch/tests/graph/badge.svg)](https://codecov.io/gh/oktonion/stdex/branch/tests)
 master   | [![Build Status](https://travis-ci.org/oktonion/stdex.svg?branch=master)](https://travis-ci.org/oktonion/stdex) | [![Build Status](https://ci.appveyor.com/api/projects/status/3c53qm34v1j37hy5/branch/master?svg=true)](https://ci.appveyor.com/project/oktonion/stdex-a309e/branch/master) | [![codecov](https://codecov.io/gh/oktonion/stdex/branch/tests/graph/badge.svg)](https://codecov.io/gh/oktonion/stdex)
 
