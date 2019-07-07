@@ -49,15 +49,19 @@ namespace stdex
 	{
 		namespace string_detail
 		{
-			namespace std_dummy
+			namespace std_cpp11
 			{
+				namespace std_dummy
+				{
+					void strtoll(); // dummy
+					void wcstoll(); // dummy
+					void strtoull(); // dummy
+					void wcstoull(); // dummy
+					void strtold(); // dummy
+					void wcstold(); // dummy
+				}
 				using namespace std;
-				void strtoll(); // dummy
-				void wcstoll(); // dummy
-				void strtoull(); // dummy
-				void wcstoull(); // dummy
-				void strtold(); // dummy
-				void wcstold(); // dummy
+				using namespace std_dummy;
 			}
 
 			typedef char _yes_type;
@@ -106,7 +110,12 @@ namespace stdex
 			_no_type _wcstold_tester(...);
 			
 
-			using namespace std_dummy;
+			using std_cpp11::strtoll;
+			using std_cpp11::wcstoll;
+			using std_cpp11::strtoull;
+			using std_cpp11::wcstoull;
+			using std_cpp11::strtold;
+			using std_cpp11::wcstold;
 
 			struct _strtoll_present
 			{
@@ -138,7 +147,7 @@ namespace stdex
 				static const bool value = sizeof(_wcstold_tester(&wcstold)) == sizeof(_yes_type);
 			};
 
-			using namespace std;
+			using std_cpp11::swprintf;
 
 			template<class RetT, class Arg2T>
 			_yes_type _has_4arg_swprintf_tester(RetT(*)(wchar_t*, Arg2T, const wchar_t*, ...));
