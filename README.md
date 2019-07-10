@@ -5,7 +5,7 @@ Branch   | Travis | Appveyor| Codecov
 tests (development)    | [![Build Status](https://travis-ci.org/oktonion/stdex.svg?branch=tests)](https://travis-ci.org/oktonion/stdex) | [![Build Status](https://ci.appveyor.com/api/projects/status/hu8800gu31xldj25?svg=true)](https://ci.appveyor.com/project/oktonion/stdex) | [![codecov](https://codecov.io/gh/oktonion/stdex/branch/tests/graph/badge.svg)](https://codecov.io/gh/oktonion/stdex/branch/tests)
 master   | [![Build Status](https://travis-ci.org/oktonion/stdex.svg?branch=master)](https://travis-ci.org/oktonion/stdex) | [![Build Status](https://ci.appveyor.com/api/projects/status/3c53qm34v1j37hy5/branch/master?svg=true)](https://ci.appveyor.com/project/oktonion/stdex-a309e/branch/master) | [![codecov](https://codecov.io/gh/oktonion/stdex/branch/tests/graph/badge.svg)](https://codecov.io/gh/oktonion/stdex)
 
-[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/oktonion/stdex.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/oktonion/stdex/context:cpp)
+[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/oktonion/stdex.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/oktonion/stdex/context:cpp) | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b74b5f48d04641de81c8c76e3fc26f90)](https://www.codacy.com/app/oktonion/stdex?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=oktonion/stdex&amp;utm_campaign=Badge_Grade)
 
 # stdex
 
@@ -139,12 +139,13 @@ Not all features of C++ 11 can be implemented without compiler support so I have
 
 The library is portable for any compiler that supports C++98 but as we all know there are lots of different implementations of std library in even major compilers so this library is tested with:
 
-* Borland C++ Builder 6.0 Updt4;
-* g++ 4.4.2, 4.4, 4.6;
-* g++ 4.8, 4.9, 5.0 with c++98 option;
-* clang 3.5, 5.0 with c++98 option;
-* clang-900.0.37 with c++98 option (Mac OS);
-* Visual Studio 2008, 2010, 2013, 2015, 2017;
+* `Borland C++ Builder 6.0` Updt4;
+* `qcc` (just a wrapper over `gcc` in QNX)
+* `g++` 4.4.2, 4.4, 4.6;
+* `g++` 4.8, 4.9, 5.0 with c++98 option;
+* `clang` 3.5, 5.0 with c++98 option;
+* `clang-900.0.37` with c++98 option (Mac OS);
+* `Visual Studio` 2008, 2010, 2013, 2015, 2017;
 
 ...and that's it. If you use other compilers and decide to include this library in your project there is no guarantee that it will compile without errors. In case you will be able to fix the errors without breaking existing code for already supported compilers I would really appreciate your pull requests.
 
