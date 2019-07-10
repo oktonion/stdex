@@ -4,11 +4,13 @@ All notable changes to stdex library project will be documented in this file.
 
 visit https://github.com/oktonion/stdex for the latest version of stdex library
 
-## [0.2.2] - 2019-xx-xx
+## [0.2.2] - 2019-07-11
 
-### Added
+### Fixed
 
-### Changed
+- `<typeindex>` header was missing so I found it in this release
+- internals of chrono are now carefully hidden
+- updated UNIX scripts to correct line endings
 
 ## [0.2.1] - 2019-07-03
 
