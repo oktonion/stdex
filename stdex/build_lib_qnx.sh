@@ -1,3 +1,5 @@
+#!/bin/sh
+
 COMPILER=qcc
 
 $COMPILER --version
