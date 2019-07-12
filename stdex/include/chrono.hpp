@@ -8,7 +8,7 @@
 // stdex includes
 #include "./cstdint.hpp" // stdex::intmax_t, STDEX_INTMAX_MAX, STDEX_INTMAX_MIN
 #include "./ratio" // all ratio
-#include "./type_traits" // stdex::common_type
+#include "./type_traits" // stdex::common_type, stdex::is_floating_point
 
 // POSIX includes
 /*none*/
@@ -672,6 +672,10 @@ namespace stdex
 		typedef duration<stdex::intmax_t> seconds;                            //!< Duration with the unit seconds.
 		typedef duration<stdex::intmax_t, ratio<60> > minutes;                //!< Duration with the unit minutes.
 		typedef duration<stdex::intmax_t, ratio<3600> > hours;                //!< Duration with the unit hours.
+
+		template <class _Rep>
+		struct treat_as_floating_point : 
+			stdex::is_floating_point<_Rep> {};
 
 		template<class _Clock, class _Duration>
 		class time_point
