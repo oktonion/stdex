@@ -291,6 +291,13 @@ int main(void)
         DYNAMIC_VERIFY(d4.count() == d4_copy.count() * dbl_emulator(1000.0));
 #endif
     }
+
+    {
+        STATIC_ASSERT((treat_as_floating_point<duration<double>::rep>::value == (true)), shoud_be_floating_point);
+        STATIC_ASSERT((treat_as_floating_point<duration<float>::rep>::value == (true)), shoud_be_floating_point);
+        STATIC_ASSERT((treat_as_floating_point<duration<int>::rep>::value == (false)), shoud_not_be_floating_point);
+        STATIC_ASSERT((treat_as_floating_point<duration<int, micro>::rep>::value == (false)), shoud_not_be_floating_point);
+    }
 #if (CHECK_FOR_COMPILE_ERROR_TESTS == 1)
     {
         duration<double> d(3.5);
