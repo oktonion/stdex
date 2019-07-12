@@ -2,7 +2,7 @@
 
 All notable changes to stdex library project will be documented in this file.
 
-visit https://github.com/oktonion/stdex for the latest version of stdex library
+visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library
 
 ## [0.2.3] - 2019-xx-xx
 
@@ -133,7 +133,7 @@ visit https://github.com/oktonion/stdex for the latest version of stdex library
 ### Removed
 
 - rudimentary code for `nullptr` implementation
- 
+
 ### Changed
 
 - `is_array` now detects `T[]` (array with no size)
