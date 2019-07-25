@@ -10,7 +10,7 @@ namespace stdex
 	struct type_zero :
 		public T
 	{
-		type_zero() { memset(&static_cast<T>(*this), 0, sizeof(T)); }
+		type_zero() { memset(&static_cast<T&>(*this), 0, sizeof(T)); }
 	};
 
 	template<class T, std::size_t N>
