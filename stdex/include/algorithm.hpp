@@ -1021,9 +1021,9 @@ namespace stdex
 			}
 
 			template<class _ForwardIt1, class _ForwardIt2, class _BinaryPredicate>
-			bool is_permutation( _ForwardIt1 _first1, 
-				typename detail::_if_iterators_cat_are_forward<_ForwardIt1, _ForwardIt2>::type _last1,
-				_ForwardIt2 first2, _BinaryPredicate _pred)
+			bool is_permutation( _ForwardIt1 _first, 
+				typename detail::_if_iterators_cat_are_forward<_ForwardIt1, _ForwardIt2>::type _last,
+				_ForwardIt2 _d_first, _BinaryPredicate _pred)
 			{
 				// skip common prefix
 				std::pair<_ForwardIt1, _ForwardIt2> _tie = std::mismatch(_first, _last, _d_first, _pred);
