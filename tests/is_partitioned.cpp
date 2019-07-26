@@ -155,7 +155,7 @@ int
 test1()
 {
   Container con(array, array);
-  DYNAMIC_VERIFY( std::is_partitioned(con.begin(), con.end(), predicate) );
+  DYNAMIC_VERIFY( stdex::is_partitioned(con.begin(), con.end(), predicate) );
   return 0;
 }
 
@@ -163,7 +163,7 @@ int
 test2()
 {
   Container con(array, array + 1);
-  DYNAMIC_VERIFY( std::is_partitioned(con.begin(), con.end(), predicate) );
+  DYNAMIC_VERIFY( stdex::is_partitioned(con.begin(), con.end(), predicate) );
   return 0;
 }
 
@@ -171,7 +171,7 @@ int
 test3()
 {
   Container con(array, array + 8);
-  DYNAMIC_VERIFY( !std::is_partitioned(con.begin(), con.end(), predicate) );
+  DYNAMIC_VERIFY( !stdex::is_partitioned(con.begin(), con.end(), predicate) );
   return 0;
 }
 
@@ -179,7 +179,25 @@ int
 test4()
 {
   Container con(array + 2, array + 7);
-  DYNAMIC_VERIFY( std::is_partitioned(con.begin(), con.end(), predicate) );
+  DYNAMIC_VERIFY( stdex::is_partitioned(con.begin(), con.end(), predicate) );
+  return 0;
+}
+
+int count;
+
+struct pred
+{
+  bool operator()(int i) const { ++count; return i < 5; }
+};
+
+int
+test5()
+{
+  int i[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+  bool result = stdex::is_partitioned(i, i + 10, pred());
+  DYNAMIC_VERIFY( result );
+  DYNAMIC_VERIFY( count == 10 );
+
   return 0;
 }
 
@@ -190,5 +208,6 @@ main()
   RUN_TEST(test2);
   RUN_TEST(test3);
   RUN_TEST(test4);
+  RUN_TEST(test5);
   return 0;
 }
