@@ -124,9 +124,9 @@ struct unsigned_integral_constant_checker
 	char int_least_of_##bitsn##_bits_check_fail[((signed_integral_constant_checker<stdex::int_least##bitsn##_t, STDEX_INT##bitsn##_C(cvalue)>::value == STDEX_INT##bitsn##_C(cvalue))) ? 1 : -1]; \
 	char int_fast_of_##bitsn##_bits_check_fail[((signed_integral_constant_checker<stdex::int_fast##bitsn##_t, STDEX_INT##bitsn##_C(cvalue)>::value == STDEX_INT##bitsn##_C(cvalue))) ? 1 : -1];
 #define UNSIGNED_INTEGRAL_CONSTANT_CHECK(bitsn, cvalue)\
-	char uint_of_##bitsn##_bits_check_fail[((unsigned_integral_constant_checker<stdex::uint##bitsn##_t, STDEX_INT##bitsn##_C(cvalue)>::value == STDEX_UINT##bitsn##_C(cvalue))) ? 1 : -1]; \
-	char uint_least_of_##bitsn##_bits_check_fail[((unsigned_integral_constant_checker<stdex::uint_least##bitsn##_t, STDEX_INT##bitsn##_C(cvalue)>::value == STDEX_UINT##bitsn##_C(cvalue))) ? 1 : -1]; \
-	char uint_fast_of_##bitsn##_bits_check_fail[((unsigned_integral_constant_checker<stdex::uint_fast##bitsn##_t, STDEX_INT##bitsn##_C(cvalue)>::value == STDEX_UINT##bitsn##_C(cvalue))) ? 1 : -1];
+	char uint_of_##bitsn##_bits_check_fail[((unsigned_integral_constant_checker<stdex::uint##bitsn##_t, STDEX_UINT##bitsn##_C(cvalue)>::value == STDEX_UINT##bitsn##_C(cvalue))) ? 1 : -1]; \
+	char uint_least_of_##bitsn##_bits_check_fail[((unsigned_integral_constant_checker<stdex::uint_least##bitsn##_t, STDEX_UINT##bitsn##_C(cvalue)>::value == STDEX_UINT##bitsn##_C(cvalue))) ? 1 : -1]; \
+	char uint_fast_of_##bitsn##_bits_check_fail[((unsigned_integral_constant_checker<stdex::uint_fast##bitsn##_t, STDEX_UINT##bitsn##_C(cvalue)>::value == STDEX_UINT##bitsn##_C(cvalue))) ? 1 : -1];
 
 #define INTEGRAL_CONSTANT_CHECK(bitsn, value_signed, value_unsigned)\
 	SIGNED_INTEGRAL_CONSTANT_CHECK(bitsn, value_signed) \
