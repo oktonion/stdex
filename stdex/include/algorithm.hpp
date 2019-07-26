@@ -964,6 +964,28 @@ namespace stdex
 				_ForwardIt1
 			>
 		{};
+
+		template<class _Tp, class _BinaryPredicate>
+		struct _BinaryToUnaryPredicate{
+			_BinaryToUnaryPredicate(const _Tp &value_, const _BinaryPredicate &pred_):
+				value(value_),
+				pred(pred_)
+			{}
+			const _Tp &value;
+			const _BinaryPredicate &pred;
+
+			bool operator()(const _Tp &input)
+			{
+				return pred(value, input);
+			}
+		};
+		
+		template<class _Tp, class _BinaryPredicate>
+		_BinaryToUnaryPredicate<_Tp, _BinaryPredicate> 
+		_make_b2u_predicate(const _Tp &value_, const _BinaryPredicate &pred_)
+		{
+			return _BinaryToUnaryPredicate<_Tp, _BinaryPredicate>(value_, pred_);
+		}
 	}
 
 	namespace std_cpp11
@@ -991,6 +1013,31 @@ namespace stdex
 							if (_i != std::find(_first, _i, *_i)) continue; // already counted this *i
 							typename iterator_traits<_ForwardIt2>::difference_type _m = std::count(_d_first, _d_last, *_i);
 							if (_m==0 || std::count(_i, _last, *_i) != _m) {
+								return false;
+							}
+						}
+					}
+				return true;
+			}
+
+			template<class _ForwardIt1, class _ForwardIt2, class _BinaryPredicate>
+			bool is_permutation( _ForwardIt1 _first1, 
+				typename detail::_if_iterators_cat_are_forward<_ForwardIt1, _ForwardIt2>::type _last1,
+				_ForwardIt2 first2, _BinaryPredicate _pred)
+			{
+				// skip common prefix
+				std::pair<_ForwardIt1, _ForwardIt2> _tie = std::mismatch(_first, _last, _d_first, _pred);
+				_first = _tie.first;
+				_d_first = _tie.second;
+				// iterate over the rest, counting how many times each element
+				// from [first, last) appears in [d_first, d_last)
+				if (_first != _last) {
+					_ForwardIt2 _d_last = _d_first;
+					std::advance(_d_last, std::distance(_first, _last));
+					for (_ForwardIt1 _i = _first; _i != _last; ++_i) {
+							if (_i != std::find_if(_first, _i, detail::_make_b2u_predicate(*_i, _pred))) continue; // already counted this *i
+							typename iterator_traits<_ForwardIt2>::difference_type _m = std::count_if(_d_first, _d_last, detail::_make_b2u_predicate(*_i, _pred));
+							if (_m==0 || std::count_if(_i, _last, detail::_make_b2u_predicate(*_i, _pred)) != _m) {
 								return false;
 							}
 						}
