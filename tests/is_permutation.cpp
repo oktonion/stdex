@@ -21,7 +21,9 @@ int
 do_test(int arr1[5], bool np = true)
 {
   do
+  {
     DYNAMIC_VERIFY( stdex::is_permutation(arr1, arr1 + 5, arr0) == np );
+  }
   while (stdex::next_permutation(arr1, arr1 + 5));
   return 0;
 }
@@ -31,7 +33,9 @@ template<typename Predicate>
   do_test(int arr1[5], Predicate pred, bool np = true)
   {
     do
+    {
       DYNAMIC_VERIFY( stdex::is_permutation(arr1, arr1 + 5, arr0, pred) == np );
+    }
     while (stdex::next_permutation(arr1, arr1 + 5));
     return 0;
   }
