@@ -183,7 +183,7 @@ test4()
   return 0;
 }
 
-int count;
+int count = 0;
 
 struct pred
 {
