@@ -145,11 +145,11 @@ struct test_container
 };
 
 typedef test_container<int> Container;
-int array[] = {0, 0, 0, 1, 0, 1};
+int array[] = {0, 0, 1, 1, 1, 0, 0, 1};
 
 bool
 predicate(const int& i) 
-{ return i == 0; }
+{ return i == 1; }
 
 int
 test1()
