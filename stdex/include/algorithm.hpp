@@ -965,14 +965,14 @@ namespace stdex
 
 		template<class _Tp, class _BinaryPredicate>
 		struct _BinaryToUnaryPredicate{
-			_BinaryToUnaryPredicate(const _Tp &value_, const _BinaryPredicate &pred_):
+			_BinaryToUnaryPredicate(const _Tp &value_, _BinaryPredicate &pred_):
 				value(value_),
 				pred(pred_)
 			{}
 			const _Tp &value;
-			const _BinaryPredicate &pred;
+			_BinaryPredicate &pred;
 
-			bool operator()(const _Tp &input)
+			bool operator()(const _Tp &input) const
 			{
 				return pred(value, input);
 			}
@@ -980,7 +980,7 @@ namespace stdex
 		
 		template<class _Tp, class _BinaryPredicate>
 		_BinaryToUnaryPredicate<_Tp, _BinaryPredicate> 
-		_make_b2u_predicate(const _Tp &value_, const _BinaryPredicate &pred_)
+		_make_b2u_predicate(const _Tp &value_, _BinaryPredicate &pred_)
 		{
 			return _BinaryToUnaryPredicate<_Tp, _BinaryPredicate>(value_, pred_);
 		}
