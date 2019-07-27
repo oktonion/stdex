@@ -550,15 +550,13 @@ namespace stdex
 			template<class _InputIt, class _UnaryPredicate>
 			inline
 			bool is_partitioned(_InputIt _first, 
-				typename detail::_if_iterator_cat_is_input<_InputIt>::type _last, _UnaryPredicate _p)
+				typename detail::_if_iterator_cat_is_input<_InputIt>::type _last, _UnaryPredicate _pred)
 			{
-				for (; _first != _last; ++_first)
-					if (!_p(*_first))
-						break;
-				for (; _first != _last; ++_first)
-					if (_p(*_first))
-						return false;
-				return true;
+				_first = stdex::find_if_not(_first, _last, _pred);
+				if (_first == _last)
+					return true;
+				++_first;
+				return stdex::none_of(_first, _last, _pred);
 			}
 		}
 		using namespace impl;
