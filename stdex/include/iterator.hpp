@@ -285,8 +285,7 @@ namespace stdex
 		struct _is_legacy_output_iterator
 		{
 			static const bool value =
-				_is_legacy_iterator<_It>::value &&
-				_if_iterator_cat_is_output<_It>::value;
+				_is_legacy_iterator<_It>::value;
 		};
 	} // namespace detail
 
