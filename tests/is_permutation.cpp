@@ -41,11 +41,11 @@ do_test(int arr1[5], Predicate pred, bool np = true)
 }
 
 int
-do_test2(int arr1[5], bool np = true, unsigned N = 5)
+do_test2(int arr1[5], bool np = true)
 {
     do
     {
-        DYNAMIC_VERIFY( stdex::is_permutation(arr1, arr1 + 5, arr0, arr0 + N) == np );
+        DYNAMIC_VERIFY( stdex::is_permutation(arr1, arr1 + 5, arr0) == np );
     }
     while (stdex::next_permutation(arr1, arr1 + 5));
     return 0;
