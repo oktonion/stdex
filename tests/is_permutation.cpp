@@ -68,7 +68,6 @@ int test01()
   int arr1[] = { 11, 22, 33, 44, 55 };
   DYNAMIC_VERIFY(do_test(arr1) == 0);
   DYNAMIC_VERIFY(do_test2(arr1) == 0);
-  DYNAMIC_VERIFY(do_test2(arr1, false) == 0);
 
   int arr2[] = { 11, 33, 33, 44, 55 };
   DYNAMIC_VERIFY(do_test(arr2, false) == 0);
