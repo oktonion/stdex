@@ -81,7 +81,6 @@ int test01()
   int arr4[] = { 11, 22, 33, 44, 55 };
   DYNAMIC_VERIFY(do_test(arr4, std::equal_to<int>()) == 0);
   DYNAMIC_VERIFY(do_test2(arr4, std::equal_to<int>()) == 0);
-  DYNAMIC_VERIFY(do_test2(arr4, std::equal_to<int>(), false, 4) == 0);
 
   int arr5[] = { 11, 33, 33, 44, 55 };
   DYNAMIC_VERIFY(do_test(arr5, std::equal_to<int>(), false) == 0);
