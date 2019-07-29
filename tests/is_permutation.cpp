@@ -93,7 +93,6 @@ int test01()
   int arr7[] = { 1, 2, 3, 4, 5 };
   DYNAMIC_VERIFY(do_test(arr7, my_equal_to()) == 0);
   DYNAMIC_VERIFY(do_test2(arr7, my_equal_to()) == 0);
-  DYNAMIC_VERIFY(do_test2(arr7, my_equal_to(), false, 4) == 0);
 
   int arr8[] = { 1, 3, 3, 4, 5 };
   DYNAMIC_VERIFY(do_test(arr8, my_equal_to(), false) == 0);
@@ -106,7 +105,6 @@ int test01()
   int arr10[] = { 111, 222, 333, 444, 555 };
   DYNAMIC_VERIFY(do_test(arr10, my_equal_to()) == 0);
   DYNAMIC_VERIFY(do_test2(arr10, my_equal_to()) == 0);
-  DYNAMIC_VERIFY(do_test2(arr10, my_equal_to(), false, 4) == 0);
 
   int arr11[] = { 1, 222, 33, 4, 55 };
   DYNAMIC_VERIFY(do_test(arr11, my_equal_to()) == 0);
