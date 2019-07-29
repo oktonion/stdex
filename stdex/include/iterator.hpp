@@ -113,6 +113,18 @@ namespace stdex
             typedef _Tp type;
         };
 
+		template<class, class>
+		struct _iterator_is_same
+		{
+			static const bool value = false;
+		};
+
+		template<class _Tp>
+		struct _iterator_is_same<_Tp, _Tp>
+		{
+			static const bool value = true;
+		};
+
         template<bool, class _ItType>
         struct _iterator_traits_enable_if
         {
@@ -243,6 +255,41 @@ namespace stdex
         {};
     } // namespace detail
 
+	namespace detail
+	{
+		// some iterator traits
+
+		struct _iterator_false_type { static const bool value = false; };
+
+		template<class _It>
+		struct _is_legacy_iterator:
+			_iterator_is_same<
+				typename _iterator_traits_enable_if<true, _It>::type,
+				typename _iterator_enable_if<false, void>::type
+			>
+		{ };
+
+		template<class _It, bool>
+		struct _is_legacy_input_iterator_impl :
+			_iterator_false_type { };
+
+		template<class _It>
+		struct _is_legacy_input_iterator
+		{
+			static const bool value =
+				_is_legacy_iterator<_It>::value &&
+				_if_iterator_cat_is_input<_It>::value;
+		};
+
+		template<class _It>
+		struct _is_legacy_output_iterator
+		{
+			static const bool value =
+				_is_legacy_iterator<_It>::value &&
+				_if_iterator_cat_is_output<_It>::value;
+		};
+	} // namespace detail
+
     namespace iterator_cpp11
     {
         // next (C++11)
@@ -262,7 +309,7 @@ namespace stdex
         inline
         _ForwardIt next(_ForwardIt _it) 
         {
-            return impl::next(_it, 1);
+            return iterator_cpp11::next(_it, 1);
         }
 
         // prev (C++11)
@@ -282,7 +329,7 @@ namespace stdex
         inline
         _BidirIt prev(_BidirIt _it) 
         {
-            return impl::prev(_it, 1);
+            return iterator_cpp11::prev(_it, 1);
         }
     } // namespace iterator_cpp11
 
