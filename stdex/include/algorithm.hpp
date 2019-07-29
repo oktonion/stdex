@@ -995,7 +995,7 @@ namespace stdex
 			// (function template)
 			template<class _ForwardIt1, class _ForwardIt2>
 			inline
-			bool is_permutation(_ForwardIt1 _first, 
+			bool is_permutation1(_ForwardIt1 _first, 
 				typename detail::_if_iterators_cat_are_forward<_ForwardIt1, _ForwardIt2>::type _last, _ForwardIt2 _d_first)
 			{
 				// skip common prefix
@@ -1019,7 +1019,7 @@ namespace stdex
 			}
 
 			template<class _ForwardIt1, class _ForwardIt2, class _BinaryPredicate>
-			bool is_permutation( _ForwardIt1 _first, 
+			bool is_permutation1( _ForwardIt1 _first, 
 				typename detail::_if_iterators_cat_are_forward<_ForwardIt1, _ForwardIt2>::type _last,
 				_ForwardIt2 _d_first, _BinaryPredicate _pred)
 			{
