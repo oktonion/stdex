@@ -989,40 +989,6 @@ namespace stdex
 
 	namespace algorithm_cpp11
 	{
-<<<<<<< Updated upstream
-		namespace impl
-		{
-			// (C++11)
-			// determines if a sequence is a permutation of another sequence
-			// (function template)
-			template<class _ForwardIt1, class _ForwardIt2>
-			inline
-			bool is_permutation(_ForwardIt1 _first, 
-				typename detail::_if_iterators_cat_are_forward<_ForwardIt1, _ForwardIt2>::type _last, _ForwardIt2 _d_first)
-			{
-				// skip common prefix
-				std::pair<_ForwardIt1, _ForwardIt2> _tie = std::mismatch(_first, _last, _d_first);
-				_first = _tie.first;
-				_d_first = _tie.second;
-				// iterate over the rest, counting how many times each element
-				// from [first, last) appears in [d_first, d_last)
-				if (_first != _last) {
-					_ForwardIt2 _d_last = _d_first;
-					std::advance(_d_last, std::distance(_first, _last));
-					for (_ForwardIt1 _i = _first; _i != _last; ++_i) {
-							if (_i != std::find(_first, _i, *_i)) continue; // already counted this *i
-							typename iterator_traits<_ForwardIt2>::difference_type _m = std::count(_d_first, _d_last, *_i);
-							if (_m==0 || std::count(_i, _last, *_i) != _m) {
-								return false;
-							}
-						}
-					}
-				return true;
-			}
-		}
-		using namespace impl;
-		
-=======
 		// (C++11)
 		// determines if a sequence is a permutation of another sequence
 		// (function template)
@@ -1075,7 +1041,6 @@ namespace stdex
 				}
 			return true;
 		}	
->>>>>>> Stashed changes
 	}
 
 	// (C++11)
