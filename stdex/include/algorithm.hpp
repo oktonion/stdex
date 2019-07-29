@@ -20,7 +20,7 @@
 
 namespace stdex
 {
-	namespace std_cpp11
+	namespace algorithm_cpp11
 	{
 #ifndef STDEX_DO_NOT_ADD_CPP11_STD // define to exclude std implementations
 		using namespace std;
@@ -34,50 +34,70 @@ namespace stdex
 
 	// Non-modifying sequence operations
 
-	// all_of (C++11)  
-	// checks if a predicate is true for all of the elements in a range     
-	template<class _InputIt, class _UnaryPredicate>
-	inline
-	bool all_of(_InputIt _first, 
-		typename detail::_if_iterator_cat_is_input<_InputIt>::type _last, _UnaryPredicate _p)
+	namespace algorithm_cpp11
 	{
-		for (; _first != _last; ++_first) {
-			if (!_p(*_first)) {
-				return false;
+		// all_of (C++11)  
+		// checks if a predicate is true for all of the elements in a range     
+		template<class _InputIt, class _UnaryPredicate>
+		inline
+		bool all_of(_InputIt _first, 
+			typename detail::_if_iterator_cat_is_input<_InputIt>::type _last, _UnaryPredicate _p)
+		{
+			for (; _first != _last; ++_first) {
+				if (!_p(*_first)) {
+					return false;
+				}
 			}
+			return true;
 		}
-		return true;
+
+		// any_of (C++11)
+		// checks if a predicate is true for any of the elements in a range
+		template<class _InputIt, class _UnaryPredicate>
+		inline
+		bool any_of(_InputIt _first, 
+			typename detail::_if_iterator_cat_is_input<_InputIt>::type _last, _UnaryPredicate _p)
+		{
+			return std::find_if(_first, _last, _p) != _last;
+		}
+
+		// none_of (C++11)
+		// checks if a predicate is true for none of the elements in a range
+		template<class _InputIt, class _UnaryPredicate>
+		inline
+		bool none_of(_InputIt _first, 
+			typename detail::_if_iterator_cat_is_input<_InputIt>::type _last, _UnaryPredicate _p)
+		{
+			for (; _first != _last; ++_first) {
+				if (_p(*_first)) return false;
+			}
+			return true;
+		}
 	}
+
+	// all_of (C++11)  
+	// checks if a predicate is true for all of the elements in a range
+	// (function template)
+	using algorithm_cpp11::all_of;
 
 	// any_of (C++11)
 	// checks if a predicate is true for any of the elements in a range
-	template<class _InputIt, class _UnaryPredicate>
-	inline
-	bool any_of(_InputIt _first, 
-		typename detail::_if_iterator_cat_is_input<_InputIt>::type _last, _UnaryPredicate _p)
-	{
-		return std::find_if(_first, _last, _p) != _last;
-	}
+	// (function template)
+	using algorithm_cpp11::any_of;
 
 	// none_of (C++11)
 	// checks if a predicate is true for none of the elements in a range
-	template<class _InputIt, class _UnaryPredicate>
-	inline
-	bool none_of(_InputIt _first, 
-		typename detail::_if_iterator_cat_is_input<_InputIt>::type _last, _UnaryPredicate _p)
-	{
-		for (; _first != _last; ++_first) {
-			if (_p(*_first)) return false;
-		}
-		return true;
-	}
+	// (function template)
+	using algorithm_cpp11::none_of;
 
 	// applies a function to a range of elements
 	// (function template)
 	using std::for_each; 
-						 
-	//<TODO>: using std::for_each_n; // (C++17) applies a function object to the first n elements of a sequence
-					  // (function template)
+		
+	// for_each_n (C++17) 
+	// applies a function object to the first n elements of a sequence
+	// (function template)
+	//<TODO>: using std::for_each_n; 
 
 	// returns the number of elements					  
 	using std::count; 
@@ -101,19 +121,29 @@ namespace stdex
 	// finds the first element satisfying specific criteria   
 	using std::find_if; 
 
-	// find_if_not (C++11)
-	template<class _InputIt, class _UnaryPredicate>
-	inline 
-	_InputIt find_if_not(_InputIt _first, 
-		typename detail::_if_iterator_cat_is_input<_InputIt>::type _last, _UnaryPredicate _p)
+	namespace algorithm_cpp11
 	{
-		for (; _first != _last; ++_first) {
-			if (!_p(*_first)) {
-				return _first;
+		// find_if_not (C++11)
+		// finds the first element satisfying specific criteria
+		// (function template)
+		template<class _InputIt, class _UnaryPredicate>
+		inline 
+		_InputIt find_if_not(_InputIt _first, 
+			typename detail::_if_iterator_cat_is_input<_InputIt>::type _last, _UnaryPredicate _p)
+		{
+			for (; _first != _last; ++_first) {
+				if (!_p(*_first)) {
+					return _first;
+				}
 			}
+			return _last;
 		}
-		return _last;
 	}
+
+	// find_if_not (C++11)
+	// finds the first element satisfying specific criteria
+	// (function template)
+	using algorithm_cpp11::find_if_not;
 
 	// finds the last sequence of elements in a certain range
 	// (function template)
@@ -162,23 +192,32 @@ namespace stdex
 			_iterator_enable_if<false, void>
 		{};
 	}
+	namespace algorithm_cpp11
+	{
+		// copy_if (C++11)
+		// copies a range of elements to a new location
+		// (function template)
+		template<class _InputIt, class _OutputIt, class _UnaryPredicate>
+		inline
+		_OutputIt  copy_if(
+			_InputIt _first,
+			typename detail::_copy_if_args_check<_InputIt, _OutputIt>::type _last,
+			_OutputIt _d_first,
+			_UnaryPredicate _p)
+		{
+			while (_first != _last) {
+				if (_p(*_first))
+					* _d_first++ = *_first;
+				_first++;
+			}
+			return _d_first;
+		}
+	}
 
 	// copy_if (C++11)
-	template<class _InputIt, class _OutputIt, class _UnaryPredicate>
-	inline
-	_OutputIt  copy_if(
-		_InputIt _first, 
-		typename detail::_copy_if_args_check<_InputIt, _OutputIt>::type _last,
-		_OutputIt _d_first, 
-		_UnaryPredicate _p)
-	{
-		while (_first != _last) {
-			if (_p(*_first))
-				*_d_first++ = *_first;
-			_first++;
-		}
-		return _d_first;
-	}
+	// copies a range of elements to a new location
+	// (function template)
+	using algorithm_cpp11::copy_if;
 
 	namespace detail
 	{
@@ -297,35 +336,28 @@ namespace stdex
 		{ };
 	}
 
-	namespace std_cpp11
+	namespace algorithm_cpp11
 	{
-		namespace impl
+		// copy_n (C++11)
+		// copies a number of elements to a new location
+		template<class _InputIt, class _OutputIt>
+		inline
+		_OutputIt copy_n(_InputIt _first,
+				typename detail::_copy_n_args_check<_InputIt, _OutputIt>::type _count, _OutputIt _result)
 		{
-			// copy_n (C++11)
-			// copies a number of elements to a new location
-			template<class _InputIt, class _OutputIt>
-			inline
-			_OutputIt copy_n(_InputIt _first,
-				 typename detail::_copy_n_args_check<_InputIt, _OutputIt>::type _count, _OutputIt _result)
-			{
-				if (_count > 0) {
-					*_result++ = *_first;
-					for (cstddef::size_t _i = 1; _i < _count; ++_i) {
-						*_result++ = *++_first;
-					}
+			if (_count > 0) {
+				*_result++ = *_first;
+				for (cstddef::size_t _i = 1; _i < _count; ++_i) {
+					*_result++ = *++_first;
 				}
-				return _result;
 			}
-
-			
+			return _result;
 		}
-		using namespace impl;	
-		
 	}
 
 	// copy_n (C++11)
 	// copies a number of elements to a new location
-	using std_cpp11::copy_n;
+	using algorithm_cpp11::copy_n;
 
 	// copy_n (C++11)
 	// copies a number of elements to a new location
@@ -486,47 +518,42 @@ namespace stdex
 	// (function template)
 	using std::rotate_copy;
 
-	namespace std_cpp11
+	namespace algorithm_cpp11
 	{
-		namespace impl
+		template<class _RandomIt>
+		inline
+		void random_shuffle(_RandomIt _first, 
+			typename detail::_if_iterator_cat_is_rand_access<_RandomIt>::type _last)
 		{
-			template<class _RandomIt>
-			inline
-			void random_shuffle(_RandomIt _first, 
-				typename detail::_if_iterator_cat_is_rand_access<_RandomIt>::type _last)
-			{
-				typename std::iterator_traits<_RandomIt>::difference_type _i, _n;
-				_n = _last - _first;
-				for (_i = _n - 1; _i > 0; --_i) {
-					swap(_first[_i], _first[std::rand() % (_i + 1)]);
-					// rand() % (i+1) isn't actually correct, because the generated number
-					// is not uniformly distributed for most values of i. A correct implementation
-					// will need to essentially reimplement C++11 std::uniform_int_distribution,
-					// which is not implemented (yet).
-				}
-			}
-
-			// randomly re-orders elements in a range with user random number generator func
-			// (function template)
-			template<class _RandomIt, class _RandomFunc>
-			inline
-			void random_shuffle(_RandomIt _first,
-				typename detail::_if_iterator_cat_is_rand_access<_RandomIt>::type _last, _RandomFunc &_r)
-			{
-				typename std::iterator_traits<_RandomIt>::difference_type _i, _n;
-				_n = _last - _first;
-				for (_i = _n - 1; _i > 0; --_i) {
-					swap(_first[_i], _first[_r(_i + 1)]);
-				}
+			typename std::iterator_traits<_RandomIt>::difference_type _i, _n;
+			_n = _last - _first;
+			for (_i = _n - 1; _i > 0; --_i) {
+				swap(_first[_i], _first[std::rand() % (_i + 1)]);
+				// rand() % (i+1) isn't actually correct, because the generated number
+				// is not uniformly distributed for most values of i. A correct implementation
+				// will need to essentially reimplement C++11 std::uniform_int_distribution,
+				// which is not implemented (yet).
 			}
 		}
-		using namespace impl;
-		
+
+		// randomly re-orders elements in a range with user random number generator func
+		// (function template)
+		template<class _RandomIt, class _RandomFunc>
+		inline
+		void random_shuffle(_RandomIt _first,
+			typename detail::_if_iterator_cat_is_rand_access<_RandomIt>::type _last, _RandomFunc &_r)
+		{
+			typename std::iterator_traits<_RandomIt>::difference_type _i, _n;
+			_n = _last - _first;
+			for (_i = _n - 1; _i > 0; --_i) {
+				swap(_first[_i], _first[_r(_i + 1)]);
+			}
+		}	
 	}
 
 	// randomly re-orders elements in a range
 	// (function template)
-	using std_cpp11::random_shuffle;
+	using algorithm_cpp11::random_shuffle;
 
 	// (C++11)
 	// randomly re-orders elements in a range
@@ -543,10 +570,14 @@ namespace stdex
 
 	// Partitioning operations
 
-	namespace std_cpp11
+	namespace algorithm_cpp11
 	{
-		namespace impl
+		template<class _InputIt, class _UnaryPredicate>
+		inline
+		bool is_partitioned(_InputIt _first, 
+			typename detail::_if_iterator_cat_is_input<_InputIt>::type _last, _UnaryPredicate _pred)
 		{
+<<<<<<< Updated upstream
 			template<class _InputIt, class _UnaryPredicate>
 			inline
 			bool is_partitioned(_InputIt _first, 
@@ -560,14 +591,19 @@ namespace stdex
 						return false;
 				return true;
 			}
+=======
+			_first = stdex::find_if_not(_first, _last, _pred);
+			if (_first == _last)
+				return true;
+			++_first;
+			return stdex::none_of(_first, _last, _pred);
+>>>>>>> Stashed changes
 		}
-		using namespace impl;
-		
 	}
 	// (C++11)
 	// determines if the range is partitioned by the given predicate
 	// (function template)
-	using std_cpp11::is_partitioned;
+	using algorithm_cpp11::is_partitioned;
 
 	// divides a range of elements into two groups
 	// (function template)
@@ -610,41 +646,36 @@ namespace stdex
 		{};
 	}
 
-	namespace std_cpp11
+	namespace algorithm_cpp11
 	{
-		namespace impl
+		template<class _InputIt, class _OutputIt1, class _OutputIt2, class _UnaryPredicate>
+		inline
+		std::pair<_OutputIt1, _OutputIt2>
+			partition_copy(
+				_InputIt _first, 
+				typename detail::_partition_copy_args_check<_InputIt, _OutputIt1, _OutputIt2>::type _last,
+				_OutputIt1 _d_first_true, 
+				_OutputIt2 _d_first_false,
+			_UnaryPredicate _p)
 		{
-			template<class _InputIt, class _OutputIt1, class _OutputIt2, class _UnaryPredicate>
-			inline
-			std::pair<_OutputIt1, _OutputIt2>
-				partition_copy(
-					_InputIt _first, 
-					typename detail::_partition_copy_args_check<_InputIt, _OutputIt1, _OutputIt2>::type _last,
-					_OutputIt1 _d_first_true, 
-					_OutputIt2 _d_first_false,
-				_UnaryPredicate _p)
-			{
-				while (_first != _last) {
-					if (_p(*_first)) {
-						*_d_first_true = *_first;
-						++_d_first_true;
-					} else {
-						*_d_first_false = *_first;
-						++_d_first_false;
-					}
-					++_first;
+			while (_first != _last) {
+				if (_p(*_first)) {
+					*_d_first_true = *_first;
+					++_d_first_true;
+				} else {
+					*_d_first_false = *_first;
+					++_d_first_false;
 				}
-				return std::pair<_OutputIt1, _OutputIt2>(_d_first_true, _d_first_false);
+				++_first;
 			}
-		}
-		using namespace impl;
-		
+			return std::pair<_OutputIt1, _OutputIt2>(_d_first_true, _d_first_false);
+		}	
 	}
 
 	// (C++11)
 	// copies a range dividing the elements into two groups
 	// (function template)
-	using std_cpp11::partition_copy;
+	using algorithm_cpp11::partition_copy;
 
 	// divides elements into two groups while preserving their relative order
 	// (function template)
@@ -657,83 +688,78 @@ namespace stdex
 
 	// Sorting operations
 
-	namespace std_cpp11
+	namespace algorithm_cpp11
 	{
-		namespace impl
+		// (C++11)
+		// finds the largest sorted subrange
+		// (function template)
+		template<class _ForwardIt>
+		inline
+		_ForwardIt is_sorted_until(_ForwardIt _first, 
+			typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type _last)
 		{
-			// (C++11)
-			// finds the largest sorted subrange
-			// (function template)
-			template<class _ForwardIt>
-			inline
-			_ForwardIt is_sorted_until(_ForwardIt _first, 
-				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type _last)
-			{
-				if (_first != _last) {
-					_ForwardIt _next = _first;
-					while (++_next != _last) {
-						if (*_next < *_first)
-							return _next;
-						_first = _next;
-					}
+			if (_first != _last) {
+				_ForwardIt _next = _first;
+				while (++_next != _last) {
+					if (*_next < *_first)
+						return _next;
+					_first = _next;
 				}
-				return _last;
 			}
-
-			// (C++11)
-			// finds the largest sorted subrange given binary comparison function comp
-			// (function template)
-			template <class _ForwardIt, class _Compare>
-			inline
-			_ForwardIt is_sorted_until(_ForwardIt _first, 
-				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type _last, _Compare _comp) 
-			{
-				if (_first != _last) {
-					_ForwardIt _next = _first;
-					while (++_next != _last) {
-						if (true == comp(*_next, *_first))
-							return _next;
-						_first = _next;
-					}
-				}
-				return _last;
-			}
-
-			// (C++11)
-			// checks whether a range is sorted into ascending order
-			// (function template)
-			template<class _ForwardIt>
-			inline
-			bool is_sorted(_ForwardIt _first, 
-				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type _last)
-			{
-				return impl::is_sorted_until(_first, _last) == _last;
-			}
-
-			// (C++11)
-			// checks with given binary comparison function comp whether a range is sorted into ascending order
-			// (function template)
-			template<class _ForwardIt, class _Compare>
-			inline
-			bool is_sorted(_ForwardIt _first, 
-				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type _last, _Compare _comp)
-			{
-				return impl::is_sorted_until(_first, _last, _comp) == _last;
-			}
+			return _last;
 		}
-		using namespace impl;
-		
+
+		// (C++11)
+		// finds the largest sorted subrange given binary comparison function comp
+		// (function template)
+		template <class _ForwardIt, class _Compare>
+		inline
+		_ForwardIt is_sorted_until(_ForwardIt _first, 
+			typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type _last, _Compare _comp) 
+		{
+			if (_first != _last) {
+				_ForwardIt _next = _first;
+				while (++_next != _last) {
+					if (true == comp(*_next, *_first))
+						return _next;
+					_first = _next;
+				}
+			}
+			return _last;
+		}
+
+		// (C++11)
+		// checks whether a range is sorted into ascending order
+		// (function template)
+		template<class _ForwardIt>
+		inline
+		bool is_sorted(_ForwardIt _first, 
+			typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type _last)
+		{
+			return impl::is_sorted_until(_first, _last) == _last;
+		}
+
+		// (C++11)
+		// checks with given binary comparison function comp whether a range is sorted into ascending order
+		// (function template)
+		template<class _ForwardIt, class _Compare>
+		inline
+		bool is_sorted(_ForwardIt _first, 
+			typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type _last, _Compare _comp)
+		{
+			return impl::is_sorted_until(_first, _last, _comp) == _last;
+		}	
 	}
 
 	// (C++11)
 	// finds the largest sorted subrange
 	// (function template)
-	using std_cpp11::is_sorted_until;
+	using algorithm_cpp11::is_sorted_until;
 
 	// (C++11)
 	// checks whether a range is sorted into ascending order
 	// (function template)
-	using std_cpp11::is_sorted;
+	using algorithm_cpp11::is_sorted;
 
 	// sorts a range into ascending order
 	// (function template)
@@ -854,95 +880,90 @@ namespace stdex
 	// (function template)
 	using std::min_element;
 
-	namespace std_cpp11
+	namespace algorithm_cpp11
 	{
-		namespace impl
+		// (C++11)
+		// returns the smaller and larger of two elements
+		// (function template)
+		template<class _Tp> 
+		inline
+		std::pair<const _Tp&, const _Tp&> minmax( const _Tp& _a, const _Tp& _b )
 		{
-			// (C++11)
-			// returns the smaller and larger of two elements
-			// (function template)
-			template<class _Tp> 
-			inline
-			std::pair<const _Tp&, const _Tp&> minmax( const _Tp& _a, const _Tp& _b )
-			{
-				return (_b < _a) ? std::pair<const _Tp&, const _Tp&>(_b, _a)
+			return (_b < _a) ? std::pair<const _Tp&, const _Tp&>(_b, _a)
+						: std::pair<const _Tp&, const _Tp&>(_a, _b);
+		}
+
+		// (C++11)
+		// returns the smaller and larger of two elements using the given comparison function comp
+		// (function template)
+		template<class _Tp, class _Compare> 
+		inline
+		std::pair<const _Tp&, const _Tp&> minmax( const _Tp& _a, const _Tp& _b, _Compare _comp )
+		{
+			return comp(_b, _a) ? std::pair<const _Tp&, const _Tp&>(_b, _a)
 							: std::pair<const _Tp&, const _Tp&>(_a, _b);
-			}
+		}
 
-			// (C++11)
-			// returns the smaller and larger of two elements using the given comparison function comp
-			// (function template)
-			template<class _Tp, class _Compare> 
-			inline
-			std::pair<const _Tp&, const _Tp&> minmax( const _Tp& _a, const _Tp& _b, _Compare _comp )
-			{
-				return comp(_b, _a) ? std::pair<const _Tp&, const _Tp&>(_b, _a)
-								: std::pair<const _Tp&, const _Tp&>(_a, _b);
+		// (C++11)
+		// returns the smallest and the largest elements in a range 
+		// using the given binary comparison function comp
+		template<class _ForwardIt, class _Compare>
+		inline
+		std::pair<_ForwardIt, _ForwardIt> 
+			minmax_element(_ForwardIt _first, 
+				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type _last, _Compare _comp)
+		{
+			std::pair<_ForwardIt, _ForwardIt> _result(_first, _first);
+	
+			if (_first == _last) return _result;
+			if (++_first == _last) return _result;
+	
+			if (_comp(*_first, *_result.first)) {
+				_result.first = _first;
+			} else {
+				_result.second = _first;
 			}
-
-			// (C++11)
-			// returns the smallest and the largest elements in a range 
-			// using the given binary comparison function comp
-			template<class _ForwardIt, class _Compare>
-			inline
-			std::pair<_ForwardIt, _ForwardIt> 
-				minmax_element(_ForwardIt _first, 
-					typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type _last, _Compare _comp)
-			{
-				std::pair<_ForwardIt, _ForwardIt> _result(_first, _first);
-	
-				if (_first == _last) return _result;
-				if (++_first == _last) return _result;
-	
-				if (_comp(*_first, *_result.first)) {
-					_result.first = _first;
+			while (++_first != _last) {
+				_ForwardIt _i = _first;
+				if (++_first == _last) {
+					if (_comp(*_i, *_result.first)) _result.first = _i;
+					else if (!(_comp(*_i, *_result.second))) _result.second = _i;
+					break;
 				} else {
-					_result.second = _first;
-				}
-				while (++_first != _last) {
-					_ForwardIt _i = _first;
-					if (++_first == _last) {
-						if (_comp(*_i, *_result.first)) _result.first = _i;
-						else if (!(_comp(*_i, *_result.second))) _result.second = _i;
-						break;
+					if (_comp(*_first, *_i)) {
+						if (_comp(*_first, *_result.first)) _result.first = _first;
+						if (!(_comp(*_i, *_result.second))) _result.second = _i;
 					} else {
-						if (_comp(*_first, *_i)) {
-							if (_comp(*_first, *_result.first)) _result.first = _first;
-							if (!(_comp(*_i, *_result.second))) _result.second = _i;
-						} else {
-							if (_comp(*_i, *_result.first)) _result.first = _i;
-							if (!(_comp(*_first, *_result.second))) _result.second = _first;
-						}
+						if (_comp(*_i, *_result.first)) _result.first = _i;
+						if (!(_comp(*_first, *_result.second))) _result.second = _first;
 					}
 				}
-				return _result;
 			}
-
-			// (C++11)
-			// returns the smallest and the largest elements in a range
-			// (function template)
-			template<class _ForwardIt>
-			inline
-			std::pair<_ForwardIt, _ForwardIt> 
-				minmax_element(_ForwardIt _first, 
-					typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type _last)
-			{
-				typedef typename std::iterator_traits<_ForwardIt>::value_type _value_type;
-				return impl::minmax_element(_first, _last, std::less<_value_type>());
-			}
+			return _result;
 		}
-		using namespace impl;
-		
+
+		// (C++11)
+		// returns the smallest and the largest elements in a range
+		// (function template)
+		template<class _ForwardIt>
+		inline
+		std::pair<_ForwardIt, _ForwardIt> 
+			minmax_element(_ForwardIt _first, 
+				typename detail::_if_iterator_cat_is_forward<_ForwardIt>::type _last)
+		{
+			typedef typename std::iterator_traits<_ForwardIt>::value_type _value_type;
+			return impl::minmax_element(_first, _last, std::less<_value_type>());
+		}
 	}
 
 	// (C++11)
 	// returns the smaller and larger of two elements
 	// (function template)
-	using std_cpp11::minmax;
+	using algorithm_cpp11::minmax;
 
 	// (C++11)
 	// returns the smallest and the largest elements in a range
-	using std_cpp11::minmax_element;
+	using algorithm_cpp11::minmax_element;
 
 	// returns true if one range is lexicographically less than another
 	// (function template)
@@ -966,8 +987,9 @@ namespace stdex
 		{};
 	}
 
-	namespace std_cpp11
+	namespace algorithm_cpp11
 	{
+<<<<<<< Updated upstream
 		namespace impl
 		{
 			// (C++11)
@@ -1000,12 +1022,66 @@ namespace stdex
 		}
 		using namespace impl;
 		
+=======
+		// (C++11)
+		// determines if a sequence is a permutation of another sequence
+		// (function template)
+		template<class _ForwardIt1, class _ForwardIt2>
+		inline
+		bool is_permutation(_ForwardIt1 _first, 
+			typename detail::_if_iterators_cat_are_forward<_ForwardIt1, _ForwardIt2>::type _last, _ForwardIt2 _d_first)
+		{
+			// skip common prefix
+			std::pair<_ForwardIt1, _ForwardIt2> _tie = std::mismatch(_first, _last, _d_first);
+			_first = _tie.first;
+			_d_first = _tie.second;
+			// iterate over the rest, counting how many times each element
+			// from [first, last) appears in [d_first, d_last)
+			if (_first != _last) {
+				_ForwardIt2 _d_last = _d_first;
+				std::advance(_d_last, std::distance(_first, _last));
+				for (_ForwardIt1 _i = _first; _i != _last; ++_i) {
+						if (_i != std::find(_first, _i, *_i)) continue; // already counted this *i
+						typename iterator_traits<_ForwardIt2>::difference_type _m = std::count(_d_first, _d_last, *_i);
+						if (_m==0 || std::count(_i, _last, *_i) != _m) {
+							return false;
+						}
+					}
+				}
+			return true;
+		}
+
+		template<class _ForwardIt1, class _ForwardIt2, class _BinaryPredicate>
+		bool is_permutation( _ForwardIt1 _first, 
+			typename detail::_if_iterators_cat_are_forward<_ForwardIt1, _ForwardIt2>::type _last,
+			_ForwardIt2 _d_first, _BinaryPredicate _pred)
+		{
+			// skip common prefix
+			std::pair<_ForwardIt1, _ForwardIt2> _tie = std::mismatch(_first, _last, _d_first, _pred);
+			_first = _tie.first;
+			_d_first = _tie.second;
+			// iterate over the rest, counting how many times each element
+			// from [first, last) appears in [d_first, d_last)
+			if (_first != _last) {
+				_ForwardIt2 _d_last = _d_first;
+				std::advance(_d_last, std::distance(_first, _last));
+				for (_ForwardIt1 _i = _first; _i != _last; ++_i) {
+						if (_i != std::find_if(_first, _i, detail::_make_b2u_predicate(*_i, _pred))) continue; // already counted this *i
+						typename iterator_traits<_ForwardIt2>::difference_type _m = std::count_if(_d_first, _d_last, detail::_make_b2u_predicate(*_i, _pred));
+						if (_m==0 || std::count_if(_i, _last, detail::_make_b2u_predicate(*_i, _pred)) != _m) {
+							return false;
+						}
+					}
+				}
+			return true;
+		}	
+>>>>>>> Stashed changes
 	}
 
 	// (C++11)
 	// determines if a sequence is a permutation of another sequence
 	// (function template)
-	using std_cpp11::is_permutation;
+	using algorithm_cpp11::is_permutation;
 
 	// generates the next greater lexicographic permutation of a range of elements
 	// (function template)
