@@ -988,8 +988,8 @@ namespace stdex
 
 	namespace std_cpp11
 	{
-		namespace impl
-		{
+		//namespace impl
+		//{
 			// (C++11)
 			// determines if a sequence is a permutation of another sequence
 			// (function template)
@@ -1042,7 +1042,7 @@ namespace stdex
 					}
 				return true;
 			}
-		}
+		//}
 		using namespace impl;
 		
 	}
