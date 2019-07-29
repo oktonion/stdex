@@ -102,7 +102,7 @@ namespace stdex
 
 			namespace ptrdiff_detail
 			{
-				using namespace std;
+				using std::ptrdiff_t;
 			}
 
 			template<bool>
