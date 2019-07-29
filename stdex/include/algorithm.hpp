@@ -353,76 +353,76 @@ namespace stdex
             }
             return _result;
         }
+
+        // copy_n (C++11)
+        // copies a number of elements to a new location
+        template<class _InputT, cstddef::size_t _InputSize, class _OutputIt>
+        inline
+        _OutputIt copy_n(_InputT(&_first_arr)[_InputSize],
+            typename detail::_copy_n_output_it_check<_OutputIt>::type _count, _OutputIt _result)
+        {
+            assert(_count <= _InputSize);
+
+            _InputT* _first = _first_arr;
+
+            if (_count > 0) {
+                *_result++ = *_first;
+                for (cstddef::size_t _i = 1; _i < _count; ++_i) {
+                    *_result++ = *++_first;
+                }
+            }
+            return _result;
+        }
+
+        // copy_n (C++11)
+        // copies a number of elements to a new location
+        template<class _InputIt, class _OutputT, cstddef::size_t _OutputSize>
+        inline
+        _OutputT* copy_n(_InputIt _first,
+            typename detail::_copy_n_input_it_check<_InputIt, _OutputT>::type _count, _OutputT(&_result_arr)[_OutputSize])
+        {
+            assert(_count <= _OutputSize);
+
+            _OutputT* _result = _result_arr;
+
+            if (_count > 0) {
+                *_result++ = *_first;
+                for (cstddef::size_t _i = 1; _i < _count; ++_i) {
+                    *_result++ = *++_first;
+                }
+            }
+            return _result;
+        }
+
+        // copy_n (C++11)
+        // copies a number of elements to a new location
+        template<
+            class _InputT, cstddef::size_t _InputSize,
+            class _OutputT, cstddef::size_t _OutputSize
+        >
+        inline
+        _OutputT* copy_n(_InputT(&_first_arr)[_InputSize],
+            cstddef::size_t _count, _OutputT(&_result_arr)[_OutputSize])
+        {
+            assert(_count <= _OutputSize);
+            assert(_count <= _InputSize);
+
+            _InputT* _first = _first_arr;
+            _OutputT* _result = _result_arr;
+
+            if (_count > 0) {
+                *_result++ = *_first;
+                for (cstddef::size_t _i = 1; _i < _count; ++_i) {
+                    *_result++ = *++_first;
+                }
+            }
+            return _result;
+        }
     }
 
     // copy_n (C++11)
     // copies a number of elements to a new location
     using algorithm_cpp11::copy_n;
-
-    // copy_n (C++11)
-    // copies a number of elements to a new location
-    template<class _InputT, cstddef::size_t _InputSize, class _OutputIt>
-    inline
-    _OutputIt copy_n(_InputT(&_first_arr)[_InputSize],
-        typename detail::_copy_n_output_it_check<_OutputIt>::type _count, _OutputIt _result)
-    {
-        assert(_count <= _InputSize);
-
-        _InputT* _first = _first_arr;
-
-        if (_count > 0) {
-            *_result++ = *_first;
-            for (cstddef::size_t _i = 1; _i < _count; ++_i) {
-                *_result++ = *++_first;
-            }
-        }
-        return _result;
-    }
-
-    // copy_n (C++11)
-    // copies a number of elements to a new location
-    template<class _InputIt, class _OutputT, cstddef::size_t _OutputSize>
-    inline
-    _OutputT* copy_n(_InputIt _first,
-        typename detail::_copy_n_input_it_check<_InputIt, _OutputT>::type _count, _OutputT(&_result_arr)[_OutputSize])
-    {
-        assert(_count <= _OutputSize);
-
-        _OutputT* _result = _result_arr;
-
-        if (_count > 0) {
-            *_result++ = *_first;
-            for (cstddef::size_t _i = 1; _i < _count; ++_i) {
-                *_result++ = *++_first;
-            }
-        }
-        return _result;
-    }
-
-    // copy_n (C++11)
-    // copies a number of elements to a new location
-    template<
-        class _InputT, cstddef::size_t _InputSize,
-        class _OutputT, cstddef::size_t _OutputSize
-    >
-    inline
-    _OutputT* copy_n(_InputT(&_first_arr)[_InputSize],
-        cstddef::size_t _count, _OutputT(&_result_arr)[_OutputSize])
-    {
-        assert(_count <= _OutputSize);
-        assert(_count <= _InputSize);
-
-        _InputT* _first = _first_arr;
-        _OutputT* _result = _result_arr;
-
-        if (_count > 0) {
-            *_result++ = *_first;
-            for (cstddef::size_t _i = 1; _i < _count; ++_i) {
-                *_result++ = *++_first;
-            }
-        }
-        return _result;
-    }
 
     // copies a range of elements in backwards order
     // (function template)
