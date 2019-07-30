@@ -184,8 +184,10 @@ namespace stdex
 			chrono::time_point<clock_t, chrono::seconds> _s = chrono::time_point_cast<chrono::seconds>(atime);
 			chrono::nanoseconds _ns = chrono::duration_cast<chrono::nanoseconds>(atime - _s);
 
+			typename chrono::time_point<clock_t, chrono::seconds>::rep _s_count = _s.time_since_epoch().count();
+
 			timespec ts;
-			ts.tv_sec = static_cast<stdex::time_t>(_s.time_since_epoch().count());
+			ts.tv_sec = static_cast<stdex::time_t>(_s_count > 0 ? _s_count : 0);
 			ts.tv_nsec = static_cast<long>(_ns.count());
 
 			/*int res = */pthread_cond_timedwait(&_condition_handle, lock.mutex()->native_handle(), &ts);
