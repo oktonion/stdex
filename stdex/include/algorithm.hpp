@@ -247,21 +247,18 @@ namespace stdex
             struct _has_buggy_copy_n
             {
                 static int _A[20];
-                static const int _B[20];
                 static const bool value = sizeof(_copy_n_check(copy_n(_dummy_input_iterator(), sizeof(_A) / sizeof(int), _dummy_output_iterator()))) == sizeof(_iterator_yes_type);
             };
 
             struct _has_buggy_copy_n1
             {
-                static int _A[20];
                 static const int _B[20];
-                static const bool value = sizeof(_copy_n_check(copy_n(_B, sizeof(_A) / sizeof(int), _dummy_output_iterator()))) == sizeof(_iterator_yes_type);
+                static const bool value = sizeof(_copy_n_check(copy_n(_B, sizeof(_B) / sizeof(int), _dummy_output_iterator()))) == sizeof(_iterator_yes_type);
             };
 
             struct _has_buggy_copy_n2
             {
                 static int _A[20];
-                static const int _B[20];
                 static const bool value = sizeof(_copy_n_check(copy_n(_dummy_input_iterator(), sizeof(_A) / sizeof(int), _A))) == sizeof(_iterator_yes_type);
             };
 
@@ -284,7 +281,7 @@ namespace stdex
                     typename std::iterator_traits<_OutputIt>::iterator_category,
                     std::output_iterator_tag
                 >::value == bool(true) &&
-                algorithm_detail::_has_buggy_copy_n::value == bool(false),
+                algorithm_detail::_has_buggy_copy_n::value == bool(true),
                 cstddef::size_t
             >
         { };
