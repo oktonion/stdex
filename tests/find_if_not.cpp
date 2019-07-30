@@ -19,14 +19,17 @@ template<class T>
     { }
 };
 
-template<class T> struct remove_cv { typedef T type; };
-template<class T> struct remove_cv<const T> { typedef T type; };
-template<class T> struct remove_cv<volatile T> { typedef T type; };
-template<class T> struct remove_cv<const volatile T> { typedef T type; };
+namespace type_traits
+{
+	template<class T> struct remove_cv { typedef T type; };
+	template<class T> struct remove_cv<const T> { typedef T type; };
+	template<class T> struct remove_cv<volatile T> { typedef T type; };
+	template<class T> struct remove_cv<const volatile T> { typedef T type; };
+}
 
 template<class T>
 class input_iterator_wrapper
-: public std::iterator<std::input_iterator_tag, typename ::remove_cv<T>::type,
+: public std::iterator<std::input_iterator_tag, typename type_traits::remove_cv<T>::type,
       std::ptrdiff_t, T*, T&>
 {
 protected:
