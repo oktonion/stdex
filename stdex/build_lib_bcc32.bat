@@ -13,7 +13,7 @@ if ["%~1"]==["debug"] (
 )
 
 echo "compiling Borland C++ pthread-win32"
-bcc32 -x -w -tCM -Q -n.\stdex\obj\ -DHAVE_CONFIG_H;PTW32_STATIC_LIB -I%cd%\pthread\ -c .\pthread-win32\pthread.c %build_opt%
+bcc32 -X- -w -tWC -tM -Q -n.\stdex\obj\ -DHAVE_CONFIG_H;PTW32_STATIC_LIB -I%cd%\pthread\ -c .\pthread-win32\pthread.c %build_opt%
 if ERRORLEVEL 1 set "build_ok=0"
 if /I "%build_ok%" NEQ "1" (
     echo "failed"
@@ -24,7 +24,7 @@ cd .\stdex
 
 for /f %%f in ('dir /b ".\src\*.cpp"') do (
   echo "compiling %%~nf"
-  bcc32 -x -w -tCM -Q -n.\obj\ -I%cd%\..\pthread\ -c ".\src\%%f" %build_opt%
+  bcc32 -X- -w -tWC -tM -Q -n.\obj\ -I%cd%\..\pthread\ -c ".\src\%%f" %build_opt%
   if ERRORLEVEL 1 (
     set "build_ok=0"
   )
