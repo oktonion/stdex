@@ -705,7 +705,12 @@ namespace stdex
 					sizeof(_Tp)
 				>::value);
 		#endif
-			typedef integral_constant<std::size_t, std::size_t(_alignment_of_impl::value)> type;
+			typedef 
+			typename
+			integral_constant<
+				std::size_t, 
+				(const std::size_t)(_alignment_of_impl::value)
+			>::type type;
 
 		private:
 			typedef intern::type_traits_asserts check;
@@ -1367,8 +1372,8 @@ namespace stdex
 
 		template<class _Tp>
 		static _yes_type _is_convertable_to_int_tester(int);
-		template<class _Tp>
-		static _no_type _is_convertable_to_int_tester(_constructable_from_type_dummy<_Tp>);
+		//template<class _Tp>
+		//static _no_type _is_convertable_to_int_tester(_constructable_from_type_dummy<_Tp>);
 		template<class _Tp>
 		static _no_type _is_convertable_to_int_tester(...);
 
