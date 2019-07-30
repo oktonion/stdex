@@ -20,8 +20,10 @@ int main(void)
     STATIC_ASSERT(is_compound<long>::value == false, should_not_be_compound);
     STATIC_ASSERT(is_compound<unsigned long>::value == false, should_not_be_compound);
     #ifdef LLONG_MAX
-    STATIC_ASSERT(is_compound<long long>::value == false, should_not_be_compound);
-    STATIC_ASSERT(is_compound<unsigned long long>::value == false, should_not_be_compound);
+	// such strange check is due to Embarcadero C++ Builder
+	// that has LLONG_MAX macro but 'long long' is not integral constant!
+    STATIC_ASSERT(is_compound<long long>::value == !is_integral<long long>::value, should_not_be_compound);
+    STATIC_ASSERT(is_compound<unsigned long long>::value == !is_integral<unsigned long long>::value, should_not_be_compound);
     #endif
     STATIC_ASSERT(is_compound<float>::value == false, should_not_be_compound);
     STATIC_ASSERT(is_compound<double>::value == false, should_not_be_compound);

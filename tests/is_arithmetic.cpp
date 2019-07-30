@@ -21,8 +21,10 @@ int main(void)
     STATIC_ASSERT(is_arithmetic<long>::value == (true), should_be_arithmetic);
     STATIC_ASSERT(is_arithmetic<unsigned long>::value == (true), should_be_arithmetic);
     #ifdef LLONG_MAX
-    STATIC_ASSERT(is_arithmetic<long long>::value == (true), should_be_arithmetic);
-    STATIC_ASSERT(is_arithmetic<unsigned long long>::value == (true), should_be_arithmetic);
+    // such strange check is due to Embarcadero C++ Builder
+    // that has LLONG_MAX macro but 'long long' is not integral constant!
+    STATIC_ASSERT(is_arithmetic<long long>::value == is_integral<long long>::value, should_be_arithmetic); 
+    STATIC_ASSERT(is_arithmetic<unsigned long long>::value == is_integral<unsigned long long>::value, should_be_arithmetic);
     #endif
     STATIC_ASSERT(is_arithmetic<float>::value == (true), should_be_arithmetic);
     STATIC_ASSERT(is_arithmetic<double>::value == (true), should_be_arithmetic);

@@ -39,6 +39,30 @@ void test01()
   typedef stdex::uintptr_t       my_uintptr_t;
 }
 
+template<class LL_T, class ULL_T>
+struct test02_64
+{
+	static void test02()
+	{
+	#ifdef LLONG_MAX
+		LL_T i64 = 0;
+		(void) i64;
+	#endif
+	#ifdef ULLONG_MAX
+		ULL_T ui64 = 0;
+		(void) ui64;
+	#endif
+	}
+};
+
+// fallback for some lazy and buggy compilers like Embarcadero C++ builder 
+// that have LLONG_MAX and ULLONG_MAX macro but 'long long' is not integral constant there
+template<>
+struct test02_64<void, void> 
+{
+	static void test02() {}
+};
+
 void test02()
 {
 	stdex::int8_t i8 = STDEX_INT8_C(0);
@@ -53,13 +77,8 @@ void test02()
 	(void) i32;
 	stdex::uint32_t ui32 = STDEX_UINT32_C(0);
 	(void) ui32;
-#ifdef LLONG_MAX
-	stdex::int64_t i64 = 0;
-	(void) i64;
-#endif
-#ifdef ULLONG_MAX
-	stdex::uint64_t ui64 = 0;
-	(void) ui64;
+#if defined(LLONG_MAX) || defined(ULLONG_MAX)
+	test02_64<stdex::int64_t, stdex::uint64_t>::test02();
 #endif
 	stdex::int_least8_t i8least = STDEX_INT8_C(0);
 	(void) i8least;
@@ -73,13 +92,8 @@ void test02()
 	(void) i32least;
 	stdex::uint_least32_t ui32least = STDEX_UINT32_C(0);
 	(void) ui32least;
-#ifdef LLONG_MAX
-	stdex::int_least64_t i64least = 0;
-	(void) i64least;
-#endif
-#ifdef ULLONG_MAX
-	stdex::uint_least64_t ui64least = 0;
-	(void) ui64least;
+#if defined(LLONG_MAX) || defined(ULLONG_MAX)
+	test02_64<stdex::int_least64_t, stdex::uint_least64_t>::test02();
 #endif
 	stdex::int_fast8_t i8fast = STDEX_INT8_C(0);
 	(void) i8fast;
@@ -93,13 +107,8 @@ void test02()
 	(void) i32fast;
 	stdex::uint_fast32_t ui32fast = STDEX_UINT32_C(0);
 	(void) ui32fast;
-#ifdef ULLONG_MAX
-	stdex::int_fast64_t i64fast = 0;
-	(void) i64fast;
-#endif
-#ifdef ULLONG_MAX
-	stdex::uint_fast64_t ui64fast = 0;
-	(void) ui64fast;
+#if defined(LLONG_MAX) || defined(ULLONG_MAX)
+	test02_64<stdex::int_fast64_t, stdex::uint_fast64_t>::test02();
 #endif
 	stdex::intmax_t im = 0;
 	(void) im;
@@ -187,6 +196,28 @@ int integral_constant_type_check(T1, T2)
 	return 0;
 }
 
+template<class T>
+struct integral_constant_type_64
+{
+	static int check()
+	{
+	#ifdef LLONG_MAX
+		DYNAMIC_VERIFY((integral_constant_type_check(stdex::int64_t(0), STDEX_INT64_C(0)) == 0));
+	#endif
+	#ifdef ULLONG_MAX
+		DYNAMIC_VERIFY((integral_constant_type_check(stdex::uint64_t(0), STDEX_UINT64_C(0)) == 0));
+	#endif
+	}
+};
+
+// fallback for some lazy and buggy compilers like Embarcadero C++ builder 
+// that have LLONG_MAX and ULLONG_MAX macro but 'long long' is not integral constant there
+template<>
+struct integral_constant_type_64<void> 
+{
+	static int check() {return sizeof(int) - sizeof(int);}
+};
+
 int test04()
 {
 	DYNAMIC_VERIFY((integral_constant_type_check(stdex::int8_t(0), STDEX_INT8_C(0)) == 0));
@@ -196,11 +227,8 @@ int test04()
 	DYNAMIC_VERIFY((integral_constant_type_check(stdex::int32_t(0), STDEX_INT32_C(0)) == 0));
 	DYNAMIC_VERIFY((integral_constant_type_check(stdex::uint32_t(0), STDEX_UINT32_C(0)) == 0));
 
-#ifdef LLONG_MAX
-	DYNAMIC_VERIFY((integral_constant_type_check(stdex::int64_t(0), STDEX_INT64_C(0)) == 0));
-#endif
-#ifdef ULLONG_MAX
-	DYNAMIC_VERIFY((integral_constant_type_check(stdex::uint64_t(0), STDEX_UINT64_C(0)) == 0));
+#if defined(LLONG_MAX) && defined(ULLONG_MAX)
+	DYNAMIC_VERIFY((integral_constant_type_64<stdex::int64_t>::check() == 0));
 #endif
 
 	return 0;

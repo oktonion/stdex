@@ -16,6 +16,12 @@
     #include <iterator> // + <cstdlib>
 #endif
 
+#ifdef __CODEGEARC__
+// Embarcadero is the worst when it comes to standard
+	#include <type_traits> 
+	#include <memory>
+#endif
+
 // testing common names that should not be defined in stdex lib
 #define A (
 #define B (
