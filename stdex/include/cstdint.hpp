@@ -249,7 +249,7 @@ namespace stdex
 			struct _max_sized_integer_step_expr
 			{
 				static const bool result = 
-					(sizeof(_sized_integer_map<_FoundRank>::size) == _cstdint_invalid_size) ||
+					(sizeof(_sized_integer_map<_FoundRank>::size) == sizeof(_sized_integer_map<_sized_integer_max_rank>::size) && _RankIt < _sized_integer_max_rank) ||
 					(
 						sizeof(_sized_integer_map<_RankIt + 1>::size) > sizeof(_sized_integer_map<_FoundRank>::size) &&
 						sizeof(_sized_integer_map<_RankIt + 1>::size) < sizeof(_sized_integer_map<_sized_integer_max_rank>::size)
@@ -265,10 +265,6 @@ namespace stdex
 			template<int _FoundRank>
 			struct _max_sized_integer_step<_sized_integer_max_rank, _FoundRank>:
 				_sized_integer_map<_FoundRank>{};
-
-			template<>
-			struct _max_sized_integer_step<_sized_integer_max_rank, _sized_integer_max_rank> :
-				_sized_integer_map<_sized_integer_max_rank> {};
 		} // namespace cstdint_detail
 
 		template<int _Size>
