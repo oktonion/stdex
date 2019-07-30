@@ -98,6 +98,9 @@ namespace stdex
 
     namespace detail
     {
+		struct _iterator_false_type { static const bool value = false; };
+		struct _iterator_true_type { static const bool value = true; };
+
         template <bool, class _Tp>
         struct _iterator_enable_if
         {
@@ -114,16 +117,34 @@ namespace stdex
         };
 
 		template<class, class>
-		struct _iterator_is_same
-		{
-			static const bool value = false;
-		};
+		struct _iterator_is_same:
+			_iterator_false_type
+		{ };
 
 		template<class _Tp>
-		struct _iterator_is_same<_Tp, _Tp>
-		{
-			static const bool value = true;
-		};
+		struct _iterator_is_same<_Tp, _Tp>:
+			_iterator_true_type
+		{ };
+
+		template<class>
+		struct _iterator_is_reference:
+			_iterator_false_type
+		{ };
+
+		template<class _Tp>
+		struct _iterator_is_reference<_Tp&> :
+			_iterator_true_type
+		{ };
+
+		template<class>
+		struct _iterator_is_not_void :
+			_iterator_true_type
+		{ };
+
+		template<>
+		struct _iterator_is_not_void<void> :
+			_iterator_false_type
+		{ };
 
         template<bool, class _ItType>
         struct _iterator_traits_enable_if
@@ -259,14 +280,10 @@ namespace stdex
 	{
 		// some iterator traits
 
-		struct _iterator_false_type { static const bool value = false; };
-
 		template<class _It>
 		struct _is_legacy_iterator:
-			_iterator_is_same<
-				typename _iterator_traits_enable_if<true, _It>::type,
-				typename _iterator_enable_if<false, void>::type
-			>
+			_iterator_is_not_void<
+				typename std::iterator_traits<_It>::reference>
 		{ };
 
 		template<class _It, bool>
@@ -274,19 +291,56 @@ namespace stdex
 			_iterator_false_type { };
 
 		template<class _It>
-		struct _is_legacy_input_iterator
-		{
-			static const bool value =
-				_is_legacy_iterator<_It>::value &&
-				_if_iterator_cat_is_input<_It>::value;
-		};
+		struct _is_legacy_input_iterator_impl<_It, true> :
+			_iterator_cat_is_valid<_It, std::input_iterator_tag>
+		{ };
 
 		template<class _It>
-		struct _is_legacy_output_iterator
-		{
-			static const bool value =
-				_is_legacy_iterator<_It>::value;
-		};
+		struct _is_legacy_input_iterator:
+			_is_legacy_input_iterator_impl<_It, _is_legacy_iterator<_It>::value>
+		{ };
+
+		template<class _It, bool>
+		struct _is_legacy_forward_iterator_impl :
+			_iterator_false_type { };
+
+		template<class _It>
+		struct _is_legacy_forward_iterator_impl<_It, true> :
+			_iterator_cat_is_valid<_It, std::forward_iterator_tag>
+		{ };
+
+		template<class _It>
+		struct _is_legacy_forward_iterator :
+			_is_legacy_forward_iterator_impl<_It, _is_legacy_input_iterator<_It>::value>
+		{ };
+
+		template<class _It, bool>
+		struct _is_legacy_bi_iterator_impl :
+			_iterator_false_type { };
+
+		template<class _It>
+		struct _is_legacy_bi_iterator_impl<_It, true> :
+			_iterator_cat_is_valid<_It, std::bidirectional_iterator_tag>
+		{ };
+
+		template<class _It>
+		struct _is_legacy_bi_iterator :
+			_is_legacy_bi_iterator_impl<_It, _is_legacy_forward_iterator<_It>::value>
+		{ };
+
+		template<class _It, bool>
+		struct _is_legacy_rand_iterator_impl :
+			_iterator_false_type { };
+
+		template<class _It>
+		struct _is_legacy_rand_iterator_impl<_It, true> :
+			_iterator_cat_is_valid<_It, std::random_access_iterator_tag>
+		{ };
+
+		template<class _It>
+		struct _is_legacy_rand_iterator :
+			_is_legacy_rand_iterator_impl<_It, _is_legacy_bi_iterator<_It>::value>
+		{ };
 	} // namespace detail
 
     namespace iterator_cpp11
