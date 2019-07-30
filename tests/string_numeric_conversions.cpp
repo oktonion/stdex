@@ -61,13 +61,13 @@ namespace string_tests
     {
         using namespace stdex;
         bool test = false;
-
+        
         try
         {
             string one;
             stdex::stod(one);
         }
-        catch (std::invalid_argument)
+        catch (const std::invalid_argument &)
         {
             test = true;
         }
@@ -75,14 +75,14 @@ namespace string_tests
         {
         }
         DYNAMIC_VERIFY(test);
-
+        
         test = false;
         try
         {
             string one("a");
             stdex::stod(one);
         }
-        catch (std::invalid_argument)
+        catch (const std::invalid_argument &)
         {
             test = true;
         }
@@ -90,7 +90,7 @@ namespace string_tests
         {
         }
         DYNAMIC_VERIFY(test);
-
+        
         double d1 = 0.0;
         std::size_t idx1 = 0;
         try
@@ -105,15 +105,17 @@ namespace string_tests
         DYNAMIC_VERIFY(test);
         DYNAMIC_VERIFY(d1 == 2.0);
         DYNAMIC_VERIFY(idx1 == 3);
-
+        
         test = false;
         try
         {
             string one("1e");
             one.append(2 * std::numeric_limits<double>::max_exponent10, '9');
+			
             d1 = stdex::stod(one);
+			
         }
-        catch (std::out_of_range)
+        catch (const std::out_of_range &)
         {
             test = true;
         }
@@ -122,7 +124,7 @@ namespace string_tests
         }
         DYNAMIC_VERIFY(test);
         DYNAMIC_VERIFY(d1 == 2.0);
-
+        
         try
         {
             long double ld0 = std::numeric_limits<double>::max() / 100.0;
@@ -134,30 +136,37 @@ namespace string_tests
             test = false;
         }
         DYNAMIC_VERIFY(test);
-
+        
         if ((std::numeric_limits<long double>::max() / 10000.0L)
                 > std::numeric_limits<double>::max())
         {
+			
             test = false;
             d1 = -1.0;
             try
             {
                 long double ld1 = std::numeric_limits<double>::max();
                 ld1 *= 100.0;
+				
                 string one(to_string(ld1));
+				
                 d1 = stdex::stod(one);
+				
             }
-            catch (std::out_of_range)
+            catch (const std::out_of_range&)
             {
+				
                 test = true;
             }
             catch (...)
             {
             }
+			
             DYNAMIC_VERIFY(test);
+			
             DYNAMIC_VERIFY(d1 == -1.0);
         }
-
+        
         return 0;
     }
 
@@ -172,7 +181,7 @@ namespace string_tests
             string one;
             stdex::stof(one);
         }
-        catch (std::invalid_argument)
+        catch (const std::invalid_argument &)
         {
             test = true;
         }
@@ -187,7 +196,7 @@ namespace string_tests
             string one("a");
             stdex::stof(one);
         }
-        catch (std::invalid_argument)
+        catch (const std::invalid_argument &)
         {
             test = true;
         }
@@ -218,7 +227,7 @@ namespace string_tests
             one.append(2 * std::numeric_limits<float>::max_exponent10, '9');
             f1 = stdex::stof(one);
         }
-        catch (std::out_of_range)
+        catch (const std::out_of_range &)
         {
             test = true;
         }
@@ -251,7 +260,7 @@ namespace string_tests
                 string one(to_string(ld1));
                 f1 = stdex::stof(one);
             }
-            catch (std::out_of_range)
+            catch (const std::out_of_range &)
             {
                 test = true;
             }
@@ -275,7 +284,7 @@ namespace string_tests
             string one;
             stdex::stoi(one);
         }
-        catch (std::invalid_argument)
+        catch (const std::invalid_argument &)
         {
             test = true;
         }
@@ -290,7 +299,7 @@ namespace string_tests
             string one("a");
             stdex::stoi(one);
         }
-        catch (std::invalid_argument)
+        catch (const std::invalid_argument &)
         {
             test = true;
         }
@@ -358,7 +367,7 @@ namespace string_tests
             string one(1000, '9');
             i1 = stdex::stoi(one);
         }
-        catch (std::out_of_range)
+        catch (const std::out_of_range &)
         {
             test = true;
         }
@@ -404,7 +413,7 @@ namespace string_tests
             string one(to_string(ll0));
             i1 = stdex::stoi(one);
         }
-        catch (std::out_of_range)
+        catch (const std::out_of_range &)
         {
             test = true;
         }
@@ -422,7 +431,7 @@ namespace string_tests
             string one(to_string(ll1));
             i1 = stdex::stoi(one);
         }
-        catch (std::out_of_range)
+        catch (const std::out_of_range &)
         {
             test = true;
         }
@@ -446,7 +455,7 @@ namespace string_tests
             string one;
             stdex::stol(one);
         }
-        catch (std::invalid_argument)
+        catch (const std::invalid_argument &)
         {
             test = true;
         }
@@ -461,7 +470,7 @@ namespace string_tests
             string one("a");
             stdex::stol(one);
         }
-        catch (std::invalid_argument)
+        catch (const std::invalid_argument &)
         {
             test = true;
         }
@@ -529,7 +538,7 @@ namespace string_tests
             string one(1000, '9');
             l1 = stdex::stol(one);
         }
-        catch (std::out_of_range)
+        catch (const std::out_of_range &)
         {
             test = true;
         }
@@ -581,7 +590,7 @@ namespace string_tests
             string one;
             stdex::stold(one);
         }
-        catch (std::invalid_argument)
+        catch (const std::invalid_argument &)
         {
             test = true;
         }
@@ -597,7 +606,7 @@ namespace string_tests
             string one("a");
             stdex::stold(one);
         }
-        catch (std::invalid_argument)
+        catch (const std::invalid_argument &)
         {
             test = true;
         }
@@ -630,7 +639,7 @@ namespace string_tests
             one.append(2 * std::numeric_limits<long double>::max_exponent10, '9');
             ld1 = stdex::stold(one);
         }
-        catch (std::out_of_range)
+        catch (const std::out_of_range &)
         {
             test = true;
         }
@@ -666,7 +675,7 @@ namespace string_tests
             string one;
             stdex::stoll(one);
         }
-        catch (std::invalid_argument)
+        catch (const std::invalid_argument &)
         {
             test = true;
         }
@@ -681,7 +690,7 @@ namespace string_tests
             string one("a");
             stdex::stoll(one);
         }
-        catch (std::invalid_argument)
+        catch (const std::invalid_argument &)
         {
             test = true;
         }
@@ -749,7 +758,7 @@ namespace string_tests
             string one(1000, '9');
             ll1 = stdex::stoll(one);
         }
-        catch (std::out_of_range)
+        catch (const std::out_of_range &)
         {
             test = true;
         }
@@ -800,7 +809,7 @@ namespace string_tests
             string one;
             stdex::stoul(one);
         }
-        catch (std::invalid_argument)
+        catch (const std::invalid_argument &)
         {
             test = true;
         }
@@ -815,7 +824,7 @@ namespace string_tests
             string one("a");
             stdex::stoul(one);
         }
-        catch (std::invalid_argument)
+        catch (const std::invalid_argument &)
         {
             test = true;
         }
@@ -883,7 +892,7 @@ namespace string_tests
             string one(1000, '9');
             ul1 = stdex::stoul(one);
         }
-        catch (std::out_of_range)
+        catch (const std::out_of_range &)
         {
             test = true;
         }
@@ -920,7 +929,7 @@ namespace string_tests
             string one;
             stdex::stoull(one);
         }
-        catch (std::invalid_argument)
+        catch (const std::invalid_argument &)
         {
             test = true;
         }
@@ -935,7 +944,7 @@ namespace string_tests
             string one("a");
             stdex::stoull(one);
         }
-        catch (std::invalid_argument)
+        catch (const std::invalid_argument &)
         {
             test = true;
         }
@@ -1003,7 +1012,7 @@ namespace string_tests
             string one(1000, '9');
             ull1 = stdex::stoull(one);
         }
-        catch (std::out_of_range)
+        catch (const std::out_of_range &)
         {
             test = true;
         }
@@ -1079,7 +1088,7 @@ int main(void)
 {
     using namespace stdex;
     using namespace string_tests;
-    
+
     RUN_TEST(test1);
     RUN_TEST(test2);
     RUN_TEST(stod_test);
