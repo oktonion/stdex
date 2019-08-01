@@ -8,6 +8,8 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 ### Added
 
+- static asserts in constructors for `<system_error>` to forbid invalid constructor calls
+
 ### Changed
 
 ## [0.2.2] - 2019-07-11
