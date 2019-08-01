@@ -436,6 +436,8 @@ int test19()
     error_code e1 = error_code(errno, generic_category());
 
     DYNAMIC_VERIFY(e1.value() == errno);
+
+    return 0;
 }
 
 int main(void)
