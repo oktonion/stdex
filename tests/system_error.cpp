@@ -429,6 +429,15 @@ int test18()
     return 0;
 }
 
+int test19()
+{
+    using namespace stdex;
+
+    error_code e1 = error_code(errno, generic_category());
+
+    DYNAMIC_VERIFY(e1.value() == errno);
+}
+
 int main(void)
 {
     using namespace stdex;
@@ -451,6 +460,7 @@ int main(void)
     RUN_TEST(test16);
     RUN_TEST(test17);
     RUN_TEST(test18);
+    RUN_TEST(test19);
 
     return 0;
 }
