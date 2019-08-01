@@ -443,7 +443,7 @@ namespace stdex
 		template<class _ErrorCondEnum>
 		explicit error_condition(const _ErrorCondEnum& val) _STDEX_NOEXCEPT_FUNCTION
 		{
-			STATIC_ASSERT(is_error_condition_enum<_ErrorCodeEnum>::value == true, value_should_be_error_condition_enum);
+			STATIC_ASSERT(is_error_condition_enum<_ErrorCondEnum>::value == true, value_should_be_error_condition_enum);
 			*this = val;
 		}
 
