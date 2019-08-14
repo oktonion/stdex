@@ -8,14 +8,14 @@ set "build_ok=1"
 
 for /f %%f in ('dir /b ".\tests\*.cpp"') do (
   echo "compiling test Borland C++ %%~nf"
-  bcc32 -X- -w-inl -w-ccc -tWC -tM -Q -n.\tests\obj\ -L.\stdex\lib\ -I%cd%\pthread\ -c ".\tests\%%f"
+  bcc32 -X- -w-inl -w-ccc -tWC -Q -n.\tests\obj\ -L.\stdex\lib\ -I%cd%\pthread\ -c ".\tests\%%f"
   IF ERRORLEVEL 1 (
     set "build_ok=0"
     exit /B 1
   )
 
   if "%build_ok%"=="1" (
-    bcc32 -X- -w-inl -w-ccc -tWC -tM -Q -L.\stdex\lib\ -lap -I%cd%\pthread\ -e.\tests\bin\%%~nf.exe stdex.lib cw32mt.lib ntdll.lib .\tests\obj\%%~nf.obj
+    bcc32 -X- -w-inl -w-ccc -tWC -Q -L.\stdex\lib\ -lap -I%cd%\pthread\ -e.\tests\bin\%%~nf.exe stdex.lib cw32mt.lib ntdll.lib .\tests\obj\%%~nf.obj
     IF ERRORLEVEL 1 (
       set "build_ok=0"
       exit /B 1
