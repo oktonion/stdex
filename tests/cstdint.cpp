@@ -207,6 +207,8 @@ struct integral_constant_type_64
 	#ifdef ULLONG_MAX
 		DYNAMIC_VERIFY((integral_constant_type_check(stdex::uint64_t(0), STDEX_UINT64_C(0)) == 0));
 	#endif
+
+		return 0;
 	}
 };
 
