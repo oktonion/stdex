@@ -244,12 +244,6 @@ namespace stdex
                 _dummy_output_iterator operator++ (int);
             };
 
-            struct _has_buggy_copy_n
-            {
-                static int _A[20];
-                static const bool value = sizeof(_copy_n_check(copy_n(_dummy_input_iterator(), sizeof(_A) / sizeof(int), _dummy_output_iterator()))) == sizeof(_iterator_yes_type);
-            };
-
             struct _has_buggy_copy_n1
             {
                 static const int _B[20];
@@ -269,22 +263,6 @@ namespace stdex
                 static const bool value = sizeof(_copy_n_check(copy_n(_B, sizeof(_A) / sizeof(int), _A))) == sizeof(_iterator_yes_type);
             };
         }
-
-        template<class _InputIt, class _OutputIt>
-        struct _copy_n_args_check :
-            _iterator_enable_if<
-                _iterator_cat_is<
-                    typename std::iterator_traits<_InputIt>::iterator_category,
-                    std::input_iterator_tag
-                >::value == bool(true) &&
-                _iterator_cat_is_valid<
-                    typename std::iterator_traits<_OutputIt>::iterator_category,
-                    std::output_iterator_tag
-                >::value == bool(true) &&
-                algorithm_detail::_has_buggy_copy_n::value == bool(true),
-                cstddef::size_t
-            >
-        { };
 
         template<class _InputIt, class _OutputT>
         struct _copy_n_input_it_check :
@@ -333,23 +311,9 @@ namespace stdex
         { };
     }
 
-    namespace algorithm_cpp11
-    {
-        // copy_n (C++11)
-        // copies a number of elements to a new location
-        template<class _InputIt, class _OutputIt>
-        inline
-        _OutputIt copy_n(_InputIt _first,
-            typename detail::_copy_n_args_check<_InputIt, _OutputIt>::type _count, _OutputIt _result)
-        {
-            if (_count > 0) {
-                *_result++ = *_first;
-                for (cstddef::size_t _i = 1; _i < _count; ++_i) {
-                    *_result++ = *++_first;
-                }
-            }
-            return _result;
-        }
+
+	namespace algorithm_cpp11
+	{
 
         // copy_n (C++11)
         // copies a number of elements to a new location
@@ -416,6 +380,56 @@ namespace stdex
             return _result;
         }
     }
+
+	namespace detail
+	{
+		namespace algorithm_detail
+		{
+			template<class _Tp>
+			_Tp declval();
+
+			template<class _InputIt, class _OutputIt>
+			struct _has_copy_n
+			{
+				static const bool value = sizeof(_copy_n_check(copy_n(declval<_InputIt>(), 0, declval<_OutputIt>()))) == sizeof(_iterator_yes_type);
+			};
+		}
+
+		template<class _InputIt, class _OutputIt>
+        struct _copy_n_args_check :
+            _iterator_enable_if<
+                _iterator_cat_is<
+                    typename std::iterator_traits<_InputIt>::iterator_category,
+                    std::input_iterator_tag
+                >::value == bool(true) &&
+                _iterator_cat_is_valid<
+                    typename std::iterator_traits<_OutputIt>::iterator_category,
+                    std::output_iterator_tag
+                >::value == bool(true) &&
+                algorithm_detail::_has_copy_n<_InputIt, _OutputIt>::value == bool(false),
+                cstddef::size_t
+            >
+        { };
+	}
+
+	namespace algorithm_cpp11
+    {
+        // copy_n (C++11)
+        // copies a number of elements to a new location
+        template<class _InputIt, class _OutputIt>
+        inline
+        _OutputIt copy_n(_InputIt _first,
+            typename detail::_copy_n_args_check<_InputIt, _OutputIt>::type _count, _OutputIt _result)
+        {
+            if (_count > 0) {
+                *_result++ = *_first;
+                for (cstddef::size_t _i = 1; _i < _count; ++_i) {
+                    *_result++ = *++_first;
+                }
+            }
+            return _result;
+        }
+	}
 
     // copy_n (C++11)
     // copies a number of elements to a new location
