@@ -91,7 +91,7 @@ namespace stdex
 				char _padding[8];
 			};
 
-			class _is_integral_constant_helper
+			class _is_integral_constant_std_impl_helper
 			{
 				class _type;
 			public:
@@ -99,12 +99,55 @@ namespace stdex
 				static cstdint_detail::_no_type check(_constructible_from_any);
 			};
 
-			template<class _Tp>
-			struct _is_integral_constant
+			class _is_integral_constant_hack_impl_helper
 			{
-				static const bool value = 
-					sizeof(_is_integral_constant_helper::check(_Tp(NULL))) == sizeof(cstdint_detail::_yes_type) &&
-					sizeof(_is_integral_constant_helper::check(_Tp(1))) == sizeof(cstdint_detail::_no_type);
+			public:
+				static cstdint_detail::_yes_type check1(int);
+				static cstdint_detail::_no_type check1(_constructible_from_any);
+
+				template<class _Tp>
+				static cstdint_detail::_yes_type check2(_Tp);
+				template<class>
+				static cstdint_detail::_no_type check2(_constructible_from_any);
+
+				static cstdint_detail::_yes_type check3(_constructible_from_any);
+				static cstdint_detail::_no_type check3(const float*);
+				static cstdint_detail::_no_type check3(const double*);
+				static cstdint_detail::_no_type check3(const long double*);
+			};
+
+			template<class _Tp>
+			struct _is_integral_constant_std_impl
+			{
+				static const bool value =
+					sizeof(_is_integral_constant_std_impl_helper::check(_Tp(NULL))) == sizeof(cstdint_detail::_yes_type) &&
+					sizeof(_is_integral_constant_std_impl_helper::check(_Tp(1))) == sizeof(cstdint_detail::_no_type);
+			};
+
+			template<class _Tp>
+			struct _is_integral_constant_hack_impl
+			{
+				static const bool value =
+					sizeof(_is_integral_constant_hack_impl_helper::check1(_Tp(NULL))) == sizeof(cstdint_detail::_yes_type) &&
+					sizeof(_is_integral_constant_hack_impl_helper::check2<_Tp>(NULL)) == sizeof(cstdint_detail::_yes_type) &&
+					sizeof(_is_integral_constant_hack_impl_helper::check3(static_cast<_Tp*>(NULL))) == sizeof(cstdint_detail::_yes_type);
+			};
+
+			template<class _Tp, bool /*does integral implementation conform standard?*/>
+			struct _is_integral_constant_impl :
+				_is_integral_constant_std_impl<_Tp>
+			{ };
+
+			template<class _Tp>
+			struct _is_integral_constant_impl<_Tp, false> :
+				_is_integral_constant_hack_impl<_Tp>
+			{ };
+
+			template<class _Tp>
+			struct _is_integral_constant:
+				_is_integral_constant_impl<_Tp, _is_integral_constant_std_impl<long>::value>
+			{
+
 			};
 
 			template<class _Tp>
@@ -210,11 +253,18 @@ namespace stdex
 
 			template<int _Rank> 
 			struct _sized_integer_map:
-				_sized_integer_map_helper<_Rank, cstdint_detail::_is_integral_constant<typename _sized_integer_map_impl<_Rank>::signed_type>::value>
+				_sized_integer_map_helper<_Rank, cstdint_detail::_is_integral_constant<typename _sized_integer_map_impl<_Rank>::signed_type>::value == true>
 			{ };
 
+			template<>
+			struct _sized_integer_map<_sized_integer_max_rank> :
+				_sized_integer_map_impl<_sized_integer_max_rank>
+			{ };
 
 			template<int _BitsCount, int _RankIt = 0, int _Found = sizeof(_sized_integer_map<_RankIt>::size)>
+			struct _exact_sized_integer_step;
+
+			template<int _BitsCount, int _RankIt, int _Found>
 			struct _exact_sized_integer_step:
 				_exact_sized_integer_step<_BitsCount, _RankIt + 1, sizeof(_sized_integer_map<_RankIt + 1>::size)>{};
 
@@ -237,6 +287,9 @@ namespace stdex
 			};
 
 			template<int _BitsCount, int _RankIt = 0, int _FoundRank = 0>
+			struct _least_sized_integer_step;
+
+			template<int _BitsCount, int _RankIt, int _FoundRank>
 			struct _least_sized_integer_step:
 				_least_sized_integer_step<_BitsCount, _RankIt + 1,
 					_least_sized_integer_step_expr<_BitsCount, _RankIt, _FoundRank>::value>{};
@@ -258,6 +311,9 @@ namespace stdex
 			};
 
 			template<int _RankIt = 0, int _FoundRank = 0>
+			struct _max_sized_integer_step;
+
+			template<int _RankIt, int _FoundRank>
 			struct _max_sized_integer_step:
 				_max_sized_integer_step<_RankIt + 1, 
 					_max_sized_integer_step_expr<_RankIt, _FoundRank>::value>{};
@@ -278,6 +334,10 @@ namespace stdex
 			static const _Signed max_value = ((_Signed(1) << (_Size - 2)) + ((_Signed(1) << (_Size - 2)) - _Signed(1)));
 		};
 
+		template<int _Size>
+		struct _sized_integer_max_impl<void, _Size>
+		{ };
+
 		template<class _Signed, int _Size>
 		struct _sized_integer_min_impl
 		{
@@ -288,11 +348,20 @@ namespace stdex
 		#endif
 		};
 
+		template<int _Size>
+		struct _sized_integer_min_impl<void, _Size>
+		{ };
+
 		template<class _Unsigned, int _Size>
 		struct _sized_integer_umax_impl
 		{
-			static const _Unsigned umax_value = (((_Unsigned(1) << (_Size - 1)) - 1) * _Unsigned(2) + _Unsigned(1));
+			char _sized_integer_umax_size_is_invalid_assert[_Size > 0 ? 1 : (sizeof(_Unsigned) / sizeof(_Unsigned) - 3)]; // should never ever happen!
+			static const _Unsigned umax_value = _Size > 0 ? (((_Unsigned(1) << (_Size - 1)) - 1) * _Unsigned(2) + _Unsigned(1)) : 0;
 		};
+
+		template<int _Size>
+		struct _sized_integer_umax_impl<void, _Size>
+		{ };
 
 		template<class _Signed, class _Unsigned, int _Size>
 		struct _max_sized_integer_min_max_impl:

@@ -360,6 +360,7 @@ namespace stdex
 		{
 			template<class _Tp> struct _is_integral_cstdint_type: public true_type {};
 			template<> struct _is_integral_cstdint_type<cstdint_detail::_cstdint_invalid_type>: public false_type {};
+			template<> struct _is_integral_cstdint_type<void>: public false_type {};
 
 			enum {_is_integral_rank = __LINE__};
 			template <int, class> struct _is_integral_map : public false_type {};
