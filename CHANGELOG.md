@@ -4,13 +4,24 @@ All notable changes to stdex library project will be documented in this file.
 
 visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library
 
-## [0.2.3] - 2019-xx-xx
+## [0.2.3] - 2019-12-09
 
 ### Added
 
 - static asserts in constructors for `<system_error>` to forbid invalid constructor calls
+- `<algorithm>` header:
+- - SFINAE checks for `std::copy_n` existence
 
 ### Changed
+
+- `<cstdint>` header:
+- - hack for integral constant detection for Visual Studio 2019
+- Borland Builder build script changed (removed extra cmd line arguments)
+
+### Fixed
+
+- `<string>` header:
+- - removed warnings for signed/unsigned casts in `itol`, `itoul` etc.
 
 ## [0.2.2] - 2019-07-11
 
