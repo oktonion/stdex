@@ -9,7 +9,7 @@ set INCLUDE=%INCLUDE%;%cd%\pthread;
 set build_opt="-Ox"
 
 if ["%~1"]==["debug"] (
-  set "build_opt="
+  set "build_opt=-DEBUG -D _DEBUG"
   echo "debug build"
 )
 
