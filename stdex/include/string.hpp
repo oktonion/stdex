@@ -381,7 +381,7 @@ namespace stdex
 				* Set any if any `digits' consumed; make it negative to indicate
 				* overflow.
 				*/
-				cutoff = neg ? -(string_detail::_unsigned_long_long_type) LLONG_MIN : LLONG_MAX;
+				cutoff = neg ? LLONG_MIN : LLONG_MAX;
 				cutlim = cutoff % (string_detail::_unsigned_long_long_type) base;
 				cutoff /= (string_detail::_unsigned_long_long_type) base;
 				for (acc = 0, any = 0;; _c = *_s++) {
@@ -406,7 +406,7 @@ namespace stdex
 					errno = ERANGE;
 				}
 				else if (neg)
-					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc); // generates WC4146 on Visual Studio and it's a bug probably (idk how to fix it yet)
+					acc = static_cast<string_detail::_unsigned_long_long_type>(static_cast<string_detail::_unsigned_long_long_type >(0) - acc);
 				if (endptr != 0)
 					*endptr = (char *) (any ? _s - 1 : nptr);
 				return (acc);
@@ -449,11 +449,15 @@ namespace stdex
 				string_detail::_unsigned_long_long_type cutoff;
 				int neg = 0, any, cutlim;
 
+                (void)&acc; (void)&cutoff;
+
 				/*
 				* Skip white space and pick up leading +/- sign if any.
 				* If base is 0, allow 0x for hex and 0 for octal, else
 				* assume decimal; if base is already 16, allow 0x.
 				*/
+                _s = nptr;
+
 				do {
 					_c = *_s++;
 				} while (isspace(_c));
@@ -489,8 +493,8 @@ namespace stdex
 				* Set any if any `digits' consumed; make it negative to indicate
 				* overflow.
 				*/
-				cutoff = neg ? -(string_detail::_unsigned_long_long_type) LLONG_MIN : LLONG_MAX;
-				cutlim = cutoff % (string_detail::_unsigned_long_long_type) base;
+				cutoff = neg ? LLONG_MIN : LLONG_MAX;
+				cutlim = (int)(cutoff % base);
 				cutoff /= (string_detail::_unsigned_long_long_type) base;
 				for (acc = 0, any = 0;; _c = *_s++) {
 					if (isdigit(_c))
@@ -514,7 +518,7 @@ namespace stdex
 					errno = ERANGE;
 				}
 				else if (neg)
-					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc); // generates WC4146 on Visual Studio and it's a bug probably (idk how to fix it yet)
+					acc = static_cast<string_detail::_unsigned_long_long_type>(static_cast<string_detail::_unsigned_long_long_type >(0) - acc);
 				if (endptr != 0)
 					*endptr = (wchar_t *) (any ? _s - 1 : nptr);
 				return (acc);
