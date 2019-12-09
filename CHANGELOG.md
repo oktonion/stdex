@@ -9,8 +9,19 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 ### Added
 
 - static asserts in constructors for `<system_error>` to forbid invalid constructor calls
+- `<algorithm>` header:
+- - SFINAE checks for `std::copy_n` existence
 
 ### Changed
+
+- `<cstdint>` header:
+- - hack for integral constant detection for Visual Studio 2019
+- Borland Builder build script changed
+
+### Fixed
+
+- `<string>` header:
+- - removed warnings for signed/unsigned casts in `itol` etc.
 
 ## [0.2.2] - 2019-07-11
 
