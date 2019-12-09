@@ -192,6 +192,7 @@ example script build for Windows (with Visual Studio 2008 and Windows Kit 8.1 in
 ```bat
 call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\Tools\vsvars32.bat"
 set LIB=%LIB%C:\Program Files (x86)\Windows Kits\8.1\Lib\winv6.3\um\x86\;
+set INCLUDE=%INCLUDE%;%cd%\pthread;
 cl -EHsc -Fo.\obj\main.obj -c ".\main.cpp"
 cl .\obj\main.obj stdex.lib ntdll.lib -Fe.\bin\main.exe -link -LIBPATH:.\stdex\lib
 ```
@@ -217,4 +218,4 @@ COMPILER=clang++
 $COMPILER main.cpp -L./stdex/lib/ -lstdex -lpthread -o "./bin/main"
 ```
 
-visit https://github.com/oktonion/stdex for the latest version of stdex library
+visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library

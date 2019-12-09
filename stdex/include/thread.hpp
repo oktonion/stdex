@@ -1445,10 +1445,12 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 
 
 
-
-inline ::std::ostream& operator<<(::std::ostream &out, const stdex::thread::id &id)
+namespace
 {
-	return id.print(out);
+	inline ::std::ostream& operator<<(::std::ostream &out, const stdex::thread::id &id)
+	{
+		return id.print(out);
+	}
 }
 
 namespace std

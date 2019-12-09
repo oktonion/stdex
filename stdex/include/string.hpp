@@ -381,7 +381,7 @@ namespace stdex
 				* Set any if any `digits' consumed; make it negative to indicate
 				* overflow.
 				*/
-				cutoff = neg ? -(string_detail::_unsigned_long_long_type) LLONG_MIN : LLONG_MAX;
+				cutoff = neg ? LLONG_MIN : LLONG_MAX;
 				cutlim = cutoff % (string_detail::_unsigned_long_long_type) base;
 				cutoff /= (string_detail::_unsigned_long_long_type) base;
 				for (acc = 0, any = 0;; _c = *_s++) {
@@ -406,7 +406,7 @@ namespace stdex
 					errno = ERANGE;
 				}
 				else if (neg)
-					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc); // generates WC4146 on Visual Studio and it's a bug probably (idk how to fix it yet)
+					acc = static_cast<string_detail::_unsigned_long_long_type>(static_cast<string_detail::_unsigned_long_long_type >(0) - acc);
 				if (endptr != 0)
 					*endptr = (char *) (any ? _s - 1 : nptr);
 				return (acc);
@@ -449,11 +449,15 @@ namespace stdex
 				string_detail::_unsigned_long_long_type cutoff;
 				int neg = 0, any, cutlim;
 
+                (void)&acc; (void)&cutoff;
+
 				/*
 				* Skip white space and pick up leading +/- sign if any.
 				* If base is 0, allow 0x for hex and 0 for octal, else
 				* assume decimal; if base is already 16, allow 0x.
 				*/
+                _s = nptr;
+
 				do {
 					_c = *_s++;
 				} while (isspace(_c));
@@ -489,8 +493,8 @@ namespace stdex
 				* Set any if any `digits' consumed; make it negative to indicate
 				* overflow.
 				*/
-				cutoff = neg ? -(string_detail::_unsigned_long_long_type) LLONG_MIN : LLONG_MAX;
-				cutlim = cutoff % (string_detail::_unsigned_long_long_type) base;
+				cutoff = neg ? LLONG_MIN : LLONG_MAX;
+				cutlim = (int)(cutoff % base);
 				cutoff /= (string_detail::_unsigned_long_long_type) base;
 				for (acc = 0, any = 0;; _c = *_s++) {
 					if (isdigit(_c))
@@ -514,7 +518,7 @@ namespace stdex
 					errno = ERANGE;
 				}
 				else if (neg)
-					acc = static_cast<string_detail::_unsigned_long_long_type >(-acc); // generates WC4146 on Visual Studio and it's a bug probably (idk how to fix it yet)
+					acc = static_cast<string_detail::_unsigned_long_long_type>(static_cast<string_detail::_unsigned_long_long_type >(0) - acc);
 				if (endptr != 0)
 					*endptr = (wchar_t *) (any ? _s - 1 : nptr);
 				return (acc);
@@ -801,12 +805,13 @@ namespace stdex
 			int last_errno = errno;
 			errno = 0;
 			char *endptr = 0;
-			typename _str_to_integral::type _value = _str_to_integral::call(_str, &endptr, base);
+			typedef typename _str_to_integral::type large_value_type;
+			large_value_type _value = _str_to_integral::call(_str, &endptr, base);
 
 
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
-			else if (_value > std::numeric_limits<_Tp>::max() || _value < std::numeric_limits<_Tp>::min())
+			else if (_value > static_cast<large_value_type>(std::numeric_limits<_Tp>::max()) || _value < static_cast<large_value_type>(std::numeric_limits<_Tp>::min()))
 			{
 				_value = std::numeric_limits<_Tp>::max();
 				num_s_end = 0;
@@ -828,11 +833,12 @@ namespace stdex
 			int last_errno = errno;
 			errno = 0;
 			wchar_t *endptr = 0;
-			typename _str_to_integral::type _value = _str_to_integral::call(_str, &endptr, base);
+			typedef typename _str_to_integral::type large_value_type;
+			large_value_type _value = _str_to_integral::call(_str, &endptr, base);
 
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
-			else if (_value > std::numeric_limits<_Tp>::max() || _value < std::numeric_limits<_Tp>::min())
+			else if (_value > static_cast<large_value_type>(std::numeric_limits<_Tp>::max()) || _value < static_cast<large_value_type>(std::numeric_limits<_Tp>::min()))
 			{
 				_value = std::numeric_limits<_Tp>::max();
 				num_s_end = 0;
@@ -855,11 +861,12 @@ namespace stdex
 			int last_errno = errno;
 			errno = 0;
 			char *endptr = 0;
-			typename _str_to_integral::type _value = _str_to_integral::call(_str, &endptr, base);
+            typedef typename _str_to_integral::type large_value_type;
+			large_value_type _value = _str_to_integral::call(_str, &endptr, base);
 
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
-			else if (_value > std::numeric_limits<_Tp>::max() || _value < std::numeric_limits<_Tp>::min())
+			else if (_value > static_cast<large_value_type>(std::numeric_limits<_Tp>::max()) || _value < static_cast<large_value_type>(std::numeric_limits<_Tp>::min()))
 			{
 				_value = std::numeric_limits<_Tp>::max();
 				num_s_end = 0;
@@ -881,11 +888,12 @@ namespace stdex
 			int last_errno = errno;
 			errno = 0;
 			wchar_t *endptr = 0;
-			typename _str_to_integral::type _value = _str_to_integral::call(_str, &endptr, base);
+            typedef typename _str_to_integral::type large_value_type;
+			large_value_type _value = _str_to_integral::call(_str, &endptr, base);
 
 			if (_str_to_integral::check(_value) && errno == ERANGE)
 				num_s_end = 0;
-			else if (_value > std::numeric_limits<_Tp>::max() || _value < std::numeric_limits<_Tp>::min())
+			else if (_value > static_cast<large_value_type>(std::numeric_limits<_Tp>::max()) || _value < static_cast<large_value_type>(std::numeric_limits<_Tp>::min()))
 			{
 				_value = std::numeric_limits<_Tp>::max();
 				num_s_end = 0;
@@ -916,7 +924,7 @@ namespace stdex
 			if (errno == ERANGE)
 #endif
 				num_s_end = 0;
-			else if (_value > std::numeric_limits<_Tp>::max() || _value < -std::numeric_limits<_Tp>::max())
+			else if (_value > static_cast<double>(std::numeric_limits<_Tp>::max()) || _value < static_cast<double>(-std::numeric_limits<_Tp>::max()))
 			{
 				_value = std::numeric_limits<_Tp>::max();
 				num_s_end = 0;
@@ -946,7 +954,7 @@ namespace stdex
 			if (errno == ERANGE)
 #endif
 				num_s_end = 0;
-			else if (_value > std::numeric_limits<_Tp>::max() || _value < -std::numeric_limits<_Tp>::max())
+			else if (_value > static_cast<double>(std::numeric_limits<_Tp>::max()) || _value < static_cast<double>(-std::numeric_limits<_Tp>::max()))
 			{
 				_value = std::numeric_limits<_Tp>::max();
 				num_s_end = 0;
@@ -1687,11 +1695,11 @@ namespace stdex
 	}
 
 #if defined(LLONG_MAX) || defined(LLONG_MIN)
-	inline int64_t stoll(const string &_str, cstddef::size_t *idx = 0, int base = 10)
+	inline long long stoll(const string &_str, cstddef::size_t *idx = 0, int base = 10)
 	{
 		const char *_eptr = _str.c_str(), *_ptr = _eptr;
 		
-		int64_t _value = detail::_cs_to_integral_ll<int64_t>(_ptr, _eptr, base);
+		long long _value = detail::_cs_to_integral_ll<long long>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stoll argument"));
@@ -1704,11 +1712,11 @@ namespace stdex
 		return (_value);
 	}
 
-	inline int64_t stoll(const wstring &_str, cstddef::size_t *idx = 0, int base = 10)
+	inline long long stoll(const wstring &_str, cstddef::size_t *idx = 0, int base = 10)
 	{
 		const wchar_t *_eptr = _str.c_str(), *_ptr = _eptr;
 
-		int64_t _value = detail::_cs_to_integral_ll<int64_t>(_ptr, _eptr, base);
+		long long _value = detail::_cs_to_integral_ll<long long>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid wide stdex::stoll argument"));
@@ -1721,11 +1729,11 @@ namespace stdex
 		return (_value);
 	}
 
-	inline uint64_t stoull(const string &_str, cstddef::size_t *idx = 0, int base = 10)
+	inline unsigned long long stoull(const string &_str, cstddef::size_t *idx = 0, int base = 10)
 	{
 		const char *_eptr = _str.c_str(), *_ptr = _eptr;
 		
-		uint64_t _value = detail::_cs_to_integral_ll<uint64_t>(_ptr, _eptr, base);
+		unsigned long long _value = detail::_cs_to_integral_ll<unsigned long long>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid stdex::stoull argument"));
@@ -1738,11 +1746,11 @@ namespace stdex
 		return (_value);
 	}
 
-	inline uint64_t stoull(const wstring &_str, cstddef::size_t *idx = 0, int base = 10)
+	inline unsigned long long stoull(const wstring &_str, cstddef::size_t *idx = 0, int base = 10)
 	{
 		const wchar_t *_eptr = _str.c_str(), *_ptr = _eptr;
 
-		uint64_t _value = detail::_cs_to_integral_ll<uint64_t>(_ptr, _eptr, base);
+		unsigned long long _value = detail::_cs_to_integral_ll<unsigned long long>(_ptr, _eptr, base);
 
 		if (_ptr == _eptr)
 			throw(std::invalid_argument("invalid wide stdex::stoull argument"));

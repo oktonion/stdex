@@ -358,8 +358,11 @@ namespace stdex
 
 		namespace type_traits_detail
 		{
-			template<class _Tp> struct _is_integral_cstdint_type: public true_type {};
+			template<class _Tp> struct _is_integral_cstdint_type_helper: public true_type {};
+			template<> struct _is_integral_cstdint_type_helper<void>: public false_type {};
+			template<class _Tp> struct _is_integral_cstdint_type: _is_integral_cstdint_type_helper<_Tp> {};
 			template<> struct _is_integral_cstdint_type<cstdint_detail::_cstdint_invalid_type>: public false_type {};
+			
 
 			enum {_is_integral_rank = __LINE__};
 			template <int, class> struct _is_integral_map : public false_type {};
@@ -705,7 +708,12 @@ namespace stdex
 					sizeof(_Tp)
 				>::value);
 		#endif
-			typedef integral_constant<std::size_t, std::size_t(_alignment_of_impl::value)> type;
+			typedef 
+			typename
+			integral_constant<
+				std::size_t, 
+				(const std::size_t)(_alignment_of_impl::value)
+			>::type type;
 
 		private:
 			typedef intern::type_traits_asserts check;
@@ -1367,8 +1375,8 @@ namespace stdex
 
 		template<class _Tp>
 		static _yes_type _is_convertable_to_int_tester(int);
-		template<class _Tp>
-		static _no_type _is_convertable_to_int_tester(_constructable_from_type_dummy<_Tp>);
+		//template<class _Tp>
+		//static _no_type _is_convertable_to_int_tester(_constructable_from_type_dummy<_Tp>);
 		template<class _Tp>
 		static _no_type _is_convertable_to_int_tester(...);
 

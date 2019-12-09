@@ -1,3 +1,5 @@
+#!/bin/sh
+
 $COMPILER --version
 
 mkdir ./obj
