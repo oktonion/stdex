@@ -17,20 +17,20 @@
 
 namespace stdex
 {
-	using std::basic_istringstream;
-	using std::basic_ostringstream;
-	using std::basic_stringstream;
-	using std::basic_stringbuf;
+    using std::basic_istringstream;
+    using std::basic_ostringstream;
+    using std::basic_stringstream;
+    using std::basic_stringbuf;
 
-	using std::istringstream;
-	using std::ostringstream;
-	using std::stringstream;
-	using std::stringbuf;
+    using std::istringstream;
+    using std::ostringstream;
+    using std::stringstream;
+    using std::stringbuf;
 
-	using std::wistringstream;
-	using std::wostringstream;
-	using std::wstringstream;
-	using std::wstringbuf;
+    using std::wistringstream;
+    using std::wostringstream;
+    using std::wstringstream;
+    using std::wstringbuf;
 }
 #else
 // std includes
@@ -38,20 +38,20 @@ namespace stdex
 
 namespace stdex
 {
-	//typedef basic_istringstream;
-	//typedef basic_ostringstream;
-	//typedef basic_stringstream;
-	//typedef basic_stringbuf;
+    //typedef basic_istringstream;
+    //typedef basic_ostringstream;
+    //typedef basic_stringstream;
+    //typedef basic_stringbuf;
 
-	//typedef istringstream;
-	//typedef ostringstream;
-	typedef std::strstream stringstream;
-	//typedef stringbuf;
+    //typedef istringstream;
+    //typedef ostringstream;
+    typedef std::strstream stringstream;
+    //typedef stringbuf;
 
-	//typedef wistringstream;
-	//typedef wostringstream;
-	typedef stringstream wstringstream; // temporarily, need to be redone
-	//typedef wstringbuf;
+    //typedef wistringstream;
+    //typedef wostringstream;
+    typedef stringstream wstringstream; // temporarily, need to be redone
+    //typedef wstringbuf;
 }
 
 
