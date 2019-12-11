@@ -16,7 +16,7 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 ### Fixed
 
-- some serious changes
+- warnings for possible overflow in `<ratio>`
 
 ## [0.2.3] - 2019-12-09
 
