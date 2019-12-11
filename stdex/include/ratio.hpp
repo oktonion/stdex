@@ -490,16 +490,17 @@ namespace stdex
 			_ratio_predefined_impl<_MaxBitsN - 1>
 		{ };
 
-		#define _STDEX_10_POW_01 STDEX_UINTMAX_C(10)
-		#define _STDEX_10_POW_02 (_STDEX_10_POW_01 * _STDEX_10_POW_01)
-		#define _STDEX_10_POW_03 (_STDEX_10_POW_01 * _STDEX_10_POW_02)
-		#define _STDEX_10_POW_06 (_STDEX_10_POW_03 * _STDEX_10_POW_03)
-		#define _STDEX_10_POW_09 (_STDEX_10_POW_03 * _STDEX_10_POW_06)
-		#define _STDEX_10_POW_12 (_STDEX_10_POW_06 * _STDEX_10_POW_06)
-		#define _STDEX_10_POW_15 (_STDEX_10_POW_06 * _STDEX_10_POW_09)
-		#define _STDEX_10_POW_18 (_STDEX_10_POW_09 * _STDEX_10_POW_09)
-		#define _STDEX_10_POW_21 (_STDEX_10_POW_09 * _STDEX_10_POW_12)
-		#define _STDEX_10_POW_24 (_STDEX_10_POW_12 * _STDEX_10_POW_12)
+		template<bool>
+		struct _10_pow_01
+		{
+			static const stdex::uintmax_t value = STDEX_UINTMAX_C(10);
+		};
+
+		template<>
+		struct _10_pow_01<true>
+		{
+			static const stdex::uintmax_t value = STDEX_UINTMAX_C(1);
+		};
 
 		enum {
 			_10_pow_01_bit_n = 4,
@@ -513,6 +514,36 @@ namespace stdex
 			_10_pow_21_bit_n = 70,
 			_10_pow_24_bit_n = 80
 		};
+
+		#define _STDEX_10_POW(cond) _10_pow_01<(cond)>::value
+		#define _STDEX_INTMAX_BIT_COUNT (sizeof(stdex::intmax_t) * CHAR_BIT)
+		#define _STDEX_10_POW_IMPL(pow_n) _STDEX_10_POW(_10_pow_##pow_n##_bit_n > _STDEX_INTMAX_BIT_COUNT)
+		#define _STDEX_10_POW_01_IMPL(pow_n) (_STDEX_10_POW_IMPL(pow_n))
+		#define _STDEX_10_POW_02_IMPL(pow_n) (_STDEX_10_POW_01_IMPL(pow_n) * _STDEX_10_POW_01_IMPL(pow_n))
+		#define _STDEX_10_POW_03_IMPL(pow_n) (_STDEX_10_POW_01_IMPL(pow_n) * _STDEX_10_POW_02_IMPL(pow_n))
+		#define _STDEX_10_POW_06_IMPL(pow_n) (_STDEX_10_POW_03_IMPL(pow_n) * _STDEX_10_POW_03_IMPL(pow_n))
+		#define _STDEX_10_POW_09_IMPL(pow_n) (_STDEX_10_POW_03_IMPL(pow_n) * _STDEX_10_POW_06_IMPL(pow_n))
+		#define _STDEX_10_POW_12_IMPL(pow_n) (_STDEX_10_POW_06_IMPL(pow_n) * _STDEX_10_POW_06_IMPL(pow_n))
+		#define _STDEX_10_POW_15_IMPL(pow_n) (_STDEX_10_POW_06_IMPL(pow_n) * _STDEX_10_POW_09_IMPL(pow_n))
+		#define _STDEX_10_POW_18_IMPL(pow_n) (_STDEX_10_POW_09_IMPL(pow_n) * _STDEX_10_POW_09_IMPL(pow_n))
+		#define _STDEX_10_POW_21_IMPL(pow_n) (_STDEX_10_POW_09_IMPL(pow_n) * _STDEX_10_POW_12_IMPL(pow_n))
+		#define _STDEX_10_POW_24_IMPL(pow_n) (_STDEX_10_POW_12_IMPL(pow_n) * _STDEX_10_POW_12_IMPL(pow_n))
+
+		#define _STDEX_10_POW_01 _STDEX_10_POW_01_IMPL(01)
+		#define _STDEX_10_POW_02 _STDEX_10_POW_02_IMPL(02)
+		#define _STDEX_10_POW_03 _STDEX_10_POW_03_IMPL(03)
+		#define _STDEX_10_POW_06 _STDEX_10_POW_06_IMPL(06)
+		#define _STDEX_10_POW_09 _STDEX_10_POW_09_IMPL(09)
+		#define _STDEX_10_POW_12 _STDEX_10_POW_12_IMPL(12)
+		#define _STDEX_10_POW_15 _STDEX_10_POW_15_IMPL(15)
+		#define _STDEX_10_POW_18 _STDEX_10_POW_18_IMPL(18)
+		#define _STDEX_10_POW_21 _STDEX_10_POW_21_IMPL(21)
+		#define _STDEX_10_POW_24 _STDEX_10_POW_24_IMPL(24)
+
+		
+
+		template<>
+		struct _ratio_predefined_impl<0>;
 
 		template<>
 		struct _ratio_predefined_impl<_10_pow_01_bit_n>;
@@ -607,6 +638,21 @@ namespace stdex
 			typedef ratio<STDEX_INTMAX_C(1), static_cast<stdex::intmax_t>(_STDEX_10_POW_24)> yocto;
 			typedef ratio<static_cast<stdex::intmax_t>(_STDEX_10_POW_24), STDEX_INTMAX_C(1)> yotta;
 		};
+
+		#undef _STDEX_10_POW
+		#undef _STDEX_INTMAX_BIT_COUNT
+		#undef _STDEX_10_POW_IMPL
+
+		#undef _STDEX_10_POW_01_IMPL
+		#undef _STDEX_10_POW_02_IMPL
+		#undef _STDEX_10_POW_03_IMPL
+		#undef _STDEX_10_POW_06_IMPL
+		#undef _STDEX_10_POW_09_IMPL
+		#undef _STDEX_10_POW_12_IMPL
+		#undef _STDEX_10_POW_15_IMPL
+		#undef _STDEX_10_POW_18_IMPL
+		#undef _STDEX_10_POW_21_IMPL
+		#undef _STDEX_10_POW_24_IMPL
 
 		#undef _STDEX_10_POW_01
 		#undef _STDEX_10_POW_02
