@@ -312,8 +312,8 @@ namespace stdex
     }
 
 
-	namespace algorithm_cpp11
-	{
+    namespace algorithm_cpp11
+    {
 
         // copy_n (C++11)
         // copies a number of elements to a new location
@@ -381,21 +381,21 @@ namespace stdex
         }
     }
 
-	namespace detail
-	{
-		namespace algorithm_detail
-		{
-			template<class _Tp>
-			_Tp declval();
+    namespace detail
+    {
+        namespace algorithm_detail
+        {
+            template<class _Tp>
+            _Tp declval();
 
-			template<class _InputIt, class _OutputIt>
-			struct _has_copy_n
-			{
-				static const bool value = sizeof(_copy_n_check(copy_n(declval<_InputIt>(), 0, declval<_OutputIt>()))) == sizeof(_iterator_yes_type);
-			};
-		}
+            template<class _InputIt, class _OutputIt>
+            struct _has_copy_n
+            {
+                static const bool value = sizeof(_copy_n_check(copy_n(declval<_InputIt>(), 0, declval<_OutputIt>()))) == sizeof(_iterator_yes_type);
+            };
+        }
 
-		template<class _InputIt, class _OutputIt>
+        template<class _InputIt, class _OutputIt>
         struct _copy_n_args_check :
             _iterator_enable_if<
                 _iterator_cat_is<
@@ -410,9 +410,9 @@ namespace stdex
                 cstddef::size_t
             >
         { };
-	}
+    }
 
-	namespace algorithm_cpp11
+    namespace algorithm_cpp11
     {
         // copy_n (C++11)
         // copies a number of elements to a new location
@@ -429,7 +429,7 @@ namespace stdex
             }
             return _result;
         }
-	}
+    }
 
     // copy_n (C++11)
     // copies a number of elements to a new location
