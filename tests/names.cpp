@@ -197,6 +197,10 @@
 #undef ptr
 #endif
 
+#ifdef __QNX__
+#undef x
+#endif
+
 #include "../stdex/include/core.h"
 #include "../stdex/include/algorithm.hpp"
 #include "../stdex/include/chrono.hpp"
