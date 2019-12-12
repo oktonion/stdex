@@ -191,7 +191,7 @@ namespace stdex
             typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1 < (_safe_multiply::_c / stdex::uintmax_t(2))) >::
                 overflow_in_multiplication_assert_failed
             check2; // if you are there means overflow in safe template multiplication occurred
-            typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_b0 * _safe_multiply::_a0 <= STDEX_INTMAX_MAX) >::
+            typedef typename check::overflow_in_multiplication_assert< ( _safe_multiply::_b0 * _safe_multiply::_a0 <= STDEX_UINTMAX_C(STDEX_INTMAX_MAX) ) >::
                 overflow_in_multiplication_assert_failed
             check3; // if you are there means overflow in safe template multiplication occurred
             typedef typename check::overflow_in_multiplication_assert< ((_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1) * _safe_multiply::_c <= STDEX_INTMAX_MAX - _safe_multiply::_b0 * _safe_multiply::_a0) >::
