@@ -3,7 +3,7 @@ mkdir ./tests/bin
 build_ok=1
 tests_failed="failed tests:"
 exclude_warn=""
-COMPILER=qcc
+COMPILER=g++
 
 if [[ $COMPILER = *"clang"* ]]; then
   exclude_warn="-Wno-c++11-long-long -Wno-non-literal-null-conversion"
