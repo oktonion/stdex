@@ -12,11 +12,13 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 ### Changed
 
-- some serious changes
+- tabs to spaces in all header files
+- C++ 98 standard support detection for GCC
 
 ### Fixed
 
-- some serious changes
+- warnings for possible overflow in `<ratio>`
+- warnings for using deprecated header `<strstream>`
 
 ## [0.2.3] - 2019-12-09
 
