@@ -12,11 +12,11 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 ### Changed
 
-- some serious changes
+- tabs to spaces in all header files
 
 ### Fixed
 
-- some serious changes
+- warnings for possible overflow in `<ratio>`
 
 ## [0.2.3] - 2019-12-09
 
