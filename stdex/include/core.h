@@ -24,6 +24,7 @@
 
     #define _STDEX_NATIVE_CPP11_SUPPORT
     #define _STDEX_NATIVE_CPP11_TYPES_SUPPORT
+    #define _STDEX_NATIVE_CPP_98_SUPPORT
 
 #endif
 
@@ -108,12 +109,20 @@
 #endif
 
 // C++ 98 trick:
-#if ((__cplusplus >= 199711L) && ((defined(__INTEL_COMPILER) || defined(__clang__) || (defined(__GNUC__) && ((__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4))))))
-
-    #ifndef _STDEX_NATIVE_CPP_98_SUPPORT
-        #define _STDEX_NATIVE_CPP_98_SUPPORT
+#if (__cplusplus >= 199711L)
+    #if (defined(__INTEL_COMPILER) ||  defined(__clang__))
+        #ifndef _STDEX_NATIVE_CPP_98_SUPPORT
+            #define _STDEX_NATIVE_CPP_98_SUPPORT
+        #endif
     #endif
+#endif
 
+#if defined(__GNUC__)
+    #if (__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 4)
+        #ifndef _STDEX_NATIVE_CPP_98_SUPPORT
+            #define _STDEX_NATIVE_CPP_98_SUPPORT  
+        #endif
+    #endif
 #endif
 
 #if !defined(forever)
