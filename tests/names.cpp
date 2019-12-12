@@ -1,5 +1,7 @@
 
+#ifndef __GNUC__ // GCC have some serious problems with inluding <pthread.h> in QNX
 #include <pthread.h> // pthread for Windows sadly doesn't satisfy this checks
+#endif
 
 #ifdef __BORLANDC__ // borland c++ uses ptr, v in <new.h> and n in <_iterator.h>, etc.
     #include <iterator> // + <new.h>
@@ -199,6 +201,7 @@
 
 #ifdef __QNX__
 #undef x
+#undef h
 #endif
 
 #include "../stdex/include/core.h"
