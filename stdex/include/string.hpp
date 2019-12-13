@@ -174,6 +174,28 @@ namespace stdex
                 errno = 0;
 
                 long int value = strtol(str, endptr, base);
+                
+                // for some reason (errno thread-safety issue in pre-C++11 perhaps) 
+                // some compilers do not set errno to ERANGE if 
+                // str points to value too big for long int
+                // so we have to manualy check this case to disinguish between strings
+                // like LONG_MAX_STRING and SOME_REALLY_BIG_NUMBER_STRING
+                if(errno == 0 && _str_to_integral_chooser_impl::check(value)) 
+                {
+                    ptrdiff_t length = 
+                        endptr ? (*endptr - str) : (str - str + strlen(str));
+                    char *positive_str = new char[length + 1];
+                    if(str[0] == '-')
+                        memcpy(positive_str, str + 1, (length - 1) * sizeof(char));
+                    else
+                        memcpy(positive_str, str, length * sizeof(char));
+                    positive_str[length] = 0;
+                    
+                    unsigned long int uvalue = strtoul(positive_str, NULL, base);
+                    delete positive_str;
+                    if(errno == 0 && uvalue > static_cast<unsigned long int>(numeric_limits<long int>::max()))
+                        errno = ERANGE;// using errno is bad - m'kay?
+                }
 
                 if (errno && !value && endptr)
                 {
@@ -198,6 +220,28 @@ namespace stdex
                 errno = 0;
 
                 long int value = wcstol(str, endptr, base);
+
+                // for some reason (errno thread-safety issue in pre-C++11 perhaps) 
+                // some compilers do not set errno to ERANGE if 
+                // str points to value too big for long int
+                // so we have to manualy check this case to disinguish between strings
+                // like LONG_MAX_STRING and SOME_REALLY_BIG_NUMBER_STRING
+                if(errno == 0 && _str_to_integral_chooser_impl::check(value)) 
+                {
+                    ptrdiff_t length = 
+                        endptr ? (*endptr - str) : (str - str + wcslen(str));
+                    wchar_t *positive_str = new wchar_t[length + 1];
+                    if(str[0] == '-')
+                        memcpy(positive_str, str + 1, (length - 1) * sizeof(wchar_t));
+                    else
+                        memcpy(positive_str, str, length * sizeof(wchar_t));
+                    positive_str[length] = 0;
+                    
+                    unsigned long int uvalue = wcstoul(positive_str, NULL, base);
+                    delete positive_str;
+                    if(errno == 0 && uvalue > static_cast<unsigned long int>(numeric_limits<long int>::max()))
+                        errno = ERANGE;// using errno is bad - m'kay?
+                }
 
                 if (errno && !value && endptr)
                 {
@@ -239,14 +283,122 @@ namespace stdex
             {
                 using namespace std;
 
-                return strtoul(str, endptr, base);
+                if(!str)
+                    return 0;
+                errno = 0;
+                
+                unsigned long int value = strtoul(str, endptr, base);
+
+                // same compiler bugs (see implementation for signed types)
+                // but there is the problem - 
+                // we do not have conversion function for type bigger then unsigned long long
+                // so we can do one of two evil things:
+                // 1. ignore strings with actual ULONG_MAX values and 
+                //    act as standard requires in all other cases
+                // 2. assume that if errno behaves naughty 
+                //    all values larger than ULONG_MAX are valid ULONG_MAX
+                // first option seems like lesser evil so...
+                if(errno == 0 && _str_to_integral_chooser_impl::check(value))
+                {
+                    // the best we can do is check if compiler has bug:
+                    bool bug_present = true;
+#ifdef ULONG_MAX
+    #define _STDEX_STRINGIZE_HELPER(xxx) #xxx
+    #define _STDEX_STRINGIZE(xxx) _STDEX_STRINGIZE_HELPER(xxx)
+                    char overflow_str[sizeof(_STDEX_STRINGIZE(ULONG_MAX)) / sizeof(char) + 1];
+                    size_t of_size = countof(overflow_str);
+                    overflow_str[of_size - 1] = 0;
+                    overflow_str[of_size - 2] = '0';
+                    overflow_str[of_size - 3] = '0';
+                    overflow_str[of_size - 4] = '0';
+                    const char *ulong_max_cstr = _STDEX_STRINGIZE(ULONG_MAX);
+                    
+                    if(
+                        (ulong_max_cstr[of_size - 3] == 'L' && ulong_max_cstr[of_size - 4] == 'U') ||
+                        (ulong_max_cstr[of_size - 4] == 'L' && ulong_max_cstr[of_size - 3] == 'U')
+                    )
+                    {
+                        memcpy(overflow_str, ulong_max_cstr, of_size - 4);
+                        overflow_str[of_size - 3] = 'U';
+                        overflow_str[of_size - 2] = 'L';
+                    }
+                    else
+                    {
+                        memcpy(overflow_str, ulong_max_cstr, of_size - 1);
+                    }
+
+                    strtoul(overflow_str, NULL, base);
+                    if(errno == ERANGE)
+                        bug_present = false;
+    #undef _STDEX_STRINGIZE_HELPER
+    #undef _STDEX_STRINGIZE
+#endif
+                    if(bug_present) errno = ERANGE;
+                    else errno = 0;
+                }
+
+                return value;
             }
 
             static unsigned long int call(const wchar_t* str, wchar_t** endptr, int base)
             {
                 using namespace std;
+                if(!str)
+                    return 0;
+                errno = 0;
+                
+                unsigned long int value = wcstoul(str, endptr, base);
 
-                return wcstoul(str, endptr, base);
+                // same compiler bugs (see implementation for signed types)
+                // but there is the problem - 
+                // we do not have conversion function for type bigger then unsigned long long
+                // so we can do one of two evil things:
+                // 1. ignore strings with actual ULONG_MAX values and 
+                //    act as standard requires in all other cases
+                // 2. assume that if errno behaves naughty 
+                //    all values larger than ULONG_MAX are valid ULONG_MAX
+                // first option seems like lesser evil so...
+                if(errno == 0 && _str_to_integral_chooser_impl::check(value))
+                {
+                    // the best we can do is check if compiler has bug:
+                    bool bug_present = true;
+#ifdef ULONG_MAX
+    #define _STDEX_STRINGIZE_HELPER(xxx) L##xxx
+    #define _STDEX_STRINGIZE(xxx) _STDEX_STRINGIZE_HELPER(#xxx)
+                    wchar_t overflow_str[sizeof(_STDEX_STRINGIZE(ULONG_MAX)) / sizeof(wchar_t) + 1];
+                    size_t of_size = countof(overflow_str);
+                    overflow_str[of_size - 1] = 0;
+                    overflow_str[of_size - 2] = L'0';
+                    overflow_str[of_size - 3] = L'0';
+                    overflow_str[of_size - 4] = L'0';
+                    const wchar_t *ulong_max_cstr = _STDEX_STRINGIZE(ULONG_MAX);
+                    
+                    if(
+                        (ulong_max_cstr[of_size - 3] == L'L' && ulong_max_cstr[of_size - 4] == L'U') ||
+                        (ulong_max_cstr[of_size - 4] == L'L' && ulong_max_cstr[of_size - 3] == L'U')
+                    )
+                    {
+                        memcpy(overflow_str, ulong_max_cstr, of_size - 4);
+                        overflow_str[of_size - 3] = L'U';
+                        overflow_str[of_size - 2] = L'L';
+                    }
+                    else
+                    {
+                        memcpy(overflow_str, ulong_max_cstr, of_size - 1);
+                    }
+                    
+
+                    wcstoul(overflow_str, NULL, base);
+                    if(errno == ERANGE)
+                        bug_present = false;
+    #undef _STDEX_STRINGIZE_HELPER
+    #undef _STDEX_STRINGIZE
+#endif
+                    if(bug_present) errno = ERANGE;
+                    else errno = 0;
+                }
+
+                return value;
             }
 
             static bool check(unsigned long int _value)
