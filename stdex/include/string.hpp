@@ -185,15 +185,20 @@ namespace stdex
                     ptrdiff_t length = 
                         endptr ? (*endptr - str) : (str - str + strlen(str));
                     char *positive_str = new char[length + 1];
+                    bool is_negative = false;
+                    
                     if(str[0] == '-')
+                    {
+                        is_negative = true;
                         memcpy(positive_str, str + 1, (length - 1) * sizeof(char));
+                    }
                     else
                         memcpy(positive_str, str, length * sizeof(char));
                     positive_str[length] = 0;
-                    std::cout << "OLOLOtest:" << positive_str << ":" << str << std::endl;
+
                     unsigned long int uvalue = strtoul(positive_str, NULL, base);
                     delete positive_str;
-                    if(errno == 0 && uvalue > static_cast<unsigned long int>(numeric_limits<long int>::max()))
+                    if(errno == 0 && uvalue > static_cast<unsigned long int>(is_negative ? (numeric_limits<long int>::max)(): -(numeric_limits<long int>::min)()))
                         errno = ERANGE;// using errno is bad - m'kay?
                 }
 
@@ -231,15 +236,20 @@ namespace stdex
                     ptrdiff_t length = 
                         endptr ? (*endptr - str) : (str - str + wcslen(str));
                     wchar_t *positive_str = new wchar_t[length + 1];
+                    bool is_negative = false;
+
                     if(str[0] == '-')
+                    {
+                        is_negative = true;
                         memcpy(positive_str, str + 1, (length - 1) * sizeof(wchar_t));
+                    }
                     else
                         memcpy(positive_str, str, length * sizeof(wchar_t));
                     positive_str[length] = 0;
                     
                     unsigned long int uvalue = wcstoul(positive_str, NULL, base);
                     delete positive_str;
-                    if(errno == 0 && uvalue > static_cast<unsigned long int>(numeric_limits<long int>::max()))
+                    if(errno == 0 && uvalue > static_cast<unsigned long int>(is_negative ? (numeric_limits<long int>::max)(): -(numeric_limits<long int>::min)()))
                         errno = ERANGE;// using errno is bad - m'kay?
                 }
 
@@ -269,7 +279,7 @@ namespace stdex
 #ifdef LONG_MIN
                 return ((_value == -LONG_MIN || _value == LONG_MIN));
 #else
-                return ((_value == std::numeric_limits<long int>::min() || _value == std::numeric_limits<long int>::max()));
+                return ((_value == (std::numeric_limits<long int>::min)() || _value == (std::numeric_limits<long int>::max)()));
 #endif
 #endif
             }
@@ -406,7 +416,7 @@ namespace stdex
 #ifdef ULONG_MAX 
                 return ((_value == ULONG_MAX));
 #else
-                return ((_value == std::numeric_limits<unsigned long int>::max()));
+                return ((_value == (std::numeric_limits<unsigned long int>::max)()));
 #endif
             }
         };
@@ -468,7 +478,7 @@ namespace stdex
         template<class _Tp>
         struct _infinity_impl<_Tp, false>
         {
-            static _Tp inf() { return std::numeric_limits<_Tp>::max(); }
+            static _Tp inf() { return (std::numeric_limits<_Tp>::max)(); }
         };
 
         template<class _Tp>
@@ -889,7 +899,7 @@ namespace stdex
 #ifdef LLONG_MIN
                 return ((_value == -LLONG_MIN || _value == LLONG_MIN));
 #else
-                return ((_value == std::numeric_limits<string_detail::_long_long_type>::min() || _value == std::numeric_limits<string_detail::_long_long_type>::max()));
+                return ((_value == (std::numeric_limits<string_detail::_long_long_type>::min)() || _value == (std::numeric_limits<string_detail::_long_long_type>::max)()));
 #endif
 #endif
             }
@@ -918,7 +928,7 @@ namespace stdex
 #ifdef ULLONG_MAX 
                 return ((_value == ULLONG_MAX));
 #else
-                return ((_value == std::numeric_limits<string_detail::_unsigned_long_long_type>::max()));
+                return ((_value == (std::numeric_limits<string_detail::_unsigned_long_long_type>::max)()));
 #endif
             }
         };
@@ -963,9 +973,9 @@ namespace stdex
 
             if (_str_to_integral::check(_value) && errno == ERANGE)
                 num_s_end = 0;
-            else if (_value > static_cast<large_value_type>(std::numeric_limits<_Tp>::max()) || _value < static_cast<large_value_type>(std::numeric_limits<_Tp>::min()))
+            else if (_value > static_cast<large_value_type>((std::numeric_limits<_Tp>::max)()) || _value < static_cast<large_value_type>((std::numeric_limits<_Tp>::min)()))
             {
-                _value = std::numeric_limits<_Tp>::max();
+                _value = (std::numeric_limits<_Tp>::max)();
                 num_s_end = 0;
             }
             else
@@ -990,9 +1000,9 @@ namespace stdex
 
             if (_str_to_integral::check(_value) && errno == ERANGE)
                 num_s_end = 0;
-            else if (_value > static_cast<large_value_type>(std::numeric_limits<_Tp>::max()) || _value < static_cast<large_value_type>(std::numeric_limits<_Tp>::min()))
+            else if (_value > static_cast<large_value_type>((std::numeric_limits<_Tp>::max)()) || _value < static_cast<large_value_type>((std::numeric_limits<_Tp>::min)()))
             {
-                _value = std::numeric_limits<_Tp>::max();
+                _value = (std::numeric_limits<_Tp>::max)();
                 num_s_end = 0;
             }
             else
@@ -1018,9 +1028,9 @@ namespace stdex
 
             if (_str_to_integral::check(_value) && errno == ERANGE)
                 num_s_end = 0;
-            else if (_value > static_cast<large_value_type>(std::numeric_limits<_Tp>::max()) || _value < static_cast<large_value_type>(std::numeric_limits<_Tp>::min()))
+            else if (_value > static_cast<large_value_type>((std::numeric_limits<_Tp>::max)()) || _value < static_cast<large_value_type>((std::numeric_limits<_Tp>::min)()))
             {
-                _value = std::numeric_limits<_Tp>::max();
+                _value = (std::numeric_limits<_Tp>::max)();
                 num_s_end = 0;
             }
             else
@@ -1045,9 +1055,9 @@ namespace stdex
 
             if (_str_to_integral::check(_value) && errno == ERANGE)
                 num_s_end = 0;
-            else if (_value > static_cast<large_value_type>(std::numeric_limits<_Tp>::max()) || _value < static_cast<large_value_type>(std::numeric_limits<_Tp>::min()))
+            else if (_value > static_cast<large_value_type>((std::numeric_limits<_Tp>::max)()) || _value < static_cast<large_value_type>((std::numeric_limits<_Tp>::min)()))
             {
-                _value = std::numeric_limits<_Tp>::max();
+                _value = (std::numeric_limits<_Tp>::max)();
                 num_s_end = 0;
             }
             else
@@ -1078,7 +1088,7 @@ namespace stdex
                 num_s_end = 0;
             else if (_value > static_cast<double>(std::numeric_limits<_Tp>::max()) || _value < static_cast<double>(-std::numeric_limits<_Tp>::max()))
             {
-                _value = std::numeric_limits<_Tp>::max();
+                _value = (std::numeric_limits<_Tp>::max)();
                 num_s_end = 0;
             }
             else
@@ -1108,7 +1118,7 @@ namespace stdex
                 num_s_end = 0;
             else if (_value > static_cast<double>(std::numeric_limits<_Tp>::max()) || _value < static_cast<double>(-std::numeric_limits<_Tp>::max()))
             {
-                _value = std::numeric_limits<_Tp>::max();
+                _value = (std::numeric_limits<_Tp>::max)();
                 num_s_end = 0;
             }
             else
@@ -1214,7 +1224,7 @@ namespace stdex
                 value = fp_integer_part + fp_fractional_part;
                 }
 
-                if(value > numeric_limits<long double>::max() || value < numeric_limits<long double>::min())
+                if(value > (numeric_limits<long double>::max)() || value < (numeric_limits<long double>::min)())
                 {
                 errno = ERANGE;
                 value = 0.0;
@@ -1256,7 +1266,7 @@ namespace stdex
                     value = fp_integer_part + fp_fractional_part;
                 }
 
-                if (value > numeric_limits<long double>::max() || value < numeric_limits<long double>::min())
+                if (value > (numeric_limits<long double>::max)() || value < (numeric_limits<long double>::min)())
                 {
                     errno = ERANGE;
                     value = 0.0;
@@ -1351,7 +1361,7 @@ namespace stdex
                             if (std::numeric_limits<long double>::max_exponent10 < _i)
                             {
                                 errno = ERANGE;
-                                return std::numeric_limits<long double>::max();
+                                return (std::numeric_limits<long double>::max)();
                             }
                             return _a_to_floating_point(_str);
                         }
@@ -1450,7 +1460,7 @@ namespace stdex
                             if (std::numeric_limits<long double>::max_exponent10 < _i)
                             {
                                 errno = ERANGE;
-                                return std::numeric_limits<long double>::max();
+                                return (std::numeric_limits<long double>::max)();
                             }
                             return _a_to_floating_point(_str);
                         }
