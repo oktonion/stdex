@@ -340,6 +340,7 @@ namespace stdex
                     }
 
                     strtoul(overflow_str, NULL, base);
+                    std::cout << "OLOLOOLLODEBUG:" << overflow_str << ":" << errno << std::endl;
                     if(errno == ERANGE)
                         bug_present = false;
     #undef _STDEX_STRINGIZE_HELPER
