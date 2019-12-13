@@ -386,7 +386,8 @@ namespace stdex
                         char buf[512] = {0};
                         printf(buf, "%lu", value);
 
-                        ulong_max_str = wstring(&buf[0], &buf[0] + strlen(buf));
+                        ulong_max_str = wstring(&buf[0], &buf[0] + strlen(buf) + 1);
+                        std::cout << "OLOLOOdubug:" << ulong_max_str.c_str() << std::endl;
                     }
                     const wchar_t *ulong_max_cstr = ulong_max_str.c_str();
 
