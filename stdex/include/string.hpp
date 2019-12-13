@@ -45,6 +45,9 @@ namespace stdex
     using std::string;
     using std::wstring;
 
+    template<class _Tp>
+    inline string to_string(const _Tp &value);
+
     namespace detail
     {
         namespace string_detail
@@ -321,20 +324,20 @@ namespace stdex
                     const char *ulong_max_cstr = ulong_max_str.c_str();
 
                     string overflow_str(ulong_max_str.length() + 1, '0');
-                    size_t of_size = overflow_str.length();
+                    string::size_type of_size = overflow_str.length();
                     
                     if(
                         (ulong_max_cstr[of_size - 3] == 'L' && ulong_max_cstr[of_size - 4] == 'U') ||
                         (ulong_max_cstr[of_size - 4] == 'L' && ulong_max_cstr[of_size - 3] == 'U')
                     )
                     {
-                        memcpy(&overflow_str.front(), ulong_max_cstr, of_size - 4);
+                        memcpy(&overflow_str[0], ulong_max_cstr, of_size - 4);
                         overflow_str[of_size - 3] = 'U';
                         overflow_str[of_size - 2] = 'L';
                     }
                     else
                     {
-                        memcpy(&overflow_str.front(), ulong_max_cstr, of_size - 1);
+                        memcpy(&overflow_str[0], ulong_max_cstr, of_size - 1);
                     }
 
                     strtoul(overflow_str.c_str(), NULL, base);
