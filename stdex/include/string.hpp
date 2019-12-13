@@ -317,29 +317,27 @@ namespace stdex
 #ifdef ULONG_MAX
     #define _STDEX_STRINGIZE_HELPER(xxx) #xxx
     #define _STDEX_STRINGIZE(xxx) _STDEX_STRINGIZE_HELPER(xxx)
-                    char overflow_str[sizeof(_STDEX_STRINGIZE(ULONG_MAX)) / sizeof(char) + 1];
-                    size_t of_size = countof(overflow_str);
-                    overflow_str[of_size - 1] = 0;
-                    overflow_str[of_size - 2] = '0';
-                    overflow_str[of_size - 3] = '0';
-                    overflow_str[of_size - 4] = '0';
-                    const char *ulong_max_cstr = _STDEX_STRINGIZE(ULONG_MAX);
+                    string ulong_max_str = to_string(ULONG_MAX);
+                    const char *ulong_max_cstr = ulong_max_str.c_str();
+
+                    string overflow_str(ulong_max_str.length() + 1, '0');
+                    size_t of_size = overflow_str.length();
                     
                     if(
                         (ulong_max_cstr[of_size - 3] == 'L' && ulong_max_cstr[of_size - 4] == 'U') ||
                         (ulong_max_cstr[of_size - 4] == 'L' && ulong_max_cstr[of_size - 3] == 'U')
                     )
                     {
-                        memcpy(overflow_str, ulong_max_cstr, of_size - 4);
+                        memcpy(&overflow_str.front(), ulong_max_cstr, of_size - 4);
                         overflow_str[of_size - 3] = 'U';
                         overflow_str[of_size - 2] = 'L';
                     }
                     else
                     {
-                        memcpy(overflow_str, ulong_max_cstr, of_size - 1);
+                        memcpy(&overflow_str.front(), ulong_max_cstr, of_size - 1);
                     }
 
-                    strtoul(overflow_str, NULL, base);
+                    strtoul(overflow_str.c_str(), NULL, base);
                     std::cout << "OLOLOOLLODEBUG:" << overflow_str << ":" << errno << std::endl;
                     if(errno == ERANGE)
                         bug_present = false;
