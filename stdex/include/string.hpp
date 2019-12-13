@@ -320,7 +320,7 @@ namespace stdex
                     string ulong_max_str;
                     {
                         char buf[512] = {0};
-                        sprintf(buf, "%lu", value);
+                        sprintf(buf, "%lu", ULONG_MAX);
 
                         ulong_max_str = string(buf);
                     }
@@ -384,7 +384,7 @@ namespace stdex
                     wstring ulong_max_str;
                     {
                         char buf[512] = {0};
-                        printf(buf, "%lu", value);
+                        printf(buf, "%lu", ULONG_MAX);
 
                         ulong_max_str = wstring(&buf[0], &buf[0] + strlen(buf) + 1);
                         std::cout << "OLOLOOdubug:" << ulong_max_str.c_str() << std::endl;
