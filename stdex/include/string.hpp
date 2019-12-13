@@ -45,9 +45,6 @@ namespace stdex
     using std::string;
     using std::wstring;
 
-    template<class _Tp>
-    inline string to_string(const _Tp &value);
-
     namespace detail
     {
         namespace string_detail
@@ -320,7 +317,13 @@ namespace stdex
 #ifdef ULONG_MAX
     #define _STDEX_STRINGIZE_HELPER(xxx) #xxx
     #define _STDEX_STRINGIZE(xxx) _STDEX_STRINGIZE_HELPER(xxx)
-                    string ulong_max_str = to_string(ULONG_MAX);
+                    string ulong_max_str;
+                    {
+                        char buf[512];
+                        sprintf(buf, "%lu", value);
+
+                        ulong_max_str = string(buf);
+                    }
                     const char *ulong_max_cstr = ulong_max_str.c_str();
 
                     string overflow_str(ulong_max_str.length() + 1, '0');
