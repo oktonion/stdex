@@ -343,7 +343,7 @@ namespace stdex
                         memcpy(&overflow_str[0], ulong_max_cstr, of_size - 1);
                     }
 
-                    strtoul(overflow_str.c_str(), NULL, base);
+                    strtoul(overflow_str.c_str(), NULL, 10);
                     if(errno == ERANGE)
                         bug_present = false;
     #undef _STDEX_STRINGIZE_HELPER
@@ -398,17 +398,17 @@ namespace stdex
                         (ulong_max_cstr[of_size - 4] == L'L' && ulong_max_cstr[of_size - 3] == L'U')
                     )
                     {
-                        memcpy(&overflow_str[0], ulong_max_cstr, of_size - 4);
+                        memcpy(&overflow_str[0], ulong_max_cstr, (of_size - 4) * sizeof(wchar_t));
                         overflow_str[of_size - 3] = L'U';
                         overflow_str[of_size - 2] = L'L';
                     }
                     else
                     {
-                        memcpy(&overflow_str[0], ulong_max_cstr, of_size - 1);
+                        memcpy(&overflow_str[0], ulong_max_cstr, (of_size - 1) * sizeof(wchar_t));
                     }
                     
 
-                    wcstoul(overflow_str.c_str(), NULL, base);
+                    wcstoul(overflow_str.c_str(), NULL, 10);
                     if(errno == ERANGE)
                         bug_present = false;
     #undef _STDEX_STRINGIZE_HELPER
