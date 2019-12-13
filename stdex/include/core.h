@@ -5,6 +5,8 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
+#include <cerrno>
+
 
 #ifndef __has_feature         // Optional of course.
     #define _STDEX_HAS_FEATURE_BUILTIN(xxx) 0  // Compatibility with non-clang compilers.
@@ -26,6 +28,11 @@
     #define _STDEX_NATIVE_CPP11_TYPES_SUPPORT
     #define _STDEX_NATIVE_CPP_98_SUPPORT
 
+#endif
+
+// LWG 310 	C++98 	it is unspecified whether errno is a macro or an identifier with external linkage 	errno must be macro
+#ifdef errno
+    #define _STDEX_NATIVE_CPP_98_SUPPORT
 #endif
 
 #if !defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT)
