@@ -190,7 +190,7 @@ namespace stdex
                     else
                         memcpy(positive_str, str, length * sizeof(char));
                     positive_str[length] = 0;
-                    std::cout << "OLOLOtest:" << positive_str << std::endl;
+                    std::cout << "OLOLOtest:" << positive_str << ":" << str << std::endl;
                     unsigned long int uvalue = strtoul(positive_str, NULL, base);
                     delete positive_str;
                     if(errno == 0 && uvalue > static_cast<unsigned long int>(numeric_limits<long int>::max()))
