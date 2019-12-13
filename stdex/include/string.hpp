@@ -199,7 +199,7 @@ namespace stdex
                     unsigned long int uvalue = strtoul(positive_str, NULL, base);
                     delete positive_str;
                     unsigned long int _zero = 0;
-                    if(errno == 0 && uvalue > static_cast<unsigned long int>(is_negative ? (numeric_limits<long int>::max)(): _zero - (numeric_limits<long int>::min)()))
+                    if(errno == 0 && uvalue > static_cast<unsigned long int>(is_negative ? _zero - (numeric_limits<long int>::min)() : (numeric_limits<long int>::max)() ))
                         errno = ERANGE;// using errno is bad - m'kay?
                 }
 
@@ -251,7 +251,7 @@ namespace stdex
                     unsigned long int uvalue = wcstoul(positive_str, NULL, base);
                     delete positive_str;
                     unsigned long int _zero = 0;
-                    if(errno == 0 && uvalue > static_cast<unsigned long int>(is_negative ? (numeric_limits<long int>::max)(): _zero - (numeric_limits<long int>::min)()))
+                    if(errno == 0 && uvalue > static_cast<unsigned long int>(is_negative ? _zero - (numeric_limits<long int>::min)() : (numeric_limits<long int>::max)() ))
                         errno = ERANGE;// using errno is bad - m'kay?
                 }
 
