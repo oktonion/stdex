@@ -358,7 +358,7 @@ namespace wstring_tests
             wstring one(1000, '9');
             i1 = stdex::stoi(one);
         }
-        catch (std::out_of_range)
+        catch (const std::out_of_range&)
         {
             test = true;
         }
@@ -892,6 +892,24 @@ namespace wstring_tests
         }
         DYNAMIC_VERIFY(test);
         DYNAMIC_VERIFY(ul1 == 14);
+
+        test = true;
+        try
+        {
+            wstring one(stdex::to_wstring(std::numeric_limits<unsigned long>::max()));
+            ul1 = stdex::stoul(one);
+        }
+        catch (const std::out_of_range &)
+        {
+            test = false;
+        }
+        catch (...)
+        {
+            test = false;
+        }
+        DYNAMIC_VERIFY(test);
+        DYNAMIC_VERIFY(ul1 == std::numeric_limits<unsigned long>::max());
+
 #ifdef LLONG_MAX
         try
         {
