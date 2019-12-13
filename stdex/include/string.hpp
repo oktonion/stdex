@@ -319,7 +319,7 @@ namespace stdex
     #define _STDEX_STRINGIZE(xxx) _STDEX_STRINGIZE_HELPER(xxx)
                     string ulong_max_str;
                     {
-                        char buf[512];
+                        char buf[512] = {0};
                         sprintf(buf, "%lu", value);
 
                         ulong_max_str = string(buf);
@@ -344,7 +344,6 @@ namespace stdex
                     }
 
                     strtoul(overflow_str.c_str(), NULL, base);
-                    std::cout << "OLOLOOLLODEBUG:" << overflow_str << ":" << errno << std::endl;
                     if(errno == ERANGE)
                         bug_present = false;
     #undef _STDEX_STRINGIZE_HELPER
@@ -382,30 +381,34 @@ namespace stdex
 #ifdef ULONG_MAX
     #define _STDEX_STRINGIZE_HELPER(xxx) L##xxx
     #define _STDEX_STRINGIZE(xxx) _STDEX_STRINGIZE_HELPER(#xxx)
-                    wchar_t overflow_str[sizeof(_STDEX_STRINGIZE(ULONG_MAX)) / sizeof(wchar_t) + 1];
-                    size_t of_size = countof(overflow_str);
-                    overflow_str[of_size - 1] = 0;
-                    overflow_str[of_size - 2] = L'0';
-                    overflow_str[of_size - 3] = L'0';
-                    overflow_str[of_size - 4] = L'0';
-                    const wchar_t *ulong_max_cstr = _STDEX_STRINGIZE(ULONG_MAX);
+                    wstring ulong_max_str;
+                    {
+                        char buf[512] = {0};
+                        printf(buf, "%lu", value);
+
+                        ulong_max_str = wstring(&buf[0], &buf[512]);
+                    }
+                    const wchar_t *ulong_max_cstr = ulong_max_str.c_str();
+
+                    wstring overflow_str(ulong_max_str.length() + 1, '0');
+                    wstring::size_type of_size = overflow_str.length();
                     
                     if(
                         (ulong_max_cstr[of_size - 3] == L'L' && ulong_max_cstr[of_size - 4] == L'U') ||
                         (ulong_max_cstr[of_size - 4] == L'L' && ulong_max_cstr[of_size - 3] == L'U')
                     )
                     {
-                        memcpy(overflow_str, ulong_max_cstr, of_size - 4);
+                        memcpy(&overflow_str[0], ulong_max_cstr, of_size - 4);
                         overflow_str[of_size - 3] = L'U';
                         overflow_str[of_size - 2] = L'L';
                     }
                     else
                     {
-                        memcpy(overflow_str, ulong_max_cstr, of_size - 1);
+                        memcpy(&overflow_str[0], ulong_max_cstr, of_size - 1);
                     }
                     
 
-                    wcstoul(overflow_str, NULL, base);
+                    wcstoul(overflow_str.c_str(), NULL, base);
                     if(errno == ERANGE)
                         bug_present = false;
     #undef _STDEX_STRINGIZE_HELPER
