@@ -390,8 +390,8 @@ namespace stdex
 
                         ulong_max_str.resize(length + 1);
 
-                        for(wstring::size_type i = 0; i < length; ++i)
-                            ulong_max_str[i] = buf[i];
+                        for(wstring::size_type _i = 0; _i < length; ++_i)
+                            ulong_max_str[_i] = buf[_i];
                     }
                     const wchar_t *ulong_max_cstr = ulong_max_str.c_str();
 
