@@ -396,7 +396,7 @@ namespace stdex
                     }
                     const wchar_t *ulong_max_cstr = ulong_max_str.c_str();
 
-                    wstring overflow_str(ulong_max_str.length() + 1, '0');
+                    wstring overflow_str(ulong_max_str.length() + 1, L'0');
                     wstring::size_type of_size = overflow_str.length();
                     
                     if(
