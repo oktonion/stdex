@@ -415,7 +415,7 @@ namespace stdex
                     }
                     
                     wcout << overflow_str << endl;
-                    cout << wcstoul(overflow_str.c_str(), NULL, 10) << endl;
+                    cout << wcstoul(overflow_str.c_str(), NULL, 10) << ":" << errno << endl;
                     if(errno == ERANGE)
                         bug_present = false;
     #undef _STDEX_STRINGIZE_HELPER
