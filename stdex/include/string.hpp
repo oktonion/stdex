@@ -392,6 +392,7 @@ namespace stdex
 
                         for(wstring::size_type _i = 0; _i < length; ++_i)
                             ulong_max_str[_i] = buf[_i];
+                        wcout << ulong_max_str << endl;
                     }
                     const wchar_t *ulong_max_cstr = ulong_max_str.c_str();
 
