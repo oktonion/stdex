@@ -413,7 +413,7 @@ namespace stdex
                         memcpy(&overflow_str[0], ulong_max_cstr, (of_size - 1) * sizeof(wchar_t));
                     }
                     
-
+                    wcout << overflow_str << endl;
                     wcstoul(overflow_str.c_str(), NULL, 10);
                     if(errno == ERANGE)
                         bug_present = false;
