@@ -251,6 +251,7 @@ namespace stdex
                     unsigned long int uvalue = wcstoul(positive_str, NULL, base);
                     delete positive_str;
                     unsigned long int _zero = 0;
+                    std::cout << "DEBUG:" << uvalue << std::endl;
                     if(errno == 0 && uvalue > static_cast<unsigned long int>(is_negative ? _zero - (numeric_limits<long int>::min)() : (numeric_limits<long int>::max)() ))
                         errno = ERANGE;// using errno is bad - m'kay?
                 }
@@ -315,8 +316,6 @@ namespace stdex
                     // the best we can do is check if compiler has bug:
                     bool bug_present = true;
 #ifdef ULONG_MAX
-    #define _STDEX_STRINGIZE_HELPER(xxx) #xxx
-    #define _STDEX_STRINGIZE(xxx) _STDEX_STRINGIZE_HELPER(xxx)
                     string ulong_max_str;
                     {
                         char buf[512] = {0};
@@ -346,8 +345,6 @@ namespace stdex
                     unsigned long overflow_value = strtoul(overflow_str.c_str(), NULL, 10);
                     if(overflow_value == ULONG_MAX && errno == ERANGE)
                         bug_present = false;
-    #undef _STDEX_STRINGIZE_HELPER
-    #undef _STDEX_STRINGIZE
 #endif
                     if(bug_present) errno = ERANGE;
                     else errno = 0;
@@ -379,8 +376,6 @@ namespace stdex
                     // the best we can do is check if compiler has bug:
                     bool bug_present = true;
 #ifdef ULONG_MAX
-    #define _STDEX_STRINGIZE_HELPER(xxx) L##xxx
-    #define _STDEX_STRINGIZE(xxx) _STDEX_STRINGIZE_HELPER(#xxx)
                     wstring ulong_max_str;
                     {
                         char buf[512] = {0};
@@ -413,11 +408,9 @@ namespace stdex
                     }
                     
                     unsigned long overflow_value = wcstoul(overflow_str.c_str(), NULL, 10);
-                    cout << "DBUG::" << (overflow_value == ULONG_MAX) <<  endl;
+
                     if(overflow_value == ULONG_MAX && errno == ERANGE)
                         bug_present = false;
-    #undef _STDEX_STRINGIZE_HELPER
-    #undef _STDEX_STRINGIZE
 #endif
                     if(bug_present) errno = ERANGE;
                     else errno = 0;
