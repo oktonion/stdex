@@ -343,8 +343,8 @@ namespace stdex
                         memcpy(&overflow_str[0], ulong_max_cstr, of_size - 1);
                     }
 
-                    strtoul(overflow_str.c_str(), NULL, 10);
-                    if(errno == ERANGE)
+                    unsigned long overflow_value = strtoul(overflow_str.c_str(), NULL, 10);
+                    if(overflow_value == ULONG_MAX && errno == ERANGE)
                         bug_present = false;
     #undef _STDEX_STRINGIZE_HELPER
     #undef _STDEX_STRINGIZE
@@ -392,8 +392,6 @@ namespace stdex
 
                         for(wstring::size_type _i = 0; _i < length; ++_i)
                             ulong_max_str[_i] = buf[_i];
-                        cout << buf << endl;
-                        wcout << ulong_max_str << endl;
                     }
                     const wchar_t *ulong_max_cstr = ulong_max_str.c_str();
 
@@ -414,9 +412,9 @@ namespace stdex
                         memcpy(&overflow_str[0], ulong_max_cstr, (of_size - 1) * sizeof(wchar_t));
                     }
                     
-                    wcout << overflow_str << endl;
-                    cout << wcstoul(overflow_str.c_str(), NULL, 10) << ":" << errno << endl;
-                    if(errno == ERANGE)
+                    unsigned long overflow_value = wcstoul(overflow_str.c_str(), NULL, 10);
+                    cout << "DBUG::" << (overflow_value == ULONG_MAX) <<  endl;
+                    if(overflow_value == ULONG_MAX && errno == ERANGE)
                         bug_present = false;
     #undef _STDEX_STRINGIZE_HELPER
     #undef _STDEX_STRINGIZE
