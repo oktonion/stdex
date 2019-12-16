@@ -192,7 +192,7 @@ namespace stdex
 
                     unsigned long int uvalue = strtoul(positive_str.c_str(), NULL, base);
                     unsigned long int _zero = 0;
-                    
+
                     if(errno == 0 && uvalue > static_cast<unsigned long int>(is_negative ? _zero - (numeric_limits<long int>::min)() : (numeric_limits<long int>::max)() ))
                         errno = ERANGE;// using errno is bad - m'kay?
                 }
@@ -316,13 +316,13 @@ namespace stdex
                     string::size_type of_size = overflow_str.length();
                     
                     if(
-                        (ulong_max_cstr[of_size - 3] == 'L' && ulong_max_cstr[of_size - 4] == 'U') ||
-                        (ulong_max_cstr[of_size - 4] == 'L' && ulong_max_cstr[of_size - 3] == 'U')
+                        (ulong_max_cstr[of_size - 2] == 'L' && ulong_max_cstr[of_size - 3] == 'U') ||
+                        (ulong_max_cstr[of_size - 3] == 'L' && ulong_max_cstr[of_size - 2] == 'U')
                     )
                     {
-                        memcpy(&overflow_str[0], ulong_max_cstr, of_size - 4);
-                        overflow_str[of_size - 3] = 'U';
-                        overflow_str[of_size - 2] = 'L';
+                        memcpy(&overflow_str[0], ulong_max_cstr, of_size - 3);
+                        overflow_str[of_size - 2] = 'U';
+                        overflow_str[of_size - 1] = 'L';
                     }
                     else
                     {
@@ -381,13 +381,13 @@ namespace stdex
                     wstring::size_type of_size = overflow_str.length();
                     
                     if(
-                        (ulong_max_cstr[of_size - 3] == L'L' && ulong_max_cstr[of_size - 4] == L'U') ||
-                        (ulong_max_cstr[of_size - 4] == L'L' && ulong_max_cstr[of_size - 3] == L'U')
+                        (ulong_max_cstr[of_size - 2] == L'L' && ulong_max_cstr[of_size - 3] == L'U') ||
+                        (ulong_max_cstr[of_size - 3] == L'L' && ulong_max_cstr[of_size - 2] == L'U')
                     )
                     {
-                        memcpy(&overflow_str[0], ulong_max_cstr, (of_size - 4) * sizeof(wchar_t));
-                        overflow_str[of_size - 3] = L'U';
-                        overflow_str[of_size - 2] = L'L';
+                        memcpy(&overflow_str[0], ulong_max_cstr, (of_size - 3) * sizeof(wchar_t));
+                        overflow_str[of_size - 2] = L'U';
+                        overflow_str[of_size - 1] = L'L';
                     }
                     else
                     {
