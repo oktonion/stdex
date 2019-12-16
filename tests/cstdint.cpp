@@ -130,12 +130,18 @@ struct unsigned_integral_constant_checker
 
 #define SIGNED_INTEGRAL_CONSTANT_CHECK(bitsn, cvalue)\
 	char int_of_##bitsn##_bits_check_fail[((signed_integral_constant_checker<stdex::int##bitsn##_t, STDEX_INT##bitsn##_C(cvalue)>::value == STDEX_INT##bitsn##_C(cvalue))) ? 1 : -1]; \
+	(void)(int_of_##bitsn##_bits_check_fail); \
 	char int_least_of_##bitsn##_bits_check_fail[((signed_integral_constant_checker<stdex::int_least##bitsn##_t, STDEX_INT##bitsn##_C(cvalue)>::value == STDEX_INT##bitsn##_C(cvalue))) ? 1 : -1]; \
-	char int_fast_of_##bitsn##_bits_check_fail[((signed_integral_constant_checker<stdex::int_fast##bitsn##_t, STDEX_INT##bitsn##_C(cvalue)>::value == STDEX_INT##bitsn##_C(cvalue))) ? 1 : -1];
+	(void)(int_least_of_##bitsn##_bits_check_fail); \
+	char int_fast_of_##bitsn##_bits_check_fail[((signed_integral_constant_checker<stdex::int_fast##bitsn##_t, STDEX_INT##bitsn##_C(cvalue)>::value == STDEX_INT##bitsn##_C(cvalue))) ? 1 : -1]; \
+	(void)(int_fast_of_##bitsn##_bits_check_fail);
 #define UNSIGNED_INTEGRAL_CONSTANT_CHECK(bitsn, cvalue)\
 	char uint_of_##bitsn##_bits_check_fail[((unsigned_integral_constant_checker<stdex::uint##bitsn##_t, STDEX_UINT##bitsn##_C(cvalue)>::value == STDEX_UINT##bitsn##_C(cvalue))) ? 1 : -1]; \
+	(void)(uint_of_##bitsn##_bits_check_fail);\
 	char uint_least_of_##bitsn##_bits_check_fail[((unsigned_integral_constant_checker<stdex::uint_least##bitsn##_t, STDEX_UINT##bitsn##_C(cvalue)>::value == STDEX_UINT##bitsn##_C(cvalue))) ? 1 : -1]; \
-	char uint_fast_of_##bitsn##_bits_check_fail[((unsigned_integral_constant_checker<stdex::uint_fast##bitsn##_t, STDEX_UINT##bitsn##_C(cvalue)>::value == STDEX_UINT##bitsn##_C(cvalue))) ? 1 : -1];
+	(void)(uint_least_of_##bitsn##_bits_check_fail);\
+	char uint_fast_of_##bitsn##_bits_check_fail[((unsigned_integral_constant_checker<stdex::uint_fast##bitsn##_t, STDEX_UINT##bitsn##_C(cvalue)>::value == STDEX_UINT##bitsn##_C(cvalue))) ? 1 : -1]; \
+	(void)(uint_fast_of_##bitsn##_bits_check_fail);
 
 #define INTEGRAL_CONSTANT_CHECK(bitsn, value_signed, value_unsigned)\
 	SIGNED_INTEGRAL_CONSTANT_CHECK(bitsn, value_signed) \
@@ -163,7 +169,7 @@ int integral_constant_type_check(T1, T2)
 	T1 t1 = static_cast<T1>(-1);  // cast suppresses warnings
 	T2 t2 = static_cast<T2>(-1);  // ditto
 
-	STATIC_ASSERT(sizeof(T1) == sizeof(T2), integral_sizes_should_be_the_same);
+	STATIC_ASSERT((sizeof(T1) == sizeof(T2)) == true, integral_sizes_should_be_the_same);
 	DYNAMIC_VERIFY(t1 == t2);
 
 
@@ -217,7 +223,7 @@ struct integral_constant_type_64
 template<>
 struct integral_constant_type_64<void> 
 {
-	static int check() {return sizeof(int) - sizeof(int);}
+	static const int check() {return sizeof(int) - sizeof(int);}
 };
 
 int test04()
