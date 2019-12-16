@@ -236,22 +236,15 @@ namespace stdex
                 {
                     ptrdiff_t length = 
                         endptr ? (*endptr - str) : (str - str + wcslen(str));
-                    wchar_t *positive_str = new wchar_t[length + 1];
-                    bool is_negative = false;
+                    wstring positive_str(str, str + length);
+                    bool is_negative = (value == LONG_MIN);
 
-                    if(str[0] == '-')
-                    {
-                        is_negative = true;
-                        memcpy(positive_str, str + 1, (length - 1) * sizeof(wchar_t));
-                    }
-                    else
-                        memcpy(positive_str, str, length * sizeof(wchar_t));
-                    positive_str[length] = 0;
+                    if(is_negative)
+                        positive_str.replace(positive_str.find_first_of('-'));
                     
-                    unsigned long int uvalue = wcstoul(positive_str, NULL, base);
-                    delete positive_str;
+                    unsigned long int uvalue = wcstoul(positive_str.c_str(), NULL, base);
                     unsigned long int _zero = 0;
-                    
+
                     if(errno == 0 && uvalue > static_cast<unsigned long int>(is_negative ? _zero - (numeric_limits<long int>::min)() : (numeric_limits<long int>::max)() ))
                         errno = ERANGE;// using errno is bad - m'kay?
                 }
