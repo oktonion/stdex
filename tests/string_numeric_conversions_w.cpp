@@ -899,12 +899,14 @@ namespace wstring_tests
             wstring one(stdex::to_wstring(std::numeric_limits<unsigned long>::max()));
             ul1 = stdex::stoul(one);
         }
-        catch (const std::out_of_range &)
+        catch (const std::out_of_range &e)
         {
+            std::cout << "OLOLOLO:" << e.what() << std::endl;
             test = false;
         }
         catch (...)
         {
+            std::cout << "ALALALALA" << std::endl;
             test = false;
         }
         DYNAMIC_VERIFY(test);
