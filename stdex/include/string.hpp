@@ -330,6 +330,7 @@ namespace stdex
                     }
 
                     unsigned long overflow_value = strtoul(overflow_str.c_str(), NULL, 10);
+                    
                     if(overflow_value == ULONG_MAX && errno == ERANGE)
                         bug_present = false;
 #endif
@@ -343,6 +344,7 @@ namespace stdex
             static unsigned long int call(const wchar_t* str, wchar_t** endptr, int base)
             {
                 using namespace std;
+
                 if(!str)
                     return 0;
                 errno = 0;
@@ -370,10 +372,7 @@ namespace stdex
 
                         wstring::size_type length = strlen(buf);
 
-                        ulong_max_str.resize(length + 1);
-
-                        for(wstring::size_type _i = 0; _i < length; ++_i)
-                            ulong_max_str[_i] = buf[_i];
+                        ulong_max_str = wstring(&buf[0], &buf[length]);
                     }
                     const wchar_t *ulong_max_cstr = ulong_max_str.c_str();
 
@@ -964,7 +963,6 @@ namespace stdex
             char *endptr = 0;
             typedef typename _str_to_integral::type large_value_type;
             large_value_type _value = _str_to_integral::call(_str, &endptr, base);
-
 
             if (_str_to_integral::check(_value) && errno == ERANGE)
                 num_s_end = 0;
