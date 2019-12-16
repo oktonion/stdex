@@ -240,7 +240,7 @@ namespace stdex
                     bool is_negative = (value == LONG_MIN);
 
                     if(is_negative)
-                        positive_str.replace(positive_str.find_first_of('-'));
+                        positive_str.replace(positive_str.find_first_of(L'-'), 1, 1, L'+');
                     
                     unsigned long int uvalue = wcstoul(positive_str.c_str(), NULL, base);
                     unsigned long int _zero = 0;
