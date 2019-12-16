@@ -184,21 +184,15 @@ namespace stdex
                 {
                     ptrdiff_t length = 
                         endptr ? (*endptr - str) : (str - str + strlen(str));
-                    char *positive_str = new char[length + 1];
-                    bool is_negative = false;
-                    
-                    if(str[0] == '-')
-                    {
-                        is_negative = true;
-                        memcpy(positive_str, str + 1, (length - 1) * sizeof(char));
-                    }
-                    else
-                        memcpy(positive_str, str, length * sizeof(char));
-                    positive_str[length] = 0;
+                    string positive_str(str, str + length);
+                    bool is_negative = (value == LONG_MIN);
 
-                    unsigned long int uvalue = strtoul(positive_str, NULL, base);
-                    delete positive_str;
+                    if(is_negative)
+                        positive_str.replace(positive_str.find_first_of('-'), 1, 1, '+');
+
+                    unsigned long int uvalue = strtoul(positive_str.c_str(), NULL, base);
                     unsigned long int _zero = 0;
+
                     if(errno == 0 && uvalue > static_cast<unsigned long int>(is_negative ? _zero - (numeric_limits<long int>::min)() : (numeric_limits<long int>::max)() ))
                         errno = ERANGE;// using errno is bad - m'kay?
                 }
@@ -236,21 +230,15 @@ namespace stdex
                 {
                     ptrdiff_t length = 
                         endptr ? (*endptr - str) : (str - str + wcslen(str));
-                    wchar_t *positive_str = new wchar_t[length + 1];
-                    bool is_negative = false;
+                    wstring positive_str(str, str + length);
+                    bool is_negative = (value == LONG_MIN);
 
-                    if(str[0] == '-')
-                    {
-                        is_negative = true;
-                        memcpy(positive_str, str + 1, (length - 1) * sizeof(wchar_t));
-                    }
-                    else
-                        memcpy(positive_str, str, length * sizeof(wchar_t));
-                    positive_str[length] = 0;
+                    if(is_negative)
+                        positive_str.replace(positive_str.find_first_of(L'-'), 1, 1, L'+');
                     
-                    unsigned long int uvalue = wcstoul(positive_str, NULL, base);
-                    delete positive_str;
+                    unsigned long int uvalue = wcstoul(positive_str.c_str(), NULL, base);
                     unsigned long int _zero = 0;
+
                     if(errno == 0 && uvalue > static_cast<unsigned long int>(is_negative ? _zero - (numeric_limits<long int>::min)() : (numeric_limits<long int>::max)() ))
                         errno = ERANGE;// using errno is bad - m'kay?
                 }
@@ -315,36 +303,36 @@ namespace stdex
                     // the best we can do is check if compiler has bug:
                     bool bug_present = true;
 #ifdef ULONG_MAX
-    #define _STDEX_STRINGIZE_HELPER(xxx) #xxx
-    #define _STDEX_STRINGIZE(xxx) _STDEX_STRINGIZE_HELPER(xxx)
-                    char overflow_str[sizeof(_STDEX_STRINGIZE(ULONG_MAX)) / sizeof(char) + 1];
-                    size_t of_size = countof(overflow_str);
-                    overflow_str[of_size - 1] = 0;
-                    overflow_str[of_size - 2] = '0';
-                    overflow_str[of_size - 3] = '0';
-                    overflow_str[of_size - 4] = '0';
-                    const char *ulong_max_cstr = _STDEX_STRINGIZE(ULONG_MAX);
+                    string ulong_max_str;
+                    {
+                        char buf[512] = {0};
+                        sprintf(buf, "%lu", ULONG_MAX);
+
+                        ulong_max_str = string(buf);
+                    }
+                    const char *ulong_max_cstr = ulong_max_str.c_str();
+
+                    string overflow_str(ulong_max_str.length() + 1, '0');
+                    string::size_type of_size = overflow_str.length();
                     
                     if(
-                        (ulong_max_cstr[of_size - 3] == 'L' && ulong_max_cstr[of_size - 4] == 'U') ||
-                        (ulong_max_cstr[of_size - 4] == 'L' && ulong_max_cstr[of_size - 3] == 'U')
+                        (ulong_max_cstr[of_size - 2] == 'L' && ulong_max_cstr[of_size - 3] == 'U') ||
+                        (ulong_max_cstr[of_size - 3] == 'L' && ulong_max_cstr[of_size - 2] == 'U')
                     )
                     {
-                        memcpy(overflow_str, ulong_max_cstr, of_size - 4);
-                        overflow_str[of_size - 3] = 'U';
-                        overflow_str[of_size - 2] = 'L';
+                        memcpy(&overflow_str[0], ulong_max_cstr, of_size - 3);
+                        overflow_str[of_size - 2] = 'U';
+                        overflow_str[of_size - 1] = 'L';
                     }
                     else
                     {
-                        memcpy(overflow_str, ulong_max_cstr, of_size - 1);
+                        memcpy(&overflow_str[0], ulong_max_cstr, of_size - 1);
                     }
 
-                    strtoul(overflow_str, NULL, base);
-                    std::cout << "OLOLOOLLODEBUG:" << overflow_str << ":" << errno << std::endl;
-                    if(errno == ERANGE)
+                    unsigned long overflow_value = strtoul(overflow_str.c_str(), NULL, 10);
+                    
+                    if(overflow_value == ULONG_MAX && errno == ERANGE)
                         bug_present = false;
-    #undef _STDEX_STRINGIZE_HELPER
-    #undef _STDEX_STRINGIZE
 #endif
                     if(bug_present) errno = ERANGE;
                     else errno = 0;
@@ -356,6 +344,7 @@ namespace stdex
             static unsigned long int call(const wchar_t* str, wchar_t** endptr, int base)
             {
                 using namespace std;
+
                 if(!str)
                     return 0;
                 errno = 0;
@@ -376,36 +365,38 @@ namespace stdex
                     // the best we can do is check if compiler has bug:
                     bool bug_present = true;
 #ifdef ULONG_MAX
-    #define _STDEX_STRINGIZE_HELPER(xxx) L##xxx
-    #define _STDEX_STRINGIZE(xxx) _STDEX_STRINGIZE_HELPER(#xxx)
-                    wchar_t overflow_str[sizeof(_STDEX_STRINGIZE(ULONG_MAX)) / sizeof(wchar_t) + 1];
-                    size_t of_size = countof(overflow_str);
-                    overflow_str[of_size - 1] = 0;
-                    overflow_str[of_size - 2] = L'0';
-                    overflow_str[of_size - 3] = L'0';
-                    overflow_str[of_size - 4] = L'0';
-                    const wchar_t *ulong_max_cstr = _STDEX_STRINGIZE(ULONG_MAX);
+                    wstring ulong_max_str;
+                    {
+                        char buf[512] = {0};
+                        sprintf(buf, "%lu", ULONG_MAX);
+
+                        wstring::size_type length = strlen(buf);
+
+                        ulong_max_str = wstring(&buf[0], &buf[length]); // not so bright but will work
+                    }
+                    const wchar_t *ulong_max_cstr = ulong_max_str.c_str();
+
+                    wstring overflow_str(ulong_max_str.length() + 1, L'0');
+                    wstring::size_type of_size = overflow_str.length();
                     
                     if(
-                        (ulong_max_cstr[of_size - 3] == L'L' && ulong_max_cstr[of_size - 4] == L'U') ||
-                        (ulong_max_cstr[of_size - 4] == L'L' && ulong_max_cstr[of_size - 3] == L'U')
+                        (ulong_max_cstr[of_size - 2] == L'L' && ulong_max_cstr[of_size - 3] == L'U') ||
+                        (ulong_max_cstr[of_size - 3] == L'L' && ulong_max_cstr[of_size - 2] == L'U')
                     )
                     {
-                        memcpy(overflow_str, ulong_max_cstr, of_size - 4);
-                        overflow_str[of_size - 3] = L'U';
-                        overflow_str[of_size - 2] = L'L';
+                        memcpy(&overflow_str[0], ulong_max_cstr, (of_size - 3) * sizeof(wchar_t));
+                        overflow_str[of_size - 2] = L'U';
+                        overflow_str[of_size - 1] = L'L';
                     }
                     else
                     {
-                        memcpy(overflow_str, ulong_max_cstr, of_size - 1);
+                        memcpy(&overflow_str[0], ulong_max_cstr, (of_size - 1) * sizeof(wchar_t));
                     }
                     
+                    unsigned long overflow_value = wcstoul(overflow_str.c_str(), NULL, 10);
 
-                    wcstoul(overflow_str, NULL, base);
-                    if(errno == ERANGE)
+                    if(overflow_value == ULONG_MAX && errno == ERANGE)
                         bug_present = false;
-    #undef _STDEX_STRINGIZE_HELPER
-    #undef _STDEX_STRINGIZE
 #endif
                     if(bug_present) errno = ERANGE;
                     else errno = 0;
@@ -972,7 +963,6 @@ namespace stdex
             char *endptr = 0;
             typedef typename _str_to_integral::type large_value_type;
             large_value_type _value = _str_to_integral::call(_str, &endptr, base);
-
 
             if (_str_to_integral::check(_value) && errno == ERANGE)
                 num_s_end = 0;
