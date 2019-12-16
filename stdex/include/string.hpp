@@ -372,7 +372,7 @@ namespace stdex
 
                         wstring::size_type length = strlen(buf);
 
-                        ulong_max_str = wstring(&buf[0], &buf[length]);
+                        ulong_max_str = wstring(&buf[0], &buf[length]); // not so bright but will work
                     }
                     const wchar_t *ulong_max_cstr = ulong_max_str.c_str();
 
