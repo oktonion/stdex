@@ -184,21 +184,15 @@ namespace stdex
                 {
                     ptrdiff_t length = 
                         endptr ? (*endptr - str) : (str - str + strlen(str));
-                    char *positive_str = new char[length + 1];
-                    bool is_negative = false;
-                    
-                    if(str[0] == '-')
-                    {
-                        is_negative = true;
-                        memcpy(positive_str, str + 1, (length - 1) * sizeof(char));
-                    }
-                    else
-                        memcpy(positive_str, str, length * sizeof(char));
-                    positive_str[length] = 0;
+                    string positive_str(str, str + length);
+                    bool is_negative = (value == LONG_MIN);
 
-                    unsigned long int uvalue = strtoul(positive_str, NULL, base);
-                    delete positive_str;
+                    if(is_negative)
+                        positive_str.replace(positive_str.find_first_of('-'), 1, 1, '+');
+
+                    unsigned long int uvalue = strtoul(positive_str.c_str(), NULL, base);
                     unsigned long int _zero = 0;
+                    
                     if(errno == 0 && uvalue > static_cast<unsigned long int>(is_negative ? _zero - (numeric_limits<long int>::min)() : (numeric_limits<long int>::max)() ))
                         errno = ERANGE;// using errno is bad - m'kay?
                 }
