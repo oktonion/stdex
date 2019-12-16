@@ -910,7 +910,6 @@ namespace string_tests
         try
         {
             string one(stdex::to_string((std::numeric_limits<unsigned long>::max)()));
-            std::cout << "DEBUG:" << one << std::endl;
             ul1 = stdex::stoul(one);
         }
         catch (const std::out_of_range &)

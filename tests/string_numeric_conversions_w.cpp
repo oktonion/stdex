@@ -897,7 +897,6 @@ namespace wstring_tests
         try
         {
             wstring one(stdex::to_wstring((std::numeric_limits<unsigned long>::max)()));
-            std::wcout << L"DEBUG:" << one << std::endl;
             ul1 = stdex::stoul(one);
         }
         catch (const std::out_of_range &)
