@@ -999,6 +999,14 @@ namespace stdex
             {
                 return pred(value, input);
             }
+
+        private:
+            // removes MSVS 2013 warning of "assignment operator could not be generated"
+            // we do not use it anyway but whatever works for glorious Microsoft compiler...
+            _BinaryToUnaryPredicate &operator=(const _BinaryToUnaryPredicate &other)
+            {
+                return *this;
+            }
         };
 
         template<class _Tp, class _BinaryPredicate>
