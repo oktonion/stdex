@@ -774,7 +774,7 @@ namespace stdex
                     errno = ERANGE;
                 }
                 else if (neg)
-                    acc = static_cast<string_detail::_unsigned_long_long_type >(-acc); // generates WC4146 on Visual Studio and it's a bug probably (idk how to fix it yet)
+                    acc = static_cast<string_detail::_unsigned_long_long_type >(static_cast<string_detail::_unsigned_long_long_type >(0) - acc);
                 if (endptr != 0)
                     *endptr = (char *) (any ? _s - 1 : nptr);
                 return (acc);
@@ -853,7 +853,7 @@ namespace stdex
                     errno = ERANGE;
                 }
                 else if (neg)
-                    acc = static_cast<string_detail::_unsigned_long_long_type >(-acc); // generates WC4146 on Visual Studio and it's a bug probably (idk how to fix it yet)
+                    acc = static_cast<string_detail::_unsigned_long_long_type >(static_cast<string_detail::_unsigned_long_long_type >(0) - acc);
                 if (endptr != 0)
                     *endptr = (wchar_t *) (any ? _s - 1 : nptr);
                 return (acc);
