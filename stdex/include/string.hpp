@@ -31,6 +31,7 @@
 #include <cwchar>
 #include <cwctype>
 #include <cstddef> // std::size_t
+#include <iomanip> // std::setbase
 
 namespace stdex
 {
@@ -308,6 +309,11 @@ namespace stdex
                         char buf[512] = {0};
                         sprintf(buf, "%lu", ULONG_MAX);
 
+                        stringstream ss;
+                        ss << setbase(base) << ULONG_MAX;
+                        if(std::string(str) == ss.str())
+                            return value;
+
                         ulong_max_str = string(buf);
                     }
                     const char *ulong_max_cstr = ulong_max_str.c_str();
@@ -367,6 +373,13 @@ namespace stdex
 #ifdef ULONG_MAX
                     wstring ulong_max_str;
                     {
+                        stringstream ss;
+                        ss << setbase(base) << ULONG_MAX;
+                        string ulong_max_str_base = ss.str();
+                        
+                        if(wstring(str) == wstring(ulong_max_str_base.c_str(), ulong_max_str_base.c_str() + ulong_max_str_base.length()))
+                            return value;
+
                         char buf[512] = {0};
                         sprintf(buf, "%lu", ULONG_MAX);
 
