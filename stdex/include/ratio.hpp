@@ -254,7 +254,7 @@ namespace stdex
             static const stdex::uintmax_t _x1y0 = _x1 * _y0;
             static const stdex::uintmax_t _x1y1 = _x1 * _y1;
             static const stdex::uintmax_t _mix = _x0y1 + _x1y0; // possible carry...
-            static const stdex::uintmax_t _mix_lo = stdex::uintmax_t(_mix * _c);  // overflow is ok
+            static const stdex::uintmax_t _mix_lo = static_cast<stdex::uintmax_t>(_mix) * _c;  // overflow is ok
             static const stdex::uintmax_t _mix_hi
                 = _mix / _c + ((_big_multiply::_mix < _x0y1) ? _c : 0); // ... added here
             typedef _big_add<_big_multiply::_mix_hi, _big_multiply::_mix_lo, _big_multiply::_x1y1, _big_multiply::_x0y0> _Res;
