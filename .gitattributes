@@ -2,3 +2,5 @@
 * text=auto
 
 *.sh -text
+*include/*.hpp -text
+*include/*.h -text
