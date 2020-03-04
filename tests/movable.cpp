@@ -14,7 +14,7 @@
     //#define STDEX_RV_REF(Type) Type&&
 #endif
 
-#define MY_MOVE stdex::move
+#define MY_STD stdex
 
 struct movable
 {
@@ -24,7 +24,7 @@ public:
     {
         std::cout << "movable(int)" << std::endl;
     }
-    explicit movable(STDEX_RV_REF(movable) other)
+    movable(STDEX_RV_REF(movable) other)
     {
         //movable &other = other_;
         std::cout << "movable(rv_ref)" << std::endl;
@@ -53,8 +53,8 @@ public:
     {
         std::cout << "movable_not_copyable(int)" << std::endl;
     }
-    explicit movable_not_copyable(STDEX_RV_REF(movable_not_copyable) other):
-        movable(MY_MOVE(other)),
+    movable_not_copyable(STDEX_RV_REF(movable_not_copyable) other):
+        movable(MY_STD::move(other)),
         STDEX_DELETE_ICC()
     {
         //movable_not_copyable &other = other_;
@@ -67,7 +67,7 @@ public:
     {
         //movable_not_copyable &other = other_;
         std::cout << "movable_not_copyable = rv_ref" << std::endl;
-        movable_not_copyable tmp(MY_MOVE(other));
+        movable_not_copyable tmp(MY_STD::move(other));
 
         using std::swap;
         swap(data2, other.data2);
@@ -82,11 +82,14 @@ int test1()
     
     mv_t mv = mv_t(0), mv3(0);
     mv_t const mv2(0);
-    mv = MY_MOVE(mv_t(0));
+    mv =
+        MY_STD::move(mv_t(0));
     //mv = mv2;
     //mv = mv3;
-    mv = MY_MOVE(mv2);
-    mv = MY_MOVE(mv3);
+    mv =
+        MY_STD::move(mv2);
+    mv = 
+        MY_STD::move(mv3);
 
 
     return 0;
@@ -216,7 +219,7 @@ typedef X rvalue;
 X ternary( bool y )
 {
     X a, b;
-    MY_MOVE(y ? a : b);
+    MY_STD::move(y ? a : b);
     return a;
 }
 

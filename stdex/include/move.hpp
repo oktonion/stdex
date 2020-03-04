@@ -41,6 +41,18 @@ namespace stdex
 	{
 		typedef T type;
 	};
+
+	template<class T>
+	struct make_const
+	{
+		typedef const T type;
+	};
+
+	template<class T>
+	struct make_const<const T>
+	{
+		typedef const T type;
+	};
 	
     template<class T>
     class rvalue_ref:
@@ -57,22 +69,23 @@ namespace stdex
 		
         type& _ref;
     public:
-        explicit rvalue_ref(rvalue_ref &other)
+		template<class TT>
+        rvalue_ref(rvalue_ref<TT> &other)
 			: type(other._ref),
 			icc_deleter(true),
 			_ref(other._ref) 
 		{ }
         //T& get() const {return _ref;}
-		//operator T&() const {return get();}
+		//operator T&() const {return _ref;}
 		//T* operator->() const {return &get();}
 		//T& operator*() const {return get();}
 		static rvalue_ref<type> move(type &value) 
 		{
 			return rvalue_ref<type>(value);
 		}
-		static const rvalue_ref<type> move(const type &value) 
+		static rvalue_ref<type> move(const type &value) 
 		{
-			return rvalue_ref<type>(value);
+			return rvalue_ref<type>(const_cast<type&>(value));
 		}
 		static rvalue_ref<type> move(const rvalue_ref<type>& value)
 		{
@@ -81,12 +94,24 @@ namespace stdex
     };
 
 	template<class T>
-	struct not_const_ref
+	struct ref_wrap
 	{
 		T& ref;
-		explicit not_const_ref(T& ref_): ref(ref_)
+		explicit ref_wrap(const T& ref_): ref(ref_)
 			{}
 	};
+
+	namespace move_impl
+	{
+		template<class T>
+		rvalue_ref<T> move(const T& value)
+		{
+			typedef rvalue_ref<T> rvalue_ref_const;
+			return rvalue_ref_const::move(value);
+		}
+	} // namespace move_impl
+
+	//using move_impl::move;
 
 	template<class T>
 	rvalue_ref<T> move(T& value)
