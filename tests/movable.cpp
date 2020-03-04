@@ -1,0 +1,253 @@
+#include "../stdex/include/core.h"
+#include "../stdex/include/move.hpp"
+
+#include <cstdlib>
+#include <iostream>
+#include <cerrno>
+#include <limits>
+
+#define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
+#define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
+
+#ifndef __BORLANDC__
+    //#undef STDEX_RV_REF
+    //#define STDEX_RV_REF(Type) Type&&
+#endif
+
+#define MY_MOVE stdex::move
+
+struct movable
+{
+    char data;
+public:
+    movable(int)
+    {
+        std::cout << "movable(int)" << std::endl;
+    }
+    explicit movable(STDEX_RV_REF(movable) other)
+    {
+        //movable &other = other_;
+        std::cout << "movable(rv_ref)" << std::endl;
+        using std::swap;
+        swap(data, other.data);
+    }
+
+    movable& operator=(STDEX_RV_REF(movable) other)
+    {
+        //movable &other = other_;
+        std::cout << "movable = rv_ref" << std::endl;
+        using std::swap;
+        swap(data, other.data);
+
+        return *this;
+    }
+};
+
+struct movable_not_copyable:
+    public movable
+{
+    STDEX_NOT_COPYABLE
+    bool data2;
+public:
+    movable_not_copyable(int): movable(0), STDEX_DELETE_ICC()
+    {
+        std::cout << "movable_not_copyable(int)" << std::endl;
+    }
+    explicit movable_not_copyable(STDEX_RV_REF(movable_not_copyable) other):
+        movable(MY_MOVE(other)),
+        STDEX_DELETE_ICC()
+    {
+        //movable_not_copyable &other = other_;
+        std::cout << "movable_not_copyable(rv_ref)" << std::endl;
+        using std::swap;
+        swap(data2, other.data2);
+    }
+
+    movable_not_copyable& operator=(STDEX_RV_REF(movable_not_copyable) other)
+    {
+        //movable_not_copyable &other = other_;
+        std::cout << "movable_not_copyable = rv_ref" << std::endl;
+        movable_not_copyable tmp(MY_MOVE(other));
+
+        using std::swap;
+        swap(data2, other.data2);
+
+        return *this;
+    }
+};
+
+int test1()
+{
+    typedef movable_not_copyable mv_t;
+    
+    mv_t mv = mv_t(0), mv3(0);
+    mv_t const mv2(0);
+    mv = MY_MOVE(mv_t(0));
+    //mv = mv2;
+    //mv = mv3;
+    mv = MY_MOVE(mv2);
+    mv = MY_MOVE(mv3);
+
+
+    return 0;
+}
+
+struct X
+{
+    X() : id(instances++)
+    {
+        std::cout << "X" << id << ": construct\n";
+    }
+    
+    X(X const& rhs) : id(instances++)
+    {
+        std::cout << "X" << id << ": <- " << "X" << rhs.id << ": **copy**\n";
+        ++copies;
+    }
+
+    // This particular test doesn't exercise assignment, but for
+    // completeness:
+    X& operator=(const X& rhs)
+    {
+        std::cout << "X" << id << ": <- " << "X" << rhs.id << ": assign\n";
+        return *this;
+    }
+
+    X& operator=(STDEX_RV_REF(X) rhs)
+    {
+        //X& rhs = rhs_;
+        std::cout << "X" << id << ": <- " << "X" << rhs.id << ": move assign\n";
+        return *this;
+    }
+    
+    X(STDEX_RV_REF(X) rhs) : id(instances++)
+    {
+        //X& rhs = rhs_;
+        std::cout << "X" << id << ": <- " << "X" << rhs.id << ": ..move construct..\n";
+        ++copies;
+    }
+
+    ~X() { std::cout << "X" << id << ": destroy\n"; }
+
+    unsigned id;
+    
+    static unsigned copies;
+    static unsigned instances;
+};
+
+unsigned X::copies = 0;
+unsigned X::instances = 0;
+
+#define CHECK_COPIES( stmt, min, max, comment )                         \
+{                                                                       \
+    unsigned const old_copies = X::copies;                              \
+                                                                        \
+    std::cout << "\n" comment "\n" #stmt "\n===========\n";             \
+    {                                                                   \
+        stmt;                                                           \
+    }                                                                   \
+    unsigned const n = X::copies - old_copies;                          \
+    volatile unsigned const minv(min), maxv(max);                       \
+    DYNAMIC_VERIFY(n <= maxv);                                              \
+    if (n > maxv)                                                       \
+        std::cout << "*** max is too low or compiler is buggy ***\n";   \
+    DYNAMIC_VERIFY(n >= minv);                                              \
+    if (n < minv)                                                       \
+        std::cout << "*** min is too high or compiler is buggy ***\n";  \
+                                                                        \
+    std::cout << "-----------\n"                                        \
+              << n << "/" << max                                        \
+              << " possible copies/moves made\n"                        \
+              << max - n << "/" << max - min                            \
+              << " possible elisions performed\n\n";                    \
+                                                                        \
+    if (n > minv)                                                       \
+        std::cout << "*** " << n - min                                  \
+                  << " possible elisions missed! ***\n";                \
+}
+
+struct trace
+{
+    trace(char const* name)
+        : m_name(name)
+    {
+        std::cout << "->: " << m_name << "\n";
+    }
+    
+    ~trace()
+    {
+        std::cout << "<-: " << m_name << "\n";
+    }
+    
+    char const* m_name;
+};
+
+void sink(X)
+{
+  trace t("sink");
+}
+
+X nrvo_source()
+{
+    trace t("nrvo_source");
+    X a;
+    return a;
+}
+
+X urvo_source()
+{
+    trace t("urvo_source");
+    return X();
+}
+
+X identity(X a)
+{
+    trace t("identity");
+    return a;
+}
+
+X lvalue_;
+X& lvalue()
+{
+    return lvalue_;
+}
+typedef X rvalue;
+
+X ternary( bool y )
+{
+    X a, b;
+    MY_MOVE(y ? a : b);
+    return a;
+}
+
+int main(void)
+{
+    using namespace stdex;
+
+    int argc = 1000;
+    
+    RUN_TEST(test1);
+    // Double parens prevent "most vexing parse"
+    CHECK_COPIES( X a(( lvalue() )), 1U, 1U, "Direct initialization from lvalue");
+    //CHECK_COPIES( X a(( rvalue() )), 0U, 1U, "Direct initialization from rvalue");
+    
+    CHECK_COPIES( X a = lvalue(), 1U, 1U, "Copy initialization from lvalue" );
+    CHECK_COPIES( X a = rvalue(), 0U, 1U, "Copy initialization from rvalue" );
+
+    CHECK_COPIES( sink( lvalue() ), 1U, 1U, "Pass lvalue by value" );
+    CHECK_COPIES( sink( rvalue() ), 0U, 1U, "Pass rvalue by value" );
+
+    CHECK_COPIES( nrvo_source(), 0U, 1U, "Named return value optimization (NRVO)" );
+    CHECK_COPIES( urvo_source(), 0U, 1U, "Unnamed return value optimization (URVO)" );
+
+    // Just to prove these things compose properly
+    CHECK_COPIES( X a(urvo_source()), 0U, 2U, "Return value used as ctor arg" );
+    
+    // Expect to miss one possible elision here
+    CHECK_COPIES( identity( rvalue() ), 0U, 2U, "Return rvalue passed by value" );
+
+    // Expect to miss an elision in at least one of the following lines
+    CHECK_COPIES( X a = ternary( argc == 1000 ), 0U, 2U, "Return result of ternary operation" );
+    CHECK_COPIES( X a = ternary( argc != 1000 ), 0U, 2U, "Return result of ternary operation again" );
+    return 0;
+}
