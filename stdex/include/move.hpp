@@ -1,5 +1,15 @@
 #ifndef _STDEX_MOVE_H
 #define _STDEX_MOVE_H
+
+// stdex includes
+#include "./type_traits.hpp" // stdex::is_class
+
+// POSIX includes
+/*none*/
+
+// std includes
+#include <cstddef> // std::ptrdiff_t, std::size_t, NULL
+
 #ifdef _MSC_VER
 #pragma warning (push)
 	#pragma warning (disable : 4512) // assignment operator could not be generated
@@ -17,7 +27,7 @@ namespace stdex
 			deleted_implicit_copy_constructor_impl(const T &):
 				dummy(val) { (void)(dummy); }
 		};
-	}
+	} // namespace detail
 
 	typedef stdex::detail::deleted_implicit_copy_constructor_impl<char, 1> deleted_implicit_copy_constructor;
 	
@@ -30,93 +40,93 @@ namespace stdex
 		{ }
 	};
 
-	template<class T>
-	struct remove_const
+	namespace move_detail
 	{
-		typedef T type;
-	};
+		template<class _Tp, bool Value>
+		struct rvalue_ref_base_impl
+		{
+			typedef typename stdex::remove_const<_Tp>::type type;
+		};
+		template<class _Tp>
+		struct rvalue_ref_base_impl<_Tp, false>
+		{
+			struct type { template<class T> type(T) {}};
+		};
+		template<class _Tp>
+		struct rvalue_ref_base
+		{
+			typedef 
+			typename 
+			rvalue_ref_base_impl<
+				_Tp, 
+				stdex::is_class<typename stdex::remove_const<_Tp>::type>::value
+			>::type type;
+		};
+	} // namespace move_detail
 
-	template<class T>
-	struct remove_const<const T>
-	{
-		typedef T type;
-	};
-
-	template<class T>
-	struct make_const
-	{
-		typedef const T type;
-	};
-
-	template<class T>
-	struct make_const<const T>
-	{
-		typedef const T type;
-	};
-	
-    template<class T>
+    template<class _Tp>
     class rvalue_ref:
-		public remove_const<T>::type
+		public move_detail::rvalue_ref_base<_Tp>::type
     {
 	protected:
-		typedef typename remove_const<T>::type type;
-		const type& _ref;
+		typedef typename move_detail::rvalue_ref_base<_Tp>::type base_type;
+		typedef typename stdex::remove_const<_Tp>::type value_type;
+		const value_type& _ref;
 
-        explicit rvalue_ref(const type &ref) 
-			: type(ref),
+        explicit rvalue_ref(const value_type &ref) 
+			: base_type(ref),
             _ref((ref)) 
 		{ }
     public:
-		template<class TT>
-        rvalue_ref(rvalue_ref<TT> &other)
-			: type(other._ref),
+        rvalue_ref(rvalue_ref<_Tp> &other)
+			: base_type(other._ref),
 			_ref(other._ref) 
 		{ }
         //T& get() const {return _ref;}
-		//operator T&() const {return _ref;}
+		operator value_type&() const {return _ref;}
 		//T* operator->() const {return &get();}
 		//T& operator*() const {return get();}
-		static rvalue_ref<type> move(type &value) 
+		static rvalue_ref<value_type> move(value_type &value) 
 		{
-			return rvalue_ref<type>(value);
+			return rvalue_ref<value_type>(value);
 		}
-		static rvalue_ref<const type> move(const type &value) 
+		static rvalue_ref<const value_type> move(const value_type &value) 
 		{
-			return rvalue_ref<const type>(value);
+			return rvalue_ref<const value_type>(value);
 		}
-		static rvalue_ref<type> move(const rvalue_ref<type>& value)
+		static rvalue_ref<value_type> move(const rvalue_ref<value_type>& value)
 		{
-			return rvalue_ref<type>(value._ref);
+			return rvalue_ref<value_type>(value._ref);
 		}
     };
 
 	namespace move_for_const_impl
 	{
-		template<class T>
-		rvalue_ref<const T> move(const T& value)
+		template<class _Tp>
+		rvalue_ref<const _Tp> move(const _Tp& value)
 		{
-			return rvalue_ref<const T>::move(value);
+			return rvalue_ref<const _Tp>::move(value);
 		}
-	} // namespace move_impl
+	} // namespace move_for_const_impl
 
 	using move_for_const_impl::move;
 
-	template<class T>
-	rvalue_ref<T> move(T& value)
+	template<class _Tp>
+	rvalue_ref<_Tp> move(_Tp& value)
 	{
-		return rvalue_ref<T>::move(value);
+		return rvalue_ref<_Tp>::move(value);
 	}
 
-	template<class T>
-	rvalue_ref<T> move(rvalue_ref<T>& value)
+	template<class _Tp>
+	rvalue_ref<_Tp> move(rvalue_ref<_Tp>& value)
 	{
-		return rvalue_ref<T>::move(value);
+		return rvalue_ref<_Tp>::move(value);
 	}
 
-	template<class T>
-	rvalue_ref<T> move(const rvalue_ref<T>& value)
+	template<class _Tp>
+	rvalue_ref<_Tp> move(const rvalue_ref<_Tp>& value)
 	{
-		return rvalue_ref<T>::move(value);
+		return rvalue_ref<_Tp>::move(value);
 	}
 }
 

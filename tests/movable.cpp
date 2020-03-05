@@ -16,7 +16,7 @@
 
 #define MY_STD stdex
 
-struct movable
+class movable
 {
     char data;
 public:
@@ -28,22 +28,31 @@ public:
     {
         //movable &other = other_;
         std::cout << "movable(rv_ref)" << std::endl;
-        using std::swap;
-        swap(data, other.data);
+        this->swap(other);
     }
 
     movable& operator=(STDEX_RV_REF(movable) other)
     {
         //movable &other = other_;
         std::cout << "movable = rv_ref" << std::endl;
-        using std::swap;
-        swap(data, other.data);
+        this->swap(other);
 
         return *this;
     }
+
+    friend void swap(movable &lhs, movable &rhs)
+    {
+        lhs.swap(rhs);
+    }
+
+    void swap(movable &other)
+    {
+        using std::swap;
+        swap(data, other.data);
+    }
 };
 
-struct movable_not_copyable:
+class movable_not_copyable:
     public movable
 {
     STDEX_NOT_COPYABLE
@@ -59,8 +68,7 @@ public:
     {
         //movable_not_copyable &other = other_;
         std::cout << "movable_not_copyable(rv_ref)" << std::endl;
-        using std::swap;
-        swap(data2, other.data2);
+        this->swap(other);
     }
 
     movable_not_copyable& operator=(STDEX_RV_REF(movable_not_copyable) other)
@@ -70,9 +78,22 @@ public:
         movable_not_copyable tmp(MY_STD::move(other));
 
         using std::swap;
-        swap(data2, other.data2);
+        this->swap(tmp);
 
         return *this;
+    }
+
+    friend void swap(movable_not_copyable &lhs, movable_not_copyable &rhs)
+    {
+        lhs.swap(rhs);
+    }
+
+    void swap(movable_not_copyable &other)
+    {
+        using std::swap;
+        typedef movable base_type;
+        swap(static_cast<base_type&>(*this), static_cast<base_type&>(other));
+        swap(data2, other.data2);
     }
 };
 
@@ -81,12 +102,12 @@ int test1()
     typedef movable_not_copyable mv_t;
     
     mv_t mv = mv_t(0), mv3(0);
-    mv_t const mv2(0);
-    mv =
+    const mv_t  mv2(0);
+    //mv =
         MY_STD::move(mv_t(0));
     //mv = mv2;
     //mv = mv3;
-    mv =
+    //mv =
         MY_STD::move(mv2);
     mv = 
         MY_STD::move(mv3);
