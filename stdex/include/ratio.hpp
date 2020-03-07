@@ -694,4 +694,3 @@
  } // namespace stdex
  
  #endif // _STDEX_RATIO_H
- 
