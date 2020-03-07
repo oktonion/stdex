@@ -12,7 +12,7 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 ### Changed
 
-- some serious changed
+- includes now are consistent
 
 ### Fixed
 
