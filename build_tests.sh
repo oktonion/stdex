@@ -47,8 +47,18 @@ else
     filename="${filename%.*}"
     echo "compiling test c++03 $filename"
     if ! $COMPILER -std=c++03 -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename"; then
-      build_ok=0
-      tests_failed="$tests_failed $filename;"
+      if [[ $filename == *"fail"* ]]; then
+        echo "failed as expected"
+      else
+        build_ok=0
+        tests_failed="$tests_failed $filename;"
+      fi
+    else
+      if [[ $filename == *"fail"* ]]; then
+        build_ok=0
+        tests_failed="$tests_failed $filename;"
+        echo "not failed as expected"
+      fi
     fi
   done
 fi
@@ -65,8 +75,18 @@ for file in ./tests/*.cpp; do
   filename="${filename%.*}"
   echo "compiling test c++98 $filename"
   if ! $COMPILER -std=c++98 -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename"; then
-    build_ok=0
-    tests_failed="$tests_failed $filename;"
+    if [[ $filename == *"fail"* ]]; then
+      echo "failed as expected"
+    else
+      build_ok=0
+      tests_failed="$tests_failed $filename;"
+    fi
+  else
+    if [[ $filename == *"fail"* ]]; then
+      build_ok=0
+      tests_failed="$tests_failed $filename;"
+      echo "not failed as expected"
+    fi
   fi
 done
 

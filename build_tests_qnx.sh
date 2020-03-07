@@ -16,8 +16,18 @@ for file in ./tests/*.cpp; do
   filename="${filename%.*}"
   echo "compiling test c++03 $filename"
   if ! $COMPILER -pedantic $exclude_warn $file -L./stdex/lib/ -lstdex -lm -o "./tests/bin/$filename"; then
-    build_ok=0
-    tests_failed="$tests_failed $filename;"
+    if [[ $filename == *"fail"* ]]; then
+      echo "failed as expected"
+    else
+      build_ok=0
+      tests_failed="$tests_failed $filename;"
+    fi
+  else
+    if [[ $filename == *"fail"* ]]; then
+      build_ok=0
+      tests_failed="$tests_failed $filename;"
+      echo "not failed as expected"
+    fi
   fi
 done
 
@@ -33,8 +43,18 @@ for file in ./tests/*.cpp; do
   filename="${filename%.*}"
   echo "compiling test c++98 $filename"
   if ! $COMPILER -std=c++98 -pedantic $exclude_warn $file -L./stdex/lib/ -lstdex -lm -o "./tests/bin/$filename"; then
-    build_ok=0
-    tests_failed="$tests_failed $filename;"
+    if [[ $filename == *"fail"* ]]; then
+      echo "failed as expected"
+    else
+      build_ok=0
+      tests_failed="$tests_failed $filename;"
+    fi
+  else
+    if [[ $filename == *"fail"* ]]; then
+      build_ok=0
+      tests_failed="$tests_failed $filename;"
+      echo "not failed as expected"
+    fi
   fi
 done
 
