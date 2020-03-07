@@ -109,8 +109,6 @@ int test1()
     mv = mv3;
     mv =
         MY_STD::move(mv2);
-    mv = 
-        MY_STD::move(mv3);
 
 
     return 0;
