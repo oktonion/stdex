@@ -97,7 +97,59 @@ public:
     }
 };
 
+class movable_with_const_rv_ref:
+    public movable
+{
+    int bbb;
+public:
+    movable_with_const_rv_ref():
+        movable(0)
+    { }
+
+    movable_with_const_rv_ref(STDEX_RV_REF_CONST(movable_with_const_rv_ref) other):
+        movable(MY_STD::move(other))
+    {
+        //movable_not_copyable &other = other_;
+        std::cout << "movable_not_copyable(rv_ref)" << std::endl;
+        using std::swap;
+        swap(bbb, other.bbb);
+        movable::swap(other);
+    }
+
+    movable_with_const_rv_ref& operator=(STDEX_RV_REF_CONST(movable_with_const_rv_ref) other)
+    {
+        //movable_not_copyable &other = other_;
+        std::cout << "movable_not_copyable = rv_ref" << std::endl;
+        movable_with_const_rv_ref tmp(MY_STD::move(other));
+
+        using std::swap;
+        swap(bbb, other.bbb);
+        movable::swap(other);
+
+        return *this;
+    }    
+};
+
 int test1()
+{
+    typedef movable mv_t;
+    
+    mv_t mv = mv_t(0), mv3(0);
+    const mv_t  mv2(0);
+    mv =
+        MY_STD::move(mv_t(0));
+    mv = mv2;
+    mv = mv3;
+    mv =
+        MY_STD::move(mv2);
+    mv = 
+        MY_STD::move(mv3);
+
+
+    return 0;
+}
+
+int test2()
 {
     typedef movable_not_copyable mv_t;
     
@@ -108,6 +160,25 @@ int test1()
     //mv = mv2;
     //mv = mv3;
     //mv =
+        MY_STD::move(mv2);
+    mv = 
+        MY_STD::move(mv3);
+
+
+    return 0;
+}
+
+int test3()
+{
+    typedef movable_with_const_rv_ref mv_t;
+    
+    mv_t mv = mv_t(), mv3;
+    const mv_t  mv2;
+    mv =
+        MY_STD::move(mv_t());
+    mv = mv2;
+    mv = mv3;
+    mv =
         MY_STD::move(mv2);
     mv = 
         MY_STD::move(mv3);
