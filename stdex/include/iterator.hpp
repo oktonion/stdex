@@ -488,4 +488,3 @@
  #undef _STDEX_NOEXCEPT_FUNCTION
  
  #endif // _STDEX_ITERATOR_H
- 
