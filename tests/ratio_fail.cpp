@@ -21,6 +21,6 @@ int main(void)
 			volatile ratio_multiply<ratio<-M, 2>, ratio<3, 2> >::type r1; // error
 			volatile ratio_multiply<ratio<M>, ratio<M> >::type r2; // error
 		}
-	}
+
     return 0;
 }
