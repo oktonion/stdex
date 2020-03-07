@@ -20,6 +20,7 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 - warnings for possible overflow in `<ratio>`
 - warnings for using deprecated header `<strstream>`
 - compiler bug that was leading to `std::out_of_range` exception in `stdex::stol`, `stdex::stoul` for perfectly valid u/long maximum, minimum value strings
+- new lines at EOF for all '.hpp'
 
 ## [0.2.3] - 2019-12-09
 
