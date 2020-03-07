@@ -58,4 +58,3 @@
  #endif // _STDEX_NATIVE_CPP_98_SUPPORT
  
  #endif // _STDEX_SSTREAM_H
- 
