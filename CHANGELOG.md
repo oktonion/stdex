@@ -4,6 +4,20 @@ All notable changes to stdex library project will be documented in this file.
 
 visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library
 
+## [0.2.4] - 2020-03-07
+
+### Changed
+
+- tabs to spaces in all header files
+- C++ 98 standard support detection for GCC
+
+### Fixed
+
+- warnings for possible overflow in `<ratio>`
+- warnings for using deprecated header `<strstream>`
+- compiler bug that was leading to `std::out_of_range` exception in `stdex::stol`, `stdex::stoul` for perfectly valid u/long maximum, minimum value strings
+- new lines at EOF for all '.hpp'
+
 ## [0.2.3] - 2019-12-09
 
 ### Added

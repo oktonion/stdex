@@ -47,7 +47,7 @@ namespace stdex
 
         bool
         operator<(const type_index& _other) const _STDEX_NOEXCEPT_FUNCTION
-            { return _type_info_obj->before(*_other._type_info_obj); }
+            { return !!_type_info_obj->before(*_other._type_info_obj); }
 
         bool
         operator<=(const type_index& _other) const _STDEX_NOEXCEPT_FUNCTION
@@ -55,7 +55,7 @@ namespace stdex
 
         bool
         operator>(const type_index& _other) const _STDEX_NOEXCEPT_FUNCTION
-            { return _other._type_info_obj->before(*_type_info_obj); }
+            { return !!_other._type_info_obj->before(*_type_info_obj); }
 
         bool
         operator>=(const type_index& _other) const _STDEX_NOEXCEPT_FUNCTION
