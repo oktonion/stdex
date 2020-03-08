@@ -131,9 +131,9 @@ namespace stdex
 }
 
 #define STDEX_NOT_COPYABLE \
-	stdex::delete_implicit_copy_constructor stdex_icc_deleter;
+	stdex::delete_implicit_copy_constructor _stdex_icc_deleter;
 
-#define STDEX_DELETE_ICC() stdex_icc_deleter(true)
+#define STDEX_DELETE_ICC() _stdex_icc_deleter(true)
 
 #define STDEX_RV_REF(Type) stdex::rvalue_ref<Type>
 #define STDEX_RV_REF_CONST(Type) stdex::rvalue_ref<Type const>
