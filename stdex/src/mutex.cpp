@@ -1,5 +1,5 @@
 // stdex includes
-#include "../include/mutex"
+#include "../include/mutex.hpp"
 
 // POSIX includes
 /*none*/

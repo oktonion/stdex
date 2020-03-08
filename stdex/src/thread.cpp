@@ -1,7 +1,7 @@
 // stdex includes
-#include "../include/thread"
-#include "../include/mutex"
-#include "../include/condition_variable"
+#include "../include/thread.hpp"
+#include "../include/mutex.hpp"
+#include "../include/condition_variable.hpp"
 
 // POSIX includes
 /*none*/
