@@ -6,8 +6,8 @@
  #endif // _MSC_VER > 1000
  
  // stdex includes
- #include "./system_error"
- #include "./chrono"
+ #include "./system_error.hpp"
+ #include "./chrono.hpp"
  
  // POSIX includes
  #include <pthread.h>

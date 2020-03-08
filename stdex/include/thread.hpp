@@ -6,9 +6,9 @@
 #endif // _MSC_VER > 1000
 
 // stdex includes
-#include "./mutex"
-#include "./condition_variable"
-#include "./chrono"
+#include "./mutex.hpp"
+#include "./condition_variable.hpp"
+#include "./chrono.hpp"
 
 // POSIX includes
 #include <pthread.h>
