@@ -5,6 +5,7 @@
 #include <iostream>
 #include <cerrno>
 #include <limits>
+#include <map>
 
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
@@ -24,11 +25,26 @@ public:
     {
         std::cout << "movable(int)" << std::endl;
     }
+    movable(const movable & other):
+        data(other.data)
+    { 
+        std::cout << "movable(lv_ref)" << std::endl;
+    }
     movable(STDEX_RV_REF(movable) other)
     {
         //movable &other = other_;
         std::cout << "movable(rv_ref)" << std::endl;
         this->swap(other);
+    }
+
+    movable& operator=(const movable &other)
+    {
+        //movable &other = other_;
+        std::cout << "movable = lv_ref" << std::endl;
+        movable tmp(other);
+        this->swap(tmp);
+
+        return *this;
     }
 
     movable& operator=(STDEX_RV_REF(movable) other)
@@ -187,6 +203,21 @@ int test3()
     return 0;
 }
 
+int test4()
+{
+    typedef movable_not_copyable mv_t;
+
+    mv_t mv = mv_t(0), mv3(0);
+    const mv_t  mv2(0);
+
+    std::map<int, mv_t> mv_map;
+
+    mv_map[0] = MY_STD::move(mv);
+    mv_map[0] = MY_STD::move(mv_map[1]);
+
+    return 0;
+}
+
 struct X
 {
     X() : id(instances++)
@@ -322,9 +353,12 @@ int main(void)
     int argc = 1000;
     
     RUN_TEST(test1);
+    RUN_TEST(test2);
+    RUN_TEST(test3);
+    RUN_TEST(test4);
     // Double parens prevent "most vexing parse"
     CHECK_COPIES( X a(( lvalue() )), 1U, 1U, "Direct initialization from lvalue");
-    //CHECK_COPIES( X a(( rvalue() )), 0U, 1U, "Direct initialization from rvalue");
+    CHECK_COPIES( X a(( rvalue() )), 0U, 1U, "Direct initialization from rvalue");
     
     CHECK_COPIES( X a = lvalue(), 1U, 1U, "Copy initialization from lvalue" );
     CHECK_COPIES( X a = rvalue(), 0U, 1U, "Copy initialization from rvalue" );
