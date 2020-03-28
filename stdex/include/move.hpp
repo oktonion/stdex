@@ -29,7 +29,7 @@ namespace stdex
 		};
 	} // namespace detail
 
-	typedef stdex::detail::deleted_implicit_copy_constructor_impl<char, 1> deleted_implicit_copy_constructor;
+	typedef stdex::detail::deleted_implicit_copy_constructor_impl<char, 0> deleted_implicit_copy_constructor;
 	
 	class delete_implicit_copy_constructor:
 		deleted_implicit_copy_constructor
