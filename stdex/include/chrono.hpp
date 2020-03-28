@@ -496,7 +496,7 @@
                  static const duration max()
              #endif
              {
-                 return duration_values<_Rep>::max();
+                 return (duration_values<_Rep>::max)();
              }
  
              #ifdef min
@@ -505,7 +505,7 @@
                  static const duration min()
              #endif
              {
-                 return duration_values<_Rep>::min();
+                 return (duration_values<_Rep>::min)();
              }
          };
  
