@@ -152,12 +152,17 @@ int test1()
     
     mv_t mv = mv_t(0), mv3(0);
     const mv_t  mv2(0);
+    std::cout << "should be rv_ref" << std::endl;
     mv =
         MY_STD::move(mv_t(0));
+    std::cout << "should be lv_ref" << std::endl;
     mv = mv2;
+    std::cout << "should be lv_ref" << std::endl;
     mv = mv3;
+    std::cout << "should be lv_ref" << std::endl;
     mv =
         MY_STD::move(mv2);
+    std::cout << "should be rv_ref" << std::endl;
     mv = 
         MY_STD::move(mv3);
 
