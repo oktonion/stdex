@@ -74,7 +74,7 @@ class movable_not_copyable:
     STDEX_NOT_COPYABLE
     bool data2;
 public:
-    movable_not_copyable(int): movable(0), STDEX_DELETE_ICC()
+    movable_not_copyable(int v = 0): movable(v), STDEX_DELETE_ICC()
     {
         std::cout << "movable_not_copyable(int)" << std::endl;
     }
