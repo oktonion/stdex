@@ -123,7 +123,7 @@ public:
     { }
 
     movable_with_const_rv_ref(STDEX_RV_REF_CONST(movable_with_const_rv_ref) other):
-        movable(MY_STD::move(other))
+        movable((other))
     {
         //movable_not_copyable &other = other_;
         std::cout << "movable_not_copyable(rv_ref)" << std::endl;
