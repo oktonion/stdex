@@ -70,8 +70,9 @@ namespace stdex
     class rvalue_reference:
 		public move_detail::rvalue_reference_base<_Tp>::type
     {
-	protected:
+	public:
 		typedef typename move_detail::rvalue_reference_base<_Tp>::type base_type;
+	protected:
 		typedef typename stdex::remove_const<_Tp>::type value_type;
 		value_type& _ref;
 
@@ -109,12 +110,22 @@ namespace stdex
 		}
     };
 
+	namespace move_detail
+	{
+		template<class _Tp>
+		struct rvalue_reference_base<rvalue_reference<_Tp>/**/>
+		{
+			typedef typename rvalue_reference<_Tp>::base_type type;
+		};
+	} // namespace move_detail
+
     template<class _Tp>
     class rvalue_reference <const _Tp>:
 		public move_detail::rvalue_reference_base<_Tp>::type
     {
-	protected:
+	public:
 		typedef typename move_detail::rvalue_reference_base<_Tp>::type base_type;
+	protected:
 		typedef const _Tp value_type;
 		value_type& _ref;
 
