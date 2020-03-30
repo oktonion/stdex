@@ -72,13 +72,14 @@ public:
 
 class movable_only
 {
+    STDEX_NOT_COPYABLE
     char data;
 public:
-    movable_only(int)
+    movable_only(int): STDEX_DELETE_ICC()
     {
         std::cout << "movable_only(int)" << std::endl;
     }
-    movable_only(STDEX_RV_REF(movable_only) other)
+    movable_only(STDEX_RV_REF(movable_only) other): STDEX_DELETE_ICC()
     {
         //movable &other = other_;
         std::cout << "movable_only(rv_ref)" << std::endl;
@@ -119,11 +120,11 @@ public:
     }
     movable_not_copyable(STDEX_RV_REF(movable_not_copyable) other):
         movable(MY_STD::move(other)),
-        STDEX_DELETE_ICC()
+        STDEX_DELETE_ICC(),
+        data2(other.data2)
     {
         //movable_not_copyable &other = other_;
         std::cout << "movable_not_copyable(rv_ref)" << std::endl;
-        this->swap(other);
     }
 
     movable_not_copyable& operator=(STDEX_RV_REF(movable_not_copyable) other)
@@ -193,7 +194,7 @@ int test0()
     const mv_t  mv2(0); // shouldn't work
     std::cout << "should be rv_ref" << std::endl;
     mv = // works
-        (mv_t(0)); // works
+        MY_STD::move(mv_t(0)); // works
 
     //mv = mv2; // shouldn't work
 
