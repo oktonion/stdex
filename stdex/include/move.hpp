@@ -86,11 +86,6 @@ namespace stdex
 			, _ref(other._ref) 
 		{ } 
 
-		rvalue_reference(const rvalue_reference<const _Tp> &other)
-			: base_type(other._ref)
-			, _ref(*this) 
-		{ } 
-
 		operator value_type&() const {return _ref;}
 
 		static rvalue_reference<value_type> move(value_type &value) 
@@ -120,6 +115,11 @@ namespace stdex
 
     public:
         rvalue_reference(const rvalue_reference<_Tp> &other)
+			: base_type(other)
+			, _ref(other._ref) 
+		{ }
+
+		rvalue_reference(const rvalue_reference<const _Tp> &other)
 			: base_type(other)
 			, _ref(other._ref) 
 		{ }
