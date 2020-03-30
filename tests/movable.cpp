@@ -239,7 +239,7 @@ int test2()
     
     mv_t mv = mv_t(0), mv3(0);
     const mv_t  mv2(0);
-    mv = // works
+    //mv = // works
         MY_STD::move(mv_t(0)); // works
     //mv = mv2; // shouldn't work
     //mv = mv3; // shouldn't work
