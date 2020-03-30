@@ -103,12 +103,7 @@ int test1()
     
     mv_t mv = mv_t(0), mv3(0);
     const mv_t  mv2(0);
-    mv =
-        MY_STD::move(mv_t(0));
     mv = mv2;
-    mv = mv3;
-    mv =
-        MY_STD::move(mv2);
 
 
     return 0;
