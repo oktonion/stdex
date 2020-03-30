@@ -137,6 +137,12 @@ namespace stdex
 	}
 
 	template<class _Tp>
+	rvalue_reference<const _Tp> move(const _Tp& value, ...)
+	{
+		return rvalue_reference<const _Tp>::move(value);
+	}
+
+	template<class _Tp>
 	rvalue_reference<_Tp> move(const rvalue_reference<_Tp>& value)
 	{
 		return rvalue_reference<_Tp>::move(value);
