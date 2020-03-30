@@ -26,6 +26,8 @@ namespace stdex
 		public:
 			deleted_implicit_copy_constructor_impl(const T &):
 				dummy(val) { (void)(dummy); }
+			deleted_implicit_copy_constructor_impl &operator=(deleted_implicit_copy_constructor_impl &other)
+			{ return *this; }
 		};
 
 		typedef stdex::detail::deleted_implicit_copy_constructor_impl<char, 0> deleted_implicit_copy_constructor;
