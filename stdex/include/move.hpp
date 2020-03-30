@@ -79,6 +79,11 @@ namespace stdex
             : base_type(ref)
 			, _ref((ref)) 
 		{ }
+
+		explicit rvalue_reference(const value_type &ref)
+            : base_type(ref)
+			, _ref(*this) 
+		{ }
 		
     public:
         rvalue_reference(const rvalue_reference<_Tp> &other)
