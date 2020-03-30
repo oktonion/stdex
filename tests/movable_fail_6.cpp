@@ -18,6 +18,8 @@
 
 class movable_only
 {
+    movable_only(const movable_only&);
+    const movable_only& operator=(const movable_only&);
     char data;
 public:
     movable_only(int)

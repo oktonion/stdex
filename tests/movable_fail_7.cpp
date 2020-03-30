@@ -61,11 +61,7 @@ int test1()
     
     mv_t mv = mv_t(0), mv3(0);
     const mv_t  mv2(mv); // shouldn't work
-    std::cout << "should be rv_ref" << std::endl;
-
-    mv = mv2; // shouldn't work
-
-
+    
     return 0;
 }
 
