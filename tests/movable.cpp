@@ -121,7 +121,7 @@ public:
     movable_not_copyable(STDEX_RV_REF(movable_not_copyable) other):
         movable(MY_STD::move(other)),
         STDEX_DELETE_ICC(),
-        data2(other.data2)
+        data2(static_cast<const movable_not_copyable&>(other).data2)
     {
         //movable_not_copyable &other = other_;
         std::cout << "movable_not_copyable(rv_ref)" << std::endl;
@@ -238,14 +238,21 @@ int test2()
 {
     typedef movable_not_copyable mv_t;
     
-    mv_t mv = mv_t(0), mv3(0);
+    std::cout << __LINE__ << std::endl;
+    mv_t mv = mv_t(0); 
+    std::cout << __LINE__ << std::endl;
+    mv_t mv3(0);
+    std::cout << __LINE__ << std::endl;
     const mv_t  mv2(0);
+    std::cout << __LINE__ << std::endl;
     //mv = // works
         MY_STD::move(mv_t(0)); // works
     //mv = mv2; // shouldn't work
     //mv = mv3; // shouldn't work
+    std::cout << __LINE__ << std::endl;
     //mv =  // shouldn't work
         MY_STD::move(mv2); // works
+    std::cout << __LINE__ << std::endl;
     mv =  // works
         MY_STD::move(mv3); // works
 
@@ -294,7 +301,7 @@ int test4()
 
 struct X
 {
-    X() : id(instances++)
+    X(int d = 0) : id(instances++)
     {
         std::cout << "X" << id << ": construct\n";
     }
@@ -432,7 +439,7 @@ int main(void)
     RUN_TEST(test4);
     // Double parens prevent "most vexing parse"
     CHECK_COPIES( X a(( lvalue() )), 1U, 1U, "Direct initialization from lvalue");
-    CHECK_COPIES( X a(( rvalue() )), 0U, 1U, "Direct initialization from rvalue");
+    CHECK_COPIES( X a(( rvalue(0) )), 0U, 1U, "Direct initialization from rvalue");
     
     CHECK_COPIES( X a = lvalue(), 1U, 1U, "Copy initialization from lvalue" );
     CHECK_COPIES( X a = rvalue(), 0U, 1U, "Copy initialization from rvalue" );
