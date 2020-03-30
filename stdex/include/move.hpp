@@ -80,7 +80,7 @@ namespace stdex
 		
     public:
         rvalue_reference(const rvalue_reference<_Tp> &other)
-			: base_type(ref)
+			: base_type(other)
 			, _ref(other._ref) 
 		{ } 
 
@@ -113,7 +113,7 @@ namespace stdex
 
     public:
         rvalue_reference(const rvalue_reference<_Tp> &other)
-			: base_type(ref)
+			: base_type(other)
 			, _ref(other._ref) 
 		{ }
 
