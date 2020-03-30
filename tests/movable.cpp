@@ -13,6 +13,8 @@
 #ifndef __BORLANDC__
     //#undef STDEX_RV_REF
     //#define STDEX_RV_REF(Type) Type&&
+    //#undef STDEX_RV_REF_CONST
+    //#define STDEX_RV_REF_CONST(Type) Type const&&
 #endif
 
 #define MY_STD stdex
@@ -62,6 +64,43 @@ public:
     }
 
     void swap(movable &other)
+    {
+        using std::swap;
+        swap(data, other.data);
+    }
+};
+
+class movable_only
+{
+    char data;
+public:
+    movable_only(int)
+    {
+        std::cout << "movable_only(int)" << std::endl;
+    }
+    movable_only(STDEX_RV_REF(movable_only) other)
+    {
+        //movable &other = other_;
+        std::cout << "movable_only(rv_ref)" << std::endl;
+        this->swap(other);
+    }
+
+
+    movable_only& operator=(STDEX_RV_REF(movable_only) other)
+    {
+        //movable &other = other_;
+        std::cout << "movable_only = rv_ref" << std::endl;
+        this->swap(other);
+
+        return *this;
+    }
+
+    friend void swap(movable_only &lhs, movable_only &rhs)
+    {
+        lhs.swap(rhs);
+    }
+
+    void swap(movable_only &other)
     {
         using std::swap;
         swap(data, other.data);
@@ -122,29 +161,53 @@ public:
         movable(0)
     { }
 
-    movable_with_const_rv_ref(STDEX_RV_REF_CONST(movable_with_const_rv_ref) other):
-        movable(MY_STD::move(other))
+    movable_with_const_rv_ref(STDEX_RV_REF_CONST(movable_with_const_rv_ref) other_):
+        movable(MY_STD::move(other_)),
+        bbb(static_cast<const movable_with_const_rv_ref&>(other_).bbb)
     {
         //movable_not_copyable &other = other_;
         std::cout << "movable_not_copyable(rv_ref)" << std::endl;
-        using std::swap;
-        swap(bbb, other.bbb);
-        movable::swap(other);
+
+        const movable_with_const_rv_ref &other = other_;
+        
     }
 
-    movable_with_const_rv_ref& operator=(STDEX_RV_REF_CONST(movable_with_const_rv_ref) other)
+    movable_with_const_rv_ref& operator=(STDEX_RV_REF_CONST(movable_with_const_rv_ref) other_)
     {
         //movable_not_copyable &other = other_;
         std::cout << "movable_not_copyable = rv_ref" << std::endl;
-        movable_with_const_rv_ref tmp(MY_STD::move(other));
+        movable_with_const_rv_ref tmp(MY_STD::move(other_));
 
         using std::swap;
-        swap(bbb, other.bbb);
-        movable::swap(other);
+        swap(*this, tmp);
 
         return *this;
     }    
 };
+
+int test0()
+{
+    typedef movable_only mv_t;
+    
+    mv_t mv = mv_t(0), mv3(0);
+    const mv_t  mv2(0); // shouldn't work
+    std::cout << "should be rv_ref" << std::endl;
+    mv = // works
+        (mv_t(0)); // works
+
+    //mv = mv2; // shouldn't work
+
+    //mv = mv3; // shouldn't work
+
+    //mv = // shouldn't work
+        MY_STD::move(mv2); // works
+    std::cout << "should be rv_ref" << std::endl;
+    mv =  // works
+        MY_STD::move(mv3); // works
+
+
+    return 0;
+}
 
 int test1()
 {
@@ -153,18 +216,18 @@ int test1()
     mv_t mv = mv_t(0), mv3(0);
     const mv_t  mv2(0);
     std::cout << "should be rv_ref" << std::endl;
-    mv =
-        MY_STD::move(mv_t(0));
+    mv = // works
+        MY_STD::move(mv_t(0)); // works
     std::cout << "should be lv_ref" << std::endl;
-    mv = mv2;
+    mv = mv2; // works
     std::cout << "should be lv_ref" << std::endl;
-    mv = mv3;
+    mv = mv3; // works
     std::cout << "should be lv_ref" << std::endl;
-    mv =
-        MY_STD::move(mv2);
+    mv = // works
+        MY_STD::move(mv2); // works
     std::cout << "should be rv_ref" << std::endl;
-    mv = 
-        MY_STD::move(mv3);
+    mv =  // works
+        MY_STD::move(mv3); // works
 
 
     return 0;
@@ -176,14 +239,14 @@ int test2()
     
     mv_t mv = mv_t(0), mv3(0);
     const mv_t  mv2(0);
-    //mv =
-        MY_STD::move(mv_t(0));
-    //mv = mv2;
-    //mv = mv3;
-    //mv =
-        MY_STD::move(mv2);
-    mv = 
-        MY_STD::move(mv3);
+    mv = // works
+        MY_STD::move(mv_t(0)); // works
+    //mv = mv2; // shouldn't work
+    //mv = mv3; // shouldn't work
+    //mv =  // shouldn't work
+        MY_STD::move(mv2); // works
+    mv =  // works
+        MY_STD::move(mv3); // works
 
 
     return 0;
@@ -195,14 +258,14 @@ int test3()
     
     mv_t mv = mv_t(), mv3;
     const mv_t  mv2;
-    mv =
-        MY_STD::move(mv_t());
-    mv = mv2;
-    mv = mv3;
-    mv =
-        MY_STD::move(mv2);
-    mv = 
-        MY_STD::move(mv3);
+    mv = // works
+        MY_STD::move(mv_t()); // works
+    //mv = mv2; // shouldn't work
+    //mv = mv3; // shouldn't work
+    mv = // works
+        MY_STD::move(mv2); // works
+    mv = // works
+        MY_STD::move(mv3); // works
 
 
     return 0;
@@ -217,8 +280,13 @@ int test4()
 
     std::map<int, mv_t> mv_map;
 
-    mv_map[0] = MY_STD::move(mv);
-    mv_map[0] = MY_STD::move(mv_map[1]);
+    mv_map[0] =  // works
+        MY_STD::move(mv);  // works
+    mv_map[0] =  // works
+        MY_STD::move(mv_map[1]);  // works
+
+    //mv_map[0] = mv;// shouldn't work
+    //mv_map[0] = mv_map[1];// shouldn't work
 
     return 0;
 }
