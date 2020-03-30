@@ -93,6 +93,11 @@ namespace stdex
 			return rvalue_reference<value_type>(value);
 		}
 
+		static rvalue_reference<value_type> move(const value_type &value) 
+		{
+			return rvalue_reference<value_type>(value);
+		}
+
 		static rvalue_reference<value_type> move(const rvalue_reference<value_type>& value)
 		{
 			return rvalue_reference<value_type>(value._ref);
