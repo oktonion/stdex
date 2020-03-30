@@ -86,6 +86,11 @@ namespace stdex
 			, _ref(other._ref) 
 		{ } 
 
+		rvalue_reference(const rvalue_reference<const _Tp> &other)
+			: base_type(other._ref)
+			, _ref(*this) 
+		{ } 
+
 		operator value_type&() const {return _ref;}
 
 		static rvalue_reference<value_type> move(value_type &value) 
@@ -139,9 +144,9 @@ namespace stdex
 	}
 
 	template<class _Tp>
-	rvalue_reference<const _Tp> move(const _Tp& value, ...)
+	rvalue_reference<_Tp> move(const _Tp& value, ...)
 	{
-		return rvalue_reference<const _Tp>::move(value);
+		return rvalue_reference<_Tp>::move(value);
 	}
 
 	template<class _Tp>
@@ -156,8 +161,8 @@ namespace stdex
 
 #define STDEX_DELETE_ICC() _stdex_icc_deleter(true)
 
-#define STDEX_RV_REF(Type) stdex::rvalue_reference<Type> 
-#define STDEX_RV_REF_CONST(Type) stdex::rvalue_reference<Type const> 
+#define STDEX_RV_REF(Type) stdex::rvalue_reference<Type>
+#define STDEX_RV_REF_CONST(Type) stdex::rvalue_reference<Type const>
 
 #ifdef _MSC_VER
 	#pragma warning (pop)
