@@ -47,7 +47,7 @@ namespace stdex
 		template<class _Tp, bool Value>
 		struct rvalue_reference_base_impl
 		{
-			typedef typename stdex::remove_const<_Tp>::type type;
+			typedef typename stdex::remove_reference<typename stdex::remove_cv<_Tp>::type>::type type;
 		};
 		template<class _Tp>
 		struct rvalue_reference_base_impl<_Tp, false>
@@ -61,7 +61,7 @@ namespace stdex
 			typename 
 			rvalue_reference_base_impl<
 				_Tp, 
-				stdex::is_class<typename stdex::remove_const<_Tp>::type>::value
+				stdex::is_class<typename stdex::remove_cv<_Tp>::type>::value
 			>::type type;
 		};
 	} // namespace move_detail
@@ -198,8 +198,8 @@ namespace stdex
 
 #define STDEX_DELETE_ICC() _stdex_icc_deleter(true)
 
-#define STDEX_RV_REF(Type) stdex::rvalue_reference<Type>&
-#define STDEX_RV_REF_CONST(Type) const stdex::rvalue_reference<Type const>&
+#define STDEX_RV_REF(Type) stdex::rvalue_reference< Type >&
+#define STDEX_RV_REF_CONST(Type) const stdex::rvalue_reference< Type const>&
 
 #ifdef _MSC_VER
 	#pragma warning (pop)
