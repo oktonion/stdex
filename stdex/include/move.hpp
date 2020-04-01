@@ -166,9 +166,9 @@ namespace stdex
 	} // namespace move_detail
 
 	template<class _Tp>
-	rvalue_reference<_Tp>& move(_Tp& value)
+	rvalue_reference<typename stdex::remove_cv<_Tp>::type>& move(_Tp& value)
 	{
-		typedef rvalue_reference<_Tp> type;
+		typedef rvalue_reference<typename stdex::remove_cv<_Tp>::type> type;
 		return reinterpret_cast<type&>(value);
 	}
 
@@ -185,9 +185,9 @@ namespace stdex
 	}
 
 	template<class _Tp>
-	const rvalue_reference<const _Tp>& move(const _Tp& value, ...)
+	const rvalue_reference<const typename stdex::remove_cv<_Tp>::type>& move(const _Tp& value, ...)
 	{
-		typedef const rvalue_reference<const _Tp> type;
+		typedef const rvalue_reference<const typename stdex::remove_cv<_Tp>::type> type;
 		return reinterpret_cast<type&>(value);
 	}
 
