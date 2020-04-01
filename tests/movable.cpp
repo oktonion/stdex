@@ -153,6 +153,46 @@ public:
     }
 };
 
+class movable_not_copyable_child:
+    public movable_not_copyable
+{
+public:
+    movable_not_copyable_child(int v = 0): movable_not_copyable(v)
+    {
+        std::cout << "movable_not_copyable(int)" << std::endl;
+    }
+    movable_not_copyable_child(STDEX_RV_REF(movable_not_copyable_child) other):
+        movable_not_copyable(MY_STD::move(other))
+    {
+        //movable_not_copyable &other = other_;
+        std::cout << "movable_not_copyable(rv_ref)" << std::endl;
+    }
+
+    movable_not_copyable_child& operator=(STDEX_RV_REF(movable_not_copyable_child) other)
+    {
+        //movable_not_copyable &other = other_;
+        std::cout << "movable_not_copyable = rv_ref" << std::endl;
+        movable_not_copyable_child tmp(MY_STD::move(other));
+
+        using std::swap;
+        this->swap(tmp);
+
+        return *this;
+    }
+
+    friend void swap(movable_not_copyable_child &lhs, movable_not_copyable_child &rhs)
+    {
+        lhs.swap(rhs);
+    }
+
+    void swap(movable_not_copyable_child &other)
+    {
+        using std::swap;
+        typedef movable_not_copyable base_type;
+        swap(static_cast<base_type&>(*this), static_cast<base_type&>(other));
+    }
+};
+
 class movable_with_const_rv_ref:
     public movable
 {
@@ -459,7 +499,7 @@ int test5()
     return 0;
 }
 
-void test6_func(STDEX_RV_REF(movable) ref)
+void test6_func(STDEX_RV_REF(movable))
 {
 
 }
@@ -470,6 +510,32 @@ int test6()
     movable m(0);
     STDEX_RV_REF(movable) r = MY_STD::move(m);
     test6_func(r);
+
+    return 0;
+}
+
+int test7()
+{
+    typedef movable_not_copyable_child mv_t;
+    
+    std::cout << __LINE__ << std::endl;
+    mv_t mv = mv_t(0); 
+    std::cout << __LINE__ << std::endl;
+    mv_t mv3(0);
+    std::cout << __LINE__ << std::endl;
+    const mv_t  mv2(0);
+    std::cout << __LINE__ << std::endl;
+    //mv = // works
+        MY_STD::move(mv_t(0)); // works
+    //mv = mv2; // shouldn't work
+    //mv = mv3; // shouldn't work
+    std::cout << __LINE__ << std::endl;
+    //mv =  // shouldn't work
+        MY_STD::move(mv2); // works
+    std::cout << __LINE__ << std::endl;
+    mv =  // works
+        MY_STD::move(mv3); // works
+
 
     return 0;
 }
@@ -486,6 +552,7 @@ int main(void)
     RUN_TEST(test4);
     RUN_TEST(test5);
     RUN_TEST(test6);
+    RUN_TEST(test7);
     // Double parens prevent "most vexing parse"
     CHECK_COPIES( X a(( lvalue() )), 1U, 1U, "Direct initialization from lvalue");
     CHECK_COPIES( X a(( rvalue(0) )), 0U, 1U, "Direct initialization from rvalue");
