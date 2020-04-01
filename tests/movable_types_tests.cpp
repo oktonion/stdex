@@ -18,7 +18,7 @@ int test1()
         lock1(m),
         lock2(stdex::move(lock1));
     
-    DYNAMIC_VERIFY(lock2.mutex()->native_handle == m.native_handle);
+    DYNAMIC_VERIFY(lock2.mutex()->native_handle() == m.native_handle());
     DYNAMIC_VERIFY(!lock1.mutex());
     
     return 0;
