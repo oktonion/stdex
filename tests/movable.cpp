@@ -159,19 +159,19 @@ class movable_not_copyable_child:
 public:
     movable_not_copyable_child(int v = 0): movable_not_copyable(v)
     {
-        std::cout << "movable_not_copyable(int)" << std::endl;
+        std::cout << "movable_not_copyable_child(int)" << std::endl;
     }
     movable_not_copyable_child(STDEX_RV_REF(movable_not_copyable_child) other):
         movable_not_copyable(MY_STD::move(other))
     {
         //movable_not_copyable &other = other_;
-        std::cout << "movable_not_copyable(rv_ref)" << std::endl;
+        std::cout << "movable_not_copyable_child(rv_ref)" << std::endl;
     }
 
     movable_not_copyable_child& operator=(STDEX_RV_REF(movable_not_copyable_child) other)
     {
         //movable_not_copyable &other = other_;
-        std::cout << "movable_not_copyable = rv_ref" << std::endl;
+        std::cout << "movable_not_copyable_child = rv_ref" << std::endl;
         movable_not_copyable_child tmp(MY_STD::move(other));
 
         using std::swap;
