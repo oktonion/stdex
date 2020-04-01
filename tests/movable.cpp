@@ -159,6 +159,7 @@ public:
 class movable_not_copyable_child:
     public movable_not_copyable
 {
+
 public:
     movable_not_copyable_child(int v = 0): movable_not_copyable(v)
     {
@@ -193,7 +194,7 @@ public:
     {
         using std::swap;
         typedef movable_not_copyable base_type;
-        swap(static_cast<base_type&>(*this), static_cast<base_type&>(other));
+        static_cast<base_type&>(*this).swap(other);
     }
 };
 
