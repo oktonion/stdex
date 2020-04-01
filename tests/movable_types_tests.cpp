@@ -39,10 +39,32 @@ int test2()
     return 0;
 }
 
+int test3()
+{
+    stdex::thread
+        thr1,
+        thr2(stdex::move(thr1));
+    
+    return 0;
+}
+
+int test4()
+{
+    stdex::thread
+        thr1,
+        thr2;
+    
+    thr2 = stdex::move(thr1);
+    
+    return 0;
+}
+
 int main()
 {
     RUN_TEST(test1);
     RUN_TEST(test2);
+    RUN_TEST(test3);
+    RUN_TEST(test4);
 
     return 0;
 }

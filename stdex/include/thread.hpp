@@ -9,6 +9,7 @@
 #include "./mutex.hpp"
 #include "./condition_variable.hpp"
 #include "./chrono.hpp"
+#include "./move.hpp"
 
 // POSIX includes
 #include <pthread.h>
@@ -1323,11 +1324,26 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
             init(&detail::_thread_function_proxy<func_t, args_t>::gproxy, new detail::_thread_function_proxy<func_t, args_t>(fx, args_t(t0, t1, t2, t3, t4, t5, t6, t7)));
         }
 
+        thread(STDEX_RV_REF(thread) other) _STDEX_NOEXCEPT_FUNCTION
+        {
+            this->swap(other);
+        }
+
         //! Destructor.
         //! @note If the thread is joinable upon destruction, @c std::terminate()
         //! will be called, which terminates the process. It is always wise to do
         //! @c join() before deleting a thread object.
         ~thread();
+
+        thread& operator=(STDEX_RV_REF(thread) other) _STDEX_NOEXCEPT_FUNCTION
+        {
+            if (joinable())
+	            std::terminate();
+            
+            this->swap(other);
+
+            return *this;
+        }
 
         //! Wait for the thread to finish (join execution flows).
         //! After calling @c join(), the thread object is no longer associated with
