@@ -342,10 +342,10 @@
              if (_owns)
                  unlock();
  
-             unique_lock(stdex::move(other)).swap(*this);
+             unique_lock<mutex_type>(stdex::move(other)).swap(*this);
  
-             other._device = 0;
-             other._owns = false;
+             static_cast<unique_lock<mutex_type>&>(other)._device = 0;
+             static_cast<unique_lock<mutex_type>&>(other)._owns = false;
  
              return *this;
          }
