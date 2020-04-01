@@ -70,20 +70,17 @@ namespace stdex
     class rvalue_reference:
 		public move_detail::rvalue_reference_base<_Tp>::type
     {
-	public:
+	/*public:
 		typedef typename move_detail::rvalue_reference_base<_Tp>::type base_type;
 	protected:
 		typedef typename stdex::remove_const<_Tp>::type value_type;
-		value_type& _ref;
 
         explicit rvalue_reference(value_type &ref)
-            : base_type(ref)
-			, _ref((ref)) 
+            : base_type(ref) 
 		{ }
 
 		explicit rvalue_reference(const value_type &ref)
             : base_type(ref)
-			, _ref(*this) 
 		{ }
 		
     public:
@@ -92,7 +89,7 @@ namespace stdex
 			, _ref(other._ref) 
 		{ } 
 
-		operator value_type&() const {return _ref;}
+		//operator value_type&() const {return *this;}
 
 		static rvalue_reference<value_type> move(value_type &value) 
 		{
@@ -104,10 +101,10 @@ namespace stdex
 			return rvalue_reference<value_type>(value);
 		}
 
-		static rvalue_reference<value_type> move(const rvalue_reference<value_type>& value)
+		static rvalue_reference<value_type>& move(const rvalue_reference<value_type>& value)
 		{
-			return rvalue_reference<value_type>(value._ref);
-		}
+			return remove_const<rvalue_reference<value_type>&>(value);
+		}*/
     };
 
 	namespace move_detail
@@ -123,58 +120,77 @@ namespace stdex
     class rvalue_reference <const _Tp>:
 		public move_detail::rvalue_reference_base<_Tp>::type
     {
-	public:
+	/*public:
 		typedef typename move_detail::rvalue_reference_base<_Tp>::type base_type;
 	protected:
 		typedef const _Tp value_type;
-		value_type& _ref;
 
         explicit rvalue_reference(value_type &ref)
             : base_type(ref)
-			, _ref((ref)) 
 		{ }
 
     public:
         rvalue_reference(const rvalue_reference<_Tp> &other)
 			: base_type(static_cast<value_type &>(other))
-			, _ref(other._ref) 
 		{ }
 
 		rvalue_reference(const rvalue_reference<const _Tp> &other)
 			: base_type(static_cast<value_type &>(other))
-			, _ref(other._ref) 
 		{ }
 
-		operator value_type&() const {return _ref;}
+		//operator value_type&() const {return _ref;}
 
 		static rvalue_reference<value_type> move(value_type &value) 
 		{
 			return rvalue_reference<value_type>(value);
 		}
 
-		static rvalue_reference<value_type> move(const rvalue_reference<value_type>& value)
+		static rvalue_reference<value_type>& move(const rvalue_reference<value_type>& value)
 		{
-			return rvalue_reference<value_type>(value._ref);
-		}
+			return remove_const<rvalue_reference<value_type>&>(value);
+		}*/
     };
 
-	template<class _Tp>
-	rvalue_reference<_Tp> move(_Tp& value)
+	namespace move_detail
 	{
-		return rvalue_reference<_Tp>::move(value);
+		template<class _Tp>
+		struct _is_rvalue_reference:
+			false_type
+		{ };
+
+		template<class _Tp>
+		struct _is_rvalue_reference<rvalue_reference<_Tp>/**/>:
+			true_type
+		{ };
+
+	} // namespace move_detail
+
+	template<class _Tp>
+	rvalue_reference<_Tp>& move(_Tp& value)
+	{
+		typedef rvalue_reference<_Tp> type;
+		return reinterpret_cast<type&>(value);
 	}
 
 	template<class _Tp>
-	rvalue_reference<_Tp> move(const _Tp& value, ...)
+	const rvalue_reference<const _Tp>& move(const rvalue_reference<const _Tp>& value)
 	{
-		return rvalue_reference<_Tp>::move(value);
+		return value;
 	}
 
 	template<class _Tp>
-	rvalue_reference<_Tp> move(const rvalue_reference<_Tp>& value)
+	rvalue_reference<_Tp>& move(rvalue_reference<_Tp>& value)
 	{
-		return rvalue_reference<_Tp>::move(value);
+		return value;
 	}
+
+	template<class _Tp>
+	const rvalue_reference<const _Tp>& move(const _Tp& value, ...)
+	{
+		typedef const rvalue_reference<const _Tp> type;
+		return reinterpret_cast<type&>(value);
+	}
+
 }
 
 #define STDEX_NOT_COPYABLE \
@@ -182,8 +198,8 @@ namespace stdex
 
 #define STDEX_DELETE_ICC() _stdex_icc_deleter(true)
 
-#define STDEX_RV_REF(Type) stdex::rvalue_reference<Type>
-#define STDEX_RV_REF_CONST(Type) stdex::rvalue_reference<Type const>
+#define STDEX_RV_REF(Type) stdex::rvalue_reference<Type>&
+#define STDEX_RV_REF_CONST(Type) const stdex::rvalue_reference<Type const>&
 
 #ifdef _MSC_VER
 	#pragma warning (pop)
