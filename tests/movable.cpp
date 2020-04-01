@@ -38,6 +38,7 @@ public:
         std::cout << "movable(rv_ref)" << std::endl;
         this->swap(other);
     }
+    ~movable(){} // eliminates compiler generated move-members
 
     movable& operator=(const movable &other)
     {
@@ -85,7 +86,7 @@ public:
         std::cout << "movable_only(rv_ref)" << std::endl;
         this->swap(other);
     }
-
+    ~movable_only(){} // eliminates compiler generated move-members
 
     movable_only& operator=(STDEX_RV_REF(movable_only) other)
     {
@@ -126,6 +127,8 @@ public:
         //movable_not_copyable &other = other_;
         std::cout << "movable_not_copyable(rv_ref)" << std::endl;
     }
+    ~movable_not_copyable(){} // eliminates compiler generated move-members
+
 
     movable_not_copyable& operator=(STDEX_RV_REF(movable_not_copyable) other)
     {
@@ -167,6 +170,7 @@ public:
         //movable_not_copyable &other = other_;
         std::cout << "movable_not_copyable_child(rv_ref)" << std::endl;
     }
+    ~movable_not_copyable_child(){} // eliminates compiler generated move-members
 
     movable_not_copyable_child& operator=(STDEX_RV_REF(movable_not_copyable_child) other)
     {
@@ -212,6 +216,8 @@ public:
         const movable_with_const_rv_ref &other = other_;
         
     }
+
+    ~movable_with_const_rv_ref(){} // eliminates compiler generated move-members
 
     movable_with_const_rv_ref& operator=(STDEX_RV_REF_CONST(movable_with_const_rv_ref) other_)
     {
