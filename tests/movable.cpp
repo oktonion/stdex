@@ -459,6 +459,21 @@ int test5()
     return 0;
 }
 
+void test6_func(STDEX_RV_REF(movable) ref)
+{
+
+}
+
+int test6()
+{
+    // Binding of rvalue references to lvalues
+    movable m(0);
+    STDEX_RV_REF(movable) r = MY_STD::move(m);
+    test6_func(r);
+
+    return 0;
+}
+
 int main(void)
 {
     using namespace stdex;
@@ -470,6 +485,7 @@ int main(void)
     RUN_TEST(test3);
     RUN_TEST(test4);
     RUN_TEST(test5);
+    RUN_TEST(test6);
     // Double parens prevent "most vexing parse"
     CHECK_COPIES( X a(( lvalue() )), 1U, 1U, "Direct initialization from lvalue");
     CHECK_COPIES( X a(( rvalue(0) )), 0U, 1U, "Direct initialization from rvalue");
