@@ -427,6 +427,38 @@ X ternary( bool y )
     return a;
 }
 
+class Foo
+{
+public:
+   int i;
+   explicit Foo(int val)      : i(val)   {}
+
+   Foo(STDEX_RV_REF(Foo) obj) : i(obj.i) {}
+
+   Foo& operator=(STDEX_RV_REF(Foo) rhs)
+   {  i = rhs.i; rhs.i = 0; return *this; }
+
+   Foo& operator=(const Foo &rhs)
+   {  i = rhs.i; return *this;   } //(1)
+
+   template<class U> //(*) TEMPLATED ASSIGNMENT, potential problem
+   Foo& operator=(const U& rhs)
+   {  i = -rhs.i; return *this;  } //(2)
+};
+
+int test5()
+{
+    Foo foo1(1);
+    Foo foo2(2);
+    foo2 = foo1; // Calls (1) in C++11 but (2) in C++98
+    DYNAMIC_VERIFY(foo2.i == foo1.i);
+    const Foo foo5(5);
+    foo2 = foo5; // Calls (1) in C++11 but (2) in C++98
+    DYNAMIC_VERIFY(foo2.i == foo5.i);
+
+    return 0;
+}
+
 int main(void)
 {
     using namespace stdex;
@@ -437,6 +469,7 @@ int main(void)
     RUN_TEST(test2);
     RUN_TEST(test3);
     RUN_TEST(test4);
+    RUN_TEST(test5);
     // Double parens prevent "most vexing parse"
     CHECK_COPIES( X a(( lvalue() )), 1U, 1U, "Direct initialization from lvalue");
     CHECK_COPIES( X a(( rvalue(0) )), 0U, 1U, "Direct initialization from rvalue");
