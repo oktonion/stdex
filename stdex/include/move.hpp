@@ -19,14 +19,14 @@ namespace stdex
 {
 	namespace detail
 	{
-		template<class T, T val>
+		template<class _Tp, _Tp _Value>
 		class deleted_implicit_copy_constructor_impl
 		{
-			const T dummy:1;
+			const _Tp dummy:1;
 		public:
-			deleted_implicit_copy_constructor_impl(const T &):
-				dummy(val) { (void)(dummy); }
-			deleted_implicit_copy_constructor_impl &operator=(const T &)
+			deleted_implicit_copy_constructor_impl(const _Tp &):
+				dummy(_Value) { (void)(dummy); }
+			deleted_implicit_copy_constructor_impl &operator=(const _Tp &)
 			{ return *this; }
 		};
 
@@ -44,7 +44,7 @@ namespace stdex
 
 	namespace move_detail
 	{
-		template<class _Tp, bool Value>
+		template<class _Tp, bool>
 		struct rvalue_reference_base_impl
 		{
 			typedef typename stdex::remove_reference<typename stdex::remove_cv<_Tp>::type>::type type;
@@ -52,7 +52,7 @@ namespace stdex
 		template<class _Tp>
 		struct rvalue_reference_base_impl<_Tp, false>
 		{
-			struct type { template<class T> type(T) {}};
+			struct type {};
 		};
 		template<class _Tp>
 		struct rvalue_reference_base
