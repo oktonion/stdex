@@ -656,6 +656,7 @@ struct forwardable:
     forwardable &operator=(const forwardable &other)
     {
         i = other.i;
+        return *this;
     }
 
     forwardable &operator++(int)
