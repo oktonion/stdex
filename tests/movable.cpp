@@ -687,6 +687,105 @@ int test9()
     return forwarding_test(val);
 }
 
+struct forwardable_v:
+    public virtual movable_not_copyable_child
+{
+    std::size_t i;
+
+    virtual
+    forwardable_v &operator=(const forwardable_v &other)
+    {
+        i = other.i;
+        return *this;
+    }
+
+    virtual
+    forwardable_v &operator++(int)
+    {
+        i++;
+        return *this;
+    }
+
+    virtual
+    bool operator==(const forwardable_v &other) const
+    {
+        return i == other.i;
+    }
+
+    virtual
+    bool operator!=(const forwardable_v &other) const
+    {
+        return i != other.i;
+    }
+
+    virtual ~forwardable_v() {}
+};
+
+struct forwardable_vv:
+    public virtual forwardable_v,
+    public Foo,
+    public virtual movable
+{
+    forwardable_vv(int i_ = 0):
+        Foo(i_),
+        movable(i_)
+    { 
+        Foo::i = i_;
+        forwardable_v::i = Foo::i;
+    }
+
+    virtual
+    forwardable_vv &operator=(const forwardable_vv &other)
+    {
+        Foo::i = other.forwardable_v::i;
+        forwardable_v::i = Foo::i;
+        return *this;
+    }
+
+    virtual
+    forwardable_v &operator=(const forwardable_v &other)
+    {
+        Foo::i = other.forwardable_v::i;
+        forwardable_v::i = Foo::i;
+        return *this;
+    }
+
+    virtual
+    forwardable_v &operator++(int)
+    {
+        Foo::i++;
+        forwardable_v::i = Foo::i;
+        return *this;
+    }
+
+    virtual
+    bool operator==(const forwardable_v &other) const
+    {
+        return Foo::i == int(other.forwardable_v::i);
+    }
+
+    virtual
+    bool operator!=(const forwardable_v &other) const
+    {
+        return Foo::i != int(other.forwardable_v::i);
+    }
+    
+    virtual ~forwardable_vv() {}
+};
+
+int test10()
+{
+    forwardable_v val;
+    val.i = 5;
+    return forwarding_test(val);
+}
+
+int test11()
+{
+    forwardable_vv val(5);
+    return forwarding_test(val);
+}
+
 int main(void)
 {
     using namespace stdex;
@@ -702,6 +801,8 @@ int main(void)
     RUN_TEST(test7);
     RUN_TEST(test8);
     RUN_TEST(test9);
+    RUN_TEST(test10);
+    RUN_TEST(test11);
     // Double parens prevent "most vexing parse"
     CHECK_COPIES( X a(( lvalue() )), 1U, 1U, "Direct initialization from lvalue");
     CHECK_COPIES( X a(( rvalue(0) )), 0U, 1U, "Direct initialization from rvalue");
