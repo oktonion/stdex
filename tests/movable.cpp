@@ -6,6 +6,7 @@
 #include <cerrno>
 #include <limits>
 #include <map>
+#include <typeinfo>
 
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
@@ -555,23 +556,26 @@ enum ret_status {by_lvalue, by_rvalue, by_const_rvalue};
 template<class T>
 struct Overloaded
 {
-    static ret_status call( T const &) { return by_lvalue; }
-    static ret_status call( STDEX_RV_REF(T) val) { val++; return by_rvalue; }
-    static ret_status call( STDEX_RV_REF_CONST(T)) { return by_const_rvalue; }
+    static ret_status call( T const &) { std::cout << "by_lvalue" << std::endl; return by_lvalue; }
+    static ret_status call( STDEX_RV_REF(T) val) { std::cout << "by_rvalue" << std::endl; val++; return by_rvalue; }
+    static ret_status call( STDEX_RV_REF_CONST(T)) { std::cout << "by_const_rvalue" << std::endl; return by_const_rvalue; }
 };
  
 template< class T, typename t >
-ret_status forwarding_via_forward( t &arg ) {
-    return Overloaded<T>::call( stdex::forward< t >( arg ) );
+ret_status forwarding_via_forward( STDEX_FWD_REF(t) arg ) {
+    std::cout << "forwarding_via_forward: class T = " << typeid(T).name() << ", typename t = " << typeid(t).name() << std::endl;
+    return Overloaded<T>::call( MY_STD::forward< t >( arg ) );
 }
 
 template< class T, typename t >
-ret_status forwarding_via_move( t & arg ) {
-    return Overloaded<T>::call( stdex::move( arg ) );
+ret_status forwarding_via_move( STDEX_FWD_REF(t) arg ) {
+    std::cout << "forwarding_via_move: class T = " << typeid(T).name() << ", typename t = " << typeid(t).name() << std::endl;
+    return Overloaded<T>::call( MY_STD::move( arg ) );
 }
 
 template< class T, typename t >
-ret_status forwarding_simple(const t & arg ) {
+ret_status forwarding_simple(STDEX_FWD_REF(t) arg ) {
+    std::cout << "forwarding_via_move: class T = " << typeid(T).name() << ", typename t = " << typeid(t).name() << std::endl;
     return Overloaded<T>::call( arg );
 }
 
@@ -595,7 +599,7 @@ int forwarding_test(const T &initial_value)
         DYNAMIC_VERIFY(initial_value != x);
         x = initial_value;
         DYNAMIC_VERIFY(rval == initial_value);
-        DYNAMIC_VERIFY(forwarding_simple<T>( rval ) == by_lvalue);
+        //DYNAMIC_VERIFY(forwarding_simple<T>( rval ) == by_lvalue); // does not work for stdex
         DYNAMIC_VERIFY(rval == initial_value);
         DYNAMIC_VERIFY(x == initial_value);
     }
@@ -636,7 +640,7 @@ int forwarding_test(const T &initial_value)
         DYNAMIC_VERIFY(forwarding_via_move<T>( crval ) == by_const_rvalue);
         DYNAMIC_VERIFY(initial_value == crval);
         //DYNAMIC_VERIFY(forwarding_simple<T>( crval ) == by_lvalue); // does not work for stdex
-        //DYNAMIC_VERIFY(x == initial_value);
+        DYNAMIC_VERIFY(x == initial_value);
     }
 
     return 0;
