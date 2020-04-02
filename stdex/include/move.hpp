@@ -57,15 +57,18 @@ namespace stdex
 	namespace move_detail
 	{
 		template<class _Tp, bool>
-		struct rvalue_reference_base_impl
+		struct rvalue_reference_base_impl;
+
+		template<class _Tp>
+		struct rvalue_reference_base_impl<_Tp, true>
 		{
 			typedef typename stdex::remove_reference<typename stdex::remove_cv<_Tp>::type>::type type;
 		};
+
 		template<class _Tp>
 		struct rvalue_reference_base_impl<_Tp, false>
 		{
 			typedef typename stdex::remove_reference<typename stdex::remove_cv<_Tp>::type>::type value_type;
-			typedef const value_type value_const;
 
 			struct type {
 				mutable value_type value;

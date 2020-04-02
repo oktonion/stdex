@@ -575,29 +575,28 @@ ret_status forwarding_simple(const t & arg ) {
     return Overloaded<T>::call( arg );
 }
 
-//template<class T>
-int forwarding_test(const int &initial_value) 
+template<class T>
+int forwarding_test(const T &initial_value) 
 {
-    typedef int T;
     {
         T x = initial_value;
-        STDEX_RV_REF(T) rvalue = MY_STD::move(x);
-        DYNAMIC_VERIFY(rvalue == x);
-        DYNAMIC_VERIFY(x == rvalue);
+        STDEX_RV_REF(T) rval = MY_STD::move(x);
+        DYNAMIC_VERIFY(rval == x);
+        DYNAMIC_VERIFY(x == rval);
 
         std::cout << "initial caller passes rvalue:\n";
-        DYNAMIC_VERIFY(forwarding_via_forward<T>( rvalue ) == by_rvalue);
-        DYNAMIC_VERIFY(rvalue != initial_value);
+        DYNAMIC_VERIFY(forwarding_via_forward<T>( rval ) == by_rvalue);
+        DYNAMIC_VERIFY(rval != initial_value);
         DYNAMIC_VERIFY(x != initial_value);
         x = initial_value;
-        DYNAMIC_VERIFY(rvalue == initial_value);
-        DYNAMIC_VERIFY(forwarding_via_move<T>( rvalue ) == by_rvalue);
-        DYNAMIC_VERIFY(initial_value != rvalue);
+        DYNAMIC_VERIFY(rval == initial_value);
+        DYNAMIC_VERIFY(forwarding_via_move<T>( rval ) == by_rvalue);
+        DYNAMIC_VERIFY(initial_value != rval);
         DYNAMIC_VERIFY(initial_value != x);
         x = initial_value;
-        DYNAMIC_VERIFY(rvalue == initial_value);
-        DYNAMIC_VERIFY(forwarding_simple<T>( rvalue ) == by_lvalue);
-        DYNAMIC_VERIFY(rvalue == initial_value);
+        DYNAMIC_VERIFY(rval == initial_value);
+        DYNAMIC_VERIFY(forwarding_simple<T>( rval ) == by_lvalue);
+        DYNAMIC_VERIFY(rval == initial_value);
         DYNAMIC_VERIFY(x == initial_value);
     }
 
@@ -628,15 +627,15 @@ int forwarding_test(const int &initial_value)
     {
         std::cout << "initial caller passes const rvalue:\n";
         const T x = initial_value;
-        STDEX_RV_REF_CONST(T) rvalue = MY_STD::move(x);
-        DYNAMIC_VERIFY(rvalue == x);
-        DYNAMIC_VERIFY(x == rvalue);
+        STDEX_RV_REF_CONST(T) crval = MY_STD::move(x);
+        DYNAMIC_VERIFY(crval == x);
+        DYNAMIC_VERIFY(x == crval);
 
-        DYNAMIC_VERIFY(forwarding_via_forward<T>( rvalue ) == by_const_rvalue);
-        DYNAMIC_VERIFY(rvalue == initial_value);
-        DYNAMIC_VERIFY(forwarding_via_move<T>( rvalue ) == by_const_rvalue);
-        DYNAMIC_VERIFY(initial_value == rvalue);
-        //DYNAMIC_VERIFY(forwarding_simple<T>( rvalue ) == by_lvalue); // does not work for stdex
+        DYNAMIC_VERIFY(forwarding_via_forward<T>( crval ) == by_const_rvalue);
+        DYNAMIC_VERIFY(crval == initial_value);
+        DYNAMIC_VERIFY(forwarding_via_move<T>( crval ) == by_const_rvalue);
+        DYNAMIC_VERIFY(initial_value == crval);
+        //DYNAMIC_VERIFY(forwarding_simple<T>( crval ) == by_lvalue); // does not work for stdex
         //DYNAMIC_VERIFY(x == initial_value);
     }
 
@@ -646,6 +645,40 @@ int forwarding_test(const int &initial_value)
 int test8()
 {
     int val = 5;
+    return forwarding_test(val);
+}
+
+struct forwardable:
+    public movable_not_copyable_child
+{
+    std::size_t i;
+
+    forwardable &operator=(const forwardable &other)
+    {
+        i = other.i;
+    }
+
+    forwardable &operator++(int)
+    {
+        i++;
+        return *this;
+    }
+
+    bool operator==(const forwardable &other) const
+    {
+        return i == other.i;
+    }
+
+    bool operator!=(const forwardable &other) const
+    {
+        return i != other.i;
+    }
+};
+
+int test9()
+{
+    forwardable val;
+    val.i = 5;
     return forwarding_test(val);
 }
 
@@ -663,6 +696,7 @@ int main(void)
     RUN_TEST(test6);
     RUN_TEST(test7);
     RUN_TEST(test8);
+    RUN_TEST(test9);
     // Double parens prevent "most vexing parse"
     CHECK_COPIES( X a(( lvalue() )), 1U, 1U, "Direct initialization from lvalue");
     CHECK_COPIES( X a(( rvalue(0) )), 0U, 1U, "Direct initialization from rvalue");
