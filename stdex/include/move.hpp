@@ -15,6 +15,18 @@
 	#pragma warning (disable : 4512) // assignment operator could not be generated
 #endif
 
+#ifdef _STDEX_NATIVE_CPP11_SUPPORT
+
+#define _STDEX_DELETED_FUNCTION =delete
+#define _STDEX_NOEXCEPT_FUNCTION noexcept 
+
+#else
+
+#define _STDEX_DELETED_FUNCTION 
+#define _STDEX_NOEXCEPT_FUNCTION throw()
+
+#endif
+
 namespace stdex
 {
 	namespace detail
@@ -52,7 +64,17 @@ namespace stdex
 		template<class _Tp>
 		struct rvalue_reference_base_impl<_Tp, false>
 		{
-			struct type {};
+			typedef typename stdex::remove_reference<typename stdex::remove_cv<_Tp>::type>::type value_type;
+			typedef const value_type value_const;
+
+			struct type {
+				mutable value_type value;
+
+				operator value_type&() const
+				{
+					return value;
+				}
+			};
 		};
 		template<class _Tp>
 		struct rvalue_reference_base
@@ -69,43 +91,10 @@ namespace stdex
     template<class _Tp>
     class rvalue_reference:
 		public move_detail::rvalue_reference_base<_Tp>::type
-    {
-	/*public:
+    { 
+	public:
 		typedef typename move_detail::rvalue_reference_base<_Tp>::type base_type;
-	protected:
-		typedef typename stdex::remove_const<_Tp>::type value_type;
-
-        explicit rvalue_reference(value_type &ref)
-            : base_type(ref) 
-		{ }
-
-		explicit rvalue_reference(const value_type &ref)
-            : base_type(ref)
-		{ }
-		
-    public:
-        rvalue_reference(const rvalue_reference<_Tp> &other)
-			: base_type(static_cast<const value_type&>(other))
-			, _ref(other._ref) 
-		{ } 
-
-		//operator value_type&() const {return *this;}
-
-		static rvalue_reference<value_type> move(value_type &value) 
-		{
-			return rvalue_reference<value_type>(value);
-		}
-
-		static rvalue_reference<value_type> move(const value_type &value) 
-		{
-			return rvalue_reference<value_type>(value);
-		}
-
-		static rvalue_reference<value_type>& move(const rvalue_reference<value_type>& value)
-		{
-			return remove_const<rvalue_reference<value_type>&>(value);
-		}*/
-    };
+	};
 
 	namespace move_detail
 	{
@@ -119,37 +108,10 @@ namespace stdex
     template<class _Tp>
     class rvalue_reference <const _Tp>:
 		public move_detail::rvalue_reference_base<_Tp>::type
-    {
-	/*public:
+    { 
+	public:
 		typedef typename move_detail::rvalue_reference_base<_Tp>::type base_type;
-	protected:
-		typedef const _Tp value_type;
-
-        explicit rvalue_reference(value_type &ref)
-            : base_type(ref)
-		{ }
-
-    public:
-        rvalue_reference(const rvalue_reference<_Tp> &other)
-			: base_type(static_cast<value_type &>(other))
-		{ }
-
-		rvalue_reference(const rvalue_reference<const _Tp> &other)
-			: base_type(static_cast<value_type &>(other))
-		{ }
-
-		//operator value_type&() const {return _ref;}
-
-		static rvalue_reference<value_type> move(value_type &value) 
-		{
-			return rvalue_reference<value_type>(value);
-		}
-
-		static rvalue_reference<value_type>& move(const rvalue_reference<value_type>& value)
-		{
-			return remove_const<rvalue_reference<value_type>&>(value);
-		}*/
-    };
+	};
 
 	namespace move_detail
 	{
@@ -166,29 +128,54 @@ namespace stdex
 	} // namespace move_detail
 
 	template<class _Tp>
-	rvalue_reference<typename stdex::remove_cv<_Tp>::type>& move(_Tp& value)
+	rvalue_reference<typename stdex::remove_cv<_Tp>::type>& move(_Tp& value) _STDEX_NOEXCEPT_FUNCTION
 	{
 		typedef rvalue_reference<typename stdex::remove_cv<_Tp>::type> type;
 		return reinterpret_cast<type&>(value);
 	}
 
 	template<class _Tp>
-	const rvalue_reference<const _Tp>& move(const rvalue_reference<const _Tp>& value)
+	const rvalue_reference<const _Tp>& move(const rvalue_reference<const _Tp>& value) _STDEX_NOEXCEPT_FUNCTION
 	{
 		return value;
 	}
 
 	template<class _Tp>
-	rvalue_reference<_Tp>& move(rvalue_reference<_Tp>& value)
+	rvalue_reference<_Tp>& move(rvalue_reference<_Tp>& value) _STDEX_NOEXCEPT_FUNCTION
 	{
 		return value;
 	}
 
 	template<class _Tp>
-	const rvalue_reference<const typename stdex::remove_cv<_Tp>::type>& move(const _Tp& value, ...)
+	const rvalue_reference<const typename stdex::remove_cv<_Tp>::type>& move(const _Tp& value, ...) _STDEX_NOEXCEPT_FUNCTION
 	{
 		typedef const rvalue_reference<const typename stdex::remove_cv<_Tp>::type> type;
 		return reinterpret_cast<type&>(value);
+	}
+
+
+	template<class _Tp>
+	_Tp& forward(_Tp& value) _STDEX_NOEXCEPT_FUNCTION
+	{
+		return value;
+	}
+
+	template<class _Tp>
+	const rvalue_reference<const _Tp>& forward(const rvalue_reference<const _Tp>& value) _STDEX_NOEXCEPT_FUNCTION
+	{
+		return value;
+	}
+
+	template<class _Tp>
+	rvalue_reference<_Tp>& forward(rvalue_reference<_Tp>& value) _STDEX_NOEXCEPT_FUNCTION
+	{
+		return value;
+	}
+
+	template<class _Tp>
+	const _Tp& forward(const _Tp& value, ...) _STDEX_NOEXCEPT_FUNCTION
+	{
+		return value;
 	}
 
 }
@@ -200,6 +187,9 @@ namespace stdex
 
 #define STDEX_RV_REF(Type) stdex::rvalue_reference< Type >&
 #define STDEX_RV_REF_CONST(Type) const stdex::rvalue_reference< Type const>&
+
+#undef _STDEX_DELETED_FUNCTION
+#undef _STDEX_NOEXCEPT_FUNCTION
 
 #ifdef _MSC_VER
 	#pragma warning (pop)

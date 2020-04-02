@@ -215,6 +215,8 @@ public:
         std::cout << "movable_not_copyable(rv_ref)" << std::endl;
 
         const movable_with_const_rv_ref &other = other_;
+
+        (void)(&other);
         
     }
 
@@ -350,6 +352,7 @@ struct X
 {
     X(int d = 0) : id(instances++)
     {
+        (void)(&d);
         std::cout << "X" << id << ": construct\n";
     }
     
@@ -547,6 +550,105 @@ int test7()
     return 0;
 }
 
+enum ret_status {by_lvalue, by_rvalue, by_const_rvalue};
+
+template<class T>
+struct Overloaded
+{
+    static ret_status call( T const &) { return by_lvalue; }
+    static ret_status call( STDEX_RV_REF(T) val) { val++; return by_rvalue; }
+    static ret_status call( STDEX_RV_REF_CONST(T)) { return by_const_rvalue; }
+};
+ 
+template< class T, typename t >
+ret_status forwarding_via_forward( t &arg ) {
+    return Overloaded<T>::call( stdex::forward< t >( arg ) );
+}
+
+template< class T, typename t >
+ret_status forwarding_via_move( t & arg ) {
+    return Overloaded<T>::call( stdex::move( arg ) );
+}
+
+template< class T, typename t >
+ret_status forwarding_simple(const t & arg ) {
+    return Overloaded<T>::call( arg );
+}
+
+//template<class T>
+int forwarding_test(const int &initial_value) 
+{
+    typedef int T;
+    {
+        T x = initial_value;
+        STDEX_RV_REF(T) rvalue = MY_STD::move(x);
+        DYNAMIC_VERIFY(rvalue == x);
+        DYNAMIC_VERIFY(x == rvalue);
+
+        std::cout << "initial caller passes rvalue:\n";
+        DYNAMIC_VERIFY(forwarding_via_forward<T>( rvalue ) == by_rvalue);
+        DYNAMIC_VERIFY(rvalue != initial_value);
+        DYNAMIC_VERIFY(x != initial_value);
+        x = initial_value;
+        DYNAMIC_VERIFY(rvalue == initial_value);
+        DYNAMIC_VERIFY(forwarding_via_move<T>( rvalue ) == by_rvalue);
+        DYNAMIC_VERIFY(initial_value != rvalue);
+        DYNAMIC_VERIFY(initial_value != x);
+        x = initial_value;
+        DYNAMIC_VERIFY(rvalue == initial_value);
+        DYNAMIC_VERIFY(forwarding_simple<T>( rvalue ) == by_lvalue);
+        DYNAMIC_VERIFY(rvalue == initial_value);
+        DYNAMIC_VERIFY(x == initial_value);
+    }
+
+    {
+        std::cout << "initial caller passes lvalue:\n";
+        T x = initial_value;
+        DYNAMIC_VERIFY(forwarding_via_forward<T>( x ) == by_lvalue);
+        DYNAMIC_VERIFY(x == initial_value);
+        DYNAMIC_VERIFY(forwarding_via_move<T>( x ) == by_rvalue);
+        DYNAMIC_VERIFY(x != initial_value);
+        x = initial_value;
+        DYNAMIC_VERIFY(x == initial_value);
+        DYNAMIC_VERIFY(forwarding_simple<T>( x ) == by_lvalue);
+        DYNAMIC_VERIFY(x == initial_value);
+    }
+
+    {
+        std::cout << "initial caller passes const lvalue:\n";
+        const T x = initial_value;
+        DYNAMIC_VERIFY(forwarding_via_forward<T>( x ) == by_lvalue);
+        DYNAMIC_VERIFY(x == initial_value);
+        DYNAMIC_VERIFY(forwarding_via_move<T>( x ) == by_const_rvalue);
+        DYNAMIC_VERIFY(x == initial_value);
+        DYNAMIC_VERIFY(forwarding_simple<T>( x ) == by_lvalue);
+        DYNAMIC_VERIFY(x == initial_value);
+    }
+
+    {
+        std::cout << "initial caller passes const rvalue:\n";
+        const T x = initial_value;
+        STDEX_RV_REF_CONST(T) rvalue = MY_STD::move(x);
+        DYNAMIC_VERIFY(rvalue == x);
+        DYNAMIC_VERIFY(x == rvalue);
+
+        DYNAMIC_VERIFY(forwarding_via_forward<T>( rvalue ) == by_const_rvalue);
+        DYNAMIC_VERIFY(rvalue == initial_value);
+        DYNAMIC_VERIFY(forwarding_via_move<T>( rvalue ) == by_const_rvalue);
+        DYNAMIC_VERIFY(initial_value == rvalue);
+        //DYNAMIC_VERIFY(forwarding_simple<T>( rvalue ) == by_lvalue); // does not work for stdex
+        //DYNAMIC_VERIFY(x == initial_value);
+    }
+
+    return 0;
+}
+
+int test8()
+{
+    int val = 5;
+    return forwarding_test(val);
+}
+
 int main(void)
 {
     using namespace stdex;
@@ -560,6 +662,7 @@ int main(void)
     RUN_TEST(test5);
     RUN_TEST(test6);
     RUN_TEST(test7);
+    RUN_TEST(test8);
     // Double parens prevent "most vexing parse"
     CHECK_COPIES( X a(( lvalue() )), 1U, 1U, "Direct initialization from lvalue");
     CHECK_COPIES( X a(( rvalue(0) )), 0U, 1U, "Direct initialization from rvalue");
