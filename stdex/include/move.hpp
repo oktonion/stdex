@@ -71,11 +71,10 @@ namespace stdex
 			typedef typename stdex::remove_reference<typename stdex::remove_cv<_Tp>::type>::type value_type;
 
 			struct type {
-				mutable value_type value;
-
+				value_type value;
 				operator value_type&() const
 				{
-					return value;
+					return *reinterpret_cast<value_type*>(const_cast<type*>(this));
 				}
 			};
 		};
@@ -97,6 +96,7 @@ namespace stdex
     { 
 	public:
 		typedef typename move_detail::rvalue_reference_base<_Tp>::type base_type;
+		typedef _Tp value_type;
 	};
 
 	namespace move_detail
@@ -114,6 +114,7 @@ namespace stdex
     { 
 	public:
 		typedef typename move_detail::rvalue_reference_base<_Tp>::type base_type;
+		typedef const _Tp value_type;
 	};
 
 	namespace move_detail
@@ -128,6 +129,33 @@ namespace stdex
 			true_type
 		{ };
 
+		template<class _Tp>
+		struct _do_const_cast:
+			false_type
+		{ };
+
+		template<class _Tp>
+		struct _do_const_cast<rvalue_reference<_Tp>/**/>:
+			stdex::detail::_not_<stdex::is_const<_Tp>/**/>
+		{ };
+
+		template<class _Tp>
+		struct _move_const
+		{
+			typedef const rvalue_reference<const typename stdex::remove_cv<_Tp>::type>& type;
+			static type call(const _Tp &value) {return reinterpret_cast<type>(value);}
+		};
+
+		template<class _Tp>
+		struct _move_const<rvalue_reference<_Tp>/**/>
+		{
+			typedef typename stdex::remove_const<_Tp>::type value_type;
+			typedef const rvalue_reference<const _Tp>& type1;
+			static type1 call(const rvalue_reference<const value_type> &value) {return reinterpret_cast<type1>(value);}
+
+			typedef rvalue_reference<_Tp>& type2;
+			static type2 call(const rvalue_reference<value_type> &value) {return const_cast<type2>(value);}
+		};
 	} // namespace move_detail
 
 	template<class _Tp>
@@ -138,49 +166,46 @@ namespace stdex
 	}
 
 	template<class _Tp>
-	const rvalue_reference<const _Tp>& move(const rvalue_reference<const _Tp>& value) _STDEX_NOEXCEPT_FUNCTION
+	rvalue_reference<_Tp>& move(const rvalue_reference<_Tp>& value) _STDEX_NOEXCEPT_FUNCTION
 	{
-		return value;
+		return const_cast<rvalue_reference<_Tp>&>(value);
 	}
 
 	template<class _Tp>
 	rvalue_reference<_Tp>& move(rvalue_reference<_Tp>& value) _STDEX_NOEXCEPT_FUNCTION
 	{
-		return value;
+		return const_cast<rvalue_reference<_Tp>&>(value);
 	}
 
 	template<class _Tp>
-	const rvalue_reference<const typename stdex::remove_cv<_Tp>::type>& move(const _Tp& value, ...) _STDEX_NOEXCEPT_FUNCTION
+	typename
+	stdex::conditional<
+		move_detail::_do_const_cast<_Tp>::value == bool(true),
+		_Tp&,
+		const rvalue_reference<const typename stdex::remove_cv<_Tp>::type>&
+	>::type move(const _Tp& value, ...) _STDEX_NOEXCEPT_FUNCTION
 	{
-		typedef const rvalue_reference<const typename stdex::remove_cv<_Tp>::type> type;
-		return reinterpret_cast<type&>(value);
-	}
-
-
-	template<class _Tp>
-	_Tp& forward(_Tp& value) _STDEX_NOEXCEPT_FUNCTION
-	{
-		return value;
-	}
-
-	template<class _Tp>
-	const rvalue_reference<const _Tp>& forward(const rvalue_reference<const _Tp>& value) _STDEX_NOEXCEPT_FUNCTION
-	{
-		return value;
+		return
+			move_detail::_move_const<_Tp>::call(value);
 	}
 
 	template<class _Tp>
-	rvalue_reference<_Tp>& forward(rvalue_reference<_Tp>& value) _STDEX_NOEXCEPT_FUNCTION
+	typename
+	stdex::conditional<
+		move_detail::_do_const_cast<_Tp>::value == bool(true),
+		_Tp&,
+		const _Tp&
+	>::type forward(const _Tp& value) _STDEX_NOEXCEPT_FUNCTION
 	{
-		return value;
+		typedef
+		typename
+		stdex::conditional<
+			move_detail::_do_const_cast<_Tp>::value == bool(true),
+			_Tp&,
+			const _Tp&
+		>::type type;
+		return const_cast<type>(value);
 	}
-
-	template<class _Tp>
-	const _Tp& forward(const _Tp& value, ...) _STDEX_NOEXCEPT_FUNCTION
-	{
-		return value;
-	}
-
 }
 
 #define STDEX_NOT_COPYABLE \
@@ -189,7 +214,8 @@ namespace stdex
 #define STDEX_DELETE_ICC() _stdex_icc_deleter(true)
 
 #define STDEX_RV_REF(Type) stdex::rvalue_reference< Type >&
-#define STDEX_RV_REF_CONST(Type) const stdex::rvalue_reference< Type const>&
+#define STDEX_RV_REF_CONST(Type) const stdex::rvalue_reference< Type const >&
+#define STDEX_FWD_REF(Type) Type&
 
 #undef _STDEX_DELETED_FUNCTION
 #undef _STDEX_NOEXCEPT_FUNCTION
