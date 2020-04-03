@@ -199,7 +199,7 @@ namespace stdex
 		move_detail::_do_const_cast<_Tp>::value == bool(true),
 		_Tp&,
 		const rvalue_reference<const typename stdex::remove_cv<_Tp>::type>&
-	>::type move(const _Tp& value, ...) _STDEX_NOEXCEPT_FUNCTION
+	>::type move(const _Tp& value) _STDEX_NOEXCEPT_FUNCTION
 	{
 		return
 			move_detail::_move_const<_Tp>::call(value);
