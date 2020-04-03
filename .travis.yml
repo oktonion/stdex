@@ -6,10 +6,15 @@ matrix:
       compiler: gcc
       addons:
         apt:
-          sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-3']
+          sources: 
+            - sourceline: 'ppa:ubuntu-toolchain-r-test'
+            - sourceline: 'deb https://snapshot.debian.org/archive/debian/20091004T111800Z/ lenny main'
+            - sourceline: 'deb-src https://snapshot.debian.org/archive/debian/20091004T111800Z/ lenny main'
+            - sourceline: 'deb https://snapshot.debian.org/archive/debian-security/20091004T121501Z/ lenny/updates main'
+            - sourceline: 'deb-src https://snapshot.debian.org/archive/debian-security/20091004T121501Z/ lenny/updates main'
+          packages: ['g++-3.4']
       env: 
-      - COMPILER=g++-3
+      - COMPILER=g++-3.4
       - BUILD_LIB_SCRIPT="./build_lib.sh"
       - BUILD_SCRIPT="./build_tests.sh"
       - RUN_SCRIPT="./run_tests.sh"
