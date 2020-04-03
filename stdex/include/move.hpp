@@ -95,7 +95,7 @@ namespace stdex
 		public move_detail::rvalue_reference_base<_Tp>::type
     { 
 		rvalue_reference();
-		~rvalue_reference() throw();
+		//~rvalue_reference() throw();
 		rvalue_reference(rvalue_reference const&);
 		void operator=(rvalue_reference const&);
 	public:
@@ -121,7 +121,7 @@ namespace stdex
 		public move_detail::rvalue_reference_base<_Tp>::type
     { 
 		rvalue_reference();
-		~rvalue_reference() throw();
+		//~rvalue_reference() throw();
 		rvalue_reference(rvalue_reference const&);
 		void operator=(rvalue_reference const&);
 	public:
