@@ -99,6 +99,9 @@ namespace stdex
 		typedef _Tp value_type;
 
 		rvalue_reference();
+		~rvalue_reference() throw();
+		rvalue_reference(rvalue_reference const&);
+		void operator=(rvalue_reference const&);
 
 		operator value_type&() const {
 			return *reinterpret_cast<value_type*>(const_cast<rvalue_reference*>(this));
@@ -123,7 +126,10 @@ namespace stdex
 		typedef const _Tp value_type;
 
 		rvalue_reference();
-		
+		~rvalue_reference() throw();
+		rvalue_reference(rvalue_reference const&);
+		void operator=(rvalue_reference const&);
+
 		operator value_type&() const {
 			return *reinterpret_cast<value_type*>(const_cast<rvalue_reference*>(this));
 		}
