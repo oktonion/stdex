@@ -22,7 +22,8 @@ matrix:
       before_install:
       - sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com `sudo apt-get update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs`
       before_script:
-      - sudo apt-get -y --allow-unauthenticated install gcc-3.4
+      - sudo apt-get -y --allow-unauthenticated install g++-3.4
+      - dpkg --list | grep compiler
 
 
     - os: linux
