@@ -9,7 +9,7 @@ matrix:
           sources: 
             - sourceline: 'deb     http://old-releases.ubuntu.com/ubuntu/ hardy universe'
             - sourceline: 'deb-src http://old-releases.ubuntu.com/ubuntu/ hardy universe'
-          packages: ['g++-3.4', 'gcc-multilib', 'g++-multilib']
+          packages: ['gcc-3.4', 'g++-3.4', 'gcc-3.4-multilib', 'g++-3.4-multilib']
       env: 
       - COMPILER=g++-3.4
       - BUILD_LIB_SCRIPT="./build_lib.sh"
