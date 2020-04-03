@@ -41,6 +41,8 @@ esac
 
 if [[ $COMPILER = *"g++-4."* ]]; then
   echo "c++03 option is not supported"
+elif [[ $COMPILER = *"g++-3."* ]]; then
+  echo "c++03 option is not supported"
 else
   for file in ./tests/*.cpp; do
     filename=$(basename -- "$file")
