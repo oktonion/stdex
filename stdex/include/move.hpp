@@ -190,6 +190,12 @@ namespace stdex
 	}
 
 	template<class _Tp>
+	_Tp& forward(_Tp& value) _STDEX_NOEXCEPT_FUNCTION
+	{
+		return value;
+	}
+
+	template<class _Tp>
 	typename
 	stdex::conditional<
 		move_detail::_do_const_cast<_Tp>::value == bool(true),
@@ -201,10 +207,10 @@ namespace stdex
 		typename
 		stdex::conditional<
 			move_detail::_do_const_cast<_Tp>::value == bool(true),
-			_Tp&,
-			const _Tp&
+			_Tp,
+			const _Tp
 		>::type type;
-		return const_cast<type>(value);
+		return const_cast<type&>(value);
 	}
 }
 
