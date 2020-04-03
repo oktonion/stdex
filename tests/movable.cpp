@@ -587,6 +587,8 @@ int forwarding_test(const T &initial_value)
         STDEX_RV_REF(T) rval = MY_STD::move(x);
         DYNAMIC_VERIFY(rval == x);
         DYNAMIC_VERIFY(x == rval);
+        DYNAMIC_VERIFY(rval == initial_value);
+        DYNAMIC_VERIFY(initial_value == rval);
 
         std::cout << "initial caller passes rvalue:\n";
         DYNAMIC_VERIFY(forwarding_via_forward<T>( rval ) == by_rvalue);
