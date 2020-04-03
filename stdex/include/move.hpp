@@ -72,10 +72,10 @@ namespace stdex
 
 			struct type {
 				value_type value;
-				operator value_type&() const
+				/*operator value_type&() const
 				{
 					return *reinterpret_cast<value_type*>(const_cast<type*>(this));
-				}
+				}*/
 			};
 		};
 		template<class _Tp>
@@ -97,6 +97,10 @@ namespace stdex
 	public:
 		typedef typename move_detail::rvalue_reference_base<_Tp>::type base_type;
 		typedef _Tp value_type;
+
+		operator value_type&() const {
+			return *reinterpret_cast<value_type*>(const_cast<rvalue_reference*>(this));
+		}
 	};
 
 	namespace move_detail
@@ -115,6 +119,10 @@ namespace stdex
 	public:
 		typedef typename move_detail::rvalue_reference_base<_Tp>::type base_type;
 		typedef const _Tp value_type;
+
+		operator value_type&() const {
+			return *reinterpret_cast<value_type*>(const_cast<rvalue_reference*>(this));
+		}
 	};
 
 	namespace move_detail
