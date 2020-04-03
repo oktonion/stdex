@@ -141,7 +141,7 @@ The library is portable for any compiler that supports C++98 but as we all know 
 
 * `Borland C++ Builder 6.0` Updt4;
 * `qcc` (just a wrapper over `gcc` in QNX)
-* `g++` 4.4.2, 4.4, 4.6;
+* `g++` 3.4, 4.4.2, 4.4, 4.6;
 * `g++` 4.8, 4.9, 5.0 with c++98 option;
 * `clang` 3.5, 5.0 with c++98 option;
 * `clang-900.0.37` with c++98 option (Mac OS);
