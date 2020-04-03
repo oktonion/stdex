@@ -14,6 +14,9 @@ matrix:
             - sourceline: 'deb http://archive.ubuntu.com/ubuntu/ hardy universe'
             - sourceline: 'deb-src http://archive.ubuntu.com/ubuntu/ hardy universe'
           packages: ['g++-3.4']
+      before_install:
+      - sudo apt-get update
+      - sudo apt-get -y install g++-3.4
       env: 
       - COMPILER=g++-3.4
       - BUILD_LIB_SCRIPT="./build_lib.sh"
