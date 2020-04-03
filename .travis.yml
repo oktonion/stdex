@@ -7,9 +7,9 @@ matrix:
       addons:
         apt:
           sources: ['ubuntu-toolchain-r-test']
-          packages: ['g++-4.1']
+          packages: ['g++-3']
       env: 
-      - COMPILER=g++-4.1
+      - COMPILER=g++-3
       - BUILD_LIB_SCRIPT="./build_lib.sh"
       - BUILD_SCRIPT="./build_tests.sh"
       - RUN_SCRIPT="./run_tests.sh"
