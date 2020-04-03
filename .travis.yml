@@ -17,7 +17,7 @@ matrix:
       - RUN_SCRIPT="./run_tests.sh"
       - LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH 
       before_script:
-      - sudo ln /lib/i386-linux-gnu/libgcc_s.so.1  /usr/lib/gcc/i486-linux-gnu/3.4.6/libgcc_s.so
+      - sudo /sbin/ldconfig -p | grep libgcc
       #before_install:
       #- sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com `sudo apt-get update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs`
 
