@@ -7,10 +7,10 @@ matrix:
       addons:
         apt:
           sources: 
-            - sourceline: 'deb https://snapshot.debian.org/archive/debian/20070730T000000Z/ lenny main'
-            - sourceline: 'deb-src https://snapshot.debian.org/archive/debian/20070730T000000Z/ lenny main'
-            - sourceline: 'deb https://snapshot.debian.org/archive/debian-security/20070730T000000Z/ lenny/updates main'
-            - sourceline: 'deb-src https://snapshot.debian.org/archive/debian-security/20070730T000000Z/ lenny/updates main'
+            - sourceline: 'deb https://snapshot.debian.org/archive/debian/20110127T084257Z/ lenny main'
+            - sourceline: 'deb-src https://snapshot.debian.org/archive/debian/20110127T084257Z/ lenny main'
+            - sourceline: 'deb https://snapshot.debian.org/archive/debian-security/20110127T084257Z/ lenny/updates main'
+            - sourceline: 'deb-src https://snapshot.debian.org/archive/debian-security/20110127T084257Z/ lenny/updates main'
             #- sourceline: 'deb http://archive.ubuntu.com/ubuntu/ hardy universe'
             #- sourceline: 'deb-src http://archive.ubuntu.com/ubuntu/ hardy universe'
           packages: ['g++-3.4']
@@ -22,8 +22,7 @@ matrix:
       before_install:
       - sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com `sudo apt-get update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs`
       before_script:
-      - sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com `sudo apt-get --allow-unauthenticated update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs`
-      - sudo apt-get --allow-unauthenticated install gcc-3.4 g++-3.4
+      - sudo apt-get --allow-unauthenticated install gcc-3.3 g++-3.3
       - dpkg --list | grep compiler
 
 
