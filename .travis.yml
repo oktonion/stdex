@@ -4,16 +4,16 @@ matrix:
     - os: linux
       dist: trusty
       compiler: gcc
-      addons:
-        apt:
-          sources: 
-            - sourceline: 'deb https://snapshot.debian.org/archive/debian/20110127T084257Z/ lenny main'
-            - sourceline: 'deb-src https://snapshot.debian.org/archive/debian/20110127T084257Z/ lenny main'
-            - sourceline: 'deb https://snapshot.debian.org/archive/debian-security/20110127T084257Z/ lenny/updates main'
-            - sourceline: 'deb-src https://snapshot.debian.org/archive/debian-security/20110127T084257Z/ lenny/updates main'
+      #addons:
+        #apt:
+          #sources: 
+            #- sourceline: 'deb https://snapshot.debian.org/archive/debian/20110127T084257Z/ lenny main'
+            #- sourceline: 'deb-src https://snapshot.debian.org/archive/debian/20110127T084257Z/ lenny main'
+            #- sourceline: 'deb https://snapshot.debian.org/archive/debian-security/20110127T084257Z/ lenny/updates main'
+            #- sourceline: 'deb-src https://snapshot.debian.org/archive/debian-security/20110127T084257Z/ lenny/updates main'
             #- sourceline: 'deb http://archive.ubuntu.com/ubuntu/ hardy universe'
             #- sourceline: 'deb-src http://archive.ubuntu.com/ubuntu/ hardy universe'
-          packages: ['g++-3.3']
+          #packages: ['g++-3.3']
       env: 
       - COMPILER=g++-3.3
       - BUILD_LIB_SCRIPT="./build_lib.sh"
