@@ -19,6 +19,8 @@ matrix:
       - BUILD_LIB_SCRIPT="./build_lib.sh"
       - BUILD_SCRIPT="./build_tests.sh"
       - RUN_SCRIPT="./run_tests.sh"
+      before_install:
+      - sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com `sudo apt-get update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs`
       before_script:
       - sudo apt-get -q update
       - sudo apt-get -y install gcc-3.4
