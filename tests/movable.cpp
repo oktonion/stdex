@@ -689,6 +689,26 @@ int test9()
     return forwarding_test(val);
 }
 
+int test9_1()
+{
+    forwardable val1, val2;
+    val1.i = 5;
+    val2.i = 5;
+    STDEX_RV_REF(forwardable) 
+        val1_rv = stdex::move(val1);
+    STDEX_RV_REF(forwardable) 
+        val2_rv = stdex::move(val2);
+    DYNAMIC_VERIFY(val1_rv.i == val2_rv.i);
+    DYNAMIC_VERIFY(val1_rv.i == val2.i);
+    DYNAMIC_VERIFY(val2_rv.i == val1.i);
+    DYNAMIC_VERIFY(val1_rv.i == val1.i);
+    DYNAMIC_VERIFY(val2_rv.i == val2.i);
+    DYNAMIC_VERIFY(&val1_rv.i == &val1.i);
+    DYNAMIC_VERIFY(&val2_rv.i == &val2.i);
+
+    return 0;
+}
+
 struct forwardable_v:
     public virtual movable_not_copyable_child
 {
@@ -803,6 +823,7 @@ int main(void)
     RUN_TEST(test7);
     RUN_TEST(test8);
     RUN_TEST(test9);
+    RUN_TEST(test9_1);
     RUN_TEST(test10);
     RUN_TEST(test11);
     // Double parens prevent "most vexing parse"
