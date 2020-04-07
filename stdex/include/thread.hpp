@@ -402,7 +402,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                 _Arg4 arg4;
                 _Arg5 arg5;
 
-                _arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg3 arg4_, _Arg5 arg5_) :
+                _arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg4 arg4_, _Arg5 arg5_) :
                     arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_), arg5(arg5_)
                 { }
 
@@ -488,7 +488,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                 _Arg5 arg5;
                 _Arg6 arg6;
 
-                _arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg3 arg4_, _Arg5 arg5_, _Arg6 arg6_) :
+                _arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg4 arg4_, _Arg5 arg5_, _Arg6 arg6_) :
                     arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_), arg5(arg5_), arg6(arg6_)
                 { }
 
@@ -611,7 +611,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                 _Arg6 arg6;
                 _Arg7 arg7;
 
-                _arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg3 arg4_, _Arg5 arg5_, _Arg6 arg6_, _Arg7 arg7_) :
+                _arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg4 arg4_, _Arg5 arg5_, _Arg6 arg6_, _Arg7 arg7_) :
                     arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_), arg5(arg5_), arg6(arg6_), arg7(arg7_)
                 { }
 
@@ -802,7 +802,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                 _Arg7 arg7;
                 _Arg8 arg8;
 
-                _arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg3 arg4_, _Arg5 arg5_, _Arg6 arg6_, _Arg7 arg7_, _Arg8 arg8_) :
+                _arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg4 arg4_, _Arg5 arg5_, _Arg6 arg6_, _Arg7 arg7_, _Arg8 arg8_) :
                     arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_), arg5(arg5_), arg6(arg6_), arg7(arg7_), arg8(arg8_)
                 { }
 

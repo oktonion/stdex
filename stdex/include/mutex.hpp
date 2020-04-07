@@ -1,5 +1,5 @@
 #ifndef _STDEX_MUTEX_H
- #define _STDEX_MUTEX_H
+#define _STDEX_MUTEX_H
  
  #if _MSC_VER > 1000
  #pragma once
