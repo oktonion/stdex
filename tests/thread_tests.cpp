@@ -572,6 +572,8 @@ int test12()
 {
     using namespace stdex;
 
+    thread_func_nullptr_check_ret = 0;
+    
     {
         float p;
         ClassType cl;
@@ -581,6 +583,68 @@ int test12()
     }
 
     return thread_func_nullptr_check_ret;
+}
+
+void dummy_func_0() {}
+void dummy_func_1(void*) {}
+void dummy_func_2(void*, void*) {}
+void dummy_func_3(void*, void*, void*) {}
+void dummy_func_4(void*, void*, void*, void*) {}
+void dummy_func_5(void*, void*, void*, void*, void*) {}
+void dummy_func_6(void*, void*, void*, void*, void*, void*) {}
+void dummy_func_7(void*, void*, void*, void*, void*, void*, void*) {}
+void dummy_func_8(void*, void*, void*, void*, void*, void*, void*, void*) {}
+
+int test13()
+{
+    using namespace stdex;
+
+    {
+        thread tt(&dummy_func_0);
+        tt.join();
+    }
+
+    {
+        thread tt(&dummy_func_1, nullptr);
+        tt.join();
+    }
+
+    {
+        thread tt(&dummy_func_2, nullptr, nullptr);
+        tt.join();
+    }
+
+    {
+        thread tt(&dummy_func_3, nullptr, nullptr, nullptr);
+        tt.join();
+    }
+
+    {
+        thread tt(&dummy_func_4, nullptr, nullptr, nullptr, nullptr);
+        tt.join();
+    }
+
+    {
+        thread tt(&dummy_func_5, nullptr, nullptr, nullptr, nullptr, nullptr);
+        tt.join();
+    }
+
+    {
+        thread tt(&dummy_func_6, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+        tt.join();
+    }
+
+    {
+        thread tt(&dummy_func_7, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+        tt.join();
+    }
+
+    {
+        thread tt(&dummy_func_8, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+        tt.join();
+    }
+
+    return 0;
 }
 
 int main(void)
@@ -604,6 +668,8 @@ int main(void)
         RUN_TEST(test9);
         RUN_TEST(test10);
         RUN_TEST(test11);
+        RUN_TEST(test12);
+        RUN_TEST(test13);
 
         DYNAMIC_VERIFY(thread::hardware_concurrency() >= 1);
     }
