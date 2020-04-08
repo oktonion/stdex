@@ -587,13 +587,13 @@ int test12()
 
 void dummy_func_0() {}
 void dummy_func_1(void*) {}
-void dummy_func_2(void*, void*) {}
-void dummy_func_3(void*, void*, void*) {}
-void dummy_func_4(void*, void*, void*, void*) {}
-void dummy_func_5(void*, void*, void*, void*, void*) {}
-void dummy_func_6(void*, void*, void*, void*, void*, void*) {}
-void dummy_func_7(void*, void*, void*, void*, void*, void*, void*) {}
-void dummy_func_8(void*, void*, void*, void*, void*, void*, void*, void*) {}
+void dummy_func_2(void*, int*) {}
+void dummy_func_3(void*, double*, float*) {}
+void dummy_func_4(struct dummy_func_4_t0*, struct dummy_func_4_t1*, struct dummy_func_4_t2*, struct dummy_func_4_t3*) {}
+void dummy_func_5(struct dummy_func_5_t0*, struct dummy_func_5_t1*, struct dummy_func_5_t2*, struct dummy_func_5_t3*, struct dummy_func_5_t4*) {}
+void dummy_func_6(struct dummy_func_5_t0*, struct dummy_func_5_t1*, struct dummy_func_5_t2 const*, struct dummy_func_5_t3*, struct dummy_func_5_t4*, struct dummy_func_5_t5 const*) {}
+void dummy_func_7(struct dummy_func_7_t0*, struct dummy_func_7_t1*, struct dummy_func_7_t2 const*, struct dummy_func_7_t3*, struct dummy_func_7_t4*, struct dummy_func_7_t5 const*, struct dummy_func_7_t6 const*) {}
+void dummy_func_8(struct dummy_func_7_t0*, struct dummy_func_7_t1*, struct dummy_func_7_t2 const*, struct dummy_func_7_t3*, struct dummy_func_7_t4*, struct dummy_func_7_t5 const*, struct dummy_func_7_t6 const**, void*) {}
 
 int test13()
 {
