@@ -4,11 +4,7 @@ All notable changes to stdex library project will be documented in this file.
 
 visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library
 
-## [0.2.5] - 2020-xx-xx
-
-### Added
-
-- some serious additions
+## [0.2.5] - 2020-04-08
 
 ### Changed
 
@@ -16,7 +12,7 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 ### Fixed
 
-- some serious fixes
+- threads for 4+ args typo
 
 ## [0.2.4] - 2020-03-07
 
