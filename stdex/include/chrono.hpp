@@ -7,8 +7,8 @@
  
  // stdex includes
  #include "./cstdint.hpp" // stdex::intmax_t, STDEX_INTMAX_MAX, STDEX_INTMAX_MIN
- #include "./ratio" // all ratio
- #include "./type_traits" // stdex::common_type, stdex::is_floating_point
+ #include "./ratio.hpp" // all ratio
+ #include "./type_traits.hpp" // stdex::common_type, stdex::is_floating_point
  
  // POSIX includes
  /*none*/
@@ -496,7 +496,7 @@
                  static const duration max()
              #endif
              {
-                 return duration_values<_Rep>::max();
+                 return (duration_values<_Rep>::max)();
              }
  
              #ifdef min
@@ -505,7 +505,7 @@
                  static const duration min()
              #endif
              {
-                 return duration_values<_Rep>::min();
+                 return (duration_values<_Rep>::min)();
              }
          };
  

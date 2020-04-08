@@ -1,13 +1,13 @@
 #ifndef _STDEX_MUTEX_H
- #define _STDEX_MUTEX_H
+#define _STDEX_MUTEX_H
  
  #if _MSC_VER > 1000
  #pragma once
  #endif // _MSC_VER > 1000
  
  // stdex includes
- #include "./system_error"
- #include "./chrono"
+ #include "./system_error.hpp"
+ #include "./chrono.hpp"
  
  // POSIX includes
  #include <pthread.h>

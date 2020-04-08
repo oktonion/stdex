@@ -4,6 +4,16 @@ All notable changes to stdex library project will be documented in this file.
 
 visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library
 
+## [0.2.5] - 2020-04-08
+
+### Changed
+
+- includes now are consistent
+
+### Fixed
+
+- threads for 4+ args typo
+
 ## [0.2.4] - 2020-03-07
 
 ### Changed
