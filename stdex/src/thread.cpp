@@ -203,13 +203,17 @@ struct thread_notification_data {
 		static mutex dataMapLock;
 		static data_map_type dataMap;
 
-		lock_guard<mutex> guard(dataMapLock);
+		unique_lock<mutex> lock(dataMapLock);
 
 		if (operation == AddToThreadData)
 		{
 			thread_notification_data *result = dataMap[this_thread::get_id()];
+
 			if(result)
+			{
+				lock.unlock();
 				result->notify_all_at_thread_exit(cond, lk->release());
+			}
 		}
 		else if (operation == SetThreadData)
 		{
