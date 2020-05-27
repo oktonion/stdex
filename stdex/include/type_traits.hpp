@@ -849,108 +849,784 @@ namespace stdex
         struct _is_function_ptr_helper : false_type {};
         template <class _R >
         struct _is_function_ptr_helper<_R(*)()> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R >
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)()> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R >
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)()> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R >
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)()> : true_type {};
+#endif
+
         template <class _R >
         struct _is_function_ptr_helper<_R(*)(...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R >
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R >
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R >
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(...)> : true_type {};
+#endif
+
         template <class _R, class _T0>
         struct _is_function_ptr_helper<_R(*)(_T0)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0)> : true_type {};
+#endif
+
         template <class _R, class _T0>
         struct _is_function_ptr_helper<_R(*)(_T0 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23 ...)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23, class _T24>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23, _T24)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23, class _T24>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23, _T24)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23, class _T24>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23, _T24)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23, class _T24>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23, _T24)> : true_type {};
+#endif
+
         template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23, class _T24>
         struct _is_function_ptr_helper<_R(*)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23, _T24 ...)> : true_type {};
+#ifdef _STDEX_CDECL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23, class _T24>
+        struct _is_function_ptr_helper<_R(_STDEX_CDECL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23, _T24 ...)> : true_type {};
+#endif
+#ifdef _STDEX_STDCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23, class _T24>
+        struct _is_function_ptr_helper<_R(_STDEX_STDCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23, _T24 ...)> : true_type {};
+#endif
+#ifdef _STDEX_FASTCALL
+        template <class _R, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23, class _T24>
+        struct _is_function_ptr_helper<_R(_STDEX_FASTCALL *)(_T0, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23, _T24 ...)> : true_type {};
+#endif
+
         
 
 #undef _STDEX_TYPES
