@@ -132,8 +132,8 @@
             #define _STDEX_NATIVE_CPP_98_SUPPORT  
         #endif
     #endif
-    #define _STDEX_CDECL __attribute__((cdecl))
     #if !__x86_64__ && !__ppc64__
+        #define _STDEX_CDECL __attribute__((cdecl))
         #define _STDEX_STDCALL __attribute__((stdcall))
         #define _STDEX_FASTCALL __attribute__((fastcall))
     #endif
