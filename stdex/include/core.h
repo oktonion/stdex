@@ -108,6 +108,8 @@
 
     #define _STDEX_NATIVE_MICROSOFT_COMPILER_EXTENSIONS_SUPPORT
     #define _STDEX_CDECL __cdecl
+    #define _STDEX_STDCALL __stdcall
+    //#define _STDEX_FASTCALL __fastcal
 
     #if (__cplusplus >= 199711L)
         #define _STDEX_NATIVE_CPP_98_SUPPORT
