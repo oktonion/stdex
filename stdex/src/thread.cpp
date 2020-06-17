@@ -579,7 +579,7 @@ namespace thread_cpp_detail
 #define _STDEX_NANOSLEEP_CLOCK CLOCK_REALTIME
 #endif
 
-#ifdef _STDEX_NANOSLEEP_CLOCK
+#if defined(_STDEX_NANOSLEEP_CLOCK) && defined(TIMER_ABSTIME)
 	template<>
 	struct nanosleep_impl1<true>
 	{
