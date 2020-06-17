@@ -607,14 +607,9 @@ namespace thread_cpp_detail
 
 			timespec_add(tp, *req);
 			
-			err = ::clock_nanosleep(_STDEX_NANOSLEEP_CLOCK, TIMER_ABSTIME, &tp, NULL);
-			if(err != 0)
-				return err;
-			if(rem)
-			{
-				rem->tv_nsec = 0;
-				rem->tv_sec = 0;
-			}
+			err = ::clock_nanosleep(_STDEX_NANOSLEEP_CLOCK, TIMER_ABSTIME, &tp, rem);
+
+			return err;
 		}
 	};
 #endif
