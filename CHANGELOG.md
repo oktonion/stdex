@@ -8,15 +8,15 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 ### Added
 
-- some serious additions
+- `<type_traits>` (`is_function` trait): detection for different calling conventions
 
 ### Changed
 
-- some serious changes
+- improved threads blocking times
 
 ### Fixed
 
-- some serious fixes
+- threads native handle is determined as invalid now for empty `stdex::thread` object
 
 ## [0.2.5] - 2020-04-08
 
