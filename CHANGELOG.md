@@ -8,11 +8,20 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 ### Added
 
-- `<type_traits>` (`is_function` trait): detection for different calling conventions
+- `<type_traits>` header: 
+- - `stdex::is_function` trait detection for different calling conventions
+- - `stdex::is_union` detection now includes more compiler intrinsics thus making it more accurate for distinguishing between *class* and *union*
+
+- `<thread>` implementation:
+- - `stdex::this_thread::sleep_for` is implemented as steady (monotonic) timer if available thus providing more precise sleep interval
 
 ### Changed
 
 - improved threads blocking times
+
+- `<chrono>` implementation:
+- - `stdex::chrono::system_clock::is_steady` and `stdex::chrono::steady_clock::is_steady` are now correct
+- -  using more precise and correct clocks if provided by OS (f.e. `CLOCK_MONOTONIC_RAW` for newer Linux) affects `stdex::chrono::system_clock::now()` and `stdex::chrono::steady_clock::now()`
 
 ### Fixed
 
