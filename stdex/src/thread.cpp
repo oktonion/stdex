@@ -586,6 +586,10 @@ namespace thread_cpp_detail
 		enum {BILLION = 1000000000};
 		static void timespec_add(timespec &result, const timespec &t2)
 		{
+			if (result.tv_nsec >= BILLION) {
+				result.tv_nsec -= BILLION;
+				result.tv_sec++;
+			}
 			result.tv_sec += t2.tv_sec;
 			result.tv_nsec += t2.tv_nsec;
 			if (result.tv_nsec >= BILLION) {
@@ -596,10 +600,21 @@ namespace thread_cpp_detail
 		static int call(const timespec *req, timespec *rem)
 		{
 			timespec tp;
-			if(::clock_gettime(_STDEX_NANOSLEEP_CLOCK, &tp) != 0)
-				return -1;
+
+			int err = ::clock_gettime(_STDEX_NANOSLEEP_CLOCK, &tp)
+			if(err != 0)
+				return err;
+
 			timespec_add(tp, *req);
-			return ::clock_nanosleep(_STDEX_NANOSLEEP_CLOCK, TIMER_ABSTIME, &tp, rem);
+			
+			err = ::clock_nanosleep(_STDEX_NANOSLEEP_CLOCK, TIMER_ABSTIME, &tp, NULL);
+			if(err != 0)
+				return err;
+			if(rem)
+			{
+				rem->tv_nsec = 0;
+				rem->tv_sec = 0;
+			}
 		}
 	};
 #endif
