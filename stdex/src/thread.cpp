@@ -601,7 +601,7 @@ namespace thread_cpp_detail
 		{
 			timespec tp;
 
-			int err = ::clock_gettime(_STDEX_NANOSLEEP_CLOCK, &tp)
+			int err = ::clock_gettime(_STDEX_NANOSLEEP_CLOCK, &tp);
 			if(err != 0)
 				return err;
 
