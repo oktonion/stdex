@@ -598,7 +598,7 @@ namespace thread_cpp_detail
 			timespec tp;
 			if(::clock_gettime(_STDEX_NANOSLEEP_CLOCK, &tp) != 0)
 				return -1;
-			timespec_add(tp, req);
+			timespec_add(tp, *req);
 			return ::clock_nanosleep(_STDEX_NANOSLEEP_CLOCK, TIMER_ABSTIME, &tp, rem);
 		}
 	};
@@ -631,7 +631,7 @@ void detail::sleep_for_impl(const struct timespec *reltime)
 		using thread_cpp_detail::nanosleep_impl;
 		err = nanosleep_impl::call(&remaining, &remaining);
 	}
-	while (err == -1 && errno == EINTR) { }
+	while (err == -1 && errno == EINTR);
 }
 
 #endif
