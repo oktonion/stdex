@@ -41,6 +41,7 @@ A:
 * **stdex_char16_t** and **stdex_char32_t** (as equivalent to **char16_t**, **char32_t**)
 * **stdex_noexcept** (as partial equivalent to **noexcept**)
 * `stdex_assert` macro (as equivalent to `cassert` macro)
+* move semantic is in progress
 
 ### Utilities library
 
