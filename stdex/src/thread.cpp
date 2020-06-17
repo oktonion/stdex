@@ -11,6 +11,8 @@
 #include <set>
 #include <vector>
 #include <ctime>
+#include <cerrno>
+#include <time.h>
 
 #ifdef __GLIBC__
 #include <sys/sysinfo.h>
@@ -203,13 +205,17 @@ struct thread_notification_data {
 		static mutex dataMapLock;
 		static data_map_type dataMap;
 
-		lock_guard<mutex> guard(dataMapLock);
+		unique_lock<mutex> lock(dataMapLock);
 
 		if (operation == AddToThreadData)
 		{
 			thread_notification_data *result = dataMap[this_thread::get_id()];
+
 			if(result)
+			{
+				lock.unlock();
 				result->notify_all_at_thread_exit(cond, lk->release());
+			}
 		}
 		else if (operation == SetThreadData)
 		{
@@ -552,10 +558,84 @@ void detail::sleep_for_impl(const struct timespec *reltime)
 }
 
 #else
+
+static char clock_gettime(...); // dummy
+static char clock_nanosleep(...); // dummy
+
+namespace thread_cpp_detail
+{
+	template<bool>
+	struct nanosleep_impl1
+	{
+		static int call(const timespec *req, timespec *rem)
+		{
+			return ::nanosleep(req, rem);
+		}
+	};
+
+#if defined(CLOCK_MONOTONIC) && defined(TIMER_ABSTIME)
+	template<>
+	struct nanosleep_impl1<true>
+	{
+		enum {BILLION = 1000000000};
+		static void timespec_add(timespec &result, const timespec &t2)
+		{
+			if (result.tv_nsec >= BILLION) {
+				result.tv_nsec -= BILLION;
+				result.tv_sec++;
+			}
+			result.tv_sec += t2.tv_sec;
+			result.tv_nsec += t2.tv_nsec;
+			if (result.tv_nsec >= BILLION) {
+				result.tv_nsec -= BILLION;
+				result.tv_sec++;
+			}
+		}
+		static int call(const timespec *req, timespec *rem)
+		{
+			timespec tp;
+
+			int err = ::clock_gettime(CLOCK_MONOTONIC, &tp);
+			if(err != 0)
+				return err;
+
+			timespec_add(tp, *req);
+			
+			err = ::clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &tp, rem);
+
+			return err;
+		}
+	};
+#endif
+} // namespace thread_cpp_detail
+
+namespace thread_cpp_detail
+{
+	template<class _Tp>
+	static _Tp declval(); 
+
+	struct nanosleep_impl:
+		nanosleep_impl1<
+			sizeof(::clock_gettime(declval<clockid_t&>(), declval<timespec*>())) != sizeof(char) &&
+			sizeof(::clock_nanosleep(declval<clockid_t&>(), declval<int>(), declval<timespec*>(), declval<timespec*>())) != sizeof(char)
+		>
+	{ };
+} // namespace thread_cpp_detail
+
+
+
 void detail::sleep_for_impl(const struct timespec *reltime)
 {
 	using namespace std;
-	nanosleep(reltime, NULL);
+	timespec remaining = *reltime;
+	
+	int err = 0;
+	do
+	{
+		using thread_cpp_detail::nanosleep_impl;
+		err = nanosleep_impl::call(&remaining, &remaining);
+	}
+	while (err == -1 && errno == EINTR);
 }
 
 #endif

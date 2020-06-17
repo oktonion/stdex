@@ -1248,7 +1248,8 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
         //! Default constructor.
         //! Construct a @c thread object without an associated thread of execution
         //! (i.e. non-joinable).
-        thread() _STDEX_NOEXCEPT_FUNCTION
+        thread() _STDEX_NOEXCEPT_FUNCTION:
+            _handle() 
         { }
 
         template<class _FuncT>

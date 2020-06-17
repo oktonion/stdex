@@ -4,6 +4,29 @@ All notable changes to stdex library project will be documented in this file.
 
 visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library
 
+## [0.2.6] - 2020-06-17
+
+### Added
+
+- `<type_traits>` header: 
+- - `stdex::is_function` trait detection for different calling conventions
+- - `stdex::is_union` detection now includes more compiler intrinsics thus making it more accurate for distinguishing between *class* and *union*
+
+- `<thread>` implementation:
+- - `stdex::this_thread::sleep_for` is implemented as steady (monotonic) timer if available thus providing more precise sleep interval
+
+### Changed
+
+- improved threads blocking times
+
+- `<chrono>` implementation:
+- - `stdex::chrono::system_clock::is_steady` and `stdex::chrono::steady_clock::is_steady` are now correct
+- -  using more precise and correct clocks if provided by OS (f.e. `CLOCK_MONOTONIC_RAW` for newer Linux) affects `stdex::chrono::system_clock::now()` and `stdex::chrono::steady_clock::now()`
+
+### Fixed
+
+- threads native handle is determined as invalid now for empty `stdex::thread` object
+
 ## [0.2.5] - 2020-04-08
 
 ### Changed
