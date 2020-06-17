@@ -659,7 +659,7 @@ int test14()
     system_clock::duration dur = 
         system_clock::now() - start;
 
-    intmax_t desired_dur = duration_cast<milliseconds>(dur).count();
+    stdex::intmax_t desired_dur = duration_cast<milliseconds>(dur).count();
 
     start = system_clock::now();
 
