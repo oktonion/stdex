@@ -166,16 +166,6 @@ namespace clock_gettime_impl
 #endif
 }
 
-#ifdef LLONG_MAX
-LARGE_INTEGER performanceFrequency;
-
-const bool stdex::chrono::system_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency) != 0;
-const bool stdex::chrono::steady_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency) != 0;
-#else
-const bool stdex::chrono::system_clock::is_steady = false;
-const bool stdex::chrono::steady_clock::is_steady = false;
-#endif
-
 #define _STDEX_CHRONO_CLOCK_REALTIME 0
 #define _STDEX_CHRONO_CLOCK_MONOTONIC 0
 int(*clock_gettime_func_pointer)(int X, mytimespec *tv) = &clock_gettime_impl::clock_gettime;
@@ -241,15 +231,6 @@ struct mytimespec:
 	public timespec
 {};
 
-#ifdef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
-	const bool stdex::chrono::steady_clock::is_steady = true;
-	const bool stdex::chrono::system_clock::is_steady = 
-		(_STDEX_CHRONO_CLOCK_MONOTONIC == _STDEX_CHRONO_CLOCK_REALTIME);
-#else
-	const bool stdex::chrono::steady_clock::is_steady = false;
-	const bool stdex::chrono::system_clock::is_steady = false;
-#endif
-
 int clock_gettime(int X, timespec *tv)
 {
 	*tv = get_abs_future_time_fine(1500);
@@ -262,15 +243,6 @@ int(*clock_gettime_func_pointer)(int X, timespec *tv) = &clock_gettime;
 struct mytimespec:
 	public timespec
 {};
-
-#ifdef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
-	const bool stdex::chrono::steady_clock::is_steady = true;
-	const bool stdex::chrono::system_clock::is_steady = 
-		(_STDEX_CHRONO_CLOCK_MONOTONIC == _STDEX_CHRONO_CLOCK_REALTIME);
-#else
-	const bool stdex::chrono::steady_clock::is_steady = false;
-	const bool stdex::chrono::system_clock::is_steady = false;
-#endif
 
 int clock_gettime(int X, timespec *tv);
 int(*clock_gettime_func_pointer)(int X, timespec *tv) = &clock_gettime;
@@ -312,6 +284,30 @@ int(*clock_gettime_func_pointer)(int X, timespec *tv) = &clock_gettime;
 		#define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_REALTIME
 	#endif
 #endif
+
+#if defined(WIN32) || defined(_WIN32)
+#ifdef LLONG_MAX
+	LARGE_INTEGER performanceFrequency;
+
+	const bool stdex::chrono::system_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency) != 0;
+	const bool stdex::chrono::steady_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency) != 0;
+#else
+	const bool stdex::chrono::system_clock::is_steady = false;
+	const bool stdex::chrono::steady_clock::is_steady = false;
+#endif
+
+#else
+
+#ifdef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+	const bool stdex::chrono::steady_clock::is_steady = true;
+	const bool stdex::chrono::system_clock::is_steady = 
+		(_STDEX_CHRONO_CLOCK_MONOTONIC == _STDEX_CHRONO_CLOCK_REALTIME);
+#else
+	const bool stdex::chrono::steady_clock::is_steady = false;
+	const bool stdex::chrono::system_clock::is_steady = false;
+#endif
+
+#endif // not windows
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
