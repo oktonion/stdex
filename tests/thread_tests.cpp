@@ -654,17 +654,24 @@ int test14()
 
     system_clock::time_point start = system_clock::now();
 
+    this_thread::sleep_for(milliseconds(25000));
+
+    system_clock::duration dur = 
+        system_clock::now() - start;
+
+    intmax_t desired_dur = duration_cast<milliseconds>(dur).count();
+
+    start = system_clock::now();
+
     for(std::size_t i = 0; i < 1000; ++i)
     {
         this_thread::sleep_for(milliseconds(25));
     }
-    system_clock::duration dur = 
+    dur = 
         system_clock::now() - start;
-    std::cout << "duration is " << duration_cast<milliseconds>(dur).count() << " ms" << std::endl;
-    DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= 25 * 1000);
-    DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < 28 * 1000);
-    DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < 27 * 1000);
-    DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < 26 * 1000);
+    std::cout << "duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired" << desired_dur << " ms" << std::endl;
+    DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= desired_dur);
+    DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + 1000);
 
     return 0;
 }
