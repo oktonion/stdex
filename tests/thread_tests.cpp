@@ -663,13 +663,13 @@ int test14()
 
     start = system_clock::now();
 
-    for(std::size_t i = 0; i < 1000; ++i)
+    for(std::size_t i = 0; i < 100; ++i)
     {
-        this_thread::sleep_for(milliseconds(25));
+        this_thread::sleep_for(milliseconds(250));
     }
     dur = 
         system_clock::now() - start;
-    std::cout << "duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired" << desired_dur << " ms" << std::endl;
+    std::cout << "duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired " << desired_dur << " ms" << std::endl;
     DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= desired_dur);
     DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + 1000);
 
