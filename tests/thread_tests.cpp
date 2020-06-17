@@ -647,6 +647,35 @@ int test13()
     return 0;
 }
 
+int test14()
+{
+    using namespace stdex;
+    using namespace stdex::chrono;
+
+    system_clock::time_point start = system_clock::now();
+
+    this_thread::sleep_for(milliseconds(25000));
+
+    system_clock::duration dur = 
+        system_clock::now() - start;
+
+    stdex::intmax_t desired_dur = duration_cast<milliseconds>(dur).count();
+
+    start = system_clock::now();
+
+    for(std::size_t i = 0; i < 100; ++i)
+    {
+        this_thread::sleep_for(milliseconds(250));
+    }
+    dur = 
+        system_clock::now() - start;
+    std::cout << "duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired " << desired_dur << " ms" << std::endl;
+    DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= desired_dur);
+    DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + 3000); // 3 sec is bullshit but better than nothing
+
+    return 0;
+}
+
 int main(void)
 {
     using namespace stdex;
@@ -670,8 +699,13 @@ int main(void)
         RUN_TEST(test11);
         RUN_TEST(test12);
         RUN_TEST(test13);
+        
+    }
 
+    for (size_t i = 0; i < 3; ++i)
+    {
         DYNAMIC_VERIFY(thread::hardware_concurrency() >= 1);
+        RUN_TEST(test14);
     }
     
     test_thread_id();

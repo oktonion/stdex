@@ -573,19 +573,17 @@ namespace thread_cpp_detail
 		}
 	};
 
-#if defined(CLOCK_MONOTONIC)
-#define _STDEX_NANOSLEEP_CLOCK CLOCK_MONOTONIC
-#elif defined(CLOCK_REALTIME)
-#define _STDEX_NANOSLEEP_CLOCK CLOCK_REALTIME
-#endif
-
-#ifdef _STDEX_NANOSLEEP_CLOCK
+#if defined(CLOCK_MONOTONIC) && defined(TIMER_ABSTIME)
 	template<>
 	struct nanosleep_impl1<true>
 	{
 		enum {BILLION = 1000000000};
 		static void timespec_add(timespec &result, const timespec &t2)
 		{
+			if (result.tv_nsec >= BILLION) {
+				result.tv_nsec -= BILLION;
+				result.tv_sec++;
+			}
 			result.tv_sec += t2.tv_sec;
 			result.tv_nsec += t2.tv_nsec;
 			if (result.tv_nsec >= BILLION) {
@@ -596,10 +594,16 @@ namespace thread_cpp_detail
 		static int call(const timespec *req, timespec *rem)
 		{
 			timespec tp;
-			if(::clock_gettime(_STDEX_NANOSLEEP_CLOCK, &tp) != 0)
-				return -1;
-			timespec_add(tp, req);
-			return ::clock_nanosleep(_STDEX_NANOSLEEP_CLOCK, TIMER_ABSTIME, &tp, rem);
+
+			int err = ::clock_gettime(CLOCK_MONOTONIC, &tp);
+			if(err != 0)
+				return err;
+
+			timespec_add(tp, *req);
+			
+			err = ::clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &tp, rem);
+
+			return err;
 		}
 	};
 #endif
@@ -631,7 +635,7 @@ void detail::sleep_for_impl(const struct timespec *reltime)
 		using thread_cpp_detail::nanosleep_impl;
 		err = nanosleep_impl::call(&remaining, &remaining);
 	}
-	while (err == -1 && errno == EINTR) { }
+	while (err == -1 && errno == EINTR);
 }
 
 #endif
