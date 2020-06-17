@@ -573,13 +573,7 @@ namespace thread_cpp_detail
 		}
 	};
 
-#if defined(CLOCK_MONOTONIC)
-#define _STDEX_NANOSLEEP_CLOCK CLOCK_MONOTONIC
-#elif defined(CLOCK_REALTIME)
-#define _STDEX_NANOSLEEP_CLOCK CLOCK_REALTIME
-#endif
-
-#if defined(_STDEX_NANOSLEEP_CLOCK) && defined(TIMER_ABSTIME)
+#if defined(CLOCK_MONOTONIC) && defined(TIMER_ABSTIME)
 	template<>
 	struct nanosleep_impl1<true>
 	{
@@ -601,13 +595,13 @@ namespace thread_cpp_detail
 		{
 			timespec tp;
 
-			int err = ::clock_gettime(_STDEX_NANOSLEEP_CLOCK, &tp);
+			int err = ::clock_gettime(CLOCK_MONOTONIC, &tp);
 			if(err != 0)
 				return err;
 
 			timespec_add(tp, *req);
 			
-			err = ::clock_nanosleep(_STDEX_NANOSLEEP_CLOCK, TIMER_ABSTIME, &tp, rem);
+			err = ::clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, &tp, rem);
 
 			return err;
 		}
