@@ -647,6 +647,25 @@ int test13()
     return 0;
 }
 
+int test14()
+{
+    using namespace stdex;
+    using namespace stdex::chrono;
+
+    system_clock::time_point start = system_clock::now();
+
+    for(std::size_t i = 0; i < 1000; ++i)
+    {
+        this_thread::sleep_for(milliseconds(25));
+    }
+    system_clock::duration dur = 
+        system_clock::now() - start;
+    DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= 25 * 1000);
+    DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < 26 * 1000);
+
+    return 0;
+}
+
 int main(void)
 {
     using namespace stdex;
@@ -670,6 +689,7 @@ int main(void)
         RUN_TEST(test11);
         RUN_TEST(test12);
         RUN_TEST(test13);
+        RUN_TEST(test14);
 
         DYNAMIC_VERIFY(thread::hardware_concurrency() >= 1);
     }
