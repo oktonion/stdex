@@ -689,9 +689,13 @@ int main(void)
         RUN_TEST(test11);
         RUN_TEST(test12);
         RUN_TEST(test13);
-        RUN_TEST(test14);
+        
+    }
 
+    for (size_t i = 0; i < 3; ++i)
+    {
         DYNAMIC_VERIFY(thread::hardware_concurrency() >= 1);
+        RUN_TEST(test14);
     }
     
     test_thread_id();
