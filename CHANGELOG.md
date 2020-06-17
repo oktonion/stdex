@@ -4,7 +4,7 @@ All notable changes to stdex library project will be documented in this file.
 
 visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library
 
-## [0.2.6] - 2020-xx-xx
+## [0.2.6] - 2020-06-17
 
 ### Added
 
