@@ -660,6 +660,7 @@ int test14()
     }
     system_clock::duration dur = 
         system_clock::now() - start;
+    std::cout << "duration is " << duration_cast<milliseconds>(dur).count() << " ms" << std::endl;
     DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= 25 * 1000);
     DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < 28 * 1000);
     DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < 27 * 1000);
