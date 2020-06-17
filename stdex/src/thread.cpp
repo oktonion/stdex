@@ -575,8 +575,7 @@ namespace thread_cpp_detail
 
 #if defined(CLOCK_MONOTONIC)
 #define _STDEX_NANOSLEEP_CLOCK CLOCK_MONOTONIC
-#else 
-#if defined(CLOCK_REALTIME)
+#elif defined(CLOCK_REALTIME)
 #define _STDEX_NANOSLEEP_CLOCK CLOCK_REALTIME
 #endif
 
