@@ -10,9 +10,16 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 - `<type_traits>` (`is_function` trait): detection for different calling conventions
 
+- `<thread>` header:
+- - `stdex::this_thread::sleep_for` is implemented as steady (monotonic) timer if available thus providing more precise sleep interval
+
 ### Changed
 
 - improved threads blocking times
+
+- `<chrono>` header:
+- - `stdex::chrono::system_clock::is_steady` and `stdex::chrono::steady_clock::is_steady` are now correct
+- -  using more precise and correct clocks if provided by OS (f.e. `CLOCK_MONOTONIC_RAW` for new Linux)
 
 ### Fixed
 
