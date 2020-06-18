@@ -82,28 +82,35 @@ static void _pthread_t_ID(const eThreadIDOperation operation, stdex::uintmax_t *
 {
 	typedef std::map<stdex::thread::native_handle_type, stdex::uintmax_t, _pthread_t_less> id_map_type;
 
-	static stdex::mutex idMapLock;
-	static id_map_type idMap;
-	static stdex::uintmax_t idCount = 1;
-
-	stdex::lock_guard<stdex::mutex> guard(idMapLock);
+	static stdex::mutex idLock;
+	static id_map_type idCollection_shared;
+	static stdex::uintmax_t idCount_shared = 1;
 
 	stdex::thread::native_handle_type aHandle = pthread_self();
 
+	stdex::unique_lock<stdex::mutex> guard(idLock); // shared section begin
+
 	if (operation == GetThreadID)
 	{
-		id_map_type::iterator result =
-			idMap.find(aHandle);
+		const id_map_type idCollection = idCollection_shared;
+		guard.unlock(); // shared section end
+
+		id_map_type::const_iterator result =
+			idCollection.find(aHandle);
 
 		id_map_type::mapped_type out;
 
-		if (idMap.end() == result)
+		if (idCollection.end() == result)
 		{
-			idMap.insert(std::make_pair(aHandle, idCount));
+			guard.lock(); // shared section begin
 
-			out = idCount;
+			idCollection_shared.insert(std::make_pair(aHandle, idCount_shared));
 
-			idCount++;
+			out = idCount_shared;
+
+			idCount_shared++;
+
+			guard.unlock(); // shared section end
 		}
 		else
 		{
@@ -118,18 +125,20 @@ static void _pthread_t_ID(const eThreadIDOperation operation, stdex::uintmax_t *
 	else if (operation == AddThreadID)
 	{
 		std::pair<id_map_type::iterator, bool> result =
-			idMap.insert(std::make_pair(aHandle, idCount));
+			idCollection_shared.insert(std::make_pair(aHandle, idCount_shared));
 
 		id_map_type::mapped_type out = result.first->second;
 
 		if (result.second) // new element
 		{
-			idCount++;
+			idCount_shared++;
 		}
 		else
 		{
 			std::terminate();
 		}
+
+		guard.unlock(); // shared section end
 
 		if (id_out != NULL)
 		{
@@ -139,21 +148,23 @@ static void _pthread_t_ID(const eThreadIDOperation operation, stdex::uintmax_t *
 	else
 	{
 		id_map_type::iterator result =
-			idMap.find(aHandle);
+			idCollection_shared.find(aHandle);
 
-		if (idMap.end() == result)
+		if (idCollection_shared.end() == result)
 		{
 			std::terminate();
 		}
 		else
 		{
-			idMap.erase(result);
-			if (idMap.size() == 0)
-				idCount = 1;
-			else if(idMap.size() == 1)
-				idCount = idMap.rbegin()->second + 1;
+			idCollection_shared.erase(result);
+			if (idCollection_shared.size() == 0)
+				idCount_shared = 1;
+			else if(idCollection_shared.size() == 1)
+				idCount_shared = idCollection_shared.rbegin()->second + 1;
 		}
 	}
+
+	// shared section end
 }
 
 using namespace stdex;
