@@ -455,7 +455,7 @@
              static bool try_lock_until(pthread_mutex_t& _mutex_handle,
                  const chrono::time_point<chrono::system_clock, _Duration>& _atime)
              {
-                 chrono::seconds _s = 
+                 chrono::time_point<chrono::system_clock, chrono::seconds> _s =
                      chrono::time_point_cast<chrono::seconds>(_atime);
                  chrono::nanoseconds _ns = 
                      chrono::duration_cast<chrono::nanoseconds>(_atime - _s);
