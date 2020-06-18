@@ -17,9 +17,14 @@ namespace stdex
 {
     namespace detail
     {
-        pthread_mutex_t* _get_mutex_native_handle(const unique_lock<mutex>& lock)
+        pthread_mutex_t* _lock_mutex_native_handle(const unique_lock<mutex>& lock)
         {
             return lock.mutex()->native_handle();
+        }
+
+        bool _lock_owns_lock(const unique_lock<mutex>& lock)
+        {
+            return lock.owns_lock();
         }
     } // namespace detail
 

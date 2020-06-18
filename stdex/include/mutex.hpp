@@ -497,6 +497,15 @@
          template<>
          class _timed_mutex_impl_base<_mutex_base, false>
          { 
+             struct _Pred
+             {
+                 bool operator()() const {
+                     return !*_locked;
+                 }
+
+                 bool* _locked;
+             } ;
+
          public:
              _timed_mutex_impl_base() _STDEX_NOEXCEPT_FUNCTION:
                  _locked(false)
@@ -509,15 +518,7 @@
              {
                  unique_lock<mutex> _lk(_mut);
 
-                 struct
-                 {
-                     bool operator()() const {
-                         return !*_locked;
-                     }
-
-                     bool *_locked;
-                 } _pred;
-
+                 _Pred _pred;
                  _pred._locked = &_locked;
 
                  _cv.wait(_lk, _pred);
@@ -538,15 +539,7 @@
              {
                  unique_lock<mutex> _lk(_mut);
 
-                 struct
-                 {
-                     bool operator()() const {
-                         return !*_locked;
-                     }
-
-                     bool* _locked;
-                 } _pred;
-
+                 _Pred _pred;
                  _pred._locked = &_locked;
 
                  if (!_cv.wait_for(_lk, _rtime, _pred))
@@ -560,15 +553,7 @@
              {
                  unique_lock<mutex> _lk(_mut);
 
-                 struct
-                 {
-                     bool operator()() const {
-                         return !*_locked;
-                     }
-
-                     bool* _locked;
-                 } _pred;
-
+                 _Pred _pred;
                  _pred._locked = &_locked;
 
                  if (!_cv.wait_until(_lk, _atime, _pred))
@@ -676,7 +661,7 @@
              }
 
              template<class _Clock, class _Duration>
-             bool try_lock_until(const chrono::time_point<_Clock, _Duration>& __atime)
+             bool try_lock_until(const chrono::time_point<_Clock, _Duration>& _atime)
              {
                  thread::id _id = this_thread::get_id();
                  _Can_lock _can_lock;
@@ -862,7 +847,8 @@
 
      namespace detail
      {
-         pthread_mutex_t* _get_mutex_native_handle(const unique_lock<mutex>& lock);
+         pthread_mutex_t* _lock_mutex_native_handle(const unique_lock<mutex>&);
+         bool _lock_owns_lock(const unique_lock<mutex>&);
      } // namespace detail
  
  } // namespace stdex
