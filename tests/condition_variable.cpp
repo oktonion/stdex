@@ -1,5 +1,6 @@
 #include "../stdex/include/core.h"
 #include "../stdex/include/condition_variable.hpp"
+#include "../stdex/include/mutex.hpp"
 #include "../stdex/include/system_error.hpp"
 #include "../stdex/include/thread.hpp"
 

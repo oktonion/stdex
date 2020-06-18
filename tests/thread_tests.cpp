@@ -591,9 +591,9 @@ void dummy_func_2(void*, int*) {}
 void dummy_func_3(void*, double*, float*) {}
 void dummy_func_4(struct dummy_func_4_t0*, struct dummy_func_4_t1*, struct dummy_func_4_t2*, struct dummy_func_4_t3*) {}
 void dummy_func_5(struct dummy_func_5_t0*, struct dummy_func_5_t1*, struct dummy_func_5_t2*, struct dummy_func_5_t3*, struct dummy_func_5_t4*) {}
-void dummy_func_6(struct dummy_func_5_t0*, struct dummy_func_5_t1*, struct dummy_func_5_t2 const*, struct dummy_func_5_t3*, struct dummy_func_5_t4*, struct dummy_func_5_t5 const*) {}
+void dummy_func_6(struct dummy_func_6_t0*, struct dummy_func_6_t1*, struct dummy_func_6_t2 const*, struct dummy_func_6_t3*, struct dummy_func_6_t4*, struct dummy_func_6_t5 const*) {}
 void dummy_func_7(struct dummy_func_7_t0*, struct dummy_func_7_t1*, struct dummy_func_7_t2 const*, struct dummy_func_7_t3*, struct dummy_func_7_t4*, struct dummy_func_7_t5 const*, struct dummy_func_7_t6 const*) {}
-void dummy_func_8(struct dummy_func_7_t0*, struct dummy_func_7_t1*, struct dummy_func_7_t2 const*, struct dummy_func_7_t3*, struct dummy_func_7_t4*, struct dummy_func_7_t5 const*, struct dummy_func_7_t6 const**, void*) {}
+void dummy_func_8(struct dummy_func_8_t0*, struct dummy_func_8_t1*, struct dummy_func_8_t2 const*, struct dummy_func_8_t3*, struct dummy_func_8_t4*, struct dummy_func_8_t5 const*, struct dummy_func_8_t6 const**, void*) {}
 
 int test13()
 {
@@ -634,10 +634,10 @@ int test13()
         tt.join();
     }
 
-    {
+    /*{
         thread tt(&dummy_func_7, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
         tt.join();
-    }
+    }*/
 
     {
         thread tt(&dummy_func_8, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
