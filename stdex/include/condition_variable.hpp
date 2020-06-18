@@ -36,7 +36,8 @@ namespace stdex
 
     namespace detail
     {
-        pthread_mutex_t* _get_mutex_native_handle(const unique_lock<mutex>& lock);
+        pthread_mutex_t* _lock_mutex_native_handle(const unique_lock<mutex>&);
+        bool _lock_owns_lock(const unique_lock<mutex>&);
     } // namespace detail
 
 } // namespace stdex
@@ -83,7 +84,7 @@ namespace stdex
          inline void wait(unique_lock<mutex> &_lock) _STDEX_NOEXCEPT_FUNCTION
          {
              int _e = 
-                 pthread_cond_wait(&_condition_handle, detail::_get_mutex_native_handle(_lock));
+                 pthread_cond_wait(&_condition_handle, detail::_lock_mutex_native_handle(_lock));
  
              if (_e)
                  std::terminate();
@@ -153,7 +154,7 @@ namespace stdex
          template<class _Dur>
          cv_status wait_until_impl(unique_lock<mutex> &_lock, const chrono::time_point<clock_t, _Dur> &_atime)
          {
-             if (!_lock.owns_lock())
+             if (!detail::_lock_owns_lock(_lock))
                  std::terminate();
  
              chrono::time_point<clock_t, chrono::seconds> _s = chrono::time_point_cast<chrono::seconds>(_atime);
@@ -165,7 +166,7 @@ namespace stdex
              _ts.tv_sec = static_cast<stdex::time_t>(_s_count > 0 ? _s_count : 0);
              _ts.tv_nsec = static_cast<long>(_ns.count());
  
-             /*int res = */pthread_cond_timedwait(&_condition_handle, detail::_get_mutex_native_handle(_lock), &_ts);
+             /*int res = */pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
  
              return (clock_t::now() < _atime
                  ? cv_status::no_timeout : cv_status::timeout);
@@ -176,7 +177,7 @@ namespace stdex
          {
              clock_t::time_point _start_time_point = clock_t::now();
  
-             if (!lock.owns_lock())
+             if (!detail::_lock_owns_lock(_lock))
                  std::terminate();
  
              chrono::seconds _rs = chrono::duration_cast<chrono::seconds>(_rtime);
@@ -194,7 +195,7 @@ namespace stdex
              _ts.tv_nsec += static_cast<long>(_nsec.count());
  
              int res = 
-                 pthread_cond_timedwait(&_condition_handle, detail::_get_mutex_native_handle(_lock), &_ts);
+                 pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
  
              return (clock_t::now() - _start_time_point < _rtime
                  ? cv_status::no_timeout : cv_status::timeout);
