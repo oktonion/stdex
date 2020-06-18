@@ -123,7 +123,10 @@
  
          inline void unlock()
          {
-             pthread_mutex_unlock(&_mutex_handle);
+             int _err = pthread_mutex_unlock(&_mutex_handle);
+
+             if (_err)
+                throw system_error( error_code(errc::errc_t(_err)) );
          }
  
          native_handle_type native_handle() _STDEX_NOEXCEPT_FUNCTION
