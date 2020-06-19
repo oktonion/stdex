@@ -11,7 +11,7 @@ set build_ok=!true!
 
 set INCLUDE=%INCLUDE%;%cd%\pthread\;
 
-set "tests_failed=failed tests:"
+set "tests_failed=unsuccessful tests:"
 set has_compile_error=!false!
 set has_compile_warn=!false!
 

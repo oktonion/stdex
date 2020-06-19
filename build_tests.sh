@@ -2,7 +2,7 @@ mkdir ./tests/bin
 
 build_ok=1
 exclude_warn=""
-tests_failed="failed tests:"
+tests_failed="unsuccessful tests:"
 build_libs="-lrt"
 
 $COMPILER -v

@@ -1,7 +1,7 @@
 mkdir ./tests/bin
 
 build_ok=1
-tests_failed="failed tests:"
+tests_failed="unsuccessful tests:"
 exclude_warn=""
 COMPILER=g++
 

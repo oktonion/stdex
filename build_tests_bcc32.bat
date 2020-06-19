@@ -15,7 +15,7 @@ set LF=^
 
 REM The two empty lines are required here
 set "MYOUTPUT="
-set "tests_failed=failed tests:"
+set "tests_failed=unsuccessful tests:"
 set has_compile_error=!false!
 set has_compile_warn=!false!
 
