@@ -21,11 +21,13 @@
  
 #define _STDEX_DELETED_FUNCTION =delete
 #define _STDEX_NOEXCEPT_FUNCTION noexcept
+#define _STDEX_NOEXCEPT(args) noexcept(args)
  
 #else
  
 #define _STDEX_DELETED_FUNCTION 
 #define _STDEX_NOEXCEPT_FUNCTION throw()
+#define _STDEX_NOEXCEPT(args)
  
 #endif
  
@@ -46,7 +48,7 @@
                  pthread_mutex_init(&_mutex_handle, NULL);
              }
 
-             ~_mutex_base() 
+             ~_mutex_base() _STDEX_NOEXCEPT(false)
              { 
                  int _err = pthread_mutex_destroy(&_mutex_handle);
                  if (0 != _err)
@@ -81,7 +83,7 @@
                      throw(stdex::system_error( stdex::errc::errc_t(_err)) );
              }
 
-             ~_recursive_mutex_base() 
+             ~_recursive_mutex_base() _STDEX_NOEXCEPT(false)
              {
                  int _err = pthread_mutex_destroy(&_mutex_handle);
                  if (0 != _err)
@@ -865,6 +867,7 @@
  
  #undef _STDEX_DELETED_FUNCTION
  #undef _STDEX_NOEXCEPT_FUNCTION
+ #undef _STDEX_NOEXCEPT
  
  
  #endif // _STDEX_MUTEX_H
