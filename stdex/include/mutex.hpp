@@ -597,8 +597,9 @@
          class _timed_mutex_impl_base<_recursive_mutex_base, false>
          {
              // Predicate type that tests whether the current thread can lock a mutex.
-             struct _Can_lock
+             class _Can_lock
              {
+             public:
                  // Returns true if the mutex is unlocked or is locked by _caller.
                  bool operator()() const _STDEX_NOEXCEPT_FUNCTION
                  {
