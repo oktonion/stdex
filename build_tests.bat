@@ -7,6 +7,9 @@ setlocal enabledelayedexpansion
 set "build_ok=1"
 set INCLUDE=%INCLUDE%;%cd%\pthread\;
 
+set "MYOUTPUT="
+set "tests_failed=failed tests:"
+
 for /f %%f in ('dir /b ".\tests\*.cpp"') do (
   echo "compiling test %VisualStudioVersion% %%~nf"
   set "MYOUTPUT="
