@@ -128,7 +128,7 @@ namespace mutex_tests
         try
         {
             mutex_type mmm;
-            mmm.lock();
+            //mmm.lock();
         }
         catch (const system_error&)
         {
