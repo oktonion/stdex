@@ -147,10 +147,15 @@ namespace mutex_tests
     {
         using namespace stdex;
 
+        int ln = __LINE__;
+
         try
         {
+            ln = __LINE__;
             mutex_type mmm;
+            ln = __LINE__;
             mmm.lock();
+            ln = __LINE__;
 
             // Lock already locked mutex.
             try
@@ -163,14 +168,23 @@ namespace mutex_tests
                 DYNAMIC_VERIFY(sizeof(false) == 0);
             }
 
+            ln = __LINE__;
             m.unlock();
+            ln = __LINE__;
         }
-        catch (const system_error&)
+        catch (const system_error& e)
         {
+            std::cout << "unexpected exception '" << e.what() << "' at " << ln << std::endl;
+            DYNAMIC_VERIFY(sizeof(false) == 0);
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << "unexpected exception '" << e.what() << "' at " << ln << std::endl;
             DYNAMIC_VERIFY(sizeof(false) == 0);
         }
         catch (...)
         {
+            std::cout << "unexpected exception at " << ln << std::endl;
             DYNAMIC_VERIFY(sizeof(false) == 0);
         }
 
