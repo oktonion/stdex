@@ -55,11 +55,6 @@ namespace mutex_tests
     typedef stdex::mutex mutex_type;
     typedef mutex_type::native_handle_type native_handle_type;
 
-	void f()
-	{
-		stdex::lock_guard<mutex_type> l(m);
-	}
-
     int try_lock_func_res = 0;
 
 	int try_lock_func(mutex_type &mmm, bool &b)
@@ -248,7 +243,7 @@ namespace mutex_tests
             t.join();
             DYNAMIC_VERIFY(!b);
 
-            m.unlock();
+            mmm.unlock();
         }
         catch (const system_error&)
         {
@@ -283,6 +278,11 @@ namespace mutex_tests
         }
 
         return 0;
+    }
+
+    mutex_type f_m;
+    void f(){
+        stdex::lock_guard<mutex_type> l(f_m);
     }
 
     int unlock_test2()
