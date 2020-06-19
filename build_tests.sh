@@ -48,8 +48,8 @@ else
     filename=$(basename -- "$file")
     filename="${filename%.*}"
     echo "compiling test c++03 $filename"
-    output=$((result=($COMPILER -std=c++03 -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename")) 2>&1)
-    if ! $result; then
+    output=$(($COMPILER -std=c++03 -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
+    if ! $?; then
       if [[ $filename == *"fail"* ]]; then
         echo "failed as expected"
       else
@@ -78,8 +78,8 @@ for file in ./tests/*.cpp; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
   echo "compiling test c++98 $filename"
-  output=$((result=($COMPILER -std=c++98 -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename")) 2>&1)
-  if ! $result; then
+  output=$(($COMPILER -std=c++98 -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
+  if ! $?; then
     if [[ $filename == *"fail"* ]]; then
       echo "failed as expected"
     else
