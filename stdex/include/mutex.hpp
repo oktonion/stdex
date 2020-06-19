@@ -432,7 +432,14 @@
              struct _has_pthread_mutex_timedlock
              {
                  static const bool value =
-                     sizeof( _pthread_func_tester(pthread_mutex_timedlock(declval<pthread_mutex_t*>(), NULL)) ) == sizeof(_yes_type);
+                     sizeof( 
+                         _pthread_func_tester(
+                             pthread_mutex_timedlock(
+                                 declval<pthread_mutex_t*>(), 
+                                 declval<struct timespec*>()
+                            )
+                        ) 
+                    ) == sizeof(_yes_type);
              };
          }
          
@@ -469,10 +476,10 @@
                  _ts.tv_nsec = 
                      static_cast<long>(_ns.count());
 
-                 int err = 
-                     pthread_mutex_timedlock(&_mutex_handle, &_ts);
+                 bool success = 
+                     (pthread_mutex_timedlock(&_mutex_handle, &_ts) == 0);
 
-                 return (0 == err);
+                 return success;
              }
 
              template<class _Clock, class _Duration>
