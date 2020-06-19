@@ -2,7 +2,7 @@ mkdir .\tests\bin
 mkdir .\tests\obj
 
 setlocal enabledelayedexpansion
-@echo off
+@ECHO OFF
 
 set "build_ok=1"
 set INCLUDE=%INCLUDE%;%cd%\pthread\;
@@ -18,6 +18,7 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
   cl -EHsc -W4 -Fo.\tests\obj\%%~nf.obj -D _CRT_SECURE_NO_WARNINGS -c ".\tests\%%f"
   @if ERRORLEVEL != 0 (
     set "has_compile_error=1"
+    set "MYOUTPUT=compilation failed"
   )
   call :CheckOutput %%~nf
 
@@ -28,6 +29,7 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
     cl /I %cd%\pthread\ .\tests\obj\%%~nf.obj stdex.lib ntdll.lib -D _CRT_SECURE_NO_WARNINGS -Fe.\tests\bin\%%~nf.exe -link -LIBPATH:.\stdex\lib
     @if ERRORLEVEL != 0 (
       set "has_compile_error=1"
+      set "MYOUTPUT=compilation failed"
     )
     call :CheckOutput %%~nf
   )

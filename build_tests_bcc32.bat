@@ -3,9 +3,9 @@ mkdir .\tests\obj
 
 setlocal enabledelayedexpansion
 
-set "build_ok=1"
-
 @ECHO OFF
+
+set "build_ok=1"
 
 set LF=^
 
