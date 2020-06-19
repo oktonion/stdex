@@ -96,28 +96,6 @@ namespace mutex_tests
     {
         using namespace stdex;
 
-#if CHECK_FOR_COMPILE_ERROR_TESTS == 1
-		{
-			// assign
-			mutex_type m1;
-			mutex_type m2;
-			m1 = m2;			// { dg-error "deleted" }
-		}
-
-		{
-			// assign
-			mutex_type m1;
-			mutex_type m2(m1);		// { dg-error "deleted" }
-		}
-#endif
-
-        return 0;
-    }
-
-    int test3()
-    {
-        using namespace stdex;
-
         try
         {
             mutex_type mmm;
@@ -136,7 +114,7 @@ namespace mutex_tests
         return 0;
     }
 
-    int test4()
+    int test3()
     {
         using namespace stdex;
 
@@ -184,7 +162,7 @@ namespace mutex_tests
         return 0;
     }
 
-    int test5()
+    int test4()
     {
         using namespace stdex;
 
@@ -308,7 +286,6 @@ int main(void)
     RUN_TEST(test2);
     RUN_TEST(test3);
     RUN_TEST(test4);
-    RUN_TEST(test5);
     RUN_TEST(try_lock_test1);
     RUN_TEST(try_lock_test2);
     RUN_TEST(unlock_test1);
