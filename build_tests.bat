@@ -16,10 +16,17 @@ set has_compile_error=!false!
 set has_compile_warn=!false!
 
 for /f %%f in ('dir /b ".\tests\*.cpp"') do (
-  echo "compiling test %VisualStudioVersion% %%~nf"
+  echo "compiling test Visual Studio C++ %VisualStudioVersion% %%~nf"
   set has_compile_error=!false!
   set has_compile_warn=!false!
-  cl -nologo -EHsc -W4 -Fo.\tests\obj\%%~nf.obj -D _CRT_SECURE_NO_WARNINGS -c ".\tests\%%f"
+  
+  set "origin_str=%%~nf"
+  set "replaced_str=!origin_str:fail=!"
+  if "!origin_str!"=="!replaced_str!" (
+    cl -nologo -EHsc -W4 -Fo.\tests\obj\%%~nf.obj -D _CRT_SECURE_NO_WARNINGS -c ".\tests\%%f"
+  ) else (
+    cl -nologo -EHsc -W4 -Fo.\tests\obj\%%~nf.obj -D _CRT_SECURE_NO_WARNINGS -c ".\tests\%%f" >nul 2>&1
+  )
   if not !errorlevel!==0 (
     set has_compile_error=!true!
   )
