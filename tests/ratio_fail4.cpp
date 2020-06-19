@@ -4,14 +4,12 @@
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 
-static const stdex::intmax_t M = STDEX_INTMAX_MAX;
-
 int main(void)
 {
     using namespace stdex;
 		{
 			// Negative tests:
-			volatile ratio<1, M> r4; //??
+			volatile ratio<1, STDEX_INTMAX_MIN> r4; //??
 		}
 
     return 0;
