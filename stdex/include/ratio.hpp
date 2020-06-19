@@ -296,7 +296,7 @@
          typedef typename check::denominator_cant_be_zero_assert< (_Den != 0) >::
              denominator_cant_be_zero_assert_failed
          check1; // if you are there means you put the denominator to zero
-         typedef typename check::out_of_range<( (_Num >= STDEX_INTMAX_MIN) && (_Den >= STDEX_INTMAX_MIN) )>::
+         typedef typename check::out_of_range<( (_Num >= -STDEX_INTMAX_MAX) && (_Den >= -STDEX_INTMAX_MAX) )>::
              out_of_range_failed
          check2; // if you are there means that value is out of range
      };
