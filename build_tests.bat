@@ -2,7 +2,7 @@ mkdir .\tests\bin
 mkdir .\tests\obj
 
 setlocal enabledelayedexpansion
-@ECHO OFF
+rem @ECHO OFF
 
 set "build_ok=1"
 set INCLUDE=%INCLUDE%;%cd%\pthread\;
