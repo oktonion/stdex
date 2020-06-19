@@ -3,7 +3,7 @@ mkdir .\tests\obj
 
 setlocal enabledelayedexpansion
 
-@ECHO OFF
+rem @ECHO OFF
 
 set "build_ok=1"
 
