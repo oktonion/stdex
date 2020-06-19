@@ -11,15 +11,7 @@ int main(void)
     using namespace stdex;
 		{
 			// Negative tests:
-			volatile ratio<M, M> r1; //??
-			volatile ratio<-M, M> r2; //??
-			volatile ratio<M, 1> r3; //??
-			volatile ratio<1, M> r4; //??
-			volatile ratio<1, 0> r5; // error
-
 			volatile ratio_add<ratio<M, 1>, ratio<1> >::type r6; // error
-			volatile ratio_multiply<ratio<-M, 2>, ratio<3, 2> >::type r7; // error
-			volatile ratio_multiply<ratio<M>, ratio<M> >::type r8; // error
 		}
 
     return 0;
