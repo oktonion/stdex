@@ -55,8 +55,6 @@ namespace mutex_tests
     typedef stdex::mutex mutex_type;
     typedef mutex_type::native_handle_type native_handle_type;
 
-	mutex_type m;
-
 	void f()
 	{
 		stdex::lock_guard<mutex_type> l(m);
@@ -128,7 +126,7 @@ namespace mutex_tests
         try
         {
             mutex_type mmm;
-            //mmm.lock();
+            mmm.lock();
         }
         catch (const system_error&)
         {
@@ -169,17 +167,17 @@ namespace mutex_tests
             }
 
             ln = __LINE__;
-            m.unlock();
+            mmm.unlock();
             ln = __LINE__;
         }
         catch (const system_error& e)
         {
-            std::cout << "unexpected exception '" << e.what() << "' at " << ln << std::endl;
+            std::cout << "unexpected system error '" << e.what() << "' at line " << ln << std::endl;
             DYNAMIC_VERIFY(sizeof(false) == 0);
         }
         catch (const std::exception& e)
         {
-            std::cout << "unexpected exception '" << e.what() << "' at " << ln << std::endl;
+            std::cout << "unexpected exception '" << e.what() << "' at line " << ln << std::endl;
             DYNAMIC_VERIFY(sizeof(false) == 0);
         }
         catch (...)
