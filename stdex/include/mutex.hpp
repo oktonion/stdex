@@ -464,11 +464,11 @@
 
                  if (ratio_greater<_clock::period, _Period>::value)
                      ++_rt;
-                 return try_lock_until(_mutex_handle, _clock::now() + _rt);
+                 return try_lock_until1(_mutex_handle, _clock::now() + _rt);
              }
 
              template<class _Duration>
-             static bool try_lock_until(pthread_mutex_t& _mutex_handle,
+             static bool try_lock_until1(pthread_mutex_t& _mutex_handle,
                  const chrono::time_point<chrono::system_clock, _Duration>& _atime)
              {
                  chrono::time_point<chrono::system_clock, chrono::seconds> _s =
