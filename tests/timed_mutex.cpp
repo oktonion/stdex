@@ -315,6 +315,9 @@ namespace timed_mutex_tests
                 const typename clock_type::time_point start = clock_type::now();
                 b = m.try_lock_until(start + timeout);
                 t = clock_type::now() - start;
+
+                DYNAMIC_VERIFY( !b );
+                DYNAMIC_VERIFY( t >= timeout );
             }
             catch (const stdex::system_error&)
             {
@@ -359,10 +362,6 @@ namespace timed_mutex_tests
 
             stdex::thread thr(pred);
             thr.join();
-
-            DYNAMIC_VERIFY( !b );
-            DYNAMIC_VERIFY( t >= timeout );
-
             m.unlock();
         }
         catch (const stdex::system_error&)
