@@ -249,7 +249,6 @@ namespace mutex_tests
         catch (const system_error&)
         {
             // POSIX == EPERM
-            DYNAMIC_VERIFY(true);
         }
         catch (...)
         {

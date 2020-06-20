@@ -195,7 +195,6 @@ namespace recursive_mutex_tests
         catch (const stdex::system_error&)
         {
             // POSIX == EPERM
-            DYNAMIC_VERIFY(true);
         }
         catch (...)
         {
