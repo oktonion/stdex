@@ -294,10 +294,10 @@ namespace timed_mutex_tests
         return 0;
     }
 
-    //template <class clock_type>
+    template <class clock_type>
     struct try_lock_until_test3_pred{
         typedef stdex::chrono::milliseconds milliseconds;
-        typedef stdex::chrono::system_clock clock_type;
+
         try_lock_until_test3_pred(mutex_type &m_): m(m_)
         {}
 
