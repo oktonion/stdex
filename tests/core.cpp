@@ -39,16 +39,18 @@ int main(void)
 			int *ptr2 = &i;
 			if(nullptr == ptr2)
 				ptr2 = nullptr;
+			(void)(&i);
+			(void)(&ptr2);
 		}
 		
-		if(! (&Test::mfunc != nullptr) ) return 1;
-		if (&func == nullptr)  return 1;
+		if(! (&Test::mfunc != nullptr) || &func == nullptr) return 1;
 		Test::mfunc_ptr_type mf = nullptr;
 		func_type f = nullptr;
 		const Test::mfunc_ptr_type cmf = nullptr;
 		const func_type cf = nullptr;
 		f = cf; f = f;
 		mf = cmf; mf = mf;
+		(void)(&f);
 
 		// countof checks:
 		{
@@ -56,6 +58,7 @@ int main(void)
 			int iarr[20];
 			float farr[20];
 			volatile static const int i = int(countof(carr));
+			(void)(&i);
 			carr[0] = char();
 			iarr[0] = int();
 			farr[0] = float();
@@ -69,7 +72,7 @@ int main(void)
 		forever
 		{
 			static int i = 0;
-
+			(void)(&i);
             if(++i < 10)
                 break;
 

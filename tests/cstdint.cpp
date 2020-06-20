@@ -175,9 +175,13 @@ int integral_constant_type_check(T1, T2)
 
 	// native headers are permitted to promote small
 	// unsigned types to type int:
-	if (sizeof(T1) >= sizeof(int))
+	bool 
+		value = sizeof(T1) >= sizeof(int),
+		else_value = t1 < 0;
+	if (value)
 	{
-		if (t1 > 0)
+		value = t1 > 0;
+		if (value)
 		{
 			DYNAMIC_VERIFY(t2 > 0);
 		}
@@ -186,7 +190,7 @@ int integral_constant_type_check(T1, T2)
 			DYNAMIC_VERIFY(!(t2 > 0));
 		}
 	}
-	else if (t1 < 0)
+	else if (else_value)
 	{
 		DYNAMIC_VERIFY(!(t2 > 0));
 	}
