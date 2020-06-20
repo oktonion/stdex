@@ -177,16 +177,18 @@ namespace stdex
              _ts.tv_sec = static_cast<stdex::time_t>(_s_count > 0 ? _s_count : 0);
              _ts.tv_nsec = static_cast<long>(_ns.count());
  
-             int _err =
+             const int _err =
                 pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
 
              #ifdef ETIMEDOUT
-                if(_err && _err != ETIMEDOUT)
+                if (_err == ETIMEDOUT)
+                    return cv_status::timeout;
+                else if (_err)
                     std::terminate();
+             #else
+                return (clock_t::now() < _atime
+                    ? cv_status::no_timeout : cv_status::timeout);
              #endif
- 
-             return (clock_t::now() < _atime
-                 ? cv_status::no_timeout : cv_status::timeout);
          }
  
          template<class _Rep, class _Period>
@@ -215,12 +217,14 @@ namespace stdex
                  pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
              
              #ifdef ETIMEDOUT
-                if(_err && _err != ETIMEDOUT)
+                if (_err == ETIMEDOUT)
+                    return cv_status::timeout;
+                else if (_err)
                     std::terminate();
+             #else
+                return (clock_t::now() - _start_time_point < _rtime
+                    ? cv_status::no_timeout : cv_status::timeout);
              #endif
- 
-             return (clock_t::now() - _start_time_point < _rtime
-                 ? cv_status::no_timeout : cv_status::timeout);
          }
  
          pthread_cond_t _condition_handle;
