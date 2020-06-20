@@ -4,6 +4,11 @@
 #include "../stdex/include/thread.hpp"
 #include "../stdex/include/chrono.hpp"
 
+#if defined(__APPLE__)
+#include <mutex>
+#define stdex std
+#endif
+
 #include <iostream>
 #include <string>
 
