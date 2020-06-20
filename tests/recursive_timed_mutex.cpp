@@ -305,23 +305,17 @@ namespace timed_mutex_tests
     struct try_lock_until_test3_pred{
         typedef stdex::chrono::milliseconds milliseconds;
 
-        try_lock_until_test3_pred(
-            bool &b_, 
-            typename clock_type::duration &t_, 
-            milliseconds &timeout_, 
-            mutex_type &m_
-        ):
-            b(b_), t(t_), timeout(timeout_), m(m_)
+        try_lock_until_test3_pred(mutex_type &m_): m(m_)
         {}
 
         int test_func() const
         {
             try
             { 
-                timeout = milliseconds(100);
+                const milliseconds timeout = milliseconds(100);
                 const typename clock_type::time_point start = clock_type::now();
-                b = m.try_lock_until(start + timeout);
-                t = clock_type::now() - start;
+                const bool b = m.try_lock_until(start + timeout);
+                const typename clock_type::duration t = clock_type::now() - start;
 
                 DYNAMIC_VERIFY( !b );
                 DYNAMIC_VERIFY( t >= timeout );
@@ -345,9 +339,6 @@ namespace timed_mutex_tests
                 throw("");
         }
 
-        bool &b;
-        typename clock_type::duration &t;
-        milliseconds &timeout;
         mutex_type &m;
     };
 
@@ -357,15 +348,12 @@ namespace timed_mutex_tests
         
         try
         {
-            bool b;
-            typename clock_type::duration t;
-            stdex::chrono::milliseconds timeout;
             mutex_type m;
 
             m.lock();
 
             try_lock_until_test3_pred<clock_type> 
-                pred(b, t, timeout, m);
+                pred(m);
 
             stdex::thread thr(pred);
             thr.join();
