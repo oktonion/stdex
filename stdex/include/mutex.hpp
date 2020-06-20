@@ -566,17 +566,15 @@
              template<class _Clock, class _Duration>
              bool try_lock_until(const chrono::time_point<_Clock, _Duration>& _atime)
              {
-                using namespace chrono;
-                unique_lock<mutex> _lk(_mut);
-                bool no_timeout = _Clock::now() < _atime;
-                while (no_timeout && _locked)
-                    no_timeout = _cv.wait_until(_lk, _atime) == cv_status::no_timeout;
-                if (!_locked)
-                {
-                    _locked = true;
-                    return true;
-                }
-                return false;
+                 unique_lock<mutex> _lk(_mut);
+
+                 _Pred _pred;
+                 _pred._locked = &_locked;
+
+                 if (!_cv.wait_until(_lk, _atime, _pred))
+                     return false;
+                 _locked = true;
+                 return true;
              }
 
              void unlock()
