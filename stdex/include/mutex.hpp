@@ -519,9 +519,8 @@
              } ;
 
          public:
-             _timed_mutex_impl_base() _STDEX_NOEXCEPT_FUNCTION:
-                 _locked(false)
-             {}
+
+             typedef mutex::native_handle_type native_handle_type;
 
              ~_timed_mutex_impl_base()
              {}
@@ -582,15 +581,21 @@
                  _cv.notify_one();
              }
 
+             native_handle_type native_handle() _STDEX_NOEXCEPT_FUNCTION
+             {
+                 return _mut.native_handle();
+             }
+
+         protected:
+            _timed_mutex_impl_base() _STDEX_NOEXCEPT_FUNCTION:
+                 _locked(false)
+             {}
 
          private:
 
              mutex		_mut;
              condition_variable	_cv;
              bool		_locked;
-
-             _timed_mutex_impl_base(const _timed_mutex_impl_base&) _STDEX_DELETED_FUNCTION;
-             _timed_mutex_impl_base& operator=(const _timed_mutex_impl_base&) _STDEX_DELETED_FUNCTION;
          };
 
          template<>
@@ -613,9 +618,8 @@
              friend class _timed_mutex_impl_base<_recursive_mutex_base, false>::_Can_lock;
 
          public:
-             _timed_mutex_impl_base() _STDEX_NOEXCEPT_FUNCTION :
-                 _count(0)
-             {}
+
+             typedef mutex::native_handle_type native_handle_type;
 
              ~_timed_mutex_impl_base()
              {}
@@ -703,6 +707,16 @@
                  }
              }
 
+             native_handle_type native_handle() _STDEX_NOEXCEPT_FUNCTION
+             {
+                 return _mut.native_handle();
+             }
+
+         protected:
+             _timed_mutex_impl_base() _STDEX_NOEXCEPT_FUNCTION :
+                 _count(0)
+             {}
+
          private:
 
              mutex		_mut;
@@ -719,8 +733,9 @@
          class _timed_mutex_impl_base<_mutex_base, true> :
              private _mutex_base
          {
-             _timed_mutex_impl_base() _STDEX_NOEXCEPT_FUNCTION
-             {}
+         public:
+
+             typedef mutex::native_handle_type native_handle_type;
 
              ~_timed_mutex_impl_base()
              {}
@@ -757,6 +772,16 @@
                  pthread_mutex_unlock(&_mutex_handle);
              }
 
+             native_handle_type native_handle() _STDEX_NOEXCEPT_FUNCTION
+             {
+                 return &_mutex_handle;
+             }
+
+         protected:
+
+             _timed_mutex_impl_base() _STDEX_NOEXCEPT_FUNCTION
+             {}
+
          private:
 
              _timed_mutex_impl_base(const _timed_mutex_impl_base&) _STDEX_DELETED_FUNCTION;
@@ -768,8 +793,8 @@
              private _recursive_mutex_base
          {
          public:
-             _timed_mutex_impl_base()
-             {}
+
+             typedef mutex::native_handle_type native_handle_type;
 
              ~_timed_mutex_impl_base()
              {}
@@ -807,6 +832,16 @@
                  pthread_mutex_unlock(&_mutex_handle);
              }
 
+             native_handle_type native_handle() _STDEX_NOEXCEPT_FUNCTION
+             {
+                 return &_mutex_handle;
+             }
+
+         protected:
+
+             _timed_mutex_impl_base()
+             {}
+
          private:
 
              _timed_mutex_impl_base(const _timed_mutex_impl_base&) _STDEX_DELETED_FUNCTION;
@@ -818,38 +853,36 @@
 
          template<>
          class _timed_mutex_impl<timed_mutex> :
-             private _timed_mutex_impl_base<
+             public _timed_mutex_impl_base<
                 _mutex_base,
                 mutex_type_traits::_has_pthread_mutex_timedlock::value
              >
-         { };
+         { 
+         protected:
+             _timed_mutex_impl() _STDEX_NOEXCEPT_FUNCTION
+             {}
+         };
 
          template<>
          class _timed_mutex_impl<recursive_timed_mutex> :
-             private _timed_mutex_impl_base<
+             public _timed_mutex_impl_base<
                 _recursive_mutex_base,
                 mutex_type_traits::_has_pthread_mutex_timedlock::value
              >
-         { };
+         { 
+          protected:
+             _timed_mutex_impl()
+             {}
+         };
      }
 
      class timed_mutex :
-         private detail::_timed_mutex_impl<timed_mutex>
-     {
-     private:
-
-         timed_mutex(const timed_mutex&) _STDEX_DELETED_FUNCTION;
-         timed_mutex& operator=(const timed_mutex&) _STDEX_DELETED_FUNCTION;
-     };
+         public detail::_timed_mutex_impl<timed_mutex>
+     { };
 
      class recursive_timed_mutex :
-         private detail::_timed_mutex_impl<recursive_timed_mutex>
-     {
-     private:
-
-         recursive_timed_mutex(const recursive_timed_mutex&) _STDEX_DELETED_FUNCTION;
-         recursive_timed_mutex& operator=(const recursive_timed_mutex&) _STDEX_DELETED_FUNCTION;
-     };
+         public detail::_timed_mutex_impl<recursive_timed_mutex>
+     { };
  
      /// Swap overload for unique_lock objects.
      template<class _Mutex>
