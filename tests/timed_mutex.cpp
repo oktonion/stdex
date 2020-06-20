@@ -297,13 +297,23 @@ namespace timed_mutex_tests
     template <class clock_type>
     struct try_lock_until_test3_pred{
         typedef stdex::chrono::milliseconds milliseconds;
+
+        try_lock_until_test3_pred(
+            bool &b_, 
+            typename clock_type::duration &t_, 
+            milliseconds &timeout_, 
+            mutex_type &m_
+        ):
+            b(b_), t(t_), timeout(timeout_), m(m_)
+        {}
+
         int operator()()
         {
             try
             { 
                 timeout = milliseconds(100);
                 const typename clock_type::time_point start = clock_type::now();
-                b = m->try_lock_until(start + timeout);
+                b = m.try_lock_until(start + timeout);
                 t = clock_type::now() - start;
             }
             catch (const stdex::system_error&)
@@ -313,10 +323,10 @@ namespace timed_mutex_tests
             }
         }
 
-        bool b;
-        typename clock_type::duration t;
-        milliseconds timeout;
-        mutex_type *m;
+        bool &b;
+        typename clock_type::duration &t;
+        milliseconds &timeout;
+        mutex_type &m;
     };
 
     template <class clock_type>
@@ -325,17 +335,21 @@ namespace timed_mutex_tests
         
         try
         {
+            bool b;
+            typename clock_type::duration t;
+            stdex::chrono::milliseconds timeout;
             mutex_type m;
+
             m.lock();
 
-            try_lock_until_test3_pred<clock_type> pred;
+            try_lock_until_test3_pred<clock_type> 
+                pred(b, t, timeout, m);
 
-            pred.m = &m;
-            stdex::thread t(pred);
-            t.join();
+            stdex::thread thr(pred);
+            thr.join();
 
-            DYNAMIC_VERIFY( !pred.b );
-            DYNAMIC_VERIFY( pred.t >= pred.timeout );
+            DYNAMIC_VERIFY( !b );
+            DYNAMIC_VERIFY( t >= timeout );
 
             m.unlock();
         }
