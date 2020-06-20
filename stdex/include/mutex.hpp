@@ -45,7 +45,9 @@
              _mutex_base() _STDEX_NOEXCEPT_FUNCTION
              {
                  // XXX EAGAIN, ENOMEM, EPERM, EBUSY(may), EINVAL(may)
-                 pthread_mutex_init(&_mutex_handle, NULL);
+                 int _err = pthread_mutex_init(&_mutex_handle, NULL);
+                 if (0 != _err)
+                    std::terminate(); // not mentioned by standart but if we can then why not?
              }
 
              ~_mutex_base() _STDEX_NOEXCEPT(false)
@@ -113,7 +115,7 @@
              int _err = pthread_mutex_lock(&_mutex_handle);
  
              // EINVAL, EAGAIN, EBUSY, EINVAL, EDEADLK(may)
-             if (_err)
+             if (0 != _err)
                  throw system_error( error_code(errc::errc_t(_err)) );
          }
 
@@ -127,7 +129,7 @@
          {
              int _err = pthread_mutex_unlock(&_mutex_handle);
 
-             if (_err)
+             if (0 != _err)
                 throw system_error( error_code(errc::errc_t(_err)) );
          }
  
@@ -159,7 +161,7 @@
              int _err = pthread_mutex_lock(&_mutex_handle);
  
              // EINVAL, EAGAIN, EBUSY, EINVAL, EDEADLK(may)
-             if (_err)
+             if (0 != _err)
                  throw system_error(error_code(errc::errc_t(_err)));
          }
 
@@ -171,8 +173,10 @@
  
          inline void unlock()
          {
+             int _err = pthread_mutex_unlock(&_mutex_handle);
              // XXX EINVAL, EAGAIN, EBUSY
-             pthread_mutex_unlock(&_mutex_handle);
+             if (0 != _err)
+                 throw system_error(error_code(errc::errc_t(_err)));
          }
  
          native_handle_type native_handle() _STDEX_NOEXCEPT_FUNCTION
