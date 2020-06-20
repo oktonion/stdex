@@ -321,6 +321,11 @@ namespace timed_mutex_tests
                 DYNAMIC_VERIFY_FAIL;
                 throw;
             }
+            catch (...)
+            {
+                DYNAMIC_VERIFY_FAIL;
+                throw;
+            }
         }
 
         bool &b;
