@@ -485,9 +485,6 @@
                  bool success = 
                      (pthread_mutex_timedlock(&_mutex_handle, &_ts) == 0);
 
-                 if (chrono::system_clock::now() < _atime)
-                    success = false;
-
                  return success;
              }
 
