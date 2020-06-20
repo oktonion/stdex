@@ -63,45 +63,42 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
   )
   
   if !has_compile_error!==!false! (
-    if !build_ok!==!true! (
-      set "MYOUTPUT="
-      for /f %%i in ('bcc32 -X- -w-inl -w-ccc -tWC -Q -L.\stdex\lib\ -lap -I%cd%\pthread\ -e.\tests\bin\%%~nf.exe stdex.lib cw32mt.lib ntdll.lib .\tests\obj\%%~nf.obj') do (
-        if defined MYOUTPUT set "MYOUTPUT=!MYOUTPUT!!LF!"
-        set "MYOUTPUT=!MYOUTPUT!%%i"
-        set "origin_str=!MYOUTPUT!"
-        set "replaced_str=!origin_str:Error E=!"
-        if not "!origin_str!"=="!replaced_str!" (
-          set has_compile_error=!true!
-        )
-        set "replaced_str=!origin_str:Warning W=!"
-        if not "!origin_str!"=="!replaced_str!" (
-          set has_compile_warn=!true!
-        )
+    set "MYOUTPUT="
+    for /f %%i in ('bcc32 -X- -w-inl -w-ccc -tWC -Q -L.\stdex\lib\ -lap -I%cd%\pthread\ -e.\tests\bin\%%~nf.exe stdex.lib cw32mt.lib ntdll.lib .\tests\obj\%%~nf.obj') do (
+      if defined MYOUTPUT set "MYOUTPUT=!MYOUTPUT!!LF!"
+      set "MYOUTPUT=!MYOUTPUT!%%i"
+      set "origin_str=!MYOUTPUT!"
+      set "replaced_str=!origin_str:Error E=!"
+      if not "!origin_str!"=="!replaced_str!" (
+        set has_compile_error=!true!
       )
-      
-      if !has_compile_error!==!true! (
-        set "origin_str=%%~nf"
-        set "replaced_str=!origin_str:fail=!"
-        if "!origin_str!"=="!replaced_str!" (
-          set build_ok=!false!
-          echo !MYOUTPUT!
-          set "tests_failed=!tests_failed! !origin_str!"
-        ) else (
-          echo "failed as expected"
-        )
+      set "replaced_str=!origin_str:Warning W=!"
+      if not "!origin_str!"=="!replaced_str!" (
+        set has_compile_warn=!true!
+      )
+    )
+    
+    if !has_compile_error!==!true! (
+      set "origin_str=%%~nf"
+      set "replaced_str=!origin_str:fail=!"
+      if "!origin_str!"=="!replaced_str!" (
+        set build_ok=!false!
+        echo !MYOUTPUT!
+        set "tests_failed=!tests_failed! !origin_str!"
       ) else (
-        set "origin_str=%%~nf"
-        set "replaced_str=!origin_str:fail=_!"
-        if not "!origin_str!"=="!replaced_str!" (
-          set build_ok=!false!
-          echo "not failed as expected"
-          echo !MYOUTPUT!
-          set "tests_failed=!tests_failed! !origin_str!"
-        ) else (
-          if !has_compile_warn!==!true! echo !MYOUTPUT!
-        )
+        echo "failed as expected"
       )
-
+    ) else (
+      set "origin_str=%%~nf"
+      set "replaced_str=!origin_str:fail=_!"
+      if not "!origin_str!"=="!replaced_str!" (
+        set build_ok=!false!
+        echo "not failed as expected"
+        echo !MYOUTPUT!
+        set "tests_failed=!tests_failed! !origin_str!"
+      ) else (
+        if !has_compile_warn!==!true! echo !MYOUTPUT!
+      )
     )
   )
 )
@@ -111,4 +108,4 @@ if !build_ok!==!false! (
   exit /B 1
 )
 
-del /Q .\tests\obj\*.obj
+rem del /Q .\tests\obj\*.obj
