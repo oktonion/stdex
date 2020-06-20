@@ -280,6 +280,7 @@ namespace timed_mutex_tests
             {
                 b = m.try_lock();
                 DYNAMIC_VERIFY( b );
+                m.unlock();
             }
             catch (const stdex::system_error&)
             {
