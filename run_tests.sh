@@ -1,5 +1,5 @@
 run_ok=0
-tests_failed="failed tests:"
+tests_failed="unsuccessful tests:"
 
 for file in ./tests/bin/*; do
   chmod +x "$file"
