@@ -9,7 +9,7 @@
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
-#define DYNAMIC_VERIFY_FAIL DYNAMIC_VERIFY( sizeof(false) == 0 )
+#define DYNAMIC_VERIFY_FAIL {std::cout << "check condition " << "failed at line " << __LINE__ << std::endl; return -1;}
 
 namespace recursive_mutex_tests
 {
@@ -87,26 +87,6 @@ namespace recursive_mutex_tests
     }
 
     int test4()
-    {
-        try 
-        {
-            mutex_type m;
-            mutex_type::native_handle_type n = m.native_handle();
-            (void)(&n);
-        }
-        catch (const stdex::system_error&)
-        {
-            DYNAMIC_VERIFY_FAIL;
-        }
-        catch (...)
-        {
-            DYNAMIC_VERIFY_FAIL;
-        }
-
-        return 0;
-    }
-
-    int test5()
     {
         try 
         {
