@@ -9,6 +9,7 @@
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
+#define DYNAMIC_VERIFY_FAIL DYNAMIC_VERIFY( sizeof(false) == 0 )
 
 namespace mutex_tests
 {
@@ -82,11 +83,11 @@ namespace mutex_tests
         }
         catch (const stdex::system_error&)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
         catch (...)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
 
         return 0;
@@ -108,7 +109,7 @@ namespace mutex_tests
         }
         catch (...)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
 
         return 0;
@@ -136,7 +137,7 @@ namespace mutex_tests
             }
             catch (const system_error&)
             {
-                DYNAMIC_VERIFY(sizeof(false) == 0);
+                DYNAMIC_VERIFY_FAIL;
             }
 
             ln = __LINE__;
@@ -146,17 +147,17 @@ namespace mutex_tests
         catch (const system_error& e)
         {
             std::cout << "unexpected system error '" << e.what() << "' at line " << ln << std::endl;
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
         catch (const std::exception& e)
         {
             std::cout << "unexpected exception '" << e.what() << "' at line " << ln << std::endl;
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
         catch (...)
         {
             std::cout << "unexpected exception at " << ln << std::endl;
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
 
         return 0;
@@ -174,11 +175,11 @@ namespace mutex_tests
         }
         catch (const system_error&)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
         catch (...)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
 
         return 0;
@@ -197,11 +198,11 @@ namespace mutex_tests
         }
         catch (const system_error&)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
         catch (...)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
 
         return 0;
@@ -225,11 +226,11 @@ namespace mutex_tests
         }
         catch (const system_error&)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
         catch (...)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
 
         return try_lock_func_res;
@@ -252,7 +253,7 @@ namespace mutex_tests
         }
         catch (...)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
 
         return 0;
