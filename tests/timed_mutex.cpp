@@ -307,7 +307,7 @@ namespace timed_mutex_tests
             b(b_), t(t_), timeout(timeout_), m(m_)
         {}
 
-        int operator()()
+        int test_func() const
         {
             try
             { 
@@ -319,13 +319,20 @@ namespace timed_mutex_tests
             catch (const stdex::system_error&)
             {
                 DYNAMIC_VERIFY_FAIL;
-                throw;
             }
             catch (...)
             {
                 DYNAMIC_VERIFY_FAIL;
-                throw;
             }
+
+            return 0;
+        }
+
+        void operator()() const
+        {
+            const int res = test_func();
+            if(0 != res)
+                throw("");
         }
 
         bool &b;
