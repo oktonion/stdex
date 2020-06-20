@@ -447,27 +447,6 @@ namespace timed_mutex_tests
         return 0;
     }
 
-    int unlock_test1()
-    {
-        try 
-        {
-            // Unlock mutex that hasn't been locked.
-            mutex_type m;
-            m.unlock();
-        }
-        catch (const stdex::system_error&)
-        {
-            // POSIX == EPERM
-            return 0;
-        }
-        catch (...)
-        {
-            DYNAMIC_VERIFY_FAIL;
-        }
-
-        DYNAMIC_VERIFY_FAIL;
-    }
-
     mutex_type m;
 
     void ff()
@@ -475,7 +454,7 @@ namespace timed_mutex_tests
         stdex::lock_guard<mutex_type> l(m);
     }
 
-    int unlock_test2()
+    int unlock_test1()
     {
         stdex::thread t1(ff);
         stdex::thread t2(ff);
@@ -512,7 +491,6 @@ int main(void)
     RUN_TEST(try_lock_until_test5<stdex::chrono::system_clock>);
     RUN_TEST(try_lock_until_test5<stdex::chrono::steady_clock>);
     RUN_TEST(unlock_test1);
-    RUN_TEST(unlock_test2);
 
     return 0;
 }

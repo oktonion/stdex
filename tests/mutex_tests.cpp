@@ -236,35 +236,12 @@ namespace mutex_tests
         return try_lock_func_res;
     }
 
-    int unlock_test1()
-    {
-        using namespace stdex;
-        
-        try
-        {
-            // Unlock mutex that hasn't been locked.
-            mutex_type mmm;
-            mmm.unlock();
-        }
-        catch (const system_error&)
-        {
-            // POSIX == EPERM
-            return 0; // may throw - not specified by standard
-        }
-        catch (...)
-        {
-            DYNAMIC_VERIFY_FAIL;
-        }
-
-        return 0; // may not - not specified by standard
-    }
-
     mutex_type f_m;
     void f(){
         stdex::lock_guard<mutex_type> l(f_m);
     }
 
-    int unlock_test2()
+    int unlock_test1()
     {
         using namespace stdex;
         
@@ -290,7 +267,6 @@ int main(void)
     RUN_TEST(try_lock_test1);
     RUN_TEST(try_lock_test2);
     RUN_TEST(unlock_test1);
-    RUN_TEST(unlock_test2);
 
     return 0;
 }

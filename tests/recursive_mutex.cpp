@@ -164,27 +164,6 @@ namespace recursive_mutex_tests
         return 0;
     }
 
-    int unlock_test1()
-    {
-        try 
-        {
-            // Unlock mutex that hasn't been locked.
-            mutex_type m;
-            m.unlock();
-        }
-        catch (const stdex::system_error&)
-        {
-            // POSIX == EPERM
-            return 0;
-        }
-        catch (...)
-        {
-            DYNAMIC_VERIFY_FAIL;
-        }
-
-        DYNAMIC_VERIFY_FAIL;
-    }
-
     mutex_type m;
 
     void f()
@@ -192,7 +171,7 @@ namespace recursive_mutex_tests
         stdex::lock_guard<mutex_type> l(m);
     }
 
-    int unlock_test2()
+    int unlock_test1()
     {
         stdex::thread t1(f);
         stdex::thread t2(f);
@@ -218,7 +197,6 @@ int main(void)
     RUN_TEST(try_lock_test1);
     RUN_TEST(try_lock_test2);
     RUN_TEST(unlock_test1);
-    RUN_TEST(unlock_test2);
 
     return 0;
 }
