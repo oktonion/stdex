@@ -302,7 +302,7 @@ namespace timed_mutex_tests
             try
             { 
                 timeout = milliseconds(100);
-                const clock_type::time_point start = clock_type::now();
+                const typename clock_type::time_point start = clock_type::now();
                 b = m->try_lock_until(start + timeout);
                 t = clock_type::now() - start;
             }
@@ -314,7 +314,7 @@ namespace timed_mutex_tests
         }
 
         bool b;
-        clock_type::duration t;
+        typename clock_type::duration t;
         milliseconds timeout;
         mutex_type *m;
     };
