@@ -249,13 +249,14 @@ namespace mutex_tests
         catch (const system_error&)
         {
             // POSIX == EPERM
+            return 0;
         }
         catch (...)
         {
             DYNAMIC_VERIFY_FAIL;
         }
 
-        return 0;
+        DYNAMIC_VERIFY_FAIL;
     }
 
     mutex_type f_m;
