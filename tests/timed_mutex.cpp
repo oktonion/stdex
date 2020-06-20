@@ -305,7 +305,7 @@ namespace timed_mutex_tests
         {
             try
             { 
-                const milliseconds timeout = milliseconds(100);
+                const milliseconds timeout = milliseconds(200);
                 const typename clock_type::time_point start = clock_type::now();
                 const bool b = m.try_lock_until(start + timeout);
                 const typename clock_type::duration t = clock_type::now() - start;
