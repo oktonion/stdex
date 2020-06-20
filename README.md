@@ -132,7 +132,7 @@ A:
 | name                   | purpose                                       | implemented | is final |
 |------------------------|-----------------------------------------------|:-----------:|----------|
 | `<thread>`             | stdex::thread class and  supporting functions | 90%         | no       |
-| `<mutex>`              | mutual exclusion primitives                   | 100%        | yes      |
+| `<mutex>`              | mutual exclusion primitives                   | 90%         | no       |
 | `<future>`             | primitives for asynchronous computations      | no          | maybe    |
 | `<condition_variable>` | thread waiting conditions                     | 100%        | yes      |
 
