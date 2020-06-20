@@ -7,6 +7,7 @@
  
  // stdex includes
  #include "./chrono.hpp"
+ #include "./system_error.hpp"
  
  // POSIX includes
  #include <pthread.h>
@@ -18,11 +19,13 @@
  
  #define _STDEX_DELETED_FUNCTION =delete
  #define _STDEX_NOEXCEPT_FUNCTION noexcept
+ #define _STDEX_NOEXCEPT(args) noexcept(args)
  
  #else
  
  #define _STDEX_DELETED_FUNCTION 
  #define _STDEX_NOEXCEPT_FUNCTION throw()
+ #define _STDEX_NOEXCEPT(args)
  
  #endif
 
@@ -71,22 +74,30 @@ namespace stdex
      public:
          typedef pthread_cond_t* native_handle_type;
  
-         condition_variable() _STDEX_NOEXCEPT_FUNCTION
+         condition_variable()
          {
-             pthread_cond_init(&_condition_handle, NULL);
+             int _err = 
+                pthread_cond_init(&_condition_handle, NULL);
+
+             if (0 != _err)
+                 throw(stdex::system_error( stdex::errc::errc_t(_err)) );
          }
  
-         ~condition_variable() _STDEX_NOEXCEPT_FUNCTION
+         ~condition_variable() _STDEX_NOEXCEPT(false)
          {
-             pthread_cond_destroy(&_condition_handle);
+             int _err = 
+                pthread_cond_destroy(&_condition_handle);
+
+             if (0 != _err)
+                 throw(stdex::system_error( stdex::errc::errc_t(_err)) );
          }
  
          inline void wait(unique_lock<mutex> &_lock) _STDEX_NOEXCEPT_FUNCTION
          {
-             int _e = 
+             int _err = 
                  pthread_cond_wait(&_condition_handle, detail::_lock_mutex_native_handle(_lock));
  
-             if (_e)
+             if (0 != _err)
                  std::terminate();
          }
  
@@ -166,7 +177,13 @@ namespace stdex
              _ts.tv_sec = static_cast<stdex::time_t>(_s_count > 0 ? _s_count : 0);
              _ts.tv_nsec = static_cast<long>(_ns.count());
  
-             /*int res = */pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
+             int _err =
+                pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
+
+             #ifdef ETIMEDOUT
+                if(_err && _err != ETIMEDOUT)
+                    std::terminate();
+             #endif
  
              return (clock_t::now() < _atime
                  ? cv_status::no_timeout : cv_status::timeout);
@@ -194,8 +211,13 @@ namespace stdex
              _ts.tv_sec += static_cast<stdex::time_t>(_sec.time_since_epoch().count());
              _ts.tv_nsec += static_cast<long>(_nsec.count());
  
-             int res = 
+             int _err = 
                  pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
+             
+             #ifdef ETIMEDOUT
+                if(_err && _err != ETIMEDOUT)
+                    std::terminate();
+             #endif
  
              return (clock_t::now() - _start_time_point < _rtime
                  ? cv_status::no_timeout : cv_status::timeout);
@@ -212,5 +234,6 @@ namespace stdex
  
  #undef _STDEX_DELETED_FUNCTION
  #undef _STDEX_NOEXCEPT_FUNCTION
+ #undef _STDEX_NOEXCEPT
  
  #endif // _STDEX_CONDITION_VARIABLE_H
