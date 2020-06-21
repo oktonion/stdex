@@ -96,7 +96,7 @@ namespace timed_mutex_tests
     {
         try 
         {
-            #ifndef stdex
+            #if !defined(__APPLE__)
             mutex_type m;
             mutex_type::native_handle_type n = m.native_handle();
             (void)(&n);
@@ -473,7 +473,7 @@ int main(void)
     using namespace stdex;
     using namespace timed_mutex_tests;
 
-    #ifndef stdex
+    #if !defined(__APPLE__)
     typedef stdex::timed_mutex test_type;
     typedef test_type::native_handle_type type;
     #endif
