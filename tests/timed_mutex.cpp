@@ -6,6 +6,7 @@
 
 #if defined(__APPLE__)
 #include <mutex>
+#include <thread>
 #define stdex std
 #endif
 
@@ -95,9 +96,11 @@ namespace timed_mutex_tests
     {
         try 
         {
+            #ifndef stdex
             mutex_type m;
             mutex_type::native_handle_type n = m.native_handle();
             (void)(&n);
+            #endif
         }
         catch (const stdex::system_error&)
         {
@@ -470,8 +473,10 @@ int main(void)
     using namespace stdex;
     using namespace timed_mutex_tests;
 
+    #ifndef stdex
     typedef stdex::timed_mutex test_type;
     typedef test_type::native_handle_type type;
+    #endif
     
     RUN_TEST(test1);
     RUN_TEST(test2);
