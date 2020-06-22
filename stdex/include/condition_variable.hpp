@@ -137,12 +137,16 @@ namespace stdex
          template<class _Rep, class _Period>
          cv_status wait_for(unique_lock<mutex> &_lock, const chrono::duration<_Rep, _Period> &_rtime)
          {
+             if (ratio_greater<clock_t::period, _Period>::value)
+                ++_rtime;
              return wait_for_impl(_lock, _rtime);
          }
  
          template<class _Rep, class _Period, class _Predicate>
          bool wait_for(unique_lock<mutex> &_lock, const chrono::duration<_Rep, _Period> &_rtime, _Predicate _p)
          {
+             if (ratio_greater<clock_t::period, _Period>::value)
+                ++_rtime;
              return wait_until(_lock, clock_t::now() + chrono::duration_cast<clock_t::duration>(_rtime), _p);
          }
  
