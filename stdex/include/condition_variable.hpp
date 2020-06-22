@@ -71,7 +71,7 @@ namespace stdex
  
      class condition_variable 
      {
-         typedef chrono::steady_clock clock_t;
+         typedef chrono::system_clock clock_t;
  
      public:
          typedef pthread_cond_t* native_handle_type;
@@ -176,7 +176,7 @@ namespace stdex
              if (!detail::_lock_owns_lock(_lock))
                  std::terminate();
  
-             chrono::time_point<clock_t, chrono::seconds> _s = chrono::time_point_cast<chrono::seconds>(_atime) - chrono::milliseconds(1500);
+             chrono::time_point<clock_t, chrono::seconds> _s = chrono::time_point_cast<chrono::seconds>(_atime - chrono::milliseconds(1500));
              chrono::nanoseconds _ns = chrono::duration_cast<chrono::nanoseconds>(_atime - _s);
  
              typename chrono::time_point<clock_t, chrono::seconds>::rep _s_count = _s.time_since_epoch().count();
