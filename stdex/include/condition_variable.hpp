@@ -137,13 +137,19 @@ namespace stdex
          template<class _Rep, class _Period>
          cv_status wait_for(unique_lock<mutex> &_lock, const chrono::duration<_Rep, _Period> &_rtime)
          {
-             return wait_for_impl(_lock, _rtime);
+             chrono::duration<_Rep, _Period> _rt = _rtime;
+             if (ratio_greater<clock_t::period, _Period>::value)
+                ++_rt;
+             return wait_for_impl(_lock, _rt);
          }
  
          template<class _Rep, class _Period, class _Predicate>
          bool wait_for(unique_lock<mutex> &_lock, const chrono::duration<_Rep, _Period> &_rtime, _Predicate _p)
          {
-             return wait_until(_lock, clock_t::now() + chrono::duration_cast<clock_t::duration>(_rtime), _p);
+             chrono::duration<_Rep, _Period> _rt = _rtime;
+             if (ratio_greater<clock_t::period, _Period>::value)
+                ++_rt;
+             return wait_until(_lock, clock_t::now() + chrono::duration_cast<clock_t::duration>(_rt), _p);
          }
  
          native_handle_type native_handle()
@@ -204,24 +210,46 @@ namespace stdex
          template<class _Rep, class _Period>
          cv_status wait_for_impl(unique_lock<mutex> &_lock, const chrono::duration<_Rep, _Period> &_rtime)
          {
-             clock_t::time_point _start_time_point = clock_t::now();
- 
              if (!detail::_lock_owns_lock(_lock))
                  std::terminate();
  
-             chrono::seconds _rs = chrono::duration_cast<chrono::seconds>(_rtime);
-             chrono::nanoseconds _rns = chrono::duration_cast<chrono::nanoseconds>(_rtime - _rs);
+             chrono::seconds _rs = 
+                chrono::duration_cast<chrono::seconds>(_rtime);
+             chrono::nanoseconds _rns = 
+                chrono::duration_cast<chrono::nanoseconds>(_rtime - _rs);
  
+             clock_t::time_point _start_time_point = clock_t::now();
+
+             chrono::time_point<clock_t, chrono::seconds> _sec = 
+                chrono::time_point_cast<chrono::seconds>(_start_time_point);
+             chrono::nanoseconds _nsec = 
+                chrono::duration_cast<chrono::nanoseconds>(_start_time_point - _sec);
+             
+             chrono::time_point<clock_t, chrono::seconds> _sec_result =
+                chrono::duration_cast<chrono::seconds>(_start_time_point + _rtime);
+             chrono::nanoseconds _nsec_result = 
+                chrono::duration_cast<chrono::nanoseconds>(_start_time_point - _sec_result);
+                
              timespec _ts;
- 
-             _ts.tv_sec = static_cast<stdex::time_t>(_rs.count());
-             _ts.tv_nsec = static_cast<long>(_rns.count());
- 
-             chrono::time_point<clock_t, chrono::seconds> _sec = chrono::time_point_cast<chrono::seconds>(_start_time_point);
-             chrono::nanoseconds _nsec = chrono::duration_cast<chrono::nanoseconds>(_start_time_point - _sec);
- 
-             _ts.tv_sec += static_cast<stdex::time_t>(_sec.time_since_epoch().count());
-             _ts.tv_nsec += static_cast<long>(_nsec.count());
+
+             const stdex::time_t _ts_sec_max = 
+                std::numeric_limits<stdex::time_t>::max();
+             if (_sec.time_since_epoch().count() >= _ts_sec_max ||
+                 _rs.count() >= _ts_sec_max ||
+                 _sec_result.time_since_epoch().count() >= _ts_sec_max)
+             {
+                _ts.tv_sec = _ts_sec_max;
+                _ts.tv_nsec = (unsigned long)(0) - (unsigned long)(1);
+             }
+             else
+             {
+                 typename chrono::time_point<clock_t, chrono::seconds>::rep _s_count = 
+                    _sec_result.time_since_epoch().count();
+
+                _ts.tv_sec = static_cast<stdex::time_t>(_s_count > 0 ? _s_count : 0);
+                _ts.tv_nsec = static_cast<long>(_nsec_result.count()); 
+             }
+
  
              int _err = 
                  pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
