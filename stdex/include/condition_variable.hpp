@@ -196,7 +196,7 @@ namespace stdex
                 _ts.tv_nsec = (unsigned long)(0) - (unsigned long)(1);
              }
  
-             std::cout << "DEBUG1:" << (chrono::time_point<clock_t, chrono::seconds>(_ts.tv_sec) - chrono::time_point_cast<chrono::seconds>(clock_t::now()).time_since_epoch().count() << "s " << _ts.tv_nsec << "ns" << std::endl;
+             std::cout << "DEBUG1:" << ( chrono::time_point<clock_t, chrono::seconds>(_ts.tv_sec) - chrono::time_point_cast<chrono::seconds>(clock_t::now()) ).count() << "s " << _ts.tv_nsec << "ns" << std::endl;
              int _err =
                 pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
 
@@ -252,7 +252,7 @@ namespace stdex
                 _ts.tv_nsec = static_cast<long>(_nsec_result.count()); 
              }
 
-             std::cout << "DEBUG2:" << (chrono::time_point<clock_t, chrono::seconds>(_ts.tv_sec) - chrono::time_point_cast<chrono::seconds>(clock_t::now()).time_since_epoch().count() << "s " << _ts.tv_nsec << "ns" << std::endl;
+             std::cout << "DEBUG2:" << ( chrono::time_point<clock_t, chrono::seconds>(_ts.tv_sec) - chrono::time_point_cast<chrono::seconds>(clock_t::now()) ).count() << "s " << _ts.tv_nsec << "ns" << std::endl;
              int _err = 
                  pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
              
