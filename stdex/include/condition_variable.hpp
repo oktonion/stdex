@@ -186,7 +186,7 @@ namespace stdex
              else
              {
                 _ts.tv_sec = _ts_sec_max;
-                _ts.tv_nsec = --(unsigned long)(0);
+                _ts.tv_nsec = (unsigned long)(0) - (unsigned long)(1);
              }
  
              int _err =
@@ -233,7 +233,7 @@ namespace stdex
                  _sec_result.time_since_epoch().count() >= _ts_sec_max)
              {
                 _ts.tv_sec = _ts_sec_max;
-                _ts.tv_nsec = --(unsigned long)(0);
+                _ts.tv_nsec = (unsigned long)(0) - (unsigned long)(1);
              }
              else
              {
