@@ -70,7 +70,7 @@ namespace stdex
  
      class condition_variable 
      {
-         typedef chrono::system_clock clock_t;
+         typedef chrono::steady_clock clock_t;
  
      public:
          typedef pthread_cond_t* native_handle_type;
