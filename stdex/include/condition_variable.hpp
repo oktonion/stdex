@@ -176,7 +176,7 @@ namespace stdex
              if (!detail::_lock_owns_lock(_lock))
                  std::terminate();
  
-             chrono::time_point<clock_t, chrono::seconds> _s = chrono::time_point_cast<chrono::seconds>(_atime);
+             chrono::time_point<clock_t, chrono::seconds> _s = chrono::time_point_cast<chrono::seconds>(_atime) - chrono::milliseconds(1500);
              chrono::nanoseconds _ns = chrono::duration_cast<chrono::nanoseconds>(_atime - _s);
  
              typename chrono::time_point<clock_t, chrono::seconds>::rep _s_count = _s.time_since_epoch().count();
@@ -196,7 +196,6 @@ namespace stdex
                 _ts.tv_nsec = (unsigned long)(0) - (unsigned long)(1);
              }
  
-             std::cout << "DEBUG1:" << ( chrono::time_point<clock_t, chrono::seconds>(_ts.tv_sec) - chrono::time_point_cast<chrono::seconds>(clock_t::now()) ).count() << "s " << _ts.tv_nsec << "ns" << std::endl;
              int _err =
                 pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
 
@@ -223,12 +222,12 @@ namespace stdex
              clock_t::time_point _start_time_point = clock_t::now();
 
              chrono::time_point<clock_t, chrono::seconds> _sec = 
-                chrono::time_point_cast<chrono::seconds>(_start_time_point);
+                chrono::time_point_cast<chrono::seconds>(_start_time_point) - chrono::milliseconds(1500);
              chrono::nanoseconds _nsec = 
                 chrono::duration_cast<chrono::nanoseconds>(_start_time_point - _sec);
              
              chrono::time_point<clock_t, chrono::seconds> _sec_result =
-                chrono::duration_cast<chrono::seconds>(_start_time_point + _rtime);
+                chrono::duration_cast<chrono::seconds>(_start_time_point + _rtime - chrono::milliseconds(1500));
              chrono::nanoseconds _nsec_result = 
                 chrono::duration_cast<chrono::nanoseconds>(_start_time_point - _sec_result);
                 
@@ -252,7 +251,6 @@ namespace stdex
                 _ts.tv_nsec = static_cast<long>(_nsec_result.count()); 
              }
 
-             std::cout << "DEBUG2:" << ( chrono::time_point<clock_t, chrono::seconds>(_ts.tv_sec) - chrono::time_point_cast<chrono::seconds>(clock_t::now()) ).count() << "s " << _ts.tv_nsec << "ns" << std::endl;
              int _err = 
                  pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
              
