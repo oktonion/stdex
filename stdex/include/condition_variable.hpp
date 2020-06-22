@@ -213,8 +213,6 @@ namespace stdex
          {
              if (!detail::_lock_owns_lock(_lock))
                  std::terminate();
-
-             constexpr std::uint64_t tt = 0x59682F000000E941;
  
              chrono::seconds _rs = 
                 chrono::duration_cast<chrono::seconds>(_rtime);
