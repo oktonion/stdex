@@ -230,7 +230,7 @@ namespace stdex
                 std::numeric_limits<stdex::time_t>::max();
              if (_sec.time_since_epoch().count() >= _ts_sec_max ||
                  _rs.count() >= _ts_sec_max ||
-                 _sec_result.count() >= _ts_sec_max)
+                 _sec_result.time_since_epoch().count() >= _ts_sec_max)
              {
                 _ts.tv_sec = _ts_sec_max;
                 _ts.tv_nsec = --(unsigned long)(0);
