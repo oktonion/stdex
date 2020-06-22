@@ -196,6 +196,7 @@ namespace stdex
                 _ts.tv_nsec = (unsigned long)(0) - (unsigned long)(1);
              }
  
+             std::cout << "DEBUG1:" << _ts.tv_sec << "s " << _ts.tv_nsec << "ns" << std::endl;
              int _err =
                 pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
 
@@ -251,7 +252,7 @@ namespace stdex
                 _ts.tv_nsec = static_cast<long>(_nsec_result.count()); 
              }
 
-             std::cout << _ts.tv_sec << "s " << _ts.tv_nsec << "ns" << std::endl;
+             std::cout << "DEBUG2:" << _ts.tv_sec << "s " << _ts.tv_nsec << "ns" << std::endl;
              int _err = 
                  pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
              
