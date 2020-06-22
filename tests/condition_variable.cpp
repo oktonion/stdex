@@ -176,7 +176,7 @@ int test6()
         chrono::system_clock::time_point start = chrono::system_clock::now();
         cv.wait_for(l, chrono::duration<float>(1), cond_var_tests::func_val);
         chrono::system_clock::time_point t = chrono::system_clock::now();
-        std::cout << stdex::chrono::duration_cast<chrono::seconds>((t - start)).count() << " >= " << 1 << std::endl;
+        std::cout << stdex::chrono::duration_cast<chrono::milliseconds>((t - start)).count() << " >= " << 1000 << std::endl;
         DYNAMIC_VERIFY((t - start) >= chrono::seconds(1));
     }
 
