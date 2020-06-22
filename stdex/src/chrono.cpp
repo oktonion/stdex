@@ -233,7 +233,7 @@ struct mytimespec:
 
 int clock_gettime(int X, timespec *tv)
 {
-	*tv = get_abs_future_time_fine(1500);
+	*tv = get_abs_future_time_fine(0);
 
 	return (0);
 }
