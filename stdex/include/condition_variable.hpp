@@ -244,7 +244,7 @@ namespace stdex
             else
             {
                 typename chrono::time_point<clock_t, chrono::seconds>::rep _s_count = 
-                _sec_result.time_since_epoch().count();
+                    _sec_result.time_since_epoch().count();
 
                 _ts.tv_sec = static_cast<stdex::time_t>(_s_count > 0 ? _s_count : 0);
                 _ts.tv_nsec = static_cast<long>(_nsec_result.count()); 
