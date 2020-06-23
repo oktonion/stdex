@@ -5,5 +5,5 @@
 #done
 
 for file in ./tests/bin/*; do
-    gcov -e ".*tests\.*" $file.gcda
+    gcov $file.gcda
 done
