@@ -158,7 +158,7 @@ namespace stdex
                 _is_nullptr_t<_Tp>::value == (true) && 
                 (is_pointer<_ArgT>::value == (true) || is_member_function_pointer<_ArgT>::value == (true));
 
-            typedef typename _type_is_nullptr_helper<_type_is_nullptr_base_chooser::_is_nullptr == (true)> type;
+            typedef _type_is_nullptr_helper<_type_is_nullptr_base_chooser::_is_nullptr == (true)> type;
         };
         template<class _Tp, class _ArgT = void*>
         struct _type_is_nullptr:
@@ -783,7 +783,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                 template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6, class _FArg7>
                 void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7))
                 {
-                    call<_ObjectT>(fp,
+                    _call_helper::call<_ObjectT>(fp, *this, 
                         _type_is_nullptr<_Arg1, _FArg1>::value,
                         _type_is_nullptr<_Arg2, _FArg2>::value,
                         _type_is_nullptr<_Arg3, _FArg3>::value,
@@ -796,7 +796,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                 template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6, class _FArg7>
                 void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7) const)
                 {
-                    call<_ObjectT>(fp,
+                    _call_helper::call<_ObjectT>(fp, *this, 
                         _type_is_nullptr<_Arg1, _FArg1>::value,
                         _type_is_nullptr<_Arg2, _FArg2>::value,
                         _type_is_nullptr<_Arg3, _FArg3>::value,
