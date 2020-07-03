@@ -190,10 +190,16 @@ namespace stdex
                     call(fp);
                 }
 
-                template<class _ObjectT, class _FuncT>
-                void push(_ObjectT &fp, _FuncT /*unused*/)
+                template<class _ObjectT, class _ReturnT>
+                void push(_ObjectT &fp, _ReturnT(_ObjectT::*)())
                 {
-                    push(fp);
+                    call(fp);
+                }
+
+                template<class _ObjectT, class _ReturnT>
+                void push(_ObjectT &fp, _ReturnT(_ObjectT::*)() const)
+                {
+                    call(fp);
                 }
             };
 
