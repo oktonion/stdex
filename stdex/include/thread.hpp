@@ -259,7 +259,7 @@ template<class _FuncT> void call(_FuncT &fp, eTypeNullptr) { fp(nullptr); }
                 }
 
                 template<class _ObjectT>
-                void push_functor(const priority_tag<0>&, _ObjectT &fp, ...)
+                void push_functor(const priority_tag<4>&, _ObjectT &fp, ...)
                 { 
                     call(fp);
                 }
