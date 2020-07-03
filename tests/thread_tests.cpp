@@ -620,8 +620,8 @@ int test13()
     }
     {
         dummy_functor ff;
-        thread tt(ff);
-        tt.join();
+        //thread tt(ff);
+        //tt.join();
     }
 
     {
@@ -630,8 +630,8 @@ int test13()
     }
     {
         dummy_functor ff;
-        //thread tt(ff, nullptr);
-        //tt.join();
+        thread tt(ff, nullptr);
+        tt.join();
     }
 
     {
