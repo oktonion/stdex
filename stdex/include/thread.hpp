@@ -1368,7 +1368,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 
             void call(eTypeIsClass)
             {
-                //call(_perform_functor_args_checks<_has_functor_operator_overload<_FuncT, _ArgT>::value>::tag);
+                call(_perform_functor_args_checks<_has_functor_operator_overload<_FuncT, _ArgT>::value>::tag);
             }
 
             void call(ePerformFunctorArgsChecks)
