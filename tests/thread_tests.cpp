@@ -630,8 +630,8 @@ int test13()
     }
     {
         dummy_functor ff;
-        thread tt(ff, nullptr);
-        tt.join();
+        //thread tt(ff, nullptr);
+        //tt.join();
     }
 
     {
@@ -640,8 +640,8 @@ int test13()
     }
     {
         dummy_functor ff;
-        thread tt(ff, nullptr, nullptr);
-        tt.join();
+        //thread tt(ff, nullptr, nullptr);
+        //tt.join();
     }
 
     {
@@ -650,8 +650,8 @@ int test13()
     }
     {
         dummy_functor ff;
-        thread tt(ff, nullptr, nullptr, nullptr);
-        tt.join();
+        //thread tt(ff, nullptr, nullptr, nullptr);
+        //tt.join();
     }
     
     {
@@ -660,8 +660,8 @@ int test13()
     }
     {
         dummy_functor ff;
-        thread tt(ff, nullptr, nullptr, nullptr, nullptr);
-        tt.join();
+        //thread tt(ff, nullptr, nullptr, nullptr, nullptr);
+        //tt.join();
     }
     
     {
@@ -670,8 +670,8 @@ int test13()
     }
     {
         dummy_functor ff;
-        thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr);
-        tt.join();
+        //thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr);
+        //tt.join();
     }
     
     {
@@ -680,8 +680,8 @@ int test13()
     }
     {
         dummy_functor ff;
-        thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
-        tt.join();
+        //thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+        //tt.join();
     }
     
     {
@@ -690,8 +690,8 @@ int test13()
     }
     {
         dummy_functor ff;
-        thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
-        tt.join();
+        //thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+        //tt.join();
     }
     
     {
@@ -700,8 +700,8 @@ int test13()
     }
     {
         dummy_functor ff;
-        thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
-        tt.join();
+        //thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+        //tt.join();
     }
     
     return 0;
