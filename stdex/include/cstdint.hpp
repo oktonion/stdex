@@ -239,6 +239,7 @@ namespace stdex
         #endif
             template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)>: _signed_unsigned<std::ptrdiff_t> { static const char size[int(sizeof(std::ptrdiff_t) * CHAR_BIT)]; };
             template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)>: _signed_unsigned<std::wint_t> { static const char size[int(sizeof(std::wint_t) * CHAR_BIT)]; };
+            template<> struct _sized_integer_map_impl<(__LINE__ - _sized_integer_rank)>: _signed_unsigned<std::size_t> { static const char size[int(sizeof(std::size_t) * CHAR_BIT)]; };
             enum {_sized_integer_max_rank = __LINE__ - _sized_integer_rank};
 
             template<int _Rank, bool _IsIntConst> 
