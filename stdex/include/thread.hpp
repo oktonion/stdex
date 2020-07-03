@@ -186,7 +186,7 @@ namespace stdex
                 struct object_member_func
                 {
                     typedef _ReturnT(_ObjectT::*type)();
-                    typedef _ReturnT(_ObjectT::*const_type)() const;
+                    typedef _ReturnT(_ObjectT::*type_const)() const;
                 };
 
                 template<class _FuncT> void call(_FuncT &fp) { fp(); }
@@ -211,6 +211,12 @@ namespace stdex
                 {
                     call(fp);
                 }
+
+                template<class _ObjectT>
+                void push_functor(const priority_tag<0>&, _ObjectT &fp)
+                { 
+                    call(fp);
+                }
             };
 
             typedef _arguments arguments_type;
@@ -231,7 +237,7 @@ namespace stdex
                 struct object_member_func
                 {
                     typedef _ReturnT(_ObjectT::*type)(_Arg1);
-                    typedef _ReturnT(_ObjectT::*const_type)(_Arg1) const;
+                    typedef _ReturnT(_ObjectT::*type_const)(_Arg1) const;
                 };
 
 template<class _FuncT> void call(_FuncT &fp, eTypeNotNullptr) { fp(arg1); }
@@ -259,9 +265,10 @@ template<class _FuncT> void call(_FuncT &fp, eTypeNullptr) { fp(nullptr); }
                 }
 
                 template<class _ObjectT>
-                void push_functor(const priority_tag<4>&, _ObjectT &fp, ...)
+                void push_functor(const priority_tag<0>&, _ObjectT &fp)
                 { 
-                    call(fp);
+                    call(fp,
+                        _type_is_nullptr<_Arg1, _Arg1>::value);
                 }
             };
 
@@ -284,7 +291,7 @@ template<class _FuncT> void call(_FuncT &fp, eTypeNullptr) { fp(nullptr); }
                 struct object_member_func
                 {
                     typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2);
-                    typedef _ReturnT(_ObjectT::*const_type)(_Arg1, _Arg2) const;
+                    typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2) const;
                 };
 
 template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2); }
@@ -315,6 +322,14 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr) { fp(null
                         _type_is_nullptr<_Arg1, _FArg1>::value,
                         _type_is_nullptr<_Arg2, _FArg2>::value);
                 }
+
+                template<class _ObjectT>
+                void push_functor(const priority_tag<0>&, _ObjectT &fp)
+                { 
+                    call(fp,
+                        _type_is_nullptr<_Arg1, _Arg1>::value,
+                        _type_is_nullptr<_Arg2, _Arg2>::value);
+                }
             };
 
             typedef _arguments arguments_type;
@@ -337,7 +352,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr) { fp(null
                 struct object_member_func
                 {
                     typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2, _Arg3);
-                    typedef _ReturnT(_ObjectT::*const_type)(_Arg1, _Arg2, _Arg3) const;
+                    typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2, _Arg3) const;
                 };
 
 template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3); }
@@ -375,6 +390,15 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                         _type_is_nullptr<_Arg2, _FArg2>::value,
                         _type_is_nullptr<_Arg3, _FArg3>::value);
                 }
+
+                template<class _ObjectT>
+                void push_functor(const priority_tag<0>&, _ObjectT &fp)
+                { 
+                    call(fp,
+                        _type_is_nullptr<_Arg1, _Arg1>::value,
+                        _type_is_nullptr<_Arg2, _Arg2>::value,
+                        _type_is_nullptr<_Arg3, _Arg3>::value);
+                }
             };
 
             typedef _arguments arguments_type;
@@ -398,7 +422,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                 struct object_member_func
                 {
                     typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2, _Arg3, _Arg4);
-                    typedef _ReturnT(_ObjectT::*const_type)(_Arg1, _Arg2, _Arg3, _Arg4) const;
+                    typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2, _Arg3, _Arg4) const;
                 };
 
 template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4); }
@@ -448,6 +472,16 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                         _type_is_nullptr<_Arg3, _FArg3>::value,
                         _type_is_nullptr<_Arg4, _FArg4>::value);
                 }
+
+                template<class _ObjectT>
+                void push_functor(const priority_tag<0>&, _ObjectT &fp)
+                { 
+                    call(fp,
+                        _type_is_nullptr<_Arg1, _Arg1>::value,
+                        _type_is_nullptr<_Arg2, _Arg2>::value,
+                        _type_is_nullptr<_Arg3, _Arg3>::value,
+                        _type_is_nullptr<_Arg4, _Arg4>::value);
+                }
             };
 
             typedef _arguments arguments_type;
@@ -472,7 +506,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                 struct object_member_func
                 {
                     typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5);
-                    typedef _ReturnT(_ObjectT::*const_type)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5) const;
+                    typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5) const;
                 };
 
 template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4,arg5); }
@@ -540,6 +574,17 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                         _type_is_nullptr<_Arg4, _FArg4>::value,
                         _type_is_nullptr<_Arg5, _FArg5>::value);
                 }
+
+                template<class _ObjectT>
+                void push_functor(const priority_tag<0>&, _ObjectT &fp)
+                { 
+                    call(fp,
+                        _type_is_nullptr<_Arg1, _Arg1>::value,
+                        _type_is_nullptr<_Arg2, _Arg2>::value,
+                        _type_is_nullptr<_Arg3, _Arg3>::value,
+                        _type_is_nullptr<_Arg4, _Arg4>::value,
+                        _type_is_nullptr<_Arg5, _Arg5>::value);
+                }
             };
 
             typedef _arguments arguments_type;
@@ -565,7 +610,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                 struct object_member_func
                 {
                     typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6);
-                    typedef _ReturnT(_ObjectT::*const_type)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6) const;
+                    typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6) const;
                 };
 
 template<class _FuncT> void call(_FuncT &fp,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(arg1,arg2,arg3,arg4,arg5,arg6); }
@@ -669,6 +714,18 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                         _type_is_nullptr<_Arg5, _FArg5>::value,
                         _type_is_nullptr<_Arg6, _FArg6>::value);
                 }
+
+                template<class _ObjectT>
+                void push_functor(const priority_tag<0>&, _ObjectT &fp)
+                { 
+                    call(fp,
+                        _type_is_nullptr<_Arg1, _Arg1>::value,
+                        _type_is_nullptr<_Arg2, _Arg2>::value,
+                        _type_is_nullptr<_Arg3, _Arg3>::value,
+                        _type_is_nullptr<_Arg4, _Arg4>::value,
+                        _type_is_nullptr<_Arg5, _Arg5>::value,
+                        _type_is_nullptr<_Arg6, _Arg6>::value);
+                }
             };
 
             typedef _arguments arguments_type;
@@ -696,7 +753,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                 struct object_member_func
                 {
                     typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7);
-                    typedef _ReturnT(_ObjectT::*const_type)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7) const;
+                    typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7) const;
                 };
 
                 template<class _FuncT>
@@ -870,6 +927,19 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                         _type_is_nullptr<_Arg6, _FArg6>::value,
                         _type_is_nullptr<_Arg7, _FArg7>::value);
                 }
+
+                template<class _ObjectT>
+                void push_functor(const priority_tag<0>&, _ObjectT &fp)
+                { 
+                    call(fp,
+                        _type_is_nullptr<_Arg1, _Arg1>::value,
+                        _type_is_nullptr<_Arg2, _Arg2>::value,
+                        _type_is_nullptr<_Arg3, _Arg3>::value,
+                        _type_is_nullptr<_Arg4, _Arg4>::value,
+                        _type_is_nullptr<_Arg5, _Arg5>::value,
+                        _type_is_nullptr<_Arg6, _Arg6>::value,
+                        _type_is_nullptr<_Arg7, _Arg7>::value);
+                }
             };
 
             typedef _arguments arguments_type;
@@ -897,7 +967,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                 struct object_member_func
                 {
                     typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7, _Arg8);
-                    typedef _ReturnT(_ObjectT::*const_type)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7, _Arg8) const;
+                    typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7, _Arg8) const;
                 };
 
                 template<class _FuncT>
@@ -1202,6 +1272,20 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                         _type_is_nullptr<_Arg7, _FArg7>::value,
                         _type_is_nullptr<_Arg8, _FArg8>::value);
                 }
+
+                template<class _ObjectT>
+                void push_functor(const priority_tag<0>&, _ObjectT &fp)
+                { 
+                    call(fp,
+                        _type_is_nullptr<_Arg1, _Arg1>::value,
+                        _type_is_nullptr<_Arg2, _Arg2>::value,
+                        _type_is_nullptr<_Arg3, _Arg3>::value,
+                        _type_is_nullptr<_Arg4, _Arg4>::value,
+                        _type_is_nullptr<_Arg5, _Arg5>::value,
+                        _type_is_nullptr<_Arg6, _Arg6>::value,
+                        _type_is_nullptr<_Arg7, _Arg7>::value,
+                        _type_is_nullptr<_Arg8, _Arg8>::value);
+                }
             };
 
             typedef _arguments arguments_type;
@@ -1211,15 +1295,53 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
         enum eTypeIsNotClass { _type_is_not_class };
 
         template<bool>
-        struct _is_class_overload
+        struct _choose_class_overload
         {
-            static const eTypeIsClass value = _type_is_class;
+            static const eTypeIsClass tag = 
+                _type_is_class;
         };
 
         template<>
-        struct _is_class_overload<false>
+        struct _choose_class_overload<false>
         {
-            static const eTypeIsNotClass value = _type_is_not_class;
+            static const eTypeIsNotClass tag = 
+                _type_is_not_class;
+        };
+
+        template<class _ObjectT, class _ArgT>
+        struct _has_functor_operator_overload
+        {
+            typedef typename _ArgT::template object_member_func<_ObjectT, void>::type functor_operator_type;
+            typedef typename _ArgT::template object_member_func<_ObjectT, void>::type_const functor_operator_type_const;
+
+            template<class _ReturnT>
+            static _no_type _has_functor_operator_overload_tester(_ReturnT (_ObjectT::*)(void*), priority_tag<2>);
+            static _yes_type _has_functor_operator_overload_tester(functor_operator_type, priority_tag<1>);
+            static _yes_type _has_functor_operator_overload_tester(functor_operator_type_const, priority_tag<0>);
+
+            static const bool value = 
+                sizeof(_has_functor_operator_overload::
+                    _has_functor_operator_overload_tester(
+                        &_ObjectT::operator(), priority_tag<2>()
+                    )
+                ) == sizeof(_yes_type);
+        };
+
+        enum ePerformFunctorArgsChecks { _perform_functor_args_checks_tag };
+        enum eDoNotPerformFunctorArgsChecks { _do_not_perform_functor_args_checks_tag }; 
+
+        template<bool>
+        struct _perform_functor_args_checks
+        {
+            static const ePerformFunctorArgsChecks tag = 
+                _perform_functor_args_checks_tag;
+        };
+
+        template<>
+        struct _perform_functor_args_checks<true>
+        {
+            static const eDoNotPerformFunctorArgsChecks tag = 
+                _do_not_perform_functor_args_checks_tag;
         };
 
         template<class _FuncT, class _ArgT>
@@ -1241,12 +1363,22 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 
             void call()
             {
-                call(_is_class_overload<is_class<_FuncT>::value>::value);
+                call(_choose_class_overload<is_class<_FuncT>::value>::tag);
             }
 
             void call(eTypeIsClass)
             {
-                args.push_functor(priority_tag<3>(), fp, &_FuncT::operator());
+                //call(_perform_functor_args_checks<_has_functor_operator_overload<_FuncT, _ArgT>::value>::tag);
+            }
+
+            void call(ePerformFunctorArgsChecks)
+            {
+                args.push_functor(priority_tag<4>(), fp, &_FuncT::operator());
+            }
+
+            void call(eDoNotPerformFunctorArgsChecks)
+            {
+                args.push_functor(priority_tag<4>(), fp);
             }
 
             void call(eTypeIsNotClass)
