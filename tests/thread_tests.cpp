@@ -447,6 +447,8 @@ int test_thread_id()
 
     res = res;
 
+    (void)(&res);
+
     return 0;
 }
 
@@ -634,10 +636,10 @@ int test13()
         tt.join();
     }
 
-    /*{
+    {
         thread tt(&dummy_func_7, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
         tt.join();
-    }*/
+    }
 
     {
         thread tt(&dummy_func_8, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
