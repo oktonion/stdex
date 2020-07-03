@@ -762,15 +762,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                 template<class _FuncT>
                 void push(_FuncT &fp)
                 {
-                    typedef typename _type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::type arg1_null_type;
-                    typedef typename _type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::type arg2_null_type;
-                    typedef typename _type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::type arg3_null_type;
-                    typedef typename _type_is_nullptr<_Arg4, typename _function_traits<_FuncT>::arg4_type>::type arg4_null_type;
-                    typedef typename _type_is_nullptr<_Arg5, typename _function_traits<_FuncT>::arg5_type>::type arg5_null_type;
-                    typedef typename _type_is_nullptr<_Arg6, typename _function_traits<_FuncT>::arg6_type>::type arg6_null_type;
-                    typedef typename _type_is_nullptr<_Arg7, typename _function_traits<_FuncT>::arg7_type>::type arg7_null_type;
-
-                    _call_helper::call<_FuncT>(fp, *this, 
+                    _call_helper<_FuncT>::call(fp, *this, 
                         _type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
                         _type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value,
                         _type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value,
@@ -783,7 +775,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                 template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6, class _FArg7>
                 void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7))
                 {
-                    _call_helper::call<_ObjectT>(fp, *this, 
+                    _call_helper<_ObjectT>::call(fp, *this, 
                         _type_is_nullptr<_Arg1, _FArg1>::value,
                         _type_is_nullptr<_Arg2, _FArg2>::value,
                         _type_is_nullptr<_Arg3, _FArg3>::value,
@@ -796,7 +788,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                 template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6, class _FArg7>
                 void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7) const)
                 {
-                    _call_helper::call<_ObjectT>(fp, *this, 
+                    _call_helper<_ObjectT>::call(fp, *this, 
                         _type_is_nullptr<_Arg1, _FArg1>::value,
                         _type_is_nullptr<_Arg2, _FArg2>::value,
                         _type_is_nullptr<_Arg3, _FArg3>::value,
@@ -1092,7 +1084,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                 template<class _FuncT>
                 void push(_FuncT &fp)
                 {
-                    _call_helper::call<_FuncT>(fp, *this,
+                    _call_helper<_FuncT>::call(fp, *this,
                         _type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value, 
                         _type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value, 
                         _type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value,
@@ -1106,7 +1098,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                 template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6, class _FArg7, class _FArg8>
                 void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7, _FArg8))
                 {
-                    _call_helper::call<_ObjectT>(fp, *this,
+                    _call_helper<_ObjectT>::call(fp, *this,
                         _type_is_nullptr<_Arg1, _FArg1>::value,
                         _type_is_nullptr<_Arg2, _FArg2>::value,
                         _type_is_nullptr<_Arg3, _FArg3>::value,
@@ -1120,7 +1112,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                 template<class _ObjectT, class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4, class _FArg5, class _FArg6, class _FArg7, class _FArg8>
                 void push(_ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4, _FArg5, _FArg6, _FArg7, _FArg8) const)
                 {
-                    _call_helper::call<_ObjectT>(fp, *this,
+                    _call_helper<_ObjectT>::call(fp, *this,
                         _type_is_nullptr<_Arg1, _FArg1>::value,
                         _type_is_nullptr<_Arg2, _FArg2>::value,
                         _type_is_nullptr<_Arg3, _FArg3>::value,
