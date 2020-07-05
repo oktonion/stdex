@@ -1316,17 +1316,18 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
 
             template<class _ReturnT>
             static _no_type _has_functor_operator_overload_tester(
-                typename _ArgT::template object_member_func<_ObjectT, _ReturnT>::type_const, priority_tag<3>);
+                typename _ArgT::template object_member_func<_ObjectT, _ReturnT>::type_const, const priority_tag<4>&);
             template<class _ReturnT>
             static _no_type _has_functor_operator_overload_tester(
-                typename _ArgT::template object_member_func<_ObjectT, _ReturnT>::type, priority_tag<2>);
-            static _yes_type _has_functor_operator_overload_tester(functor_operator_type, priority_tag<1>);
-            static _yes_type _has_functor_operator_overload_tester(functor_operator_type_const, priority_tag<0>);
+                typename _ArgT::template object_member_func<_ObjectT, _ReturnT>::type, const priority_tag<3>&);
+            static _yes_type _has_functor_operator_overload_tester(functor_operator_type, const priority_tag<2>&);
+            static _yes_type _has_functor_operator_overload_tester(functor_operator_type_const, const priority_tag<1>&);
+            static _no_type _has_functor_operator_overload_tester(..., const priority_tag<0>&);
 
             static const bool value = 
                 sizeof(_has_functor_operator_overload::
                     _has_functor_operator_overload_tester(
-                        &_ObjectT::operator(), priority_tag<3>()
+                        &_ObjectT::operator(), priority_tag<4>()
                     )
                 ) == sizeof(_yes_type);
         };
