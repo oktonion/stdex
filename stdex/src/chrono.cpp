@@ -215,7 +215,7 @@ static struct _init_inittime
 
 struct timespec get_abs_future_time_fine(unsigned milli)
 {
-    struct timespec future;     /* ns since 1 Jan 1970 to 1500 ms in future */
+    struct timespec future = { 0, 0 };     /* ns since 1 Jan 1970 to 1500 ms in future */
     ::uint64_t      clock;      /* ticks since init */
     ::uint64_t      nano;       /* nanoseconds since init */
 
