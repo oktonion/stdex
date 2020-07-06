@@ -765,7 +765,7 @@ int main(void)
         
     }
 
-    for (size_t i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 5; ++i)
     {
         DYNAMIC_VERIFY(thread::hardware_concurrency() >= 1);
         RUN_TEST(test14);
