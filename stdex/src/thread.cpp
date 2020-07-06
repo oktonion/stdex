@@ -582,7 +582,7 @@ namespace thread_cpp_detail
 		{
 			int err = ::nanosleep(req, rem);
 
-			if(err && (rem.tv_sec || rem.tv_nsec))
+			if(err && (rem->tv_sec || rem->tv_nsec))
 				err = ::nanosleep(rem, rem);
 			return err;
 		}
