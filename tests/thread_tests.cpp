@@ -2,6 +2,11 @@
 #include "../stdex/include/thread.hpp"
 #include "../stdex/include/system_error.hpp"
 
+#ifdef __MACH__
+#include <thread>
+#include <system_error>
+#endif
+
 #include <cstdlib>
 #include <iostream>
 #include <ctime>
@@ -709,8 +714,15 @@ int test13()
 
 int test14()
 {
+    #ifdef __MACH__
+    using namespace std;
+    using namespace std::chrono;
+    typedef std::intmax_t intmax_type;
+    #else
     using namespace stdex;
     using namespace stdex::chrono;
+    typedef stdex::intmax_t intmax_type;
+    #endif
 
     system_clock::time_point start = system_clock::now();
 
@@ -719,7 +731,7 @@ int test14()
     system_clock::duration dur = 
         system_clock::now() - start;
 
-    stdex::intmax_t desired_dur = duration_cast<milliseconds>(dur).count();
+    intmax_type desired_dur = duration_cast<milliseconds>(dur).count();
 
     DYNAMIC_VERIFY(desired_dur >= 25000);
 
