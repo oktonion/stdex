@@ -17,6 +17,7 @@
 #include <memory>
 #include <algorithm> // std::swap
 #include <utility> // std::swap
+#include <limits>
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
@@ -1791,11 +1792,24 @@ namespace stdex
             chrono::seconds _sec = chrono::duration_cast<chrono::seconds>(_dur);
             chrono::nanoseconds _ns = chrono::duration_cast<chrono::nanoseconds>(_dur - _sec);
             
-            timespec ts;
-            ts.tv_sec = static_cast<stdex::time_t>(_sec.count());
-            ts.tv_nsec = static_cast<long>(_ns.count());
+            chrono::seconds::rep _s_count = _sec.count();
 
-            detail::sleep_for_impl(&ts);
+            timespec _ts;
+
+            const stdex::time_t _ts_sec_max = 
+                std::numeric_limits<stdex::time_t>::max();
+            if (_s_count < _ts_sec_max)
+            {
+                _ts.tv_sec = static_cast<stdex::time_t>(_s_count > 0 ? _s_count : 0);
+                _ts.tv_nsec = static_cast<long>(_ns.count());
+            }
+            else
+            {
+                _ts.tv_sec = _ts_sec_max;
+                _ts.tv_nsec = 999999999;
+            }
+
+            detail::sleep_for_impl(&_ts);
         }
 
         template <class _Clock, class _Duration>
