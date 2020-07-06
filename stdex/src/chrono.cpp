@@ -168,7 +168,7 @@ namespace clock_gettime_impl
 
 #define _STDEX_CHRONO_CLOCK_REALTIME 0
 #define _STDEX_CHRONO_CLOCK_MONOTONIC 0
-int(*clock_gettime_func_pointer)(int X, mytimespec *tv) = &clock_gettime_impl::clock_gettime;
+int(*clock_gettime_func_pointer)(int, mytimespec*) = &clock_gettime_impl::clock_gettime;
 #elif defined(__MACH__) && !defined(CLOCK_REALTIME)
 #include <time.h>
 #include <sys/time.h>       /* gettimeofday */
@@ -237,15 +237,15 @@ int clock_gettime(int X, timespec *tv)
 
 	return (0);
 }
-int(*clock_gettime_func_pointer)(int X, timespec *tv) = &clock_gettime;
+int(*clock_gettime_func_pointer)(int, timespec*) = &clock_gettime;
 #else
 
 struct mytimespec:
 	public timespec
 {};
 
-int clock_gettime(int X, timespec *tv);
-int(*clock_gettime_func_pointer)(int X, timespec *tv) = &clock_gettime;
+int clock_gettime(clockid_t, struct timespec*);
+int(*clock_gettime_func_pointer)(clockid_t, struct timespec*) = &clock_gettime;
 #endif
 
 #ifdef CLOCK_MONOTONIC
