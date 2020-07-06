@@ -332,8 +332,12 @@ stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDE
 		if(ts.tv_sec < 0 || ts.tv_nsec < 0 || ts.tv_nsec > 999999999)
 			std::terminate();
 
-		return time_point(duration(
-			seconds(ts.tv_sec) + duration_cast<duration>(nanoseconds(ts.tv_nsec))));
+		if((ts.tv_nsec % 1000) == 0)
+			return time_point(
+				seconds(ts.tv_sec) + milliseconds(ts.tv_nsec / 1000));
+
+		return time_point(
+				seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec));
 	}
 }
 
@@ -350,7 +354,11 @@ stdex::chrono::steady_clock::time_point stdex::chrono::steady_clock::now() _STDE
 		if(ts.tv_sec < 0 || ts.tv_nsec < 0 || ts.tv_nsec > 999999999)
 			std::terminate();
 
-		return time_point(duration(
-			seconds(ts.tv_sec) + duration_cast<duration>(nanoseconds(ts.tv_nsec))));
+		if((ts.tv_nsec % 1000) == 0)
+			return time_point(
+				seconds(ts.tv_sec) + milliseconds(ts.tv_nsec / 1000));
+
+		return time_point(
+				seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec));
 	}
 }
