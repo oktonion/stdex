@@ -511,7 +511,7 @@ namespace stdex
                     };
 
                     template<class _ReturnT>
-                    void push(const priority_tag<5>&, _arguments &args, const _ObjectT &fp, _ReturnT(_ObjectT::*)(_Arg1, _Arg2, _Arg3, _Arg4) const)
+                    static void push(const priority_tag<5>&, _arguments &args, const _ObjectT &fp, _ReturnT(_ObjectT::*)(_Arg1, _Arg2, _Arg3, _Arg4) const)
                     {
                         _call_helper<const _ObjectT>::call(fp, args,
                             _type_is_nullptr<_Arg1, _Arg1>::value,
@@ -521,7 +521,7 @@ namespace stdex
                     }
 
                     template<class _ReturnT>
-                    void push(const priority_tag<4>&, _arguments &args, _ObjectT &fp, _ReturnT(_ObjectT::*)(_Arg1, _Arg2, _Arg3, _Arg4))
+                    static void push(const priority_tag<4>&, _arguments &args, _ObjectT &fp, _ReturnT(_ObjectT::*)(_Arg1, _Arg2, _Arg3, _Arg4))
                     {
                         _call_helper<_ObjectT>::call(fp, args,
                             _type_is_nullptr<_Arg1, _Arg1>::value,
@@ -531,7 +531,7 @@ namespace stdex
                     }
 
                     template<class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4>
-                    void push(const priority_tag<3>&, _arguments &args, const _ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4) const)
+                    static void push(const priority_tag<3>&, _arguments &args, const _ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4) const)
                     {
                         _call_helper<const _ObjectT>::call(fp, args,
                             _type_is_nullptr<_Arg1, _FArg1>::value,
@@ -541,7 +541,7 @@ namespace stdex
                     }
 
                     template<class _ReturnT, class _FArg1, class _FArg2, class _FArg3, class _FArg4>
-                    void push(const priority_tag<2>&, _arguments &args, _ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4))
+                    static void push(const priority_tag<2>&, _arguments &args, _ObjectT &fp, _ReturnT(_ObjectT::*)(_FArg1, _FArg2, _FArg3, _FArg4))
                     {
                         _call_helper<_ObjectT>::call(fp, args,
                             _type_is_nullptr<_Arg1, _FArg1>::value,
