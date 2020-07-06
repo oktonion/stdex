@@ -158,7 +158,7 @@ namespace clock_gettime_impl
 
 		t.QuadPart -= offset.QuadPart;
 		microseconds = (double) t.QuadPart / frequencyToMicroseconds;
-		t.QuadPart = (microseconds + 0.5);
+		t.QuadPart = LONGLONG(microseconds + 0.5);
 		tv->tv_sec = t.QuadPart / 1000000;
 		tv->tv_nsec = (t.QuadPart % 1000000) * 1000;
 		return (0);
@@ -329,8 +329,11 @@ stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDE
 			std::terminate();
 		}
 
-		return time_point(
-			seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec));
+		if(ts.tv_sec < 0 || ts.tv_nsec < 0 || ts.tv_nsec > 999999999)
+			std::terminate();
+
+		return time_point(duration(
+			seconds(ts.tv_sec) + duration_cast<duration>(nanoseconds(ts.tv_nsec))));
 	}
 }
 
@@ -344,7 +347,10 @@ stdex::chrono::steady_clock::time_point stdex::chrono::steady_clock::now() _STDE
 			std::terminate();
 		}
 
-		return time_point(
-			seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec));
+		if(ts.tv_sec < 0 || ts.tv_nsec < 0 || ts.tv_nsec > 999999999)
+			std::terminate();
+
+		return time_point(duration(
+			seconds(ts.tv_sec) + duration_cast<duration>(nanoseconds(ts.tv_nsec))));
 	}
 }
