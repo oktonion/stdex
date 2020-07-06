@@ -721,6 +721,8 @@ int test14()
 
     stdex::intmax_t desired_dur = duration_cast<milliseconds>(dur).count();
 
+    DYNAMIC_VERIFY(desired_dur >= 25000);
+
     start = system_clock::now();
 
     for(std::size_t i = 0; i < 100; ++i)
@@ -731,7 +733,7 @@ int test14()
         system_clock::now() - start;
     std::cout << "duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired " << desired_dur << " ms" << std::endl;
     DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= desired_dur || duration_cast<milliseconds>(dur).count() >= 25000);
-    DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + 3000); // 1 sec is bullshit but better than nothing
+    DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + 1000); // 1 sec is bullshit but better than nothing
 
     return 0;
 }
