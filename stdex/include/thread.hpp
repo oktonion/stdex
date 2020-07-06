@@ -1326,7 +1326,7 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
             static _no_type _has_functor_operator_overload_tester(_Tp, const priority_tag<0>&);
 
             static const bool value = 
-                sizeof(_has_functor_operator_overload::
+                sizeof(_has_functor_operator_overload<_ObjectT,_ArgT>::
                     _has_functor_operator_overload_tester(
                         &_ObjectT::operator(), priority_tag<4>()
                     )
