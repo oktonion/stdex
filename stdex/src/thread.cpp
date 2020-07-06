@@ -580,7 +580,11 @@ namespace thread_cpp_detail
 	{
 		static int call(const timespec *req, timespec *rem)
 		{
-			return ::nanosleep(req, rem);
+			int err = ::nanosleep(req, rem);
+
+			if(err && (rem.tv_sec || rem.tv_nsec))
+				err = ::nanosleep(rem, rem);
+			return err;
 		}
 	};
 
@@ -589,11 +593,16 @@ namespace thread_cpp_detail
 	struct nanosleep_impl1<true>
 	{
 		enum {BILLION = 1000000000};
-		static void timespec_add(timespec &result, const timespec &t2)
+		static void timespec_add(timespec &result, const timespec &in)
 		{
+			timespec t2 = in;
 			if (result.tv_nsec >= BILLION) {
 				result.tv_nsec -= BILLION;
 				result.tv_sec++;
+			}
+			if (t2.tv_nsec >= BILLION) {
+				t2.tv_nsec -= BILLION;
+				t2.tv_sec++;
 			}
 			result.tv_sec += t2.tv_sec;
 			result.tv_nsec += t2.tv_nsec;
