@@ -169,7 +169,7 @@ namespace clock_gettime_impl
 #define _STDEX_CHRONO_CLOCK_REALTIME 0
 #define _STDEX_CHRONO_CLOCK_MONOTONIC 0
 int(*clock_gettime_func_pointer)(int X, mytimespec *tv) = &clock_gettime_impl::clock_gettime;
-#elif defined(__MACH__)
+#elif defined(__MACH__) && !defined(CLOCK_REALTIME)
 #include <time.h>
 #include <sys/time.h>       /* gettimeofday */
 #include <mach/mach_time.h> /* mach_absolute_time */
