@@ -1322,7 +1322,8 @@ template<class _FuncT> void call(_FuncT &fp,eTypeNullptr,eTypeNullptr,eTypeNullp
                 typename _ArgT::template object_member_func<_ObjectT, _ReturnT>::type, const priority_tag<3>&);
             static _yes_type _has_functor_operator_overload_tester(functor_operator_type, const priority_tag<2>&);
             static _yes_type _has_functor_operator_overload_tester(functor_operator_type_const, const priority_tag<1>&);
-            static _no_type _has_functor_operator_overload_tester(..., const priority_tag<0>&);
+            template<class _Tp>
+            static _no_type _has_functor_operator_overload_tester(_Tp, const priority_tag<0>&);
 
             static const bool value = 
                 sizeof(_has_functor_operator_overload::
