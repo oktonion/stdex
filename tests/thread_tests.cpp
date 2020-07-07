@@ -6,6 +6,11 @@
 #include <iostream>
 #include <ctime>
 
+#if (__cplusplus >= 201103L)
+#include <thread>
+#include <system_error>
+#endif
+
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
 using std::size_t;
@@ -709,31 +714,75 @@ int test13()
 
 int test14()
 {
-    using namespace stdex;
-    using namespace stdex::chrono;
-    typedef stdex::intmax_t intmax_type;
+    #if (__cplusplus >= 201103L)
+    
+    std::intmax_t std_dur, std_desired_dur;
 
-    system_clock::time_point start = system_clock::now();
+    {   
+        using namespace std;
+        using namespace std::chrono;
+        typedef std::intmax_t intmax_type;
 
-    this_thread::sleep_for(milliseconds(25000));
+        system_clock::time_point start = system_clock::now();
 
-    system_clock::duration dur = 
-        system_clock::now() - start;
+        this_thread::sleep_for(milliseconds(25000));
 
-    intmax_type desired_dur = duration_cast<milliseconds>(dur).count();
+        system_clock::duration dur = 
+            system_clock::now() - start;
 
-    start = system_clock::now();
+        intmax_type desired_dur = duration_cast<milliseconds>(dur).count();
 
-    for(std::size_t i = 0; i < 100; ++i)
-    {
-        this_thread::sleep_for(milliseconds(250));
+        start = system_clock::now();
+
+        for(std::size_t i = 0; i < 100; ++i)
+        {
+            this_thread::sleep_for(milliseconds(250));
+        }
+        dur = 
+            system_clock::now() - start;
+        std::cout << "std::duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired is " << desired_dur << " ms" << std::endl;
+        DYNAMIC_VERIFY(desired_dur >= intmax_type(25000));
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= desired_dur && duration_cast<milliseconds>(dur).count() >= intmax_type(25000));
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + intmax_type(2000)); // 2 sec is bullshit but better than nothing
+
+        std_dur = duration_cast<milliseconds>(dur).count();
+        std_desired_dur = desired_dur;
     }
-    dur = 
-        system_clock::now() - start;
-    std::cout << "duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired is " << desired_dur << " ms" << std::endl;
-    DYNAMIC_VERIFY(desired_dur >= intmax_type(25000));
-    DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= desired_dur && duration_cast<milliseconds>(dur).count() >= intmax_type(25000));
-    DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + intmax_type(2000)); // 2 sec is bullshit but better than nothing
+    #endif
+    
+    {   
+        using namespace stdex;
+        using namespace stdex::chrono;
+        typedef stdex::intmax_t intmax_type;
+
+        system_clock::time_point start = system_clock::now();
+
+        this_thread::sleep_for(milliseconds(25000));
+
+        system_clock::duration dur = 
+            system_clock::now() - start;
+
+        intmax_type desired_dur = duration_cast<milliseconds>(dur).count();
+
+        start = system_clock::now();
+
+        for(std::size_t i = 0; i < 100; ++i)
+        {
+            this_thread::sleep_for(milliseconds(250));
+        }
+        dur = 
+            system_clock::now() - start;
+        std::cout << "duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired is " << desired_dur << " ms" << std::endl;
+
+        #if (__cplusplus >= 201103L)
+        std::cout << "std::duration is " << std_dur << " ms, stdex::duration is " << duration_cast<milliseconds>(dur).count() << " ms" << std::endl;
+        std::cout << "std::desired is " << std_desired_dur << " ms, stdex::desired is " << desired_dur << " ms" << std::endl;
+        #endif
+
+        DYNAMIC_VERIFY(desired_dur >= intmax_type(25000));
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= desired_dur && duration_cast<milliseconds>(dur).count() >= intmax_type(25000));
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + intmax_type(2000)); // 2 sec is bullshit but better than nothing
+    }
 
     return 0;
 }
