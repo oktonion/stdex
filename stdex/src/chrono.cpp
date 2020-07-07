@@ -118,7 +118,7 @@ namespace clock_gettime_impl
 		tv->tv_nsec = (t.QuadPart % 1000000) * 1000;
 		return (0);
 	}
-
+#define _STDEX_CHRONO_USE_MICROSECONDS
 #else
 
 
@@ -163,6 +163,7 @@ namespace clock_gettime_impl
 		tv->tv_nsec = (t.QuadPart % 1000000) * 1000;
 		return (0);
 	}
+#define _STDEX_CHRONO_USE_MICROSECONDS
 #endif
 }
 
@@ -322,43 +323,39 @@ int(*clock_gettime_func_pointer)(clockid_t, struct timespec*) = &clock_gettime;
 stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDEX_NOEXCEPT_FUNCTION
 {	// get current time
 	{
-		mytimespec ts;
+		mytimespec ts = {0, 0};
 
 		if ((*clock_gettime_func_pointer)(_STDEX_CHRONO_CLOCK_REALTIME, &ts) != 0)
 		{
 			std::terminate();
 		}
 
-		if(ts.tv_sec < 0 || ts.tv_nsec < 0 || ts.tv_nsec > 999999999)
-			std::terminate();
-
-		if((ts.tv_nsec % 1000) == 0)
-			return time_point(
-				seconds(ts.tv_sec) + microseconds(ts.tv_nsec / 1000));
-
+#ifdef _STDEX_CHRONO_USE_MICROSECONDS
 		return time_point(
-				seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec));
+			seconds(ts.tv_sec) + microseconds(ts.tv_nsec / 1000));
+#else
+		return time_point(
+			seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec));
+#endif
 	}
 }
 
 stdex::chrono::steady_clock::time_point stdex::chrono::steady_clock::now() _STDEX_NOEXCEPT_FUNCTION
 {	// get current time
 	{
-		mytimespec ts;
+		mytimespec ts = {0, 0};
 
 		if ((*clock_gettime_func_pointer)(_STDEX_CHRONO_CLOCK_MONOTONIC, &ts) != 0)
 		{
 			std::terminate();
 		}
 
-		if(ts.tv_sec < 0 || ts.tv_nsec < 0 || ts.tv_nsec > 999999999)
-			std::terminate();
-
-		if((ts.tv_nsec % 1000) == 0)
-			return time_point(
-				seconds(ts.tv_sec) + microseconds(ts.tv_nsec / 1000));
-
+#ifdef _STDEX_CHRONO_USE_MICROSECONDS
 		return time_point(
-				seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec));
+			seconds(ts.tv_sec) + microseconds(ts.tv_nsec / 1000));
+#else
+		return time_point(
+			seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec));
+#endif
 	}
 }
