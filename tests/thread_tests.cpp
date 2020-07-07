@@ -6,7 +6,7 @@
 #include <iostream>
 #include <ctime>
 
-#ifdef _STDEX_NATIVE_CPP11_SUPPORT
+#if defined(_STDEX_NATIVE_CPP11_SUPPORT) || defined(__MACH__)
 #include <thread>
 #include <system_error>
 #endif
@@ -714,7 +714,7 @@ int test13()
 
 int test14()
 {
-    #ifdef _STDEX_NATIVE_CPP11_SUPPORT
+    #if defined(_STDEX_NATIVE_CPP11_SUPPORT) || defined(__MACH__)
     
     std::intmax_t std_dur, std_desired_dur;
 
@@ -774,7 +774,7 @@ int test14()
             system_clock::now() - start;
         std::cout << "duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired is " << desired_dur << " ms" << std::endl;
 
-        #ifdef _STDEX_NATIVE_CPP11_SUPPORT
+        #if defined(_STDEX_NATIVE_CPP11_SUPPORT) || defined(__MACH__)
         std::cout << "std::duration is " << std_dur << " ms, stdex::duration is " << duration_cast<milliseconds>(dur).count() << " ms" << std::endl;
         std::cout << "std::desired is " << std_desired_dur << " ms, stdex::desired is " << desired_dur << " ms" << std::endl;
         #endif
