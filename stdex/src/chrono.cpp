@@ -323,7 +323,9 @@ int(*clock_gettime_func_pointer)(clockid_t, struct timespec*) = &clock_gettime;
 stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDEX_NOEXCEPT_FUNCTION
 {	// get current time
 	{
-		mytimespec ts = {0, 0};
+		mytimespec ts;
+		ts.tv_sec = 0;
+		ts.tv_nsec = 0;
 
 		if ((*clock_gettime_func_pointer)(_STDEX_CHRONO_CLOCK_REALTIME, &ts) != 0)
 		{
@@ -343,7 +345,9 @@ stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDE
 stdex::chrono::steady_clock::time_point stdex::chrono::steady_clock::now() _STDEX_NOEXCEPT_FUNCTION
 {	// get current time
 	{
-		mytimespec ts = {0, 0};
+		mytimespec ts;
+		ts.tv_sec = 0;
+		ts.tv_nsec = 0;
 
 		if ((*clock_gettime_func_pointer)(_STDEX_CHRONO_CLOCK_MONOTONIC, &ts) != 0)
 		{
