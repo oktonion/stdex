@@ -169,8 +169,8 @@ namespace clock_gettime_impl
 
 #define _STDEX_CHRONO_CLOCK_REALTIME 0
 #define _STDEX_CHRONO_CLOCK_MONOTONIC 0
-int(*clock_gettime_func_pointer)(int X, mytimespec *tv) = &clock_gettime_impl::clock_gettime;
-#elif defined(__MACH__)
+int(*clock_gettime_func_pointer)(int, mytimespec*) = &clock_gettime_impl::clock_gettime;
+#elif defined(__MACH__) && !defined(CLOCK_REALTIME)
 #include <time.h>
 #include <sys/time.h>       /* gettimeofday */
 #include <mach/mach_time.h> /* mach_absolute_time */
@@ -216,7 +216,7 @@ static struct _init_inittime
 
 struct timespec get_abs_future_time_fine(unsigned milli)
 {
-    struct timespec future;     /* ns since 1 Jan 1970 to 1500 ms in future */
+    struct timespec future = { 0, 0 };     /* ns since 1 Jan 1970 to 1500 ms in future */
     ::uint64_t      clock;      /* ticks since init */
     ::uint64_t      nano;       /* nanoseconds since init */
 
@@ -238,15 +238,15 @@ int clock_gettime(int X, timespec *tv)
 
 	return (0);
 }
-int(*clock_gettime_func_pointer)(int X, timespec *tv) = &clock_gettime;
+int(*clock_gettime_func_pointer)(int, timespec*) = &clock_gettime;
 #else
 
 struct mytimespec:
 	public timespec
 {};
 
-int clock_gettime(int X, timespec *tv);
-int(*clock_gettime_func_pointer)(int X, timespec *tv) = &clock_gettime;
+int clock_gettime(clockid_t, struct timespec*);
+int(*clock_gettime_func_pointer)(clockid_t, struct timespec*) = &clock_gettime;
 #endif
 
 #ifdef CLOCK_MONOTONIC
