@@ -725,7 +725,7 @@ int test14()
 
         system_clock::time_point start = system_clock::now();
 
-        this_thread::sleep_for(milliseconds(25000));
+        stdex::this_thread::sleep_for(stdex::chrono::milliseconds(25000));
 
         system_clock::duration dur = 
             system_clock::now() - start;
@@ -736,7 +736,7 @@ int test14()
 
         for(std::size_t i = 0; i < 100; ++i)
         {
-            this_thread::sleep_for(milliseconds(250));
+            stdex::this_thread::sleep_for(stdex::chrono::milliseconds(250));
         }
         dur = 
             system_clock::now() - start;
