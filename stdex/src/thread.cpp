@@ -607,8 +607,8 @@ namespace thread_cpp_detail
 	#endif
 #endif
 
-#if defined(CLOCK_MONOTONIC) && 
-		defined(_STDEX_THREAD_CLOCK_MONOTONIC_EXISTS) && 
+#if defined(CLOCK_MONOTONIC) && \
+		defined(_STDEX_THREAD_CLOCK_MONOTONIC_EXISTS) && \
 			defined(TIMER_ABSTIME)
 	template<>
 	struct nanosleep_impl1<true>
