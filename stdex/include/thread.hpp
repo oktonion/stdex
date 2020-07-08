@@ -169,12 +169,6 @@ namespace stdex
             _type_is_nullptr_base_chooser<_Tp, _ArgT>::type
         { };
 
-        template<class _Tp>
-        struct _thread_nullptr_arg_helper
-        {
-            //static 
-        };
-
         template<class _T0 = detail::void_type, class _T1 = detail::void_type, class _T2 = detail::void_type, class _T3 = detail::void_type, class _T4 = detail::void_type, class _T5 = detail::void_type, class _T6 = detail::void_type, class _T7 = detail::void_type, class _T8 = detail::void_type, class _T9 = detail::void_type, class _T10 = detail::void_type, class _T11 = detail::void_type, class _T12 = detail::void_type, class _T13 = detail::void_type, class _T14 = detail::void_type, class _T15 = detail::void_type, class _T16 = detail::void_type, class _T17 = detail::void_type, class _T18 = detail::void_type, class _T19 = detail::void_type, class _T20 = detail::void_type, class _T21 = detail::void_type, class _T22 = detail::void_type, class _T23 = detail::void_type, class _T24 = detail::void_type>
         struct _thread_args_helper;
 
@@ -183,6 +177,8 @@ namespace stdex
         {
             struct _arguments
             {
+                static const unsigned int count = 0;
+
                 template<class _FuncT>
                 struct _call_helper
                 {
@@ -207,18 +203,6 @@ namespace stdex
                         typedef _ReturnT(_ObjectT::*type)();
                         typedef _ReturnT(_ObjectT::*type_const)() const;
                     };
-
-                    template<class _ReturnT>
-                    static void push(const priority_tag<3>&, _arguments &, const _ObjectT &fp, _ReturnT(_ObjectT::*)() const)
-                    {
-                        _call_helper<const _ObjectT>::call(fp);
-                    }
-
-                    template<class _ReturnT>
-                    static void push(const priority_tag<2>&, _arguments &, _ObjectT &fp, _ReturnT(_ObjectT::*)())
-                    {
-                        _call_helper<_ObjectT>::call(fp);
-                    }
                 };
                 
             };
@@ -231,6 +215,8 @@ namespace stdex
         {
             struct _arguments
             {
+                static const unsigned int count = 1;
+
                 _Arg1 arg1;
 
                 _arguments(_Arg1 arg1_) :
@@ -299,6 +285,8 @@ namespace stdex
         {
             struct _arguments
             {
+                static const unsigned int count = 2;
+
                 _Arg1 arg1;
                 _Arg2 arg2;
 
@@ -375,6 +363,8 @@ namespace stdex
         {
             struct _arguments
             {
+                static const unsigned int count = 3;
+
                 _Arg1 arg1;
                 _Arg2 arg2;
                 _Arg3 arg3;
@@ -461,6 +451,8 @@ namespace stdex
         {
             struct _arguments
             {
+                static const unsigned int count = 4;
+
                 _Arg1 arg1;
                 _Arg2 arg2;
                 _Arg3 arg3;
@@ -561,6 +553,8 @@ namespace stdex
         {
             struct _arguments
             {
+                static const unsigned int count = 5;
+
                 _Arg1 arg1;
                 _Arg2 arg2;
                 _Arg3 arg3;
@@ -683,6 +677,8 @@ namespace stdex
         {
             struct _arguments
             {
+                static const unsigned int count = 6;
+
                 _Arg1 arg1;
                 _Arg2 arg2;
                 _Arg3 arg3;
@@ -843,6 +839,8 @@ namespace stdex
         {
             struct _arguments
             {
+                static const unsigned int count = 7;
+
                 _Arg1 arg1;
                 _Arg2 arg2;
                 _Arg3 arg3;
@@ -1073,6 +1071,8 @@ namespace stdex
         {
             struct _arguments
             {
+                static const unsigned int count = 8;
+
                 _Arg1 arg1;
                 _Arg2 arg2;
                 _Arg3 arg3;
@@ -1449,47 +1449,6 @@ namespace stdex
                 _type_is_not_class;
         };
 
-        template<class _ObjectT, class _ArgT>
-        struct _has_functor_operator_overload
-        {
-            template<class _ReturnT>
-            static _yes_type _has_functor_operator_overload_tester(
-                _ReturnT,
-                typename _ArgT::template object_member_func<_ObjectT, _ReturnT>::type_const, const priority_tag<3>&);
-            template<class _ReturnT>
-            static _yes_type _has_functor_operator_overload_tester(
-                _ReturnT,
-                typename _ArgT::template object_member_func<_ObjectT, _ReturnT>::type, const priority_tag<2>&);
-            template<class _ReturnT, class _Tp>
-            static _no_type _has_functor_operator_overload_tester(
-                _ReturnT, 
-                _Tp, const priority_tag<1>&);
-
-            static const bool value = 
-                sizeof(_has_functor_operator_overload<_ObjectT, _ArgT>::
-                    _has_functor_operator_overload_tester(
-                        &_ObjectT::operator(), priority_tag<4>()
-                    )
-                ) == sizeof(_yes_type);
-        };
-
-        enum ePerformFunctorArgsChecks { _perform_functor_args_checks_tag };
-        enum eDoNotPerformFunctorArgsChecks { _do_not_perform_functor_args_checks_tag }; 
-
-        template<bool>
-        struct _perform_functor_args_checks
-        {
-            static const ePerformFunctorArgsChecks tag = 
-                _perform_functor_args_checks_tag;
-        };
-
-        template<>
-        struct _perform_functor_args_checks<true>
-        {
-            static const eDoNotPerformFunctorArgsChecks tag = 
-                _do_not_perform_functor_args_checks_tag;
-        };
-
         template<class _FuncT, class _ArgT>
         struct _thread_function_proxy
         {
@@ -1509,23 +1468,17 @@ namespace stdex
 
             void call()
             {
-                call(_choose_class_overload<is_class<_FuncT>::value>::tag);
+                call(
+                    _choose_class_overload<
+                        is_class<_FuncT>::value && 
+                        bool(arguments_type::count > 0)
+                    >::tag);
             }
 
             void call(eTypeIsClass)
             {
-                //call_class(_perform_functor_args_checks<_has_functor_operator_overload<_FuncT, _ArgT>::value>::tag);
-                arguments_type::template _functor<function_type>::push(priority_tag<5>(), args, fp, &function_type::operator());
-            }
-
-            void call_class(ePerformFunctorArgsChecks)
-            {
-                args.push_functor(priority_tag<4>(), fp, &_FuncT::operator());
-            }
-
-            void call_class(eDoNotPerformFunctorArgsChecks)
-            {
-                args.push_functor(priority_tag<4>(), fp);
+                arguments_type::template _functor<function_type>::
+                    push(priority_tag<5>(), args, fp, &function_type::operator());
             }
 
             void call(eTypeIsNotClass)
