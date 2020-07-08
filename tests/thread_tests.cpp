@@ -603,7 +603,7 @@ void dummy_func_7(struct dummy_func_7_t0*, struct dummy_func_7_t1*, struct dummy
 void dummy_func_8(struct dummy_func_8_t0*, struct dummy_func_8_t1*, struct dummy_func_8_t2 const*, struct dummy_func_8_t3*, struct dummy_func_8_t4*, struct dummy_func_8_t5 const*, struct dummy_func_8_t6 const**, void*) {}
 
 struct dummy_functor{
-    void operator()() {}
+    int operator()() {return 0;}
     void operator()(void*) {}
     void operator()(void*, int*) {}
     void operator()(void*, double*, float*) {}
