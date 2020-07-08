@@ -723,23 +723,23 @@ int test14()
         using namespace std::chrono;
         typedef std::intmax_t intmax_type;
 
-        system_clock::time_point start = system_clock::now();
+        steady_clock::time_point start = steady_clock::now();
 
         this_thread::sleep_for(milliseconds(25000));
 
-        system_clock::duration dur = 
-            system_clock::now() - start;
+        steady_clock::duration dur = 
+            steady_clock::now() - start;
 
         intmax_type desired_dur = duration_cast<milliseconds>(dur).count();
 
-        start = system_clock::now();
+        start = steady_clock::now();
 
         for(std::size_t i = 0; i < 100; ++i)
         {
             this_thread::sleep_for(milliseconds(250));
         }
         dur = 
-            system_clock::now() - start;
+            steady_clock::now() - start;
         std::cout << "std::duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired is " << desired_dur << " ms" << std::endl;
         DYNAMIC_VERIFY(desired_dur >= intmax_type(25000));
         DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= desired_dur && duration_cast<milliseconds>(dur).count() >= intmax_type(25000));
@@ -755,23 +755,23 @@ int test14()
         using namespace stdex::chrono;
         typedef stdex::intmax_t intmax_type;
 
-        system_clock::time_point start = system_clock::now();
+        steady_clock::time_point start = steady_clock::now();
 
         this_thread::sleep_for(milliseconds(25000));
 
-        system_clock::duration dur = 
-            system_clock::now() - start;
+        steady_clock::duration dur = 
+            steady_clock::now() - start;
 
         intmax_type desired_dur = duration_cast<milliseconds>(dur).count();
 
-        start = system_clock::now();
+        start = steady_clock::now();
 
         for(std::size_t i = 0; i < 100; ++i)
         {
             this_thread::sleep_for(milliseconds(250));
         }
         dur = 
-            system_clock::now() - start;
+            steady_clock::now() - start;
         std::cout << "duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired is " << desired_dur << " ms" << std::endl;
 
         #if defined(_STDEX_NATIVE_CPP11_SUPPORT) || defined(__MACH__)
