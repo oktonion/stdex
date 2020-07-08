@@ -118,7 +118,7 @@ namespace clock_gettime_impl
 		tv->tv_nsec = (t.QuadPart % 1000000) * 1000;
 		return (0);
 	}
-
+#define _STDEX_CHRONO_USE_MICROSECONDS
 #else
 
 
@@ -158,18 +158,19 @@ namespace clock_gettime_impl
 
 		t.QuadPart -= offset.QuadPart;
 		microseconds = (double) t.QuadPart / frequencyToMicroseconds;
-		t.QuadPart = (microseconds + 0.5);
+		t.QuadPart = LONGLONG(microseconds + 0.5);
 		tv->tv_sec = t.QuadPart / 1000000;
 		tv->tv_nsec = (t.QuadPart % 1000000) * 1000;
 		return (0);
 	}
+#define _STDEX_CHRONO_USE_MICROSECONDS
 #endif
 }
 
 #define _STDEX_CHRONO_CLOCK_REALTIME 0
 #define _STDEX_CHRONO_CLOCK_MONOTONIC 0
-int(*clock_gettime_func_pointer)(int X, mytimespec *tv) = &clock_gettime_impl::clock_gettime;
-#elif defined(__MACH__)
+int(*clock_gettime_func_pointer)(int, mytimespec*) = &clock_gettime_impl::clock_gettime;
+#elif defined(__MACH__) && !defined(CLOCK_REALTIME)
 #include <time.h>
 #include <sys/time.h>       /* gettimeofday */
 #include <mach/mach_time.h> /* mach_absolute_time */
@@ -215,7 +216,7 @@ static struct _init_inittime
 
 struct timespec get_abs_future_time_fine(unsigned milli)
 {
-    struct timespec future;     /* ns since 1 Jan 1970 to 1500 ms in future */
+    struct timespec future = { 0, 0 };     /* ns since 1 Jan 1970 to 1500 ms in future */
     ::uint64_t      clock;      /* ticks since init */
     ::uint64_t      nano;       /* nanoseconds since init */
 
@@ -233,19 +234,19 @@ struct mytimespec:
 
 int clock_gettime(int X, timespec *tv)
 {
-	*tv = get_abs_future_time_fine(1500);
+	*tv = get_abs_future_time_fine(0);
 
 	return (0);
 }
-int(*clock_gettime_func_pointer)(int X, timespec *tv) = &clock_gettime;
+int(*clock_gettime_func_pointer)(int, timespec*) = &clock_gettime;
 #else
 
 struct mytimespec:
 	public timespec
 {};
 
-int clock_gettime(int X, timespec *tv);
-int(*clock_gettime_func_pointer)(int X, timespec *tv) = &clock_gettime;
+int clock_gettime(clockid_t, struct timespec*);
+int(*clock_gettime_func_pointer)(clockid_t, struct timespec*) = &clock_gettime;
 #endif
 
 #ifdef CLOCK_MONOTONIC
@@ -323,14 +324,21 @@ stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDE
 {	// get current time
 	{
 		mytimespec ts;
+		ts.tv_sec = 0;
+		ts.tv_nsec = 0;
 
 		if ((*clock_gettime_func_pointer)(_STDEX_CHRONO_CLOCK_REALTIME, &ts) != 0)
 		{
 			std::terminate();
 		}
 
-		return time_point(duration(
-			seconds(ts.tv_sec) + duration_cast<duration>(nanoseconds(ts.tv_nsec))));
+#ifdef _STDEX_CHRONO_USE_MICROSECONDS
+		return time_point(
+			seconds(ts.tv_sec) + microseconds(ts.tv_nsec / 1000));
+#else
+		return time_point(
+			seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec));
+#endif
 	}
 }
 
@@ -338,13 +346,20 @@ stdex::chrono::steady_clock::time_point stdex::chrono::steady_clock::now() _STDE
 {	// get current time
 	{
 		mytimespec ts;
+		ts.tv_sec = 0;
+		ts.tv_nsec = 0;
 
 		if ((*clock_gettime_func_pointer)(_STDEX_CHRONO_CLOCK_MONOTONIC, &ts) != 0)
 		{
 			std::terminate();
 		}
 
-		return time_point(duration(
-			seconds(ts.tv_sec) + duration_cast<duration>(nanoseconds(ts.tv_nsec))));
+#ifdef _STDEX_CHRONO_USE_MICROSECONDS
+		return time_point(
+			seconds(ts.tv_sec) + microseconds(ts.tv_nsec / 1000));
+#else
+		return time_point(
+			seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec));
+#endif
 	}
 }

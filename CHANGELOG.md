@@ -8,15 +8,18 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 ### Added
 
-- serious additions
+- `<mutex>` header:
+- - `stdex::timed_mutex` and `stdex::recursive_timed_mutex` implemented
 
 ### Changed
 
-- serious changes
+- `<mutex>` header:
+- - throw exceptions if underlying pthread implementation is capable to detect errors (less bugs in production, more exceptions to handle, yeeeah!)
 
 ### Fixed
 
-- serious fixes
+- `<chrono>` implementation:
+- - removed 1500ms time shift for MacOS implementation of `chrono`, this fix affects `stdex::chrono::system_clock::now()`, `stdex::chrono::steady_clock::now()`, `stdex::condition_variable::wait_for()`, all waitable mutexes etc.
 
 ## [0.2.6] - 2020-06-17
 

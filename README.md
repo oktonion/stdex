@@ -41,6 +41,7 @@ A:
 * **stdex_char16_t** and **stdex_char32_t** (as equivalent to **char16_t**, **char32_t**)
 * **stdex_noexcept** (as partial equivalent to **noexcept**)
 * `stdex_assert` macro (as equivalent to `cassert` macro)
+* move semantic is in progress
 
 ### Utilities library
 
@@ -131,7 +132,7 @@ A:
 | name                   | purpose                                       | implemented | is final |
 |------------------------|-----------------------------------------------|:-----------:|----------|
 | `<thread>`             | stdex::thread class and  supporting functions | 90%         | no       |
-| `<mutex>`              | mutual exclusion primitives                   | 100%        | yes      |
+| `<mutex>`              | mutual exclusion primitives                   | 90%         | no       |
 | `<future>`             | primitives for asynchronous computations      | no          | maybe    |
 | `<condition_variable>` | thread waiting conditions                     | 100%        | yes      |
 
