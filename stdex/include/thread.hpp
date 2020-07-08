@@ -1471,7 +1471,7 @@ namespace stdex
                 call(
                     _choose_class_overload<
                         is_class<_FuncT>::value && 
-                        bool(arguments_type::count > 0)
+                        (arguments_type::count > 0) == bool(true)
                     >::tag);
             }
 
