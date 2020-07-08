@@ -6,6 +6,11 @@
 #include <iostream>
 #include <ctime>
 
+#if defined(_STDEX_NATIVE_CPP11_SUPPORT) || defined(__MACH__)
+#include <thread>
+#include <system_error>
+#endif
+
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
 using std::size_t;
@@ -447,6 +452,8 @@ int test_thread_id()
 
     res = res;
 
+    (void)(&res);
+
     return 0;
 }
 
@@ -591,9 +598,22 @@ void dummy_func_2(void*, int*) {}
 void dummy_func_3(void*, double*, float*) {}
 void dummy_func_4(struct dummy_func_4_t0*, struct dummy_func_4_t1*, struct dummy_func_4_t2*, struct dummy_func_4_t3*) {}
 void dummy_func_5(struct dummy_func_5_t0*, struct dummy_func_5_t1*, struct dummy_func_5_t2*, struct dummy_func_5_t3*, struct dummy_func_5_t4*) {}
-void dummy_func_6(struct dummy_func_5_t0*, struct dummy_func_5_t1*, struct dummy_func_5_t2 const*, struct dummy_func_5_t3*, struct dummy_func_5_t4*, struct dummy_func_5_t5 const*) {}
+void dummy_func_6(struct dummy_func_6_t0*, struct dummy_func_6_t1*, struct dummy_func_6_t2 const*, struct dummy_func_6_t3*, struct dummy_func_6_t4*, struct dummy_func_6_t5 const*) {}
 void dummy_func_7(struct dummy_func_7_t0*, struct dummy_func_7_t1*, struct dummy_func_7_t2 const*, struct dummy_func_7_t3*, struct dummy_func_7_t4*, struct dummy_func_7_t5 const*, struct dummy_func_7_t6 const*) {}
-void dummy_func_8(struct dummy_func_7_t0*, struct dummy_func_7_t1*, struct dummy_func_7_t2 const*, struct dummy_func_7_t3*, struct dummy_func_7_t4*, struct dummy_func_7_t5 const*, struct dummy_func_7_t6 const**, void*) {}
+void dummy_func_8(struct dummy_func_8_t0*, struct dummy_func_8_t1*, struct dummy_func_8_t2 const*, struct dummy_func_8_t3*, struct dummy_func_8_t4*, struct dummy_func_8_t5 const*, struct dummy_func_8_t6 const**, void*) {}
+
+struct dummy_functor{
+    int operator()() {return 0;}
+    void operator()(void*) {}
+    void operator()(void*, int*) {}
+    void operator()(void*, double*, float*) {}
+    void operator()(struct dummy_func_4_t0*, struct dummy_func_4_t1*, struct dummy_func_4_t2*, struct dummy_func_4_t3*) {}
+    void operator()(struct dummy_func_5_t0*, struct dummy_func_5_t1*, struct dummy_func_5_t2*, struct dummy_func_5_t3*, struct dummy_func_5_t4*) {}
+    void operator()(struct dummy_func_6_t0*, struct dummy_func_6_t1*, struct dummy_func_6_t2 const*, struct dummy_func_6_t3*, struct dummy_func_6_t4*, struct dummy_func_6_t5 const*) {}
+    void operator()(struct dummy_func_7_t0*, struct dummy_func_7_t1*, struct dummy_func_7_t2 const*, struct dummy_func_7_t3*, struct dummy_func_7_t4*, struct dummy_func_7_t5 const*, struct dummy_func_7_t6 const*) {}
+    void operator()(struct dummy_func_8_t0*, struct dummy_func_8_t1*, struct dummy_func_8_t2 const*, struct dummy_func_8_t3*, struct dummy_func_8_t4*, struct dummy_func_8_t5 const*, struct dummy_func_8_t6 const**, void*) {}
+
+};
 
 int test13()
 {
@@ -603,9 +623,19 @@ int test13()
         thread tt(&dummy_func_0);
         tt.join();
     }
+    {
+        dummy_functor ff;
+        thread tt(ff);
+        tt.join();
+    }
 
     {
         thread tt(&dummy_func_1, nullptr);
+        tt.join();
+    }
+    {
+        dummy_functor ff;
+        thread tt(ff, nullptr);
         tt.join();
     }
 
@@ -613,65 +643,146 @@ int test13()
         thread tt(&dummy_func_2, nullptr, nullptr);
         tt.join();
     }
+    {
+        dummy_functor ff;
+        thread tt(ff, nullptr, nullptr);
+        tt.join();
+    }
 
     {
         thread tt(&dummy_func_3, nullptr, nullptr, nullptr);
         tt.join();
     }
-
+    {
+        dummy_functor ff;
+        thread tt(ff, nullptr, nullptr, nullptr);
+        tt.join();
+    }
+    
     {
         thread tt(&dummy_func_4, nullptr, nullptr, nullptr, nullptr);
         tt.join();
     }
-
+    {
+        dummy_functor ff;
+        thread tt(ff, nullptr, nullptr, nullptr, nullptr);
+        tt.join();
+    }
+    
     {
         thread tt(&dummy_func_5, nullptr, nullptr, nullptr, nullptr, nullptr);
         tt.join();
     }
-
+    {
+        dummy_functor ff;
+        thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr);
+        tt.join();
+    }
+    
     {
         thread tt(&dummy_func_6, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
         tt.join();
     }
-
+    {
+        dummy_functor ff;
+        thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+        tt.join();
+    }
+    
     {
         thread tt(&dummy_func_7, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
         tt.join();
     }
-
+    {
+        dummy_functor ff;
+        thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+        tt.join();
+    }
+    
     {
         thread tt(&dummy_func_8, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
         tt.join();
     }
-
+    {
+        dummy_functor ff;
+        thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+        tt.join();
+    }
+    
     return 0;
 }
 
 int test14()
 {
-    using namespace stdex;
-    using namespace stdex::chrono;
+    #if defined(_STDEX_NATIVE_CPP11_SUPPORT) || defined(__MACH__)
+    
+    std::intmax_t std_dur, std_desired_dur;
 
-    system_clock::time_point start = system_clock::now();
+    {   
+        using namespace std;
+        using namespace std::chrono;
+        typedef std::intmax_t intmax_type;
 
-    this_thread::sleep_for(milliseconds(25000));
+        steady_clock::time_point start = steady_clock::now();
 
-    system_clock::duration dur = 
-        system_clock::now() - start;
+        stdex::this_thread::sleep_for(stdex::chrono::milliseconds(25000));
 
-    stdex::intmax_t desired_dur = duration_cast<milliseconds>(dur).count();
+        steady_clock::duration dur = 
+            steady_clock::now() - start;
 
-    start = system_clock::now();
+        intmax_type desired_dur = duration_cast<milliseconds>(dur).count();
 
-    for(std::size_t i = 0; i < 100; ++i)
-    {
-        this_thread::sleep_for(milliseconds(250));
+        start = steady_clock::now();
+
+        for(std::size_t i = 0; i < 100; ++i)
+        {
+            stdex::this_thread::sleep_for(stdex::chrono::milliseconds(250));
+        }
+        dur = 
+            steady_clock::now() - start;
+        std::cout << "std::duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired is " << desired_dur << " ms" << std::endl;
+        DYNAMIC_VERIFY(desired_dur >= intmax_type(25000));
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= desired_dur && duration_cast<milliseconds>(dur).count() >= intmax_type(25000));
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + intmax_type(2000)); // 2 sec is bullshit but better than nothing
+
+        std_dur = duration_cast<milliseconds>(dur).count();
+        std_desired_dur = desired_dur;
     }
-    dur = 
-        system_clock::now() - start;
-    std::cout << "duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired " << desired_dur << " ms" << std::endl;
-    DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= desired_dur);
-    DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + 3000); // 3 sec is bullshit but better than nothing
+    #endif
+    
+    {   
+        using namespace stdex;
+        using namespace stdex::chrono;
+        typedef stdex::intmax_t intmax_type;
+
+        steady_clock::time_point start = steady_clock::now();
+
+        this_thread::sleep_for(milliseconds(25000));
+
+        steady_clock::duration dur = 
+            steady_clock::now() - start;
+
+        intmax_type desired_dur = duration_cast<milliseconds>(dur).count();
+
+        start = steady_clock::now();
+
+        for(std::size_t i = 0; i < 100; ++i)
+        {
+            this_thread::sleep_for(milliseconds(250));
+        }
+        dur = 
+            steady_clock::now() - start;
+        std::cout << "duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired is " << desired_dur << " ms" << std::endl;
+
+        #if defined(_STDEX_NATIVE_CPP11_SUPPORT) || defined(__MACH__)
+        std::cout << "std::duration is " << std_dur << " ms, stdex::duration is " << duration_cast<milliseconds>(dur).count() << " ms" << std::endl;
+        std::cout << "std::desired is " << std_desired_dur << " ms, stdex::desired is " << desired_dur << " ms" << std::endl;
+        #endif
+
+        DYNAMIC_VERIFY(desired_dur >= intmax_type(25000));
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= desired_dur && duration_cast<milliseconds>(dur).count() >= intmax_type(25000));
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + intmax_type(2000)); // 2 sec is bullshit but better than nothing
+    }
 
     return 0;
 }
@@ -702,7 +813,7 @@ int main(void)
         
     }
 
-    for (size_t i = 0; i < 3; ++i)
+    for (size_t i = 0; i < 5; ++i)
     {
         DYNAMIC_VERIFY(thread::hardware_concurrency() >= 1);
         RUN_TEST(test14);

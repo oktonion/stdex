@@ -1,22 +1,27 @@
 setlocal enabledelayedexpansion
+@ECHO OFF
 
-set "run_ok=1"
+set true=1==1
+set false=1==0
+
+set "tests_failed=unsuccessful tests:"
+set run_ok=!true!
+
 for /f %%f in ('dir /b ".\tests\bin\*.exe"') do (
   echo "running test %%~nf..."
   
   .\tests\bin\%%f --duration
 
-  IF ERRORLEVEL 1 (
-    set "run_ok=0"
-    echo "...failed with %ERRORLEVEL%."
+  if not !errorlevel!==0 (
+    set run_ok=!false!
+    echo "...failed with !errorlevel!."
+    set "tests_failed=!tests_failed! %%~nf"
   ) else (
     echo "...ok."
   )
 )
 
-if /I "%run_ok%" NEQ "1" (
-  echo "tests run failed"
+if !run_ok!==!false! (
+  echo !tests_failed!
   exit /B 1
 )
-
-echo "tests run ok"

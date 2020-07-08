@@ -1,7 +1,7 @@
 mkdir ./tests/bin
 
 build_ok=1
-tests_failed="failed tests:"
+tests_failed="unsuccessful tests:"
 exclude_warn=""
 COMPILER=g++
 
@@ -15,7 +15,8 @@ for file in ./tests/*.cpp; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
   echo "compiling test c++03 $filename"
-  if ! $COMPILER -pedantic $exclude_warn $file -L./stdex/lib/ -lstdex -lm -o "./tests/bin/$filename"; then
+  output=$(($COMPILER -pedantic $exclude_warn $file -L./stdex/lib/ -lstdex -lm -o "./tests/bin/$filename") 2>&1)
+  if [[ $? -ne 0 ]]; then
     if [[ $filename == *"fail"* ]]; then
       echo "failed as expected"
     else
@@ -42,12 +43,14 @@ for file in ./tests/*.cpp; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
   echo "compiling test c++98 $filename"
-  if ! $COMPILER -std=c++98 -pedantic $exclude_warn $file -L./stdex/lib/ -lstdex -lm -o "./tests/bin/$filename"; then
+  output=$(($COMPILER -std=c++98 -pedantic $exclude_warn $file -L./stdex/lib/ -lstdex -lm -o "./tests/bin/$filename") 2>&1)
+  if [[ $? -ne 0 ]]; then
     if [[ $filename == *"fail"* ]]; then
       echo "failed as expected"
     else
       build_ok=0
       tests_failed="$tests_failed $filename;"
+      echo $output
     fi
   else
     if [[ $filename == *"fail"* ]]; then

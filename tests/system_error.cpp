@@ -283,10 +283,10 @@ int test10()
     error_code e2(make_error_code(errc::operation_not_supported));
     if (static_cast<bool>(e2))
     {
-        DYNAMIC_VERIFY(true);
+        return 0;
     }
 
-    return 0;
+    DYNAMIC_VERIFY(false);
 }
 
 int test11()
@@ -391,10 +391,10 @@ int test16()
     error_condition e2(errc::operation_not_supported);
     if (static_cast<bool>(e2))
     {
-        DYNAMIC_VERIFY(true);
+        return 0;
     }
 
-    return 0;
+    DYNAMIC_VERIFY(false);
 }
 
 int test17()

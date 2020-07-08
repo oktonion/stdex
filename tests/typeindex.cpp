@@ -34,6 +34,7 @@ int test01()
     Cadabra a1, a2_;
     const Cadabra a2 = a2_;
 
+    ((void)(a1));
     ((void)(a2));
     ((void)(a2_));
 
@@ -77,6 +78,7 @@ int test02()
     Alakazam a1, a2_;
     const Alakazam a2 = a2_;
 
+    ((void)(a1));
     ((void)(a2));
     ((void)(a2_));
 
