@@ -1745,6 +1745,11 @@ namespace stdex
             chrono::seconds _sec = chrono::duration_cast<chrono::seconds>(_dur);
             chrono::nanoseconds _ns = chrono::duration_cast<chrono::nanoseconds>(_dur - _sec);
             
+            if(_sec.count() < 0 || _ns.count() < 0)
+                return;
+            if(_sec.count() == 0 && _ns.count() == 0)
+                return;
+
             chrono::seconds::rep _s_count = _sec.count();
 
             timespec _ts;
@@ -1762,7 +1767,14 @@ namespace stdex
                 _ts.tv_nsec = 999999999;
             }
 
-            detail::sleep_for_impl(&_ts);
+            if(chrono::steady_clock::is_steady)
+            {
+                chrono::steady_clock::time_point _end_tp = 
+                        chrono::steady_clock::now() + _dur;     
+                detail::sleep_for_impl(&_ts);
+                while(chrono::steady_clock::now() < _end_tp)
+                    sleep_for(_end_tp - chrono::steady_clock::now());
+            }
         }
 
         template <class _Clock, class _Duration>
