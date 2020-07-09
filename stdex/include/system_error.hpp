@@ -32,13 +32,6 @@
 
 #endif 
 
-class _system_error{
-    ~_system_error() _STDEX_DELETED_FUNCTION;
-};
-
-inline void make_error_code(_system_error&);
-inline void make_error_condition(_system_error&);
-
 namespace stdex
 {
     struct errc
@@ -379,6 +372,18 @@ namespace stdex
     error_condition make_error_condition(errc::errc_t) _STDEX_NOEXCEPT_FUNCTION;
     error_condition make_error_condition(io_errc) _STDEX_NOEXCEPT_FUNCTION;
 
+    namespace system_error_detail
+    {
+        using stdex::make_error_code;
+        using stdex::make_error_condition;
+
+        template<class _Tp>
+        error_code make_error_code(_Tp _val) { return ::make_error_code(_val); }
+
+        template<class _Tp>
+        error_condition make_error_condition(_Tp _val) { return ::make_error_condition(_val); }
+    }
+
     class error_category;
 
     const error_category& generic_category() _STDEX_NOEXCEPT_FUNCTION;
@@ -467,8 +472,7 @@ namespace stdex
         typename enable_if<detail::_or_<is_error_condition_enum<_ErrorCondEnum>, is_same<error_condition, _ErrorCondEnum> >::value, error_condition&>::type
             operator=(const _ErrorCondEnum& val) _STDEX_NOEXCEPT_FUNCTION
         {
-            using stdex::make_error_condition;
-            using ::make_error_condition;
+            using system_error_detail::make_error_condition;
             
             return (*this = make_error_condition(val));
         }
@@ -543,8 +547,7 @@ namespace stdex
         typename enable_if<detail::_or_<is_error_code_enum<_ErrorCodeEnum>, is_same<error_code, _ErrorCodeEnum> >::value, error_code&>::type
             operator=(const _ErrorCodeEnum& val) _STDEX_NOEXCEPT_FUNCTION
         {
-            using stdex::make_error_code;
-            using ::make_error_code;
+            using system_error_detail::make_error_code;
 
             return (*this = make_error_code(val));
         }
