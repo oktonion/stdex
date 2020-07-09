@@ -613,7 +613,7 @@ namespace thread_cpp_detail
 
 #if defined(CLOCK_MONOTONIC) && \
 		defined(_STDEX_THREAD_CLOCK_MONOTONIC_EXISTS) && \
-			defined(TIMER_ABSTIME) && !defined(__MACH__)
+			defined(TIMER_ABSTIME)
 	template<>
 	struct nanosleep_impl1<true>
 	{
