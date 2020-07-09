@@ -846,32 +846,21 @@ namespace stdex
     {	// get system_category
         return (detail::_error_objects<int>::_system_object());
     }
+} // namespace stdex
 
+static stdex::error_code make_error_code(struct _dummy_error_code&);
+static stdex::error_condition make_error_condition(struct _dummy_error_condition&);
+namespace stdex
+{
     namespace system_error_detail
     {
         template<class _Tp>
-        struct _make_error_code_helper
-        {
-            static error_code call(const _Tp &_val) {
-                return ::make_error_code(_val); 
-            }
-        };
-
-        template<class _Tp>
-        struct _make_error_condition_helper
-        {
-            static error_condition call(const _Tp &_val) {
-                return ::make_error_condition(_val); 
-            }
-        };
+        inline
+        error_code make_error_code(_Tp _val, ...) { return ::make_error_code(_val); }
 
         template<class _Tp>
         inline
-        error_code make_error_code(_Tp _val, ...) { return _make_error_code_helper<_Tp>::call(_val); }
-
-        template<class _Tp>
-        inline
-        error_condition make_error_condition(_Tp _val, ...) { return _make_error_condition_helper<_Tp>::call(_val); }
+        error_condition make_error_condition(_Tp _val, ...) { return ::make_error_condition(_val); }
     }
 } // namespace stdex
 
