@@ -621,7 +621,7 @@ namespace thread_cpp_detail
 		static void timespec_add(timespec &result, const timespec &in)
 		{
 			const stdex::time_t _ts_sec_max = 
-                std::numeric_limits<stdex::time_t>::max();
+                (std::numeric_limits<stdex::time_t>::max)();
 			
 			if(result.tv_sec == _ts_sec_max || result.tv_sec < 0 ||
 				in.tv_sec == _ts_sec_max)

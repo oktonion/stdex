@@ -183,7 +183,7 @@ namespace stdex
             timespec _ts;
 
             const stdex::time_t _ts_sec_max = 
-                std::numeric_limits<stdex::time_t>::max();
+                (std::numeric_limits<stdex::time_t>::max)();
             if (_s_count < _ts_sec_max)
             {
                 _ts.tv_sec = static_cast<stdex::time_t>(_s_count > 0 ? _s_count : 0);
@@ -233,7 +233,7 @@ namespace stdex
             timespec _ts;
 
             const stdex::time_t _ts_sec_max = 
-                std::numeric_limits<stdex::time_t>::max();
+                (std::numeric_limits<stdex::time_t>::max)();
             if (_sec.time_since_epoch().count() >= _ts_sec_max ||
                 _rs.count() >= _ts_sec_max ||
                 _sec_result.time_since_epoch().count() >= _ts_sec_max)
