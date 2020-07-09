@@ -466,7 +466,7 @@ namespace stdex
         typename enable_if<detail::_or_<is_error_condition_enum<_ErrorCondEnum>, is_same<error_condition, _ErrorCondEnum> >::value, error_condition&>::type
             operator=(const _ErrorCondEnum& val) _STDEX_NOEXCEPT_FUNCTION
         {
-            using system_error_detail::make_error_condition;
+            using namespace system_error_detail;
             
             return (*this = make_error_condition(val));
         }
@@ -541,7 +541,7 @@ namespace stdex
         typename enable_if<detail::_or_<is_error_code_enum<_ErrorCodeEnum>, is_same<error_code, _ErrorCodeEnum> >::value, error_code&>::type
             operator=(const _ErrorCodeEnum& val) _STDEX_NOEXCEPT_FUNCTION
         {
-            using system_error_detail::make_error_code;
+            using namespace system_error_detail;
 
             return (*this = make_error_code(val));
         }
