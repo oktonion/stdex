@@ -398,11 +398,11 @@ int test6()
         t1.join();
     }
 
-    /*{
+    {
         thread t1(thread_func7, 1, 1, 1, 1, 1, nullptr, nullptr);
 
         t1.join();
-    }*/
+    }
 
     {
         thread t1(thread_func8, nullptr, nullptr, nullptr, nullptr);
@@ -511,6 +511,8 @@ int test9()
     }
     return 0;
 }
+
+#define CHECK_FOR_THROW_EVENTS 1
 
 int test10()
 {
