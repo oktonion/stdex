@@ -89,11 +89,6 @@ int test4()
         int i = e;  // error "cannot convert"
     }
 
-    {
-        error_condition e;
-        int i = e; // error "cannot convert"
-    }
-
     return 0;
 }
 

@@ -87,6 +87,7 @@ int test0()
     if (ec == errc::not_supported)
     { }
 
+
     return 0;
 }
 
@@ -141,39 +142,6 @@ int test3()
     system_error x(error_code(), s);
 
     DYNAMIC_VERIFY(std::string(x.what()).find(s.data()) != std::string::npos);
-
-    return 0;
-}
-
-int test4()
-{
-    using namespace stdex;
-
-#if CHECK_FOR_COMPILE_ERROR_TESTS == 1
-    try
-    {
-        throw fuzzy_logic();
-    }
-    catch (const fuzzy_logic& obj)
-    {
-        DYNAMIC_VERIFY(std::string(obj.what()).find("whoa") != std::string::npos);
-    }
-    catch (...)
-    {
-        DYNAMIC_VERIFY(false);
-    }
-
-    {
-        error_code e;
-        int i = e;  // error "cannot convert"
-    }
-
-    {
-        error_condition e;
-        int i = e; // error "cannot convert"
-    }
-
-#endif
 
     return 0;
 }
@@ -447,7 +415,6 @@ int main(void)
     RUN_TEST(test1);
     RUN_TEST(test2);
     RUN_TEST(test3);
-    RUN_TEST(test4);
     RUN_TEST(test5);
     RUN_TEST(test6);
     RUN_TEST(test7);
