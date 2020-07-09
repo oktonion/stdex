@@ -35,8 +35,8 @@
 class _system_error{
     ~_system_error() _STDEX_DELETED_FUNCTION;
     struct _hidden;
-    friend void make_error_code(_hidden);
-    friend void make_error_condition(_hidden);
+    friend void make_error_code(_hidden&){}
+    friend void make_error_condition(_hidden&){}
 };
 
 namespace stdex
