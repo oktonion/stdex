@@ -781,7 +781,7 @@ int test14()
 
         DYNAMIC_VERIFY(desired_dur >= intmax_type(25000));
         DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= intmax_type(25000));
-        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + intmax_type(2000)); // 2 sec is bullshit but better than nothing
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + intmax_type(2500)); // 2.5 sec is bullshit but better than nothing
     }
 
     return 0;
