@@ -851,11 +851,11 @@ namespace stdex
     {
         template<class _Tp>
         inline
-        error_code make_error_code(_Tp _val) { return ::make_error_code(_val); }
+        error_code make_error_code(_Tp _val) { return make_error_code(_val); }
 
         template<class _Tp>
         inline
-        error_condition make_error_condition(_Tp _val) { return ::make_error_condition(_val); }
+        error_condition make_error_condition(_Tp _val) { return make_error_condition(_val); }
     }
 } // namespace stdex
 
