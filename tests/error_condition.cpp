@@ -108,10 +108,10 @@ int test4()
     stdex::error_condition e2(stdex::errc::operation_not_supported);
     if (static_cast<bool>(e2))
     {
-        DYNAMIC_VERIFY( true );
+        return 0;
     }
 
-    return 0;
+    DYNAMIC_VERIFY( false );
 }
 
 
