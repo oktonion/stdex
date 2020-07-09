@@ -848,8 +848,6 @@ namespace stdex
     }
 } // namespace stdex
 
-static stdex::error_code make_error_code(struct _dummy_error_code&);
-static stdex::error_condition make_error_condition(struct _dummy_error_condition&);
 namespace stdex
 {
     namespace system_error_detail
