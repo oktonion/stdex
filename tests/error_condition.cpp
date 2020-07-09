@@ -10,6 +10,7 @@
 
 struct test_category : public stdex::error_category
 {
+    test_category() stdex_noexcept {}
     virtual const char*
     name() const stdex_noexcept
     {
