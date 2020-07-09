@@ -616,6 +616,17 @@ namespace thread_cpp_detail
 		enum {BILLION = 1000000000};
 		static void timespec_add(timespec &result, const timespec &in)
 		{
+			const stdex::time_t _ts_sec_max = 
+                std::numeric_limits<stdex::time_t>::max();
+			
+			if(result.tv_sec == _ts_sec_max || result.tv_sec < 0 ||
+				in.tv_sec == _ts_sec_max)
+			{
+				result.tv_sec = _ts_sec_max;
+				result.tv_nsec = BILLION - 1;
+				return;
+			}
+
 			timespec t2 = in;
 			if (result.tv_nsec >= BILLION) {
 				result.tv_nsec -= BILLION;
@@ -631,6 +642,16 @@ namespace thread_cpp_detail
 				result.tv_nsec -= BILLION;
 				result.tv_sec++;
 			}
+
+			if(result.tv_sec < 0)
+			{
+				result.tv_sec = 0;
+				result.tv_nsec = 0;
+			}
+			if(result.tv_nsec < 0)
+			{
+				result.tv_nsec = 0;
+			}
 		}
 		static int call(const timespec *req, timespec *rem)
 		{
@@ -638,7 +659,7 @@ namespace thread_cpp_detail
 
 			int err = ::clock_gettime(CLOCK_MONOTONIC, &tp);
 			if(err != 0)
-				return err;
+				return nanosleep<false>::call(req, rem);
 
 			timespec_add(tp, *req);
 			
