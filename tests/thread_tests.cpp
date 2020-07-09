@@ -778,9 +778,9 @@ int test14()
         std::cout << "std::duration is " << std_dur << " ms, stdex::duration is " << duration_cast<milliseconds>(dur).count() << " ms" << std::endl;
         std::cout << "std::desired is " << std_desired_dur << " ms, stdex::desired is " << desired_dur << " ms" << std::endl;
         #endif
-
+        
         DYNAMIC_VERIFY(desired_dur >= intmax_type(25000));
-        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= desired_dur && duration_cast<milliseconds>(dur).count() >= intmax_type(25000));
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= intmax_type(25000));
         DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + intmax_type(2000)); // 2 sec is bullshit but better than nothing
     }
 
