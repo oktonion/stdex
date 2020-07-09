@@ -606,10 +606,10 @@ struct dummy_functor{
     int operator()() {return 0;}
     void operator()(void*) {}
     void operator()(void*, int*) {}
-    void operator()(void*, double*, float*) {}
+    int operator()(void*, double*, float*) {}
     void operator()(struct dummy_func_4_t0*, struct dummy_func_4_t1*, struct dummy_func_4_t2*, struct dummy_func_4_t3*) {}
     void operator()(struct dummy_func_5_t0*, struct dummy_func_5_t1*, struct dummy_func_5_t2*, struct dummy_func_5_t3*, struct dummy_func_5_t4*) {}
-    void operator()(struct dummy_func_6_t0*, struct dummy_func_6_t1*, struct dummy_func_6_t2 const*, struct dummy_func_6_t3*, struct dummy_func_6_t4*, struct dummy_func_6_t5 const*) {}
+    float operator()(struct dummy_func_6_t0*, struct dummy_func_6_t1*, struct dummy_func_6_t2 const*, struct dummy_func_6_t3*, struct dummy_func_6_t4*, struct dummy_func_6_t5 const*) {}
     void operator()(struct dummy_func_7_t0*, struct dummy_func_7_t1*, struct dummy_func_7_t2 const*, struct dummy_func_7_t3*, struct dummy_func_7_t4*, struct dummy_func_7_t5 const*, struct dummy_func_7_t6 const*) {}
     void operator()(struct dummy_func_8_t0*, struct dummy_func_8_t1*, struct dummy_func_8_t2 const*, struct dummy_func_8_t3*, struct dummy_func_8_t4*, struct dummy_func_8_t5 const*, struct dummy_func_8_t6 const**, void*) {}
 
