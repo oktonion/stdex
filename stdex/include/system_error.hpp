@@ -1,192 +1,199 @@
 #ifndef _STDEX_SYSTEM_ERROR_H
 #define _STDEX_SYSTEM_ERROR_H
  
- #if _MSC_VER > 1000
- #pragma once
- #endif // _MSC_VER > 1000
- 
- // stdex includes
- #include "./type_traits.hpp" // stdex::enable_if
- 
- // POSIX includes
- /*none*/
- 
- // std includes
- #include <errno.h>
- #include <cerrno>
- #include <cstdlib>		// std::strerror
- #include <cstring>		// std::strerror
- #include <stdexcept>	// std::runtime_error
- #include <string> 		// std::string
- #include <functional>
- 
- #ifdef _STDEX_NATIVE_CPP11_SUPPORT
- 
- #define _STDEX_DELETED_FUNCTION =delete
- #define _STDEX_NOEXCEPT_FUNCTION noexcept
- 
- #else
- 
- #define _STDEX_DELETED_FUNCTION 
- #define _STDEX_NOEXCEPT_FUNCTION throw()
- 
- #endif 
- 
- namespace stdex
- {
-     struct errc
-     {
-         enum errc_t {	// names for generic error codes
- #ifdef EAFNOSUPPORT
-             address_family_not_supported = EAFNOSUPPORT,
- #else
-             address_family_not_supported = 102,
- #endif
- #ifdef EADDRINUSE
-             address_in_use = EADDRINUSE,
- #else
-             address_in_use = 100,
- #endif
- #ifdef EADDRNOTAVAIL
-             address_not_available = EADDRNOTAVAIL,
- #else
-             address_not_available = 101,
- #endif
- #ifdef EISCONN
-             already_connected = EISCONN,
- #else
-             already_connected = 113,
- #endif
-             argument_list_too_long = E2BIG,
-             argument_out_of_domain = EDOM,
-             bad_address = EFAULT,
-             bad_file_descriptor = EBADF,
- #ifdef EBADMSG
-             bad_message = EBADMSG,
- #else
-             bad_message = 103,
- #endif
-             broken_pipe = EPIPE,
- #ifdef ECONNABORTED
-             connection_aborted = ECONNABORTED,
- #else
-             connection_aborted = 106,
- #endif
- #ifdef EALREADY
-             connection_already_in_progress = EALREADY,
- #else
-             connection_already_in_progress = 103,
- #endif
- #ifdef ECONNREFUSED
-             connection_refused = ECONNREFUSED,
- #else
-             connection_refused = 107,
- #endif
- #ifdef ECONNRESET
-             connection_reset = ECONNRESET,
- #else
-             connection_reset = 108,
- #endif
-             cross_device_link = EXDEV,
- #ifdef EDESTADDRREQ
-             destination_address_required = EDESTADDRREQ,
- #else
-             destination_address_required = 109,
- #endif
-             device_or_resource_busy = EBUSY,
-             directory_not_empty = ENOTEMPTY,
-             executable_format_error = ENOEXEC,
-             file_exists = EEXIST,
-             file_too_large = EFBIG,
-             filename_too_long = ENAMETOOLONG,
- #ifdef ENOSYS
-             function_not_supported = ENOSYS,
- #else
-             function_not_supported = 40,
- #endif
- #ifdef EHOSTUNREACH
-             host_unreachable = EHOSTUNREACH,
- #else
-             host_unreachable = 110,
- #endif
- #ifdef EIDRM
-             identifier_removed = EIDRM,
- #else
-             identifier_removed = 111,
- #endif
- #ifdef EILSEQ
-             illegal_byte_sequence = EILSEQ,
- #else
-             illegal_byte_sequence = 42,
- #endif
-             inappropriate_io_control_operation = ENOTTY,
-             interrupted = EINTR,
-             invalid_argument = EINVAL,
-             invalid_seek = ESPIPE,
-             io_error = EIO,
-             is_a_directory = EISDIR,
- #ifdef EMSGSIZE
-             message_size = EMSGSIZE,
- #else
-             message_size = 115,
- #endif
- #ifdef ENETDOWN
-             network_down = ENETDOWN,
- #else
-             network_down = 116,
- #endif
- #ifdef ENETRESET
-             network_reset = ENETRESET,
- #else
-             network_reset = 117,
- #endif
- #ifdef ENETUNREACH
-             network_unreachable = ENETUNREACH,
- #else
-             network_unreachable = 118,
- #endif
- #ifdef ENOBUFS
-             no_buffer_space = ENOBUFS,
- #else
-             no_buffer_space = 119,
- #endif
-             no_child_process = ECHILD,
- #ifdef ENOLINK
-             no_link = ENOLINK,
- #else
-             no_link = 121,
- #endif
- #ifdef ENOLCK
-             no_lock_available = ENOLCK,
- #else
-             no_lock_available = 39,
- #endif
- #ifdef ENODATA
-             no_message_available = ENODATA,
- #else
-             no_message_available = 120,
- #endif
- #ifdef ENOMSG
-             no_message = ENOMSG,
- #else
-             no_message = 122,
- #endif
- #ifdef ENOPROTOOPT
-             no_protocol_option = ENOPROTOOPT,
- #else
-             no_protocol_option = 123,
- #endif
-             no_space_on_device = ENOSPC,
- #ifdef ENOSR
-             no_stream_resources = ENOSR,
- #else
-             no_stream_resources = 124,
- #endif
-             no_such_device_or_address = ENXIO,
-            no_such_device = ENODEV,
-            no_such_file_or_directory = ENOENT,
-            no_such_process = ESRCH,
-            not_a_directory = ENOTDIR,
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
+// stdex includes
+#include "./type_traits.hpp" // stdex::enable_if
+
+// POSIX includes
+/*none*/
+
+// std includes
+#include <errno.h>
+#include <cerrno>
+#include <cstdlib>		// std::strerror
+#include <cstring>		// std::strerror
+#include <stdexcept>	// std::runtime_error
+#include <string> 		// std::string
+#include <functional>
+
+#ifdef _STDEX_NATIVE_CPP11_SUPPORT
+
+#define _STDEX_DELETED_FUNCTION =delete
+#define _STDEX_NOEXCEPT_FUNCTION noexcept
+
+#else
+
+#define _STDEX_DELETED_FUNCTION 
+#define _STDEX_NOEXCEPT_FUNCTION throw()
+
+#endif 
+
+class _system_error{
+    ~_system_error() _STDEX_DELETED_FUNCTION;
+    struct _hidden;
+    friend void make_error_code(_hidden);
+    friend void make_error_condition(_hidden);
+};
+
+namespace stdex
+{
+    struct errc
+    {
+        enum errc_t {	// names for generic error codes
+#ifdef EAFNOSUPPORT
+            address_family_not_supported = EAFNOSUPPORT,
+#else
+            address_family_not_supported = 102,
+#endif
+#ifdef EADDRINUSE
+            address_in_use = EADDRINUSE,
+#else
+            address_in_use = 100,
+#endif
+#ifdef EADDRNOTAVAIL
+            address_not_available = EADDRNOTAVAIL,
+#else
+            address_not_available = 101,
+#endif
+#ifdef EISCONN
+            already_connected = EISCONN,
+#else
+            already_connected = 113,
+#endif
+            argument_list_too_long = E2BIG,
+            argument_out_of_domain = EDOM,
+            bad_address = EFAULT,
+            bad_file_descriptor = EBADF,
+#ifdef EBADMSG
+            bad_message = EBADMSG,
+#else
+            bad_message = 103,
+#endif
+            broken_pipe = EPIPE,
+#ifdef ECONNABORTED
+            connection_aborted = ECONNABORTED,
+#else
+            connection_aborted = 106,
+#endif
+#ifdef EALREADY
+            connection_already_in_progress = EALREADY,
+#else
+            connection_already_in_progress = 103,
+#endif
+#ifdef ECONNREFUSED
+            connection_refused = ECONNREFUSED,
+#else
+            connection_refused = 107,
+#endif
+#ifdef ECONNRESET
+            connection_reset = ECONNRESET,
+#else
+            connection_reset = 108,
+#endif
+            cross_device_link = EXDEV,
+#ifdef EDESTADDRREQ
+            destination_address_required = EDESTADDRREQ,
+#else
+            destination_address_required = 109,
+#endif
+            device_or_resource_busy = EBUSY,
+            directory_not_empty = ENOTEMPTY,
+            executable_format_error = ENOEXEC,
+            file_exists = EEXIST,
+            file_too_large = EFBIG,
+            filename_too_long = ENAMETOOLONG,
+#ifdef ENOSYS
+            function_not_supported = ENOSYS,
+#else
+            function_not_supported = 40,
+#endif
+#ifdef EHOSTUNREACH
+            host_unreachable = EHOSTUNREACH,
+#else
+            host_unreachable = 110,
+#endif
+#ifdef EIDRM
+            identifier_removed = EIDRM,
+#else
+            identifier_removed = 111,
+#endif
+#ifdef EILSEQ
+            illegal_byte_sequence = EILSEQ,
+#else
+            illegal_byte_sequence = 42,
+#endif
+            inappropriate_io_control_operation = ENOTTY,
+            interrupted = EINTR,
+            invalid_argument = EINVAL,
+            invalid_seek = ESPIPE,
+            io_error = EIO,
+            is_a_directory = EISDIR,
+#ifdef EMSGSIZE
+            message_size = EMSGSIZE,
+#else
+            message_size = 115,
+#endif
+#ifdef ENETDOWN
+            network_down = ENETDOWN,
+#else
+            network_down = 116,
+#endif
+#ifdef ENETRESET
+            network_reset = ENETRESET,
+#else
+            network_reset = 117,
+#endif
+#ifdef ENETUNREACH
+            network_unreachable = ENETUNREACH,
+#else
+            network_unreachable = 118,
+#endif
+#ifdef ENOBUFS
+            no_buffer_space = ENOBUFS,
+#else
+            no_buffer_space = 119,
+#endif
+            no_child_process = ECHILD,
+#ifdef ENOLINK
+            no_link = ENOLINK,
+#else
+            no_link = 121,
+#endif
+#ifdef ENOLCK
+            no_lock_available = ENOLCK,
+#else
+            no_lock_available = 39,
+#endif
+#ifdef ENODATA
+            no_message_available = ENODATA,
+#else
+            no_message_available = 120,
+#endif
+#ifdef ENOMSG
+            no_message = ENOMSG,
+#else
+            no_message = 122,
+#endif
+#ifdef ENOPROTOOPT
+            no_protocol_option = ENOPROTOOPT,
+#else
+            no_protocol_option = 123,
+#endif
+            no_space_on_device = ENOSPC,
+#ifdef ENOSR
+            no_stream_resources = ENOSR,
+#else
+            no_stream_resources = 124,
+#endif
+            no_such_device_or_address = ENXIO,
+        no_such_device = ENODEV,
+        no_such_file_or_directory = ENOENT,
+        no_such_process = ESRCH,
+        not_a_directory = ENOTDIR,
 #ifdef ENOTSOCK
             not_a_socket = ENOTSOCK,
 #else
@@ -460,6 +467,9 @@
         typename enable_if<detail::_or_<is_error_condition_enum<_ErrorCondEnum>, is_same<error_condition, _ErrorCondEnum> >::value, error_condition&>::type
             operator=(const _ErrorCondEnum& val) _STDEX_NOEXCEPT_FUNCTION
         {
+            using stdex::make_error_condition;
+            using ::make_error_condition;
+            
             return (*this = make_error_condition(val));
         }
 
@@ -533,6 +543,9 @@
         typename enable_if<detail::_or_<is_error_code_enum<_ErrorCodeEnum>, is_same<error_code, _ErrorCodeEnum> >::value, error_code&>::type
             operator=(const _ErrorCodeEnum& val) _STDEX_NOEXCEPT_FUNCTION
         {
+            using stdex::make_error_code;
+            using ::make_error_code;
+
             return (*this = make_error_code(val));
         }
 
