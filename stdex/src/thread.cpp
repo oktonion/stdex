@@ -580,10 +580,14 @@ namespace thread_cpp_detail
 	{
 		static int call(const timespec *req, timespec *rem)
 		{
+			errno = 0;
 			int err = ::nanosleep(req, rem);
 
 			if(err && (rem->tv_sec || rem->tv_nsec))
+			{
+				errno = 0;
 				err = ::nanosleep(rem, rem);
+			}
 			return err;
 		}
 	};
@@ -659,10 +663,11 @@ namespace thread_cpp_detail
 
 			int err = ::clock_gettime(CLOCK_MONOTONIC, &tp);
 			if(err != 0)
-				return nanosleep<false>::call(req, rem);
+				return nanosleep_impl1<false>::call(req, rem);
 
 			timespec_add(tp, *req);
 			
+			errno = 0;
 			err = ::clock_nanosleep(_STDEX_THREAD_CLOCK_MONOTONIC, TIMER_ABSTIME, &tp, rem);
 
 			return err;
