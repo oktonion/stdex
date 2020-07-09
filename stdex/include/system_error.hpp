@@ -376,12 +376,6 @@ namespace stdex
     {
         using stdex::make_error_code;
         using stdex::make_error_condition;
-
-        template<class _Tp>
-        error_code make_error_code(_Tp _val) { return ::make_error_code(_val); }
-
-        template<class _Tp>
-        error_condition make_error_condition(_Tp _val) { return ::make_error_condition(_val); }
     }
 
     class error_category;
@@ -851,6 +845,17 @@ namespace stdex
     inline const error_category& system_category() _STDEX_NOEXCEPT_FUNCTION
     {	// get system_category
         return (detail::_error_objects<int>::_system_object());
+    }
+
+    namespace system_error_detail
+    {
+        template<class _Tp>
+        inline
+        error_code make_error_code(_Tp _val) { return ::make_error_code(_val); }
+
+        template<class _Tp>
+        inline
+        error_condition make_error_condition(_Tp _val) { return ::make_error_condition(_val); }
     }
 } // namespace stdex
 
