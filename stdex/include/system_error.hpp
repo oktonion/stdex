@@ -429,6 +429,9 @@
         int _value;
         const error_category *_cat;
 
+        typedef void(*unspecified_bool_type)();
+        static void unspecified_bool_true() {}
+
     public:
         error_condition() _STDEX_NOEXCEPT_FUNCTION: 
             _value(0), 
@@ -475,9 +478,6 @@
             return category().message(value());
         }
 
-        typedef void(*unspecified_bool_type)();
-        static void unspecified_bool_true() {}
-
         operator unspecified_bool_type() const _STDEX_NOEXCEPT_FUNCTION  // true if error
         {
             return _value == 0 ? 0 : unspecified_bool_true;
@@ -495,6 +495,9 @@
 
         int _value;
         const error_category *_cat;
+
+        typedef void(*unspecified_bool_type)();
+        static void unspecified_bool_true() {}
 
     public:
         error_code() _STDEX_NOEXCEPT_FUNCTION: 
@@ -543,9 +546,6 @@
         {
             return category().message(value());
         }
-
-        typedef void(*unspecified_bool_type)();
-        static void unspecified_bool_true() {}
 
         operator unspecified_bool_type() const  _STDEX_NOEXCEPT_FUNCTION // true if error
         {
