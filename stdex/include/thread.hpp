@@ -1755,7 +1755,7 @@ namespace stdex
             timespec _ts;
 
             const stdex::time_t _ts_sec_max = 
-                std::numeric_limits<stdex::time_t>::max();
+                (std::numeric_limits<stdex::time_t>::max)();
             if (_s_count < _ts_sec_max)
             {
                 _ts.tv_sec = static_cast<stdex::time_t>(_s_count > 0 ? _s_count : 0);
