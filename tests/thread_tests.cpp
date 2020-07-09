@@ -413,26 +413,6 @@ int test6()
     return 0;
 }
 
-int test7()
-{
-    using namespace stdex;
-
-#if CHECK_FOR_COMPILE_ERROR_TESTS == 1
-		{
-			typedef thread test_type;
-			test_type t1;
-			test_type t2;
-			t1 = t2;
-		}
-
-		{
-			typedef thread test_type;
-			test_type t1;
-			test_type t2(t1);
-		}
-#endif
-    return 0;
-}
 
 int test_thread_id()
 {
@@ -512,7 +492,7 @@ int test9()
     return 0;
 }
 
-#define CHECK_FOR_THROW_EVENTS 1
+//#define CHECK_FOR_THROW_EVENTS 1
 
 int test10()
 {
@@ -805,7 +785,6 @@ int main(void)
         RUN_TEST(test4);
         RUN_TEST(test5);
         RUN_TEST(test6);
-        RUN_TEST(test7);
         RUN_TEST(test8);
         RUN_TEST(test9);
         RUN_TEST(test10);
