@@ -492,7 +492,7 @@ int test9()
     return 0;
 }
 
-//#define CHECK_FOR_THROW_EVENTS 1
+#define CHECK_FOR_THROW_EVENTS 1
 
 int test10()
 {
