@@ -57,23 +57,31 @@ namespace stdex
     : public true_type { };
 }
 
+std::string get_name(const stdex::error_category& ec)
+{
+  return ec.name();
+}
+
 int test1()
 {
   // 1
   stdex::error_condition e1;
   DYNAMIC_VERIFY( e1.value() == 0 );
   DYNAMIC_VERIFY( e1.category() == stdex::generic_category() );
+  DYNAMIC_VERIFY( e1.category().name() == get_name(stdex::generic_category()) );
 
   // 2
   const test_category cat;
   stdex::error_condition e2(e1.value(), cat);
   DYNAMIC_VERIFY( e2.value() == e1.value() );
   DYNAMIC_VERIFY( e2.category() == cat );
+  DYNAMIC_VERIFY( e2.category().name() == get_name(cat) );
 
   // 3
   stdex::error_condition e3(stdex::errc::operation_not_supported);
   DYNAMIC_VERIFY( e3.value() == int(stdex::errc::operation_not_supported) );
   DYNAMIC_VERIFY( e3.category() == stdex::generic_category() );
+  DYNAMIC_VERIFY( e3.category().name() == get_name(stdex::generic_category()) );
 
   return 0;
 }
