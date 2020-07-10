@@ -368,13 +368,11 @@ namespace stdex
     class error_code;
     class error_condition;
 
-    namespace hidden
-    {
-        error_code make_error_code(errc::errc_t) _STDEX_NOEXCEPT_FUNCTION;
-        error_code make_error_code(io_errc) _STDEX_NOEXCEPT_FUNCTION;
-        error_condition make_error_condition(errc::errc_t) _STDEX_NOEXCEPT_FUNCTION;
-        error_condition make_error_condition(io_errc) _STDEX_NOEXCEPT_FUNCTION;
-    }
+
+    error_code make_error_code(errc::errc_t) _STDEX_NOEXCEPT_FUNCTION;
+    error_code make_error_code(io_errc) _STDEX_NOEXCEPT_FUNCTION;
+    error_condition make_error_condition(errc::errc_t) _STDEX_NOEXCEPT_FUNCTION;
+    error_condition make_error_condition(io_errc) _STDEX_NOEXCEPT_FUNCTION;
 
     class error_category;
 
@@ -382,18 +380,29 @@ namespace stdex
     const error_category& iostream_category() _STDEX_NOEXCEPT_FUNCTION;
     const error_category& system_category() _STDEX_NOEXCEPT_FUNCTION;
 
+} // namespace stdex
 
-    namespace ADL
+// this is used for compilers that fail to ADL properly for functions in global namespace
+// looks ugly but is doing its job
+namespace _stdex_ADL
+{
+    template<class _Tp>
+    inline
+    static stdex::error_code _make_error_code(_Tp _val) 
     {
-        template<class _Tp>
-        inline
-        static error_code _make_error_code(_Tp _val);
+        return make_error_code(_val);
+    }
 
-        template<class _Tp>
-        inline
-        static error_condition _make_error_condition(_Tp _val);
-    } // namespace ADL
+    template<class _Tp>
+    inline
+    static stdex::error_condition _make_error_condition(_Tp _val) 
+    {
+        return make_error_condition(_val);
+    }
+} // namespace _stdex_ADL
 
+namespace stdex
+{
     class error_category
     {
     public:
@@ -476,7 +485,7 @@ namespace stdex
         typename enable_if<detail::_or_<is_error_condition_enum<_ErrorCondEnum>, is_same<error_condition, _ErrorCondEnum> >::value, error_condition&>::type
             operator=(const _ErrorCondEnum& val) _STDEX_NOEXCEPT_FUNCTION
         {   
-            return (*this = ADL::_make_error_condition(val));
+            return (*this = _stdex_ADL::_make_error_condition(val));
         }
 
         void clear() _STDEX_NOEXCEPT_FUNCTION
@@ -548,7 +557,7 @@ namespace stdex
         typename enable_if<detail::_or_<is_error_code_enum<_ErrorCodeEnum>, is_same<error_code, _ErrorCodeEnum> >::value, error_code&>::type
             operator=(const _ErrorCodeEnum& val) _STDEX_NOEXCEPT_FUNCTION
         {
-            return (*this = ADL::_make_error_code(val));
+            return (*this = _stdex_ADL::_make_error_code(val));
         }
 
         int value() const _STDEX_NOEXCEPT_FUNCTION { return _value; }
@@ -854,25 +863,6 @@ namespace stdex
     {	// get system_category
         return (detail::_error_objects<int>::_system_object());
     }
-
-    using namespace hidden;
-
-    namespace ADL
-    {
-        template<class _Tp>
-        inline
-        static error_code _make_error_code(_Tp _val) 
-        {
-            return make_error_code(_val);
-        }
-
-        template<class _Tp>
-        inline
-        static error_condition _make_error_condition(_Tp _val) 
-        {
-            return make_error_condition(_val);
-        }
-    } // namespace ADL
 
 } // namespace stdex
 
