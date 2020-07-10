@@ -10,10 +10,10 @@
 
 namespace test
 {
-  using std::system_error;
-  using std::error_code;
-  using std::error_category;
-  using std::system_category;
+  using stdex::system_error;
+  using stdex::error_code;
+  using stdex::error_category;
+  using stdex::system_category;
 }
 
 struct test_category : public stdex::error_category
