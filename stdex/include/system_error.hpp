@@ -383,7 +383,7 @@ namespace stdex
     const error_category& system_category() _STDEX_NOEXCEPT_FUNCTION;
 
 
-    /*namespace ADL
+    namespace ADL
     {
         template<class _Tp>
         inline
@@ -392,7 +392,7 @@ namespace stdex
         template<class _Tp>
         inline
         stdex::error_condition _make_error_condition(_Tp _val);
-    }*/ // namespace ADL
+    } // namespace ADL
 
     class error_category
     {
