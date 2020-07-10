@@ -367,15 +367,13 @@ namespace stdex
 
     class error_code;
     class error_condition;
-    error_code make_error_code(errc::errc_t) _STDEX_NOEXCEPT_FUNCTION;
-    error_code make_error_code(io_errc) _STDEX_NOEXCEPT_FUNCTION;
-    error_condition make_error_condition(errc::errc_t) _STDEX_NOEXCEPT_FUNCTION;
-    error_condition make_error_condition(io_errc) _STDEX_NOEXCEPT_FUNCTION;
 
-    namespace system_error_detail
+    namespace hidden
     {
-        using stdex::make_error_code;
-        using stdex::make_error_condition;
+        error_code make_error_code(errc::errc_t) _STDEX_NOEXCEPT_FUNCTION;
+        error_code make_error_code(io_errc) _STDEX_NOEXCEPT_FUNCTION;
+        error_condition make_error_condition(errc::errc_t) _STDEX_NOEXCEPT_FUNCTION;
+        error_condition make_error_condition(io_errc) _STDEX_NOEXCEPT_FUNCTION;
     }
 
     class error_category;
@@ -383,6 +381,18 @@ namespace stdex
     const error_category& generic_category() _STDEX_NOEXCEPT_FUNCTION;
     const error_category& iostream_category() _STDEX_NOEXCEPT_FUNCTION;
     const error_category& system_category() _STDEX_NOEXCEPT_FUNCTION;
+
+
+    /*namespace ADL
+    {
+        template<class _Tp>
+        inline
+        stdex::error_code _make_error_code(_Tp _val);
+
+        template<class _Tp>
+        inline
+        stdex::error_condition _make_error_condition(_Tp _val);
+    }*/ // namespace ADL
 
     class error_category
     {
@@ -465,10 +475,8 @@ namespace stdex
         template<class _ErrorCondEnum>
         typename enable_if<detail::_or_<is_error_condition_enum<_ErrorCondEnum>, is_same<error_condition, _ErrorCondEnum> >::value, error_condition&>::type
             operator=(const _ErrorCondEnum& val) _STDEX_NOEXCEPT_FUNCTION
-        {
-            using namespace system_error_detail;
-            
-            return (*this = make_error_condition(val));
+        {   
+            return (*this = ADL::_make_error_condition(val));
         }
 
         void clear() _STDEX_NOEXCEPT_FUNCTION
@@ -536,14 +544,11 @@ namespace stdex
             assign(0, system_category());
         }
 
-
         template<class _ErrorCodeEnum>
         typename enable_if<detail::_or_<is_error_code_enum<_ErrorCodeEnum>, is_same<error_code, _ErrorCodeEnum> >::value, error_code&>::type
             operator=(const _ErrorCodeEnum& val) _STDEX_NOEXCEPT_FUNCTION
         {
-            using namespace system_error_detail;
-
-            return (*this = make_error_code(val));
+            return (*this = ADL::_make_error_code(val));
         }
 
         int value() const _STDEX_NOEXCEPT_FUNCTION { return _value; }
@@ -712,26 +717,29 @@ namespace stdex
         return (!(_lhs == _rhs));
     }
 
-    // FUNCTION make_error_code
-    inline error_code make_error_code(errc::errc_t _Errno) _STDEX_NOEXCEPT_FUNCTION
-    {	// make an error_code
-        return (error_code((int) _Errno, generic_category()));
-    }
+    namespace hidden
+    {
+        // FUNCTION make_error_code
+        inline error_code make_error_code(errc::errc_t _Errno) _STDEX_NOEXCEPT_FUNCTION
+        {	// make an error_code
+            return (error_code((int) _Errno, generic_category()));
+        }
 
-    inline error_code make_error_code(io_errc _Errno) _STDEX_NOEXCEPT_FUNCTION
-    {	// make an error_code
-        return (error_code((int) _Errno, iostream_category()));
-    }
+        inline error_code make_error_code(io_errc _Errno) _STDEX_NOEXCEPT_FUNCTION
+        {	// make an error_code
+            return (error_code((int) _Errno, iostream_category()));
+        }
 
-    // FUNCTION make_error_condition
-    inline error_condition make_error_condition(errc::errc_t _Errno) _STDEX_NOEXCEPT_FUNCTION
-    {	// make an error_condition
-        return (error_condition((int) _Errno, generic_category()));
-    }
+        // FUNCTION make_error_condition
+        inline error_condition make_error_condition(errc::errc_t _Errno) _STDEX_NOEXCEPT_FUNCTION
+        {	// make an error_condition
+            return (error_condition((int) _Errno, generic_category()));
+        }
 
-    inline error_condition make_error_condition(io_errc _Errno) _STDEX_NOEXCEPT_FUNCTION
-    {	// make an error_condition
-        return (error_condition((int) _Errno, iostream_category()));
+        inline error_condition make_error_condition(io_errc _Errno) _STDEX_NOEXCEPT_FUNCTION
+        {	// make an error_condition
+            return (error_condition((int) _Errno, iostream_category()));
+        }
     }
 
     namespace detail
@@ -846,21 +854,30 @@ namespace stdex
     {	// get system_category
         return (detail::_error_objects<int>::_system_object());
     }
+
+    namespace ADL
+    {
+        template<class _Tp>
+        inline
+        static stdex::error_code _make_error_code(_Tp _val) 
+        {
+            return make_error_code(_val);
+        }
+
+        template<class _Tp>
+        inline
+        static stdex::error_condition _make_error_condition(_Tp _val) 
+        {
+            return make_error_condition(_val);
+        }
+    } // namespace ADL
+
 } // namespace stdex
 
 namespace stdex
 {
-    namespace system_error_detail
-    {
-        template<class _Tp>
-        inline
-        error_code make_error_code(_Tp _val, ...) { return ::make_error_code(_val); }
-
-        template<class _Tp>
-        inline
-        error_condition make_error_condition(_Tp _val, ...) { return ::make_error_condition(_val); }
-    }
-} // namespace stdex
+    using namespace hidden;
+}
 
 #undef _STDEX_DELETED_FUNCTION
 #undef _STDEX_NOEXCEPT_FUNCTION
