@@ -33,10 +33,18 @@ struct test_category : public stdex::error_category
     }
 };
 
+std::string get_name(const stdex::error_category& ec)
+{
+  return ec.name();
+}
+
 int test1()
 {
   test_category c1;
   test_derived_category c2;
+
+  DYNAMIC_VERIFY(get_name(c1) == c1.name());
+  DYNAMIC_VERIFY(get_name(c2) == c2.name());
 
   return 0;
 }
