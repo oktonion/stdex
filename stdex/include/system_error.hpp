@@ -387,11 +387,11 @@ namespace stdex
     {
         template<class _Tp>
         inline
-        stdex::error_code _make_error_code(_Tp _val);
+        static error_code _make_error_code(_Tp _val);
 
         template<class _Tp>
         inline
-        stdex::error_condition _make_error_condition(_Tp _val);
+        static error_condition _make_error_condition(_Tp _val);
     } // namespace ADL
 
     class error_category
@@ -861,14 +861,14 @@ namespace stdex
     {
         template<class _Tp>
         inline
-        static stdex::error_code _make_error_code(_Tp _val) 
+        static error_code _make_error_code(_Tp _val) 
         {
             return make_error_code(_val);
         }
 
         template<class _Tp>
         inline
-        static stdex::error_condition _make_error_condition(_Tp _val) 
+        static error_condition _make_error_condition(_Tp _val) 
         {
             return make_error_condition(_val);
         }
