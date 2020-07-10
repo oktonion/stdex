@@ -382,6 +382,25 @@ namespace stdex
 
 } // namespace stdex
 
+// '_stdex_ADL' namespace is used for compilers that have bugged ADL:
+// like failing miserably to see other function overloads 
+// with 'using' directive or functions in global namespace.
+// 
+// Usage: we hide there wrapper functions that trigger ADL "properly".
+// 
+// Looks ugly, pollutes global namespace with extra symbol but  
+// g e t s  j o b  d o n e
+namespace _stdex_ADL
+{
+    template<class _Tp>
+    inline
+    static stdex::error_code _make_error_code(_Tp);
+
+    template<class _Tp>
+    inline
+    static stdex::error_condition _make_error_condition(_Tp);
+} // namespace _stdex_ADL
+
 namespace stdex
 {
     class error_category
@@ -847,9 +866,6 @@ namespace stdex
 
 } // namespace stdex
 
-// this namespace is used for compilers that fail the ADL for functions in global namespace
-// we hide there wrapper functions that trigger ADL
-// looks ugly but gets job done
 namespace _stdex_ADL
 {
     template<class _Tp>
