@@ -91,6 +91,7 @@ int test2()
 {
   stdex::error_condition ec1(my_err);
   DYNAMIC_VERIFY( ec1 == make_error_condition(my_err) );
+  DYNAMIC_VERIFY( ec1.category().name() == get_name(my_error_category_instance) );
   return 0;
 }
 
