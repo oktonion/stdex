@@ -19,7 +19,7 @@ struct ConvType
 
 class PolymorphicClass
 {
-	virtual int func() { return 0; }
+	virtual int func();
 };
 
 class DerivedPolymorphic : PolymorphicClass {};
