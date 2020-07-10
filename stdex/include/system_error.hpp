@@ -855,6 +855,8 @@ namespace stdex
         return (detail::_error_objects<int>::_system_object());
     }
 
+    using namespace hidden;
+
     namespace ADL
     {
         template<class _Tp>
@@ -873,11 +875,6 @@ namespace stdex
     } // namespace ADL
 
 } // namespace stdex
-
-namespace stdex
-{
-    using namespace hidden;
-}
 
 #undef _STDEX_DELETED_FUNCTION
 #undef _STDEX_NOEXCEPT_FUNCTION
