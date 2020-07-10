@@ -382,25 +382,6 @@ namespace stdex
 
 } // namespace stdex
 
-// this is used for compilers that fail to ADL properly for functions in global namespace
-// looks ugly but is doing its job
-namespace _stdex_ADL
-{
-    template<class _Tp>
-    inline
-    static stdex::error_code _make_error_code(_Tp _val) 
-    {
-        return make_error_code(_val);
-    }
-
-    template<class _Tp>
-    inline
-    static stdex::error_condition _make_error_condition(_Tp _val) 
-    {
-        return make_error_condition(_val);
-    }
-} // namespace _stdex_ADL
-
 namespace stdex
 {
     class error_category
@@ -865,6 +846,26 @@ namespace stdex
     }
 
 } // namespace stdex
+
+// this namespace is used for compilers that fail the ADL for functions in global namespace
+// we hide there wrapper functions that trigger ADL
+// looks ugly but gets job done
+namespace _stdex_ADL
+{
+    template<class _Tp>
+    inline
+    static stdex::error_code _make_error_code(_Tp _val) 
+    {
+        return make_error_code(_val);
+    }
+
+    template<class _Tp>
+    inline
+    static stdex::error_condition _make_error_condition(_Tp _val) 
+    {
+        return make_error_condition(_val);
+    }
+} // namespace _stdex_ADL
 
 #undef _STDEX_DELETED_FUNCTION
 #undef _STDEX_NOEXCEPT_FUNCTION
