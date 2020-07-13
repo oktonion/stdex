@@ -479,6 +479,7 @@
              }
  
 	         duration& operator%=(
+                 typename
                  conditional<
                     treat_as_floating_point<_Rep>::value == bool(false),
                     const _Rep &,
@@ -491,6 +492,7 @@
              }
 
 	         duration& operator%=(
+                 typename
                  conditional<
                     treat_as_floating_point<_Rep>::value == bool(false),
                     const duration &,
