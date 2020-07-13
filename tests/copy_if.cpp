@@ -8,7 +8,7 @@
 
 #define THROW_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; throw(__LINE__);}
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
-#define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
+#define RUN_TEST(test) {std::cout << #test << std::endl; X line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
 
 template<class T>
   struct BoundsContainer
@@ -28,7 +28,7 @@ struct OutputContainer : public BoundsContainer<T>
     : BoundsContainer<T>(_first, _last), incrementedto(_first)
     {
 writtento = new bool[this->last - this->first];
-for(int i = 0; i < this->last - this->first; i++)
+for(X i = 0; i < this->last - this->first; i++)
     writtento[i] = false;
     }
 
@@ -113,7 +113,7 @@ public:
   }
 
   void
-  operator++(int)
+  operator++(X)
   {
     ++*this;
   }
@@ -190,7 +190,7 @@ struct output_iterator_wrapper
     }
 
     output_iterator_wrapper
-    operator++(int)
+    operator++(X)
     {
         output_iterator_wrapper<T> tmp = *this;
         ++*this;
@@ -230,8 +230,34 @@ test2(input_iterator_wrapper<X>& begin,
       output_iterator_wrapper<Z>& output)
 { return stdex::copy_if(begin, end, output, pred_obj()); }
 
-int 
+int
 main()
 {
+  X x;
+  Z z;
+  OutputContainer<Z> cont_z = OutputContainer<Z>(&z, &z);
+  OutputContainer<X> cont_x = OutputContainer<X>(&x, &x);
+  WritableObject<X> obj1 = WritableObject<X>(&x, &cont_x), obj2 = obj1;
+  BoundsContainer<X> bcont = BoundsContainer<X>(&x, &x);
+  (void)(&x);
+  (void)(&z);
+  (void)(&cont_x);
+  (void)(&cont_z);
+  (void)(&obj1);
+  (void)(&obj2);
+  (void)(&bcont);
+  obj2 = obj1;
+
+
+  output_iterator_wrapper<Z> owr = output_iterator_wrapper<Z>(&z, &cont_z);
+  input_iterator_wrapper<X> iwr = input_iterator_wrapper<X>(&x, &bcont);
+  owr++;
+  iwr++;
+  (void)(&owr);
+  (void)(&iwr);
+
+  test1(iwr, iwr, owr);
+  test2(iwr, iwr, owr);
+
   return 0;
 }
