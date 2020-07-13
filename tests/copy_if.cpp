@@ -10,6 +10,15 @@
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; X line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
 
+struct X { };
+
+struct Z
+{
+  Z&
+  operator=(const X&)
+  { return *this; }
+};
+
 template<class T>
   struct BoundsContainer
   {
@@ -198,14 +207,7 @@ struct output_iterator_wrapper
     }
 };
 
-struct X { };
 
-struct Z
-{
-  Z&
-  operator=(const X&)
-  { return *this; }
-};
 
 bool
 pred_function(const X&)
