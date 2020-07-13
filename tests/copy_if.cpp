@@ -20,29 +20,30 @@ struct Z
 };
 
 template<class T>
-  struct BoundsContainer
-  {
-    T* first;
-    T* last;
-    BoundsContainer(T* _first, T* _last) : first(_first), last(_last)
-    { }
+struct BoundsContainer
+{
+  T* first;
+  T* last;
+
+  BoundsContainer(T* _first, T* _last) : first(_first), last(_last)
+  { }
+
+  std::size_t size() const { return last - first; }
 };
 
 template<class T>
 struct OutputContainer : public BoundsContainer<T>
 {
-    T* incrementedto;
-    bool* writtento;
-    OutputContainer(T* _first, T* _last)
-    : BoundsContainer<T>(_first, _last), incrementedto(_first)
-    {
-writtento = new bool[this->last - this->first];
-for(X i = 0; i < this->last - this->first; i++)
-    writtento[i] = false;
-    }
+  T* incrementedto;
+  bool* writtento;
 
-    ~OutputContainer()
-    { delete[] writtento; }
+  OutputContainer(T* _first, T* _last)
+  : BoundsContainer<T>(_first, _last), incrementedto(_first),
+  writtento(new bool[this->size()])
+  { }
+
+  ~OutputContainer()
+  { delete[] writtento; }
 };
 
 namespace type_traits
@@ -122,7 +123,7 @@ public:
   }
 
   void
-  operator++(X)
+  operator++(int)
   {
     ++*this;
   }
@@ -135,23 +136,22 @@ private:
 template<class T>
 class WritableObject
 {
-    T* ptr;
+  T* ptr;
 
 public:
-    OutputContainer<T>* SharedInfo;
-    WritableObject(T* ptr_in,OutputContainer<T>* SharedInfo_in):
-    ptr(ptr_in), SharedInfo(SharedInfo_in)
-    { }
+  OutputContainer<T>* SharedInfo;
 
-    template<class U>
-    void
-    operator=(const U& new_val)
-    {
-        THROW_VERIFY((SharedInfo->writtento[ptr - SharedInfo->first] == 0));
-        SharedInfo->writtento[ptr - SharedInfo->first] = 1;
-        *ptr = new_val;
-    }
-
+  WritableObject(T* ptr_in, OutputContainer<T>* SharedInfo_in):
+  ptr(ptr_in), SharedInfo(SharedInfo_in)
+  { }
+  template<class U>
+  void
+  operator=(const U& new_val)
+  {
+    assert(SharedInfo->writtento[ptr - SharedInfo->first] == 0);
+    SharedInfo->writtento[ptr - SharedInfo->first] = 1;
+    *ptr = new_val;
+  }
 };
 
 template<class T>
@@ -199,7 +199,7 @@ struct output_iterator_wrapper
     }
 
     output_iterator_wrapper
-    operator++(X)
+    operator++(int)
     {
         output_iterator_wrapper<T> tmp = *this;
         ++*this;
