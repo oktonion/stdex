@@ -10,7 +10,7 @@
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; X line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
 
-struct X { X(int){}};
+struct X {};
 
 struct Z
 {
@@ -235,12 +235,12 @@ test2(input_iterator_wrapper<X>& begin,
 int
 main()
 {
-  X x(0);
-  Z z;
-  OutputContainer<Z> cont_z = OutputContainer<Z>(&z, &z);
-  OutputContainer<X> cont_x = OutputContainer<X>(&x, &x);
-  WritableObject<X> obj1 = WritableObject<X>(&x, &cont_x), obj2 = obj1;
-  BoundsContainer<X> bcont = BoundsContainer<X>(&x, &x);
+  X x[2];
+  Z z[2];
+  OutputContainer<Z> cont_z = OutputContainer<Z>(&z[0], &z[1]);
+  OutputContainer<X> cont_x = OutputContainer<X>(&x[0], &x[1]);
+  WritableObject<X> obj1 = WritableObject<X>(&x[0], &cont_x), obj2 = obj1;
+  BoundsContainer<X> bcont = BoundsContainer<X>(&x[0], &x[1]);
   (void)(&x);
   (void)(&z);
   (void)(&cont_x);
@@ -251,8 +251,8 @@ main()
   obj2 = obj1;
 
 
-  output_iterator_wrapper<Z> owr = output_iterator_wrapper<Z>(&z, &cont_z);
-  input_iterator_wrapper<X> iwr = input_iterator_wrapper<X>(&x, &bcont);
+  output_iterator_wrapper<Z> owr = output_iterator_wrapper<Z>(&z[0], &cont_z);
+  input_iterator_wrapper<X> iwr = input_iterator_wrapper<X>(&x[0], &bcont);
   owr++;
   iwr++;
   (void)(&owr);
