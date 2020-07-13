@@ -10,7 +10,7 @@
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; X line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
 
-struct X { };
+struct X { X(int){}};
 
 struct Z
 {
@@ -235,7 +235,7 @@ test2(input_iterator_wrapper<X>& begin,
 int
 main()
 {
-  X x;
+  X x(0);
   Z z;
   OutputContainer<Z> cont_z = OutputContainer<Z>(&z, &z);
   OutputContainer<X> cont_x = OutputContainer<X>(&x, &x);
