@@ -199,7 +199,7 @@ test5()
   int i[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
   bool result = stdex::is_partitioned(i, i + 10, pred());
   DYNAMIC_VERIFY( result );
-  std::cout << count << "should be " << "10" << std::endl;
+  std::cout << count << " should be " << "10" << std::endl;
   DYNAMIC_VERIFY( count == 10 );
 
   return 0;
