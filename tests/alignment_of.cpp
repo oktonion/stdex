@@ -102,6 +102,13 @@ int align_of_test()
 int main(void)
 {
     using namespace stdex;
+
+    {
+       empty_UDT dummy1, dummy2 = dummy1;
+       dummy2 = dummy1;
+       if(dummy1 == dummy2)
+         dummy1 = dummy2;
+    }
     
     RUN_TEST(align_of_test);
     return 0;

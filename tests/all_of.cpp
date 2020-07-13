@@ -160,9 +160,9 @@ int test1()
     Container con(array, array);
     DYNAMIC_VERIFY( stdex::all_of(con.begin(), con.end(), predicate) );
   }
-  catch(int line)
+  catch(...)
   {
-    return line;
+    DYNAMIC_VERIFY(false);
   }
 
   return 0;
@@ -175,9 +175,9 @@ int test2()
     Container con(array, array + 1);
     DYNAMIC_VERIFY( stdex::all_of(con.begin(), con.end(), predicate) );
   }
-  catch(int line)
+  catch(...)
   {
-    return line;
+    DYNAMIC_VERIFY(false);
   }
 
    return 0;
@@ -190,9 +190,9 @@ int test3()
     Container con(array, array + 6);
     DYNAMIC_VERIFY( !stdex::all_of(con.begin(), con.end(), predicate) );
   }
-  catch(int line)
+  catch(...)
   {
-    return line;
+    DYNAMIC_VERIFY(false);
   }
 
   return 0;
