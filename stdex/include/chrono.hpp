@@ -375,6 +375,7 @@
              _Rep _r;
  
              typedef intern::chrono_asserts check;
+             struct _disabled;
  
              typedef typename check::rep_cannot_be_a_duration_assert< (detail::_is_duration<_Rep>::value == bool(false)) >::
                  rep_cannot_be_a_duration_assert_failed
@@ -477,13 +478,25 @@
                  return (*this);
              }
  
-             duration& operator%=(const _Rep &_r_in)
+	         duration& operator%=(
+                 conditional<
+                    treat_as_floating_point<_Rep>::value == bool(false),
+                    const _Rep &,
+                    _disabled&
+                >::type _r_in
+             )
              {	// modulus rep by r
                  _r %= _r_in;
                  return (*this);
              }
- 
-             duration& operator%=(const duration &other)
+
+	         duration& operator%=(
+                 conditional<
+                    treat_as_floating_point<_Rep>::value == bool(false),
+                    const duration &,
+                    _disabled&
+                >::type other
+             )
              {	// modulus rep by other
                  _r %= other.count();
                  return (*this);
