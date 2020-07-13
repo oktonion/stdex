@@ -152,11 +152,11 @@ int test6()
   DYNAMIC_VERIFY( !(e1 < e1) );
   DYNAMIC_VERIFY( !(e2 < e2) );
 
-  DYNAMIC_VERIFY( (e1.value() < e2.value()) );
-  DYNAMIC_VERIFY( !(e2.value() < e1.value()) );
+  DYNAMIC_VERIFY( (e1.value() < e2.value()) || (e1.category() < e2.category()) );
   DYNAMIC_VERIFY( (e1 < e2) );
   DYNAMIC_VERIFY( !(e2 < e1) );
-  DYNAMIC_VERIFY( (e1 < e2) == (e1.value() < e2.value()) );
+  if( !(e1.category() < e2.category()) )
+    DYNAMIC_VERIFY( (e1 < e2) == (e1.value() < e2.value()) );
 
   const test_category cat;
   stdex::error_code e3(e2.value(), cat);
