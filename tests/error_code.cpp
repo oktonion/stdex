@@ -142,7 +142,7 @@ int test6()
   stdex::error_code e1;
   stdex::error_code e2(stdex::make_error_code(stdex::errc::operation_not_supported));
 
-  if(stdex::errc::operation_not_supported < 0)
+  if( stdex::errc::operation_not_supported < 0 || !(e1.category() < e2.category()) )
   {
     stdex::error_code tmp = e1;
     e1 = e2;
