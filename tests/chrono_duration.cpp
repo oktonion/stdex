@@ -104,6 +104,14 @@ namespace stdex
 	{
 		typedef typename common_type<T, U>::type type;
 	};
+
+    namespace chrono
+    {    
+        template<typename T>
+        struct treat_as_floating_point<type_emulator<T> >
+        : is_floating_point<T>
+        { };
+    }
 }
 typedef type_emulator<int> int_emulator;
 typedef type_emulator<double> dbl_emulator;
@@ -140,7 +148,7 @@ int main(void)
         DYNAMIC_VERIFY(d6.count() == 3);
     }
 
-    /*{
+    {
         duration<int> d0(12);
         duration<int> d1(3);
         int i = 3;
@@ -162,7 +170,7 @@ int main(void)
 
         int j = d0 / d1;
         DYNAMIC_VERIFY(j == 4);
-    }*/
+    }
 
     {
         chrono::duration<long, ratio_divide<kilo, milli> >   d1;
@@ -300,6 +308,6 @@ int main(void)
         duration<double> d(3.5);
         duration<int> i = d;
     }
-    
+
     return 0;
 }
