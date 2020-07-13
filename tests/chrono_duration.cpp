@@ -304,10 +304,5 @@ int main(void)
         STATIC_ASSERT((treat_as_floating_point<duration<int, micro>::rep>::value == (false)), shoud_not_be_floating_point);
     }
 
-    {
-        duration<double> d(3.5);
-        duration<int> i = d;
-    }
-
     return 0;
 }
