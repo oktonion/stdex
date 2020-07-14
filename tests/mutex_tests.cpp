@@ -257,6 +257,32 @@ namespace mutex_tests
 
 int main(void)
 {
+    {
+        // require
+
+        typedef stdex::mutex                  mutex;
+        typedef stdex::timed_mutex            timed_mutex;
+        typedef stdex::recursive_mutex        recursive_mutex;
+        typedef stdex::recursive_timed_mutex  recursive_timed_mutex;
+        typedef stdex::lock_guard<mutex>      lock_guard;
+        typedef stdex::unique_lock<mutex>     unique_lock;
+        //typedef stdex::scoped_lock<mutex>     scoped_lock; // c++ 17 - ni
+        
+        typedef stdex::defer_lock_t           defer_lock_t;
+        typedef stdex::try_to_lock_t          try_to_lock_t;
+        typedef stdex::adopt_lock_t           adopt_lock_t;
+        
+        using stdex::defer_lock;
+        using stdex::try_to_lock;
+        using stdex::adopt_lock;
+        
+        //typedef stdex::once_flag              once_flag; // ni
+
+        //using stdex::try_lock; // ni
+        //using stdex::lock; // ni
+        //using stdex::call_once; // ni
+    }
+
     using namespace stdex;
     using namespace mutex_tests;
     
