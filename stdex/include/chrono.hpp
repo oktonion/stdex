@@ -44,6 +44,10 @@
  
          template<class _Clock, class _Dur = typename _Clock::duration>
          class time_point;
+
+         template <class _Rep>
+         struct treat_as_floating_point : 
+             stdex::is_floating_point<_Rep> {};
      }
  
      template <class Rep1, class Period1, class Rep2, class Period2>
@@ -380,6 +384,13 @@
              _Rep _r;
  
              typedef intern::chrono_asserts check;
+             struct _disabled1;
+             struct _disabled2;
+             
+             void _modulus(const _Rep &_r_in) { _r %= _r_in; }
+             void _modulus(const duration &other) { _r %= other.count(); }
+             void _modulus(const _disabled1 &) { }
+             void _modulus(const _disabled2 &) { }
  
              typedef typename check::rep_cannot_be_a_duration_assert< (detail::_is_duration<_Rep>::value == bool(false)) >::
                  rep_cannot_be_a_duration_assert_failed
@@ -404,7 +415,7 @@
              duration(const _Rep2 &_r_in) : 
                  _r(static_cast<_Rep>(_r_in))
              {
-                 typedef typename check::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert<(is_floating_point<_Rep>::value == bool(true)) || (is_floating_point<_Rep2>::value == bool(false))>::
+                 typedef typename check::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert<(treat_as_floating_point<_Rep>::value == bool(true)) || (treat_as_floating_point<_Rep2>::value == bool(false))>::
                      a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert_failed
                  check4; // if you are there means rep type is integer but floating-point type is passed as argument
              }
@@ -421,6 +432,7 @@
                      >::duration_does_not_use_floating_point_ticks_or_other_duration_period_is_not_exactly_divisible_by_current_period_assert_failed
                  check5;
 
+ 
                  typedef typename check::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert<(treat_as_floating_point<_Rep>::value == bool(true)) || (treat_as_floating_point<_Rep2>::value == bool(false))>::
                      a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert_failed
                  check6; // if you are there means rep type is integer but floating-point duration type is passed as argument
@@ -488,15 +500,29 @@
                  return (*this);
              }
  
-             duration& operator%=(const _Rep &_r_in)
+	         duration& operator%=(
+                 typename
+                 conditional<
+                    treat_as_floating_point<_Rep>::value == bool(false),
+                    const _Rep &,
+                    _disabled1&
+                >::type _r_in
+             )
              {	// modulus rep by r
-                 _r %= _r_in;
+                 _modulus(_r_in);
                  return (*this);
              }
- 
-             duration& operator%=(const duration &other)
+
+	         duration& operator%=(
+                 typename
+                 conditional<
+                    treat_as_floating_point<_Rep>::value == bool(false),
+                    const duration &,
+                    _disabled2&
+                >::type other
+             )
              {	// modulus rep by other
-                 _r %= other.count();
+                 _modulus(other);
                  return (*this);
              }
  
@@ -687,10 +713,6 @@
          typedef duration<stdex::intmax_t> seconds;                            //!< Duration with the unit seconds.
          typedef duration<stdex::intmax_t, ratio<60> > minutes;                //!< Duration with the unit minutes.
          typedef duration<stdex::intmax_t, ratio<3600> > hours;                //!< Duration with the unit hours.
- 
-         template <class _Rep>
-         struct treat_as_floating_point : 
-             stdex::is_floating_point<_Rep> {};
  
          template<class _Clock, class _Duration>
          class time_point
