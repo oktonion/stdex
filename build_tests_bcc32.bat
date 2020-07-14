@@ -20,6 +20,7 @@ set "MYOUTPUT3="
 set "tests_failed=unsuccessful tests:"
 set has_compile_error=!false!
 set has_compile_warn=!false!
+set current_test_is_ok=!false!
 
 
 for /f %%f in ('dir /b ".\tests\*.cpp"') do (
@@ -58,11 +59,14 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
     )
   )
   
+  set current_test_is_ok=!true!
+
   if !has_compile_error!==!true! (
     set "origin_str=%%~nf"
     set "replaced_str=!origin_str:fail=!"
     if "!origin_str!"=="!replaced_str!" (
       set build_ok=!false!
+      set current_test_is_ok=!false!
       echo !MYOUTPUT3!
       echo !MYOUTPUT2!
       echo !MYOUTPUT!
@@ -75,6 +79,7 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
     set "replaced_str=!origin_str:fail=_!"
     if not "!origin_str!"=="!replaced_str!" (
       set build_ok=!false!
+      set current_test_is_ok=!false!
       echo "not failed as expected"
       echo !MYOUTPUT3!
       echo !MYOUTPUT2!
@@ -85,7 +90,7 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
     )
   )
   
-  if !has_compile_error!==!false! (
+  if !current_test_is_ok!==!true! (
     set "MYOUTPUT="
     set "MYOUTPUT2="
     set "MYOUTPUT3="

@@ -14,6 +14,7 @@ set INCLUDE=%INCLUDE%;%cd%\pthread\;
 set "tests_failed=unsuccessful tests:"
 set has_compile_error=!false!
 set has_compile_warn=!false!
+set current_test_is_ok=!false!
 
 for /f %%f in ('dir /b ".\tests\*.cpp"') do (
   echo "compiling test Visual Studio C++ %VisualStudioVersion% %%~nf"
@@ -31,11 +32,14 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
     set has_compile_error=!true!
   )
 
+  set current_test_is_ok=!true!
+
   if !has_compile_error!==!true! (
     set "origin_str=%%~nf"
     set "replaced_str=!origin_str:fail=!"
     if "!origin_str!"=="!replaced_str!" (
       set build_ok=!false!
+      set current_test_is_ok=!false!
       set "tests_failed=!tests_failed! !origin_str!"
     ) else (
       echo "failed as expected"
@@ -45,12 +49,13 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
     set "replaced_str=!origin_str:fail=_!"
     if not "!origin_str!"=="!replaced_str!" (
       set build_ok=!false!
+      set current_test_is_ok=!false!
       echo "not failed as expected"
       set "tests_failed=!tests_failed! !origin_str!"
     )
   )
   
-  if !has_compile_error!==!false! (
+  if !current_test_is_ok!==!true! (
     cl -nologo /I %cd%\pthread\ .\tests\obj\%%~nf.obj stdex.lib ntdll.lib -D _CRT_SECURE_NO_WARNINGS -Fe.\tests\bin\%%~nf.exe -link -LIBPATH:.\stdex\lib
     if not !errorlevel!==0 (
       set has_compile_error=!true!
