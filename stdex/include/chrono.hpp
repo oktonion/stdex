@@ -50,10 +50,6 @@
              stdex::is_floating_point<_Rep> {};
      }
  
-     template <class Rep1, class Period1, class Rep2, class Period2>
-     struct common_type<chrono::duration<Rep1, Period1>,
-         chrono::duration<Rep2, Period2> >;
- 
      template<class _Rep1, class _Period1, class _Rep2, class _Period2>
      struct common_type<chrono::duration<_Rep1, _Period1>,
          chrono::duration<_Rep2, _Period2> >
