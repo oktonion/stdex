@@ -183,9 +183,9 @@ matrix:
         - sudo echo "deb https://apt.repos.intel.com/oneapi all main" > /etc/apt/sources.list.d/oneAPI.list
         - sudo apt-get -qqq update
         - sudo apt-get install -y intel-oneapi-icc
-        - sudo set +e
+        - set +e
         - . /opt/intel/inteloneapi/setvars.sh
-        - sudo set -e
+        - set -e
         - cd src
         - make
 
