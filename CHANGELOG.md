@@ -4,7 +4,7 @@ All notable changes to stdex library project will be documented in this file.
 
 visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library
 
-## [0.2.7] - 2020-xx-xx
+## [0.2.7] - 2020-07-14
 
 ### Added
 
@@ -12,6 +12,8 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 - `<mutex>` header:
 - - `stdex::timed_mutex` and `stdex::recursive_timed_mutex` implemented
+
+- moar tests to the god of tests
 
 ### Changed
 
