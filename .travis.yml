@@ -176,16 +176,16 @@ matrix:
       - RUN_SCRIPT=./run_tests.sh
       script:
         - export DEBIAN_FRONTEND=noninteractive
-        - apt-get -qqq update
-        - apt-get install -y wget build-essential pkg-config cmake ca-certificates gnupg
-        - wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
-        - apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
+        - sudo apt-get -qqq update
+        - sudo apt-get install -y wget build-essential pkg-config cmake ca-certificates gnupg
+        - sudo wget https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
+        - sudo apt-key add GPG-PUB-KEY-INTEL-SW-PRODUCTS-2023.PUB
         - echo "deb https://apt.repos.intel.com/oneapi all main" > /etc/apt/sources.list.d/oneAPI.list
-        - apt-get -qqq update
-        - apt-get install -y intel-oneapi-icc
-        - set +e
+        - sudo apt-get -qqq update
+        - sudo apt-get install -y intel-oneapi-icc
+        - sudo set +e
         - . /opt/intel/inteloneapi/setvars.sh
-        - set -e
+        - sudo set -e
         - cd src
         - make
 
