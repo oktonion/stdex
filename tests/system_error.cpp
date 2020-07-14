@@ -109,7 +109,7 @@ int test1()
     // 2
     {
         system_error err2(95, system_category(), s);
-        DYNAMIC_VERIFY(err2.code() == error_code(95, system_category()));
+        DYNAMIC_VERIFY(err2.code() == error_code(95, stdex::system_category()));
         DYNAMIC_VERIFY(std::string((err2.what(), s)).find(s) != std::string::npos);
     }
 
