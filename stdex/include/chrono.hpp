@@ -50,9 +50,10 @@
              stdex::is_floating_point<_Rep> {};
      }
  
-     template <class _Rep1, class _Period1, class _Rep2, class _Period2>
-     struct common_type<chrono::duration<_Rep1, _Period1>,
-         chrono::duration<_Rep2, _Period2> >;
+     template <class Rep1, class Period1, class Rep2, class Period2>
+     struct common_type<chrono::duration<Rep1, Period1>,
+         chrono::duration<Rep2, Period2> >;
+ 
      
      namespace detail
      {
@@ -63,7 +64,6 @@
             static const stdex::intmax_t value = (_Ax / _gcd<_Ax, _Bx>::value) * _Bx;
         };
      }
-
      template<class _Rep1, class _Period1, class _Rep2, class _Period2>
      struct common_type<chrono::duration<_Rep1, _Period1>,
          chrono::duration<_Rep2, _Period2> >
@@ -72,6 +72,7 @@
          typedef detail::_gcd<_Period1::num, _Period2::num> 	_gcd_num;
          typedef detail::_lcm<_Period1::den, _Period2::den> 	_lcm_den;
          typedef typename common_type<_Rep1, _Rep2>::type		_cr;
+         typedef ratio<_gcd_num::value,
          typedef ratio<_gcd_num::value, _lcm_den::value>        _r;
  
      public:
