@@ -376,6 +376,9 @@
  
              typedef intern::chrono_asserts check;
              struct _disabled;
+             
+             void _modulus(const _Rep &_r_in) { _r %= _r_in; }
+             void _modulus(const _disabled &) { }
  
              typedef typename check::rep_cannot_be_a_duration_assert< (detail::_is_duration<_Rep>::value == bool(false)) >::
                  rep_cannot_be_a_duration_assert_failed
@@ -487,7 +490,7 @@
                 >::type _r_in
              )
              {	// modulus rep by r
-                 _r %= _r_in;
+                 _modulus(_r_in);
                  return (*this);
              }
 
@@ -500,7 +503,7 @@
                 >::type other
              )
              {	// modulus rep by other
-                 _r %= other.count();
+                 _modulus(other.count());
                  return (*this);
              }
  
