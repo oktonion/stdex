@@ -72,6 +72,9 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
       echo !MYOUTPUT!
       set "tests_failed=!tests_failed! !origin_str!"
     ) else (
+      echo !MYOUTPUT3!
+      echo !MYOUTPUT2!
+      echo !MYOUTPUT!
       echo "failed as expected"
     )
   ) else (
