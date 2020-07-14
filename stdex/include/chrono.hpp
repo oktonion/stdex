@@ -324,6 +324,9 @@
  
                  template<bool>
                  struct a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert; // if you are there means that what it says
+
+                 template<bool>
+                 struct duration_does_not_use_floating_point_ticks_or_other_duration_period_is_not_exactly_divisible_by_current_period; // if you are there means that what it says
  
                  template<bool>
                  struct a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert; // if you are there means that what it says
@@ -358,7 +361,13 @@
              {
                  typedef bool a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert_failed;
              };
- 
+
+             template<>
+             struct chrono_asserts::duration_does_not_use_floating_point_ticks_or_other_duration_period_is_not_exactly_divisible_by_current_period<true>
+             {
+                 typedef bool duration_does_not_use_floating_point_ticks_or_other_duration_period_is_not_exactly_divisible_by_current_period_assert_failed;
+             };
+
              template<>
              struct chrono_asserts::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert<true>
              {
@@ -416,10 +425,17 @@
                  _r(duration_cast<duration>(other).count())
              {	// construct from a duration
                  typedef ratio_divide<_Period2, _Period> _Checked_type;
+
+                 typedef typename check::duration_does_not_use_floating_point_ticks_or_other_duration_period_is_not_exactly_divisible_by_current_period<
+                     (treat_as_floating_point<_Rep>::value == bool(true)) || 
+                     ( (_Checked_type::den == 1 && treat_as_floating_point<_Rep2>::value == bool(false)) )
+                     >::duration_does_not_use_floating_point_ticks_or_other_duration_period_is_not_exactly_divisible_by_current_period_assert_failed
+                 check5;
+
  
                  typedef typename check::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert<(treat_as_floating_point<_Rep>::value == bool(true)) || (treat_as_floating_point<_Rep2>::value == bool(false))>::
                      a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert_failed
-                 check5; // if you are there means rep type is integer but floating-point duration type is passed as argument
+                 check6; // if you are there means rep type is integer but floating-point duration type is passed as argument
              }
  
              //! Return the value of the duration object.
