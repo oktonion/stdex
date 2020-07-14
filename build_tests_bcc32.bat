@@ -90,7 +90,7 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
     )
   )
   
-  if !current_test_is_ok!==!true! (
+  if !current_test_is_ok!==!true! if !has_compile_error!==!false! (
     set "MYOUTPUT="
     set "MYOUTPUT2="
     set "MYOUTPUT3="

@@ -55,7 +55,7 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
     )
   )
   
-  if !current_test_is_ok!==!true! (
+  if !current_test_is_ok!==!true! if !has_compile_error!==!false! (
     cl -nologo /I %cd%\pthread\ .\tests\obj\%%~nf.obj stdex.lib ntdll.lib -D _CRT_SECURE_NO_WARNINGS -Fe.\tests\bin\%%~nf.exe -link -LIBPATH:.\stdex\lib
     if not !errorlevel!==0 (
       set has_compile_error=!true!
