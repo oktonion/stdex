@@ -378,6 +378,7 @@
              struct _disabled;
              
              void _modulus(const _Rep &_r_in) { _r %= _r_in; }
+             void _modulus(const duration &other) { _r %= other.count(); }
              void _modulus(const _disabled &) { }
  
              typedef typename check::rep_cannot_be_a_duration_assert< (detail::_is_duration<_Rep>::value == bool(false)) >::
@@ -503,7 +504,7 @@
                 >::type other
              )
              {	// modulus rep by other
-                 _modulus(other.count());
+                 _modulus(other);
                  return (*this);
              }
  
