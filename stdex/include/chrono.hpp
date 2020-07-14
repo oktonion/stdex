@@ -54,16 +54,26 @@
      struct common_type<chrono::duration<Rep1, Period1>,
          chrono::duration<Rep2, Period2> >;
  
+     
+     namespace detail
+     {
+        template<stdex::intmax_t _Ax,
+            stdex::intmax_t _Bx>
+        struct _lcm
+        {	/* compute least common multiple of _Ax and _Bx */
+            static const stdex::intmax_t value = (_Ax / _gcd<_Ax, _Bx>::value) * _Bx;
+        };
+     }
      template<class _Rep1, class _Period1, class _Rep2, class _Period2>
      struct common_type<chrono::duration<_Rep1, _Period1>,
          chrono::duration<_Rep2, _Period2> >
      {
      private:
          typedef detail::_gcd<_Period1::num, _Period2::num> 	_gcd_num;
-         typedef detail::_gcd<_Period1::den, _Period2::den> 	_gcd_den;
+         typedef detail::_lcm<_Period1::den, _Period2::den> 	_lcm_den;
          typedef typename common_type<_Rep1, _Rep2>::type		_cr;
          typedef ratio<_gcd_num::value,
-             (_Period1::den / _gcd_den::value) * _Period2::den> _r;
+         typedef ratio<_gcd_num::value, _lcm_den::value>        _r;
  
      public:
          typedef chrono::duration<_cr, _r> 			type;
