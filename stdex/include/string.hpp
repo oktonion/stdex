@@ -1122,7 +1122,7 @@ namespace stdex
             if (errno == ERANGE)
 #endif
                 num_s_end = 0;
-            else if (_value > static_cast<double>(std::numeric_limits<_Tp>::max()) || _value < static_cast<double>(-std::numeric_limits<_Tp>::max()))
+            else if (_value > static_cast<double>((std::numeric_limits<_Tp>::max)()) || _value < static_cast<double>(-(std::numeric_limits<_Tp>::max)()))
             {
                 _value = (std::numeric_limits<_Tp>::max)();
                 num_s_end = 0;
