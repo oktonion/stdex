@@ -334,10 +334,12 @@ stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDE
 
 #ifdef _STDEX_CHRONO_USE_MICROSECONDS
 		return time_point(
-			seconds(ts.tv_sec) + microseconds(ts.tv_nsec / 1000));
+			duration_cast<duration>(
+				seconds(ts.tv_sec) + microseconds(ts.tv_nsec / 1000)) );
 #else
 		return time_point(
-			seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec));
+			duration_cast<duration>(
+				seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec)) );
 #endif
 	}
 }
@@ -356,10 +358,12 @@ stdex::chrono::steady_clock::time_point stdex::chrono::steady_clock::now() _STDE
 
 #ifdef _STDEX_CHRONO_USE_MICROSECONDS
 		return time_point(
-			seconds(ts.tv_sec) + microseconds(ts.tv_nsec / 1000));
+			duration_cast<duration>(
+				seconds(ts.tv_sec) + microseconds(ts.tv_nsec / 1000)) );
 #else
 		return time_point(
-			seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec));
+			duration_cast<duration>(
+				seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec)) );
 #endif
 	}
 }
