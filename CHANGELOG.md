@@ -18,6 +18,8 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 - `<mutex>` header:
 - - throw exceptions if underlying pthread implementation is capable to detect errors (less bugs in production, more exceptions to handle, yeeeah!)
 
+- all build and test run scripts now povide more clear output
+
 ### Fixed
 
 - stupid MS defines for `max` and `min` breaking valid code
