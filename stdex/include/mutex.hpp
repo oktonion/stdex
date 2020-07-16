@@ -495,7 +495,7 @@ namespace stdex
                 // The user-supplied clock may not tick at the same rate as
                 // steady_clock, so we must loop in order to guarantee that
                 // the timeout has expired before returning false.
-                class _Clock::time_point _now = _Clock::now();
+                typename _Clock::time_point _now = _Clock::now();
                 do {
                     class _Clock::duration _rtime = _atime - _now;
                     if (try_lock_for(_mutex_handle, _rtime))
