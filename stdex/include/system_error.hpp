@@ -750,6 +750,93 @@ namespace stdex
 
     namespace detail
     {
+        namespace system_error_detail
+        {
+            float strerrorlen_s(...);
+            float strerror_s(...);
+            struct strerror_is_not_present_assert&
+                strerror(...);
+
+            template<class _Tp>
+            _yes_type _tester(_Tp);
+            _no_type _tester(float);
+
+            static const char* _unknown_error()
+            {return "unknown error";}
+
+            template<bool, class _DummyT = int>
+            struct strerror_impl
+            {
+                static std::string call(_DummyT _Errcode)
+                {
+                    using namespace std;
+
+                    const char *result = 
+                        strerror(_Errcode);
+                    
+                    return result ? result : "";
+                }
+            };
+
+            template<class _DummyT>
+            struct strerror_impl<true, _DummyT>
+            {
+                static std::string call(_DummyT _Errcode)
+                {
+                    using namespace std;
+                    
+                    std::string result;
+
+                    size_t len = strerrorlen_s(_Errcode);
+                    if(len)
+                    {
+                        struct _RAII{
+                            char *buf;
+                            _RAII() : buf(0) {}
+                            ~_RAII() {delete [] buf;}
+                        } _tmp;
+
+                        _tmp.buf = new char[len + 1];
+                        if(0 == strerror_s(_tmp.buf, len + 1, _Errcode))
+                            result = _tmp.buf;
+                    }
+                    return result;
+                }
+            };
+
+            std::string _strerror(int _errnum)
+            {
+                using namespace std;
+
+                std::string result =
+                    system_error_detail::strerror_impl<
+                        sizeof(_tester(strerrorlen_s(0))) == sizeof(_yes_type) &&
+                        sizeof(_tester(strerror_s(_declptr<char>(), 0, 0))) == sizeof(_yes_type)
+                    >::call(_errnum);
+                
+                if(result.empty())
+                    return _unknown_error();
+                return result;
+            }
+
+            bool _is_valid_errnum(int _errnum)
+            {
+                using namespace std;
+
+                std::string result =
+                    system_error_detail::strerror_impl<
+                        sizeof(_tester(strerrorlen_s(0))) == sizeof(_yes_type) &&
+                        sizeof(_tester(strerror_s(_declptr<char>(), 0, 0))) == sizeof(_yes_type)
+                    >::call(_errnum);
+
+                return !result.empty();
+            }
+        }
+
+        using system_error_detail::_strerror;
+        using system_error_detail::_is_valid_errnum;
+        
+
         class _generic_error_category
             : public error_category
         {	// categorize a generic error
@@ -765,8 +852,7 @@ namespace stdex
 
             virtual std::string message(int _Errcode) const
             {	// convert to name of error
-                const char *_Name = std::strerror(_Errcode);
-                return (std::string(_Name != 0 ? _Name : "unknown error"));
+                return _strerror(_Errcode);
             }
         };
 
@@ -807,14 +893,13 @@ namespace stdex
 
             virtual std::string message(int _Errcode) const
             {	// convert to name of error
-                const char *_Name = std::strerror(_Errcode);
-                return (std::string(_Name != 0 ? _Name : "unknown error"));
+                return _strerror(_Errcode);
             }
 
             virtual error_condition
                 default_error_condition(int _Errval) const _STDEX_NOEXCEPT_FUNCTION
             {	// make error_condition for error code (generic if possible)
-                if (std::strerror(_Errval))
+                if (_is_valid_errnum(_Errval))
                     return (error_condition(_Errval, generic_category()));
                 else
                     return (error_condition(_Errval, system_category()));
