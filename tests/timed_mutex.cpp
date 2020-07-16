@@ -343,16 +343,16 @@ namespace timed_mutex_tests
         
         try
         {
-            mutex_type m;
+            mutex_type mm;
 
-            m.lock();
+            mm.lock();
 
             try_lock_until_test3_pred<clock_type> 
-                pred(m);
+                pred(mm);
 
             stdex::thread thr(pred);
             thr.join();
-            m.unlock();
+            mm.unlock();
         }
         catch (const stdex::system_error&)
         {
@@ -443,11 +443,11 @@ namespace timed_mutex_tests
         return 0;
     }
 
-    mutex_type m;
+    mutex_type global_m;
 
     void ff()
     {
-        stdex::lock_guard<mutex_type> l(m);
+        stdex::lock_guard<mutex_type> l(global_m);
     }
 
     int unlock_test1()
