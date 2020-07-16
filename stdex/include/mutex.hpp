@@ -960,7 +960,7 @@ namespace stdex
                 if (_failed_lock > 0) \
                     return _failed_lock + 1; \
                 \
-                l1.release();\
+                _l1.release();\
                 return 0;\
             } \
             template <class _Lockbl1, _STDEX_TYPES##N > \
