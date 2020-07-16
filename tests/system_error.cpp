@@ -7,6 +7,7 @@
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
+#define DYNAMIC_VERIFY_FAIL {std::cout << "check condition " << "failed at line " << __LINE__ << std::endl; return -1;}
 using std::size_t;
 
 struct ClassType {};
@@ -244,7 +245,7 @@ int test10()
     error_code e1;
     if (static_cast<bool>(e1))
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     // 2
@@ -254,7 +255,7 @@ int test10()
         return 0;
     }
 
-    DYNAMIC_VERIFY(false);
+    DYNAMIC_VERIFY_FAIL ;
 }
 
 int test11()
@@ -352,7 +353,7 @@ int test16()
     error_condition e1;
     if (static_cast<bool>(e1))
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     // 2
@@ -362,7 +363,7 @@ int test16()
         return 0;
     }
 
-    DYNAMIC_VERIFY(false);
+    DYNAMIC_VERIFY_FAIL ;
 }
 
 int test17()

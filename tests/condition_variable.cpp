@@ -69,11 +69,11 @@ int test1()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     return 0;
@@ -98,11 +98,11 @@ int test2()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     return 0;
@@ -129,11 +129,11 @@ int test3()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     return 0;

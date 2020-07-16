@@ -162,7 +162,7 @@ int test1()
   }
   catch(...)
   {
-    DYNAMIC_VERIFY(false);
+    DYNAMIC_VERIFY_FAIL ;
   }
 
   return 0;
@@ -177,7 +177,7 @@ int test2()
   }
   catch(...)
   {
-    DYNAMIC_VERIFY(false);
+    DYNAMIC_VERIFY_FAIL ;
   }
 
    return 0;
@@ -192,7 +192,7 @@ int test3()
   }
   catch(...)
   {
-    DYNAMIC_VERIFY(false);
+    DYNAMIC_VERIFY_FAIL ;
   }
 
   return 0;

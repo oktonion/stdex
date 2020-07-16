@@ -13,6 +13,7 @@
 
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
+#define DYNAMIC_VERIFY_FAIL {std::cout << "check condition " << "failed at line " << __LINE__ << std::endl; return -1;}
 using std::size_t;
 
 namespace thread_tests_std
@@ -228,11 +229,11 @@ int test1()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     return 0;
@@ -257,15 +258,15 @@ int test2()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (const char *)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     return 0;
@@ -306,15 +307,15 @@ int test3()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (const char *)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     return 0;
@@ -334,15 +335,15 @@ int test4()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (const char *)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     return 0;
@@ -372,15 +373,15 @@ int test5()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (const char *)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     return 0;
@@ -451,15 +452,15 @@ int test8()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (const char *)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     return 0;
@@ -479,15 +480,15 @@ int test9()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (const char *)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     return 0;
 }
@@ -512,7 +513,7 @@ int test10()
 			}
 			catch (const char *)
 			{
-				DYNAMIC_VERIFY(false);
+				DYNAMIC_VERIFY_FAIL ;
 			}
 
 			DYNAMIC_VERIFY(test);
@@ -533,7 +534,7 @@ int test10()
 			}
 			catch (const char *)
 			{
-				DYNAMIC_VERIFY(false);
+				DYNAMIC_VERIFY_FAIL ;
 			}
 
 			DYNAMIC_VERIFY(test);
