@@ -12,6 +12,11 @@
 /*none*/
 
 // std includes
+#ifndef __STDC_WANT_LIB_EXT1__
+    #define __STDC_WANT_LIB_EXT1__ 1
+    #define _STDEX_WANT_LIB_EXT1_DEFINED
+#endif
+
 #include <errno.h>
 #include <cerrno>
 #include <cstdlib>		// std::strerror
@@ -19,6 +24,11 @@
 #include <stdexcept>	// std::runtime_error
 #include <string> 		// std::string
 #include <functional>
+
+#ifdef _STDEX_WANT_LIB_EXT1_DEFINED
+    #undef __STDC_WANT_LIB_EXT1__
+    #undef _STDEX_WANT_LIB_EXT1_DEFINED
+#endif
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
