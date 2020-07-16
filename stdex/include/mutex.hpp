@@ -497,7 +497,7 @@ namespace stdex
                 // the timeout has expired before returning false.
                 typename _Clock::time_point _now = _Clock::now();
                 do {
-                    class _Clock::duration _rtime = _atime - _now;
+                    typename _Clock::duration _rtime = _atime - _now;
                     if (try_lock_for(_mutex_handle, _rtime))
                         return true;
                     _now = _Clock::now();
