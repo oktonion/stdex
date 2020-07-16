@@ -752,10 +752,10 @@ namespace stdex
     {
         namespace system_error_detail
         {
+            using namespace std;
+
             float strerrorlen_s(...);
             float strerror_s(...);
-            struct strerror_is_not_present_assert&
-                strerror(...);
 
             template<class _Tp>
             _yes_type _tester(_Tp);
@@ -764,8 +764,8 @@ namespace stdex
             static const char* _unknown_error()
             {return "unknown error";}
 
-            template<bool, class _DummyT = int>
-            struct strerror_impl
+            template<bool, class _DummyT>
+            struct strerror_impl_helper
             {
                 static std::string call(_DummyT _Errcode)
                 {
@@ -779,7 +779,7 @@ namespace stdex
             };
 
             template<class _DummyT>
-            struct strerror_impl<true, _DummyT>
+            struct strerror_impl_helper<true, _DummyT>
             {
                 static std::string call(_DummyT _Errcode)
                 {
@@ -804,32 +804,31 @@ namespace stdex
                 }
             };
 
-            std::string _strerror(int _errnum)
+            struct has_safe_strerror
             {
-                using namespace std;
+                static const bool value = 
+                    sizeof(_tester(strerrorlen_s(0))) == sizeof(_yes_type) &&
+                    sizeof(_tester(strerror_s(_declptr<char>(), 0, 0))) == sizeof(_yes_type);
+            };
 
+            struct strerror_impl:
+                strerror_impl_helper<has_safe_strerror::value, int>
+            { };
+
+            static inline std::string _strerror(int _errnum)
+            {
                 std::string result =
-                    system_error_detail::strerror_impl<
-                        sizeof(_tester(strerrorlen_s(0))) == sizeof(_yes_type) &&
-                        sizeof(_tester(strerror_s(_declptr<char>(), 0, 0))) == sizeof(_yes_type)
-                    >::call(_errnum);
+                    strerror_impl::call(_errnum);
                 
                 if(result.empty())
                     return _unknown_error();
                 return result;
             }
 
-            bool _is_valid_errnum(int _errnum)
+            static inline bool _is_valid_errnum(int _errnum)
             {
-                using namespace std;
-
-                std::string result =
-                    system_error_detail::strerror_impl<
-                        sizeof(_tester(strerrorlen_s(0))) == sizeof(_yes_type) &&
-                        sizeof(_tester(strerror_s(_declptr<char>(), 0, 0))) == sizeof(_yes_type)
-                    >::call(_errnum);
-
-                return !result.empty();
+                return 
+                    !strerror_impl::call(_errnum).empty();
             }
         }
 
