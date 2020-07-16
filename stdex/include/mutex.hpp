@@ -16,6 +16,10 @@
  
 // std includes
 #include <algorithm>
+
+#if defined(_DEBUG) || defined(DEBUG)
+    #include <iostream> // for logging
+#endif
  
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
  
@@ -47,14 +51,24 @@ namespace stdex
                 // XXX EAGAIN, ENOMEM, EPERM, EBUSY(may), EINVAL(may)
                 int _err = pthread_mutex_init(&_mutex_handle, NULL);
                 if (0 != _err)
-                std::terminate(); // not mentioned by standart but if we can then why not?
+                {
+                #if defined(_DEBUG) || defined(DEBUG)
+                    std::cerr << stdex::error_code(stdex::errc::errc_t(_err)).message() << std::endl;
+                #endif
+                    std::terminate();
+                }
             }
 
-            ~_mutex_base() _STDEX_NOEXCEPT(false)
+            ~_mutex_base()
             { 
                 int _err = pthread_mutex_destroy(&_mutex_handle);
                 if (0 != _err)
-                    throw(stdex::system_error( stdex::errc::errc_t(_err)) );
+                {
+                #if defined(_DEBUG) || defined(DEBUG)
+                    std::cerr << stdex::error_code(stdex::errc::errc_t(_err)).message() << std::endl;
+                #endif
+                    std::terminate();
+                }
             }
 
         private:
@@ -85,11 +99,16 @@ namespace stdex
                     throw(stdex::system_error( stdex::errc::errc_t(_err)) );
             }
 
-            ~_recursive_mutex_base() _STDEX_NOEXCEPT(false)
+            ~_recursive_mutex_base()
             {
                 int _err = pthread_mutex_destroy(&_mutex_handle);
                 if (0 != _err)
-                    throw(stdex::system_error( stdex::errc::errc_t(_err)) );
+                {
+                #if defined(_DEBUG) || defined(DEBUG)
+                    std::cerr << stdex::error_code(stdex::errc::errc_t(_err)).message() << std::endl;
+                #endif
+                    std::terminate();
+                }
             }
 
         private:
@@ -130,7 +149,7 @@ namespace stdex
             int _err = pthread_mutex_unlock(&_mutex_handle);
 
             if (0 != _err)
-            throw system_error( error_code(errc::errc_t(_err)) );
+                throw system_error( error_code(errc::errc_t(_err)) );
         }
 
         native_handle_type native_handle() _STDEX_NOEXCEPT_FUNCTION

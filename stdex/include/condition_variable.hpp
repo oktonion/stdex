@@ -16,6 +16,10 @@
 #include <memory>
 #include <limits>
 
+#if defined(_DEBUG) || defined(DEBUG)
+    #include <iostream> // for logging
+#endif
+
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
 #define _STDEX_DELETED_FUNCTION =delete
@@ -84,13 +88,18 @@ namespace stdex
                 throw(stdex::system_error( stdex::errc::errc_t(_err)) );
         }
 
-        ~condition_variable() _STDEX_NOEXCEPT(false)
+        ~condition_variable()
         {
             int _err = 
                 pthread_cond_destroy(&_condition_handle);
 
             if (0 != _err)
-                throw(stdex::system_error( stdex::errc::errc_t(_err)) );
+            {
+            #if defined(_DEBUG) || defined(DEBUG)
+                std::cerr << stdex::error_code(stdex::errc::errc_t(_err)).message() << std::endl;
+            #endif
+                std::terminate();
+            }
         }
 
         inline void wait(unique_lock<mutex> &_lock) _STDEX_NOEXCEPT_FUNCTION
@@ -99,7 +108,12 @@ namespace stdex
                 pthread_cond_wait(&_condition_handle, detail::_lock_mutex_native_handle(_lock));
 
             if (0 != _err)
+            {
+            #if defined(_DEBUG) || defined(DEBUG)
+                std::cerr << stdex::error_code(stdex::errc::errc_t(_err)).message() << std::endl;
+            #endif
                 std::terminate();
+            }
         }
 
         template<class _Predicate>
@@ -198,10 +212,15 @@ namespace stdex
             int _err =
                 pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
 
-            #ifdef ETIMEDOUT
+        #ifdef ETIMEDOUT
             if(_err && _err != ETIMEDOUT)
-                std::terminate();
+            {
+            #if defined(_DEBUG) || defined(DEBUG)
+                std::cerr << stdex::error_code(stdex::errc::errc_t(_err)).message() << std::endl;
             #endif
+                std::terminate();
+            }
+        #endif
 
             return (clock_t::now() < _atime
                 ? cv_status::no_timeout : cv_status::timeout);
@@ -254,10 +273,15 @@ namespace stdex
             int _err = 
                 pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
             
-            #ifdef ETIMEDOUT
+        #ifdef ETIMEDOUT
             if(_err && _err != ETIMEDOUT)
-                std::terminate();
+            {
+            #if defined(_DEBUG) || defined(DEBUG)
+                std::cerr << stdex::error_code(stdex::errc::errc_t(_err)).message() << std::endl;
             #endif
+                std::terminate();
+            }
+        #endif
 
             return (clock_t::now() - _start_time_point < _rtime
                 ? cv_status::no_timeout : cv_status::timeout);
