@@ -1279,10 +1279,57 @@ namespace stdex
                 _lock_first = detail::_lock_helper(_m6, _m1, _m2, _m3, _m4, _m5);
                 if (0 == _lock_first) return;
                 _lock_first = (_lock_first + 5) % _lock_count;
-                break;}
+                break;
+            }
         }
     }
 
+    template <class _Lockbl1, _STDEX_TYPES7>
+    void lock(_Lockbl1 &_m1, _STDEX_ARGS7)
+    {
+        const unsigned int _lock_count = 7;
+        unsigned int _lock_first = 0;
+        for (;;)
+        {
+            switch (_lock_first)
+            {
+            case 0:
+                _lock_first = detail::_lock_helper(_m1, _m2, _m3, _m4, _m5, _m6, _m7);
+                if (0 == _lock_first) return;
+                break;
+            case 1:
+                _lock_first = detail::_lock_helper(_m2, _m3, _m4, _m5, _m6, _m7, _m1);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 1) % _lock_count;
+                break;
+            case 2:
+                _lock_first = detail::_lock_helper(_m3, _m4, _m5, _m6, _m7, _m1, _m2);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 2) % _lock_count;
+                break;
+            case 3:
+                _lock_first = detail::_lock_helper(_m4, _m5, _m6, _m7, _m1, _m2, _m3);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 3) % _lock_count;
+                break;
+            case 4:
+                _lock_first = detail::_lock_helper(_m5, _m6, _m7, _m1, _m2, _m3, _m4);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 4) % _lock_count;
+                break;
+            case 5:
+                _lock_first = detail::_lock_helper(_m6, _m7, _m1, _m2, _m3, _m4, _m5);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 5) % _lock_count;
+                break;
+            case 6:
+                _lock_first = detail::_lock_helper(_m7, _m1, _m2, _m3, _m4, _m5, _m6);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 6) % _lock_count;
+                break;
+            }
+        }
+    }
     template <class _Lockbl1, class _Lockbl2>
     int try_lock(_Lockbl1 &_m1, _Lockbl2 &_m2)
     {
