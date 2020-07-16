@@ -130,7 +130,7 @@ int try_lock_test2()
         lock_type l2(m2);
         lock_type l3(m3);
     }
-    catch (const stdex::system_error& e)
+    catch (const stdex::system_error&)
     {
         DYNAMIC_VERIFY_FAIL;
     }
