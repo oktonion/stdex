@@ -47,14 +47,14 @@ namespace stdex
                 // XXX EAGAIN, ENOMEM, EPERM, EBUSY(may), EINVAL(may)
                 int _err = pthread_mutex_init(&_mutex_handle, NULL);
                 if (0 != _err)
-                std::terminate(); // not mentioned by standart but if we can then why not?
+                    _throw_system_error(stdex::errc::errc_t(_err));
             }
 
             ~_mutex_base() _STDEX_NOEXCEPT(false)
             { 
                 int _err = pthread_mutex_destroy(&_mutex_handle);
                 if (0 != _err)
-                    throw(stdex::system_error( stdex::errc::errc_t(_err)) );
+                    _throw_system_error(stdex::errc::errc_t(_err));
             }
 
         private:
@@ -89,7 +89,7 @@ namespace stdex
             {
                 int _err = pthread_mutex_destroy(&_mutex_handle);
                 if (0 != _err)
-                    throw(stdex::system_error( stdex::errc::errc_t(_err)) );
+                    _throw_system_error(stdex::errc::errc_t(_err));
             }
 
         private:
@@ -130,7 +130,7 @@ namespace stdex
             int _err = pthread_mutex_unlock(&_mutex_handle);
 
             if (0 != _err)
-            throw system_error( error_code(errc::errc_t(_err)) );
+                throw system_error( error_code(errc::errc_t(_err)) );
         }
 
         native_handle_type native_handle() _STDEX_NOEXCEPT_FUNCTION
@@ -204,10 +204,10 @@ namespace stdex
     extern const defer_lock_t defer_lock;
     extern const try_to_lock_t try_to_lock;
 
-    template <class _Tp>
+    template <class _Lockbl>
     class lock_guard {
     public:
-        typedef _Tp mutex_type;
+        typedef _Lockbl mutex_type;
 
         explicit lock_guard(mutex_type &_m):
             _device(_m)
@@ -232,11 +232,11 @@ namespace stdex
         lock_guard& operator=(const lock_guard&) _STDEX_DELETED_FUNCTION;
     };
 
-    template<class _Tp>
+    template<class _Lockbl>
     class unique_lock
     {
     public:
-        typedef _Tp mutex_type;
+        typedef _Lockbl mutex_type;
 
         unique_lock() _STDEX_NOEXCEPT_FUNCTION : 
             _device(0), 
@@ -506,7 +506,7 @@ namespace stdex
             }
         };
 
-        template<class _Tp, bool>
+        template<class, bool>
         class _timed_mutex_impl_base;
 
         // without pthread_mutex_timedlock support
@@ -889,8 +889,8 @@ namespace stdex
     { };
 
     /// Swap overload for unique_lock objects.
-    template<class _Mutex>
-    inline void swap(stdex::unique_lock<_Mutex> &lhs, stdex::unique_lock<_Mutex> &rhs) _STDEX_NOEXCEPT_FUNCTION
+    template<class _Lockbl>
+    inline void swap(stdex::unique_lock<_Lockbl> &lhs, stdex::unique_lock<_Lockbl> &rhs) _STDEX_NOEXCEPT_FUNCTION
     {
         lhs.swap(rhs);
     }
@@ -907,7 +907,525 @@ namespace stdex
 
 namespace stdex
 {
+    namespace detail
+    {
 
+        namespace
+        {
+            template <class _Lockbl1, class _Lockbl2>
+            unsigned int _try_lock(_Lockbl1 &_m1, _Lockbl2 &_m2)
+            {
+                stdex::unique_lock<_Lockbl1> _l1(_m1, stdex::try_to_lock);
+
+                if (!_l1)
+                    return 1;
+
+                if (!_m2.try_lock())
+                    return 2;
+
+                _l1.release();
+                return 0;
+            }
+
+            template <class _Lockbl1, class _Lockbl2>
+            unsigned int _lock_helper(_Lockbl1 &_m1, _Lockbl2 &_m2)
+            {
+                stdex::unique_lock<_Lockbl1> _l1(_m1);
+                if (!_m2.try_lock())
+                    return 1;
+            
+                _l1.release();
+                return 0;
+            }
+
+// some boilreplate code:
+
+#undef _STDEX_TRY_LOCK
+#undef _STDEX_LOCK_HELPER
+
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
+#undef _STDEX_ARGS_NAMES
+
+#define _STDEX_TRY_LOCK(N) \
+            template <class _Lockbl1, _STDEX_TYPES##N > \
+            unsigned int _try_lock(_Lockbl1 &_m1, _STDEX_ARGS##N ) \
+            { \
+                stdex::unique_lock<_Lockbl1> _l1(_m1, stdex::try_to_lock); \
+                if (!_l1) \
+                    return 1; \
+                \
+                const unsigned int _failed_lock = _try_lock(_STDEX_ARGS_NAMES##N ); \
+                \
+                if (_failed_lock > 0) \
+                    return _failed_lock + 1; \
+                \
+                _l1.release();\
+                return 0;\
+            } \
+            template <class _Lockbl1, _STDEX_TYPES##N > \
+            int try_lock(_Lockbl1 &_m1, _STDEX_ARGS##N ) \
+            { \
+                return ((int) _try_lock(_m1, _STDEX_ARGS_NAMES##N )) - 1; \
+            }
+
+#define _STDEX_LOCK_HELPER(N) \
+            template <class _Lockbl1, _STDEX_TYPES##N > \
+            unsigned int _lock_helper(_Lockbl1 &_m1, _STDEX_ARGS##N ) \
+            { \
+                stdex::unique_lock<_Lockbl1> _l1(_m1); \
+                const unsigned int _failed_lock = _try_lock(_STDEX_ARGS_NAMES##N ); \
+                if (_failed_lock > 0) \
+                    return _failed_lock; \
+                \
+                _l1.release(); \
+                return 0; \
+            }
+
+
+
+#define _STDEX_TYPES_N(N)      class _Lockbl##N
+#define _STDEX_ARGS_N(N)       _Lockbl##N &_m##N
+#define _STDEX_ARGS_NAMES_N(N) _m##N
+
+#define      _STDEX_TYPES3  class _Lockbl2, class _Lockbl3
+#define       _STDEX_ARGS3  _Lockbl2 &_m2, _Lockbl3 &_m3
+#define _STDEX_ARGS_NAMES3  _m2, _m3
+#define      _STDEX_TYPES4        _STDEX_TYPES3 , _STDEX_TYPES_N      (4)
+#define       _STDEX_ARGS4         _STDEX_ARGS3 , _STDEX_ARGS_N       (4)
+#define _STDEX_ARGS_NAMES4   _STDEX_ARGS_NAMES3 , _STDEX_ARGS_NAMES_N (4)
+#define      _STDEX_TYPES5        _STDEX_TYPES4 , _STDEX_TYPES_N      (5)
+#define       _STDEX_ARGS5         _STDEX_ARGS4 , _STDEX_ARGS_N       (5)
+#define _STDEX_ARGS_NAMES5   _STDEX_ARGS_NAMES4 , _STDEX_ARGS_NAMES_N (5)
+#define      _STDEX_TYPES6        _STDEX_TYPES5 , _STDEX_TYPES_N      (6)
+#define       _STDEX_ARGS6         _STDEX_ARGS5 , _STDEX_ARGS_N       (6)
+#define _STDEX_ARGS_NAMES6   _STDEX_ARGS_NAMES5 , _STDEX_ARGS_NAMES_N (6)
+#define      _STDEX_TYPES7        _STDEX_TYPES6 , _STDEX_TYPES_N      (7)
+#define       _STDEX_ARGS7         _STDEX_ARGS6 , _STDEX_ARGS_N       (7)
+#define _STDEX_ARGS_NAMES7   _STDEX_ARGS_NAMES6 , _STDEX_ARGS_NAMES_N (7)
+#define      _STDEX_TYPES8        _STDEX_TYPES7 , _STDEX_TYPES_N      (8)
+#define       _STDEX_ARGS8         _STDEX_ARGS7 , _STDEX_ARGS_N       (8)
+#define _STDEX_ARGS_NAMES8   _STDEX_ARGS_NAMES7 , _STDEX_ARGS_NAMES_N (8)
+#define      _STDEX_TYPES9        _STDEX_TYPES8 , _STDEX_TYPES_N      (9)
+#define       _STDEX_ARGS9         _STDEX_ARGS8 , _STDEX_ARGS_N       (9)
+#define _STDEX_ARGS_NAMES9   _STDEX_ARGS_NAMES8 , _STDEX_ARGS_NAMES_N (9)
+#define      _STDEX_TYPES10       _STDEX_TYPES9 , _STDEX_TYPES_N      (10)
+#define       _STDEX_ARGS10        _STDEX_ARGS9 , _STDEX_ARGS_N       (10)
+#define _STDEX_ARGS_NAMES10  _STDEX_ARGS_NAMES9 , _STDEX_ARGS_NAMES_N (10)
+#define      _STDEX_TYPES11       _STDEX_TYPES10, _STDEX_TYPES_N      (11)
+#define       _STDEX_ARGS11        _STDEX_ARGS10, _STDEX_ARGS_N       (11)
+#define _STDEX_ARGS_NAMES11  _STDEX_ARGS_NAMES10, _STDEX_ARGS_NAMES_N (11)
+#define      _STDEX_TYPES12       _STDEX_TYPES11, _STDEX_TYPES_N      (12)
+#define       _STDEX_ARGS12        _STDEX_ARGS11, _STDEX_ARGS_N       (12)
+#define _STDEX_ARGS_NAMES12  _STDEX_ARGS_NAMES11, _STDEX_ARGS_NAMES_N (12)
+#define      _STDEX_TYPES13       _STDEX_TYPES12, _STDEX_TYPES_N      (13)
+#define       _STDEX_ARGS13        _STDEX_ARGS12, _STDEX_ARGS_N       (13)
+#define _STDEX_ARGS_NAMES13  _STDEX_ARGS_NAMES12, _STDEX_ARGS_NAMES_N (13)
+#define      _STDEX_TYPES14       _STDEX_TYPES13, _STDEX_TYPES_N      (14)
+#define       _STDEX_ARGS14        _STDEX_ARGS13, _STDEX_ARGS_N       (14)
+#define _STDEX_ARGS_NAMES14  _STDEX_ARGS_NAMES13, _STDEX_ARGS_NAMES_N (14)
+#define      _STDEX_TYPES15       _STDEX_TYPES14, _STDEX_TYPES_N      (15)
+#define       _STDEX_ARGS15        _STDEX_ARGS14, _STDEX_ARGS_N       (15)
+#define _STDEX_ARGS_NAMES15  _STDEX_ARGS_NAMES14, _STDEX_ARGS_NAMES_N (15)
+#define      _STDEX_TYPES16       _STDEX_TYPES15, _STDEX_TYPES_N      (16)
+#define       _STDEX_ARGS16        _STDEX_ARGS15, _STDEX_ARGS_N       (16)
+#define _STDEX_ARGS_NAMES16  _STDEX_ARGS_NAMES15, _STDEX_ARGS_NAMES_N (16)
+#define      _STDEX_TYPES17       _STDEX_TYPES16, _STDEX_TYPES_N      (17)
+#define       _STDEX_ARGS17        _STDEX_ARGS16, _STDEX_ARGS_N       (17)
+#define _STDEX_ARGS_NAMES17  _STDEX_ARGS_NAMES16, _STDEX_ARGS_NAMES_N (17)
+#define      _STDEX_TYPES18       _STDEX_TYPES17, _STDEX_TYPES_N      (18)
+#define       _STDEX_ARGS18        _STDEX_ARGS17, _STDEX_ARGS_N       (18)
+#define _STDEX_ARGS_NAMES18  _STDEX_ARGS_NAMES17, _STDEX_ARGS_NAMES_N (18)
+#define      _STDEX_TYPES19       _STDEX_TYPES18, _STDEX_TYPES_N      (19)
+#define       _STDEX_ARGS19        _STDEX_ARGS18, _STDEX_ARGS_N       (19)
+#define _STDEX_ARGS_NAMES19  _STDEX_ARGS_NAMES18, _STDEX_ARGS_NAMES_N (19)
+#define      _STDEX_TYPES20       _STDEX_TYPES19, _STDEX_TYPES_N      (20)
+#define       _STDEX_ARGS20        _STDEX_ARGS19, _STDEX_ARGS_N       (20)
+#define _STDEX_ARGS_NAMES20  _STDEX_ARGS_NAMES19, _STDEX_ARGS_NAMES_N (20)
+#define      _STDEX_TYPES21       _STDEX_TYPES20, _STDEX_TYPES_N      (21)
+#define       _STDEX_ARGS21        _STDEX_ARGS20, _STDEX_ARGS_N       (21)
+#define _STDEX_ARGS_NAMES21  _STDEX_ARGS_NAMES20, _STDEX_ARGS_NAMES_N (21)
+#define      _STDEX_TYPES22       _STDEX_TYPES21, _STDEX_TYPES_N      (22)
+#define       _STDEX_ARGS22        _STDEX_ARGS21, _STDEX_ARGS_N       (22)
+#define _STDEX_ARGS_NAMES22  _STDEX_ARGS_NAMES21, _STDEX_ARGS_NAMES_N (22)
+#define      _STDEX_TYPES23       _STDEX_TYPES22, _STDEX_TYPES_N      (23)
+#define       _STDEX_ARGS23        _STDEX_ARGS22, _STDEX_ARGS_N       (23)
+#define _STDEX_ARGS_NAMES23  _STDEX_ARGS_NAMES22, _STDEX_ARGS_NAMES_N (23)
+#define      _STDEX_TYPES24       _STDEX_TYPES23, _STDEX_TYPES_N      (24)
+#define       _STDEX_ARGS24        _STDEX_ARGS23, _STDEX_ARGS_N       (24)
+#define _STDEX_ARGS_NAMES24  _STDEX_ARGS_NAMES23, _STDEX_ARGS_NAMES_N (24)
+
+#define _STDEX_LOCK_DEFINE(N) \
+    _STDEX_TRY_LOCK(N) \
+    _STDEX_LOCK_HELPER(N)
+
+            _STDEX_LOCK_DEFINE(3)
+            _STDEX_LOCK_DEFINE(4)
+            _STDEX_LOCK_DEFINE(5)
+            _STDEX_LOCK_DEFINE(6)
+            _STDEX_LOCK_DEFINE(7)
+            _STDEX_LOCK_DEFINE(8)
+            _STDEX_LOCK_DEFINE(9)
+            _STDEX_LOCK_DEFINE(10)
+            _STDEX_LOCK_DEFINE(11)
+            _STDEX_LOCK_DEFINE(12)
+            _STDEX_LOCK_DEFINE(13)
+            _STDEX_LOCK_DEFINE(14)
+            _STDEX_LOCK_DEFINE(15)
+            _STDEX_LOCK_DEFINE(16)
+            _STDEX_LOCK_DEFINE(17)
+            _STDEX_LOCK_DEFINE(18)
+            _STDEX_LOCK_DEFINE(19)
+            _STDEX_LOCK_DEFINE(20)
+            _STDEX_LOCK_DEFINE(21)
+            _STDEX_LOCK_DEFINE(22)
+            _STDEX_LOCK_DEFINE(23)
+            _STDEX_LOCK_DEFINE(24)
+
+#undef _STDEX_TRY_LOCK
+#undef _STDEX_LOCK_HELPER
+#undef _STDEX_LOCK_DEFINE
+        }
+
+        template <class _Lockbl1, class _Lockbl2>
+        void _lock_impl(_Lockbl1 &_m1, _Lockbl2 &_m2)
+        {
+            const unsigned int _lock_count = 2;
+            unsigned int _lock_first = 0;
+            for (;;)
+            {
+                switch (_lock_first)
+                {
+                case 0:
+                    _lock_first = detail::_lock_helper(_m1, _m2);
+                    if (0 == _lock_first) return;
+                    break;
+                case 1:
+                    _lock_first = detail::_lock_helper(_m2, _m1);
+                    if (0 == _lock_first) return;
+                    _lock_first = (_lock_first + 1) % _lock_count;
+                    break;
+                }
+            }
+        }
+
+        template <class _It>
+        void _lock_impl_iterators(_It begin, _It end);
+
+        template <class _Lockbl1, class _Lockbl2>
+        int _try_lock_impl(_Lockbl1 &_m1, _Lockbl2 &_m2)
+        {
+            return ((int) detail::_try_lock(_m1, _m2)) - 1;
+        }
+
+        template <class _It>
+        _It _try_lock_impl_iterators(_It begin, _It end);
+    } // namespace detail
+
+    template <class _Lockbl1, class _Lockbl2>
+    void lock(_Lockbl1 &_m1, _Lockbl2 &_m2)
+    {
+        detail::_lock_impl(_m1, _m2);
+    }
+
+    template <class _Lockbl1, class _Lockbl2>
+    void lock(const _Lockbl1 &_m1, _Lockbl2 &_m2)
+    {
+        detail::_lock_impl(_m1, _m2);
+    }
+
+    template <class _Lockbl1, class _Lockbl2>
+    void lock(_Lockbl1 &_m1, const _Lockbl2 &_m2)
+    {
+        detail::_lock_impl(_m1, _m2);
+    }
+
+    template <class _Lockbl1, class _Lockbl2>
+    void lock(const _Lockbl1 &_m1, const _Lockbl2 &_m2)
+    {
+        detail::_lock_impl(_m1, _m2);
+    }
+
+    template <class _Lockbl1, _STDEX_TYPES3>
+    void lock(_Lockbl1 &_m1, _STDEX_ARGS3)
+    {
+        const unsigned int _lock_count = 3;
+        unsigned int _lock_first = 0;
+        for (;;)
+        {
+            switch (_lock_first)
+            {
+            case 0:
+                _lock_first = detail::_lock_helper(_m1, _m2, _m3);
+                if (0 == _lock_first) return;
+                break;
+            case 1:
+                _lock_first = detail::_lock_helper(_m2, _m3, _m1);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 1) % _lock_count;
+                break;
+            case 2:
+                _lock_first = detail::_lock_helper(_m3, _m1, _m2);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 2) % _lock_count;
+                break;
+            }
+        }
+    }
+
+    template <class _Lockbl1, _STDEX_TYPES4>
+    void lock(_Lockbl1 &_m1, _STDEX_ARGS4)
+    {
+        const unsigned int _lock_count = 4;
+        unsigned int _lock_first = 0;
+        for (;;)
+        {
+            switch (_lock_first)
+            {
+            case 0:
+                _lock_first = detail::_lock_helper(_m1, _m2, _m3, _m4);
+                if (0 == _lock_first) return;
+                break;
+            case 1:
+                _lock_first = detail::_lock_helper(_m2, _m3, _m4, _m1);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 1) % _lock_count;
+                break;
+            case 2:
+                _lock_first = detail::_lock_helper(_m3, _m4, _m1, _m2);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 2) % _lock_count;
+                break;
+            case 3:
+                _lock_first = detail::_lock_helper(_m4, _m1, _m2, _m3);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 3) % _lock_count;
+                break;
+            }
+        }
+    }
+
+    template <class _Lockbl1, _STDEX_TYPES5>
+    void lock(_Lockbl1 &_m1, _STDEX_ARGS5)
+    {
+        const unsigned int _lock_count = 5;
+        unsigned int _lock_first = 0;
+        for (;;)
+        {
+            switch (_lock_first)
+            {
+            case 0:
+                _lock_first = detail::_lock_helper(_m1, _m2, _m3, _m4, _m5);
+                if (0 == _lock_first) return;
+                break;
+            case 1:
+                _lock_first = detail::_lock_helper(_m2, _m3, _m4, _m5, _m1);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 1) % _lock_count;
+                break;
+            case 2:
+                _lock_first = detail::_lock_helper(_m3, _m4, _m5, _m1, _m2);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 2) % _lock_count;
+                break;
+            case 3:
+                _lock_first = detail::_lock_helper(_m4, _m5, _m1, _m2, _m3);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 3) % _lock_count;
+                break;
+            case 4:
+                _lock_first = detail::_lock_helper(_m5, _m1, _m2, _m3, _m4);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 4) % _lock_count;
+                break;
+            }
+        }
+    }
+
+    template <class _Lockbl1, _STDEX_TYPES6>
+    void lock(_Lockbl1 &_m1, _STDEX_ARGS6)
+    {
+        const unsigned int _lock_count = 6;
+        unsigned int _lock_first = 0;
+        for (;;)
+        {
+            switch (_lock_first)
+            {
+            case 0:
+                _lock_first = detail::_lock_helper(_m1, _m2, _m3, _m4, _m5, _m6);
+                if (0 == _lock_first) return;
+                break;
+            case 1:
+                _lock_first = detail::_lock_helper(_m2, _m3, _m4, _m5, _m6, _m1);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 1) % _lock_count;
+                break;
+            case 2:
+                _lock_first = detail::_lock_helper(_m3, _m4, _m5, _m6, _m1, _m2);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 2) % _lock_count;
+                break;
+            case 3:
+                _lock_first = detail::_lock_helper(_m4, _m5, _m6, _m1, _m2, _m3);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 3) % _lock_count;
+                break;
+            case 4:
+                _lock_first = detail::_lock_helper(_m5, _m6, _m1, _m2, _m3, _m4);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 4) % _lock_count;
+                break;
+            case 5:
+                _lock_first = detail::_lock_helper(_m6, _m1, _m2, _m3, _m4, _m5);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 5) % _lock_count;
+                break;
+            }
+        }
+    }
+
+    template <class _Lockbl1, _STDEX_TYPES7>
+    void lock(_Lockbl1 &_m1, _STDEX_ARGS7)
+    {
+        const unsigned int _lock_count = 7;
+        unsigned int _lock_first = 0;
+        for (;;)
+        {
+            switch (_lock_first)
+            {
+            case 0:
+                _lock_first = detail::_lock_helper(_m1, _m2, _m3, _m4, _m5, _m6, _m7);
+                if (0 == _lock_first) return;
+                break;
+            case 1:
+                _lock_first = detail::_lock_helper(_m2, _m3, _m4, _m5, _m6, _m7, _m1);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 1) % _lock_count;
+                break;
+            case 2:
+                _lock_first = detail::_lock_helper(_m3, _m4, _m5, _m6, _m7, _m1, _m2);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 2) % _lock_count;
+                break;
+            case 3:
+                _lock_first = detail::_lock_helper(_m4, _m5, _m6, _m7, _m1, _m2, _m3);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 3) % _lock_count;
+                break;
+            case 4:
+                _lock_first = detail::_lock_helper(_m5, _m6, _m7, _m1, _m2, _m3, _m4);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 4) % _lock_count;
+                break;
+            case 5:
+                _lock_first = detail::_lock_helper(_m6, _m7, _m1, _m2, _m3, _m4, _m5);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 5) % _lock_count;
+                break;
+            case 6:
+                _lock_first = detail::_lock_helper(_m7, _m1, _m2, _m3, _m4, _m5, _m6);
+                if (0 == _lock_first) return;
+                _lock_first = (_lock_first + 6) % _lock_count;
+                break;
+            }
+        }
+    }
+    template <class _Lockbl1, class _Lockbl2>
+    int try_lock(_Lockbl1 &_m1, _Lockbl2 &_m2)
+    {
+        return detail::_try_lock_impl(_m1, _m2);
+    }
+
+    template <class _Lockbl1, class _Lockbl2>
+    int try_lock(const _Lockbl1 &_m1, _Lockbl2 &_m2)
+    {
+        return detail::_try_lock_impl(_m1, _m2);
+    }
+
+    template <class _Lockbl1, class _Lockbl2>
+    int try_lock(_Lockbl1 &_m1, const _Lockbl2 &_m2)
+    {
+        return detail::_try_lock_impl(_m1, _m2);
+    }
+
+    template <class _Lockbl1, class _Lockbl2>
+    int try_lock(const _Lockbl1 &_m1, const _Lockbl2 &_m2)
+    {
+        return detail::_try_lock_impl(_m1, _m2);
+    }
+
+    using detail::try_lock;
+
+#undef _STDEX_TYPES_N
+#undef _STDEX_ARGS_N
+#undef _STDEX_ARGS_NAMES_N
+
+#undef      _STDEX_TYPES3 
+#undef       _STDEX_ARGS3 
+#undef _STDEX_ARGS_NAMES3 
+#undef      _STDEX_TYPES4 
+#undef       _STDEX_ARGS4 
+#undef _STDEX_ARGS_NAMES4 
+#undef      _STDEX_TYPES5 
+#undef       _STDEX_ARGS5 
+#undef _STDEX_ARGS_NAMES5 
+#undef      _STDEX_TYPES6 
+#undef       _STDEX_ARGS6 
+#undef _STDEX_ARGS_NAMES6 
+#undef      _STDEX_TYPES7 
+#undef       _STDEX_ARGS7 
+#undef _STDEX_ARGS_NAMES7 
+#undef      _STDEX_TYPES8 
+#undef       _STDEX_ARGS8 
+#undef _STDEX_ARGS_NAMES8 
+#undef      _STDEX_TYPES9 
+#undef       _STDEX_ARGS9 
+#undef _STDEX_ARGS_NAMES9 
+#undef      _STDEX_TYPES10
+#undef       _STDEX_ARGS10
+#undef _STDEX_ARGS_NAMES10
+#undef      _STDEX_TYPES11
+#undef       _STDEX_ARGS11
+#undef _STDEX_ARGS_NAMES11
+#undef      _STDEX_TYPES12
+#undef       _STDEX_ARGS12
+#undef _STDEX_ARGS_NAMES12
+#undef      _STDEX_TYPES13
+#undef       _STDEX_ARGS13
+#undef _STDEX_ARGS_NAMES13
+#undef      _STDEX_TYPES14
+#undef       _STDEX_ARGS14
+#undef _STDEX_ARGS_NAMES14
+#undef      _STDEX_TYPES15
+#undef       _STDEX_ARGS15
+#undef _STDEX_ARGS_NAMES15
+#undef      _STDEX_TYPES16
+#undef       _STDEX_ARGS16
+#undef _STDEX_ARGS_NAMES16
+#undef      _STDEX_TYPES17
+#undef       _STDEX_ARGS17
+#undef _STDEX_ARGS_NAMES17
+#undef      _STDEX_TYPES18
+#undef       _STDEX_ARGS18
+#undef _STDEX_ARGS_NAMES18
+#undef      _STDEX_TYPES19
+#undef       _STDEX_ARGS19
+#undef _STDEX_ARGS_NAMES19
+#undef      _STDEX_TYPES20
+#undef       _STDEX_ARGS20
+#undef _STDEX_ARGS_NAMES20
+#undef      _STDEX_TYPES21
+#undef       _STDEX_ARGS21
+#undef _STDEX_ARGS_NAMES21
+#undef      _STDEX_TYPES22
+#undef       _STDEX_ARGS22
+#undef _STDEX_ARGS_NAMES22
+#undef      _STDEX_TYPES23
+#undef       _STDEX_ARGS23
+#undef _STDEX_ARGS_NAMES23
+#undef      _STDEX_TYPES24
+#undef       _STDEX_ARGS24
+#undef _STDEX_ARGS_NAMES24
 } // namespace stdex
 
 #undef _STDEX_DELETED_FUNCTION

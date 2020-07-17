@@ -756,7 +756,7 @@ namespace stdex
                     static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,ina.arg5,ina.arg6); }
                     static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,ina.arg5,nullptr); }
                     static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,nullptr); }
+                    static void call(_FuncT &fp, _arguments &,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,nullptr); }
                 };
 
                 template<class _FuncT>

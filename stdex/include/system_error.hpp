@@ -12,6 +12,11 @@
 /*none*/
 
 // std includes
+#ifndef __STDC_WANT_LIB_EXT1__
+    #define __STDC_WANT_LIB_EXT1__ 1
+    #define _STDEX_WANT_LIB_EXT1_DEFINED
+#endif
+
 #include <errno.h>
 #include <cerrno>
 #include <cstdlib>		// std::strerror
@@ -19,6 +24,11 @@
 #include <stdexcept>	// std::runtime_error
 #include <string> 		// std::string
 #include <functional>
+
+#ifdef _STDEX_WANT_LIB_EXT1_DEFINED
+    #undef __STDC_WANT_LIB_EXT1__
+    #undef _STDEX_WANT_LIB_EXT1_DEFINED
+#endif
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
@@ -750,6 +760,92 @@ namespace stdex
 
     namespace detail
     {
+        namespace system_error_detail
+        {
+            using namespace std;
+
+            float strerrorlen_s(...);
+            float strerror_s(...);
+
+            template<class _Tp>
+            _yes_type _tester(_Tp);
+            _no_type _tester(float);
+
+            static const char* _unknown_error()
+            {return "unknown error";}
+
+            template<bool, class _DummyT>
+            struct strerror_impl_helper
+            {
+                static std::string call(_DummyT _Errcode)
+                {
+                    using namespace std;
+
+                    const char *result = 
+                        strerror(_Errcode);
+                    
+                    return result ? result : "";
+                }
+            };
+
+            template<class _DummyT>
+            struct strerror_impl_helper<true, _DummyT>
+            {
+                static std::string call(_DummyT _Errcode)
+                {
+                    using namespace std;
+                    
+                    std::string result;
+
+                    size_t len = strerrorlen_s(_Errcode);
+                    if(len)
+                    {
+                        struct _RAII{
+                            char *buf;
+                            _RAII() : buf(0) {}
+                            ~_RAII() {delete [] buf;}
+                        } _tmp;
+
+                        _tmp.buf = new char[len + 1];
+                        if(0 == strerror_s(_tmp.buf, len + 1, _Errcode))
+                            result = _tmp.buf;
+                    }
+                    return result;
+                }
+            };
+
+            struct has_safe_strerror
+            {
+                static const bool value = 
+                    sizeof(_tester(strerrorlen_s(0))) == sizeof(_yes_type) &&
+                    sizeof(_tester(strerror_s(_declptr<char>(), 0, 0))) == sizeof(_yes_type);
+            };
+
+            struct strerror_impl:
+                strerror_impl_helper<has_safe_strerror::value, int>
+            { };
+
+            static inline std::string _strerror(int _errnum)
+            {
+                std::string result =
+                    strerror_impl::call(_errnum);
+                
+                if(result.empty())
+                    return _unknown_error();
+                return result;
+            }
+
+            static inline bool _is_valid_errnum(int _errnum)
+            {
+                return 
+                    !strerror_impl::call(_errnum).empty();
+            }
+        }
+
+        using system_error_detail::_strerror;
+        using system_error_detail::_is_valid_errnum;
+        
+
         class _generic_error_category
             : public error_category
         {	// categorize a generic error
@@ -765,8 +861,7 @@ namespace stdex
 
             virtual std::string message(int _Errcode) const
             {	// convert to name of error
-                const char *_Name = std::strerror(_Errcode);
-                return (std::string(_Name != 0 ? _Name : "unknown error"));
+                return _strerror(_Errcode);
             }
         };
 
@@ -807,14 +902,13 @@ namespace stdex
 
             virtual std::string message(int _Errcode) const
             {	// convert to name of error
-                const char *_Name = std::strerror(_Errcode);
-                return (std::string(_Name != 0 ? _Name : "unknown error"));
+                return _strerror(_Errcode);
             }
 
             virtual error_condition
                 default_error_condition(int _Errval) const _STDEX_NOEXCEPT_FUNCTION
             {	// make error_condition for error code (generic if possible)
-                if (std::strerror(_Errval))
+                if (_is_valid_errnum(_Errval))
                     return (error_condition(_Errval, generic_category()));
                 else
                     return (error_condition(_Errval, system_category()));

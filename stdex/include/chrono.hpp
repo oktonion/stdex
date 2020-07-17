@@ -416,10 +416,6 @@ namespace stdex
                 check4; // if you are there means rep type is integer but floating-point type is passed as argument
             }
 
-            duration(const duration &other):
-            _r(other._r)
-            { }
-
             template<class _Rep2, class _Period2>
             duration(const duration<_Rep2, _Period2> &other):
                 _r(duration_cast<duration>(other).count())
