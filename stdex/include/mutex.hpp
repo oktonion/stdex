@@ -36,12 +36,6 @@ namespace stdex
 {
     namespace detail
     {
-        template<class _Tp>
-        static void _throw_system_error(const _Tp &_errc)
-        {
-            throw stdex::system_error(_errc);
-        }
-
         class _mutex_base
         {
         protected:
