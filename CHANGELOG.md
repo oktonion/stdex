@@ -4,6 +4,24 @@ All notable changes to stdex library project will be documented in this file.
 
 visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library
 
+## [0.2.8] - 2020-xx-xx
+
+### Added
+
+- `<mutex>` header:
+- - `stdex::try_lock`
+- - `stdex::lock`
+
+- moar tests to the god of tests
+
+### Changed
+
+- trying to be more clear why `std::terminate` has been raised (affects DEBUG mode only)
+
+### Fixed
+
+- some serious fixes
+
 ## [0.2.7] - 2020-07-14
 
 ### Added
