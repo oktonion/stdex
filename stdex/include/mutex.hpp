@@ -16,10 +16,6 @@
  
 // std includes
 #include <algorithm>
-
-#if defined(_DEBUG) || defined(DEBUG)
-    #include <iostream> // for logging
-#endif
  
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
  
@@ -40,6 +36,12 @@ namespace stdex
 {
     namespace detail
     {
+        template<class _Tp>
+        static void _throw_system_error(const _Tp &_errc)
+        {
+            throw stdex::system_error(_errc);
+        }
+
         class _mutex_base
         {
         protected:
@@ -51,24 +53,14 @@ namespace stdex
                 // XXX EAGAIN, ENOMEM, EPERM, EBUSY(may), EINVAL(may)
                 int _err = pthread_mutex_init(&_mutex_handle, NULL);
                 if (0 != _err)
-                {
-                #if defined(_DEBUG) || defined(DEBUG)
-                    std::cerr << stdex::error_code(stdex::errc::errc_t(_err)).message() << std::endl;
-                #endif
-                    std::terminate();
-                }
+                    _throw_system_error(stdex::errc::errc_t(_err));
             }
 
-            ~_mutex_base()
+            ~_mutex_base() _STDEX_NOEXCEPT(false)
             { 
                 int _err = pthread_mutex_destroy(&_mutex_handle);
                 if (0 != _err)
-                {
-                #if defined(_DEBUG) || defined(DEBUG)
-                    std::cerr << stdex::error_code(stdex::errc::errc_t(_err)).message() << std::endl;
-                #endif
-                    std::terminate();
-                }
+                    _throw_system_error(stdex::errc::errc_t(_err));
             }
 
         private:
@@ -99,16 +91,11 @@ namespace stdex
                     throw(stdex::system_error( stdex::errc::errc_t(_err)) );
             }
 
-            ~_recursive_mutex_base()
+            ~_recursive_mutex_base() _STDEX_NOEXCEPT(false)
             {
                 int _err = pthread_mutex_destroy(&_mutex_handle);
                 if (0 != _err)
-                {
-                #if defined(_DEBUG) || defined(DEBUG)
-                    std::cerr << stdex::error_code(stdex::errc::errc_t(_err)).message() << std::endl;
-                #endif
-                    std::terminate();
-                }
+                    _throw_system_error(stdex::errc::errc_t(_err));
             }
 
         private:
