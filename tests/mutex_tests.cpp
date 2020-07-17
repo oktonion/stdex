@@ -505,6 +505,37 @@ int lock_test6()
   return 0;
 }
 
+int lock_test7()
+{
+    // test behaviour when a lock is already held
+    try
+    {
+        unreliable_lock::lock_on = 1;
+        while (unreliable_lock::lock_on < 8)
+        {
+            unreliable_lock::count = 0;
+            unreliable_lock l1, l2, l3, l4, l5, l6, l7, l8;
+            stdex::lock(l1, l2, l3, l4, l5, l6, l7, l8);
+            DYNAMIC_VERIFY( unreliable_lock::count > 8 );
+            l1.unlock();
+            l2.unlock();
+            l3.unlock();
+            l4.unlock();
+            l5.unlock();
+            l6.unlock();
+            l7.unlock();
+            l8.unlock();
+            ++unreliable_lock::lock_on;
+        }
+    }
+    catch (...)
+    {
+        DYNAMIC_VERIFY_FAIL;
+    }
+
+    return 0;
+}
+
 int main(void)
 {
     {
