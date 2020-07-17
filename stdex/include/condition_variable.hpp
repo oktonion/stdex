@@ -52,6 +52,15 @@ namespace stdex
 
 namespace stdex
 {
+    namespace detail
+    {
+        template<class _Tp>
+        static void _throw_system_error(const _Tp &_errc)
+        {
+            throw stdex::system_error(_errc);
+        }
+    }
+
     /// cv_status
     struct cv_status
     {
@@ -88,18 +97,13 @@ namespace stdex
                 throw(stdex::system_error( stdex::errc::errc_t(_err)) );
         }
 
-        ~condition_variable()
+        ~condition_variable() _STDEX_NOEXCEPT(false)
         {
             int _err = 
                 pthread_cond_destroy(&_condition_handle);
 
             if (0 != _err)
-            {
-            #if defined(_DEBUG) || defined(DEBUG)
-                std::cerr << stdex::error_code(stdex::errc::errc_t(_err)).message() << std::endl;
-            #endif
-                std::terminate();
-            }
+                detail::_throw_system_error(stdex::errc::errc_t(_err));
         }
 
         inline void wait(unique_lock<mutex> &_lock) _STDEX_NOEXCEPT_FUNCTION
