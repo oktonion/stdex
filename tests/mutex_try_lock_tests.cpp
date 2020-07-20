@@ -5,12 +5,13 @@
 
 #include <iostream>
 #include <string>
-#include <cassert>
+#include <mutex>
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
 #define DYNAMIC_VERIFY_FAIL {std::cout << "check condition " << "failed at line " << __LINE__ << std::endl; return -1;}
+#define DYNAMIC_VERIFY_ABORT(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; std::abort();}
 
 struct user_lock
 {
@@ -18,7 +19,7 @@ struct user_lock
 
   void lock()
   {
-    assert( !is_locked );
+    DYNAMIC_VERIFY_ABORT( !is_locked );
     is_locked = true;
   }
 
@@ -27,7 +28,7 @@ struct user_lock
 
   void unlock()
   {
-    assert( is_locked );
+    DYNAMIC_VERIFY_ABORT( is_locked );
     is_locked = false;
   }
 
@@ -48,7 +49,7 @@ struct unreliable_lock
 
     ~unreliable_lock()
     {
-        assert( !l.owns_lock() );
+        DYNAMIC_VERIFY_ABORT(!l.owns_lock());
     }
 
     void lock()
@@ -71,7 +72,7 @@ struct unreliable_lock
 
     void unlock()
     {
-        assert( l.owns_lock() );
+        DYNAMIC_VERIFY_ABORT( l.owns_lock() );
         l.unlock();
     }
 
@@ -99,7 +100,7 @@ int try_lock_test1()
             int result = stdex::try_lock(l1, l2, l3);
             DYNAMIC_VERIFY( result == -1 );
         }
-            catch (const stdex::system_error&)
+        catch (const stdex::system_error&)
         {
             DYNAMIC_VERIFY_FAIL;
         }
@@ -298,6 +299,36 @@ int try_lock_test8()
     return 0;
 }
 
+int try_lock_test9()
+{
+    unreliable_lock l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13, l14, l15, l16, l17, l18, l19, l20, l21, l22, l23, l24;
+
+    try
+    {
+        // test behaviour when an exception is thrown
+        unreliable_lock::throw_on = 0;
+        while (unreliable_lock::throw_on < 24)
+        {
+            unreliable_lock::count = 0;
+            try
+            {
+                std::try_lock(l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13, l14, l15, l16, l17, l18, l19, l20, l21, l22, l23, l24);
+                DYNAMIC_VERIFY(unreliable_lock::throw_on >= 4);
+            }
+            catch (int e)
+            {
+                DYNAMIC_VERIFY( e == unreliable_lock::throw_on );
+            }
+            ++unreliable_lock::throw_on;
+        }
+    }
+    catch (...)
+    {
+        DYNAMIC_VERIFY_FAIL;
+    }
+    return 0;
+}
+
 int main(void)
 {
     using namespace stdex;
@@ -310,6 +341,7 @@ int main(void)
     RUN_TEST(try_lock_test6);
     RUN_TEST(try_lock_test7);
     RUN_TEST(try_lock_test8);
+    RUN_TEST(try_lock_test9);
 
     return 0;
 }
