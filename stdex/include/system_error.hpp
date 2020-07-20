@@ -770,6 +770,7 @@ namespace stdex
                 }
             };
 
+#ifdef __STDC_WANT_LIB_EXT1__
             template<class _DummyT>
             struct strerror_impl_helper<true, _DummyT>
             {
@@ -796,6 +797,7 @@ namespace stdex
                 }
             };
 
+#endif
             struct has_safe_strerror
             {
                 static const bool value =
