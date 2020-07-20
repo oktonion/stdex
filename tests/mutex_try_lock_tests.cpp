@@ -5,7 +5,6 @@
 
 #include <iostream>
 #include <string>
-#include <mutex>
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
@@ -312,7 +311,7 @@ int try_lock_test9()
             unreliable_lock::count = 0;
             try
             {
-                std::try_lock(l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13, l14, l15, l16, l17, l18, l19, l20, l21, l22, l23, l24);
+                stdex::try_lock(l1, l2, l3, l4, l5, l6, l7, l8, l9, l10, l11, l12, l13, l14, l15, l16, l17, l18, l19, l20, l21, l22, l23, l24);
                 DYNAMIC_VERIFY(unreliable_lock::throw_on >= 4);
             }
             catch (int e)
