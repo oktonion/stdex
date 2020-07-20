@@ -12,10 +12,6 @@
 /*none*/
 
 // std includes
-#ifndef __STDC_WANT_LIB_EXT1__
-    #define __STDC_WANT_LIB_EXT1__ 1
-    #define _STDEX_WANT_LIB_EXT1_DEFINED
-#endif
 
 #include <errno.h>
 #include <cerrno>
@@ -24,11 +20,6 @@
 #include <stdexcept>	// std::runtime_error
 #include <string> 		// std::string
 #include <functional>
-
-#ifdef _STDEX_WANT_LIB_EXT1_DEFINED
-    #undef __STDC_WANT_LIB_EXT1__
-    #undef _STDEX_WANT_LIB_EXT1_DEFINED
-#endif
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
@@ -762,15 +753,6 @@ namespace stdex
     {
         namespace system_error_detail
         {
-            using namespace std;
-
-            float strerrorlen_s(...);
-            float strerror_s(...);
-
-            template<class _Tp>
-            _yes_type _tester(_Tp);
-            _no_type _tester(float);
-
             static const char* _unknown_error()
             {return "unknown error";}
 
@@ -782,7 +764,7 @@ namespace stdex
                     using namespace std;
 
                     const char *result = 
-                        strerror(_Errcode);
+                        strerror(_Errcode); // if you are there U need to disable _CRT_SECURE_NO_WARNINGS bullshit
                     
                     return result ? result : "";
                 }
@@ -797,7 +779,7 @@ namespace stdex
                     
                     std::string result;
 
-                    size_t len = strerrorlen_s(_Errcode);
+                    size_t len = ::strerrorlen_s(_Errcode);
                     if(len)
                     {
                         struct _RAII{
@@ -807,7 +789,7 @@ namespace stdex
                         } _tmp;
 
                         _tmp.buf = new char[len + 1];
-                        if(0 == strerror_s(_tmp.buf, len + 1, _Errcode))
+                        if(0 == ::strerror_s(_tmp.buf, len + 1, _Errcode))
                             result = _tmp.buf;
                     }
                     return result;
@@ -816,9 +798,12 @@ namespace stdex
 
             struct has_safe_strerror
             {
-                static const bool value = 
-                    sizeof(_tester(strerrorlen_s(0))) == sizeof(_yes_type) &&
-                    sizeof(_tester(strerror_s(_declptr<char>(), 0, 0))) == sizeof(_yes_type);
+                static const bool value =
+#ifndef __STDC_WANT_LIB_EXT1__
+                    false;
+#else
+                    true;
+#endif
             };
 
             struct strerror_impl:
