@@ -580,6 +580,7 @@ int main(void)
     RUN_TEST(lock_test4);
     RUN_TEST(lock_test5);
     RUN_TEST(lock_test6);
+    RUN_TEST(lock_test7);
 
     return 0;
 }
