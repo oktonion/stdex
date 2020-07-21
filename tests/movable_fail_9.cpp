@@ -16,10 +16,31 @@
 
 #define MY_STD stdex
 struct move_only {
-    STDEX_NOT_COPYABLE;
-    move_only() : STDEX_DELETE_ICC() {}
-    move_only(STDEX_RV_REF(move_only) other) : STDEX_DELETE_ICC(){}
-    move_only& operator=(STDEX_RV_REF(move_only) other) {return *this;}
+private:
+    STDEX_NOT_COPYABLE
+
+public:
+    move_only() : STDEX_DELETE_ICC() {
+        std::cout << "move_only()" << std::endl;
+    }
+    move_only(STDEX_RV_REF(move_only) other) : STDEX_DELETE_ICC(){
+        std::cout << "move_only(STDEX_RV_REF(move_only) other)" << std::endl;
+    }
+    move_only& operator=(STDEX_RV_REF(move_only) other) {
+        std::cout << "move_only& operator=(STDEX_RV_REF(move_only) other)" << std::endl;
+        return *this;
+    }
+    ~move_only() {
+        std::cout << "~move_only()" << std::endl;
+    }
+
+    //move_only(move_only&&) : STDEX_DELETE_ICC() {
+    //    std::cout << "move_only(move_only&&)" << std::endl;
+    //}
+    //move_only& operator=(move_only&& other) {
+    //    std::cout << __func__ << std::endl;
+    //    return *this;
+    //}
 };
 
 move_only source() {return move_only();}
@@ -29,7 +50,7 @@ void test(move_only) {}
 
 int main()
 {
-  const move_only ca = move_only();
+  move_only ca = move_only();
   // expected-error@+1 {{call to implicitly-deleted copy constructor of 'move_only'}}
   test(MY_STD::move(ca));
 
