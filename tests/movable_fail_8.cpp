@@ -60,8 +60,10 @@ int test1()
     typedef movable_only mv_t;
     
     mv_t mv = mv_t(0), mv3(0);
-    const mv_t  mv2(mv); // shouldn't work
     std::cout << "should be rv_ref" << std::endl;
+
+    mv = // shouldn't work
+        MY_STD::move(mv2); // works
 
 
     return 0;
