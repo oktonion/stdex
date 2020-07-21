@@ -287,28 +287,26 @@ namespace stdex
                 unlock();
         }
 
-        /* move move move, no move in pre-C++11
-        unique_lock(unique_lock &&u) _STDEX_NOEXCEPT_FUNCTION: 
-            _device(u._device), 
-            _owns(u._owns)
-        {
-            u._device = 0;
-            u._owns = false;
-        }
-
-        unique_lock& operator=(unique_lock &&u) _STDEX_NOEXCEPT_FUNCTION
-        {
-            if (_owns)
-                unlock();
-
-            unique_lock(std::move(u)).swap(*this);
-
-            u._device = 0;
-            u._owns = false;
-
-            return *this;
-        }
-        */
+        unique_lock(STDEX_RV_REF(unique_lock<mutex_type>) other) _STDEX_NOEXCEPT_FUNCTION: 
+             _device(static_cast<unique_lock<mutex_type>&>(other)._device), 
+             _owns(static_cast<unique_lock<mutex_type>&>(other)._owns)
+         {
+             static_cast<unique_lock<mutex_type>&>(other)._device = 0;
+             static_cast<unique_lock<mutex_type>&>(other)._owns = false;
+         }
+ 
+        unique_lock& operator=(STDEX_RV_REF(unique_lock<mutex_type>) other) _STDEX_NOEXCEPT_FUNCTION
+         {
+             if (_owns)
+                 unlock();
+ 
+             unique_lock<mutex_type>(stdex::move(other)).swap(*this);
+ 
+             static_cast<unique_lock<mutex_type>&>(other)._device = 0;
+             static_cast<unique_lock<mutex_type>&>(other)._owns = false;
+ 
+             return *this;
+         }
 
         void lock()
         {
