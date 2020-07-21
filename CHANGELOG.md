@@ -4,22 +4,61 @@ All notable changes to stdex library project will be documented in this file.
 
 visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library
 
-## [0.2.7] - 2020-xx-xx
+## [0.2.8] - 2020-xx-xx
 
 ### Added
 
 - `<mutex>` header:
+- - `stdex::try_lock`
+- - `stdex::lock`
+
+- moar tests to the god of tests
+
+### Changed
+
+- trying to be more clear why `std::terminate` has been raised (affects DEBUG mode only)
+
+### Fixed
+
+- some serious fixes
+
+## [0.2.7] - 2020-07-14
+
+### Added
+
+- `namespace _stdex_ADL` for ADL hack for bugged compilers (pollutes global scope but gets job done)
+
+- `<mutex>` header:
 - - `stdex::timed_mutex` and `stdex::recursive_timed_mutex` implemented
+
+- moar tests to the god of tests
 
 ### Changed
 
 - `<mutex>` header:
 - - throw exceptions if underlying pthread implementation is capable to detect errors (less bugs in production, more exceptions to handle, yeeeah!)
 
+- all build and test run scripts now povide more clear output
+
 ### Fixed
+
+- stupid MS defines for `max` and `min` breaking valid code
+
+- `<thread>` header:
+- - `stdex::this_thread::sleep_for` bug with sleep interval less than expected (sync OS clocks used in `<thread>` with OS clocks of `stdex::chrono::system_clock` and `stdex::chrono::steady_clock`)
+- - bugged compilers problems with `stdex::thread` functor argument params deduction
 
 - `<chrono>` implementation:
 - - removed 1500ms time shift for MacOS implementation of `chrono`, this fix affects `stdex::chrono::system_clock::now()`, `stdex::chrono::steady_clock::now()`, `stdex::condition_variable::wait_for()`, all waitable mutexes etc.
+
+- `<chrono>` header:
+- - correct constructors set for `stdex::chrono::duration`
+- - disabled `operator%` for floating point `stdex::chrono::duration::rep`
+- - using correct trait `stdex::chrono::treat_as_floating_point` for detecting floating point `stdex::chrono::duration::rep`
+
+- `<system_error>` header:
+- - correct construction for custom error codes with `stdex::make_error_code` using ADL hack for bugged compilers
+- - correct construction for custom error conditions with `stdex::make_error_condition` using ADL hack for bugged compilers
 
 ## [0.2.6] - 2020-06-17
 

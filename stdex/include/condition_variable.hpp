@@ -16,6 +16,10 @@
 #include <memory>
 #include <limits>
 
+#if defined(_DEBUG) || defined(DEBUG)
+    #include <iostream> // for logging
+#endif
+
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
 #define _STDEX_DELETED_FUNCTION =delete
@@ -48,6 +52,15 @@ namespace stdex
 
 namespace stdex
 {
+    namespace detail
+    {
+        template<class _Tp>
+        static void _throw_system_error(const _Tp &_errc)
+        {
+            throw stdex::system_error(_errc);
+        }
+    }
+
     /// cv_status
     struct cv_status
     {
@@ -90,7 +103,7 @@ namespace stdex
                 pthread_cond_destroy(&_condition_handle);
 
             if (0 != _err)
-                throw(stdex::system_error( stdex::errc::errc_t(_err)) );
+                detail::_throw_system_error(stdex::errc::errc_t(_err));
         }
 
         inline void wait(unique_lock<mutex> &_lock) _STDEX_NOEXCEPT_FUNCTION
@@ -99,7 +112,12 @@ namespace stdex
                 pthread_cond_wait(&_condition_handle, detail::_lock_mutex_native_handle(_lock));
 
             if (0 != _err)
+            {
+            #if defined(_DEBUG) || defined(DEBUG)
+                std::cerr << stdex::error_code(stdex::errc::errc_t(_err)).message() << std::endl;
+            #endif
                 std::terminate();
+            }
         }
 
         template<class _Predicate>
@@ -183,7 +201,7 @@ namespace stdex
             timespec _ts;
 
             const stdex::time_t _ts_sec_max = 
-                std::numeric_limits<stdex::time_t>::max();
+                (std::numeric_limits<stdex::time_t>::max)();
             if (_s_count < _ts_sec_max)
             {
                 _ts.tv_sec = static_cast<stdex::time_t>(_s_count > 0 ? _s_count : 0);
@@ -198,10 +216,15 @@ namespace stdex
             int _err =
                 pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
 
-            #ifdef ETIMEDOUT
+        #ifdef ETIMEDOUT
             if(_err && _err != ETIMEDOUT)
-                std::terminate();
+            {
+            #if defined(_DEBUG) || defined(DEBUG)
+                std::cerr << stdex::error_code(stdex::errc::errc_t(_err)).message() << std::endl;
             #endif
+                std::terminate();
+            }
+        #endif
 
             return (clock_t::now() < _atime
                 ? cv_status::no_timeout : cv_status::timeout);
@@ -233,7 +256,7 @@ namespace stdex
             timespec _ts;
 
             const stdex::time_t _ts_sec_max = 
-                std::numeric_limits<stdex::time_t>::max();
+                (std::numeric_limits<stdex::time_t>::max)();
             if (_sec.time_since_epoch().count() >= _ts_sec_max ||
                 _rs.count() >= _ts_sec_max ||
                 _sec_result.time_since_epoch().count() >= _ts_sec_max)
@@ -254,10 +277,15 @@ namespace stdex
             int _err = 
                 pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
             
-            #ifdef ETIMEDOUT
+        #ifdef ETIMEDOUT
             if(_err && _err != ETIMEDOUT)
-                std::terminate();
+            {
+            #if defined(_DEBUG) || defined(DEBUG)
+                std::cerr << stdex::error_code(stdex::errc::errc_t(_err)).message() << std::endl;
             #endif
+                std::terminate();
+            }
+        #endif
 
             return (clock_t::now() - _start_time_point < _rtime
                 ? cv_status::no_timeout : cv_status::timeout);

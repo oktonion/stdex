@@ -13,6 +13,7 @@
 
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
+#define DYNAMIC_VERIFY_FAIL {std::cout << "check condition " << "failed at line " << __LINE__ << std::endl; return -1;}
 using std::size_t;
 
 namespace thread_tests_std
@@ -228,11 +229,11 @@ int test1()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     return 0;
@@ -257,15 +258,15 @@ int test2()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (const char *)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     return 0;
@@ -306,15 +307,15 @@ int test3()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (const char *)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     return 0;
@@ -334,15 +335,15 @@ int test4()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (const char *)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     return 0;
@@ -372,15 +373,15 @@ int test5()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (const char *)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     return 0;
@@ -398,11 +399,11 @@ int test6()
         t1.join();
     }
 
-    /*{
-        thread t1(thread_func7, 1, 1, 1, 1, 1, nullptr, nullptr);
+    {
+        thread t1(thread_func7, 1, 1, 1, 1.f, 1, nullptr, nullptr);
 
         t1.join();
-    }*/
+    }
 
     {
         thread t1(thread_func8, nullptr, nullptr, nullptr, nullptr);
@@ -413,26 +414,6 @@ int test6()
     return 0;
 }
 
-int test7()
-{
-    using namespace stdex;
-
-#if CHECK_FOR_COMPILE_ERROR_TESTS == 1
-		{
-			typedef thread test_type;
-			test_type t1;
-			test_type t2;
-			t1 = t2;
-		}
-
-		{
-			typedef thread test_type;
-			test_type t1;
-			test_type t2(t1);
-		}
-#endif
-    return 0;
-}
 
 int test_thread_id()
 {
@@ -471,15 +452,15 @@ int test8()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (const char *)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     return 0;
@@ -499,18 +480,20 @@ int test9()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (const char *)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     return 0;
 }
+
+#define CHECK_FOR_THROW_EVENTS 1
 
 int test10()
 {
@@ -530,7 +513,7 @@ int test10()
 			}
 			catch (const char *)
 			{
-				DYNAMIC_VERIFY(false);
+				DYNAMIC_VERIFY_FAIL ;
 			}
 
 			DYNAMIC_VERIFY(test);
@@ -551,7 +534,7 @@ int test10()
 			}
 			catch (const char *)
 			{
-				DYNAMIC_VERIFY(false);
+				DYNAMIC_VERIFY_FAIL ;
 			}
 
 			DYNAMIC_VERIFY(test);
@@ -563,6 +546,8 @@ int test10()
 int test11()
 {
     using namespace stdex;
+
+    thread_func_nullptr_check_ret = 0;
 
     {
         float p;
@@ -606,10 +591,10 @@ struct dummy_functor{
     int operator()() {return 0;}
     void operator()(void*) {}
     void operator()(void*, int*) {}
-    void operator()(void*, double*, float*) {}
+    int operator()(void*, double*, float*) {return 0;}
     void operator()(struct dummy_func_4_t0*, struct dummy_func_4_t1*, struct dummy_func_4_t2*, struct dummy_func_4_t3*) {}
     void operator()(struct dummy_func_5_t0*, struct dummy_func_5_t1*, struct dummy_func_5_t2*, struct dummy_func_5_t3*, struct dummy_func_5_t4*) {}
-    void operator()(struct dummy_func_6_t0*, struct dummy_func_6_t1*, struct dummy_func_6_t2 const*, struct dummy_func_6_t3*, struct dummy_func_6_t4*, struct dummy_func_6_t5 const*) {}
+    float operator()(struct dummy_func_6_t0*, struct dummy_func_6_t1*, struct dummy_func_6_t2 const*, struct dummy_func_6_t3*, struct dummy_func_6_t4*, struct dummy_func_6_t5 const*) {return 0.f;}
     void operator()(struct dummy_func_7_t0*, struct dummy_func_7_t1*, struct dummy_func_7_t2 const*, struct dummy_func_7_t3*, struct dummy_func_7_t4*, struct dummy_func_7_t5 const*, struct dummy_func_7_t6 const*) {}
     void operator()(struct dummy_func_8_t0*, struct dummy_func_8_t1*, struct dummy_func_8_t2 const*, struct dummy_func_8_t3*, struct dummy_func_8_t4*, struct dummy_func_8_t5 const*, struct dummy_func_8_t6 const**, void*) {}
 
@@ -742,8 +727,8 @@ int test14()
             steady_clock::now() - start;
         std::cout << "std::duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired is " << desired_dur << " ms" << std::endl;
         DYNAMIC_VERIFY(desired_dur >= intmax_type(25000));
-        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= desired_dur && duration_cast<milliseconds>(dur).count() >= intmax_type(25000));
-        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + intmax_type(2000)); // 2 sec is bullshit but better than nothing
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= intmax_type(25000));
+        //DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + intmax_type(2000)); // 2 sec is bullshit but better than nothing
 
         std_dur = duration_cast<milliseconds>(dur).count();
         std_desired_dur = desired_dur;
@@ -780,8 +765,8 @@ int test14()
         #endif
 
         DYNAMIC_VERIFY(desired_dur >= intmax_type(25000));
-        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= desired_dur && duration_cast<milliseconds>(dur).count() >= intmax_type(25000));
-        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + intmax_type(2000)); // 2 sec is bullshit but better than nothing
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= intmax_type(25000));
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + intmax_type(2500)); // 2.5 sec is bullshit but better than nothing
     }
 
     return 0;
@@ -803,7 +788,6 @@ int main(void)
         RUN_TEST(test4);
         RUN_TEST(test5);
         RUN_TEST(test6);
-        RUN_TEST(test7);
         RUN_TEST(test8);
         RUN_TEST(test9);
         RUN_TEST(test10);

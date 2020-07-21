@@ -8,6 +8,7 @@
 #define THROW_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; throw(__LINE__);}
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
+#define DYNAMIC_VERIFY_FAIL {std::cout << "check condition " << "failed at line " << __LINE__ << std::endl; return -1;}
 
 template<class T>
   struct BoundsContainer
@@ -160,9 +161,9 @@ int test1()
     Container con(array, array);
     DYNAMIC_VERIFY( stdex::all_of(con.begin(), con.end(), predicate) );
   }
-  catch(int line)
+  catch(...)
   {
-    return line;
+    DYNAMIC_VERIFY_FAIL ;
   }
 
   return 0;
@@ -175,9 +176,9 @@ int test2()
     Container con(array, array + 1);
     DYNAMIC_VERIFY( stdex::all_of(con.begin(), con.end(), predicate) );
   }
-  catch(int line)
+  catch(...)
   {
-    return line;
+    DYNAMIC_VERIFY_FAIL ;
   }
 
    return 0;
@@ -190,9 +191,9 @@ int test3()
     Container con(array, array + 6);
     DYNAMIC_VERIFY( !stdex::all_of(con.begin(), con.end(), predicate) );
   }
-  catch(int line)
+  catch(...)
   {
-    return line;
+    DYNAMIC_VERIFY_FAIL ;
   }
 
   return 0;

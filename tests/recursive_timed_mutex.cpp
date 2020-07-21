@@ -449,11 +449,11 @@ namespace timed_mutex_tests
         return 0;
     }
 
-    mutex_type m;
+    mutex_type global_m;
 
     void ff()
     {
-        stdex::lock_guard<mutex_type> l(m);
+        stdex::lock_guard<mutex_type> l(global_m);
     }
 
     int unlock_test1()

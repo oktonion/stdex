@@ -8,32 +8,42 @@
 
 #define THROW_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; throw(__LINE__);}
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
-#define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
+#define RUN_TEST(test) {std::cout << #test << std::endl; X line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
+
+struct X {};
+
+struct Z
+{
+  Z&
+  operator=(const X&)
+  { return *this; }
+};
 
 template<class T>
-  struct BoundsContainer
-  {
-    T* first;
-    T* last;
-    BoundsContainer(T* _first, T* _last) : first(_first), last(_last)
-    { }
+struct BoundsContainer
+{
+  T* first;
+  T* last;
+
+  BoundsContainer(T* _first, T* _last) : first(_first), last(_last)
+  { }
+
+  std::size_t size() const { return last - first; }
 };
 
 template<class T>
 struct OutputContainer : public BoundsContainer<T>
 {
-    T* incrementedto;
-    bool* writtento;
-    OutputContainer(T* _first, T* _last)
-    : BoundsContainer<T>(_first, _last), incrementedto(_first)
-    {
-writtento = new bool[this->last - this->first];
-for(int i = 0; i < this->last - this->first; i++)
-    writtento[i] = false;
-    }
+  T* incrementedto;
+  bool* writtento;
 
-    ~OutputContainer()
-    { delete[] writtento; }
+  OutputContainer(T* _first, T* _last)
+  : BoundsContainer<T>(_first, _last), incrementedto(_first),
+  writtento(new bool[this->size()])
+  { }
+
+  ~OutputContainer()
+  { delete[] writtento; }
 };
 
 namespace type_traits
@@ -126,23 +136,22 @@ private:
 template<class T>
 class WritableObject
 {
-    T* ptr;
+  T* ptr;
 
 public:
-    OutputContainer<T>* SharedInfo;
-    WritableObject(T* ptr_in,OutputContainer<T>* SharedInfo_in):
-    ptr(ptr_in), SharedInfo(SharedInfo_in)
-    { }
+  OutputContainer<T>* SharedInfo;
 
-    template<class U>
-    void
-    operator=(const U& new_val)
-    {
-        THROW_VERIFY((SharedInfo->writtento[ptr - SharedInfo->first] == 0));
-        SharedInfo->writtento[ptr - SharedInfo->first] = 1;
-        *ptr = new_val;
-    }
-
+  WritableObject(T* ptr_in, OutputContainer<T>* SharedInfo_in):
+  ptr(ptr_in), SharedInfo(SharedInfo_in)
+  { }
+  template<class U>
+  void
+  operator=(const U& new_val)
+  {
+    assert(SharedInfo->writtento[ptr - SharedInfo->first] == 0);
+    SharedInfo->writtento[ptr - SharedInfo->first] = 1;
+    *ptr = new_val;
+  }
 };
 
 template<class T>
@@ -198,14 +207,7 @@ struct output_iterator_wrapper
     }
 };
 
-struct X { };
 
-struct Z
-{
-  Z&
-  operator=(const X&)
-  { return *this; }
-};
 
 bool
 pred_function(const X&)
@@ -230,8 +232,34 @@ test2(input_iterator_wrapper<X>& begin,
       output_iterator_wrapper<Z>& output)
 { return stdex::copy_if(begin, end, output, pred_obj()); }
 
-int 
+int
 main()
 {
+  X x[2];
+  Z z[2];
+  OutputContainer<Z> cont_z = OutputContainer<Z>(&z[0], &z[1]);
+  OutputContainer<X> cont_x = OutputContainer<X>(&x[0], &x[1]);
+  WritableObject<X> obj1 = WritableObject<X>(&x[0], &cont_x), obj2 = obj1;
+  BoundsContainer<X> bcont = BoundsContainer<X>(&x[0], &x[1]);
+  (void)(&x);
+  (void)(&z);
+  (void)(&cont_x);
+  (void)(&cont_z);
+  (void)(&obj1);
+  (void)(&obj2);
+  (void)(&bcont);
+  obj2 = obj1;
+
+
+  output_iterator_wrapper<Z> owr = output_iterator_wrapper<Z>(&z[0], &cont_z);
+  input_iterator_wrapper<X> iwr = input_iterator_wrapper<X>(&x[0], &bcont);
+  owr++;
+  iwr++;
+  (void)(&owr);
+  (void)(&iwr);
+
+  test1(iwr, iwr, owr);
+  test2(iwr, iwr, owr);
+
   return 0;
 }
