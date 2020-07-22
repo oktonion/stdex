@@ -51,6 +51,10 @@ namespace stdex
 			delete_implicit_copy_constructor(const bool &):
 				deleted_implicit_copy_constructor(1)
 			{ }
+			delete_implicit_copy_constructor(delete_implicit_copy_constructor&):
+				deleted_implicit_copy_constructor(1) {}
+			delete_implicit_copy_constructor(delete_implicit_copy_constructor&, char dummy = 0) :
+				deleted_implicit_copy_constructor(dummy) {} // ambiguous copy constructor
 		};
 	} // namespace detail
 
