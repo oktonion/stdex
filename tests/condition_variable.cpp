@@ -1,11 +1,13 @@
 #include "../stdex/include/core.h"
 #include "../stdex/include/condition_variable.hpp"
+#include "../stdex/include/mutex.hpp"
 #include "../stdex/include/system_error.hpp"
 #include "../stdex/include/thread.hpp"
 
 #include <iostream>
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {return line;}}
+#define DYNAMIC_VERIFY_FAIL {std::cout << "check condition " << "failed at line " << __LINE__ << std::endl; return -1;}
 
 namespace cond_var_tests
 {
@@ -68,37 +70,17 @@ int test1()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     return 0;
 }
 
 int test2()
-{
-    using namespace stdex;
-
-#if CHECK_FOR_COMPILE_ERROR_TESTS == 1
-    {
-        condition_variable c1;
-        condition_variable c2;
-        c1 = c2; // dg-error "deleted"
-    }
-
-    {
-        // copy
-        condition_variable c1;
-        condition_variable c2(c1); // dg-error "deleted"
-    }
-#endif
-    return 0;
-}
-
-int test3()
 {
     using namespace stdex;
 
@@ -117,17 +99,17 @@ int test3()
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     return 0;
 }
 
-int test4()
+int test3()
 {
     using namespace stdex;
 
@@ -140,23 +122,25 @@ int test4()
 
         chrono::steady_clock::time_point then = chrono::steady_clock::now();
         bool result = c1.wait_for(l, ms, &false_predicate);
+        const chrono::steady_clock::duration t = chrono::steady_clock::now() - then;
         DYNAMIC_VERIFY(result == false);
+        std::cout << stdex::chrono::duration_cast<chrono::microseconds>(t).count() << " >= " << ms.count() << std::endl;
         DYNAMIC_VERIFY((chrono::steady_clock::now() - then) >= ms);
         DYNAMIC_VERIFY(l.owns_lock());
     }
     catch (const system_error&)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
     catch (...)
     {
-        DYNAMIC_VERIFY(false);
+        DYNAMIC_VERIFY_FAIL ;
     }
 
     return 0;
 }
 
-int test5()
+int test4()
 {
     using namespace stdex;
 
@@ -168,7 +152,7 @@ int test5()
     return 0;
 }
 
-int test6()
+int test5()
 {
     using namespace stdex;
 
@@ -180,7 +164,7 @@ int test6()
     return 0;
 }
 
-int test7()
+int test6()
 {
     using namespace stdex;
 
@@ -193,7 +177,8 @@ int test7()
         chrono::system_clock::time_point start = chrono::system_clock::now();
         cv.wait_for(l, chrono::duration<float>(1), cond_var_tests::func_val);
         chrono::system_clock::time_point t = chrono::system_clock::now();
-        DYNAMIC_VERIFY((t - start) >= chrono::seconds(1));
+        std::cout << stdex::chrono::duration_cast<chrono::milliseconds>((t - start)).count() << " >= " << 1000 << std::endl;
+        DYNAMIC_VERIFY( (t - start) >= chrono::duration<float>(1) );
     }
 
     return 0;
@@ -211,7 +196,6 @@ int main(void)
     RUN_TEST(test4);
     RUN_TEST(test5);
     RUN_TEST(test6);
-    RUN_TEST(test7);
 
     return 0;
 }

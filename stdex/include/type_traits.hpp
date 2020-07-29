@@ -38,6 +38,7 @@
 // std includes
 #include <cstddef> // std::ptrdiff_t, std::size_t, NULL
 #include <climits>
+#include <typeinfo>
 
 namespace stdex
 {
@@ -2246,13 +2247,15 @@ namespace stdex
         template<class _Tp>
         struct _is_union_intrinsic // ugly hack that cannot be done without compiler support
         {
-            static const bool value = 
+            static const bool value =
                 #if defined(__is_union)
                     __is_union(_Tp)
                 #elif defined(__oracle_is_union)
                     __oracle_is_union(_Tp)
                 #elif defined(__typeinfo)
                     (__typeinfo(_Tp) & 0x400)
+                #elif defined(__is_class)
+                    (!__is_class(_Tp))
                 #else
                     false
                 #endif

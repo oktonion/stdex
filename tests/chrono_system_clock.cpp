@@ -10,7 +10,7 @@ int main(void)
     {
         system_clock::time_point t1 = system_clock::now();
         bool is_steady = system_clock::is_steady;
-        is_steady = is_steady; // suppress unused warning
+        (void)(&is_steady); // suppress unused warning
         ::time_t t2 = system_clock::to_time_t(t1);
         system_clock::time_point t3 = system_clock::from_time_t(t2);
         t3 = t3; // suppress unused warning

@@ -11,6 +11,8 @@
 #include <set>
 #include <vector>
 #include <ctime>
+#include <cerrno>
+#include <time.h>
 
 #ifdef __GLIBC__
 #include <sys/sysinfo.h>
@@ -80,28 +82,35 @@ static void _pthread_t_ID(const eThreadIDOperation operation, stdex::uintmax_t *
 {
 	typedef std::map<stdex::thread::native_handle_type, stdex::uintmax_t, _pthread_t_less> id_map_type;
 
-	static stdex::mutex idMapLock;
-	static id_map_type idMap;
-	static stdex::uintmax_t idCount = 1;
-
-	stdex::lock_guard<stdex::mutex> guard(idMapLock);
+	static stdex::mutex idLock;
+	static id_map_type idCollection_shared;
+	static stdex::uintmax_t idCount_shared = 1;
 
 	stdex::thread::native_handle_type aHandle = pthread_self();
 
+	stdex::unique_lock<stdex::mutex> guard(idLock); // shared section begin
+
 	if (operation == GetThreadID)
 	{
-		id_map_type::iterator result =
-			idMap.find(aHandle);
+		const id_map_type idCollection = idCollection_shared;
+		guard.unlock(); // shared section end
+
+		id_map_type::const_iterator result =
+			idCollection.find(aHandle);
 
 		id_map_type::mapped_type out;
 
-		if (idMap.end() == result)
+		if (idCollection.end() == result)
 		{
-			idMap.insert(std::make_pair(aHandle, idCount));
+			guard.lock(); // shared section begin
 
-			out = idCount;
+			idCollection_shared.insert(std::make_pair(aHandle, idCount_shared));
 
-			idCount++;
+			out = idCount_shared;
+
+			idCount_shared++;
+
+			guard.unlock(); // shared section end
 		}
 		else
 		{
@@ -116,18 +125,20 @@ static void _pthread_t_ID(const eThreadIDOperation operation, stdex::uintmax_t *
 	else if (operation == AddThreadID)
 	{
 		std::pair<id_map_type::iterator, bool> result =
-			idMap.insert(std::make_pair(aHandle, idCount));
+			idCollection_shared.insert(std::make_pair(aHandle, idCount_shared));
 
 		id_map_type::mapped_type out = result.first->second;
 
 		if (result.second) // new element
 		{
-			idCount++;
+			idCount_shared++;
 		}
 		else
 		{
 			std::terminate();
 		}
+
+		guard.unlock(); // shared section end
 
 		if (id_out != NULL)
 		{
@@ -137,21 +148,23 @@ static void _pthread_t_ID(const eThreadIDOperation operation, stdex::uintmax_t *
 	else
 	{
 		id_map_type::iterator result =
-			idMap.find(aHandle);
+			idCollection_shared.find(aHandle);
 
-		if (idMap.end() == result)
+		if (idCollection_shared.end() == result)
 		{
 			std::terminate();
 		}
 		else
 		{
-			idMap.erase(result);
-			if (idMap.size() == 0)
-				idCount = 1;
-			else if(idMap.size() == 1)
-				idCount = idMap.rbegin()->second + 1;
+			idCollection_shared.erase(result);
+			if (idCollection_shared.size() == 0)
+				idCount_shared = 1;
+			else if(idCollection_shared.size() == 1)
+				idCount_shared = idCollection_shared.rbegin()->second + 1;
 		}
 	}
+
+	// shared section end
 }
 
 using namespace stdex;
@@ -556,10 +569,140 @@ void detail::sleep_for_impl(const struct timespec *reltime)
 }
 
 #else
+
+static char clock_gettime(...); // dummy
+static char clock_nanosleep(...); // dummy
+
+namespace thread_cpp_detail
+{
+	template<bool>
+	struct nanosleep_impl1
+	{
+		static int call(const timespec *req, timespec *rem)
+		{
+			errno = 0;
+			int err = ::nanosleep(req, rem);
+
+			if(err && (rem->tv_sec || rem->tv_nsec))
+			{
+				errno = 0;
+				err = ::nanosleep(rem, rem);
+			}
+			return err;
+		}
+	};
+
+#ifdef CLOCK_MONOTONIC
+	#undef _STDEX_THREAD_CLOCK_MONOTONIC
+	#define _STDEX_THREAD_CLOCK_MONOTONIC CLOCK_MONOTONIC
+	
+	#ifndef _STDEX_THREAD_CLOCK_MONOTONIC_EXISTS
+		#define _STDEX_THREAD_CLOCK_MONOTONIC_EXISTS
+	#endif
+
+#endif
+
+#ifdef CLOCK_BOOTTIME 
+	#undef _STDEX_THREAD_CLOCK_MONOTONIC
+	#define _STDEX_THREAD_CLOCK_MONOTONIC CLOCK_BOOTTIME
+
+	#ifndef _STDEX_THREAD_CLOCK_MONOTONIC_EXISTS
+		#define _STDEX_THREAD_CLOCK_MONOTONIC_EXISTS
+	#endif
+#endif
+
+#if defined(CLOCK_MONOTONIC) && \
+		defined(_STDEX_THREAD_CLOCK_MONOTONIC_EXISTS) && \
+			defined(TIMER_ABSTIME)
+	template<>
+	struct nanosleep_impl1<true>
+	{
+		enum {BILLION = 1000000000};
+		static void timespec_add(timespec &result, const timespec &in)
+		{
+			const stdex::time_t _ts_sec_max = 
+                (std::numeric_limits<stdex::time_t>::max)();
+			
+			if(result.tv_sec == _ts_sec_max || result.tv_sec < 0 ||
+				in.tv_sec == _ts_sec_max)
+			{
+				result.tv_sec = _ts_sec_max;
+				result.tv_nsec = BILLION - 1;
+				return;
+			}
+
+			timespec t2 = in;
+			if (result.tv_nsec >= BILLION) {
+				result.tv_nsec -= BILLION;
+				result.tv_sec++;
+			}
+			if (t2.tv_nsec >= BILLION) {
+				t2.tv_nsec -= BILLION;
+				t2.tv_sec++;
+			}
+			result.tv_sec += t2.tv_sec;
+			result.tv_nsec += t2.tv_nsec;
+			if (result.tv_nsec >= BILLION) {
+				result.tv_nsec -= BILLION;
+				result.tv_sec++;
+			}
+
+			if(result.tv_sec < 0)
+			{
+				result.tv_sec = 0;
+				result.tv_nsec = 0;
+			}
+			if(result.tv_nsec < 0)
+			{
+				result.tv_nsec = 0;
+			}
+		}
+		static int call(const timespec *req, timespec *rem)
+		{
+			timespec tp;
+
+			int err = ::clock_gettime(CLOCK_MONOTONIC, &tp);
+			if(err != 0)
+				return nanosleep_impl1<false>::call(req, rem);
+
+			timespec_add(tp, *req);
+			
+			errno = 0;
+			err = ::clock_nanosleep(_STDEX_THREAD_CLOCK_MONOTONIC, TIMER_ABSTIME, &tp, rem);
+
+			return err;
+		}
+	};
+#endif
+} // namespace thread_cpp_detail
+
+namespace thread_cpp_detail
+{
+	template<class _Tp>
+	static _Tp declval(); 
+
+	struct nanosleep_impl:
+		nanosleep_impl1<
+			sizeof(::clock_gettime(declval<clockid_t&>(), declval<timespec*>())) != sizeof(char) &&
+			sizeof(::clock_nanosleep(declval<clockid_t&>(), declval<int>(), declval<timespec*>(), declval<timespec*>())) != sizeof(char)
+		>
+	{ };
+} // namespace thread_cpp_detail
+
+
+
 void detail::sleep_for_impl(const struct timespec *reltime)
 {
 	using namespace std;
-	nanosleep(reltime, NULL);
+	timespec remaining = *reltime;
+	
+	int err = 0;
+	do
+	{
+		using thread_cpp_detail::nanosleep_impl;
+		err = nanosleep_impl::call(&remaining, &remaining);
+	}
+	while (err == -1 && errno == EINTR);
 }
 
 #endif

@@ -53,19 +53,6 @@ int main(void)
         STATIC_ASSERT((is_signed<make_signed<stdex_char16_t>::type>::value == (true)), make_signed_t_stdex_char16_t);
         STATIC_ASSERT((is_signed<make_signed<stdex_char32_t>::type>::value == (true)), make_signed_t_stdex_char32_t);
     }
-
-#if (CHECK_FOR_COMPILE_ERROR_TESTS == 1)
-    // Negative  tests.
-    {
-        typedef make_signed<bool>::type     	test1_type;
-
-        typedef make_signed<int[4]>::type     test3_type;
-
-        typedef void (fn_type)();
-        typedef make_signed<fn_type>::type  	test4_type;
-
-        typedef make_signed<float>::type test5_type;
-    }
-#endif
+    
     return 0;
 }

@@ -104,8 +104,17 @@ namespace stdex
 	{
 		typedef typename common_type<T, U>::type type;
 	};
+
+    namespace chrono
+    {    
+        template<typename T>
+        struct treat_as_floating_point<type_emulator<T> >
+        : is_floating_point<T>
+        { };
+    }
 }
 typedef type_emulator<int> int_emulator;
+typedef type_emulator<double> dbl_emulator;
 
 int main(void)
 {
@@ -139,7 +148,7 @@ int main(void)
         DYNAMIC_VERIFY(d6.count() == 3);
     }
 
-    /*{
+    {
         duration<int> d0(12);
         duration<int> d1(3);
         int i = 3;
@@ -161,7 +170,7 @@ int main(void)
 
         int j = d0 / d1;
         DYNAMIC_VERIFY(j == 4);
-    }*/
+    }
 
     {
         chrono::duration<long, ratio_divide<kilo, milli> >   d1;
@@ -259,11 +268,9 @@ int main(void)
         duration<int_emulator> d3(ie);
         DYNAMIC_VERIFY(d3.count() == static_cast<duration<int_emulator>::rep>(ie));
 
-#if (CHECK_FOR_COMPILE_ERROR_TESTS == 1)
         dbl_emulator de(4.0);
         duration<dbl_emulator> d4(de);
         DYNAMIC_VERIFY(d4.count() == static_cast<duration<dbl_emulator>::rep>(de));
-#endif
     }
 
     {
@@ -285,11 +292,9 @@ int main(void)
         duration<int_emulator, micro> d3_copy(d3);
         DYNAMIC_VERIFY(d3.count() * 1000 == d3_copy.count());
 
-#if (CHECK_FOR_COMPILE_ERROR_TESTS == 1)
         duration<dbl_emulator, micro> d4(5.0);
         duration<dbl_emulator, milli> d4_copy(d4);
         DYNAMIC_VERIFY(d4.count() == d4_copy.count() * dbl_emulator(1000.0));
-#endif
     }
 
     {
@@ -298,11 +303,6 @@ int main(void)
         STATIC_ASSERT((treat_as_floating_point<duration<int>::rep>::value == (false)), shoud_not_be_floating_point);
         STATIC_ASSERT((treat_as_floating_point<duration<int, micro>::rep>::value == (false)), shoud_not_be_floating_point);
     }
-#if (CHECK_FOR_COMPILE_ERROR_TESTS == 1)
-    {
-        duration<double> d(3.5);
-        duration<int> i = d;
-    }
-#endif
+
     return 0;
 }

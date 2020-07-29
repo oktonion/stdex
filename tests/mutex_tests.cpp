@@ -9,6 +9,8 @@
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
+#define DYNAMIC_VERIFY_FAIL {std::cout << "check condition " << "failed at line " << __LINE__ << std::endl; return -1;}
+#define DYNAMIC_VERIFY_ABORT(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; std::abort();}
 
 namespace mutex_tests
 {
@@ -55,13 +57,6 @@ namespace mutex_tests
     typedef stdex::mutex mutex_type;
     typedef mutex_type::native_handle_type native_handle_type;
 
-	mutex_type m;
-
-	void f()
-	{
-		stdex::lock_guard<mutex_type> l(m);
-	}
-
     int try_lock_func_res = 0;
 
 	int try_lock_func(mutex_type &mmm, bool &b)
@@ -89,39 +84,17 @@ namespace mutex_tests
         }
         catch (const stdex::system_error&)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
         catch (...)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
 
         return 0;
     }
 
     int test2()
-    {
-        using namespace stdex;
-
-#if CHECK_FOR_COMPILE_ERROR_TESTS == 1
-		{
-			// assign
-			mutex_type m1;
-			mutex_type m2;
-			m1 = m2;			// { dg-error "deleted" }
-		}
-
-		{
-			// assign
-			mutex_type m1;
-			mutex_type m2(m1);		// { dg-error "deleted" }
-		}
-#endif
-
-        return 0;
-    }
-
-    int test3()
     {
         using namespace stdex;
 
@@ -137,7 +110,55 @@ namespace mutex_tests
         }
         catch (...)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
+        }
+
+        return 0;
+    }
+
+    int test3()
+    {
+        using namespace stdex;
+
+        int ln = __LINE__;
+
+        try
+        {
+            ln = __LINE__;
+            mutex_type mmm;
+            ln = __LINE__;
+            mmm.lock();
+            ln = __LINE__;
+
+            // Lock already locked mutex.
+            try
+            {
+                // XXX Will block.
+                // m.lock();
+            }
+            catch (const system_error&)
+            {
+                DYNAMIC_VERIFY_FAIL;
+            }
+
+            ln = __LINE__;
+            mmm.unlock();
+            ln = __LINE__;
+        }
+        catch (const system_error& e)
+        {
+            std::cout << "unexpected system error '" << e.what() << "' at line " << ln << std::endl;
+            DYNAMIC_VERIFY_FAIL;
+        }
+        catch (const std::exception& e)
+        {
+            std::cout << "unexpected exception '" << e.what() << "' at line " << ln << std::endl;
+            DYNAMIC_VERIFY_FAIL;
+        }
+        catch (...)
+        {
+            std::cout << "unexpected exception at " << ln << std::endl;
+            DYNAMIC_VERIFY_FAIL;
         }
 
         return 0;
@@ -150,50 +171,16 @@ namespace mutex_tests
         try
         {
             mutex_type mmm;
-            mmm.lock();
-
-            // Lock already locked mutex.
-            try
-            {
-                // XXX Will block.
-                // m.lock();
-            }
-            catch (const system_error&)
-            {
-                DYNAMIC_VERIFY(sizeof(false) == 0);
-            }
-
-            m.unlock();
-        }
-        catch (const system_error&)
-        {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
-        }
-        catch (...)
-        {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
-        }
-
-        return 0;
-    }
-
-    int test5()
-    {
-        using namespace stdex;
-
-        try
-        {
-            mutex_type mmm;
             mutex_type::native_handle_type n = mmm.native_handle();
             (void) n;
         }
         catch (const system_error&)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
         catch (...)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
 
         return 0;
@@ -212,11 +199,11 @@ namespace mutex_tests
         }
         catch (const system_error&)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
         catch (...)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
 
         return 0;
@@ -236,44 +223,26 @@ namespace mutex_tests
             t.join();
             DYNAMIC_VERIFY(!b);
 
-            m.unlock();
+            mmm.unlock();
         }
         catch (const system_error&)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
         catch (...)
         {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
+            DYNAMIC_VERIFY_FAIL;
         }
 
         return try_lock_func_res;
     }
 
-    int unlock_test1()
-    {
-        using namespace stdex;
-        
-        try
-        {
-            // Unlock mutex that hasn't been locked.
-            mutex_type mmm;
-            mmm.unlock();
-        }
-        catch (const system_error&)
-        {
-            // POSIX == EPERM
-            DYNAMIC_VERIFY(true);
-        }
-        catch (...)
-        {
-            DYNAMIC_VERIFY(sizeof(false) == 0);
-        }
-
-        return 0;
+    mutex_type f_m;
+    void f(){
+        stdex::lock_guard<mutex_type> l(f_m);
     }
 
-    int unlock_test2()
+    int unlock_test1()
     {
         using namespace stdex;
         
@@ -286,9 +255,315 @@ namespace mutex_tests
     }
 }
 
+int lock_test1()
+{
+    typedef stdex::mutex mutex_type;
+    typedef stdex::unique_lock<mutex_type> lock_type;
+
+    try
+    {
+        mutex_type m1, m2, m3;
+        lock_type l1(m1, stdex::defer_lock), 
+        l2(m2, stdex::defer_lock),
+        l3(m3, stdex::defer_lock);
+
+        try
+        {
+            stdex::lock(l1, l2, l3);
+            DYNAMIC_VERIFY( l1.owns_lock() );
+            DYNAMIC_VERIFY( l2.owns_lock() );
+            DYNAMIC_VERIFY( l3.owns_lock() );
+        }
+        catch (const stdex::system_error&)
+        {
+            DYNAMIC_VERIFY_FAIL;
+        }
+    }
+    catch (const stdex::system_error&)
+    {
+        DYNAMIC_VERIFY_FAIL;
+    }
+    catch (...)
+    {
+        DYNAMIC_VERIFY_FAIL;
+    }
+
+    return 0;
+}
+
+stdex::mutex line_err_m;
+std::size_t line_err = 0;
+
+int locker(stdex::mutex& m1, stdex::mutex& m2, stdex::mutex& m3)
+{
+  typedef stdex::unique_lock<stdex::mutex> lock_type;
+
+  lock_type l1(m1, stdex::defer_lock);
+  lock_type l2(m2, stdex::defer_lock);
+  lock_type l3(m3, stdex::defer_lock);
+  stdex::lock(l1, l2, l3);
+  DYNAMIC_VERIFY( l1.owns_lock() );
+  DYNAMIC_VERIFY( l2.owns_lock() );
+  DYNAMIC_VERIFY( l3.owns_lock() );
+
+  return 0;
+}
+
+void locker_wrap(stdex::mutex& m1, stdex::mutex& m2, stdex::mutex& m3)
+{
+    int ln = locker(m1, m2, m3);
+
+    stdex::unique_lock<stdex::mutex> lk(line_err_m);
+    if(line_err == 0)
+        line_err = ln;
+}
+
+
+int lock_test2()
+{
+  stdex::mutex m1, m2, m3;
+  stdex::thread t1(locker_wrap, mutex_tests::ref(m1), mutex_tests::ref(m2), mutex_tests::ref(m3));
+  stdex::thread t2(locker_wrap, mutex_tests::ref(m3), mutex_tests::ref(m2), mutex_tests::ref(m1));
+  t1.join();
+  t2.join();
+
+  DYNAMIC_VERIFY( line_err == 0 );
+
+  return 0;
+}
+
+struct user_lock
+{
+  user_lock() : is_locked(false) { }
+
+  void lock()
+  {
+    DYNAMIC_VERIFY_ABORT( !is_locked );
+    is_locked = true;
+  }
+
+  bool try_lock() 
+  { return is_locked ? false : (is_locked = true); }
+
+  void unlock()
+  {
+    DYNAMIC_VERIFY_ABORT( is_locked );
+    is_locked = false;
+  }
+
+private:
+  bool is_locked;
+};
+
+int lock_test3()
+{
+    try
+    {
+        stdex::mutex m1;
+        stdex::recursive_mutex m2;
+        user_lock m3;
+
+        try
+        {
+            //heterogeneous types
+            stdex::lock(m1, m2, m3);
+            m1.unlock();
+            m2.unlock();
+            m3.unlock();
+        }
+        catch (const stdex::system_error&)
+        {
+            DYNAMIC_VERIFY_FAIL;
+        }
+    }
+    catch (const stdex::system_error&)
+    {
+        DYNAMIC_VERIFY_FAIL;
+    }
+    catch (...)
+    {
+        DYNAMIC_VERIFY_FAIL;
+    }
+
+    return 0;
+}
+
+struct unreliable_lock
+{
+    stdex::mutex m;
+    stdex::unique_lock<stdex::mutex> l;
+
+    static int count;
+    static int throw_on;
+    static int lock_on;
+
+    unreliable_lock() : l(m, stdex::defer_lock) { }
+
+    ~unreliable_lock()
+    {
+        DYNAMIC_VERIFY_ABORT( !l.owns_lock() );
+    }
+
+    void lock()
+    {
+        if (count == throw_on)
+        throw throw_on;
+        ++count;
+        l.lock();
+    }
+    bool try_lock()
+    {
+        if (count == throw_on)
+        throw throw_on;
+        stdex::unique_lock<stdex::mutex> l2(m, stdex::defer_lock);
+        if (count == lock_on)
+        l2.lock();
+        ++count;
+        return l.try_lock();
+    }
+
+    void unlock()
+    {
+        DYNAMIC_VERIFY_ABORT( l.owns_lock() );
+        l.unlock();
+    }
+
+};
+
+int unreliable_lock::count = 0;
+int unreliable_lock::throw_on = -1;
+int unreliable_lock::lock_on = -1;
+
+int lock_test4()
+{
+    unreliable_lock l1, l2, l3;
+
+    try
+    {
+        unreliable_lock::count = 0;
+        stdex::lock(l1, l2, l3);
+        DYNAMIC_VERIFY( unreliable_lock::count == 3 );
+        l1.unlock();
+        l2.unlock();
+        l3.unlock();
+    }
+    catch (...)
+    {
+        DYNAMIC_VERIFY_FAIL;
+    }
+
+    return 0;
+}
+
+int lock_test5()
+{
+    // test behaviour when a lock is already held
+    try
+    {
+        unreliable_lock::lock_on = 1;
+        while (unreliable_lock::lock_on < 3)
+        {
+            unreliable_lock::count = 0;
+            unreliable_lock l1, l2, l3;
+            stdex::lock(l1, l2, l3);
+            DYNAMIC_VERIFY( unreliable_lock::count > 3 );
+            l1.unlock();
+            l2.unlock();
+            l3.unlock();
+            ++unreliable_lock::lock_on;
+        }
+    }
+    catch (...)
+    {
+        DYNAMIC_VERIFY_FAIL;
+    }
+
+    return 0;
+}
+
+int lock_test6()
+{
+  // test behaviour when an exception is thrown
+  unreliable_lock::throw_on = 0;
+  while (unreliable_lock::throw_on < 3)
+  {
+    unreliable_lock::count = 0;
+    unreliable_lock l1, l2, l3;
+    bool test = false;
+    try
+    {
+        stdex::lock(l1, l2, l3);
+    }
+    catch (...)
+    {
+        test = true;
+    }
+    DYNAMIC_VERIFY( test );
+    ++unreliable_lock::throw_on;
+  }
+
+  return 0;
+}
+
+int lock_test7()
+{
+    // test behaviour when a lock is already held
+    try
+    {
+        unreliable_lock::lock_on = 1;
+        while (unreliable_lock::lock_on < 8)
+        {
+            unreliable_lock::count = 0;
+            unreliable_lock l1, l2, l3, l4, l5, l6, l7, l8;
+            stdex::lock(l1, l2, l3, l4, l5, l6, l7, l8);
+            DYNAMIC_VERIFY( unreliable_lock::count > 8 );
+            l1.unlock();
+            l2.unlock();
+            l3.unlock();
+            l4.unlock();
+            l5.unlock();
+            l6.unlock();
+            l7.unlock();
+            l8.unlock();
+            ++unreliable_lock::lock_on;
+        }
+    }
+    catch (...)
+    {
+        return 0;
+    }
+
+    DYNAMIC_VERIFY_FAIL;
+}
 
 int main(void)
 {
+    {
+        // require
+
+        typedef stdex::mutex                  mutex;
+        typedef stdex::timed_mutex            timed_mutex;
+        typedef stdex::recursive_mutex        recursive_mutex;
+        typedef stdex::recursive_timed_mutex  recursive_timed_mutex;
+        typedef stdex::lock_guard<mutex>      lock_guard;
+        typedef stdex::unique_lock<mutex>     unique_lock;
+        //typedef stdex::scoped_lock<mutex>     scoped_lock; // c++ 17 - ni
+        
+        typedef stdex::defer_lock_t           defer_lock_t;
+        typedef stdex::try_to_lock_t          try_to_lock_t;
+        typedef stdex::adopt_lock_t           adopt_lock_t;
+        
+        using stdex::defer_lock;
+        using stdex::try_to_lock;
+        using stdex::adopt_lock;
+        
+        //typedef stdex::once_flag              once_flag; // ni
+
+        using stdex::try_lock;
+        using stdex::lock;
+        //using stdex::call_once; // ni
+    }
+
     using namespace stdex;
     using namespace mutex_tests;
     
@@ -296,11 +571,16 @@ int main(void)
     RUN_TEST(test2);
     RUN_TEST(test3);
     RUN_TEST(test4);
-    RUN_TEST(test5);
     RUN_TEST(try_lock_test1);
     RUN_TEST(try_lock_test2);
     RUN_TEST(unlock_test1);
-    RUN_TEST(unlock_test2);
+    RUN_TEST(lock_test1);
+    RUN_TEST(lock_test2);
+    RUN_TEST(lock_test3);
+    RUN_TEST(lock_test4);
+    RUN_TEST(lock_test5);
+    RUN_TEST(lock_test6);
+    RUN_TEST(lock_test7);
 
     return 0;
 }

@@ -238,21 +238,8 @@ int main(void)
 			VERIFY((ratio_greater_equal<ratio<1, 4>, ratio<1, 4> >::value && ratio_greater_equal<ratio<1, 3>, ratio<1, 4> >::value == (true)));
 		}
 
-
-#if (CHECK_FOR_COMPILE_ERROR_TESTS == 1)
-		{
-			// Negative tests:
-			volatile ratio<M, M> r1; //??
-			volatile ratio<-M, M> r2; //??
-			volatile ratio<M, 1> r3; //??
-			volatile ratio<1, M> r4; //??
-			volatile ratio<1, 0> r5; // error
-
-			volatile ratio_add<ratio<M, 1>, ratio<1> >::type r6; // error
-			volatile ratio_multiply<ratio<-M, 2>, ratio<3, 2> >::type r1; // error
-			volatile ratio_multiply<ratio<M>, ratio<M> >::type r2; // error
-		}
-#endif
+		volatile ratio<STDEX_INTMAX_MAX, STDEX_INTMAX_MAX> rrrr1; (void)(&rrrr1);
+		volatile ratio<-STDEX_INTMAX_MAX, STDEX_INTMAX_MAX> rrrrr2; (void)(&rrrrr2);
 	}
     return 0;
 }
