@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <string>
+#include <bitset>
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
@@ -29,11 +30,11 @@ template struct stdex::hash<float>;
 template struct stdex::hash<double>;
 template struct stdex::hash<long double>;
 template struct stdex::hash<void*>;
-template struct stdex::hash<std::string>;
-template struct stdex::hash<std::error_code>;
-template struct stdex::hash<std::error_condition>;
+template struct stdex::hash<stdex::string>;
+template struct stdex::hash<stdex::error_code>;
+template struct stdex::hash<stdex::error_condition>;
 template struct stdex::hash<wchar_t>;
-template struct stdex::hash<std::wstring>;
+template struct stdex::hash<stdex::wstring>;
 
 template<typename T>
 int
@@ -59,6 +60,14 @@ int test01()
 {
   DYNAMIC_VERIFY(do_test<stdex::error_code>() == 0);
   DYNAMIC_VERIFY(do_test<stdex::error_condition>() == 0);
+}
+
+std::size_t
+test_compile02()
+{
+  std::vector<bool> b;
+  stdex::hash<std::vector<bool>/**/> h;
+  return h(b);
 }
 
 

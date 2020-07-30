@@ -14,6 +14,8 @@
  
  // std includes
  #include <functional>
+ #include <bitset> // for hash
+ #include <vector> // for hash
  
  #ifdef _STDEX_NATIVE_CPP11_SUPPORT
  
@@ -258,6 +260,38 @@
         : public detail::_hash_impl<_KeyT *>::type
     {	// hash functor for _KeyT *
     };
+
+    // standard hash overloads for std headers
+
+    template<std::size_t _Bits>
+	struct hash<std::bitset<_Bits>/**/>;
+	//{	// hash functor for bitset<_Bits>
+    //    typedef std::bitset<_Bits> argument_type;
+    //    typedef std::size_t result_type;
+    //
+    //    std::size_t operator()(const argument_type& _keyval) const
+    //    {
+    //        return (_keyval.hash());
+    //    }
+	//};
+
+    template<class _AllocatorT>
+	struct hash<std::vector<bool, _AllocatorT>/**/>
+	{	// hash functor for vector<bool, _AllocatorT>
+        typedef std::vector<bool, _AllocatorT> argument_type;
+        typedef std::size_t result_type;
+
+        std::size_t operator()(const argument_type& _keyval) const
+        {
+            const unsigned char *_first = nullptr;
+            const std::size_t _size = _keyval.size();
+            if(_size)
+                _first = (const unsigned char *)&_keyval[0];
+            
+            return (detail::_bitwise_hash_seq<std::size_t, sizeof(std::size_t)>::call(_first, _size));
+        }
+	};
+
     
     // Arithmetic operations
 
