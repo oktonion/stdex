@@ -139,7 +139,7 @@ quality_test()
       double score = quality_test(num_strings_for_quality_tests,
 				  string_size);
       sum_of_scores += score;
-      DYNAMIC_VERIFY_ABORT( score > 0.99 );
+      DYNAMIC_VERIFY_ABORT( score > 0.99 ? true : (std::cout << score << " < 0.99" << std::endl, false) );
     }
 
   if (num_quality_tests > 1)
