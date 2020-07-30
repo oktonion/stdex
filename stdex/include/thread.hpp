@@ -240,12 +240,12 @@ namespace stdex
                 template<class _ObjectT>
                 struct _functor
                 {
-                    template<class _ReturnT>
+                    /*template<class _ReturnT>
                     struct _member_function
                     {
                         typedef _ReturnT(_ObjectT::*type)(_Arg1);
                         typedef _ReturnT(_ObjectT::*type_const)(_Arg1) const;
-                    };
+                    };*/
 
                     template<class _ReturnT>
                     static void push(const priority_tag<5>&, _arguments &args, const _ObjectT &fp, _ReturnT(_ObjectT::*)(_Arg1) const)
@@ -314,12 +314,12 @@ namespace stdex
                 template<class _ObjectT>
                 struct _functor
                 {
-                    template<class _ReturnT>
+                    /*template<class _ReturnT>
                     struct _member_function
                     {
                         typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2);
                         typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2) const;
-                    };
+                    };*/
 
                     template<class _ReturnT>
                     static void push(const priority_tag<5>&, _arguments &args, const _ObjectT &fp, _ReturnT(_ObjectT::*)(_Arg1, _Arg2) const)
@@ -398,12 +398,12 @@ namespace stdex
                 template<class _ObjectT>
                 struct _functor
                 {
-                    template<class _ReturnT>
+                    /*template<class _ReturnT>
                     struct _member_function
                     {
                         typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2, _Arg3);
                         typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2, _Arg3) const;
-                    };
+                    };*/
 
                     template<class _ReturnT>
                     static void push(const priority_tag<5>&, _arguments &args, const _ObjectT &fp, _ReturnT(_ObjectT::*)(_Arg1, _Arg2, _Arg3) const)
@@ -496,12 +496,12 @@ namespace stdex
                 template<class _ObjectT>
                 struct _functor
                 {
-                    template<class _ReturnT>
+                    /*template<class _ReturnT>
                     struct _member_function
                     {
                         typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2, _Arg3, _Arg4);
                         typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2, _Arg3, _Arg4) const;
-                    };
+                    };*/
 
                     template<class _ReturnT>
                     static void push(const priority_tag<5>&, _arguments &args, const _ObjectT &fp, _ReturnT(_ObjectT::*)(_Arg1, _Arg2, _Arg3, _Arg4) const)
@@ -616,12 +616,12 @@ namespace stdex
                 template<class _ObjectT>
                 struct _functor
                 {
-                    template<class _ReturnT>
-                    struct object_member_func
+                    /*template<class _ReturnT>
+                    struct _member_function
                     {
                         typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5);
                         typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5) const;
-                    };
+                    };*/
 
                     template<class _ReturnT>
                     static void push(const priority_tag<5>&, _arguments &args, const _ObjectT &fp, _ReturnT(_ObjectT::*)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5) const)
@@ -774,12 +774,12 @@ namespace stdex
                 template<class _ObjectT>
                 struct _functor
                 {
-                    template<class _ReturnT>
+                    /*template<class _ReturnT>
                     struct _member_function
                     {
                         typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6);
                         typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6) const;
-                    };
+                    };*/
 
                     template<class _ReturnT>
                     static void push(const priority_tag<5>&, _arguments &args, const _ObjectT &fp, _ReturnT(_ObjectT::*)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6) const)
@@ -1002,12 +1002,12 @@ namespace stdex
                 template<class _ObjectT>
                 struct _functor
                 {
-                    template<class _ReturnT>
+                    /*template<class _ReturnT>
                     struct _member_function
                     {
                         typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7);
                         typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7) const;
-                    };
+                    };*/
 
                     template<class _ReturnT>
                     static void push(const priority_tag<5>&, _arguments &args, const _ObjectT &fp, _ReturnT(_ObjectT::*)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7) const)
@@ -1364,12 +1364,12 @@ namespace stdex
                 template<class _ObjectT>
                 struct _functor
                 {
-                    template<class _ReturnT>
+                    /*template<class _ReturnT>
                     struct _member_function
                     {
                         typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7, _Arg8);
                         typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7, _Arg8) const;
-                    };
+                    };*/
 
                     template<class _ReturnT>
                     static void push(const priority_tag<5>&, _arguments &args, const _ObjectT &fp, _ReturnT(_ObjectT::*)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7, _Arg8) const)
