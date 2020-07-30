@@ -7,6 +7,7 @@
 
 // stdex includes
 #include "./type_traits.hpp" // stdex::enable_if
+#include "./functional.hpp" // stdex::hash
 
 // POSIX includes
 /*none*/
@@ -19,7 +20,6 @@
 #include <cstring>		// std::strerror
 #include <stdexcept>	// std::runtime_error
 #include <string> 		// std::string
-#include <functional>
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
@@ -943,6 +943,33 @@ namespace stdex
     }
 
 } // namespace stdex
+
+namespace stdex
+{
+    template<>
+	struct hash<stdex::error_code>
+	{	// hash functor for error_code
+        typedef stdex::error_code argument_type;
+        typedef std::size_t result_type;
+
+        std::size_t operator()(const argument_type& _keyval) const
+        {	// hash _Keyval to size_t value by pseudorandomizing transform
+            return (stdex::hash<int>()(_keyval.value()));
+        }
+	};
+
+    template<>
+	struct hash<stdex::error_condition>
+	{	// hash functor for error_code
+        typedef stdex::error_condition argument_type;
+        typedef std::size_t result_type;
+
+        std::size_t operator()(const argument_type& _keyval) const
+        {	// hash _Keyval to size_t value by pseudorandomizing transform
+            return (stdex::hash<int>()(_keyval.value()));
+        }
+	};
+}
 
 namespace _stdex_ADL
 {

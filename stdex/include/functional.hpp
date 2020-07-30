@@ -6,6 +6,7 @@
  #endif // _MSC_VER > 1000
  
  // stdex includes
+ #include "./core.h"
  #include "./cstdint.hpp"
  #include "./type_traits.hpp"
  
@@ -25,12 +26,6 @@
  #define _STDEX_NOEXCEPT_FUNCTION throw()
  
  #endif
-
- namespace std
- {
-     template<class>
-     struct hash;
- }
  
  namespace stdex
  {
@@ -126,29 +121,11 @@
         {
         };
 
-        template<class _KeyT, bool>
-        struct _hash_impl_chooser
-        {
-            typedef _bitwise_hash_impl<_KeyT, _KeyT> type;
-        };
-
-        template<class _KeyT>
-        struct _hash_impl_chooser<_KeyT, false>
-        {
-            typedef std::hash<_KeyT> type;
-        };
-
         template<class _KeyT>
         struct _hash_impl
         { 
-            typedef 
-            typename
-            _hash_impl_chooser<
-                _KeyT, 
-                _is_incomplete_type<std::hash<bool>/**/>::value == bool(true)
-            >::type type;
+            typedef _bitwise_hash_impl<_KeyT, _KeyT> type;
         };
-
     }
 
     namespace intern
@@ -167,132 +144,120 @@
         };
     } // namespace intern
 
-    namespace functional_cpp11
-    {
-        template<class _KeyT>
-        struct hash
-            : public detail::_hash_impl<_KeyT>::type
-        {	// hash functor for enums
-            typedef intern::functional_asserts check;
-            typedef typename check::the_cpp_standard_does_not_provide_a_hash_for_enum_types_assert< is_enum<_KeyT>::value == bool(false)>::
-                the_cpp_standard_does_not_provide_a_hash_for_enum_types_assert_failed
-            check1; // if you are there means you tried to calculate hash for enum type
-        };
+    template<class _KeyT>
+    struct hash
+        : public detail::_hash_impl<_KeyT>::type
+    {	// hash functor for enums
+        typedef intern::functional_asserts check;
+        typedef typename check::the_cpp_standard_does_not_provide_a_hash_for_enum_types_assert<is_enum<_KeyT>::value == bool(false)>::
+            the_cpp_standard_does_not_provide_a_hash_for_enum_types_assert_failed
+        check1; // if you are there means you tried to calculate hash for enum type
+    };
 
-        template<>
-        struct hash<bool>
-            : public detail::_hash_impl<bool>::type
-        {	// hash functor for bool
-        };
+    template<>
+    struct hash<void>;
 
-        template<>
-        struct hash<char>
-            : public detail::_hash_impl<char>::type
-        {	// hash functor for char
-        };
+    template<>
+    struct hash<bool>
+        : public detail::_hash_impl<bool>::type
+    {	// hash functor for bool
+    };
 
-        template<>
-        struct hash<signed char>
-            : public detail::_hash_impl<signed char>::type
-        {	// hash functor for signed char
-        };
+    template<>
+    struct hash<char>
+        : public detail::_hash_impl<char>::type
+    {	// hash functor for char
+    };
 
-        template<>
-        struct hash<unsigned char>
-            : public detail::_hash_impl<unsigned char>::type
-        {	// hash functor for unsigned char
-        };
+    template<>
+    struct hash<signed char>
+        : public detail::_hash_impl<signed char>::type
+    {	// hash functor for signed char
+    };
 
-        template<>
-        struct hash<stdex_char16_t>
-            : public detail::_hash_impl<stdex_char16_t>::type
-        {	// hash functor for char16_t
-        };
+    template<>
+    struct hash<unsigned char>
+        : public detail::_hash_impl<unsigned char>::type
+    {	// hash functor for unsigned char
+    };
 
-        template<>
-        struct hash<stdex_char32_t>
-            : public detail::_hash_impl<stdex_char32_t>::type
-        {	// hash functor for char32_t
-        };
+    template<>
+    struct hash<wchar_t>
+        : public detail::_hash_impl<wchar_t>::type
+    {	// hash functor for wchar_t
+    };
 
-        template<>
-        struct hash<wchar_t>
-            : public detail::_hash_impl<wchar_t>::type
-        {	// hash functor for wchar_t
-        };
+    template<>
+    struct hash<short>
+        : public detail::_hash_impl<short>::type
+    {	// hash functor for short
+    };
 
-        template<>
-        struct hash<short>
-            : public detail::_hash_impl<short>::type
-        {	// hash functor for short
-        };
+    template<>
+    struct hash<unsigned short>
+        : public detail::_hash_impl<unsigned short>::type
+    {	// hash functor for unsigned short
+    };
 
-        template<>
-        struct hash<unsigned short>
-            : public detail::_hash_impl<unsigned short>::type
-        {	// hash functor for unsigned short
-        };
+    template<>
+    struct hash<int>
+        : public detail::_hash_impl<int>::type
+    {	// hash functor for int
+    };
 
-        template<>
-        struct hash<int>
-            : public detail::_hash_impl<int>::type
-        {	// hash functor for int
-        };
+    template<>
+    struct hash<unsigned int>
+        : public detail::_hash_impl<unsigned int>::type
+    {	// hash functor for unsigned int
+    };
 
-        template<>
-        struct hash<unsigned int>
-            : public detail::_hash_impl<unsigned int>::type
-        {	// hash functor for unsigned int
-        };
+    template<>
+    struct hash<long>
+        : public detail::_hash_impl<long>::type
+    {	// hash functor for long
+    };
 
-        template<>
-        struct hash<long>
-            : public detail::_hash_impl<long>::type
-        {	// hash functor for long
-        };
+    template<>
+    struct hash<unsigned long>
+        : public detail::_hash_impl<unsigned long>::type
+    {	// hash functor for unsigned long
+    };
 
-        template<>
-        struct hash<unsigned long>
-            : public detail::_hash_impl<unsigned long>::type
-        {	// hash functor for unsigned long
-        };
+    template<>
+    struct hash<long long>
+        : public detail::_hash_impl<long long>::type
+    {	// hash functor for long long
+    };
 
-        template<>
-        struct hash<long long>
-            : public detail::_hash_impl<long long>::type
-        {	// hash functor for long long
-        };
+    template<>
+    struct hash<unsigned long long>
+        : public detail::_hash_impl<unsigned long long>::type
+    {	// hash functor for unsigned long long
+    };
 
-        template<>
-        struct hash<unsigned long long>
-            : public detail::_hash_impl<unsigned long long>::type
-        {	// hash functor for unsigned long long
-        };
+    template<>
+    struct hash<float>
+        : public detail::_hash_impl<float>::type
+    {	// hash functor for float
+    };
 
-        template<>
-        struct hash<float>
-            : public detail::_hash_impl<float>::type
-        {	// hash functor for float
-        };
+    template<>
+    struct hash<double>
+        : public detail::_hash_impl<double>::type
+    {	// hash functor for double
+    };
 
-        template<>
-        struct hash<double>
-            : public detail::_hash_impl<double>::type
-        {	// hash functor for double
-        };
+    template<>
+    struct hash<long double>
+        : public detail::_hash_impl<long double>::type
+    {	// hash functor for long double
+    };
 
-        template<>
-        struct hash<long double>
-            : public detail::_hash_impl<long double>::type
-        {	// hash functor for long double
-        };
-
-        template<class _KeyT>
-        struct hash<_KeyT *>
-            : public detail::_hash_impl<_KeyT *>::type
-        {	// hash functor for _KeyT *
-        };
-    } // namespace functional_cpp11
+    template<class _KeyT>
+    struct hash<_KeyT *>
+        : public detail::_hash_impl<_KeyT *>::type
+    {	// hash functor for _KeyT *
+    };
     
     // Arithmetic operations
 
@@ -320,10 +285,56 @@
 
     // Bitwise operations
 
-    using std::bit_and;
-    using std::bit_or;
-    using std::bit_xor;
-    //using std::bit_not; // C++14
+    template<class _Tp>
+	struct bit_and
+	{	// functor for operator&
+        typedef _Tp first_argument_type;
+        typedef _Tp second_argument_type;
+        typedef _Tp result_type;
+
+        _Tp operator()(const _Tp& _left, const _Tp& _right) const
+        {	// apply operator& to operands
+            return (_left & _right);
+        }
+	};
+
+    template<class _Tp>
+	struct bit_or
+	{	// functor for operator|
+        typedef _Tp first_argument_type;
+        typedef _Tp second_argument_type;
+        typedef _Tp result_type;
+
+        _Tp operator()(const _Tp& _left, const _Tp& _right) const
+        {	// apply operator| to operands
+            return (_left | _right);
+        }
+	};
+
+    template<class _Tp>
+	struct bit_xor
+	{	// functor for operator^
+        typedef _Tp first_argument_type;
+        typedef _Tp second_argument_type;
+        typedef _Tp result_type;
+
+        _Tp operator()(const _Tp& _left, const _Tp& _right) const
+        {	// apply operator^ to operands
+            return (_left ^ _right);
+        }
+	};
+
+    template<class _Tp>
+	struct bit_not
+	{	// functor for unary operator~
+        typedef _Tp argument_type;
+        typedef _Tp result_type;
+
+        _Tp operator()(const _Tp& _left) const
+        {	// apply operator~ to operand
+            return (~_left);
+        }
+	};
     
  } // namespace stdex
  
