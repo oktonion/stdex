@@ -2093,7 +2093,7 @@ namespace stdex
         template<class _Tp>
         struct _is_constructible_from_int
         {
-            static const bool value = (sizeof(_is_constructible_from_type_tester<_Tp>(0)) == sizeof(_yes_type));
+            static const bool value = (sizeof(_is_constructible_from_type_tester<_Tp>(1)) == sizeof(_yes_type));
         };
 
         namespace is_enum_detail
