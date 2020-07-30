@@ -118,11 +118,15 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
       set /A line_n=!line_n!+1
       if !line_n! GEQ 50 (
         if !line_n! GEQ 100 (
-          set "MYOUTPUT2=!MYOUTPUT!"
-          set "MYOUTPUT="
+          if "!MYOUTPUT2!"=="" (
+            set "MYOUTPUT2=!MYOUTPUT!"
+            set "MYOUTPUT="
+          )
         ) else (
-          set "MYOUTPUT3=!MYOUTPUT!"
-          set "MYOUTPUT="
+          if "!MYOUTPUT3!"=="" (
+            set "MYOUTPUT3=!MYOUTPUT!"
+            set "MYOUTPUT="
+          )
         )
       )
     )
