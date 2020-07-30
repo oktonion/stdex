@@ -60,14 +60,8 @@ int test01()
 {
   DYNAMIC_VERIFY(do_test<stdex::error_code>() == 0);
   DYNAMIC_VERIFY(do_test<stdex::error_condition>() == 0);
-}
 
-std::size_t
-test_compile02()
-{
-  std::vector<bool> b;
-  stdex::hash<std::vector<bool>/**/> h;
-  return h(b);
+  return 0;
 }
 
 
@@ -75,6 +69,16 @@ int main()
 {
 
     RUN_TEST(test01);
+
+    const std::size_t big = std::size_t(1) << 31;
+    std::string s;
+    try {
+        s.resize(big, 'a');
+    } catch (const std::bad_alloc&) {
+        return 0; // try to avoid a FAIL if memory allocation fails
+    }
+    // PR libstdc++/89629
+    (void) stdex::hash<std::string>()(s);
 
     return 0;
 }
