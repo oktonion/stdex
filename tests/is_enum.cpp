@@ -1,6 +1,8 @@
 #include "../stdex/include/core.h"
 #include "../stdex/include/type_traits.hpp"
 
+#include <string>
+
 struct ClassType {};
 struct ConvType 
 {
@@ -62,6 +64,7 @@ int main(void)
 
     // Sanity check.
     STATIC_ASSERT(is_enum<ClassType>::value == (false), should_not_be_enum);
+    STATIC_ASSERT(is_enum<std::string>::value == (false), should_not_be_enum);
 
     return 0;
 }
