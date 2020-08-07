@@ -900,15 +900,15 @@ namespace stdex
                 now() _STDEX_NOEXCEPT_FUNCTION;
 
             // Map to C API
-            static time_t
+            static stdex::time_t
                 to_time_t(const time_point &_t) _STDEX_NOEXCEPT_FUNCTION
             {
-                return time_t(duration_cast<chrono::seconds>
+                return stdex::time_t(duration_cast<chrono::seconds>
                     (_t.time_since_epoch()).count());
             }
 
             static time_point
-                from_time_t(time_t _t) _STDEX_NOEXCEPT_FUNCTION
+                from_time_t(stdex::time_t _t) _STDEX_NOEXCEPT_FUNCTION
             {
                 typedef chrono::time_point<system_clock, seconds>	_from;
 
