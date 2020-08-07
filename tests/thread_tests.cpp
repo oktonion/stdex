@@ -89,7 +89,7 @@ struct copyable
 
 	void operator()(stdex::thread::id& id) const
 	{
-		free_function(id);
+		id = stdex::this_thread::get_id();
 	}
 
 	static int copy_count;
