@@ -17,6 +17,7 @@
 #include <time.h> // ::time_t - need to be changed
 //#include <climits> //???
 #include <limits> // std::numeric_limit
+#include <stdexcept>
 
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
@@ -39,7 +40,45 @@ namespace stdex
     //! The @c chrono namespace provides types for specifying time intervals.
     namespace chrono
     {
-        template<class _Rep, class _Period = ratio<1> >
+        namespace detail
+        {
+            template<class _Tp>
+            struct _is_ratio
+            {
+                static const bool value = false;
+            };
+
+            template<stdex::intmax_t _Num, stdex::intmax_t _Den>
+            struct _is_ratio< ratio<_Num, _Den> >
+            {
+                static const bool value = true;
+            };
+
+            template<class _Rep, class _Period, bool>
+            struct _use_big_int_impl
+            {
+                static const bool value = false;
+            };
+
+            template<class _Rep, class _Period>
+            struct _use_big_int_impl<_Rep, _Period, true>
+            {
+                static const bool value =
+                    is_integral<_Rep>::value &&
+                    (sizeof(_Rep) * CHAR_BIT) < 64;
+            };
+
+            template<class _Rep, class _Period>
+            struct _use_big_int :
+                _use_big_int_impl<_Rep, _Period, _is_ratio<_Period>::value>
+            { };
+
+            template<class _Rep, class _Period,
+                bool _Fallback> // last argument for alternative impl fallback to _big_int
+            class duration_base;
+        }
+
+        template <class _Rep, class _Period = ratio<1> >
         class duration;
 
         template<class _Clock, class _Dur = typename _Clock::duration>
@@ -81,18 +120,149 @@ namespace stdex
     {
         namespace detail
         {
+            struct _big_int
+            {
+                stdex::intmax_t first;
+                stdex::intmax_t second;
+
+                explicit _big_int(const stdex::intmax_t &_i = 0):
+                    first(_i/2),
+                    second(_i - first) {}
+
+                _big_int(const stdex::intmax_t& _f, const stdex::intmax_t& _s) :
+                    first(_f/2 + _s/2),
+                    second(_f - _f/2 + _s - _s/2) {}
+
+                _big_int(const _big_int& other):
+                    first(other.first),
+                    second(other.second) {}
+
+                operator stdex::intmax_t() const
+                {
+                    return first + second;
+                }
+            };
+
+            inline
+            void throw_check_oveflow(const stdex::uintmax_t& value)
+            {
+                if (value > static_cast<stdex::uintmax_t>(std::numeric_limits<stdex::intmax_t>::max() - 1))
+                    throw(std::out_of_range("stdex::chrono::duration value overflow"));
+            }
+
+            inline
+            _big_int operator+(const _big_int &a, const _big_int &b) {
+                stdex::uintmax_t first, second;
+                first = a.first + b.first;
+                first |= -(first < a.first);
+                second = a.second + b.second;
+                second |= -(second < a.second);
+
+                throw_check_oveflow(first);
+                throw_check_oveflow(second);
+
+                _big_int res(first, second);
+
+                return res;
+            }
+
+            inline
+            _big_int operator-(const _big_int& a, const _big_int& b) {
+                stdex::uintmax_t first, second;
+                first = a.first - b.first;
+                first &= -(first <= a.first);
+                second = a.second - b.second;
+                second &= -(second <= a.second);
+
+                throw_check_oveflow(first);
+                throw_check_oveflow(second);
+
+                _big_int res(first, second);
+
+                return res;
+            }
+
+            inline
+            _big_int operator*(const _big_int& a, const _big_int& b) {
+
+                struct lambdas {
+                    static void throw_check_overflow(
+                        const stdex::intmax_t& a, const stdex::intmax_t& b, const stdex::intmax_t& result)
+                    {
+                        if (a == 0 || b == 0)
+                            return;
+
+                        if (a != result / b)
+                            throw(std::out_of_range("stdex::chrono::duration multiplication overflow"));
+                    }
+                };
+
+                _big_int 
+                    res1(a.first* b.first, a.second* b.second), 
+                    res2(a.first* b.second, a.second* b.first);
+
+                lambdas::throw_check_overflow(a.first, b.first, res1.first);
+                lambdas::throw_check_overflow(a.second, b.second, res1.second);
+                lambdas::throw_check_overflow(a.first, b.second, res2.first);
+                lambdas::throw_check_overflow(a.second, b.second, res2.second);
+
+                return res1 + res2;
+            }
+
+            inline
+            _big_int operator/(const _big_int& a, const _big_int& b) {
+                _big_int 
+                    res(a.first / (b.first + b.second),
+                        a.second / (b.first + b.second));
+
+                return res;
+            }
+
+            inline
+            _big_int operator%(const _big_int& a, const _big_int& b) {
+                _big_int 
+                    res(a.first % (b.first + b.second),
+                        a.second % (b.first + b.second));
+
+                stdex::intmax_t summ = 
+                    (res.first + res.second) % (b.first + b.second);
+
+                res.first = summ / 2;
+                res.second = summ - res.first;
+
+                return res;
+            }
+
             // Primary template for duration_cast impl.
             template<class _ToDur, class _CF, class _CR,
                 bool _NumIsOne = false, bool _DenIsOne = false>
             struct _duration_cast_impl
             {
                 template<class _Rep, class _Period>
-                static _ToDur _cast(const duration<_Rep, _Period> &_d)
+                static _ToDur _cast(const duration_base<_Rep, _Period, false> &_d)
                 {
                     typedef typename _ToDur::rep _to_rep;
                     return _ToDur(static_cast<_to_rep>(static_cast<_CR>(_d.count())
                         * static_cast<_CR>(_CF::num)
                         / static_cast<_CR>(_CF::den)));
+                }
+
+                template<class _Rep, class _Period>
+                static _ToDur _cast(const duration_base<_Rep, _Period, true>& _d)
+                {
+                    typedef typename _ToDur::rep _to_rep;
+
+                    _big_int _big = 
+                        duration_base<_Rep, _Period, true>::_number_of_ticks(_d);
+
+                    return _ToDur(
+                    static_cast<_to_rep>(
+                        static_cast<_CR>(_big.first)
+                            * static_cast<_CR>(_CF::num)
+                            / static_cast<_CR>(_CF::den) +
+                        static_cast<_CR>(_big.second)
+                            * static_cast<_CR>(_CF::num)
+                            / static_cast<_CR>(_CF::den)));
                 }
             };
 
@@ -100,10 +270,21 @@ namespace stdex
             struct _duration_cast_impl<_ToDur, _CF, _CR, true, true>
             {
                 template<class _Rep, class _Period>
-                static _ToDur _cast(const duration<_Rep, _Period> &_d)
+                static _ToDur _cast(const duration_base<_Rep, _Period, false> &_d)
                 {
                     typedef typename _ToDur::rep _to_rep;
                     return _ToDur(static_cast<_to_rep>(_d.count()));
+                }
+
+                template<class _Rep, class _Period>
+                static _ToDur _cast(const duration_base<_Rep, _Period, true>& _d)
+                {
+                    typedef typename _ToDur::rep _to_rep;
+
+                    _big_int _big = 
+                        duration_base<_Rep, _Period, true>::_number_of_ticks(_d);
+
+                    return _ToDur(static_cast<_to_rep>(_big.first) + static_cast<_to_rep>(_big.second));
                 }
             };
 
@@ -111,11 +292,24 @@ namespace stdex
             struct _duration_cast_impl<_ToDur, _CF, _CR, true, false>
             {
                 template<class _Rep, class _Period>
-                static _ToDur _cast(const duration<_Rep, _Period> &_d)
+                static _ToDur _cast(const duration_base<_Rep, _Period, false> &_d)
                 {
                     typedef typename _ToDur::rep			_to_rep;
                     return _ToDur(static_cast<_to_rep>(
-                        static_cast<_CR>(_d.count()) / static_cast<_CR>(_CF::den)));
+                        static_cast<_CR>(duration_base<_Rep, _Period, false>::_number_of_ticks(_d)) / static_cast<_CR>(_CF::den)));
+                }
+
+                template<class _Rep, class _Period>
+                static _ToDur _cast(const duration_base<_Rep, _Period, true>& _d)
+                {
+                    typedef typename _ToDur::rep			_to_rep;
+
+                    _big_int _big = 
+                        duration_base<_Rep, _Period, true>::_number_of_ticks(_d);
+
+                    return _ToDur(static_cast<_to_rep>(
+                        static_cast<_CR>(_big.first) / static_cast<_CR>(_CF::den) +
+                        static_cast<_CR>(_big.second) / static_cast<_CR>(_CF::den)));
                 }
             };
 
@@ -123,11 +317,24 @@ namespace stdex
             struct _duration_cast_impl<_ToDur, _CF, _CR, false, true>
             {
                 template<class _Rep, class _Period>
-                static _ToDur _cast(const duration<_Rep, _Period> &_d)
+                static _ToDur _cast(const duration_base<_Rep, _Period, false> &_d)
                 {
                     typedef typename _ToDur::rep			_to_rep;
                     return _ToDur(static_cast<_to_rep>(
-                        static_cast<_CR>(_d.count()) * static_cast<_CR>(_CF::num)));
+                        static_cast<_CR>(duration_base<_Rep, _Period, false>::_number_of_ticks(_d)) * static_cast<_CR>(_CF::num)));
+                }
+
+                template<class _Rep, class _Period>
+                static _ToDur _cast(const duration_base<_Rep, _Period, true>& _d)
+                {
+                    typedef typename _ToDur::rep			_to_rep;
+
+                    _big_int _big = 
+                        duration_base<_Rep, _Period, true>::_number_of_ticks(_d);
+
+                    return _ToDur(static_cast<_to_rep>(
+                        static_cast<_CR>(_big.first) * static_cast<_CR>(_CF::num) +
+                        static_cast<_CR>(_big.second) * static_cast<_CR>(_CF::num)));
                 }
             };
 
@@ -190,20 +397,20 @@ namespace stdex
                 return _Rep(0);
             }
 
-            #ifdef max
+        #ifdef max
             static _Rep(max)()
-            #else
+        #else
             static _Rep max()
-            #endif
+        #endif
             {
                 return (std::numeric_limits<_Rep>::max)();
             }
 
-            #ifdef min
+        #ifdef min
             static _Rep(min)()
-            #else
+        #else
             static _Rep min()
-            #endif
+        #endif
             {
                 return (std::numeric_limits<_Rep>::min)();
             }
@@ -225,20 +432,20 @@ namespace stdex
                 return stdex::intmax_t(0);
             }
 
-            #ifdef max
+        #ifdef max
             static stdex::intmax_t(max)()
-            #else
+        #else
             static stdex::intmax_t max()
-            #endif
+        #endif
             {
                 return STDEX_INTMAX_MAX;
             }
 
-            #ifdef min
+        #ifdef min
             static stdex::intmax_t(min)()
-            #else
+        #else
             static stdex::intmax_t min()
-            #endif
+        #endif
             {
                 return STDEX_INTMAX_MIN;
             }
@@ -260,20 +467,20 @@ namespace stdex
                 return stdex::uintmax_t(0);
             }
 
-            #ifdef max
+        #ifdef max
             static stdex::uintmax_t(max)()
-            #else
+        #else
             static stdex::uintmax_t max()
-            #endif
+        #endif
             {
                 return STDEX_UINTMAX_MAX;
             }
 
-            #ifdef min
+        #ifdef min
             static stdex::uintmax_t(min)()
-            #else
+        #else
             static stdex::uintmax_t min()
-            #endif
+        #endif
             {
                 return 0;
             }
@@ -286,20 +493,6 @@ namespace stdex
                 static const stdex::uintmax_t min = 0;
             };
         };
-        namespace detail
-        {
-            template<class _Tp>
-            struct _is_ratio
-            { 
-                static const bool value = false;
-            };
-
-            template<stdex::intmax_t _Num, stdex::intmax_t _Den>
-            struct _is_ratio< ratio<_Num, _Den> >
-            { 
-                static const bool value = true;
-            };
-        } // namespace detail
 
         namespace intern
         {
@@ -371,20 +564,77 @@ namespace stdex
             };
         }
 
+        namespace detail
+        {
+            template <class _Rep, class _Period>
+            class duration_base<_Rep, _Period, false>
+            {
+            protected:
+                friend class duration<_Rep, _Period>;
+            
+                typedef _Rep internal_value_type;
+                internal_value_type _r;
+
+                duration_base(_Rep _r_in) :
+                    _r(_r_in) {}
+
+            public:
+                //! Return the value of the duration object.
+                static internal_value_type _number_of_ticks(const duration_base &_dur)
+                {
+                    return _dur._r;
+                }
+
+                static _Rep number_of_ticks(const duration_base& _dur)
+                {
+                    return _dur._r;
+                }
+            };
+
+            template <class _Rep, class _Period>
+            class duration_base<_Rep, _Period, true>
+            {
+            protected:
+                friend class duration<_Rep, _Period>;
+            
+                typedef _big_int internal_value_type;
+                internal_value_type _r;
+
+                duration_base(_Rep _r_in) :
+                    _r(_r_in) {}
+
+            public:
+                //! Return the value of the duration object.
+                static internal_value_type _number_of_ticks(const duration_base& _dur)
+                {
+                    return _dur._r;
+                }
+
+                static _Rep number_of_ticks(const duration_base& _dur)
+                {
+                    return _dur._r.first + _dur._r.second;
+                }
+            };
+        }
+
         //! Duration template class. This class provides enough functionality to
         //! implement @c this_thread::sleep_for().
         template <class _Rep, class _Period>
-        class duration
+        class duration:
+            public detail::duration_base<_Rep, _Period,
+                detail::_use_big_int<_Rep, _Period>::value>
         {
         private:
-            _Rep _r;
+
+            typedef detail::duration_base<_Rep, _Period, 
+                detail::_use_big_int<_Rep, _Period>::value> base_type;
 
             typedef intern::chrono_asserts check;
             struct _disabled1;
             struct _disabled2;
             
-            void _modulus(const _Rep &_r_in) { _r %= _r_in; }
-            void _modulus(const duration &other) { _r %= other.count(); }
+            void _modulus(const _Rep &_r_in) { base_type::_r %= _r_in; }
+            void _modulus(const duration &other) { base_type::_r %= other.count(); }
             void _modulus(const _disabled1 &) { }
             void _modulus(const _disabled2 &) { }
 
@@ -403,13 +653,13 @@ namespace stdex
             typedef _Period period;
 
             //! Construct a duration by default.
-            explicit duration() : _r()
+            explicit duration()
             {};
 
             //! Construct a duration object with the given duration.
             template <class _Rep2>
             duration(const _Rep2 &_r_in) : 
-                _r(static_cast<_Rep>(_r_in))
+                base_type(static_cast<_Rep>(_r_in))
             {
                 typedef typename check::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert<(treat_as_floating_point<_Rep>::value == bool(true)) || (treat_as_floating_point<_Rep2>::value == bool(false))>::
                     a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert_failed
@@ -418,7 +668,7 @@ namespace stdex
 
             template<class _Rep2, class _Period2>
             duration(const duration<_Rep2, _Period2> &other):
-                _r(duration_cast<duration>(other).count())
+                base_type(duration_cast<duration>(other).count())
             {	// construct from a duration
                 typedef ratio_divide<_Period2, _Period> _Checked_type;
 
@@ -437,7 +687,14 @@ namespace stdex
             //! Return the value of the duration object.
             rep count() const
             {
-                return _r;
+                return base_type::number_of_ticks(static_cast<const base_type&>(*this));
+            }
+
+            typename
+            base_type::internal_value_type
+                number_of_ticks() const
+            {
+                return base_type::_r;
             }
 
             duration operator+() const
@@ -447,58 +704,58 @@ namespace stdex
 
             duration operator-() const
             {	// get negated value
-                return (duration<_Rep, _Period>(0 - _r));
+                return (duration<_Rep, _Period>(0 - base_type::_r));
             }
 
             duration& operator++()
             {	// increment rep
-                ++_r;
+                ++base_type::_r;
                 return (*this);
             }
 
             duration operator++(int)
             {	// postincrement rep
-                return (duration<_Rep, _Period>(_r++));
+                return (duration<_Rep, _Period>(base_type::_r++));
             }
 
             duration& operator--()
             {	// decrement rep
-                --_r;
+                --base_type::_r;
                 return (*this);
             }
 
             duration operator--(int)
             {	// postdecrement rep
-                return (duration<_Rep, _Period>(_r--));
+                return (duration<_Rep, _Period>(base_type::_r--));
             }
 
             duration& operator+=(const duration &other)
             {	// add other to rep
-                _r += other._r;
+                base_type::_r += other.base_type::_r;
                 return (*this);
             }
 
             duration& operator-=(const duration &other)
             {	// subtract other from rep
-                _r -= other._r;
+                base_type::_r -= other.base_type::_r;
                 return (*this);
             }
 
             duration& operator*=(const _Rep &_r_in)
             {	// multiply rep by r
-                _r *= _r_in;
+                base_type::_r *= _r_in;
                 return (*this);
             }
 
             duration& operator/=(const _Rep &_r_in)
             {	// divide rep by r
-                _r /= _r_in;
+                base_type::_r /= _r_in;
                 return (*this);
             }
 
             duration& operator%=(
-                typename
-                conditional<
+            typename
+            conditional<
                 treat_as_floating_point<_Rep>::value == bool(false),
                 const _Rep &,
                 _disabled1&
@@ -510,8 +767,8 @@ namespace stdex
             }
 
             duration& operator%=(
-                typename
-                conditional<
+            typename
+            conditional<
                 treat_as_floating_point<_Rep>::value == bool(false),
                 const duration &,
                 _disabled2&
@@ -527,20 +784,20 @@ namespace stdex
                 return duration_values<_Rep>::zero();
             }
 
-            #ifdef max
-                static const duration(max)()
-            #else
-                static const duration max()
-            #endif
+        #ifdef max
+            static const duration(max)()
+        #else
+            static const duration max()
+        #endif
             {
                 return (duration_values<_Rep>::max)();
             }
 
-            #ifdef min
-                static const duration(min)()
-            #else
-                static const duration min()
-            #endif
+        #ifdef min
+            static const duration(min)()
+        #else
+            static const duration min()
+        #endif
             {
                 return (duration_values<_Rep>::min)();
             }
@@ -561,7 +818,7 @@ namespace stdex
             typedef duration<_Rep2, _Period2>			_dur2;
             typedef typename common_type<_dur1, _dur2>::type	_cd;
 
-            return _cd(_cd(lhs).count() + _cd(rhs).count());
+            return _cd(_cd(lhs).number_of_ticks() + _cd(rhs).number_of_ticks());
         }
 
         template<class _Rep1, class _Period1,
@@ -579,7 +836,7 @@ namespace stdex
             typedef duration<_Rep2, _Period2>			_dur2;
             typedef typename common_type<_dur1, _dur2>::type	_cd;
 
-            return _cd(_cd(lhs).count() - _cd(rhs).count());
+            return _cd(_cd(lhs).number_of_ticks() - _cd(rhs).number_of_ticks());
         }
 
         namespace detail
@@ -607,7 +864,7 @@ namespace stdex
         {
             typedef duration<typename common_type<_Rep1, _Rep2>::type, _Period> _cd;
 
-            return _cd(_cd(_d).count() * _s);
+            return _cd(_cd(_d).number_of_ticks() * _s);
         }
 
         template<class _Rep1, class _Rep2, class _Period>
@@ -623,7 +880,7 @@ namespace stdex
         {
             typedef duration<typename common_type<_Rep1, _Rep2>::type, _Period> _cd;
 
-            return _cd(_cd(_d).count() / _s);
+            return _cd(_cd(_d).number_of_ticks() / _s);
         }
 
         template<class _Rep1, class _Period1,
@@ -635,7 +892,7 @@ namespace stdex
             typedef duration<_Rep2, _Period2>			_dur2;
             typedef typename common_type<_dur1, _dur2>::type	_cd;
 
-            return _cd(lhs).count() / _cd(rhs).count();
+            return _cd(lhs).number_of_ticks() / _cd(rhs).number_of_ticks();
         }
 
         // DR 934.
@@ -644,7 +901,7 @@ namespace stdex
         operator%(const duration<_Rep1, _Period> &_d, const _Rep2 &_s)
         {
             typedef duration<typename common_type<_Rep1, _Rep2>::type, _Period> _cd;
-            return _cd(_cd(_d).count() % _s);
+            return _cd(_cd(_d).number_of_ticks() % _s);
         }
 
         template<class _Rep1, class _Period1, class _Rep2, class _Period2>
@@ -654,7 +911,7 @@ namespace stdex
             typedef duration<_Rep1, _Period1>			_dur1;
             typedef duration<_Rep2, _Period2>			_dur2;
             typedef typename common_type<_dur1, _dur2>::type	_cd;
-            return _cd(_cd(lhs).count() % _cd(rhs).count());
+            return _cd(_cd(lhs).number_of_ticks() % _cd(rhs).number_of_ticks());
         }
 
         // comparisons
@@ -665,7 +922,7 @@ namespace stdex
             typedef duration<_Rep2, _Period2>			_dur2;
             typedef typename common_type<_dur1, _dur2>::type	_ct;
 
-            return _ct(lhs).count() == _ct(rhs).count();
+            return _ct(lhs).number_of_ticks() == _ct(rhs).number_of_ticks();
         }
 
         template<class _Rep1, class _Period1, class _Rep2, class _Period2>
@@ -675,7 +932,7 @@ namespace stdex
             typedef duration<_Rep2, _Period2>			_dur2;
             typedef typename common_type<_dur1, _dur2>::type	_ct;
 
-            return _ct(lhs).count() < _ct(rhs).count();
+            return _ct(lhs).number_of_ticks() < _ct(rhs).number_of_ticks();
         }
 
         template<class _Rep1, class _Period1, class _Rep2, class _Period2>
@@ -751,20 +1008,20 @@ namespace stdex
                 return (*this);
             }
 
-            #ifdef min
+        #ifdef min
             static const time_point(min)()
-            #else
+        #else
             static const time_point min()
-            #endif
+        #endif
             {	// get minimum time point
                 return (time_point((duration::min)()));
             }
 
-            #ifdef max
+        #ifdef max
             static const time_point(max)()
-            #else
+        #else
             static const time_point max()
-            #endif
+        #endif
             {	// get maximum time point
                 return (time_point((duration::max)()));
             }
