@@ -1998,16 +1998,7 @@ namespace stdex
                 _ts.tv_nsec = 999999999;
             }
 
-            if(chrono::steady_clock::is_steady)
-            {
-                chrono::steady_clock::time_point _end_tp = 
-                        chrono::steady_clock::now() + _dur;     
-                detail::sleep_for_impl(&_ts);
-                while(chrono::steady_clock::now() < _end_tp)
-                    sleep_for(_end_tp - chrono::steady_clock::now());
-            }
-            else
-                detail::sleep_for_impl(&_ts);
+            detail::sleep_for_impl(&_ts);
         }
 
         template <class _Clock, class _Duration>
