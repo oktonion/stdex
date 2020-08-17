@@ -592,32 +592,7 @@ namespace stdex {
             {
                 return a %= b;
             }
-
-
-            _big_int operator+(const stdex::intmax_t& a, const _big_int& b)
-            {
-                return convert(duration_long_long(a) + convert(b));
-            }
-
-            _big_int operator-(const stdex::intmax_t& a, const _big_int& b)
-            {
-                return convert(duration_long_long(a) - convert(b));
-            }
-
-            _big_int operator*(const stdex::intmax_t& a, const _big_int& b)
-            {
-                return convert(duration_long_long(a) * convert(b));
-            }
-
-            _big_int operator/(const stdex::intmax_t& a, const _big_int& b)
-            {
-                return convert(duration_long_long(a) / convert(b));
-            }
-
-            _big_int operator%(const stdex::intmax_t& a, const _big_int& b)
-            {
-                return convert(duration_long_long(a) % convert(b));
-            }
+        
         }
     }
 }

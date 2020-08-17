@@ -147,12 +147,46 @@ namespace stdex
             _big_int operator*(_big_int, const _big_int&);
             _big_int operator/(_big_int, const _big_int&);
             _big_int operator%(_big_int, const _big_int&);
+            
+            template<class _Tp>
+            _big_int operator+(const _Tp& _lhs,
+                typename
+                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled&>::type _rhs)
+            {
+                return _big_int(_lhs) + _rhs;
+            }
 
-            _big_int operator+(const stdex::intmax_t&, const _big_int&);
-            _big_int operator-(const stdex::intmax_t&, const _big_int&);
-            _big_int operator*(const stdex::intmax_t&, const _big_int&);
-            _big_int operator/(const stdex::intmax_t&, const _big_int&);
-            _big_int operator%(const stdex::intmax_t&, const _big_int&);
+            template<class _Tp>
+            _big_int operator-(const _Tp& _lhs,
+                typename
+                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled&>::type _rhs)
+            {
+                return _big_int(_lhs) - _rhs;
+            }
+
+            template<class _Tp>
+            _big_int operator*(const _Tp& _lhs,
+                typename
+                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled&>::type _rhs)
+            {
+                return _big_int(_lhs) * _rhs;
+            }
+
+            template<class _Tp>
+            _big_int operator/(const _Tp& _lhs,
+                typename
+                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled&>::type _rhs)
+            {
+                return _big_int(_lhs) / _rhs;
+            }
+
+            template<class _Tp>
+            _big_int operator%(const _Tp& _lhs,
+                typename
+                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled&>::type _rhs)
+            {
+                return _big_int(_lhs) % _rhs;
+            }
 
             template <class _Rep, class _Period,
                 bool _Fallback>
