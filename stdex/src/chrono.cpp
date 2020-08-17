@@ -9,6 +9,7 @@
 #include <exception>
 #include <cstdlib>
 #include <numeric>
+#include <cstring>
 
 
 #if defined(WIN32) || defined(_WIN32) // assuming we are on windows platform and have no realtime clock
