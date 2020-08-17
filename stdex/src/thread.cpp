@@ -718,11 +718,9 @@ namespace thread_cpp_detail
 			rem->tv_nsec = 0;
 
 			int nanosleep_err = 0;
-
-			int attempts = 9;
 			
 			do{
-				timespec _end;
+				timespec _end, _passed;
 
 				errno = 0;
 				nanosleep_err = 
@@ -737,14 +735,15 @@ namespace thread_cpp_detail
 						break;
 				}
 
-				timespec_diff(&_end, &_begin, rem);
+				timespec_diff(&_end, &_begin, &_passed);
 
-				if(0 == rem->tv_sec && 0 == rem->tv_nsec)
+				if( _passed.tv_sec > req->tv_sec || 
+					(_passed.tv_sec == req->tv_sec && _passed.tv_nsec > req->tv_nsec) )
 					break;
-				if(rem->tv_sec < 0 || rem->tv_nsec < 0)
-					break;
+				timespec_diff(req, &_passed, &tp);
+				timespec_add(tp, _end);
 			}
-			while(nanosleep_err == 0 && attempts--);
+			while(nanosleep_err == 0);
 
 			return nanosleep_err;
 		}
