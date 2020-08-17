@@ -96,6 +96,8 @@ int main(void)
 {
     using namespace stdex;
 
+    stdex::ratio<1000000l, 1l>::num;
+
     //int a[sizeof(stdex::intmax_t) < sizeof(long long) ? -1 : 1];
     std::cout <<
         stdex::detail::cstdint_detail::_max_sized_integer_step<>::value << std::endl;
