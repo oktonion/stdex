@@ -611,7 +611,7 @@ namespace stdex
             struct _disabled2;
             
             void _modulus(const _Rep &_r_in) { base_type::_r %= _r_in; }
-            void _modulus(const duration &other) { base_type::_r %= other.count(); }
+            void _modulus(const duration &other) { base_type::_r %= detail::duration_count(other); }
             void _modulus(const _disabled1 &) { }
             void _modulus(const _disabled2 &) { }
 
