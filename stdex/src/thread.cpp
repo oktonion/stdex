@@ -562,6 +562,14 @@ void detail::sleep_for_impl(const struct timespec *reltime)
 	WaitableTimer timer;
 
 	LONGLONG us100 = reltime->tv_sec * 1000 * 1000 * 10 + reltime->tv_nsec / 100;
+
+	if (us100 < 0)
+		return;
+	if (us100 == 0)
+	{
+		stdex::this_thread::yield();
+		return;
+	}
 	
 	LARGE_INTEGER nStartTime;
 	LARGE_INTEGER nStopTime;
@@ -591,7 +599,7 @@ void detail::sleep_for_impl(const struct timespec *reltime)
 
 		nElapsed.QuadPart = (nStopTime.QuadPart - nStartTime.QuadPart) * 1000000;
 		nElapsed.QuadPart /= nFrequency.QuadPart;
-	} while (check_timings && nElapsed.QuadPart < (us100 / 10) );
+	} while (check_timings && (nElapsed.QuadPart * 10) < us100);
 }
 
 #else
