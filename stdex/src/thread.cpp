@@ -699,7 +699,7 @@ namespace thread_cpp_detail
 			result->tv_nsec = a->tv_nsec - b->tv_nsec;
 			if (result->tv_nsec < 0) {
 				--result->tv_sec;
-				result->tv_nsec += 1000000000L;
+				result->tv_nsec += BILLION;
 			}
 		}
 
@@ -714,25 +714,27 @@ namespace thread_cpp_detail
 
 			tp = _begin;
 			timespec_add(tp, *req);
-
+			rem->tv_sec = -1;
+			rem->tv_nsec = -1;
 			
 			do{
 				timespec _end;
 
 				errno = 0;
-				err = 
+				int nanosleep_err = 
 					::clock_nanosleep(_STDEX_THREAD_CLOCK_MONOTONIC, TIMER_ABSTIME, &tp, rem);
 				
-				if(0 == err)
+				if(0 == nanosleep_err)
 				{
 					err = 
 						::clock_gettime(CLOCK_MONOTONIC, &_end);
+					errno = 0;
 				}
+				else 
+					err = nanosleep_err;
 
 				if(0 == err)
-				{
 					timespec_diff(&_end, &_begin, rem);
-				}
 			}
 			while(rem->tv_sec >= 0 && rem->tv_nsec >= 0 && err == 0);
 
