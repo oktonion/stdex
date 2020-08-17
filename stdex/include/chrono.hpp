@@ -185,7 +185,7 @@ namespace stdex
                     _r(static_cast<_Rep>(_r_in)) {}
 
                 friend
-                stdex::chrono::detail::duration_secret;
+                struct stdex::chrono::detail::duration_secret;
             };
 
             template <class _Rep, class _Period>
@@ -204,7 +204,7 @@ namespace stdex
                     _r(static_cast<_Rep>(_r_in)) {}
                 
                 friend
-                stdex::chrono::detail::duration_secret;
+                struct stdex::chrono::detail::duration_secret;
             };
 
             template <class _Rep, class _Period>
