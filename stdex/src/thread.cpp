@@ -714,8 +714,8 @@ namespace thread_cpp_detail
 
 			tp = _begin;
 			timespec_add(tp, *req);
-			rem->tv_sec = -1;
-			rem->tv_nsec = -1;
+			rem->tv_sec = 0;
+			rem->tv_nsec = 0;
 
 			int nanosleep_err = 0;
 			
@@ -731,12 +731,18 @@ namespace thread_cpp_detail
 					err = 
 						::clock_gettime(CLOCK_MONOTONIC, &_end);
 					errno = 0;
+					if(0 != err)
+						break;
 				}
 
-				if(0 == err)
-					timespec_diff(&_end, &_begin, rem);
+				timespec_diff(&_end, &_begin, rem);
+
+				if(0 == rem->tv_sec && 0 == rem->tv_nsec)
+					break;
+				if(rem->tv_sec < 0 || rem->tv_nsec < 0)
+					break;
 			}
-			while(rem->tv_sec >= 0 && rem->tv_nsec >= 0 && err == 0);
+			while(nanosleep_err == 0);
 
 			return nanosleep_err;
 		}
@@ -768,6 +774,8 @@ void detail::sleep_for_impl(const struct timespec *reltime)
 	do
 	{
 		using thread_cpp_detail::nanosleep_impl;
+		if(remaining.tv_sec < 0 || remaining.tv_nsec < 0)
+			break;
 		err = nanosleep_impl::call(&remaining, &remaining);
 	}
 	while (err == -1 && errno == EINTR);
