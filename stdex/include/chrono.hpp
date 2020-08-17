@@ -298,7 +298,7 @@ namespace stdex
                 double[]
             >::type _chrono_static_cast(_From _value)
             {
-                return _big_int(std::intmax_t(_value));
+                return _big_int(stdex::intmax_t(_value));
             }
 
             // Primary template for duration_cast impl.
