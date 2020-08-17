@@ -190,12 +190,20 @@ int main(void)
     
     // condition_variable
 
+try
+{
     RUN_TEST(test1);
     RUN_TEST(test2);
     RUN_TEST(test3);
     RUN_TEST(test4);
     RUN_TEST(test5);
     RUN_TEST(test6);
+}
+catch(const std::exception& e)
+{
+    std::cout << "std::exception " << e.what() << std::endl;
+    throw;
+}
 
     return 0;
 }
