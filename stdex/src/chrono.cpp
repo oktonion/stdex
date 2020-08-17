@@ -479,7 +479,7 @@ namespace stdex {
 
             _big_int::_big_int(const stdex::intmax_t& _i)
             {
-                STATIC_ASSERT(sizeof(duration_long_long) <= sizeof(least64_value), platform_specific_int64_should_fit_in_8_bytes);
+                STATIC_ASSERT(( sizeof(duration_long_long) <= sizeof(least64_value) ), platform_specific_int64_should_fit_in_8_bytes);
                 duration_long_long value = _i;
                 std::memcpy(least64_value, &value, sizeof(duration_long_long));
             }
