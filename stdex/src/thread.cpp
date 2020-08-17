@@ -718,6 +718,8 @@ namespace thread_cpp_detail
 			rem->tv_nsec = 0;
 
 			int nanosleep_err = 0;
+
+			int attempts = 9;
 			
 			do{
 				timespec _end;
@@ -742,7 +744,7 @@ namespace thread_cpp_detail
 				if(rem->tv_sec < 0 || rem->tv_nsec < 0)
 					break;
 			}
-			while(nanosleep_err == 0);
+			while(nanosleep_err == 0 && attempts--);
 
 			return nanosleep_err;
 		}
