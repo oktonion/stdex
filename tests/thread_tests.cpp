@@ -96,7 +96,7 @@ int main(void)
 {
     using namespace stdex;
 
-    stdex::ratio<1000000l, 1l>::num;
+    stdex::ratio<1l, 60l>::den;
 
     //int a[sizeof(stdex::intmax_t) < sizeof(long long) ? -1 : 1];
     std::cout <<
