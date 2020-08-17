@@ -330,7 +330,7 @@ namespace stdex
                     detail::_duration_common_type<_to_dur_rep, _to_dur_rep, _Period>::type
                         _to_rep;
                     return _ToDur(static_cast<_to_rep>(
-                        static_cast<_CR>(detail::duration_count(_d)) / /*static_cast<_CR>*/(_CF::den)));
+                        static_cast<_CR>(detail::duration_count(_d)) / static_cast<_CR>(_CF::den)));
                 }
             };
 
