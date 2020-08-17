@@ -734,7 +734,7 @@ namespace thread_cpp_detail
 					timespec_diff(&now, &begin, rem);
 				}
 			}
-			while(rem->tv_sec != 0 && rem->tv_nsec != 0 && err == 0)
+			while(rem->tv_sec >= 0 && rem->tv_nsec >= 0 && err == 0);
 
 			return err;
 		}
