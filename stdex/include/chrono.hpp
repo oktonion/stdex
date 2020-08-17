@@ -65,7 +65,7 @@ namespace stdex
             {
                 static const bool value =
                     is_integral<_Rep>::value &&
-                    (sizeof(_Rep) * CHAR_BIT) < 8;
+                    (sizeof(_Rep) * CHAR_BIT) < 127;
             };
 
             template<class _Rep, class _Period>
