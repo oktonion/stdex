@@ -691,18 +691,50 @@ namespace thread_cpp_detail
 				result.tv_nsec = 0;
 			}
 		}
+
+		static inline void timespec_diff(struct timespec *a, struct timespec *b,
+			struct timespec *result) 
+		{
+			result->tv_sec  = a->tv_sec  - b->tv_sec;
+			result->tv_nsec = a->tv_nsec - b->tv_nsec;
+			if (result->tv_nsec < 0) {
+				--result->tv_sec;
+				result->tv_nsec += 1000000000L;
+			}
+		}
+
 		static int call(const timespec *req, timespec *rem)
 		{
 			timespec tp;
 
-			int err = ::clock_gettime(CLOCK_MONOTONIC, &tp);
+			int err = 
+				::clock_gettime(CLOCK_MONOTONIC, &tp);
 			if(err != 0)
 				return nanosleep_impl1<false>::call(req, rem);
 
 			timespec_add(tp, *req);
+
 			
-			errno = 0;
-			err = ::clock_nanosleep(_STDEX_THREAD_CLOCK_MONOTONIC, TIMER_ABSTIME, &tp, rem);
+			do{
+				timespec begin, now;
+
+				::clock_gettime(CLOCK_MONOTONIC, &begin);
+
+				errno = 0;
+				err = 
+					::clock_nanosleep(_STDEX_THREAD_CLOCK_MONOTONIC, TIMER_ABSTIME, &tp, rem);
+				if(0 == err)
+				{
+					err = 
+						::clock_gettime(CLOCK_MONOTONIC, &now);
+				}
+
+				if(0 == err)
+				{
+					timespec_diff(&now, &begin, rem);
+				}
+			}
+			while(rem->tv_sec != 0 && rem->tv_nsec != 0 && err == 0)
 
 			return err;
 		}
