@@ -284,6 +284,23 @@ namespace stdex
                 >
             { };
 
+            template<class _To, class _From>
+            _To _chrono_static_cast(_From _value)
+            {
+                return static_cast<_To>(_value);
+            }
+
+            template<class _From>
+            typename
+            conditional<
+                is_integral<_From>::value, 
+                _big_int,
+                double[]
+            >::type _chrono_static_cast(_From _value)
+            {
+                return _big_int(std::intmax_t(_value));
+            }
+
             // Primary template for duration_cast impl.
             template<class _ToDur, class _CF, class _CR,
                 bool _NumIsOne = false, bool _DenIsOne = false>
@@ -297,9 +314,9 @@ namespace stdex
                     typename 
                     detail::_duration_common_type<_to_dur_rep, _to_dur_rep, _Period>::type
                         _to_rep;
-                    return _ToDur(static_cast<_to_rep>(static_cast<_CR>(detail::duration_count(_d))
-                        * /*static_cast<_CR>*/(_CF::num)
-                        / /*static_cast<_CR>*/(_CF::den)));
+                    return _ToDur(_chrono_static_cast<_to_rep>(_chrono_static_cast<_CR>(detail::duration_count(_d))
+                        * _chrono_static_cast<_CR>(_CF::num)
+                        / _chrono_static_cast<_CR>(_CF::den)));
                 }
             };
 
@@ -314,7 +331,7 @@ namespace stdex
                     typename 
                     detail::_duration_common_type<_to_dur_rep, _to_dur_rep, _Period>::type
                         _to_rep;
-                    return _ToDur(static_cast<_to_rep>(detail::duration_count(_d)));
+                    return _ToDur(_chrono_static_cast<_to_rep>(detail::duration_count(_d)));
                 }
             };
 
@@ -329,8 +346,8 @@ namespace stdex
                     typename 
                     detail::_duration_common_type<_to_dur_rep, _to_dur_rep, _Period>::type
                         _to_rep;
-                    return _ToDur(static_cast<_to_rep>(
-                        static_cast<_CR>(detail::duration_count(_d)) / static_cast<_CR>(_CF::den)));
+                    return _ToDur(_chrono_static_cast<_to_rep>(
+                        _chrono_static_cast<_CR>(detail::duration_count(_d)) / _chrono_static_cast<_CR>(_CF::den)));
                 }
             };
 
@@ -345,8 +362,8 @@ namespace stdex
                     typename 
                     detail::_duration_common_type<_to_dur_rep, _to_dur_rep, _Period>::type
                         _to_rep;
-                    return _ToDur(static_cast<_to_rep>(
-                        static_cast<_CR>(detail::duration_count(_d)) * /*static_cast<_CR>*/(_CF::num)));
+                    return _ToDur(_chrono_static_cast<_to_rep>(
+                        _chrono_static_cast<_CR>(detail::duration_count(_d)) * _chrono_static_cast<_CR>(_CF::num)));
                 }
             };
 
