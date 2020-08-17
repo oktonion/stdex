@@ -116,23 +116,43 @@ namespace stdex
     {
         namespace detail
         {
+            // this structure is used internaly to represent platform specific big integers
+            // and safe number precision checks (throws out_of_range)
             struct _big_int
             {
-                char least64bits_value[8];
+                char least64_value[8];
 
-                explicit _big_int(const stdex::intmax_t& _i = 0);
+                explicit _big_int(const stdex::intmax_t& _value = 0);
 
-                _big_int(const _big_int& other);
-                _big_int& operator=(const _big_int& other);
+                _big_int(const _big_int&);
+                _big_int& operator=(const _big_int&);
+
+                _big_int& operator++();
+                _big_int operator++(int);
+                _big_int& operator--();
+                _big_int operator--(int);
+
+                _big_int& operator+=(const _big_int&);
+                _big_int& operator-=(const _big_int&);
+                _big_int& operator*=(const stdex::intmax_t&);
+                _big_int& operator/=(const stdex::intmax_t&);
+                _big_int& operator%=(const stdex::intmax_t&);
+                _big_int& operator%=(const _big_int&);
 
                 operator stdex::intmax_t() const;
             };
 
-            _big_int operator+(const _big_int& a, const _big_int& b);
-            _big_int operator-(const _big_int& a, const _big_int& b);
-            _big_int operator*(const _big_int& a, const _big_int& b);
-            _big_int operator/(const _big_int& a, const _big_int& b);
-            _big_int operator%(const _big_int& a, const _big_int& b);
+            _big_int operator+(_big_int, const _big_int&);
+            _big_int operator-(_big_int, const _big_int&);
+            _big_int operator*(_big_int, const _big_int&);
+            _big_int operator/(_big_int, const _big_int&);
+            _big_int operator%(_big_int, const _big_int&);
+
+            _big_int operator+(const stdex::intmax_t&, const _big_int&);
+            _big_int operator-(const stdex::intmax_t&, const _big_int&);
+            _big_int operator*(const stdex::intmax_t&, const _big_int&);
+            _big_int operator/(const stdex::intmax_t&, const _big_int&);
+            _big_int operator%(const stdex::intmax_t&, const _big_int&);
 
             template <class _Rep, class _Period,
                 bool _Fallback>
@@ -160,8 +180,9 @@ namespace stdex
                 typedef _Rep internal_value_type;
                 internal_value_type _r;
 
-                duration_base(_Rep _r_in) :
-                    _r(_r_in) {}
+                template <class _Rep2>
+                duration_base(const _Rep2& _r_in) :
+                    _r(static_cast<_Rep>(_r_in)) {}
 
                 friend
                 stdex::chrono::detail::duration_secret;
@@ -175,8 +196,12 @@ namespace stdex
                 typedef _big_int internal_value_type;
                 internal_value_type _r;
 
-                duration_base(_Rep _r_in) :
+                duration_base(const internal_value_type& _r_in) :
                     _r(_r_in) {}
+
+                template <class _Rep2>
+                duration_base(const _Rep2& _r_in) :
+                    _r(static_cast<_Rep>(_r_in)) {}
                 
                 friend
                 stdex::chrono::detail::duration_secret;
@@ -198,6 +223,33 @@ namespace stdex
                 return duration_secret::duration_count(_dur);
             }
 
+            template<class _ToRep, class _FromRep, bool>
+            struct _duration_common_type_impl
+            {
+                typedef _big_int type;
+            };
+
+            template<class _ToRep, class _FromRep>
+            struct _duration_common_type_impl<_ToRep, _FromRep, false>
+            {
+                typedef 
+                typename 
+                common_type<_ToRep, _FromRep, stdex::intmax_t>::type type;
+            };
+
+            template<class _ToRep, class _FromRep, class _Period>
+            struct _duration_common_type:
+                _duration_common_type_impl <
+                    _ToRep, 
+                    _FromRep,
+                    _use_big_int<
+                        typename
+                        common_type<_ToRep, _FromRep, stdex::intmax_t>::type, 
+                        _Period
+                    >::value
+                >
+            { };
+
             // Primary template for duration_cast impl.
             template<class _ToDur, class _CF, class _CR,
                 bool _NumIsOne = false, bool _DenIsOne = false>
@@ -206,7 +258,11 @@ namespace stdex
                 template<class _Rep, class _Period>
                 static _ToDur _cast(const duration<_Rep, _Period>& _d)
                 {
-                    typedef typename _ToDur::rep _to_rep;
+                    typedef typename _ToDur::rep _to_dur_rep;
+                    typedef 
+                    typename 
+                    detail::_duration_common_type<_to_dur_rep, _to_dur_rep, _Period>::type
+                        _to_rep;
                     return _ToDur(static_cast<_to_rep>(static_cast<_CR>(detail::duration_count(_d))
                         * static_cast<_CR>(_CF::num)
                         / static_cast<_CR>(_CF::den)));
@@ -219,7 +275,11 @@ namespace stdex
                 template<class _Rep, class _Period>
                 static _ToDur _cast(const duration<_Rep, _Period>& _d)
                 {
-                    typedef typename _ToDur::rep _to_rep;
+                    typedef typename _ToDur::rep _to_dur_rep;
+                    typedef 
+                    typename 
+                    detail::_duration_common_type<_to_dur_rep, _to_dur_rep, _Period>::type
+                        _to_rep;
                     return _ToDur(static_cast<_to_rep>(detail::duration_count(_d)));
                 }
             };
@@ -230,7 +290,11 @@ namespace stdex
                 template<class _Rep, class _Period>
                 static _ToDur _cast(const duration<_Rep, _Period>& _d)
                 {
-                    typedef typename _ToDur::rep			_to_rep;
+                    typedef typename _ToDur::rep _to_dur_rep;
+                    typedef 
+                    typename 
+                    detail::_duration_common_type<_to_dur_rep, _to_dur_rep, _Period>::type
+                        _to_rep;
                     return _ToDur(static_cast<_to_rep>(
                         static_cast<_CR>(detail::duration_count(_d)) / static_cast<_CR>(_CF::den)));
                 }
@@ -242,7 +306,11 @@ namespace stdex
                 template<class _Rep, class _Period>
                 static _ToDur _cast(const duration<_Rep, _Period>& _d)
                 {
-                    typedef typename _ToDur::rep			_to_rep;
+                    typedef typename _ToDur::rep _to_dur_rep;
+                    typedef 
+                    typename 
+                    detail::_duration_common_type<_to_dur_rep, _to_dur_rep, _Period>::type
+                        _to_rep;
                     return _ToDur(static_cast<_to_rep>(
                         static_cast<_CR>(detail::duration_count(_d)) * static_cast<_CR>(_CF::num)));
                 }
@@ -279,6 +347,7 @@ namespace stdex
             struct _disable_if_is_duration :
                 _enable_if_is_duration_impl<_is_duration<_Tp>::value == bool(false), _Tp>
             {};
+
         } // namespace detail
 
         // duration_cast
@@ -289,7 +358,7 @@ namespace stdex
             typedef typename _ToDur::period	_to_period;
             typedef typename _ToDur::rep _to_rep;
             typedef ratio_divide<_Period, _to_period> _cf;
-            typedef typename common_type<_to_rep, _Rep, stdex::intmax_t>::type
+            typedef typename detail::_duration_common_type<_to_rep, _Rep, _Period>::type
                 _cr;
             typedef  detail::_duration_cast_impl<_ToDur, _cf, _cr,
                 _cf::num == 1, _cf::den == 1> _dc;
@@ -510,13 +579,14 @@ namespace stdex
             typedef _Period period;
 
             //! Construct a duration by default.
-            explicit duration()
+            explicit duration():
+                base_type(0)
             {};
 
             //! Construct a duration object with the given duration.
             template <class _Rep2>
             duration(const _Rep2 &_r_in) : 
-                base_type(static_cast<_Rep>(_r_in))
+                base_type(_r_in)
             {
                 typedef typename check::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert<(treat_as_floating_point<_Rep>::value == bool(true)) || (treat_as_floating_point<_Rep2>::value == bool(false))>::
                     a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert_failed
@@ -525,7 +595,7 @@ namespace stdex
 
             template<class _Rep2, class _Period2>
             duration(const duration<_Rep2, _Period2> &other):
-                base_type(duration_cast<duration>(other).count())
+                base_type(detail::duration_count( duration_cast<duration>(other) ))
             {	// construct from a duration
                 typedef ratio_divide<_Period2, _Period> _Checked_type;
 

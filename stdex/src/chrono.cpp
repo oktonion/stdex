@@ -10,8 +10,6 @@
 #include <cstdlib>
 #include <numeric>
 
-#include <iostream>
-
 
 #if defined(WIN32) || defined(_WIN32) // assuming we are on windows platform and have no realtime clock
 
@@ -198,7 +196,7 @@ namespace clock_gettime_impl
             ts.tv_sec = _ts_sec_max;
             ts.tv_nsec = 999999999;
         }
-        std::cout << "ts:" << ts.tv_sec << "." << ts.tv_nsec << std::endl;
+
         return 0;
     }
 
@@ -288,8 +286,6 @@ namespace clock_gettime_impl
             ts.tv_sec = _ts_sec_max;
             ts.tv_nsec = 999999999;
         }
-
-        std::cout << "ts:" << ts.tv_sec << "." << ts.tv_nsec << std::endl;
 
         return 0;
     }
@@ -469,63 +465,157 @@ namespace stdex {
             duration_long_long convert(const _big_int &value)
             {
                 duration_long_long result;
-                std::memcpy(&result, value.least64bits_value, sizeof(duration_long_long));
+                std::memcpy(&result, value.least64_value, sizeof(duration_long_long));
                 return result;
             }
 
             _big_int convert(const duration_long_long& value)
             {
                 _big_int result;
-                std::memcpy(result.least64bits_value, &value, sizeof(duration_long_long));
+                std::memcpy(result.least64_value, &value, sizeof(duration_long_long));
                 return result;
             }
 
             _big_int::_big_int(const stdex::intmax_t& _i)
             {
-                STATIC_ASSERT(sizeof(duration_long_long) <= sizeof(least64bits_value), platform_specific_int64_should_fit_in_8_bytes);
+                STATIC_ASSERT(sizeof(duration_long_long) <= sizeof(least64_value), platform_specific_int64_should_fit_in_8_bytes);
                 duration_long_long value = _i;
-                std::memcpy(least64bits_value, &value, sizeof(duration_long_long));
+                std::memcpy(least64_value, &value, sizeof(duration_long_long));
             }
 
             _big_int::_big_int(const _big_int& other)
             {
-                std::memcpy(least64bits_value, &other.least64bits_value, sizeof(least64bits_value));
+                std::memcpy(least64_value, other.least64_value, sizeof(least64_value));
             }
 
             _big_int& _big_int::operator=(const _big_int& other)
             {
-                std::memcpy(least64bits_value, &other.least64bits_value, sizeof(least64bits_value));
+                std::memcpy(least64_value, other.least64_value, sizeof(least64_value));
                 return *this;
             }
 
             _big_int::operator stdex::intmax_t() const
             {
-                return stdex::intmax_t(convert(*this));
+                duration_long_long result = convert(*this);
+
+                if (result > (std::numeric_limits<stdex::intmax_t>::max)())
+                    throw(std::out_of_range("stdex::intmax_t overflow"));
+
+                return stdex::intmax_t(result);
             }
 
-            _big_int operator+(const _big_int& a, const _big_int& b)
+            _big_int& _big_int::operator++()
             {
-                return convert(convert(a) + convert(b));
+                *this = convert(convert(*this) + 1);
+                return *this;
             }
 
-            _big_int operator-(const _big_int& a, const _big_int& b)
+            _big_int _big_int::operator++(int)
             {
-                return convert(convert(a) - convert(b));
+                _big_int tmp(*this);
+                operator++();
+                return tmp;
             }
 
-            _big_int operator*(const _big_int& a, const _big_int& b)
+            _big_int& _big_int::operator--()
             {
-                return convert(convert(a) * convert(b));
+                *this = convert(convert(*this) - 1);
+                return *this;
             }
 
-            _big_int operator/(const _big_int& a, const _big_int& b)
+            _big_int _big_int::operator--(int)
             {
-                return convert(convert(a) / convert(b));
+                _big_int tmp(*this);
+                operator--();
+                return tmp;
             }
 
-            _big_int operator%(const _big_int& a, const _big_int& b)
+            _big_int& _big_int::operator+=(const _big_int& other)
             {
-                return convert(convert(a) % convert(b));
+                *this = convert(convert(*this) + convert(other));
+                return *this;
+            }
+
+            _big_int& _big_int::operator-=(const _big_int& other)
+            {
+                *this = convert(convert(*this) - convert(other));
+                return *this;
+            }
+
+            _big_int& _big_int::operator*=(const stdex::intmax_t& _r_in)
+            {
+                *this = convert(convert(*this) * duration_long_long(_r_in));
+                return *this;
+            }
+
+            _big_int& _big_int::operator/=(const stdex::intmax_t& _r_in)
+            {
+                *this = convert(convert(*this) / duration_long_long(_r_in));
+                return *this;
+            }
+
+            _big_int& _big_int::operator%=(const stdex::intmax_t& _r_in)
+            {
+                *this = convert(convert(*this) % duration_long_long(_r_in));
+                return *this;
+            }
+
+            _big_int& _big_int::operator%=(const _big_int& other)
+            {
+                *this = convert(convert(*this) % convert(other));
+                return *this;
+            }
+
+
+            _big_int operator+(_big_int a, const _big_int& b)
+            {
+                return a += b;
+            }
+
+            _big_int operator-(_big_int a, const _big_int& b)
+            {
+                return a -= b;
+            }
+
+            _big_int operator*(_big_int a, const _big_int& b)
+            {
+                return a *= b;
+            }
+
+            _big_int operator/(_big_int a, const _big_int& b)
+            {
+                return a /= b;
+            }
+
+            _big_int operator%(_big_int a, const _big_int& b)
+            {
+                return a %= b;
+            }
+
+
+            _big_int operator+(const stdex::intmax_t& a, const _big_int& b)
+            {
+                return convert(duration_long_long(a) + convert(b));
+            }
+
+            _big_int operator-(const stdex::intmax_t& a, const _big_int& b)
+            {
+                return convert(duration_long_long(a) - convert(b));
+            }
+
+            _big_int operator*(const stdex::intmax_t& a, const _big_int& b)
+            {
+                return convert(duration_long_long(a) * convert(b));
+            }
+
+            _big_int operator/(const stdex::intmax_t& a, const _big_int& b)
+            {
+                return convert(duration_long_long(a) / convert(b));
+            }
+
+            _big_int operator%(const stdex::intmax_t& a, const _big_int& b)
+            {
+                return convert(duration_long_long(a) % convert(b));
             }
         }
     }
@@ -543,11 +633,9 @@ stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDE
             std::terminate();
         }
         
-        time_point tp =
+        return
         time_point( 
-            duration(seconds(ts.tv_sec)) + duration(microseconds(ts.tv_nsec / 1000)) );
-        std::cout << "tp:" << stdex::uintmax_t(time_point_cast<seconds>(tp).time_since_epoch().count()) << "." << (time_point_cast<milliseconds>(tp) - time_point_cast<seconds>(tp)).count() << std::endl;
-        return tp;
+            seconds(ts.tv_sec) + microseconds(ts.tv_nsec / 1000) );
     }
 }
 
@@ -563,10 +651,8 @@ stdex::chrono::steady_clock::time_point stdex::chrono::steady_clock::now() _STDE
             std::terminate();
         }
 
-        time_point tp =
+        return
         time_point(
-            duration(seconds(ts.tv_sec)) + duration(microseconds(ts.tv_nsec / 1000)) );
-        std::cout << "tp:" << stdex::uintmax_t(time_point_cast<seconds>(tp).time_since_epoch().count()) << "." << (time_point_cast<milliseconds>(tp) - time_point_cast<seconds>(tp)).count() << std::endl;
-        return tp;
+            seconds(ts.tv_sec) + microseconds(ts.tv_nsec / 1000) );
     }
 }
