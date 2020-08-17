@@ -705,33 +705,33 @@ namespace thread_cpp_detail
 
 		static int call(const timespec *req, timespec *rem)
 		{
-			timespec tp;
+			timespec _begin, tp;
 
 			int err = 
-				::clock_gettime(CLOCK_MONOTONIC, &tp);
+				::clock_gettime(CLOCK_MONOTONIC, &_begin);
 			if(err != 0)
 				return nanosleep_impl1<false>::call(req, rem);
 
+			tp = _begin;
 			timespec_add(tp, *req);
 
 			
 			do{
-				timespec begin, now;
-
-				::clock_gettime(CLOCK_MONOTONIC, &begin);
+				timespec _end;
 
 				errno = 0;
 				err = 
 					::clock_nanosleep(_STDEX_THREAD_CLOCK_MONOTONIC, TIMER_ABSTIME, &tp, rem);
+				
 				if(0 == err)
 				{
 					err = 
-						::clock_gettime(CLOCK_MONOTONIC, &now);
+						::clock_gettime(CLOCK_MONOTONIC, &_end);
 				}
 
 				if(0 == err)
 				{
-					timespec_diff(&now, &begin, rem);
+					timespec_diff(&_end, &_begin, rem);
 				}
 			}
 			while(rem->tv_sec >= 0 && rem->tv_nsec >= 0 && err == 0);
