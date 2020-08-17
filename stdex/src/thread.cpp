@@ -516,7 +516,6 @@ void AdjustSystemTimerResolutionTo(const ULONG &sysTimerOrigResolution)
 	}
 }
 
-
 class WaitableTimer
 {
 public:
@@ -534,13 +533,12 @@ public:
 		m_timer = NULL;
 	}
 
-	void Start(stdex::intmax_t relativeTime100Ns)
+	void Start(LONGLONG relativeTime100Ns)
 	{
 		const ULONG sysTimerOrigResolution = AdjustSystemTimerResolutionTo500mcs();
 
 		LARGE_INTEGER dueTime = { {0} };
-		dueTime.QuadPart = static_cast<LONGLONG>(relativeTime100Ns) * -1;
-
+		dueTime.QuadPart = relativeTime100Ns * -1;
 
 		BOOL res = ::SetWaitableTimer(m_timer, &dueTime, 0, NULL, NULL, FALSE);
 
@@ -563,9 +561,37 @@ void detail::sleep_for_impl(const struct timespec *reltime)
 {
 	WaitableTimer timer;
 
-	stdex::intmax_t us100 = reltime->tv_sec * 1000 * 1000 * 10 + reltime->tv_nsec / 100;
+	LONGLONG us100 = reltime->tv_sec * 1000 * 1000 * 10 + reltime->tv_nsec / 100;
+	
+	LARGE_INTEGER nStartTime;
+	LARGE_INTEGER nStopTime;
+	LARGE_INTEGER nElapsed;
+	LARGE_INTEGER nFrequency;
 
-	timer.Start(us100);
+	nElapsed.QuadPart = 0;
+	nFrequency.QuadPart = 1;
+
+	bool check_timings = 
+		(0 != ::QueryPerformanceFrequency(&nFrequency));
+
+	if (!check_timings)
+		us100 += 1000 * 10;
+
+
+	do {
+		us100 -= (nElapsed.QuadPart * 10);
+		
+		check_timings =
+			(0 != ::QueryPerformanceCounter(&nStartTime));
+
+		timer.Start(us100);
+
+		check_timings =
+			(0 != ::QueryPerformanceCounter(&nStopTime));
+
+		nElapsed.QuadPart = (nStopTime.QuadPart - nStartTime.QuadPart) * 1000000;
+		nElapsed.QuadPart /= nFrequency.QuadPart;
+	} while (check_timings && nElapsed.QuadPart < (us100 / 10) );
 }
 
 #else
