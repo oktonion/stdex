@@ -703,12 +703,35 @@ namespace thread_cpp_detail
 			}
 		}
 
+		static int clock_nanosleep_abs(const timespec* tp)
+		{
+			errno = 0;
+			int err =
+				::clock_nanosleep(_STDEX_THREAD_CLOCK_MONOTONIC, TIMER_ABSTIME, tp, 0);
+
+			if (0 == err || ENOTSUP != errno)
+				return err;
+
+			errno = 0;
+			err =
+				::clock_nanosleep(CLOCK_MONOTONIC, TIMER_ABSTIME, tp, 0);
+
+			if (0 == err || ENOTSUP != errno)
+				return err;
+
+			errno = 0;
+			err = 
+				::clock_nanosleep(CLOCK_REALTIME, TIMER_ABSTIME, tp, 0);
+
+			return err;
+		}
+
 		static int call(const timespec *req, timespec *rem)
 		{
 			timespec _begin, tp;
 
 			int err = 
-				::clock_gettime(CLOCK_MONOTONIC, &_begin);
+				::clock_gettime(_STDEX_THREAD_CLOCK_MONOTONIC, &_begin);
 			if(err != 0)
 				return nanosleep_impl1<false>::call(req, rem);
 
@@ -719,31 +742,45 @@ namespace thread_cpp_detail
 
 			int nanosleep_err = 0;
 			
-			do{
-				timespec _end, _passed;
 
+			errno = 0;
+			nanosleep_err = 
+				clock_nanosleep_abs(&tp);
+
+			if (0 != nanosleep_err && EINTR != errno)
+			{
 				errno = 0;
-				nanosleep_err = 
-					::clock_nanosleep(_STDEX_THREAD_CLOCK_MONOTONIC, TIMER_ABSTIME, &tp, rem);
-				
-				if(0 == nanosleep_err)
-				{
-					err = 
-						::clock_gettime(CLOCK_MONOTONIC, &_end);
-					errno = 0;
-					if(0 != err)
-						break;
-				}
-
-				timespec_diff(_end, _begin, _passed);
-
-				if( _passed.tv_sec > req->tv_sec || 
-					(_passed.tv_sec == req->tv_sec && _passed.tv_nsec > req->tv_nsec) )
-					break;
-				timespec_diff(*req, _passed, tp);
-				timespec_add(tp, _end);
+				nanosleep_err =
+					nanosleep_impl1<false>::call(req, rem);
+				if (0 != nanosleep_err)
+					return nanosleep_err;
 			}
-			while(nanosleep_err == 0);
+
+			timespec _end, _passed;
+
+			if (0 == nanosleep_err || EINTR == errno)
+			{
+				int myerrno = errno;
+				err = 
+					::clock_gettime(_STDEX_THREAD_CLOCK_MONOTONIC, &_end);
+				errno = 0;
+				if (0 != err)
+				{
+					errno = myerrno;
+					return nanosleep_err;
+				}
+			}
+
+			timespec_diff(_end, _begin, _passed);
+
+			if (_passed.tv_sec > req->tv_sec ||
+				(_passed.tv_sec == req->tv_sec && _passed.tv_nsec > req->tv_nsec))
+				return 0;
+
+			timespec_diff(*req, _passed, *rem);
+
+			if (rem->tv_sec < 0) rem->tv_sec = 0;
+			if (rem->tv_nsec < 0) rem->tv_nsec = 0;
 
 			return nanosleep_err;
 		}
