@@ -47,7 +47,7 @@ stdex::error_condition
 make_error_condition(my_errc e)
 {
   return stdex::error_condition(static_cast<int>(e),
-			      my_error_category_instance);
+                  my_error_category_instance);
 }
 
 namespace stdex

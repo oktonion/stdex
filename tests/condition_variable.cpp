@@ -11,53 +11,53 @@
 
 namespace cond_var_tests
 {
-	int counter = 0;
+    int counter = 0;
 
-	struct Inc
-	{
-		Inc() { ++counter; }
-		~Inc() { ++counter; }
-	};
+    struct Inc
+    {
+        Inc() { ++counter; }
+        ~Inc() { ++counter; }
+    };
 
-	stdex::mutex mx;
-	stdex::condition_variable cv;
+    stdex::mutex mx;
+    stdex::condition_variable cv;
 
-	bool val = false;
+    bool val = false;
 
-	bool func_val() { return cond_var_tests::val; }
+    bool func_val() { return cond_var_tests::val; }
 
-	void func()
-	{
-		stdex::this_thread::sleep_for(stdex::chrono::milliseconds(10000));
-		stdex::unique_lock<stdex::mutex> lock(cond_var_tests::mx);
-		stdex::notify_all_at_thread_exit(cv, lock);
+    void func()
+    {
+        stdex::this_thread::sleep_for(stdex::chrono::milliseconds(10000));
+        stdex::unique_lock<stdex::mutex> lock(cond_var_tests::mx);
+        stdex::notify_all_at_thread_exit(cv, lock);
 
-		Inc inc;
-	}
+        Inc inc;
+    }
 
-	bool condition_func()
-	{
-		return cond_var_tests::counter == 2;
-	}
+    bool condition_func()
+    {
+        return cond_var_tests::counter == 2;
+    }
 
 
-	struct FPClock : stdex::chrono::system_clock
-	{
-		typedef double rep;
-		typedef stdex::ratio<1> period;
-		typedef stdex::chrono::duration<rep, period> duration;
-		typedef stdex::chrono::time_point<FPClock> time_point;
+    struct FPClock : stdex::chrono::system_clock
+    {
+        typedef double rep;
+        typedef stdex::ratio<1> period;
+        typedef stdex::chrono::duration<rep, period> duration;
+        typedef stdex::chrono::time_point<FPClock> time_point;
 
-		static time_point now()
-		{
-			return time_point(duration(stdex::chrono::system_clock::now().time_since_epoch()));
-		}
-	};
+        static time_point now()
+        {
+            return time_point(duration(stdex::chrono::system_clock::now().time_since_epoch()));
+        }
+    };
 }
 
 bool false_predicate()
 {
-	return false;
+    return false;
 }
 
 int test1()

@@ -7,7 +7,7 @@ int main(void)
     typedef stdex::recursive_timed_mutex mutex_type;
     mutex_type m1;
     mutex_type m2;
-    m1 = m2;			// { dg-error "deleted" }
+    m1 = m2;            // { dg-error "deleted" }
 
     return 0;
 }

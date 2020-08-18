@@ -111,9 +111,9 @@ namespace string_tests
         {
             string one("1e");
             one.append(2 * std::numeric_limits<double>::max_exponent10, '9');
-			
+            
             d1 = stdex::stod(one);
-			
+            
         }
         catch (const std::out_of_range &)
         {
@@ -140,30 +140,30 @@ namespace string_tests
         if ((std::numeric_limits<long double>::max() / 10000.0L)
                 > std::numeric_limits<double>::max())
         {
-			
+            
             test = false;
             d1 = -1.0;
             try
             {
                 long double ld1 = std::numeric_limits<double>::max();
                 ld1 *= 100.0;
-				
+                
                 string one(to_string(ld1));
-				
+                
                 d1 = stdex::stod(one);
-				
+                
             }
             catch (const std::out_of_range&)
             {
-				
+                
                 test = true;
             }
             catch (...)
             {
             }
-			
+            
             DYNAMIC_VERIFY(test);
-			
+            
             DYNAMIC_VERIFY(d1 == -1.0);
         }
         
@@ -940,7 +940,7 @@ namespace string_tests
     }
 
 #ifdef LLONG_MAX
-	int stoull_test()
+    int stoull_test()
     {
         bool test = false;
         using namespace stdex;

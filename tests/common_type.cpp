@@ -76,25 +76,25 @@ int main(void)
         typedef int type2;
         typedef int type3;
 
-        typedef common_type<type1, type2>::type  	JOIN(JOIN(test_, uid), _t1);
-        typedef common_type<type2, type1>::type  	JOIN(JOIN(test_, uid), _t2);
-        typedef common_type<type1&, type2>::type  	JOIN(JOIN(test_, uid), _t1_ref);
-        typedef common_type<type2&, type1>::type  	JOIN(JOIN(test_, uid), _t2_ref);
+        typedef common_type<type1, type2>::type      JOIN(JOIN(test_, uid), _t1);
+        typedef common_type<type2, type1>::type      JOIN(JOIN(test_, uid), _t2);
+        typedef common_type<type1&, type2>::type      JOIN(JOIN(test_, uid), _t1_ref);
+        typedef common_type<type2&, type1>::type      JOIN(JOIN(test_, uid), _t2_ref);
 
-        typedef common_type<const type1, type2>::type  		JOIN(JOIN(test_c_, uid), _t1);
-        typedef common_type<const type2, type1>::type  		JOIN(JOIN(test_c_, uid), _t2);
-        typedef common_type<const type1&, type2>::type  	JOIN(JOIN(test_c_, uid), _t1_ref);
-        typedef common_type<const type2&, type1>::type  	JOIN(JOIN(test_c_, uid), _t2_ref);
+        typedef common_type<const type1, type2>::type          JOIN(JOIN(test_c_, uid), _t1);
+        typedef common_type<const type2, type1>::type          JOIN(JOIN(test_c_, uid), _t2);
+        typedef common_type<const type1&, type2>::type      JOIN(JOIN(test_c_, uid), _t1_ref);
+        typedef common_type<const type2&, type1>::type      JOIN(JOIN(test_c_, uid), _t2_ref);
 
-        typedef common_type<volatile type1, type2>::type  		JOIN(JOIN(test_v_, uid), _t1);
-        typedef common_type<volatile type2, type1>::type  		JOIN(JOIN(test_v_, uid), _t2);
-        typedef common_type<volatile type1&, type2>::type  		JOIN(JOIN(test_v_, uid), _t1_ref);
-        typedef common_type<volatile type2&, type1>::type  		JOIN(JOIN(test_v_, uid), _t2_ref);
+        typedef common_type<volatile type1, type2>::type          JOIN(JOIN(test_v_, uid), _t1);
+        typedef common_type<volatile type2, type1>::type          JOIN(JOIN(test_v_, uid), _t2);
+        typedef common_type<volatile type1&, type2>::type          JOIN(JOIN(test_v_, uid), _t1_ref);
+        typedef common_type<volatile type2&, type1>::type          JOIN(JOIN(test_v_, uid), _t2_ref);
 
-        typedef common_type<const volatile type1, type2>::type  		JOIN(JOIN(test_cv_, uid), _t1);
-        typedef common_type<const volatile type2, type1>::type  		JOIN(JOIN(test_cv_, uid), _t2);
-        typedef common_type<const volatile type1&, type2>::type  		JOIN(JOIN(test_cv_, uid), _t1_ref);
-        typedef common_type<const volatile type2&, type1>::type  		JOIN(JOIN(test_cv_, uid), _t2_ref);
+        typedef common_type<const volatile type1, type2>::type          JOIN(JOIN(test_cv_, uid), _t1);
+        typedef common_type<const volatile type2, type1>::type          JOIN(JOIN(test_cv_, uid), _t2);
+        typedef common_type<const volatile type1&, type2>::type          JOIN(JOIN(test_cv_, uid), _t1_ref);
+        typedef common_type<const volatile type2&, type1>::type          JOIN(JOIN(test_cv_, uid), _t2_ref);
 
         VERIFY((is_same<test_uid_t1, type3>::value));
         VERIFY((is_same<test_uid_t2, type3>::value));
@@ -122,25 +122,25 @@ int main(void)
         typedef double type2;
         typedef double type3;
 
-        typedef common_type<type1, type2>::type  	JOIN(JOIN(test_, uid), _t1);
-        typedef common_type<type2, type1>::type  	JOIN(JOIN(test_, uid), _t2);
-        typedef common_type<type1&, type2>::type  	JOIN(JOIN(test_, uid), _t1_ref);
-        typedef common_type<type2&, type1>::type  	JOIN(JOIN(test_, uid), _t2_ref);
+        typedef common_type<type1, type2>::type      JOIN(JOIN(test_, uid), _t1);
+        typedef common_type<type2, type1>::type      JOIN(JOIN(test_, uid), _t2);
+        typedef common_type<type1&, type2>::type      JOIN(JOIN(test_, uid), _t1_ref);
+        typedef common_type<type2&, type1>::type      JOIN(JOIN(test_, uid), _t2_ref);
 
-        typedef common_type<const type1, type2>::type  		JOIN(JOIN(test_c_, uid), _t1);
-        typedef common_type<const type2, type1>::type  		JOIN(JOIN(test_c_, uid), _t2);
-        typedef common_type<const type1&, type2>::type  	JOIN(JOIN(test_c_, uid), _t1_ref);
-        typedef common_type<const type2&, type1>::type  	JOIN(JOIN(test_c_, uid), _t2_ref);
+        typedef common_type<const type1, type2>::type          JOIN(JOIN(test_c_, uid), _t1);
+        typedef common_type<const type2, type1>::type          JOIN(JOIN(test_c_, uid), _t2);
+        typedef common_type<const type1&, type2>::type      JOIN(JOIN(test_c_, uid), _t1_ref);
+        typedef common_type<const type2&, type1>::type      JOIN(JOIN(test_c_, uid), _t2_ref);
 
-        typedef common_type<volatile type1, type2>::type  		JOIN(JOIN(test_v_, uid), _t1);
-        typedef common_type<volatile type2, type1>::type  		JOIN(JOIN(test_v_, uid), _t2);
-        typedef common_type<volatile type1&, type2>::type  		JOIN(JOIN(test_v_, uid), _t1_ref);
-        typedef common_type<volatile type2&, type1>::type  		JOIN(JOIN(test_v_, uid), _t2_ref);
+        typedef common_type<volatile type1, type2>::type          JOIN(JOIN(test_v_, uid), _t1);
+        typedef common_type<volatile type2, type1>::type          JOIN(JOIN(test_v_, uid), _t2);
+        typedef common_type<volatile type1&, type2>::type          JOIN(JOIN(test_v_, uid), _t1_ref);
+        typedef common_type<volatile type2&, type1>::type          JOIN(JOIN(test_v_, uid), _t2_ref);
 
-        typedef common_type<const volatile type1, type2>::type  		JOIN(JOIN(test_cv_, uid), _t1);
-        typedef common_type<const volatile type2, type1>::type  		JOIN(JOIN(test_cv_, uid), _t2);
-        typedef common_type<const volatile type1&, type2>::type  		JOIN(JOIN(test_cv_, uid), _t1_ref);
-        typedef common_type<const volatile type2&, type1>::type  		JOIN(JOIN(test_cv_, uid), _t2_ref);
+        typedef common_type<const volatile type1, type2>::type          JOIN(JOIN(test_cv_, uid), _t1);
+        typedef common_type<const volatile type2, type1>::type          JOIN(JOIN(test_cv_, uid), _t2);
+        typedef common_type<const volatile type1&, type2>::type          JOIN(JOIN(test_cv_, uid), _t1_ref);
+        typedef common_type<const volatile type2&, type1>::type          JOIN(JOIN(test_cv_, uid), _t2_ref);
 
         VERIFY((is_same<test_uid_t1, type3>::value));
         VERIFY((is_same<test_uid_t2, type3>::value));
@@ -168,25 +168,25 @@ int main(void)
         typedef A type2;
         typedef A type3;
 
-        typedef common_type<type1, type2>::type  	JOIN(JOIN(test_, uid), _t1);
-        typedef common_type<type2, type1>::type  	JOIN(JOIN(test_, uid), _t2);
-        typedef common_type<type1&, type2>::type  	JOIN(JOIN(test_, uid), _t1_ref);
-        typedef common_type<type2&, type1>::type  	JOIN(JOIN(test_, uid), _t2_ref);
+        typedef common_type<type1, type2>::type      JOIN(JOIN(test_, uid), _t1);
+        typedef common_type<type2, type1>::type      JOIN(JOIN(test_, uid), _t2);
+        typedef common_type<type1&, type2>::type      JOIN(JOIN(test_, uid), _t1_ref);
+        typedef common_type<type2&, type1>::type      JOIN(JOIN(test_, uid), _t2_ref);
 
-        typedef common_type<const type1, type2>::type  		JOIN(JOIN(test_c_, uid), _t1);
-        typedef common_type<const type2, type1>::type  		JOIN(JOIN(test_c_, uid), _t2);
-        typedef common_type<const type1&, type2>::type  	JOIN(JOIN(test_c_, uid), _t1_ref);
-        typedef common_type<const type2&, type1>::type  	JOIN(JOIN(test_c_, uid), _t2_ref);
+        typedef common_type<const type1, type2>::type          JOIN(JOIN(test_c_, uid), _t1);
+        typedef common_type<const type2, type1>::type          JOIN(JOIN(test_c_, uid), _t2);
+        typedef common_type<const type1&, type2>::type      JOIN(JOIN(test_c_, uid), _t1_ref);
+        typedef common_type<const type2&, type1>::type      JOIN(JOIN(test_c_, uid), _t2_ref);
 
-        typedef common_type<volatile type1, type2>::type  		JOIN(JOIN(test_v_, uid), _t1);
-        typedef common_type<volatile type2, type1>::type  		JOIN(JOIN(test_v_, uid), _t2);
-        typedef common_type<volatile type1&, type2>::type  		JOIN(JOIN(test_v_, uid), _t1_ref);
-        typedef common_type<volatile type2&, type1>::type  		JOIN(JOIN(test_v_, uid), _t2_ref);
+        typedef common_type<volatile type1, type2>::type          JOIN(JOIN(test_v_, uid), _t1);
+        typedef common_type<volatile type2, type1>::type          JOIN(JOIN(test_v_, uid), _t2);
+        typedef common_type<volatile type1&, type2>::type          JOIN(JOIN(test_v_, uid), _t1_ref);
+        typedef common_type<volatile type2&, type1>::type          JOIN(JOIN(test_v_, uid), _t2_ref);
 
-        typedef common_type<const volatile type1, type2>::type  		JOIN(JOIN(test_cv_, uid), _t1);
-        typedef common_type<const volatile type2, type1>::type  		JOIN(JOIN(test_cv_, uid), _t2);
-        typedef common_type<const volatile type1&, type2>::type  		JOIN(JOIN(test_cv_, uid), _t1_ref);
-        typedef common_type<const volatile type2&, type1>::type  		JOIN(JOIN(test_cv_, uid), _t2_ref);
+        typedef common_type<const volatile type1, type2>::type          JOIN(JOIN(test_cv_, uid), _t1);
+        typedef common_type<const volatile type2, type1>::type          JOIN(JOIN(test_cv_, uid), _t2);
+        typedef common_type<const volatile type1&, type2>::type          JOIN(JOIN(test_cv_, uid), _t1_ref);
+        typedef common_type<const volatile type2&, type1>::type          JOIN(JOIN(test_cv_, uid), _t2_ref);
 
         VERIFY((is_same<test_uid_t1, type3>::value));
         VERIFY((is_same<test_uid_t2, type3>::value));

@@ -8,9 +8,9 @@ struct PODType { int data; };
 
 struct ConvTypeInt
 {
-	ConvTypeInt(int) {}
-	template<class T>
-	operator T() { return T(); }
+    ConvTypeInt(int) {}
+    template<class T>
+    operator T() { return T(); }
 };
 
 struct ClassType1 { ClassType1(int); };

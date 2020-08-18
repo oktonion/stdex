@@ -15,11 +15,11 @@ namespace mutex_tests
     {
         using namespace stdex;
 
-		{
-			// assign
-			mutex_type m1;
-			mutex_type m2(m1);		// { dg-error "deleted" }
-		}
+        {
+            // assign
+            mutex_type m1;
+            mutex_type m2(m1);        // { dg-error "deleted" }
+        }
 
         return 0;
     }

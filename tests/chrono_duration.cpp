@@ -6,104 +6,104 @@
 
 class ClockTime
 {
-	typedef stdex::chrono::hours hours;
-	typedef stdex::chrono::minutes minutes;
-	typedef stdex::chrono::seconds seconds;
+    typedef stdex::chrono::hours hours;
+    typedef stdex::chrono::minutes minutes;
+    typedef stdex::chrono::seconds seconds;
 
 public:
-	hours hours_;
-	minutes minutes_;
-	seconds seconds_;
+    hours hours_;
+    minutes minutes_;
+    seconds seconds_;
 
-	template<typename Rep, typename Period>
-	explicit
-		ClockTime(const stdex::chrono::duration<Rep, Period>& d)
-		: hours_(stdex::chrono::duration_cast<hours>  (d)),
-		minutes_(stdex::chrono::duration_cast<minutes>(d % hours(1))),
-		seconds_(stdex::chrono::duration_cast<seconds>(d % minutes(1))) { }
+    template<typename Rep, typename Period>
+    explicit
+        ClockTime(const stdex::chrono::duration<Rep, Period>& d)
+        : hours_(stdex::chrono::duration_cast<hours>  (d)),
+        minutes_(stdex::chrono::duration_cast<minutes>(d % hours(1))),
+        seconds_(stdex::chrono::duration_cast<seconds>(d % minutes(1))) { }
 };
 
 template<typename T>
 struct type_emulator
 {
-	type_emulator()
-		: i(T(0)) { }
+    type_emulator()
+        : i(T(0)) { }
 
-	type_emulator(T j)
-		: i(j) { }
+    type_emulator(T j)
+        : i(j) { }
 
-	type_emulator(const type_emulator& e)
-		: i(e.i) { }
+    type_emulator(const type_emulator& e)
+        : i(e.i) { }
 
-	type_emulator&
-		operator*=(type_emulator a)
-	{
-		i *= a.i;
-		return *this;
-	}
+    type_emulator&
+        operator*=(type_emulator a)
+    {
+        i *= a.i;
+        return *this;
+    }
 
-	type_emulator&
-		operator+=(type_emulator a)
-	{
-		i += a.i;
-		return *this;
-	}
+    type_emulator&
+        operator+=(type_emulator a)
+    {
+        i += a.i;
+        return *this;
+    }
 
-	operator T ()
-	{
-		return i;
-	}
+    operator T ()
+    {
+        return i;
+    }
 
-	T i;
+    T i;
 };
 
 template<typename T>
 bool
 operator==(type_emulator<T> a, type_emulator<T> b)
 {
-	return a.i == b.i;
+    return a.i == b.i;
 }
 
 template<typename T>
 bool
 operator<(type_emulator<T> a, type_emulator<T> b)
 {
-	return a.i < b.i;
+    return a.i < b.i;
 }
 
 template<typename T>
 type_emulator<T>
 operator+(type_emulator<T> a, type_emulator<T> b)
 {
-	return a += b;
+    return a += b;
 }
 
 template<typename T>
 type_emulator<T>
 operator*(type_emulator<T> a, type_emulator<T> b)
 {
-	return a *= b;
+    return a *= b;
 }
 
 namespace stdex
 {
-	template<typename T, typename U>
-	struct common_type<type_emulator<T>, U>
-	{
-		typedef typename common_type<T, U>::type type;
-	};
+    template<typename T, typename U>
+    struct common_type<type_emulator<T>, U>
+    {
+        typedef typename common_type<T, U>::type type;
+    };
 
-	template<typename T, typename U>
-	struct common_type<U, type_emulator<T> >
-	{
-		typedef typename common_type<U, T>::type type;
-	};
+    template<typename T, typename U>
+    struct common_type<U, type_emulator<T> >
+    {
+        typedef typename common_type<U, T>::type type;
+    };
 
-	template<typename T, typename U>
-	struct common_type<type_emulator<T>, type_emulator<U> >
-	{
-		typedef typename common_type<T, U>::type type;
-	};
+    template<typename T, typename U>
+    struct common_type<type_emulator<T>, type_emulator<U> >
+    {
+        typedef typename common_type<T, U>::type type;
+    };
 
     namespace chrono
     {    

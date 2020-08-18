@@ -9,9 +9,9 @@ struct PODType { int data; };
 
 struct ConvTypeInt
 {
-	ConvTypeInt(int) {}
-	template<class T>
-	operator T() { return T(); }
+    ConvTypeInt(int) {}
+    template<class T>
+    operator T() { return T(); }
 };
 
 struct ClassType1 { ClassType1(int); };
@@ -32,7 +32,7 @@ int main(void)
     using namespace stdex;
     
     STATIC_ASSERT(is_integral<void>::value == (false), can_not_be_integral);
-								 
+                                 
     STATIC_ASSERT(is_integral<char>::value == (true), should_be_integral);
     STATIC_ASSERT(is_integral<signed char>::value == (true), should_be_integral);
     STATIC_ASSERT(is_integral<unsigned char>::value == (true), should_be_integral);

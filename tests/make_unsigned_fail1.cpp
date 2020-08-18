@@ -8,7 +8,7 @@ int main(void)
     // make_unsigned
     // Negative  tests.
     {
-        typedef make_unsigned<bool>::type     	test1_type;
+        typedef make_unsigned<bool>::type         test1_type;
     }
 
     return 0;

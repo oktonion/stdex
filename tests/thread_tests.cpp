@@ -18,44 +18,44 @@ using std::size_t;
 
 namespace thread_tests_std
 {
-	template<class T>
-	class reference_wrapper
-	{
-	public:
-		reference_wrapper(T &ref_) :
-			_ptr(&ref_)
-		{ }
+    template<class T>
+    class reference_wrapper
+    {
+    public:
+        reference_wrapper(T &ref_) :
+            _ptr(&ref_)
+        { }
 
-		reference_wrapper(const reference_wrapper &other): 
-			_ptr(other._ptr)
-		{ }
+        reference_wrapper(const reference_wrapper &other): 
+            _ptr(other._ptr)
+        { }
 
-		reference_wrapper& operator=(const reference_wrapper &other)
-		{
-			_ptr = other._ptr;
-			return (*this);
-		}
+        reference_wrapper& operator=(const reference_wrapper &other)
+        {
+            _ptr = other._ptr;
+            return (*this);
+        }
 
-		operator T&() const
-		{
-			return *_ptr;
-		}
+        operator T&() const
+        {
+            return *_ptr;
+        }
 
-	private:
-		T *_ptr;
-	};
+    private:
+        T *_ptr;
+    };
 
-	template<class T>
-	reference_wrapper<T> ref(T &ref_)
-	{
-		return reference_wrapper<T>(ref_);
-	}
+    template<class T>
+    reference_wrapper<T> ref(T &ref_)
+    {
+        return reference_wrapper<T>(ref_);
+    }
 
-	template<class T>
-	reference_wrapper<T> ref(reference_wrapper<T> &ref_)
-	{
-		return ref_;
-	}
+    template<class T>
+    reference_wrapper<T> ref(reference_wrapper<T> &ref_)
+    {
+        return ref_;
+    }
 }
 
 size_t active_thread_left = 0;
@@ -63,36 +63,36 @@ size_t active_thread_left = 0;
 void
 free_function(stdex::thread::id& id)
 {
-	id = stdex::this_thread::get_id();
-	std::cout << "[id]=" << id << std::endl;
-	static int i = 0;
+    id = stdex::this_thread::get_id();
+    std::cout << "[id]=" << id << std::endl;
+    static int i = 0;
 
-	++i;
+    ++i;
 
-	if (i % 4 == 0)
-	{
-		std::srand( (unsigned int)(std::time(nullptr)) );
+    if (i % 4 == 0)
+    {
+        std::srand( (unsigned int)(std::time(nullptr)) );
 
-		stdex::this_thread::sleep_for(stdex::chrono::milliseconds(1 + (std::rand() % (330 - 1 + 1))));
-	}
-	active_thread_left--;
+        stdex::this_thread::sleep_for(stdex::chrono::milliseconds(1 + (std::rand() % (330 - 1 + 1))));
+    }
+    active_thread_left--;
 }
 
 struct copyable
 {
-	copyable() {}
-	~copyable() {}
-	copyable(const copyable&)
-	{
-		++copy_count;
-	}
+    copyable() {}
+    ~copyable() {}
+    copyable(const copyable&)
+    {
+        ++copy_count;
+    }
 
-	void operator()(stdex::thread::id& id) const
-	{
-		id = stdex::this_thread::get_id();
-	}
+    void operator()(stdex::thread::id& id) const
+    {
+        id = stdex::this_thread::get_id();
+    }
 
-	static int copy_count;
+    static int copy_count;
 };
 
 int copyable::copy_count = 0;
@@ -101,8 +101,8 @@ bool f_was_called = false;
 
 void f()
 {
-	f_was_called = true;
-	active_thread_left--;
+    f_was_called = true;
+    active_thread_left--;
 }
 
 struct ClassType {};
@@ -119,11 +119,11 @@ int thread_func_nullptr_check_ret = 0;
 
 struct functor
 {
-	functor() {}
-	~functor() {}
+    functor() {}
+    ~functor() {}
 
-	int operator()(float *arg1, double *arg2, void(*arg3)(int, float, int*), float(functor::*arg4)(int, void*), ClassType *arg5)
-	{
+    int operator()(float *arg1, double *arg2, void(*arg3)(int, float, int*), float(functor::*arg4)(int, void*), ClassType *arg5)
+    {
         if (arg1 == nullptr)
         {
             thread_func_nullptr_check_ret = __LINE__;
@@ -156,8 +156,8 @@ struct functor
         }
 
         thread_func_nullptr_check_ret = 0;
-		return 0;
-	}
+        return 0;
+    }
 };
 
 
@@ -197,17 +197,17 @@ int total = 0;
 // Functor has internal state.
 struct moveable
 {
-	int i;
+    int i;
 
-	moveable() {};
-	~moveable() {};
-	//moveable(const moveable& c) = delete;
-	//moveable& operator=(const moveable&) = delete;
+    moveable() {};
+    ~moveable() {};
+    //moveable(const moveable& c) = delete;
+    //moveable& operator=(const moveable&) = delete;
 
-	moveable(int j) : i(j) { }
-	//moveable(moveable&& m) : i(m.i) { }
+    moveable(int j) : i(j) { }
+    //moveable(moveable&& m) : i(m.i) { }
 
-	void operator()() const { total += i; active_thread_left--;}
+    void operator()() const { total += i; active_thread_left--;}
 };
 
 int test0()
@@ -499,46 +499,46 @@ int test10()
 {
     using namespace stdex;
 #if CHECK_FOR_THROW_EVENTS != 0
-		{
-			bool test = false;
+        {
+            bool test = false;
 
-			thread t;
-			try
-			{
-				t.join();
-			}
-			catch (const system_error&)
-			{
-				test = true;
-			}
-			catch (const char *)
-			{
-				DYNAMIC_VERIFY_FAIL ;
-			}
+            thread t;
+            try
+            {
+                t.join();
+            }
+            catch (const system_error&)
+            {
+                test = true;
+            }
+            catch (const char *)
+            {
+                DYNAMIC_VERIFY_FAIL ;
+            }
 
-			DYNAMIC_VERIFY(test);
-		}
+            DYNAMIC_VERIFY(test);
+        }
 
-		{
-			bool test = false;
+        {
+            bool test = false;
 
-			thread t;
+            thread t;
 
-			try
-			{
-				t.detach();
-			}
-			catch (const system_error&)
-			{
-				test = true;
-			}
-			catch (const char *)
-			{
-				DYNAMIC_VERIFY_FAIL ;
-			}
+            try
+            {
+                t.detach();
+            }
+            catch (const system_error&)
+            {
+                test = true;
+            }
+            catch (const char *)
+            {
+                DYNAMIC_VERIFY_FAIL ;
+            }
 
-			DYNAMIC_VERIFY(test);
-		}
+            DYNAMIC_VERIFY(test);
+        }
 #endif
     return 0;
 }

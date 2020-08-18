@@ -12,7 +12,7 @@ int main(void)
     typedef int rep_type;
     typedef int period_type;
     typedef stdex::chrono::duration<rep_type, period_type> test_type;
-    test_type d;			// { dg-error "required from here" }
+    test_type d;            // { dg-error "required from here" }
 
     return 0;
 }

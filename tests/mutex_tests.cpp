@@ -14,65 +14,65 @@
 
 namespace mutex_tests
 {
-	template<class T>
-	class reference_wrapper
-	{
-	public:
-		reference_wrapper(T &ref_) :
-			_ptr(&ref_)
-		{ }
+    template<class T>
+    class reference_wrapper
+    {
+    public:
+        reference_wrapper(T &ref_) :
+            _ptr(&ref_)
+        { }
 
-		reference_wrapper(const reference_wrapper &other): 
-			_ptr(other._ptr)
-		{ }
+        reference_wrapper(const reference_wrapper &other): 
+            _ptr(other._ptr)
+        { }
 
-		reference_wrapper& operator=(const reference_wrapper &other)
-		{
-			_ptr = other._ptr;
-			return (*this);
-		}
+        reference_wrapper& operator=(const reference_wrapper &other)
+        {
+            _ptr = other._ptr;
+            return (*this);
+        }
 
-		operator T&() const
-		{
-			return *_ptr;
-		}
+        operator T&() const
+        {
+            return *_ptr;
+        }
 
-	private:
-		T *_ptr;
-	};
+    private:
+        T *_ptr;
+    };
 
-	template<class T>
-	reference_wrapper<T> ref(T &ref_)
-	{
-		return reference_wrapper<T>(ref_);
-	}
+    template<class T>
+    reference_wrapper<T> ref(T &ref_)
+    {
+        return reference_wrapper<T>(ref_);
+    }
 
-	template<class T>
-	reference_wrapper<T> ref(reference_wrapper<T> &ref_)
-	{
-		return ref_;
-	}
+    template<class T>
+    reference_wrapper<T> ref(reference_wrapper<T> &ref_)
+    {
+        return ref_;
+    }
 
-	// Check for required typedefs
+    // Check for required typedefs
     typedef stdex::mutex mutex_type;
     typedef mutex_type::native_handle_type native_handle_type;
 
     int try_lock_func_res = 0;
 
-	int try_lock_func(mutex_type &mmm, bool &b)
-	{
-		try
-		{
-			b = mmm.try_lock();
-		}
-		catch (const stdex::system_error&)
-		{
+    int try_lock_func(mutex_type &mmm, bool &b)
+    {
+        try
+        {
+            b = mmm.try_lock();
+        }
+        catch (const stdex::system_error&)
+        {
             try_lock_func_res = -1;
-			DYNAMIC_VERIFY(try_lock_func_res == 0);
-		}
+            DYNAMIC_VERIFY(try_lock_func_res == 0);
+        }
 
         return 0;
-	}
+    }
 
     int test1()
     {
