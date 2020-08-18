@@ -26,143 +26,143 @@
 
 struct mytimespec
 {
-	stdex::time_t tv_sec;
-	long tv_nsec;
+    stdex::time_t tv_sec;
+    long tv_nsec;
 };
 
 namespace clock_gettime_impl
 {
-	LARGE_INTEGER
-		getFILETIMEoffset()
-	{
-		SYSTEMTIME s;
-		FILETIME f;
-		LARGE_INTEGER t;
+    LARGE_INTEGER
+        getFILETIMEoffset()
+    {
+        SYSTEMTIME s;
+        FILETIME f;
+        LARGE_INTEGER t;
 
-		s.wYear = 1970;
-		s.wMonth = 1;
-		s.wDay = 1;
-		s.wHour = 0;
-		s.wMinute = 0;
-		s.wSecond = 0;
-		s.wMilliseconds = 0;
-		if (SystemTimeToFileTime(&s, &f) == 0)
-			std::abort(); // never ever happens
-		t.QuadPart = f.dwHighDateTime;
-		t.QuadPart <<= 32;
-		t.QuadPart |= f.dwLowDateTime;
-		return (t);
-	}
+        s.wYear = 1970;
+        s.wMonth = 1;
+        s.wDay = 1;
+        s.wHour = 0;
+        s.wMinute = 0;
+        s.wSecond = 0;
+        s.wMilliseconds = 0;
+        if (SystemTimeToFileTime(&s, &f) == 0)
+            std::abort(); // never ever happens
+        t.QuadPart = f.dwHighDateTime;
+        t.QuadPart <<= 32;
+        t.QuadPart |= f.dwLowDateTime;
+        return (t);
+    }
 
 #ifdef LLONG_MAX
 #define exp7           10000000i64     //1E+7     //C-file part
 #define exp9         1000000000i64     //1E+9
 #define w2ux 116444736000000000i64     //1.jan1601 to 1.jan1970
-	void unix_time(struct mytimespec *spec)
-	{
-		__int64 wintime; GetSystemTimeAsFileTime((FILETIME*) &wintime);
-		wintime -= w2ux;  spec->tv_sec = wintime / exp7;
-		spec->tv_nsec = wintime % exp7 * 100;
-	}
+    void unix_time(struct mytimespec *spec)
+    {
+        __int64 wintime; GetSystemTimeAsFileTime((FILETIME*) &wintime);
+        wintime -= w2ux;  spec->tv_sec = wintime / exp7;
+        spec->tv_nsec = wintime % exp7 * 100;
+    }
 
-	int clock_gettime_steady(int, mytimespec *spec)
-	{
-		static  struct mytimespec startspec; static double ticks2nano;
-		static __int64 startticks, tps = 0;    __int64 tmp, curticks;
-		QueryPerformanceFrequency((LARGE_INTEGER*) &tmp); //some strange system can
-		if (tps != tmp) {
-			tps = tmp; //init ~~ONCE         //possibly change freq ?
-			QueryPerformanceCounter((LARGE_INTEGER*) &startticks);
-			unix_time(&startspec); ticks2nano = (double) exp9 / tps;
-		}
-		QueryPerformanceCounter((LARGE_INTEGER*) &curticks); curticks -= startticks;
-		spec->tv_sec = startspec.tv_sec + (curticks / tps);
-		spec->tv_nsec = startspec.tv_nsec + (long)((double) (curticks % tps) * ticks2nano);
-		if (!(spec->tv_nsec < exp9)) { spec->tv_sec++; spec->tv_nsec -= exp9; }
-		return 0;
-	}
+    int clock_gettime_steady(int, mytimespec *spec)
+    {
+        static  struct mytimespec startspec; static double ticks2nano;
+        static __int64 startticks, tps = 0;    __int64 tmp, curticks;
+        QueryPerformanceFrequency((LARGE_INTEGER*) &tmp); //some strange system can
+        if (tps != tmp) {
+            tps = tmp; //init ~~ONCE         //possibly change freq ?
+            QueryPerformanceCounter((LARGE_INTEGER*) &startticks);
+            unix_time(&startspec); ticks2nano = (double) exp9 / tps;
+        }
+        QueryPerformanceCounter((LARGE_INTEGER*) &curticks); curticks -= startticks;
+        spec->tv_sec = startspec.tv_sec + (curticks / tps);
+        spec->tv_nsec = startspec.tv_nsec + (long)((double) (curticks % tps) * ticks2nano);
+        if (!(spec->tv_nsec < exp9)) { spec->tv_sec++; spec->tv_nsec -= exp9; }
+        return 0;
+    }
 
-	int
-		clock_gettime(int X, mytimespec *tv)
-	{
-		LARGE_INTEGER           t;
-		FILETIME            f;
-		double                  microseconds;
-		static LARGE_INTEGER    offset;
-		static double           frequencyToMicroseconds;
-		static int              initialized = 0;
-		static BOOL             usePerformanceCounter = 0;
+    int
+        clock_gettime(int X, mytimespec *tv)
+    {
+        LARGE_INTEGER           t;
+        FILETIME            f;
+        double                  microseconds;
+        static LARGE_INTEGER    offset;
+        static double           frequencyToMicroseconds;
+        static int              initialized = 0;
+        static BOOL             usePerformanceCounter = 0;
 
-		if (!initialized) {
-			LARGE_INTEGER performanceFrequency;
-			initialized = 1;
-			usePerformanceCounter = QueryPerformanceFrequency(&performanceFrequency);
-			if (!usePerformanceCounter) {
-				offset = getFILETIMEoffset();
-				frequencyToMicroseconds = 10.;
-			}
-		}
-		if (usePerformanceCounter) 
-			return clock_gettime_steady(X, tv);
-		else {
-			GetSystemTimeAsFileTime(&f);
-			t.QuadPart = f.dwHighDateTime;
-			t.QuadPart <<= 32;
-			t.QuadPart |= f.dwLowDateTime;
-		}
+        if (!initialized) {
+            LARGE_INTEGER performanceFrequency;
+            initialized = 1;
+            usePerformanceCounter = QueryPerformanceFrequency(&performanceFrequency);
+            if (!usePerformanceCounter) {
+                offset = getFILETIMEoffset();
+                frequencyToMicroseconds = 10.;
+            }
+        }
+        if (usePerformanceCounter) 
+            return clock_gettime_steady(X, tv);
+        else {
+            GetSystemTimeAsFileTime(&f);
+            t.QuadPart = f.dwHighDateTime;
+            t.QuadPart <<= 32;
+            t.QuadPart |= f.dwLowDateTime;
+        }
 
-		t.QuadPart -= offset.QuadPart;
-		microseconds = (double) t.QuadPart / frequencyToMicroseconds;
-		t.QuadPart = LONGLONG(microseconds + 0.5);
-		tv->tv_sec = t.QuadPart / 1000000;
-		tv->tv_nsec = (t.QuadPart % 1000000) * 1000;
-		return (0);
-	}
+        t.QuadPart -= offset.QuadPart;
+        microseconds = (double) t.QuadPart / frequencyToMicroseconds;
+        t.QuadPart = LONGLONG(microseconds + 0.5);
+        tv->tv_sec = t.QuadPart / 1000000;
+        tv->tv_nsec = (t.QuadPart % 1000000) * 1000;
+        return (0);
+    }
 #define _STDEX_CHRONO_USE_MICROSECONDS
 #else
 
 
 
 
-	int
-		clock_gettime(int X, mytimespec *tv)
-	{
-		LARGE_INTEGER           t;
-		FILETIME            f;
-		double                  microseconds;
-		static LARGE_INTEGER    offset;
-		static double           frequencyToMicroseconds;
-		static int              initialized = 0;
-		static BOOL             usePerformanceCounter = 0;
+    int
+        clock_gettime(int X, mytimespec *tv)
+    {
+        LARGE_INTEGER           t;
+        FILETIME            f;
+        double                  microseconds;
+        static LARGE_INTEGER    offset;
+        static double           frequencyToMicroseconds;
+        static int              initialized = 0;
+        static BOOL             usePerformanceCounter = 0;
 
-		if (!initialized) {
-			LARGE_INTEGER performanceFrequency;
-			initialized = 1;
-			usePerformanceCounter = QueryPerformanceFrequency(&performanceFrequency);
-			if (usePerformanceCounter) {
-				QueryPerformanceCounter(&offset);
-				frequencyToMicroseconds = (double) performanceFrequency.QuadPart / 1000000.;
-			}
-			else {
-				offset = getFILETIMEoffset();
-				frequencyToMicroseconds = 10.;
-			}
-		}
-		if (usePerformanceCounter) QueryPerformanceCounter(&t);
-		else {
-			GetSystemTimeAsFileTime(&f);
-			t.QuadPart = f.dwHighDateTime;
-			t.QuadPart <<= 32;
-			t.QuadPart |= f.dwLowDateTime;
-		}
+        if (!initialized) {
+            LARGE_INTEGER performanceFrequency;
+            initialized = 1;
+            usePerformanceCounter = QueryPerformanceFrequency(&performanceFrequency);
+            if (usePerformanceCounter) {
+                QueryPerformanceCounter(&offset);
+                frequencyToMicroseconds = (double) performanceFrequency.QuadPart / 1000000.;
+            }
+            else {
+                offset = getFILETIMEoffset();
+                frequencyToMicroseconds = 10.;
+            }
+        }
+        if (usePerformanceCounter) QueryPerformanceCounter(&t);
+        else {
+            GetSystemTimeAsFileTime(&f);
+            t.QuadPart = f.dwHighDateTime;
+            t.QuadPart <<= 32;
+            t.QuadPart |= f.dwLowDateTime;
+        }
 
-		t.QuadPart -= offset.QuadPart;
-		microseconds = (double) t.QuadPart / frequencyToMicroseconds;
-		t.QuadPart = LONGLONG(microseconds + 0.5);
-		tv->tv_sec = t.QuadPart / 1000000;
-		tv->tv_nsec = (t.QuadPart % 1000000) * 1000;
-		return (0);
-	}
+        t.QuadPart -= offset.QuadPart;
+        microseconds = (double) t.QuadPart / frequencyToMicroseconds;
+        t.QuadPart = LONGLONG(microseconds + 0.5);
+        tv->tv_sec = t.QuadPart / 1000000;
+        tv->tv_nsec = (t.QuadPart % 1000000) * 1000;
+        return (0);
+    }
 #define _STDEX_CHRONO_USE_MICROSECONDS
 #endif
 }
@@ -208,10 +208,10 @@ void init()
 
 static struct _init_inittime
 {
-	_init_inittime()
-	{
-		init();
-	}
+    _init_inittime()
+    {
+        init();
+    }
 } init_inittime;
 
 struct timespec get_abs_future_time_fine(unsigned milli)
@@ -229,20 +229,20 @@ struct timespec get_abs_future_time_fine(unsigned milli)
     return future;
 }
 struct mytimespec:
-	public timespec
+    public timespec
 {};
 
 int clock_gettime(int X, timespec *tv)
 {
-	*tv = get_abs_future_time_fine(0);
+    *tv = get_abs_future_time_fine(0);
 
-	return (0);
+    return (0);
 }
 int(*clock_gettime_func_pointer)(int, timespec*) = &clock_gettime;
 #else
 
 struct mytimespec:
-	public timespec
+    public timespec
 {};
 
 int clock_gettime(clockid_t, struct timespec*);
@@ -250,62 +250,62 @@ int(*clock_gettime_func_pointer)(clockid_t, struct timespec*) = &clock_gettime;
 #endif
 
 #ifdef CLOCK_MONOTONIC
-	#undef _STDEX_CHRONO_CLOCK_MONOTONIC
-	#define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_MONOTONIC
-	
-	#ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
-		#define _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
-	#endif
+    #undef _STDEX_CHRONO_CLOCK_MONOTONIC
+    #define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_MONOTONIC
+    
+    #ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+        #define _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+    #endif
 
 #endif
 
 #ifdef CLOCK_BOOTTIME 
-	#undef _STDEX_CHRONO_CLOCK_MONOTONIC
-	#define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_BOOTTIME
+    #undef _STDEX_CHRONO_CLOCK_MONOTONIC
+    #define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_BOOTTIME
 
-	#ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
-		#define _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
-	#endif
+    #ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+        #define _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+    #endif
 #endif
 
 #ifdef CLOCK_MONOTONIC_RAW  
-	#undef _STDEX_CHRONO_CLOCK_MONOTONIC
-	#define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_MONOTONIC_RAW
+    #undef _STDEX_CHRONO_CLOCK_MONOTONIC
+    #define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_MONOTONIC_RAW
 
-	#ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
-		#define _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
-	#endif
+    #ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+        #define _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+    #endif
 #endif
 
 #ifdef CLOCK_REALTIME
-	#undef _STDEX_CHRONO_CLOCK_REALTIME
-	#define _STDEX_CHRONO_CLOCK_REALTIME CLOCK_REALTIME
+    #undef _STDEX_CHRONO_CLOCK_REALTIME
+    #define _STDEX_CHRONO_CLOCK_REALTIME CLOCK_REALTIME
 
-	#ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
-		#define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_REALTIME
-	#endif
+    #ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+        #define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_REALTIME
+    #endif
 #endif
 
 #if defined(WIN32) || defined(_WIN32)
 #ifdef LLONG_MAX
-	LARGE_INTEGER performanceFrequency;
+    LARGE_INTEGER performanceFrequency;
 
-	const bool stdex::chrono::system_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency) != 0;
-	const bool stdex::chrono::steady_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency) != 0;
+    const bool stdex::chrono::system_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency) != 0;
+    const bool stdex::chrono::steady_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency) != 0;
 #else
-	const bool stdex::chrono::system_clock::is_steady = false;
-	const bool stdex::chrono::steady_clock::is_steady = false;
+    const bool stdex::chrono::system_clock::is_steady = false;
+    const bool stdex::chrono::steady_clock::is_steady = false;
 #endif
 
 #else
 
 #ifdef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
-	const bool stdex::chrono::steady_clock::is_steady = true;
-	const bool stdex::chrono::system_clock::is_steady = 
-		(_STDEX_CHRONO_CLOCK_MONOTONIC == _STDEX_CHRONO_CLOCK_REALTIME);
+    const bool stdex::chrono::steady_clock::is_steady = true;
+    const bool stdex::chrono::system_clock::is_steady = 
+        (_STDEX_CHRONO_CLOCK_MONOTONIC == _STDEX_CHRONO_CLOCK_REALTIME);
 #else
-	const bool stdex::chrono::steady_clock::is_steady = false;
-	const bool stdex::chrono::system_clock::is_steady = false;
+    const bool stdex::chrono::steady_clock::is_steady = false;
+    const bool stdex::chrono::system_clock::is_steady = false;
 #endif
 
 #endif // not windows

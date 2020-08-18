@@ -1154,7 +1154,7 @@ namespace stdex
 
 #ifdef HUGE_VALL
                 if ((_value == HUGE_VALL || _value == -HUGE_VALL) && errno == ERANGE)
-#else		
+#else        
                 if(errno == ERANGE)
 #endif
                     num_s_end = 0;
@@ -1180,7 +1180,7 @@ namespace stdex
 
 #ifdef HUGE_VALL
                 if ((_value == HUGE_VALL || _value == -HUGE_VALL) && errno == ERANGE)
-#else		
+#else        
                 if(errno == ERANGE)
 #endif
                     num_s_end = 0;

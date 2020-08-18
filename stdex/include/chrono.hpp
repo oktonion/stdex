@@ -55,14 +55,14 @@ namespace stdex
         chrono::duration<_Rep2, _Period2> >
     {
     private:
-        typedef detail::_gcd<_Period1::num, _Period2::num> 	_gcd_num;
-        typedef detail::_gcd<_Period1::den, _Period2::den> 	_gcd_den;
-        typedef typename common_type<_Rep1, _Rep2>::type		_cr;
+        typedef detail::_gcd<_Period1::num, _Period2::num>     _gcd_num;
+        typedef detail::_gcd<_Period1::den, _Period2::den>     _gcd_den;
+        typedef typename common_type<_Rep1, _Rep2>::type        _cr;
         typedef ratio<_gcd_num::value,
             (_Period1::den / _gcd_den::value) * _Period2::den> _r;
 
     public:
-        typedef chrono::duration<_cr, _r> 			type;
+        typedef chrono::duration<_cr, _r>             type;
     };
 
     // specialization of common_type (for time_point)
@@ -71,10 +71,10 @@ namespace stdex
         chrono::time_point<_Clock, _Dur2> >
     {
     private:
-        typedef typename common_type<_Dur1, _Dur2>::type 		_ct;
+        typedef typename common_type<_Dur1, _Dur2>::type         _ct;
 
     public:
-        typedef chrono::time_point<_Clock, _ct> 			type;
+        typedef chrono::time_point<_Clock, _ct>             type;
     };
 
     namespace chrono
@@ -113,7 +113,7 @@ namespace stdex
                 template<class _Rep, class _Period>
                 static _ToDur _cast(const duration<_Rep, _Period> &_d)
                 {
-                    typedef typename _ToDur::rep			_to_rep;
+                    typedef typename _ToDur::rep            _to_rep;
                     return _ToDur(static_cast<_to_rep>(
                         static_cast<_CR>(_d.count()) / static_cast<_CR>(_CF::den)));
                 }
@@ -125,7 +125,7 @@ namespace stdex
                 template<class _Rep, class _Period>
                 static _ToDur _cast(const duration<_Rep, _Period> &_d)
                 {
-                    typedef typename _ToDur::rep			_to_rep;
+                    typedef typename _ToDur::rep            _to_rep;
                     return _ToDur(static_cast<_to_rep>(
                         static_cast<_CR>(_d.count()) * static_cast<_CR>(_CF::num)));
                 }
@@ -169,7 +169,7 @@ namespace stdex
         typename detail::_enable_if_is_duration<_ToDur>::type 
         duration_cast(const duration<_Rep, _Period> &_d)
         {
-            typedef typename _ToDur::period	_to_period;
+            typedef typename _ToDur::period    _to_period;
             typedef typename _ToDur::rep _to_rep;
             typedef ratio_divide<_Period, _to_period> _cf;
             typedef typename common_type<_to_rep, _Rep, stdex::intmax_t>::type
@@ -183,7 +183,7 @@ namespace stdex
 
         // duration_values
         template<class _Rep>
-        struct duration_values		
+        struct duration_values        
         {
             static _Rep zero()
             {
@@ -419,7 +419,7 @@ namespace stdex
             template<class _Rep2, class _Period2>
             duration(const duration<_Rep2, _Period2> &other):
                 _r(duration_cast<duration>(other).count())
-            {	// construct from a duration
+            {    // construct from a duration
                 typedef ratio_divide<_Period2, _Period> _Checked_type;
 
                 typedef typename check::duration_does_not_use_floating_point_ticks_or_other_duration_period_is_not_exactly_divisible_by_current_period<
@@ -441,57 +441,57 @@ namespace stdex
             }
 
             duration operator+() const
-            {	// get value
+            {    // get value
                 return (*this);
             }
 
             duration operator-() const
-            {	// get negated value
+            {    // get negated value
                 return (duration<_Rep, _Period>(0 - _r));
             }
 
             duration& operator++()
-            {	// increment rep
+            {    // increment rep
                 ++_r;
                 return (*this);
             }
 
             duration operator++(int)
-            {	// postincrement rep
+            {    // postincrement rep
                 return (duration<_Rep, _Period>(_r++));
             }
 
             duration& operator--()
-            {	// decrement rep
+            {    // decrement rep
                 --_r;
                 return (*this);
             }
 
             duration operator--(int)
-            {	// postdecrement rep
+            {    // postdecrement rep
                 return (duration<_Rep, _Period>(_r--));
             }
 
             duration& operator+=(const duration &other)
-            {	// add other to rep
+            {    // add other to rep
                 _r += other._r;
                 return (*this);
             }
 
             duration& operator-=(const duration &other)
-            {	// subtract other from rep
+            {    // subtract other from rep
                 _r -= other._r;
                 return (*this);
             }
 
             duration& operator*=(const _Rep &_r_in)
-            {	// multiply rep by r
+            {    // multiply rep by r
                 _r *= _r_in;
                 return (*this);
             }
 
             duration& operator/=(const _Rep &_r_in)
-            {	// divide rep by r
+            {    // divide rep by r
                 _r /= _r_in;
                 return (*this);
             }
@@ -504,7 +504,7 @@ namespace stdex
                 _disabled1&
             >::type _r_in
             )
-            {	// modulus rep by r
+            {    // modulus rep by r
                 _modulus(_r_in);
                 return (*this);
             }
@@ -517,13 +517,13 @@ namespace stdex
                 _disabled2&
             >::type other
             )
-            {	// modulus rep by other
+            {    // modulus rep by other
                 _modulus(other);
                 return (*this);
             }
 
             static const duration zero()
-            {	// get zero value
+            {    // get zero value
                 return duration_values<_Rep>::zero();
             }
 
@@ -557,9 +557,9 @@ namespace stdex
         operator+(const duration<_Rep1, _Period1> &lhs,
                 const duration<_Rep2, _Period2> &rhs)
         {
-            typedef duration<_Rep1, _Period1>			_dur1;
-            typedef duration<_Rep2, _Period2>			_dur2;
-            typedef typename common_type<_dur1, _dur2>::type	_cd;
+            typedef duration<_Rep1, _Period1>            _dur1;
+            typedef duration<_Rep2, _Period2>            _dur2;
+            typedef typename common_type<_dur1, _dur2>::type    _cd;
 
             return _cd(_cd(lhs).count() + _cd(rhs).count());
         }
@@ -575,9 +575,9 @@ namespace stdex
         operator-(const duration<_Rep1, _Period1> &lhs,
                 const duration<_Rep2, _Period2> & rhs)
         {
-            typedef duration<_Rep1, _Period1>			_dur1;
-            typedef duration<_Rep2, _Period2>			_dur2;
-            typedef typename common_type<_dur1, _dur2>::type	_cd;
+            typedef duration<_Rep1, _Period1>            _dur1;
+            typedef duration<_Rep2, _Period2>            _dur2;
+            typedef typename common_type<_dur1, _dur2>::type    _cd;
 
             return _cd(_cd(lhs).count() - _cd(rhs).count());
         }
@@ -631,15 +631,15 @@ namespace stdex
         typename common_type<_Rep1, _Rep2>::type
         operator/(const duration<_Rep1, _Period1> &lhs, const duration<_Rep2, _Period2> &rhs)
         {
-            typedef duration<_Rep1, _Period1>			_dur1;
-            typedef duration<_Rep2, _Period2>			_dur2;
-            typedef typename common_type<_dur1, _dur2>::type	_cd;
+            typedef duration<_Rep1, _Period1>            _dur1;
+            typedef duration<_Rep2, _Period2>            _dur2;
+            typedef typename common_type<_dur1, _dur2>::type    _cd;
 
             return _cd(lhs).count() / _cd(rhs).count();
         }
 
         // DR 934.
-        template<class _Rep1, class _Period, class _Rep2>	
+        template<class _Rep1, class _Period, class _Rep2>    
         duration<typename detail::_common_rep_t<_Rep1, typename detail::_disable_if_is_duration<_Rep2>::type >::type, _Period>
         operator%(const duration<_Rep1, _Period> &_d, const _Rep2 &_s)
         {
@@ -651,9 +651,9 @@ namespace stdex
         typename common_type< duration<_Rep1, _Period1>, duration<_Rep2, _Period2> >::type
         operator%(const duration<_Rep1, _Period1> &lhs, const duration<_Rep2, _Period2> &rhs)
         {
-            typedef duration<_Rep1, _Period1>			_dur1;
-            typedef duration<_Rep2, _Period2>			_dur2;
-            typedef typename common_type<_dur1, _dur2>::type	_cd;
+            typedef duration<_Rep1, _Period1>            _dur1;
+            typedef duration<_Rep2, _Period2>            _dur2;
+            typedef typename common_type<_dur1, _dur2>::type    _cd;
             return _cd(_cd(lhs).count() % _cd(rhs).count());
         }
 
@@ -661,9 +661,9 @@ namespace stdex
         template<class _Rep1, class _Period1, class _Rep2, class _Period2>
         bool operator==(const duration<_Rep1, _Period1> &lhs, const duration<_Rep2, _Period2> &rhs)
         {
-            typedef duration<_Rep1, _Period1>			_dur1;
-            typedef duration<_Rep2, _Period2>			_dur2;
-            typedef typename common_type<_dur1, _dur2>::type	_ct;
+            typedef duration<_Rep1, _Period1>            _dur1;
+            typedef duration<_Rep2, _Period2>            _dur2;
+            typedef typename common_type<_dur1, _dur2>::type    _ct;
 
             return _ct(lhs).count() == _ct(rhs).count();
         }
@@ -671,9 +671,9 @@ namespace stdex
         template<class _Rep1, class _Period1, class _Rep2, class _Period2>
         bool operator<(const duration<_Rep1, _Period1> &lhs, const duration<_Rep2, _Period2> &rhs)
         {
-            typedef duration<_Rep1, _Period1>			_dur1;
-            typedef duration<_Rep2, _Period2>			_dur2;
-            typedef typename common_type<_dur1, _dur2>::type	_ct;
+            typedef duration<_Rep1, _Period1>            _dur1;
+            typedef duration<_Rep2, _Period2>            _dur2;
+            typedef typename common_type<_dur1, _dur2>::type    _ct;
 
             return _ct(lhs).count() < _ct(rhs).count();
         }
@@ -712,7 +712,7 @@ namespace stdex
 
         template<class _Clock, class _Duration>
         class time_point
-        {	// represents a point in time
+        {    // represents a point in time
         public:
             typedef _Clock clock;
             typedef _Duration duration;
@@ -735,18 +735,18 @@ namespace stdex
             {}
 
             duration time_since_epoch() const
-            {	// get duration from epoch
+            {    // get duration from epoch
                 return (_d);
             }
 
             time_point& operator+=(const duration &_d_in)
-            {	// increment by duration
+            {    // increment by duration
                 _d += _d_in;
                 return (*this);
             }
 
             time_point& operator-=(const duration &_d_in)
-            {	// decrement by duration
+            {    // decrement by duration
                 _d -= _d_in;
                 return (*this);
             }
@@ -756,7 +756,7 @@ namespace stdex
             #else
             static const time_point min()
             #endif
-            {	// get minimum time point
+            {    // get minimum time point
                 return (time_point((duration::min)()));
             }
 
@@ -765,12 +765,12 @@ namespace stdex
             #else
             static const time_point max()
             #endif
-            {	// get maximum time point
+            {    // get maximum time point
                 return (time_point((duration::max)()));
             }
 
         private:
-            duration _d;	// duration since the epoch
+            duration _d;    // duration since the epoch
         };
 
         namespace detail
@@ -793,7 +793,7 @@ namespace stdex
         >::type
         time_point_cast(const time_point<_Clock, _Dur> &_t)
         {
-            typedef time_point<_Clock, _ToDur> 			_time_point;
+            typedef time_point<_Clock, _ToDur>             _time_point;
 
             return _time_point(duration_cast<_ToDur>(_t.time_since_epoch()));
         }
@@ -804,9 +804,9 @@ namespace stdex
         typename common_type<_Dur1, duration<_Rep2, _Period2> >::type>
         operator+(const time_point<_Clock, _Dur1> &lhs, const duration<_Rep2, _Period2> &rhs)
         {
-            typedef duration<_Rep2, _Period2>			_dur2;
-            typedef typename common_type<_Dur1, _dur2>::type	_ct;
-            typedef time_point<_Clock, _ct> 			_time_point;
+            typedef duration<_Rep2, _Period2>            _dur2;
+            typedef typename common_type<_Dur1, _dur2>::type    _ct;
+            typedef time_point<_Clock, _ct>             _time_point;
 
             return _time_point(lhs.time_since_epoch() + rhs);
         }
@@ -817,9 +817,9 @@ namespace stdex
         typename common_type<duration<_Rep1, _Period1>, _Dur2>::type>
         operator+(const duration<_Rep1, _Period1> &lhs, const time_point<_Clock, _Dur2> &rhs)
         {
-            typedef duration<_Rep1, _Period1>			_dur1;
-            typedef typename common_type<_dur1, _Dur2>::type	_ct;
-            typedef time_point<_Clock, _ct> 			_time_point;
+            typedef duration<_Rep1, _Period1>            _dur1;
+            typedef typename common_type<_dur1, _Dur2>::type    _ct;
+            typedef time_point<_Clock, _ct>             _time_point;
 
             return _time_point(rhs.time_since_epoch() + lhs);
         }
@@ -830,9 +830,9 @@ namespace stdex
         typename common_type<_Dur1, duration<_Rep2, _Period2> >::type>
         operator-(const time_point<_Clock, _Dur1> &lhs, const duration<_Rep2, _Period2> &rhs)
         {
-            typedef duration<_Rep2, _Period2>			_dur2;
-            typedef typename common_type<_Dur1, _dur2>::type	_ct;
-            typedef time_point<_Clock, _ct> 			_time_point;
+            typedef duration<_Rep2, _Period2>            _dur2;
+            typedef typename common_type<_Dur1, _dur2>::type    _ct;
+            typedef time_point<_Clock, _ct>             _time_point;
 
             return _time_point(lhs.time_since_epoch() - rhs);
         }
@@ -897,7 +897,7 @@ namespace stdex
             >::type duration;
             typedef system_clock::duration::rep rep;
             typedef system_clock::duration::period period;
-            typedef chrono::time_point<system_clock, duration> 	time_point;
+            typedef chrono::time_point<system_clock, duration>     time_point;
 
             static const bool is_steady;
 
@@ -915,7 +915,7 @@ namespace stdex
             static time_point
                 from_time_t(stdex::time_t _t) _STDEX_NOEXCEPT_FUNCTION
             {
-                typedef chrono::time_point<system_clock, seconds>	_from;
+                typedef chrono::time_point<system_clock, seconds>    _from;
 
                 return time_point_cast<system_clock::duration>
                     (_from(chrono::seconds(_t)));
@@ -927,7 +927,7 @@ namespace stdex
             typedef duration_values<rep>::template_constants duration_constants;
     
             typedef check::a_clocks_minimum_duration_cannot_be_less_than_its_epoch_assert< (duration_constants::min < duration_constants::zero) >::
-                a_clocks_minimum_duration_cannot_be_less_than_its_epoch_assert_failed	
+                a_clocks_minimum_duration_cannot_be_less_than_its_epoch_assert_failed    
             check1; // if you are there means that what it says
         };
 
@@ -946,7 +946,7 @@ namespace stdex
             >::type duration;
             typedef steady_clock::duration::rep rep;
             typedef steady_clock::duration::period period;
-            typedef chrono::time_point<steady_clock, duration> 	time_point;
+            typedef chrono::time_point<steady_clock, duration>     time_point;
 
             static const bool is_steady;
 
