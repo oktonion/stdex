@@ -597,9 +597,9 @@ namespace stdex
 
         private:
 
-            mutex		_mut;
-            condition_variable	_cv;
-            bool		_locked;
+            mutex        _mut;
+            condition_variable    _cv;
+            bool        _locked;
         };
 
         template<>
@@ -723,10 +723,10 @@ namespace stdex
 
         private:
 
-            mutex		_mut;
-            condition_variable	_cv;
-            thread::id		_owner;
-            unsigned		_count;
+            mutex        _mut;
+            condition_variable    _cv;
+            thread::id        _owner;
+            unsigned        _count;
 
             _timed_mutex_impl_base(const _timed_mutex_impl_base&) _STDEX_DELETED_FUNCTION;
             _timed_mutex_impl_base& operator=(const _timed_mutex_impl_base&) _STDEX_DELETED_FUNCTION;

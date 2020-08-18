@@ -54,7 +54,7 @@ namespace stdex
         template<>
         struct _gcd<0, 0>
         {   // avoids division by 0 in ratio_less
-            static const stdex::intmax_t value = 1;	// contrary to mathematical convention
+            static const stdex::intmax_t value = 1;    // contrary to mathematical convention
         };
     }
 
@@ -435,7 +435,7 @@ namespace stdex
         // ratio_add
         template<class _R1, class _R2>
         struct _ratio_add
-        {	// add two ratios
+        {    // add two ratios
         private:
             static const stdex::intmax_t _n1 = _R1::num;
             static const stdex::intmax_t _d1 = _R1::den;
@@ -670,26 +670,26 @@ namespace stdex
         { };
     } // namespace detail
 
-    typedef detail::_ratio_predefined::yocto 	yocto;
-    typedef detail::_ratio_predefined::zepto 	zepto;
-    typedef detail::_ratio_predefined::atto 	atto;
-    typedef detail::_ratio_predefined::femto 	femto;
-    typedef detail::_ratio_predefined::pico 	pico;
-    typedef detail::_ratio_predefined::nano 	nano;
-    typedef detail::_ratio_predefined::micro 	micro;
-    typedef detail::_ratio_predefined::milli 	milli;
-    typedef detail::_ratio_predefined::centi 	centi;
-    typedef detail::_ratio_predefined::deci 	deci;
-    typedef detail::_ratio_predefined::deca 	deca;
-    typedef detail::_ratio_predefined::hecto 	hecto;
-    typedef detail::_ratio_predefined::kilo 	kilo;
-    typedef detail::_ratio_predefined::mega 	mega;
-    typedef detail::_ratio_predefined::giga 	giga;
-    typedef detail::_ratio_predefined::tera 	tera;
-    typedef detail::_ratio_predefined::peta 	peta;
-    typedef detail::_ratio_predefined::exa 		exa;
-    typedef detail::_ratio_predefined::zetta 	zetta;
-    typedef detail::_ratio_predefined::yotta 	yotta;
+    typedef detail::_ratio_predefined::yocto     yocto;
+    typedef detail::_ratio_predefined::zepto     zepto;
+    typedef detail::_ratio_predefined::atto     atto;
+    typedef detail::_ratio_predefined::femto     femto;
+    typedef detail::_ratio_predefined::pico     pico;
+    typedef detail::_ratio_predefined::nano     nano;
+    typedef detail::_ratio_predefined::micro     micro;
+    typedef detail::_ratio_predefined::milli     milli;
+    typedef detail::_ratio_predefined::centi     centi;
+    typedef detail::_ratio_predefined::deci     deci;
+    typedef detail::_ratio_predefined::deca     deca;
+    typedef detail::_ratio_predefined::hecto     hecto;
+    typedef detail::_ratio_predefined::kilo     kilo;
+    typedef detail::_ratio_predefined::mega     mega;
+    typedef detail::_ratio_predefined::giga     giga;
+    typedef detail::_ratio_predefined::tera     tera;
+    typedef detail::_ratio_predefined::peta     peta;
+    typedef detail::_ratio_predefined::exa         exa;
+    typedef detail::_ratio_predefined::zetta     zetta;
+    typedef detail::_ratio_predefined::yotta     yotta;
 
 } // namespace stdex
 

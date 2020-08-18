@@ -8,7 +8,7 @@ int main(void)
     // Negative  tests.
     {
         typedef void (fn_type)();
-        typedef make_signed<fn_type>::type  	test4_type;
+        typedef make_signed<fn_type>::type      test4_type;
     }
     return 0;
 }

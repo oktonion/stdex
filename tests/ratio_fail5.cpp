@@ -7,10 +7,10 @@
 int main(void)
 {
     using namespace stdex;
-		{
-			// Negative tests:
-			volatile ratio<1, 0> r5; // error
-		}
+        {
+            // Negative tests:
+            volatile ratio<1, 0> r5; // error
+        }
 
     return 0;
 }

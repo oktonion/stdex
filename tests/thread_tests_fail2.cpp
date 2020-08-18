@@ -19,11 +19,11 @@ int main(void)
 {
     using namespace stdex;
     
-		{
-			typedef thread test_type;
-			test_type t1;
-			test_type t2(t1);
-		}
+        {
+            typedef thread test_type;
+            test_type t1;
+            test_type t2(t1);
+        }
 
     return 0;
 }

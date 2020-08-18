@@ -7,10 +7,10 @@
 int main(void)
 {
     using namespace stdex;
-		{
-			// Negative tests:
-			volatile ratio_add<ratio<STDEX_INTMAX_MAX, 1>, ratio<1> >::type r6; // error
-		}
+        {
+            // Negative tests:
+            volatile ratio_add<ratio<STDEX_INTMAX_MAX, 1>, ratio<1> >::type r6; // error
+        }
 
     return 0;
 }

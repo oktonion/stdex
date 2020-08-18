@@ -8,8 +8,8 @@ int main(void)
 
     // time_point_cast
     {
-        typedef time_point<system_clock, hours> 	to_type;
-        typedef time_point<system_clock, minutes> 	from_type;
+        typedef time_point<system_clock, hours>     to_type;
+        typedef time_point<system_clock, minutes>     from_type;
 
         minutes m(6000);
         hours h(19);
