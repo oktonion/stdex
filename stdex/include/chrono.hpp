@@ -1147,7 +1147,7 @@ namespace stdex
         {
             typedef 
             stdex::conditional<
-                sizeof(stdex::intmax_t) >= 64, 
+                (sizeof(stdex::intmax_t) >= 64), 
                 chrono::nanoseconds, 
                 chrono::microseconds
             >::type duration;
@@ -1196,7 +1196,7 @@ namespace stdex
         {
             typedef 
             stdex::conditional<
-                sizeof(stdex::intmax_t) >= 64, 
+                (sizeof(stdex::intmax_t) >= 64), 
                 chrono::nanoseconds, 
                 chrono::microseconds
             >::type duration;
@@ -1218,7 +1218,12 @@ namespace stdex
      *  std::system_clock until higher-than-nanosecond definitions
      *  become feasible.
      */
-        typedef system_clock high_resolution_clock;
+        typedef
+        stdex::conditional<
+            (steady_clock::period::den > system_clock::period::den),
+            steady_clock,
+            system_clock
+        >::type high_resolution_clock;
     } // namespace chrono
 
     // literals
