@@ -1147,7 +1147,7 @@ namespace stdex
         {
             typedef 
             stdex::conditional<
-                (sizeof(stdex::intmax_t) >= 64), 
+                (sizeof(stdex::intmax_t) * CHAR_BIT >= 64), 
                 chrono::nanoseconds, 
                 chrono::microseconds
             >::type duration;
@@ -1196,7 +1196,7 @@ namespace stdex
         {
             typedef 
             stdex::conditional<
-                (sizeof(stdex::intmax_t) >= 64), 
+                (sizeof(stdex::intmax_t)* CHAR_BIT >= 64),
                 chrono::nanoseconds, 
                 chrono::microseconds
             >::type duration;
