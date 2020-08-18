@@ -692,14 +692,14 @@ namespace thread_cpp_detail
 			}
 		}
 
-		static inline void timespec_diff(struct timespec *a, struct timespec *b,
-			struct timespec *result) 
+		static inline void timespec_diff(const timespec &a, const timespec &b,
+			timespec &result) 
 		{
-			result->tv_sec  = a->tv_sec  - b->tv_sec;
-			result->tv_nsec = a->tv_nsec - b->tv_nsec;
-			if (result->tv_nsec < 0) {
-				--result->tv_sec;
-				result->tv_nsec += BILLION;
+			result.tv_sec  = a.tv_sec  - b.tv_sec;
+			result.tv_nsec = a.tv_nsec - b.tv_nsec;
+			if (result.tv_nsec < 0) {
+				--result.tv_sec;
+				result.tv_nsec += BILLION;
 			}
 		}
 
@@ -735,12 +735,12 @@ namespace thread_cpp_detail
 						break;
 				}
 
-				timespec_diff(&_end, &_begin, &_passed);
+				timespec_diff(_end, _begin, _passed);
 
 				if( _passed.tv_sec > req->tv_sec || 
 					(_passed.tv_sec == req->tv_sec && _passed.tv_nsec > req->tv_nsec) )
 					break;
-				timespec_diff(req, &_passed, &tp);
+				timespec_diff(*req, _passed, tp);
 				timespec_add(tp, _end);
 			}
 			while(nanosleep_err == 0);
