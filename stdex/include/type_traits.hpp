@@ -87,19 +87,19 @@ namespace stdex
 
     template<class _Tp, _Tp Val>
     struct integral_constant
-    {	// convenient template for integral constant types
+    {    // convenient template for integral constant types
         static const _Tp value = Val;
 
         typedef const _Tp value_type;
         typedef integral_constant<_Tp, Val> type;
 
         operator value_type() const
-        {	// return stored value
+        {    // return stored value
             return (value);
         }
 
         value_type operator()() const
-        {	// return stored value
+        {    // return stored value
             return (value);
         }
     };
@@ -209,12 +209,12 @@ namespace stdex
             typedef integral_constant<bool, _not_::value == bool(true)> type;
 
             operator value_type() const
-            {	// return stored value
+            {    // return stored value
                 return (value);
             }
 
             value_type operator()() const
-            {	// return stored value
+            {    // return stored value
                 return (value);
             }
         };
@@ -225,7 +225,7 @@ namespace stdex
         template<bool Val>
         struct _cat_base :
             integral_constant<bool, Val>
-        {	// base class for type predicates
+        {    // base class for type predicates
         };
     }
 
@@ -234,39 +234,39 @@ namespace stdex
 
     template<class _Tp>
     struct remove_const
-    {	// remove top level const qualifier
+    {    // remove top level const qualifier
         typedef _Tp type;
     };
 
     template<class _Tp>
     struct remove_const<const _Tp>
-    {	// remove top level const qualifier
+    {    // remove top level const qualifier
         typedef _Tp type;
     };
 
     template<class _Tp>
     struct remove_const<const volatile _Tp>
-    {	// remove top level const qualifier
+    {    // remove top level const qualifier
         typedef volatile _Tp type;
     };
 
     // remove_volatile
     template<class _Tp>
     struct remove_volatile
-    {	// remove top level volatile qualifier
+    {    // remove top level volatile qualifier
         typedef _Tp type;
     };
 
     template<class _Tp>
     struct remove_volatile<volatile _Tp>
-    {	// remove top level volatile qualifier
+    {    // remove top level volatile qualifier
         typedef _Tp type;
     };
 
     // remove_cv
     template<class _Tp>
     struct remove_cv
-    {	// remove top level const and volatile qualifiers
+    {    // remove top level const and volatile qualifiers
         typedef typename remove_const<typename remove_volatile<_Tp>::type>::type
             type;
     };
@@ -622,7 +622,7 @@ namespace stdex
 
     template<class _Tp>
     struct is_signed
-    {	// determine whether _Tp is a signed type
+    {    // determine whether _Tp is a signed type
 
         static const bool value = detail::_sign_unsign_chooser<is_integral<_Tp>::value>::template _signed<_Tp>::value;
 
@@ -630,19 +630,19 @@ namespace stdex
         typedef integral_constant<bool, is_signed::value == bool(true)> type;
 
         operator value_type() const
-        {	// return stored value
+        {    // return stored value
             return (value);
         }
 
         value_type operator()() const
-        {	// return stored value
+        {    // return stored value
             return (value);
         }
     };
 
     template<class _Tp>
     struct is_unsigned
-    {	// determine whether _Tp is an unsigned type
+    {    // determine whether _Tp is an unsigned type
 
         static const bool value = detail::_sign_unsign_chooser<is_integral<_Tp>::value>::template _unsigned<_Tp>::value;
 
@@ -650,12 +650,12 @@ namespace stdex
         typedef integral_constant<bool, is_unsigned::value == bool(true)> type;
 
         operator value_type() const
-        {	// return stored value
+        {    // return stored value
             return (value);
         }
 
         value_type operator()() const
-        {	// return stored value
+        {    // return stored value
             return (value);
         }
     };
@@ -1640,7 +1640,7 @@ namespace stdex
 #undef _STDEX_TYPES
 #undef _STDEX_ARGS
 #undef _STDEX_IS_MEM_FUN_PTR
-#undef _STDEX_IS_MEM_FUN_PTR_CLR 		
+#undef _STDEX_IS_MEM_FUN_PTR_CLR         
 #undef _STDEX_IS_MEM_FUN_CDECL_PTR
 #undef _STDEX_IS_MEM_FUN_STDCALL_PTR
 #undef _STDEX_IS_MEM_FUN_FASTCALL_PTR
@@ -1874,7 +1874,7 @@ namespace stdex
 #undef _STDEX_ARGS
 
 #undef _STDEX_IS_MEM_FUN_PTR
-#undef _STDEX_IS_MEM_FUN_PTR_CLR 		
+#undef _STDEX_IS_MEM_FUN_PTR_CLR         
 #undef _STDEX_IS_MEM_FUN_CDECL_PTR
 #undef _STDEX_IS_MEM_FUN_STDCALL_PTR
 #undef _STDEX_IS_MEM_FUN_FASTCALL_PTR
@@ -1932,12 +1932,12 @@ namespace stdex
         typedef integral_constant<bool, is_function::value == bool(true)> type;
 
         operator value_type() const
-        {	// return stored value
+        {    // return stored value
             return (value);
         }
 
         value_type operator()() const
-        {	// return stored value
+        {    // return stored value
             return (value);
         }
     };
@@ -2343,12 +2343,12 @@ namespace stdex
         typedef integral_constant<std::size_t, (const std::size_t)(rank::value)> type;
 
         operator value_type() const
-        {	// return stored value
+        {    // return stored value
             return (value);
         }
 
         value_type operator()() const
-        {	// return stored value
+        {    // return stored value
             return (value);
         }
     };
