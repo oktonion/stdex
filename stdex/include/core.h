@@ -30,7 +30,7 @@
 
 #endif
 
-// LWG 310 	C++98 	it is unspecified whether errno is a macro or an identifier with external linkage 	errno must be macro
+// LWG 310     C++98     it is unspecified whether errno is a macro or an identifier with external linkage     errno must be macro
 #ifdef errno
     #define _STDEX_NATIVE_CPP_98_SUPPORT
 #endif

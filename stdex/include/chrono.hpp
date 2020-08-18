@@ -1145,7 +1145,12 @@ namespace stdex
      */
         struct system_clock
         {
-            typedef chrono::nanoseconds duration;
+            typedef 
+            stdex::conditional<
+                sizeof(stdex::intmax_t) >= 64, 
+                chrono::nanoseconds, 
+                chrono::microseconds
+            >::type duration;
             typedef system_clock::duration::rep rep;
             typedef system_clock::duration::period period;
             typedef chrono::time_point<system_clock, duration>     time_point;
@@ -1189,7 +1194,12 @@ namespace stdex
      */
         struct steady_clock
         {
-            typedef chrono::nanoseconds duration;
+            typedef 
+            stdex::conditional<
+                sizeof(stdex::intmax_t) >= 64, 
+                chrono::nanoseconds, 
+                chrono::microseconds
+            >::type duration;
             typedef steady_clock::duration::rep rep;
             typedef steady_clock::duration::period period;
             typedef chrono::time_point<steady_clock, duration>     time_point;

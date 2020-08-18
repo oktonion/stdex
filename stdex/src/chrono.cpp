@@ -613,7 +613,7 @@ stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDE
         
         return
         time_point( 
-            seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec) );
+            seconds(ts.tv_sec) + duration_cast<duration>(nanoseconds(ts.tv_nsec)) );
     }
 }
 
@@ -631,6 +631,6 @@ stdex::chrono::steady_clock::time_point stdex::chrono::steady_clock::now() _STDE
 
         return
         time_point(
-            seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec) );
+            seconds(ts.tv_sec) + duration_cast<duration>(nanoseconds(ts.tv_nsec)));
     }
 }
