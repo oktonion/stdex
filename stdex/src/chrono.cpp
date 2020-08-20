@@ -36,9 +36,9 @@ typedef LONGLONG duration_long_long;
 
 namespace clock_gettime_impl
 {
-    static LARGE_INTEGER get_start_point()
+    static LARGE_INTEGER get_abs_start_point()
     {
-        if (sizeof(stdex::intmax_t) < 64)
+        /*if (sizeof(stdex::intmax_t) * CHAR_BIT <= 64)
         {
             struct lamdas
             {
@@ -59,7 +59,7 @@ namespace clock_gettime_impl
 
             return current_date;
         }
-        else
+        else*/
         {
             LARGE_INTEGER jan_1_1970;
 
@@ -74,89 +74,11 @@ namespace clock_gettime_impl
 #define _STDEX_CHRONO_CLOCK_REALTIME 0
 #define _STDEX_CHRONO_CLOCK_MONOTONIC 1
 
-#if defined(LLONG_MAX) && defined(OLOLO)
-#define exp7           10000000i64     //1E+7     //C-file part
-#define exp9         1000000000i64     //1E+9
-#define w2ux 116444736000000000i64     //1.jan1601 to 1.jan1970
-    void unix_time(struct mytimespec *spec)
-    {
-        LARGE_INTEGER wintime;
-        FILETIME ft;
-        GetSystemTimeAsFileTime(&ft);
-        wintime.LowPart = ft.dwLowDateTime;
-        wintime.HighPart = ft.dwHighDateTime;
-
-        wintime.QuadPart -= w2ux;  spec->tv_sec = wintime.QuadPart / exp7;
-        spec->tv_nsec = wintime.QuadPart % exp7 * 100;
-    }
-
-    int clock_gettime_steady(int, mytimespec *spec)
-    {
-        static  struct mytimespec startspec; 
-        static double ticks2nano = 100.;
-        static LARGE_INTEGER startticks, tps;
-        LARGE_INTEGER tmp, curticks;
-        tps.QuadPart = 0;
-
-        QueryPerformanceFrequency(&tmp); //some strange system can
-        if (tps.QuadPart != tmp.QuadPart) {
-            tps.QuadPart = tmp.QuadPart; //init ~~ONCE         //possibly change freq ?
-            QueryPerformanceCounter(&startticks);
-            unix_time(&startspec); ticks2nano = (double) exp9 / tps.QuadPart;
-        }
-        QueryPerformanceCounter((LARGE_INTEGER*) &curticks); curticks.QuadPart -= startticks.QuadPart;
-        spec->tv_sec = startspec.tv_sec + (curticks.QuadPart / tps.QuadPart);
-        spec->tv_nsec = startspec.tv_nsec + (long)((double) (curticks.QuadPart % tps.QuadPart) * ticks2nano);
-        if (!(spec->tv_nsec < exp9)) { spec->tv_sec++; spec->tv_nsec -= exp9; }
-        return 0;
-    }
-
-    int
-        clock_gettime(int X, mytimespec *tv)
-    {
-        LARGE_INTEGER           t;
-        FILETIME            f;
-        double                  microseconds;
-        static LARGE_INTEGER    offset;
-        static double           frequencyToMicroseconds;
-        static int              initialized = 0;
-        static BOOL             usePerformanceCounter = 0;
-
-        if (!initialized) {
-            LARGE_INTEGER performanceFrequency;
-            initialized = 1;
-            usePerformanceCounter = QueryPerformanceFrequency(&performanceFrequency);
-            if (!usePerformanceCounter) {
-                offset = getFILETIMEoffset();
-                frequencyToMicroseconds = 10.;
-            }
-        }
-        if (usePerformanceCounter) 
-            return clock_gettime_steady(X, tv);
-        else {
-            GetSystemTimeAsFileTime(&f);
-            t.QuadPart = f.dwHighDateTime;
-            t.QuadPart <<= 32;
-            t.QuadPart |= f.dwLowDateTime;
-        }
-
-        t.QuadPart -= offset.QuadPart;
-        microseconds = (double) t.QuadPart / frequencyToMicroseconds;
-        t.QuadPart = LONGLONG(microseconds + 0.5);
-        tv->tv_sec = t.QuadPart / 1000000;
-        tv->tv_nsec = (t.QuadPart % 1000000) * 1000;
-        return (0);
-    }
-
-
-#define _STDEX_CHRONO_USE_MICROSECONDS
-#else
-
     int clock_gettime_realtime(mytimespec &ts)
     {
         FILETIME    filetime;
         LARGE_INTEGER today;
-        const LARGE_INTEGER start_point = get_start_point();
+        const LARGE_INTEGER start_point = get_abs_start_point();
 
         GetSystemTimeAsFileTime(&filetime);
 
@@ -221,7 +143,7 @@ namespace clock_gettime_impl
         return freq_cached;
     }
 
-    static const LARGE_INTEGER &start_point() {
+    static const LARGE_INTEGER &get_start_rel_point() {
         static const LARGE_INTEGER &cached_freq = cache_freq();
 
         struct lambdas {
@@ -242,11 +164,11 @@ namespace clock_gettime_impl
         return point_cached;
     }
 
-    static const LARGE_INTEGER &_dumb_init = start_point();
+    static const LARGE_INTEGER &_dumb_init = get_start_rel_point();
 
     int clock_gettime_monotonic(mytimespec &ts)
     {
-        const LARGE_INTEGER &sp = start_point();
+        const LARGE_INTEGER &sp = get_start_rel_point();
 
         if (sp.QuadPart == 0)
             return clock_gettime_realtime(ts);
@@ -293,15 +215,12 @@ namespace clock_gettime_impl
 
     int clock_gettime(int clk_id, mytimespec* ts) {
         if (clk_id == _STDEX_CHRONO_CLOCK_MONOTONIC)
-            return clock_gettime_monotonic(*ts);
+            return clock_gettime_realtime(*ts);
         else if (clk_id == _STDEX_CHRONO_CLOCK_REALTIME)
-            return clock_gettime_monotonic(*ts);
+            return clock_gettime_realtime(*ts);
         return -1;
 
     }
-
-#define _STDEX_CHRONO_USE_MICROSECONDS
-#endif
 }
 
 int(*clock_gettime_func_pointer)(int, mytimespec*) = &clock_gettime_impl::clock_gettime;
@@ -426,15 +345,10 @@ int(*clock_gettime_func_pointer)(clockid_t, struct timespec*) = &clock_gettime;
 #endif
 
 #if defined(WIN32) || defined(_WIN32)
-#ifdef LLONG_MAX
     LARGE_INTEGER performanceFrequency;
 
-    const bool stdex::chrono::system_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency) != 0;
-    const bool stdex::chrono::steady_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency) != 0;
-#else
     const bool stdex::chrono::system_clock::is_steady = false;
-    const bool stdex::chrono::steady_clock::is_steady = false;
-#endif
+    const bool stdex::chrono::steady_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency) != 0;
 
 #else
 
@@ -479,7 +393,7 @@ namespace stdex {
                 return result;
             }
 
-            _big_int::_big_int(const stdex::intmax_t& _value)
+            _big_int::_big_int(stdex::intmax_t _value)
             {
                 STATIC_ASSERT(sizeof(duration_long_long) <= sizeof(_declptr<_big_int>()->least64_value), platform_specific_int64_should_fit_in_8_bytes);
                 duration_long_long value = _value;
@@ -497,14 +411,24 @@ namespace stdex {
                 return *this;
             }
 
-            _big_int::operator stdex::intmax_t() const
+            stdex::intmax_t _big_int::to_integer() const
             {
                 duration_long_long result = convert(*this);
 
                 if (result > (std::numeric_limits<stdex::intmax_t>::max)())
-                    throw(std::out_of_range("stdex::intmax_t overflow"));
+                    throw(std::out_of_range("overflow in stdex::chrono::duration cast to stdex::intmax_t"));
 
                 return stdex::intmax_t(result);
+            }
+
+            long double     _big_int::to_floating_point() const
+            {
+                long double result = static_cast<long double>(convert(*this));
+
+                if (result > (std::numeric_limits<long double>::max)())
+                    throw(std::out_of_range("overflow in stdex::chrono::duration cast to long double"));
+
+                return (long double)(result);
             }
 
             _big_int& _big_int::operator++()
@@ -545,21 +469,15 @@ namespace stdex {
                 return *this;
             }
 
-            _big_int& _big_int::operator*=(const stdex::intmax_t& _r_in)
+            _big_int& _big_int::operator*=(const _big_int& other)
             {
-                *this = convert(convert(*this) * duration_long_long(_r_in));
+                *this = convert(convert(*this) * convert(other));
                 return *this;
             }
 
-            _big_int& _big_int::operator/=(const stdex::intmax_t& _r_in)
+            _big_int& _big_int::operator/=(const _big_int& other)
             {
-                *this = convert(convert(*this) / duration_long_long(_r_in));
-                return *this;
-            }
-
-            _big_int& _big_int::operator%=(const stdex::intmax_t& _r_in)
-            {
-                *this = convert(convert(*this) % duration_long_long(_r_in));
+                *this = convert(convert(*this) / convert(other));
                 return *this;
             }
 
@@ -568,7 +486,6 @@ namespace stdex {
                 *this = convert(convert(*this) % convert(other));
                 return *this;
             }
-
 
             _big_int operator+(_big_int a, const _big_int& b)
             {
@@ -594,7 +511,36 @@ namespace stdex {
             {
                 return a %= b;
             }
-        
+            
+            bool operator< (const _big_int& a, const _big_int& b)
+            {
+                return convert(a) < convert(b);
+            }
+
+            bool operator> (const _big_int& a, const _big_int& b)
+            {
+                return convert(a) > convert(b);
+            }
+
+            bool operator==(const _big_int& a, const _big_int& b)
+            {
+                return convert(a) == convert(b);
+            }
+
+            bool operator!=(const _big_int& a, const _big_int& b)
+            {
+                return convert(a) != convert(b);
+            }
+
+            bool operator>=(const _big_int& a, const _big_int& b)
+            {
+                return convert(a) >= convert(b);
+            }
+
+            bool operator<=(const _big_int& a, const _big_int& b)
+            {
+                return convert(a) <= convert(b);
+            }
         }
     }
 }

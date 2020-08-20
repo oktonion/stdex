@@ -42,6 +42,11 @@ namespace stdex
     {
         namespace detail
         {
+            namespace chrono_detail
+            {
+                template<unsigned _Rank> struct _priority_tag : _priority_tag < _Rank - 1 > {};
+                template<> struct _priority_tag<0> {};
+            }
             template<class _Tp>
             struct _is_ratio
             {
@@ -65,7 +70,7 @@ namespace stdex
             {
                 static const bool value =
                     is_integral<_Rep>::value &&
-                    (sizeof(_Rep) * CHAR_BIT) < 127;
+                    (sizeof(_Rep) * CHAR_BIT) < 64;
             };
 
             template<class _Rep, class _Period>
@@ -122,7 +127,7 @@ namespace stdex
             {
                 char least64_value[8];
 
-                explicit _big_int(const stdex::intmax_t& _value = 0);
+                _big_int(stdex::intmax_t _value = 0);
 
                 _big_int(const _big_int&);
                 _big_int& operator=(const _big_int&);
@@ -134,12 +139,12 @@ namespace stdex
 
                 _big_int& operator+=(const _big_int&);
                 _big_int& operator-=(const _big_int&);
-                _big_int& operator*=(const stdex::intmax_t&);
-                _big_int& operator/=(const stdex::intmax_t&);
-                _big_int& operator%=(const stdex::intmax_t&);
+                _big_int& operator*=(const _big_int&);
+                _big_int& operator/=(const _big_int&);
                 _big_int& operator%=(const _big_int&);
 
-                operator stdex::intmax_t() const;
+                stdex::intmax_t to_integer() const;
+                long double     to_floating_point() const;
             };
 
             _big_int operator+(_big_int, const _big_int&);
@@ -147,11 +152,18 @@ namespace stdex
             _big_int operator*(_big_int, const _big_int&);
             _big_int operator/(_big_int, const _big_int&);
             _big_int operator%(_big_int, const _big_int&);
+
+            bool operator< (const _big_int&, const _big_int&);
+            bool operator> (const _big_int&, const _big_int&);
+            bool operator==(const _big_int&, const _big_int&);
+            bool operator!=(const _big_int&, const _big_int&);
+            bool operator>=(const _big_int&, const _big_int&);
+            bool operator<=(const _big_int&, const _big_int&);
             
             template<class _Tp>
             _big_int operator+(const _Tp& _lhs,
                 typename
-                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled&>::type _rhs)
+                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled>::type _rhs)
             {
                 return _big_int(_lhs) + _rhs;
             }
@@ -159,7 +171,7 @@ namespace stdex
             template<class _Tp>
             _big_int operator-(const _Tp& _lhs,
                 typename
-                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled&>::type _rhs)
+                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled>::type _rhs)
             {
                 return _big_int(_lhs) - _rhs;
             }
@@ -167,7 +179,7 @@ namespace stdex
             template<class _Tp>
             _big_int operator*(const _Tp& _lhs,
                 typename
-                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled&>::type _rhs)
+                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled>::type _rhs)
             {
                 return _big_int(_lhs) * _rhs;
             }
@@ -175,7 +187,7 @@ namespace stdex
             template<class _Tp>
             _big_int operator/(const _Tp& _lhs,
                 typename
-                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled&>::type _rhs)
+                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled>::type _rhs)
             {
                 return _big_int(_lhs) / _rhs;
             }
@@ -183,9 +195,76 @@ namespace stdex
             template<class _Tp>
             _big_int operator%(const _Tp& _lhs,
                 typename
-                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled&>::type _rhs)
+                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled>::type _rhs)
             {
                 return _big_int(_lhs) % _rhs;
+            }
+
+        template<class _To, class _From>
+            _To _chrono_convert(_From _from,
+                typename
+                conditional<
+                    is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(false) &&
+                    is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(false),
+                    const chrono_detail::_priority_tag<0>&,
+                    class _disabled0
+                >::type)
+            {
+                return static_cast<_To>(_from);
+            }
+
+            template<class _To, class _From>
+            _To _chrono_convert(_From _from,
+                typename
+                conditional<
+                    is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(false) &&
+                    is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(true),
+                    const chrono_detail::_priority_tag<1>&,
+                    class _disabled1
+                >::type)
+            {
+                return intmax_t(_from);
+            }
+
+            template<class _To, class _From>
+            _To _chrono_convert(const _From& _from,
+                typename
+                conditional<
+                    is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(true) &&
+                    is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(false) &&
+                    is_floating_point<_To>::value == bool(true),
+                    const chrono_detail::_priority_tag<2>&,
+                    class _disabled2
+                >::type)
+            {
+                return _To(_from.to_floating_point());
+            }
+
+             template<class _To, class _From>
+             _To _chrono_convert(const _From& _from,
+                 typename
+                 conditional <
+                 is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(true) &&
+                 is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(false) &&
+                    is_floating_point<_To>::value == bool(false),
+                    const chrono_detail::_priority_tag<3>&,
+                    class _disabled3
+                >::type)
+            {
+                return _To(_from.to_integer());
+            }
+
+            template<class _To, class _From>
+            _To _chrono_convert(const _From& _from,
+                typename
+                conditional<
+                    is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(true) &&
+                    is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(true),
+                    const chrono_detail::_priority_tag<4>&,
+                    class _disabled4
+                >::type)
+            {
+                return _from;
             }
 
             template <class _Rep, class _Period,
@@ -216,7 +295,7 @@ namespace stdex
 
                 template <class _Rep2>
                 duration_base(const _Rep2& _r_in) :
-                    _r(static_cast<_Rep>(_r_in)) {}
+                    _r(_chrono_convert<_Rep>(_r_in, chrono_detail::_priority_tag<4>())) {}
 
                 friend
                 struct stdex::chrono::detail::duration_secret;
@@ -235,7 +314,7 @@ namespace stdex
 
                 template <class _Rep2>
                 duration_base(const _Rep2& _r_in) :
-                    _r(static_cast<_Rep>(_r_in)) {}
+                    _r(_chrono_convert<_Rep>(_r_in, chrono_detail::_priority_tag<4>())) {}
                 
                 friend
                 struct stdex::chrono::detail::duration_secret;
@@ -284,22 +363,21 @@ namespace stdex
                 >
             { };
 
-            template<class _To, class _From>
-            _To _chrono_static_cast(_From _value)
+            /*template<class _Tp>
+            struct _can_be_big_int
             {
-                return static_cast<_To>(_value);
-            }
+                typedef 
+                typename remove_reference<
+                    typename remove_cv<_Tp>::type
+                >::type type;
 
-            template<class _From>
-            typename
-            conditional<
-                is_integral<_From>::value, 
-                _big_int,
-                double[]
-            >::type _chrono_static_cast(_From _value)
-            {
-                return _big_int(stdex::intmax_t(_value));
-            }
+                static const bool value =
+                    is_same<type, _big_int>::value == bool(true) ||
+                    is_integral<type>::value == bool(true) ||
+                    is_floating_point<type>::value == bool(true);
+            };*/
+
+            
 
             // Primary template for duration_cast impl.
             template<class _ToDur, class _CF, class _CR,
@@ -314,9 +392,13 @@ namespace stdex
                     typename 
                     detail::_duration_common_type<_to_dur_rep, _to_dur_rep, _Period>::type
                         _to_rep;
-                    return _ToDur(_chrono_static_cast<_to_rep>(_chrono_static_cast<_CR>(detail::duration_count(_d))
-                        * _chrono_static_cast<_CR>(_CF::num)
-                        / _chrono_static_cast<_CR>(_CF::den)));
+                    return _ToDur(
+                        _chrono_convert<_to_rep>(
+                            _chrono_convert<_CR>(detail::duration_count(_d), chrono_detail::_priority_tag<4>())
+                            * _chrono_convert<_CR>(_CF::num, chrono_detail::_priority_tag<4>())
+                            / _chrono_convert<_CR>(_CF::den, chrono_detail::_priority_tag<4>())
+                        , chrono_detail::_priority_tag<4>())
+                    );
                 }
             };
 
@@ -331,7 +413,11 @@ namespace stdex
                     typename 
                     detail::_duration_common_type<_to_dur_rep, _to_dur_rep, _Period>::type
                         _to_rep;
-                    return _ToDur(_chrono_static_cast<_to_rep>(detail::duration_count(_d)));
+                    return _ToDur(
+                        _chrono_convert<_to_rep>(
+                            detail::duration_count(_d), 
+                            chrono_detail::_priority_tag<4>())
+                    );
                 }
             };
 
@@ -346,8 +432,12 @@ namespace stdex
                     typename 
                     detail::_duration_common_type<_to_dur_rep, _to_dur_rep, _Period>::type
                         _to_rep;
-                    return _ToDur(_chrono_static_cast<_to_rep>(
-                        _chrono_static_cast<_CR>(detail::duration_count(_d)) / _chrono_static_cast<_CR>(_CF::den)));
+                    return _ToDur(
+                        _chrono_convert<_to_rep>(
+                            _chrono_convert<_CR>(detail::duration_count(_d), chrono_detail::_priority_tag<4>()) / 
+                            _chrono_convert<_CR>(_CF::den, chrono_detail::_priority_tag<4>())
+                        , chrono_detail::_priority_tag<4>())
+                    );
                 }
             };
 
@@ -362,8 +452,12 @@ namespace stdex
                     typename 
                     detail::_duration_common_type<_to_dur_rep, _to_dur_rep, _Period>::type
                         _to_rep;
-                    return _ToDur(_chrono_static_cast<_to_rep>(
-                        _chrono_static_cast<_CR>(detail::duration_count(_d)) * _chrono_static_cast<_CR>(_CF::num)));
+                    return _ToDur(
+                        _chrono_convert<_to_rep>(
+                            _chrono_convert<_CR>(detail::duration_count(_d), chrono_detail::_priority_tag<4>()) * 
+                            _chrono_convert<_CR>(_CF::num, chrono_detail::_priority_tag<4>()), 
+                        chrono_detail::_priority_tag<4>())
+                    );
                 }
             };
 
@@ -665,14 +759,9 @@ namespace stdex
             //! Return the value of the duration object.
             rep count() const
             {
-                return detail::duration_count(*this);
-            }
-
-            typename
-            base_type::internal_value_type
-                number_of_ticks() const
-            {
-                return base_type::_r;
+                return 
+                    detail::_chrono_convert<rep>(
+                        base_type::_r, detail::chrono_detail::_priority_tag<4>());
             }
 
             duration operator+() const
@@ -881,8 +970,10 @@ namespace stdex
             typedef typename common_type<_dur1, _dur2>::type    _cd;
 
             return 
-                detail::duration_count(_cd(lhs)) / 
-                detail::duration_count(_cd(rhs));
+                _cd(
+                    detail::duration_count(_cd(lhs)) / 
+                    detail::duration_count(_cd(rhs))
+                ).count();
         }
 
         // DR 934.
