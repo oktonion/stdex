@@ -83,11 +83,12 @@ int test0()
     using namespace stdex;
 
     error_code ec;
-    ec = errc::not_supported;
+    ec = make_error_code(errc::not_supported);
     ec = my_err;
     if (ec == errc::not_supported)
     { }
 
+    if(errc::not_supported == errc::not_supported){}
 
     return 0;
 }
@@ -294,7 +295,7 @@ int test13()
 {
     using namespace stdex;
 
-    VERIFY((is_error_code_enum<errc>::value));
+    VERIFY((is_error_code_enum<errc>::value == false));
 
     VERIFY((!is_error_code_enum<int>::value));
 
