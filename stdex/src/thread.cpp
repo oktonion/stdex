@@ -327,7 +327,9 @@ void thread::init(void(*aFunction)(void *), void *aArg)
 
         delete thread_info;
 
-        throw system_error(error_code(errc::errc_t(_e)));
+        throw system_error(
+            stdex::make_error_code(stdex::errc::errc_t(_e))
+        );
     }
     else
     {
@@ -352,7 +354,9 @@ void thread::join()
     }
 
     if (_e)
-        throw system_error(error_code(errc::errc_t(_e)));
+        throw system_error(
+            stdex::make_error_code(stdex::errc::errc_t(_e))
+        );
 
     _id = id();
 }
@@ -373,7 +377,9 @@ void thread::detach()
     }
 
     if (_e)
-        throw system_error(error_code(errc::errc_t(_e)));
+        throw system_error(
+            stdex::make_error_code(stdex::errc::errc_t(_e))
+        );
 
     _id = id();
 }
