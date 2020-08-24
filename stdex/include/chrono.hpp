@@ -166,6 +166,7 @@ namespace stdex
 
         // duration_cast
         template<class _ToDur, class _Rep, class _Period>
+        inline
         typename detail::_enable_if_is_duration<_ToDur>::type 
         duration_cast(const duration<_Rep, _Period> &_d)
         {

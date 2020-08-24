@@ -335,18 +335,6 @@ namespace stdex
         static const bool value = true;
     };
 
-    template<>
-    struct is_error_code_enum<errc::errc_t>
-    {
-        static const bool value = true;
-    };
-
-    template<>
-    struct is_error_code_enum<errc>
-    {
-        static const bool value = true;
-    };
-
     // TEMPLATE CLASS is_error_condition_enum
     template<class _Enum>
     struct is_error_condition_enum
@@ -449,7 +437,19 @@ namespace stdex
         error_category& operator=(const error_category&) _STDEX_DELETED_FUNCTION;
     };
 
-    class error_condition
+    namespace detail
+    {
+        struct _error_condition_compare
+        {
+            operator
+            const stdex::error_condition&() const{
+                return reinterpret_cast<const error_condition&>(*this);
+            }
+        };
+    }
+
+    class error_condition:
+        public detail::_error_condition_compare
     {
     private:
         int _value;
@@ -470,7 +470,7 @@ namespace stdex
         {}
 
         template<class _ErrorCondEnum>
-        explicit error_condition(const _ErrorCondEnum& val) _STDEX_NOEXCEPT_FUNCTION
+        error_condition(const _ErrorCondEnum& val) _STDEX_NOEXCEPT_FUNCTION
         {
             STATIC_ASSERT(is_error_condition_enum<_ErrorCondEnum>::value == true, value_should_be_error_condition_enum);
             *this = val;
@@ -515,7 +515,19 @@ namespace stdex
         }
     };
 
-    class error_code
+    namespace detail
+    {
+        struct _error_code_compare
+        {
+            operator
+            const stdex::error_code&() const {
+                return reinterpret_cast<const error_code&>(*this);
+            }
+        };
+    }
+
+    class error_code:
+        public detail::_error_code_compare
     {
     private:
 
@@ -623,21 +635,65 @@ namespace stdex
         const error_code& code() const _STDEX_NOEXCEPT_FUNCTION { return _code; }
     };
 
-    inline bool
-        operator<(const error_code& _lhs, const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
+    namespace detail
     {
-        return (_lhs.category() < _rhs.category()
-            || (_lhs.category() == _rhs.category()
-                && _lhs.value() < _rhs.value()));
+        template<class _Tp>
+        struct _is_error_code
+        {
+            static const bool value =
+                is_error_code_enum<_Tp>::value == bool(true) ||
+                is_same<error_code,
+                    typename remove_reference<
+                        typename remove_cv<_Tp>::type>::type>::value == bool(true);
+        };
+
+        template<class _Tp>
+        struct _is_error_condition
+        {
+            static const bool value =
+                is_error_condition_enum<_Tp>::value == bool(true) ||
+                is_same<error_condition,
+                    typename remove_reference<
+                        typename remove_cv<_Tp>::type>::type>::value == bool(true);
+        };
     }
 
-    inline bool
-        operator<(const error_condition& _lhs,
-            const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
+    inline
+    bool operator<(
+        const detail::_error_code_compare& _lhs,
+        const detail::_error_code_compare& _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
-        return (_lhs.category() < _rhs.category()
-            || (_lhs.category() == _rhs.category()
-                && _lhs.value() < _rhs.value()));
+        struct lambdas
+        {
+            static 
+            bool compare(
+                const error_code& _lhs, const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
+            {
+                return (_lhs.category() < _rhs.category()
+                    || (_lhs.category() == _rhs.category()
+                        && _lhs.value() < _rhs.value()));
+            }
+        };
+        return lambdas::compare(_lhs, _rhs);
+    }
+
+    inline
+    bool operator<(
+        const detail::_error_condition_compare& _lhs,
+        const detail::_error_condition_compare& _rhs) _STDEX_NOEXCEPT_FUNCTION
+    {
+        struct lambdas
+        {
+            static 
+            bool compare(
+                const error_condition& _lhs, const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
+            {
+                return (_lhs.category() < _rhs.category()
+                    || (_lhs.category() == _rhs.category()
+                        && _lhs.value() < _rhs.value()));
+            }
+        };
+        return lambdas::compare(_lhs, _rhs);
     }
 
     // VIRTUALS FOR error_category
@@ -668,63 +724,143 @@ namespace stdex
     }
 
     // OPERATOR== FOR error_code/error_condition
-    inline bool
-        operator==(const error_code& _lhs, const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
+    inline
+    bool operator==(
+        const detail::_error_code_compare& _lhs,
+        const detail::_error_code_compare& _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
-        return (_lhs.category() == _rhs.category()
-            && _lhs.value() == _rhs.value());
+        struct lambdas
+        {
+            static 
+            bool compare(
+                const error_code& _lhs, const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
+            {
+                return (_lhs.category() == _rhs.category()
+                    && _lhs.value() == _rhs.value());
+            }
+        };
+        return lambdas::compare(_lhs, _rhs);
     }
 
-    inline bool operator==(
-        const error_code& _lhs,
-        const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
+    inline
+    bool operator==(
+        const detail::_error_code_compare& _lhs,
+        const detail::_error_condition_compare& _rhs) _STDEX_NOEXCEPT_FUNCTION
     {    // test errors for equality
-        return (_lhs.category().equivalent(_lhs.value(), _rhs)
-            || _rhs.category().equivalent(_lhs, _rhs.value()));
+        struct lambdas
+        {
+            static 
+            bool compare(
+                const error_code& _lhs, const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
+            {
+                return (_lhs.category().equivalent(_lhs.value(), _rhs)
+                    || _rhs.category().equivalent(_lhs, _rhs.value()));
+            }
+        };
+        return lambdas::compare(_lhs, _rhs);
     }
 
-    inline bool operator==(
-        const error_condition& _lhs,
-        const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
+    inline
+    bool operator==(
+        const detail::_error_condition_compare& _lhs,
+        const detail::_error_code_compare& _rhs) _STDEX_NOEXCEPT_FUNCTION
     {    // test errors for equality
-        return (_rhs.category().equivalent(_rhs.value(), _lhs)
-            || _lhs.category().equivalent(_rhs, _lhs.value()));
+        struct lambdas
+        {
+            static 
+            bool compare(
+                const error_condition& _lhs, const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
+            {
+                return (_rhs.category().equivalent(_rhs.value(), _lhs)
+                    || _lhs.category().equivalent(_rhs, _lhs.value()));
+            }
+        };
+        return lambdas::compare(_lhs, _rhs);
     }
 
-    inline bool
-        operator==(const error_condition& _lhs,
-            const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
+    inline
+    bool operator==(
+        const detail::_error_condition_compare& _lhs,
+        const detail::_error_condition_compare& _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
-        return (_lhs.category() == _rhs.category()
-            && _lhs.value() == _rhs.value());
+        struct lambdas
+        {
+            static 
+            bool compare(
+                const error_condition& _lhs, const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
+            {
+                return (_lhs.category() == _rhs.category()
+                    && _lhs.value() == _rhs.value());
+            }
+        };
+        return lambdas::compare(_lhs, _rhs);
     }
 
     // OPERATOR!= FOR error_code/error_condition
-    inline bool
-        operator!=(const error_code& _lhs, const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
+    inline
+    bool operator!=(const error_code& _lhs, const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
-        return (!(_lhs == _rhs));
+        struct lambdas
+        {
+            static 
+            bool compare(
+                const error_code& _lhs, const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
+            {
+                return (!(_lhs == _rhs));
+            }
+        };
+        return lambdas::compare(_lhs, _rhs);
     }
 
-    inline bool operator!=(
+    inline
+    bool operator!=(
         const error_code& _lhs,
         const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
     {    // test errors for inequality
-        return (!(_lhs == _rhs));
+        struct lambdas
+        {
+            static 
+            bool compare(
+                const error_code& _lhs, const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
+            {
+                return (!(_lhs == _rhs));
+            }
+        };
+        return lambdas::compare(_lhs, _rhs);
     }
 
-    inline bool operator!=(
+    inline
+    bool operator!=(
         const error_condition& _lhs,
         const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
     {    // test errors for inequality
-        return (!(_lhs == _rhs));
+        struct lambdas
+        {
+            static 
+            bool compare(
+                const error_condition& _lhs, const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
+            {
+                return (!(_lhs == _rhs));
+            }
+        };
+        return lambdas::compare(_lhs, _rhs); 
     }
 
-    inline bool
-        operator!=(const error_condition& _lhs,
-            const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
+    inline
+    bool operator!=(
+        const error_condition& _lhs,
+        const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
-        return (!(_lhs == _rhs));
+        struct lambdas
+        {
+            static 
+            bool compare(
+                const error_condition& _lhs, const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
+            {
+                return (!(_lhs == _rhs));
+            }
+        };
+        return lambdas::compare(_lhs, _rhs); 
     }
 
     // FUNCTION make_error_code
