@@ -57,7 +57,8 @@ namespace stdex
         template<class _Tp>
         static void _throw_system_error(const _Tp &_errc)
         {
-            throw stdex::system_error(_errc);
+            throw stdex::system_error(
+                stdex::make_error_code(_errc));
         }
     }
 
@@ -83,7 +84,7 @@ namespace stdex
 
     class condition_variable 
     {
-        typedef chrono::system_clock clock_t;
+        typedef chrono::steady_clock clock_t;
 
     public:
         typedef pthread_cond_t* native_handle_type;
@@ -94,7 +95,11 @@ namespace stdex
                 pthread_cond_init(&_condition_handle, NULL);
 
             if (0 != _err)
-                throw(stdex::system_error( stdex::errc::errc_t(_err)) );
+                throw(
+                    stdex::system_error( 
+                        stdex::make_error_code(stdex::errc::errc_t(_err)) 
+                    )
+                );
         }
 
         ~condition_variable() _STDEX_NOEXCEPT(false)
@@ -114,7 +119,9 @@ namespace stdex
             if (0 != _err)
             {
             #if defined(_DEBUG) || defined(DEBUG)
-                std::cerr << stdex::error_code(stdex::errc::errc_t(_err)).message() << std::endl;
+                std::cerr << stdex::error_code(
+                    stdex::make_error_code(stdex::errc::errc_t(_err))
+                ).message() << std::endl;
             #endif
                 std::terminate();
             }
@@ -167,6 +174,11 @@ namespace stdex
             chrono::duration<_Rep, _Period> _rt = _rtime;
             if (ratio_greater<clock_t::period, _Period>::value)
                 ++_rt;
+
+            while (!_p())
+                if (wait_for_impl(_lock, _rtime) == cv_status::timeout)
+                    return _p();
+            return true;
             return wait_until(_lock, clock_t::now() + chrono::duration_cast<clock_t::duration>(_rt), _p);
         }
 
@@ -220,7 +232,9 @@ namespace stdex
             if(_err && _err != ETIMEDOUT)
             {
             #if defined(_DEBUG) || defined(DEBUG)
-                std::cerr << stdex::error_code(stdex::errc::errc_t(_err)).message() << std::endl;
+                std::cerr << stdex::error_code(
+                    stdex::make_error_code(stdex::errc::errc_t(_err))
+                ).message() << std::endl;
             #endif
                 std::terminate();
             }
@@ -236,43 +250,42 @@ namespace stdex
             if (!detail::_lock_owns_lock(_lock))
                 std::terminate();
 
-            chrono::seconds _rs = 
-                chrono::duration_cast<chrono::seconds>(_rtime);
-            chrono::nanoseconds _rns = 
-                chrono::duration_cast<chrono::nanoseconds>(_rtime - _rs);
+            if (_rtime < 0)
+                return cv_status::timeout;
 
             clock_t::time_point _start_time_point = clock_t::now();
 
-            chrono::time_point<clock_t, chrono::seconds> _sec = 
+            chrono::seconds _delta_sec = 
+                chrono::duration_cast<chrono::seconds>(_rtime);
+            chrono::nanoseconds _delta_nsec =
+                chrono::duration_cast<chrono::nanoseconds>(_rtime - _delta_sec);
+
+            chrono::time_point<clock_t, chrono::seconds> _start_time_point_sec =
                 chrono::time_point_cast<chrono::seconds>(_start_time_point);
-            chrono::nanoseconds _nsec = 
-                chrono::duration_cast<chrono::nanoseconds>(_start_time_point - _sec);
-            
-            chrono::time_point<clock_t, chrono::seconds> _sec_result =
-                chrono::duration_cast<chrono::seconds>(_start_time_point + _rtime);
-            chrono::nanoseconds _nsec_result = 
-                chrono::duration_cast<chrono::nanoseconds>(_start_time_point - _sec_result);
+            chrono::nanoseconds _start_time_point_nsec =
+                chrono::duration_cast<chrono::nanoseconds>(_start_time_point - _start_time_point_sec);
+
+            stdex::intmax_t
+                _ts_sec = (_start_time_point_sec + _delta_sec).time_since_epoch().count(),
+                _ts_nsec = (_start_time_point_nsec + _delta_nsec).count();
             
             timespec _ts;
 
-            const stdex::time_t _ts_sec_max = 
+            const stdex::intmax_t _ts_sec_max =
                 (std::numeric_limits<stdex::time_t>::max)();
-            if (_sec.time_since_epoch().count() >= _ts_sec_max ||
-                _rs.count() >= _ts_sec_max ||
-                _sec_result.time_since_epoch().count() >= _ts_sec_max)
+            if (_ts_sec >= _ts_sec_max)
             {
-                _ts.tv_sec = _ts_sec_max;
+                _ts.tv_sec = static_cast<stdex::time_t>(_ts_sec_max);
                 _ts.tv_nsec = 999999999;
             }
             else
             {
-                typename chrono::time_point<clock_t, chrono::seconds>::rep _s_count = 
-                    _sec_result.time_since_epoch().count();
-
-                _ts.tv_sec = static_cast<stdex::time_t>(_s_count > 0 ? _s_count : 0);
-                _ts.tv_nsec = static_cast<long>(_nsec_result.count()); 
+                _ts.tv_sec = static_cast<stdex::time_t>(_ts_sec);
+                _ts.tv_nsec = static_cast<long>(_ts_nsec);
             }
 
+            if ((clock_t::now() - _start_time_point) > _rtime)
+                return cv_status::timeout;
 
             int _err = 
                 pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
@@ -281,7 +294,9 @@ namespace stdex
             if(_err && _err != ETIMEDOUT)
             {
             #if defined(_DEBUG) || defined(DEBUG)
-                std::cerr << stdex::error_code(stdex::errc::errc_t(_err)).message() << std::endl;
+                std::cerr << stdex::error_code(
+                    stdex::make_error_code(stdex::errc::errc_t(_err))
+                ).message() << std::endl;
             #endif
                 std::terminate();
             }

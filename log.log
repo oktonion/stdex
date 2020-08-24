@@ -1,0 +1,1709 @@
+
+C:\Users\User\Documents\GitHub\stdex>mkdir .\tests\bin 
+
+C:\Users\User\Documents\GitHub\stdex>mkdir .\tests\obj 
+
+C:\Users\User\Documents\GitHub\stdex>setlocal enabledelayedexpansion 
+"compiling test Borland C++ add_const"
+"compiling test Borland C++ add_cv"
+"compiling test Borland C++ add_lvalue_reference"
+"compiling test Borland C++ add_pointer"
+"compiling test Borland C++ add_volatile"
+"compiling test Borland C++ alignment_of"
+"compiling test Borland C++ all_of"
+"compiling test Borland C++ any_of"
+"compiling test Borland C++ chrono_duration"
+"compiling test Borland C++ chrono_duration_cast"
+"compiling test Borland C++ chrono_duration_fail1"
+"failed as expected"
+"compiling test Borland C++ chrono_duration_fail2"
+"failed as expected"
+"compiling test Borland C++ chrono_duration_fail3"
+"failed as expected"
+"compiling test Borland C++ chrono_duration_fail4"
+"failed as expected"
+"compiling test Borland C++ chrono_duration_fail5"
+"failed as expected"
+"compiling test Borland C++ chrono_system_clock"
+"compiling test Borland C++ chrono_time_point"
+"compiling test Borland C++ chrono_time_point_cast"
+"compiling test Borland C++ common_type"
+"compiling test Borland C++ conditional"
+"compiling test Borland C++ condition_variable"
+Borland C++ 5.6.4 for Win32 Copyright (c) 1993, 2002 Borland
+.\tests\condition_variable.cpp:
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\condition_variable.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\condition_variable.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\condition_variable.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\condition_variable.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1798: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + Full parser context
+ + .\tests\condition_variable.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::basic_ostream<char,_STL::char_traits<char> > & stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\condition_variable.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Режим вывода команд на экран (ECHO) отключен.
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\condition_variable.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\condition_variable.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\condition_variable.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1773: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + Full parser context
+ + .\tests\condition_variable.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+*** 10 errors in Compile ***
+"compiling test Borland C++ condition_variable_fail1"
+"failed as expected"
+"compiling test Borland C++ condition_variable_fail2"
+"failed as expected"
+"compiling test Borland C++ copy_if"
+"compiling test Borland C++ copy_n"
+"compiling test Borland C++ core"
+"compiling test Borland C++ cstdint"
+"compiling test Borland C++ decay"
+"compiling test Borland C++ defines"
+Borland C++ 5.6.4 for Win32 Copyright (c) 1993, 2002 Borland
+.\tests\defines.cpp:
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\defines.cpp, line 47: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\defines.cpp, line 47: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\defines.cpp, line 47: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\defines.cpp, line 47: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1798: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + Full parser context
+ + .\tests\defines.cpp, line 47: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::basic_ostream<char,_STL::char_traits<char> > & stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\defines.cpp, line 47: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\defines.cpp, line 47: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\defines.cpp, line 47: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\defines.cpp, line 47: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1773: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + Full parser context
+ + .\tests\defines.cpp, line 47: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/typeindex.hpp 42: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function type_index::operator ==(const type_index &) const throw()
+ + Full parser context
+ + .\tests\defines.cpp, line 82: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool type_index::operator ==(const type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/typeindex.hpp 42: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function type_index::operator ==(const type_index &) const throw()
+ + Full parser context
+ + .\tests\defines.cpp, line 82: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool type_index::operator ==(const type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/typeindex.hpp 42: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function type_index::operator ==(const type_index &) const throw()
+ + Full parser context
+ + .\tests\defines.cpp, line 82: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool type_index::operator ==(const type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/typeindex.hpp 42: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function type_index::operator ==(const type_index &) const throw()
+ + Full parser context
+ + .\tests\defines.cpp, line 82: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool type_index::operator ==(const type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/typeindex.hpp 42: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <std::type_info,std::type_info>(const std::type_info &,const std::type_info &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <std::type_info,std::type_info>(const std::type_info &,const std::type_info &) throw()' in function stdex::type_index::operator ==(const stdex::type_index &) const throw()
+ + Full parser context
+ + .\tests\defines.cpp, line 82: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class stdex::type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool stdex::type_index::operator ==(const stdex::type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/typeindex.hpp 46: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function type_index::operator =(const type_index &) const throw()
+ + Full parser context
+ + .\tests\defines.cpp, line 82: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool type_index::operator =(const type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/typeindex.hpp 46: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function type_index::operator =(const type_index &) const throw()
+ + Full parser context
+ + .\tests\defines.cpp, line 82: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool type_index::operator =(const type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/typeindex.hpp 46: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function type_index::operator =(const type_index &) const throw()
+ + Full parser context
+ + .\tests\defines.cpp, line 82: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool type_index::operator =(const type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/typeindex.hpp 46: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function type_index::operator =(const type_index &) const throw()
+ + Full parser context
+ + .\tests\defines.cpp, line 82: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool type_index::operator =(const type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/typeindex.hpp 46: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type :type_info,std::type_info>(const std::type_info &,const std::type_info &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type :type_info,std::type_info>(const std::type_info &,const std::type_info &) throw()' in function stdex::type_index::operator :type_index &) const throw()
+ + Full parser context
+ + .\tests\defines.cpp, line 82: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class stdex::type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool stdex::type_index::operator :type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+*** 20 errors in Compile ***
+"compiling test Borland C++ enable_if"
+"compiling test Borland C++ error_category"
+Borland C++ 5.6.4 for Win32 Copyright (c) 1993, 2002 Borland
+.\tests\error_category.cpp:
+Error E2404 .\tests\error_category.cpp 56: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test2()
+ + Full parser context
+ + .\tests\error_category.cpp, line 53: parsing: int test2()
+Error E2404 .\tests\error_category.cpp 56: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test2()
+ + Full parser context
+ + .\tests\error_category.cpp, line 53: parsing: int test2()
+Error E2404 .\tests\error_category.cpp 56: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test2()
+ + Full parser context
+ + .\tests\error_category.cpp, line 53: parsing: int test2()
+Error E2404 .\tests\error_category.cpp 56: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test2()
+ + Full parser context
+ + .\tests\error_category.cpp, line 53: parsing: int test2()
+Error E2015 .\tests\error_category.cpp 56: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <test_category,test_category>(const test_category &,const test_category &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <test_category,test_category>(const test_category &,const test_category &) throw()' in function test2()
+ + Full parser context
+ + .\tests\error_category.cpp, line 53: parsing: int test2()
+Error E2404 .\tests\error_category.cpp 57: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test2()
+ + Full parser context
+ + .\tests\error_category.cpp, line 53: parsing: int test2()
+Error E2404 .\tests\error_category.cpp 57: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test2()
+ + Full parser context
+ + .\tests\error_category.cpp, line 53: parsing: int test2()
+Error E2404 .\tests\error_category.cpp 57: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test2()
+ + Full parser context
+ + .\tests\error_category.cpp, line 53: parsing: int test2()
+Error E2404 .\tests\error_category.cpp 57: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test2()
+ + Full parser context
+ + .\tests\error_category.cpp, line 53: parsing: int test2()
+Error E2015 .\tests\error_category.cpp 57: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <test_category,test_derived_category>(const test_category &,const test_derived_category &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <test_category,test_derived_category>(const test_category &,const test_derived_category &) throw()' in function test2()
+ + Full parser context
+ + .\tests\error_category.cpp, line 53: parsing: int test2()
+Error E2404 .\tests\error_category.cpp 65: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test3()
+ + Full parser context
+ + .\tests\error_category.cpp, line 63: parsing: int test3()
+Error E2404 .\tests\error_category.cpp 65: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test3()
+ + Full parser context
+ + .\tests\error_category.cpp, line 63: parsing: int test3()
+Error E2015 .\tests\error_category.cpp 65: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1,bool>::type < <test_category,test_category>(const test_category &,const test_category &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1,bool>::type < <test_category,test_category>(const test_category &,const test_category &) throw()' in function test3()
+ + Full parser context
+ + .\tests\error_category.cpp, line 63: parsing: int test3()
+Error E2404 .\tests\error_category.cpp 67: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test3()
+ + Full parser context
+ + .\tests\error_category.cpp, line 63: parsing: int test3()
+Error E2404 .\tests\error_category.cpp 67: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test3()
+ + Full parser context
+ + .\tests\error_category.cpp, line 63: parsing: int test3()
+Error E2015 .\tests\error_category.cpp 67: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1,bool>::type < <test_category,test_derived_category>(const test_category &,const test_derived_category &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1,bool>::type < <test_category,test_derived_category>(const test_category &,const test_derived_category &) throw()' in function test3()
+ + Full parser context
+ + .\tests\error_category.cpp, line 63: parsing: int test3()
+Режим вывода команд на экран (ECHO) отключен.
+Error E2404 .\tests\error_category.cpp 67: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test3()
+ + Full parser context
+ + .\tests\error_category.cpp, line 63: parsing: int test3()
+Error E2404 .\tests\error_category.cpp 67: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test3()
+ + Full parser context
+ + .\tests\error_category.cpp, line 63: parsing: int test3()
+Error E2015 .\tests\error_category.cpp 67: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1,bool>::type < <test_derived_category,test_category>(const test_derived_category &,const test_category &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1,bool>::type < <test_derived_category,test_category>(const test_derived_category &,const test_category &) throw()' in function test3()
+ + Full parser context
+ + .\tests\error_category.cpp, line 63: parsing: int test3()
+Error E2404 .\tests\error_category.cpp 76: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test4()
+ + Full parser context
+ + .\tests\error_category.cpp, line 73: parsing: int test4()
+Error E2404 .\tests\error_category.cpp 76: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test4()
+ + Full parser context
+ + .\tests\error_category.cpp, line 73: parsing: int test4()
+Error E2404 .\tests\error_category.cpp 76: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test4()
+ + Full parser context
+ + .\tests\error_category.cpp, line 73: parsing: int test4()
+Error E2404 .\tests\error_category.cpp 76: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test4()
+ + Full parser context
+ + .\tests\error_category.cpp, line 73: parsing: int test4()
+Error E2015 .\tests\error_category.cpp 76: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type :operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type = <test_category,test_category>(const test_category &,const test_category &) throw()' in function test4()
+ + Full parser context
+ + .\tests\error_category.cpp, line 73: parsing: int test4()
+Error E2404 .\tests\error_category.cpp 77: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test4()
+ + Full parser context
+ + .\tests\error_category.cpp, line 73: parsing: int test4()
+Error E2228 .\tests\error_category.cpp 77: Too many error or warning messages in function test4()
+*** 26 errors in Compile ***
+"compiling test Borland C++ error_category_fail1"
+"failed as expected"
+"compiling test Borland C++ error_code"
+Borland C++ 5.6.4 for Win32 Copyright (c) 1993, 2002 Borland
+.\tests\error_code.cpp:
+Error E2404 .\tests\error_code.cpp 73: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_code.cpp, line 69: parsing: int test1()
+Error E2404 .\tests\error_code.cpp 73: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_code.cpp, line 69: parsing: int test1()
+Error E2404 .\tests\error_code.cpp 73: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_code.cpp, line 69: parsing: int test1()
+Error E2404 .\tests\error_code.cpp 73: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_code.cpp, line 69: parsing: int test1()
+Error E2015 .\tests\error_code.cpp 73: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::error_category,stdex::error_category>(const stdex::error_category &,const stdex::error_category &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::error_category,stdex::error_category>(const stdex::error_category &,const stdex::error_category &) throw()' in function test1()
+ + Full parser context
+ + .\tests\error_code.cpp, line 69: parsing: int test1()
+Error E2404 .\tests\error_code.cpp 79: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_code.cpp, line 69: parsing: int test1()
+Error E2404 .\tests\error_code.cpp 79: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_code.cpp, line 69: parsing: int test1()
+Error E2404 .\tests\error_code.cpp 79: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_code.cpp, line 69: parsing: int test1()
+Error E2404 .\tests\error_code.cpp 79: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_code.cpp, line 69: parsing: int test1()
+Error E2015 .\tests\error_code.cpp 79: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::error_category,test_category>(const stdex::error_category &,const test_category &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::error_category,test_category>(const stdex::error_category &,const test_category &) throw()' in function test1()
+ + Full parser context
+ + .\tests\error_code.cpp, line 69: parsing: int test1()
+Error E2404 .\tests\error_code.cpp 84: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_code.cpp, line 69: parsing: int test1()
+Error E2404 .\tests\error_code.cpp 84: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_code.cpp, line 69: parsing: int test1()
+Error E2404 .\tests\error_code.cpp 84: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_code.cpp, line 69: parsing: int test1()
+Error E2404 .\tests\error_code.cpp 84: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_code.cpp, line 69: parsing: int test1()
+Error E2015 .\tests\error_code.cpp 84: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::error_category,stdex::error_category>(const stdex::error_category &,const stdex::error_category &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::error_category,stdex::error_category>(const stdex::error_category &,const stdex::error_category &) throw()' in function test1()
+ + Full parser context
+ + .\tests\error_code.cpp, line 69: parsing: int test1()
+Error E2404 .\tests\error_code.cpp 92: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test2()
+ + Full parser context
+ + .\tests\error_code.cpp, line 90: parsing: int test2()
+Режим вывода команд на экран (ECHO) отключен.
+Error E2404 .\tests\error_code.cpp 92: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test2()
+ + Full parser context
+ + .\tests\error_code.cpp, line 90: parsing: int test2()
+Error E2404 .\tests\error_code.cpp 92: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test2()
+ + Full parser context
+ + .\tests\error_code.cpp, line 90: parsing: int test2()
+Error E2015 .\tests\error_code.cpp 92: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::error_code,stdex::error_code>(const stdex::error_code &,const stdex::error_code &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::error_code,stdex::error_code>(const stdex::error_code &,const stdex::error_code &) throw()' in function test2()
+ + Full parser context
+ + .\tests\error_code.cpp, line 90: parsing: int test2()
+Error E2404 .\tests\error_code.cpp 101: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test3()
+ + Full parser context
+ + .\tests\error_code.cpp, line 98: parsing: int test3()
+Error E2404 .\tests\error_code.cpp 101: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test3()
+ + Full parser context
+ + .\tests\error_code.cpp, line 98: parsing: int test3()
+Error E2404 .\tests\error_code.cpp 101: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test3()
+ + Full parser context
+ + .\tests\error_code.cpp, line 98: parsing: int test3()
+Error E2015 .\tests\error_code.cpp 101: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::error_code,stdex::error_code>(const stdex::error_code &,const stdex::error_code &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::error_code,stdex::error_code>(const stdex::error_code &,const stdex::error_code &) throw()' in function test3()
+ + Full parser context
+ + .\tests\error_code.cpp, line 98: parsing: int test3()
+Error E2404 .\tests\error_code.cpp 130: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test5()
+ + Full parser context
+ + .\tests\error_code.cpp, line 126: parsing: int test5()
+Error E2404 .\tests\error_code.cpp 130: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test5()
+ + Full parser context
+ + .\tests\error_code.cpp, line 126: parsing: int test5()
+Error E2228 .\tests\error_code.cpp 130: Too many error or warning messages in function test5()
+*** 26 errors in Compile ***
+"compiling test Borland C++ error_code_fail1"
+"failed as expected"
+"compiling test Borland C++ error_condition"
+Borland C++ 5.6.4 for Win32 Copyright (c) 1993, 2002 Borland
+.\tests\error_condition.cpp:
+Error E2404 .\tests\error_condition.cpp 70: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 66: parsing: int test1()
+Error E2404 .\tests\error_condition.cpp 70: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 66: parsing: int test1()
+Error E2404 .\tests\error_condition.cpp 70: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 66: parsing: int test1()
+Error E2404 .\tests\error_condition.cpp 70: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 66: parsing: int test1()
+Error E2015 .\tests\error_condition.cpp 70: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::error_category,stdex::error_category>(const stdex::error_category &,const stdex::error_category &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::error_category,stdex::error_category>(const stdex::error_category &,const stdex::error_category &) throw()' in function test1()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 66: parsing: int test1()
+Error E2404 .\tests\error_condition.cpp 77: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 66: parsing: int test1()
+Error E2404 .\tests\error_condition.cpp 77: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 66: parsing: int test1()
+Error E2404 .\tests\error_condition.cpp 77: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 66: parsing: int test1()
+Error E2404 .\tests\error_condition.cpp 77: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 66: parsing: int test1()
+Error E2015 .\tests\error_condition.cpp 77: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::error_category,test_category>(const stdex::error_category &,const test_category &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::error_category,test_category>(const stdex::error_category &,const test_category &) throw()' in function test1()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 66: parsing: int test1()
+Error E2404 .\tests\error_condition.cpp 83: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 66: parsing: int test1()
+Error E2404 .\tests\error_condition.cpp 83: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 66: parsing: int test1()
+Error E2404 .\tests\error_condition.cpp 83: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 66: parsing: int test1()
+Error E2404 .\tests\error_condition.cpp 83: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 66: parsing: int test1()
+Error E2015 .\tests\error_condition.cpp 83: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::error_category,stdex::error_category>(const stdex::error_category &,const stdex::error_category &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::error_category,stdex::error_category>(const stdex::error_category &,const stdex::error_category &) throw()' in function test1()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 66: parsing: int test1()
+Error E2404 .\tests\error_condition.cpp 93: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test2()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 91: parsing: int test2()
+Режим вывода команд на экран (ECHO) отключен.
+Error E2404 .\tests\error_condition.cpp 93: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test2()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 91: parsing: int test2()
+Error E2404 .\tests\error_condition.cpp 93: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test2()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 91: parsing: int test2()
+Error E2015 .\tests\error_condition.cpp 93: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::error_condition,stdex::error_condition>(const stdex::error_condition &,const stdex::error_condition &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::error_condition,stdex::error_condition>(const stdex::error_condition &,const stdex::error_condition &) throw()' in function test2()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 91: parsing: int test2()
+Error E2404 .\tests\error_condition.cpp 103: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test3()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 100: parsing: int test3()
+Error E2404 .\tests\error_condition.cpp 103: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test3()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 100: parsing: int test3()
+Error E2404 .\tests\error_condition.cpp 103: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test3()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 100: parsing: int test3()
+Error E2015 .\tests\error_condition.cpp 103: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::error_condition,stdex::error_condition>(const stdex::error_condition &,const stdex::error_condition &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::error_condition,stdex::error_condition>(const stdex::error_condition &,const stdex::error_condition &) throw()' in function test3()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 100: parsing: int test3()
+Error E2404 .\tests\error_condition.cpp 132: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test5()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 128: parsing: int test5()
+Error E2404 .\tests\error_condition.cpp 132: Dependent type qualifier 'stdex::enable_if<0,bool>' has no member type named 'type' in function test5()
+ + Full parser context
+ + .\tests\error_condition.cpp, line 128: parsing: int test5()
+Error E2228 .\tests\error_condition.cpp 132: Too many error or warning messages in function test5()
+*** 26 errors in Compile ***
+"compiling test Borland C++ error_condition_fail1"
+"failed as expected"
+"compiling test Borland C++ extent"
+"compiling test Borland C++ find_if_not"
+"compiling test Borland C++ integral_constant"
+"compiling test Borland C++ is_arithmetic"
+"compiling test Borland C++ is_array"
+"compiling test Borland C++ is_class"
+"compiling test Borland C++ is_compound"
+"compiling test Borland C++ is_const"
+"compiling test Borland C++ is_enum"
+"compiling test Borland C++ is_floating_point"
+"compiling test Borland C++ is_function"
+"compiling test Borland C++ is_fundamental"
+"compiling test Borland C++ is_integral"
+"compiling test Borland C++ is_lvalue_reference"
+"compiling test Borland C++ is_member_function_pointer"
+"compiling test Borland C++ is_member_object_pointer"
+"compiling test Borland C++ is_member_pointer"
+"compiling test Borland C++ is_object"
+"compiling test Borland C++ is_partitioned"
+"compiling test Borland C++ is_permutation"
+"compiling test Borland C++ is_pointer"
+"compiling test Borland C++ is_reference"
+"compiling test Borland C++ is_same"
+"compiling test Borland C++ is_scalar"
+"compiling test Borland C++ is_signed"
+"compiling test Borland C++ is_union"
+"compiling test Borland C++ is_unsigned"
+"compiling test Borland C++ is_void"
+"compiling test Borland C++ is_volatile"
+"compiling test Borland C++ iterator_begin"
+"compiling test Borland C++ iterator_end"
+"compiling test Borland C++ iterator_next"
+"compiling test Borland C++ iterator_prev"
+"compiling test Borland C++ make_signed"
+"compiling test Borland C++ make_signed_fail1"
+"failed as expected"
+"compiling test Borland C++ make_signed_fail2"
+"failed as expected"
+"compiling test Borland C++ make_signed_fail3"
+"failed as expected"
+"compiling test Borland C++ make_signed_fail4"
+"failed as expected"
+"compiling test Borland C++ make_unsigned"
+"compiling test Borland C++ make_unsigned_fail1"
+"failed as expected"
+"compiling test Borland C++ make_unsigned_fail2"
+"failed as expected"
+"compiling test Borland C++ make_unsigned_fail3"
+"failed as expected"
+"compiling test Borland C++ make_unsigned_fail4"
+"failed as expected"
+"compiling test Borland C++ mutex_tests"
+Borland C++ 5.6.4 for Win32 Copyright (c) 1993, 2002 Borland
+.\tests\mutex_tests.cpp:
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\mutex_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\mutex_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\mutex_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\mutex_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1798: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + Full parser context
+ + .\tests\mutex_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::basic_ostream<char,_STL::char_traits<char> > & stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\mutex_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Режим вывода команд на экран (ECHO) отключен.
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\mutex_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\mutex_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\mutex_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1773: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + Full parser context
+ + .\tests\mutex_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2451 .\tests\mutex_tests.cpp 150: Undefined symbol 'e' in function test3()
+ + Full parser context
+ + .\tests\mutex_tests.cpp, line 16: namespace mutex_tests
+ + .\tests\mutex_tests.cpp, line 120: parsing: int test3()
+*** 11 errors in Compile ***
+"compiling test Borland C++ mutex_tests_fail1"
+"failed as expected"
+"compiling test Borland C++ mutex_tests_fail2"
+"failed as expected"
+"compiling test Borland C++ mutex_tests_ub"
+Borland C++ 5.6.4 for Win32 Copyright (c) 1993, 2002 Borland
+.\tests\mutex_tests_ub.cpp:
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\mutex_tests_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\mutex_tests_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\mutex_tests_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\mutex_tests_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1798: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + Full parser context
+ + .\tests\mutex_tests_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::basic_ostream<char,_STL::char_traits<char> > & stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\mutex_tests_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Режим вывода команд на экран (ECHO) отключен.
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\mutex_tests_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\mutex_tests_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\mutex_tests_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1773: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + Full parser context
+ + .\tests\mutex_tests_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+*** 10 errors in Compile ***
+"compiling test Borland C++ mutex_try_lock_tests"
+Borland C++ 5.6.4 for Win32 Copyright (c) 1993, 2002 Borland
+.\tests\mutex_try_lock_tests.cpp:
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\mutex_try_lock_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\mutex_try_lock_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\mutex_try_lock_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\mutex_try_lock_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1798: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + Full parser context
+ + .\tests\mutex_try_lock_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::basic_ostream<char,_STL::char_traits<char> > & stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\mutex_try_lock_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Режим вывода команд на экран (ECHO) отключен.
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\mutex_try_lock_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\mutex_try_lock_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\mutex_try_lock_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1773: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + Full parser context
+ + .\tests\mutex_try_lock_tests.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+*** 10 errors in Compile ***
+"compiling test Borland C++ names"
+Borland C++ 5.6.4 for Win32 Copyright (c) 1993, 2002 Borland
+.\tests\names.cpp:
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\names.cpp, line 213: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\names.cpp, line 213: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\names.cpp, line 213: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\names.cpp, line 213: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1798: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + Full parser context
+ + .\tests\names.cpp, line 213: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::basic_ostream<char,_STL::char_traits<char> > & stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\names.cpp, line 213: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\names.cpp, line 213: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\names.cpp, line 213: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\names.cpp, line 213: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1773: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + Full parser context
+ + .\tests\names.cpp, line 213: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/typeindex.hpp 42: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function type_index::operator ==(const type_index &) const throw()
+ + Full parser context
+ + .\tests\names.cpp, line 220: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool type_index::operator ==(const type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/typeindex.hpp 42: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function type_index::operator ==(const type_index &) const throw()
+ + Full parser context
+ + .\tests\names.cpp, line 220: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool type_index::operator ==(const type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/typeindex.hpp 42: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function type_index::operator ==(const type_index &) const throw()
+ + Full parser context
+ + .\tests\names.cpp, line 220: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool type_index::operator ==(const type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/typeindex.hpp 42: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function type_index::operator ==(const type_index &) const throw()
+ + Full parser context
+ + .\tests\names.cpp, line 220: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool type_index::operator ==(const type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/typeindex.hpp 42: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <std::type_info,std::type_info>(const std::type_info &,const std::type_info &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <std::type_info,std::type_info>(const std::type_info &,const std::type_info &) throw()' in function stdex::type_index::operator ==(const stdex::type_index &) const throw()
+ + Full parser context
+ + .\tests\names.cpp, line 220: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class stdex::type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool stdex::type_index::operator ==(const stdex::type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/typeindex.hpp 46: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function type_index::operator =(const type_index &) const throw()
+ + Full parser context
+ + .\tests\names.cpp, line 220: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool type_index::operator =(const type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/typeindex.hpp 46: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function type_index::operator =(const type_index &) const throw()
+ + Full parser context
+ + .\tests\names.cpp, line 220: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool type_index::operator =(const type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/typeindex.hpp 46: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function type_index::operator =(const type_index &) const throw()
+ + Full parser context
+ + .\tests\names.cpp, line 220: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool type_index::operator =(const type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/typeindex.hpp 46: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function type_index::operator =(const type_index &) const throw()
+ + Full parser context
+ + .\tests\names.cpp, line 220: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool type_index::operator =(const type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/typeindex.hpp 46: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type :type_info,std::type_info>(const std::type_info &,const std::type_info &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type :type_info,std::type_info>(const std::type_info &,const std::type_info &) throw()' in function stdex::type_index::operator :type_index &) const throw()
+ + Full parser context
+ + .\tests\names.cpp, line 220: #include .\tests\../stdex/include/typeindex.hpp
+ + .\tests\../stdex/include/typeindex.hpp, line 31: namespace stdex
+ + .\tests\../stdex/include/typeindex.hpp, line 35: class stdex::type_index
+ + .\tests\../stdex/include/typeindex.hpp, line 74: decision to instantiate: bool stdex::type_index::operator :type_index &) const throw()
+ + --- Resetting parser context for instantiation...
+*** 20 errors in Compile ***
+"compiling test Borland C++ none_of"
+"compiling test Borland C++ rank"
+"compiling test Borland C++ ratio"
+"compiling test Borland C++ ratio_fail3"
+"failed as expected"
+"compiling test Borland C++ ratio_fail4"
+"failed as expected"
+"compiling test Borland C++ ratio_fail5"
+"failed as expected"
+"compiling test Borland C++ ratio_fail6"
+"failed as expected"
+"compiling test Borland C++ ratio_fail7"
+"failed as expected"
+"compiling test Borland C++ ratio_fail8"
+"failed as expected"
+"compiling test Borland C++ recursive_mutex"
+Borland C++ 5.6.4 for Win32 Copyright (c) 1993, 2002 Borland
+.\tests\recursive_mutex.cpp:
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\recursive_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\recursive_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\recursive_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\recursive_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1798: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + Full parser context
+ + .\tests\recursive_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::basic_ostream<char,_STL::char_traits<char> > & stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Режим вывода команд на экран (ECHO) отключен.
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1773: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+*** 10 errors in Compile ***
+"compiling test Borland C++ recursive_mutex_fail1"
+"failed as expected"
+"compiling test Borland C++ recursive_mutex_fail2"
+"failed as expected"
+"compiling test Borland C++ recursive_mutex_ub"
+Borland C++ 5.6.4 for Win32 Copyright (c) 1993, 2002 Borland
+.\tests\recursive_mutex_ub.cpp:
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\recursive_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\recursive_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\recursive_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\recursive_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1798: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + Full parser context
+ + .\tests\recursive_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::basic_ostream<char,_STL::char_traits<char> > & stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Режим вывода команд на экран (ECHO) отключен.
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1773: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+*** 10 errors in Compile ***
+"compiling test Borland C++ recursive_timed_mutex"
+Borland C++ 5.6.4 for Win32 Copyright (c) 1993, 2002 Borland
+.\tests\recursive_timed_mutex.cpp:
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\recursive_timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\recursive_timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\recursive_timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\recursive_timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1798: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + Full parser context
+ + .\tests\recursive_timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::basic_ostream<char,_STL::char_traits<char> > & stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Режим вывода команд на экран (ECHO) отключен.
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1773: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+*** 10 errors in Compile ***
+"compiling test Borland C++ recursive_timed_mutex_fail1"
+"failed as expected"
+"compiling test Borland C++ recursive_timed_mutex_fail2"
+"failed as expected"
+"compiling test Borland C++ recursive_timed_mutex_ub"
+Borland C++ 5.6.4 for Win32 Copyright (c) 1993, 2002 Borland
+.\tests\recursive_timed_mutex_ub.cpp:
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\recursive_timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\recursive_timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\recursive_timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\recursive_timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1798: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + Full parser context
+ + .\tests\recursive_timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::basic_ostream<char,_STL::char_traits<char> > & stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Режим вывода команд на экран (ECHO) отключен.
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1773: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + Full parser context
+ + .\tests\recursive_timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+*** 10 errors in Compile ***
+"compiling test Borland C++ remove_all_extents"
+"compiling test Borland C++ remove_const"
+"compiling test Borland C++ remove_cv"
+"compiling test Borland C++ remove_extent"
+"compiling test Borland C++ remove_pointer"
+"compiling test Borland C++ remove_reference"
+"compiling test Borland C++ remove_volatile"
+"compiling test Borland C++ string_numeric_conversions"
+"compiling test Borland C++ string_numeric_conversions_w"
+"compiling test Borland C++ system_error"
+Borland C++ 5.6.4 for Win32 Copyright (c) 1993, 2002 Borland
+.\tests\system_error.cpp:
+Error E2404 .\tests\system_error.cpp 88: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test0()
+ + Full parser context
+ + .\tests\system_error.cpp, line 82: parsing: int test0()
+Error E2404 .\tests\system_error.cpp 88: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test0()
+ + Full parser context
+ + .\tests\system_error.cpp, line 82: parsing: int test0()
+Error E2404 .\tests\system_error.cpp 88: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test0()
+ + Full parser context
+ + .\tests\system_error.cpp, line 82: parsing: int test0()
+Error E2015 .\tests\system_error.cpp 88: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::error_code,stdex::errc::errc_t>(const stdex::error_code &,const stdex::errc::errc_t &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::error_code,stdex::errc::errc_t>(const stdex::error_code &,const stdex::errc::errc_t &) throw()' in function test0()
+ + Full parser context
+ + .\tests\system_error.cpp, line 82: parsing: int test0()
+Error E2404 .\tests\system_error.cpp 107: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\system_error.cpp, line 97: parsing: int test1()
+Error E2404 .\tests\system_error.cpp 107: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\system_error.cpp, line 97: parsing: int test1()
+Error E2404 .\tests\system_error.cpp 107: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\system_error.cpp, line 97: parsing: int test1()
+Error E2015 .\tests\system_error.cpp 107: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::error_code,stdex::error_code>(const stdex::error_code &,const stdex::error_code &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::error_code,stdex::error_code>(const stdex::error_code &,const stdex::error_code &) throw()' in function test1()
+ + Full parser context
+ + .\tests\system_error.cpp, line 97: parsing: int test1()
+Error E2404 .\tests\system_error.cpp 114: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\system_error.cpp, line 97: parsing: int test1()
+Error E2404 .\tests\system_error.cpp 114: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\system_error.cpp, line 97: parsing: int test1()
+Error E2404 .\tests\system_error.cpp 114: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test1()
+ + Full parser context
+ + .\tests\system_error.cpp, line 97: parsing: int test1()
+Error E2015 .\tests\system_error.cpp 114: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::error_code,stdex::error_code>(const stdex::error_code &,const stdex::error_code &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::error_code,stdex::error_code>(const stdex::error_code &,const stdex::error_code &) throw()' in function test1()
+ + Full parser context
+ + .\tests\system_error.cpp, line 97: parsing: int test1()
+Error E2404 .\tests\system_error.cpp 221: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test8()
+ + Full parser context
+ + .\tests\system_error.cpp, line 215: parsing: int test8()
+Error E2404 .\tests\system_error.cpp 221: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test8()
+ + Full parser context
+ + .\tests\system_error.cpp, line 215: parsing: int test8()
+Error E2404 .\tests\system_error.cpp 221: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test8()
+ + Full parser context
+ + .\tests\system_error.cpp, line 215: parsing: int test8()
+Error E2404 .\tests\system_error.cpp 221: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test8()
+ + Full parser context
+ + .\tests\system_error.cpp, line 215: parsing: int test8()
+Режим вывода команд на экран (ECHO) отключен.
+Error E2015 .\tests\system_error.cpp 221: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::error_category,stdex::error_category>(const stdex::error_category &,const stdex::error_category &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::error_category,stdex::error_category>(const stdex::error_category &,const stdex::error_category &) throw()' in function test8()
+ + Full parser context
+ + .\tests\system_error.cpp, line 215: parsing: int test8()
+Error E2404 .\tests\system_error.cpp 226: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test8()
+ + Full parser context
+ + .\tests\system_error.cpp, line 215: parsing: int test8()
+Error E2404 .\tests\system_error.cpp 226: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test8()
+ + Full parser context
+ + .\tests\system_error.cpp, line 215: parsing: int test8()
+Error E2404 .\tests\system_error.cpp 226: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test8()
+ + Full parser context
+ + .\tests\system_error.cpp, line 215: parsing: int test8()
+Error E2404 .\tests\system_error.cpp 226: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test8()
+ + Full parser context
+ + .\tests\system_error.cpp, line 215: parsing: int test8()
+Error E2015 .\tests\system_error.cpp 226: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::error_category,stdex::error_category>(const stdex::error_category &,const stdex::error_category &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::error_category,stdex::error_category>(const stdex::error_category &,const stdex::error_category &) throw()' in function test8()
+ + Full parser context
+ + .\tests\system_error.cpp, line 215: parsing: int test8()
+Error E2404 .\tests\system_error.cpp 237: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test9()
+ + Full parser context
+ + .\tests\system_error.cpp, line 232: parsing: int test9()
+Error E2404 .\tests\system_error.cpp 237: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test9()
+ + Full parser context
+ + .\tests\system_error.cpp, line 232: parsing: int test9()
+Error E2404 .\tests\system_error.cpp 237: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function test9()
+ + Full parser context
+ + .\tests\system_error.cpp, line 232: parsing: int test9()
+Error E2228 .\tests\system_error.cpp 237: Too many error or warning messages in function test9()
+*** 26 errors in Compile ***
+"compiling test Borland C++ system_error_fail1"
+"failed as expected"
+"compiling test Borland C++ system_error_fail2"
+"failed as expected"
+"compiling test Borland C++ thread_tests"
+Borland C++ 5.6.4 for Win32 Copyright (c) 1993, 2002 Borland
+.\tests\thread_tests.cpp:
+Error E2404 .\tests\../stdex/include/thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\thread_tests.cpp, line 2: #include .\tests\../stdex/include/thread.hpp
+ + .\tests\../stdex/include/thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\thread_tests.cpp, line 2: #include .\tests\../stdex/include/thread.hpp
+ + .\tests\../stdex/include/thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\thread_tests.cpp, line 2: #include .\tests\../stdex/include/thread.hpp
+ + .\tests\../stdex/include/thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\thread_tests.cpp, line 2: #include .\tests\../stdex/include/thread.hpp
+ + .\tests\../stdex/include/thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/thread.hpp 1798: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + Full parser context
+ + .\tests\thread_tests.cpp, line 2: #include .\tests\../stdex/include/thread.hpp
+ + .\tests\../stdex/include/thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/thread.hpp, line 1940: decision to instantiate: _STL::basic_ostream<char,_STL::char_traits<char> > & stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\thread_tests.cpp, line 2: #include .\tests\../stdex/include/thread.hpp
+ + .\tests\../stdex/include/thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\thread_tests.cpp, line 2: #include .\tests\../stdex/include/thread.hpp
+ + .\tests\../stdex/include/thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+Режим вывода команд на экран (ECHO) отключен.
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\thread_tests.cpp, line 2: #include .\tests\../stdex/include/thread.hpp
+ + .\tests\../stdex/include/thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\thread_tests.cpp, line 2: #include .\tests\../stdex/include/thread.hpp
+ + .\tests\../stdex/include/thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/thread.hpp 1773: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + Full parser context
+ + .\tests\thread_tests.cpp, line 2: #include .\tests\../stdex/include/thread.hpp
+ + .\tests\../stdex/include/thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/thread.hpp, line 1940: decision to instantiate: bool stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+*** 10 errors in Compile ***
+"compiling test Borland C++ thread_tests_fail1"
+"failed as expected"
+"compiling test Borland C++ thread_tests_fail2"
+"failed as expected"
+"compiling test Borland C++ timed_mutex"
+Borland C++ 5.6.4 for Win32 Copyright (c) 1993, 2002 Borland
+.\tests\timed_mutex.cpp:
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1798: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + Full parser context
+ + .\tests\timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::basic_ostream<char,_STL::char_traits<char> > & stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Режим вывода команд на экран (ECHO) отключен.
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1773: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + Full parser context
+ + .\tests\timed_mutex.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+*** 10 errors in Compile ***
+"compiling test Borland C++ timed_mutex_fail1"
+"failed as expected"
+"compiling test Borland C++ timed_mutex_fail2"
+"failed as expected"
+"compiling test Borland C++ timed_mutex_ub"
+Borland C++ 5.6.4 for Win32 Copyright (c) 1993, 2002 Borland
+.\tests\timed_mutex_ub.cpp:
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1798: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function thread::id::print(_STL::ostream &) const
+ + Full parser context
+ + .\tests\timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::ostream & thread::id::print(_STL::ostream &) const
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1798: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + Full parser context
+ + .\tests\timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: _STL::basic_ostream<char,_STL::char_traits<char> > & stdex::thread::id::print(_STL::basic_ostream<char,_STL::char_traits<char> > &) const
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Режим вывода команд на экран (ECHO) отключен.
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2404 .\tests\../stdex/include/./thread.hpp 1773: Dependent type qualifier 'enable_if<0,bool>' has no member type named 'type' in function stdex::operator :id &,const thread::id &) throw()
+ + Full parser context
+ + .\tests\timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :id &,const thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+Error E2015 .\tests\../stdex/include/./thread.hpp 1773: Ambiguity between 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_code<_LhsT>::value==1&&stdex::detail::_is_error_condition<_RhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==0&&stdex::detail::_is_error_condition<_LhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' and 'stdex::operator typename stdex::enable_if<()stdex::detail::_is_error_condition<_LhsT>::value==1&&stdex::detail::_is_error_code<_RhsT>::value==1&&stdex::detail::_is_error_code<_LhsT>::value==0&&stdex::detail::_is_error_condition<_RhsT>::value==0,bool>::type == <stdex::thread::id,stdex::thread::id>(const stdex::thread::id &,const stdex::thread::id &) throw()' in function stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + Full parser context
+ + .\tests\timed_mutex_ub.cpp, line 3: #include .\tests\../stdex/include/mutex.hpp
+ + .\tests\../stdex/include/mutex.hpp, line 12: #include .\tests\../stdex/include/./thread.hpp
+ + .\tests\../stdex/include/./thread.hpp, line 36: namespace stdex
+ + .\tests\../stdex/include/./thread.hpp, line 1732: class stdex::thread
+ + .\tests\../stdex/include/./thread.hpp, line 1940: decision to instantiate: bool stdex::operator :thread::id &,const stdex::thread::id &) throw()
+ + --- Resetting parser context for instantiation...
+*** 10 errors in Compile ***
+"compiling test Borland C++ typeindex"
+unsuccessful tests: condition_variable defines error_category error_code error_condition mutex_tests mutex_tests_ub mutex_try_lock_tests names recursive_mutex recursive_mutex_ub recursive_timed_mutex recursive_timed_mutex_ub system_error thread_tests timed_mutex timed_mutex_ub
