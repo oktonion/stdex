@@ -93,7 +93,7 @@ int test0()
     DYNAMIC_VERIFY(econd == econd);
     DYNAMIC_VERIFY(econd != errc::address_family_not_supported);
     DYNAMIC_VERIFY(!(econd != econd));
-    DYNAMIC_VERIFY(errc::not_supported == errc::not_supported);
+    DYNAMIC_VERIFY(errc::not_supported == errc::not_supported && econd == econd);
 
     DYNAMIC_VERIFY(!(errc::not_supported < econd));
     DYNAMIC_VERIFY(errc::not_supported == econd);
