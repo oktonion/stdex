@@ -85,7 +85,9 @@ int test0()
     error_code ec;
     ec = make_error_code(errc::not_supported);
     ec = my_err;
-    if (ec == errc::not_supported)
+    error_condition econd;
+    detail::_is_error_condition< errc::errc_t>::value;
+    if (econd < errc::not_supported || econd == errc::address_family_not_supported)
     { }
 
     if(errc::not_supported == errc::not_supported){}
@@ -392,7 +394,9 @@ int test18()
 
     DYNAMIC_VERIFY(!(e1 != e1));
     DYNAMIC_VERIFY(e1 != e2);
-
+    if (e1 < errc::not_supported || e1 == errc::address_family_not_supported)
+    {
+    }
     error_condition e3(e2.value(), system_category());
     DYNAMIC_VERIFY(e2 != e3);
 
