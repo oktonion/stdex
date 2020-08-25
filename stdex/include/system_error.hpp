@@ -950,7 +950,7 @@ namespace stdex
             const detail::_error_code_compare&,
             class _disabled1>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
-        return !(_lhs == _rhs)
+        return !(_lhs == _rhs);
     }
 
     template<class _RhsT>
@@ -962,7 +962,7 @@ namespace stdex
             class _disabled2>::type _lhs,
         const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
     {
-        return !(_lhs == _rhs)
+        return !(_lhs == _rhs);
     }
 
     template<class _LhsT>
@@ -974,7 +974,7 @@ namespace stdex
             const detail::_error_condition_compare&,
             class _disabled3>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
-        return !(_lhs == _rhs)
+        return !(_lhs == _rhs);
     }
 
     template<class _RhsT>
@@ -986,7 +986,7 @@ namespace stdex
             class _disabled4>::type _lhs,
         const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
     {
-        return !(_lhs == _rhs)
+        return !(_lhs == _rhs);
     }
 
     template<class _LhsT>
@@ -998,7 +998,7 @@ namespace stdex
             const detail::_error_code_compare&,
             class _disabled5>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
-        return !(_lhs == _rhs)
+        return !(_lhs == _rhs);
     }
 
     template<class _RhsT>
@@ -1010,7 +1010,7 @@ namespace stdex
             class _disabled6>::type _lhs,
         const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
     {
-        return !(_lhs == _rhs)
+        return !(_lhs == _rhs);
     }
 
     template<class _LhsT>
@@ -1022,7 +1022,7 @@ namespace stdex
             const detail::_error_condition_compare&,
             class _disabled7>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
-        return !(_lhs == _rhs)
+        return !(_lhs == _rhs);
     }
 
     template<class _RhsT>
@@ -1034,7 +1034,7 @@ namespace stdex
             class _disabled8>::type _lhs,
         const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
     {
-        return !(_lhs == _rhs)
+        return !(_lhs == _rhs);
     }
 
     // FUNCTION make_error_code
