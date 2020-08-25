@@ -122,7 +122,8 @@ int test3()
 
         chrono::steady_clock::time_point then = chrono::steady_clock::now();
         bool result = c1.wait_for(l, ms, &false_predicate);
-        const chrono::steady_clock::duration t = chrono::steady_clock::now() - then;
+        chrono::steady_clock::time_point now = chrono::steady_clock::now();
+        const chrono::steady_clock::duration t = now - then;
         DYNAMIC_VERIFY(result == false);
         std::cout << stdex::chrono::duration_cast<chrono::microseconds>(t).count() << " >= " << ms.count() << std::endl;
         DYNAMIC_VERIFY((chrono::steady_clock::now() - then) >= ms);
