@@ -641,27 +641,77 @@ namespace stdex
         struct _is_error_code
         {
             static const bool value =
-                is_error_code_enum<_Tp>::value == bool(true) ||
                 is_same<error_code,
+                    typename remove_reference<
+                        typename remove_cv<_Tp>::type>::type>::value == bool(true) ||
+                is_same<detail::_error_code_compare,
                     typename remove_reference<
                         typename remove_cv<_Tp>::type>::type>::value == bool(true);
         };
 
         template<class _Tp>
+        struct _is_not_error_code:
+            _not_<_is_error_code<_Tp>/**/>
+        { };
+
+        template<class _Tp>
         struct _is_error_condition
         {
             static const bool value =
-                is_error_condition_enum<_Tp>::value == bool(true) ||
                 is_same<error_condition,
+                    typename remove_reference<
+                        typename remove_cv<_Tp>::type>::type>::value == bool(true) ||
+                is_same<detail::_error_condition_compare,
                     typename remove_reference<
                         typename remove_cv<_Tp>::type>::type>::value == bool(true);
         };
+
+        template<class _Tp>
+        struct _is_not_error_condition :
+            _not_<_is_error_condition<_Tp>/**/>
+        { };
+
+        template<class _Tp>
+        struct _is_error_code_enum_or_class:
+                _or_<
+                    is_error_code_enum<_Tp>, 
+                    _is_error_code<_Tp> 
+                >
+        { };
+
+        template<class _Tp>
+        struct _is_error_code_enum_not_class:
+                _and_<
+                    is_error_code_enum<_Tp>, 
+                    _is_not_error_code<_Tp> 
+                >
+        { };
+
+        template<class _Tp>
+        struct _is_error_condition_enum_or_class:
+                _or_<
+                    is_error_condition_enum<_Tp>,
+                    _is_error_condition<_Tp>
+                >
+        { };
+
+        template<class _Tp>
+        struct _is_error_condition_enum_not_class:
+                _and_<
+                    is_error_condition_enum<_Tp>,
+                    _is_not_error_condition<_Tp>
+                >
+        { };
     }
 
-    inline
+    template<class _LhsT>
+    inline // overload for enum values at left and classes
     bool operator<(
-        const detail::_error_code_compare& _lhs,
-        const detail::_error_code_compare& _rhs) _STDEX_NOEXCEPT_FUNCTION
+        const _LhsT& _lhs,
+        typename conditional<
+            detail::_is_error_code_enum_or_class<_LhsT>::value,
+            const detail::_error_code_compare&,
+            class _disabled1>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
         struct lambdas
         {
@@ -677,10 +727,26 @@ namespace stdex
         return lambdas::compare(_lhs, _rhs);
     }
 
-    inline
+    template<class _RhsT>
+    inline // overload for enum values at right
     bool operator<(
-        const detail::_error_condition_compare& _lhs,
-        const detail::_error_condition_compare& _rhs) _STDEX_NOEXCEPT_FUNCTION
+        typename conditional<
+            detail::_is_error_code_enum_not_class<_RhsT>::value,
+            const detail::_error_code_compare&,
+            class _disabled2>::type _lhs,
+        const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
+    {
+        return stdex::operator<(_lhs, error_code(_rhs));
+    }
+
+    template<class _LhsT>
+    inline // overload for enum values at left and classes
+    bool operator<(
+        const _LhsT& _lhs,
+        typename conditional<
+            detail::_is_error_condition_enum_or_class<_LhsT>::value,
+            const detail::_error_condition_compare&,
+            class _disabled3>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
         struct lambdas
         {
@@ -694,6 +760,18 @@ namespace stdex
             }
         };
         return lambdas::compare(_lhs, _rhs);
+    }
+
+    template<class _RhsT>
+    inline // overload for enum values at right
+    bool operator<(
+        typename conditional<
+            detail::_is_error_condition_enum_not_class<_RhsT>::value,
+            const detail::_error_condition_compare&,
+            class _disabled4>::type _lhs,
+        const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
+    {
+        return stdex::operator<(_lhs, error_condition(_rhs));
     }
 
     // VIRTUALS FOR error_category
@@ -724,10 +802,14 @@ namespace stdex
     }
 
     // OPERATOR== FOR error_code/error_condition
+    template<class _LhsT>
     inline
     bool operator==(
-        const detail::_error_code_compare& _lhs,
-        const detail::_error_code_compare& _rhs) _STDEX_NOEXCEPT_FUNCTION
+        const _LhsT& _lhs,
+        typename conditional<
+            detail::_is_error_code_enum_or_class<_LhsT>::value,
+            const detail::_error_code_compare&,
+            class _disabled1>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
         struct lambdas
         {
@@ -742,10 +824,26 @@ namespace stdex
         return lambdas::compare(_lhs, _rhs);
     }
 
+    template<class _RhsT>
     inline
     bool operator==(
-        const detail::_error_code_compare& _lhs,
-        const detail::_error_condition_compare& _rhs) _STDEX_NOEXCEPT_FUNCTION
+        typename conditional<
+            detail::_is_error_code_enum_not_class<_RhsT>::value,
+            const detail::_error_code_compare&,
+            class _disabled2>::type _lhs,
+        const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
+    {
+        return stdex::operator==(_lhs, error_code(_rhs));
+    }
+
+    template<class _LhsT>
+    inline
+    bool operator==(
+        const _LhsT& _lhs,
+        typename conditional<
+            detail::_is_error_code_enum_or_class<_LhsT>::value,
+            const detail::_error_condition_compare&,
+            class _disabled3>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {    // test errors for equality
         struct lambdas
         {
@@ -760,10 +858,26 @@ namespace stdex
         return lambdas::compare(_lhs, _rhs);
     }
 
+    template<class _RhsT>
     inline
     bool operator==(
-        const detail::_error_condition_compare& _lhs,
-        const detail::_error_code_compare& _rhs) _STDEX_NOEXCEPT_FUNCTION
+        typename conditional<
+            detail::_is_error_condition_enum_not_class<_RhsT>::value,
+            const detail::_error_code_compare&,
+            class _disabled4>::type _lhs,
+        const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
+    {    // test errors for equality
+        stdex::operator==(_lhs, error_condition(_rhs));
+    }
+
+    template<class _LhsT>
+    inline
+    bool operator==(
+        const _LhsT& _lhs,
+        typename conditional<
+            detail::_is_error_condition_enum_or_class<_LhsT>::value,
+            const detail::_error_code_compare&,
+            class _disabled5>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {    // test errors for equality
         struct lambdas
         {
@@ -778,10 +892,28 @@ namespace stdex
         return lambdas::compare(_lhs, _rhs);
     }
 
+    template<class _RhsT>
     inline
     bool operator==(
-        const detail::_error_condition_compare& _lhs,
-        const detail::_error_condition_compare& _rhs) _STDEX_NOEXCEPT_FUNCTION
+        typename conditional<
+            detail::_is_error_code_enum_not_class<_RhsT>::value,
+            const detail::_error_condition_compare&,
+            class _disabled6>::type _lhs,
+        const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
+    {    // test errors for equality
+        return stdex::operator==(_lhs, error_code(_rhs));
+    }
+
+
+
+    template<class _LhsT>
+    inline
+    bool operator==(
+        const _LhsT& _lhs,
+        typename conditional<
+            detail::_is_error_condition_enum_or_class<_LhsT>::value,
+            const detail::_error_condition_compare&,
+            class _disabled7>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
         struct lambdas
         {
@@ -796,71 +928,113 @@ namespace stdex
         return lambdas::compare(_lhs, _rhs);
     }
 
+    template<class _RhsT>
+    inline
+    bool operator==(
+        typename conditional<
+            detail::_is_error_condition_enum_not_class<_RhsT>::value,
+            const detail::_error_condition_compare&,
+            class _disabled8>::type _lhs,
+        const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
+    {
+        return stdex::operator==(_lhs, error_condition(_rhs));
+    }
+
     // OPERATOR!= FOR error_code/error_condition
+    template<class _LhsT>
     inline
-    bool operator!=(const error_code& _lhs, const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
+    bool operator!=(
+        const _LhsT& _lhs,
+        typename conditional<
+            detail::_is_error_code_enum_or_class<_LhsT>::value,
+            const detail::_error_code_compare&,
+            class _disabled1>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
-        struct lambdas
-        {
-            static 
-            bool compare(
-                const error_code& _lhs, const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
-            {
-                return (!(_lhs == _rhs));
-            }
-        };
-        return lambdas::compare(_lhs, _rhs);
+        return !(_lhs == _rhs)
     }
 
+    template<class _RhsT>
     inline
     bool operator!=(
-        const error_code& _lhs,
-        const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
-    {    // test errors for inequality
-        struct lambdas
-        {
-            static 
-            bool compare(
-                const error_code& _lhs, const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
-            {
-                return (!(_lhs == _rhs));
-            }
-        };
-        return lambdas::compare(_lhs, _rhs);
-    }
-
-    inline
-    bool operator!=(
-        const error_condition& _lhs,
-        const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
-    {    // test errors for inequality
-        struct lambdas
-        {
-            static 
-            bool compare(
-                const error_condition& _lhs, const error_code& _rhs) _STDEX_NOEXCEPT_FUNCTION
-            {
-                return (!(_lhs == _rhs));
-            }
-        };
-        return lambdas::compare(_lhs, _rhs); 
-    }
-
-    inline
-    bool operator!=(
-        const error_condition& _lhs,
-        const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
+        typename conditional<
+            detail::_is_error_code_enum_not_class<_RhsT>::value,
+            const detail::_error_code_compare&,
+            class _disabled2>::type _lhs,
+        const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
     {
-        struct lambdas
-        {
-            static 
-            bool compare(
-                const error_condition& _lhs, const error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
-            {
-                return (!(_lhs == _rhs));
-            }
-        };
-        return lambdas::compare(_lhs, _rhs); 
+        return !(_lhs == _rhs)
+    }
+
+    template<class _LhsT>
+    inline
+    bool operator!=(
+        const _LhsT& _lhs,
+        typename conditional<
+            detail::_is_error_code_enum_or_class<_LhsT>::value,
+            const detail::_error_condition_compare&,
+            class _disabled3>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
+    {
+        return !(_lhs == _rhs)
+    }
+
+    template<class _RhsT>
+    inline
+    bool operator!=(
+        typename conditional<
+            detail::_is_error_condition_enum_not_class<_RhsT>::value,
+            const detail::_error_code_compare&,
+            class _disabled4>::type _lhs,
+        const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
+    {
+        return !(_lhs == _rhs)
+    }
+
+    template<class _LhsT>
+    inline
+    bool operator!=(
+        const _LhsT& _lhs,
+        typename conditional<
+            detail::_is_error_condition_enum_or_class<_LhsT>::value,
+            const detail::_error_code_compare&,
+            class _disabled5>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
+    {
+        return !(_lhs == _rhs)
+    }
+
+    template<class _RhsT>
+    inline
+    bool operator!=(
+        typename conditional<
+            detail::_is_error_code_enum_not_class<_RhsT>::value,
+            const detail::_error_condition_compare&,
+            class _disabled6>::type _lhs,
+        const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
+    {
+        return !(_lhs == _rhs)
+    }
+
+    template<class _LhsT>
+    inline
+    bool operator!=(
+        const _LhsT& _lhs,
+        typename conditional<
+            detail::_is_error_condition_enum_or_class<_LhsT>::value,
+            const detail::_error_condition_compare&,
+            class _disabled7>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
+    {
+        return !(_lhs == _rhs)
+    }
+
+    template<class _RhsT>
+    inline
+    bool operator!=(
+        typename conditional<
+            detail::_is_error_condition_enum_not_class<_RhsT>::value,
+            const detail::_error_condition_compare&,
+            class _disabled8>::type _lhs,
+        const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
+    {
+        return !(_lhs == _rhs)
     }
 
     // FUNCTION make_error_code
