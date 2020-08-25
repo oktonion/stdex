@@ -86,11 +86,18 @@ int test0()
     ec = make_error_code(errc::not_supported);
     ec = my_err;
     error_condition econd;
-    detail::_is_error_condition< errc::errc_t>::value;
-    if (econd < errc::not_supported || econd == errc::address_family_not_supported)
-    { }
 
-    if(errc::not_supported == errc::not_supported){}
+    DYNAMIC_VERIFY(!(econd < errc::not_supported));
+    DYNAMIC_VERIFY(!(econd < econd));
+    DYNAMIC_VERIFY(econd == errc::not_supported);
+    DYNAMIC_VERIFY(econd == econd);
+    DYNAMIC_VERIFY(econd != errc::address_family_not_supported);
+    DYNAMIC_VERIFY(!(econd != econd));
+    DYNAMIC_VERIFY(errc::not_supported == errc::not_supported);
+
+    DYNAMIC_VERIFY(!(errc::not_supported < econd));
+    DYNAMIC_VERIFY(errc::not_supported == econd);
+    DYNAMIC_VERIFY(errc::address_family_not_supported != econd);
 
     return 0;
 }
