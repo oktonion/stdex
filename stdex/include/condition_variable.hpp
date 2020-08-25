@@ -250,7 +250,7 @@ namespace stdex
             if (!detail::_lock_owns_lock(_lock))
                 std::terminate();
 
-            if (_rtime < 0)
+            if (_rtime.count() < 0)
                 return cv_status::timeout;
 
             clock_t::time_point _start_time_point = clock_t::now();
