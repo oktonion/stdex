@@ -776,11 +776,20 @@ namespace stdex
 
         namespace detail
         {
-            template <class _ToDur, class _Clock>
-            struct _time_point_enable_if_is_duration
+            template <bool, class _ToDur, class _Clock>
+            struct _time_point_enable_if_is_duration_impl
             {
-                typedef time_point<_Clock, typename _enable_if_is_duration_impl<_is_duration<_ToDur>::value, _ToDur>::type> type;
+                typedef time_point<_Clock, _ToDur> type;
             };
+
+            template <class _ToDur, class _Clock>
+            struct _time_point_enable_if_is_duration_impl<false, _ToDur, _Clock>
+            { };
+
+            template <class _ToDur, class _Clock>
+            struct _time_point_enable_if_is_duration:
+                _time_point_enable_if_is_duration_impl< _is_duration<_ToDur>::value, _ToDur, _Clock>
+            { };
 
         } // namespace detail
 
