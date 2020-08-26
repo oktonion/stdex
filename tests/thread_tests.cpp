@@ -725,7 +725,7 @@ int test14()
         }
         dur = 
             steady_clock::now() - start;
-        std::cout << "std::duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired is " << desired_dur << " ms" << std::endl;
+        std::cout << "std-measured duration is " << duration_cast<milliseconds>(dur).count() << " ms, std-measured desired is " << desired_dur << " ms" << std::endl;
         DYNAMIC_VERIFY(desired_dur >= intmax_type(25000));
         DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= intmax_type(25000));
         //DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + intmax_type(2000)); // 2 sec is bullshit but better than nothing
