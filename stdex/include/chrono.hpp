@@ -11,7 +11,7 @@
 #include "./type_traits.hpp" // stdex::common_type, stdex::is_floating_point
 
 // POSIX includes
-/*none*/
+#include <pthread.h>
 
 // std includes
 #include <time.h> // ::time_t - need to be changed
@@ -776,11 +776,20 @@ namespace stdex
 
         namespace detail
         {
-            template <class _ToDur, class _Clock>
-            struct _time_point_enable_if_is_duration
+            template <bool, class _ToDur, class _Clock>
+            struct _time_point_enable_if_is_duration_impl
             {
-                typedef time_point<_Clock, typename _enable_if_is_duration_impl<_is_duration<_ToDur>::value, _ToDur>::type> type;
+                typedef time_point<_Clock, _ToDur> type;
             };
+
+            template <class _ToDur, class _Clock>
+            struct _time_point_enable_if_is_duration_impl<false, _ToDur, _Clock>
+            { };
+
+            template <class _ToDur, class _Clock>
+            struct _time_point_enable_if_is_duration:
+                _time_point_enable_if_is_duration_impl< _is_duration<_ToDur>::value, _ToDur, _Clock>
+            { };
 
         } // namespace detail
 
@@ -905,12 +914,17 @@ namespace stdex
             static time_point
                 now() _STDEX_NOEXCEPT_FUNCTION;
 
+            // Map to POSIX API
+            static ::timespec
+                to_timespec(const time_point&) _STDEX_NOEXCEPT_FUNCTION;
+
             // Map to C API
             static stdex::time_t
                 to_time_t(const time_point &_t) _STDEX_NOEXCEPT_FUNCTION
             {
-                return stdex::time_t(duration_cast<chrono::seconds>
-                    (_t.time_since_epoch()).count());
+                ::timespec _ts = to_timespec(_t);
+
+                return stdex::time_t(_ts.tv_sec);
             }
 
             static time_point

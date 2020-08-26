@@ -205,25 +205,8 @@ namespace stdex
             if (!detail::_lock_owns_lock(_lock))
                 std::terminate();
 
-            chrono::time_point<clock_t, chrono::seconds> _s = chrono::time_point_cast<chrono::seconds>(_atime);
-            chrono::nanoseconds _ns = chrono::duration_cast<chrono::nanoseconds>(_atime - _s);
-
-            typename chrono::time_point<clock_t, chrono::seconds>::rep _s_count = _s.time_since_epoch().count();
-
-            timespec _ts;
-
-            const stdex::time_t _ts_sec_max = 
-                (std::numeric_limits<stdex::time_t>::max)();
-            if (_s_count < _ts_sec_max)
-            {
-                _ts.tv_sec = static_cast<stdex::time_t>(_s_count > 0 ? _s_count : 0);
-                _ts.tv_nsec = static_cast<long>(_ns.count());
-            }
-            else
-            {
-                _ts.tv_sec = _ts_sec_max;
-                _ts.tv_nsec = 999999999;
-            }
+            ::timespec _ts = 
+                clock_t::to_timespec(chrono::time_point_cast<clock_t::duration>(_atime));
 
             int _err =
                 pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
@@ -253,36 +236,25 @@ namespace stdex
             if (_rtime.count() < 0)
                 return cv_status::timeout;
 
-            clock_t::time_point _start_time_point = clock_t::now();
+            clock_t::time_point 
+                _start_time_point = clock_t::now(),
+                _end_time_point = _start_time_point + stdex::chrono::duration_cast<clock_t::duration>(_rtime);
 
-            chrono::seconds _delta_sec = 
-                chrono::duration_cast<chrono::seconds>(_rtime);
-            chrono::nanoseconds _delta_nsec =
-                chrono::duration_cast<chrono::nanoseconds>(_rtime - _delta_sec);
+            ::timespec _ts = 
+                clock_t::to_timespec(_end_time_point),
+                _ts2 = clock_t::to_timespec(_start_time_point);
 
-            chrono::time_point<clock_t, chrono::seconds> _start_time_point_sec =
-                chrono::time_point_cast<chrono::seconds>(_start_time_point);
-            chrono::nanoseconds _start_time_point_nsec =
-                chrono::duration_cast<chrono::nanoseconds>(_start_time_point - _start_time_point_sec);
-
-            stdex::intmax_t
-                _ts_sec = (_start_time_point_sec + _delta_sec).time_since_epoch().count(),
-                _ts_nsec = (_start_time_point_nsec + _delta_nsec).count();
             
-            timespec _ts;
+            intmax_t std_sec =
+                stdex::chrono::time_point_cast<stdex::chrono::seconds>(_start_time_point).time_since_epoch().count(),
+                std_nsec = 
+                stdex::chrono::duration_cast<stdex::chrono::nanoseconds>(
+                    _start_time_point - stdex::chrono::time_point_cast<stdex::chrono::seconds>(_start_time_point)
+                ).count();
 
-            const stdex::intmax_t _ts_sec_max =
-                (std::numeric_limits<stdex::time_t>::max)();
-            if (_ts_sec >= _ts_sec_max)
-            {
-                _ts.tv_sec = static_cast<stdex::time_t>(_ts_sec_max);
-                _ts.tv_nsec = 999999999;
-            }
-            else
-            {
-                _ts.tv_sec = static_cast<stdex::time_t>(_ts_sec);
-                _ts.tv_nsec = static_cast<long>(_ts_nsec);
-            }
+            intmax_t
+                sec = _ts.tv_sec - _ts2.tv_sec,
+                nsec = _ts.tv_nsec - _ts2.tv_nsec;
 
             if ((clock_t::now() - _start_time_point) > _rtime)
                 return cv_status::timeout;
