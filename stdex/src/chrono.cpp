@@ -26,55 +26,26 @@
 
 #include <process.h>
 
-struct mytimespec
-{
-    stdex::time_t tv_sec;
-    long tv_nsec;
-};
-
 typedef LONGLONG duration_long_long;
 
 namespace clock_gettime_impl
 {
     static LARGE_INTEGER get_abs_start_point()
     {
-        /*if (sizeof(stdex::intmax_t) * CHAR_BIT <= 64)
-        {
-            struct lamdas
-            {
-                static LARGE_INTEGER get_current_date()
-                {
-                    LARGE_INTEGER current_date;
-                    FILETIME ft;
+        LARGE_INTEGER jan_1_1970;
 
-                    GetSystemTimeAsFileTime(&ft);
-                    current_date.LowPart = ft.dwLowDateTime;
-                    current_date.HighPart = ft.dwHighDateTime;
+        // January 1, 1970 (start of Unix epoch) in "ticks"
+        // 116444736000000000 in ULARGE_INTEGER
+        jan_1_1970.LowPart  = 0xD53E8000;
+        jan_1_1970.HighPart = 0x019DB1DE;
 
-                    return current_date;
-                }
-            };
-
-            static LARGE_INTEGER current_date = lamdas::get_current_date();
-
-            return current_date;
-        }
-        else*/
-        {
-            LARGE_INTEGER jan_1_1970;
-
-            // 116444736000000000 in ULARGE_INTEGER
-            jan_1_1970.LowPart = 0xD53E8000;
-            jan_1_1970.HighPart = 0x19DB1DE;
-
-            return jan_1_1970;
-        }
+        return jan_1_1970;
     }
 
 #define _STDEX_CHRONO_CLOCK_REALTIME 0
 #define _STDEX_CHRONO_CLOCK_MONOTONIC 1
 
-    int clock_gettime_realtime(mytimespec &ts)
+    int clock_gettime_realtime(timespec& ts) // unix time since January 1, 1970
     {
         FILETIME    filetime;
         LARGE_INTEGER today;
@@ -90,13 +61,13 @@ namespace clock_gettime_impl
 
         today.QuadPart -= start_point.QuadPart;
 
-        LARGE_INTEGER secs_in_filetime;
-        secs_in_filetime.QuadPart = 10000000;
+        LARGE_INTEGER ticks_per_sec_in_filetime;
+        ticks_per_sec_in_filetime.QuadPart = 10000000; // a tick is 100ns
 
         LARGE_INTEGER delta_sec, delta_nsec;
 
-        delta_sec.QuadPart = today.QuadPart/ secs_in_filetime.QuadPart;
-        delta_nsec.QuadPart = (today.QuadPart % secs_in_filetime.QuadPart) * 100;
+        delta_sec.QuadPart = today.QuadPart / ticks_per_sec_in_filetime.QuadPart;
+        delta_nsec.QuadPart = (today.QuadPart % ticks_per_sec_in_filetime.QuadPart) * 100; // ticks * 100ns
 
         while (delta_nsec.QuadPart > 999999999)
         {
@@ -143,8 +114,8 @@ namespace clock_gettime_impl
         return freq_cached;
     }
 
-    static const LARGE_INTEGER &get_start_rel_point() {
-        static const LARGE_INTEGER &cached_freq = cache_freq();
+    static const LARGE_INTEGER& get_start_rel_point() {
+        static const LARGE_INTEGER& cached_freq = cache_freq();
 
         struct lambdas {
             static LARGE_INTEGER get_qpc()
@@ -164,11 +135,17 @@ namespace clock_gettime_impl
         return point_cached;
     }
 
-    static const LARGE_INTEGER &_dumb_init = get_start_rel_point();
-
-    int clock_gettime_monotonic(mytimespec &ts)
+    static struct _init_inittime
     {
-        const LARGE_INTEGER &sp = get_start_rel_point();
+        _init_inittime()
+        {
+            get_start_rel_point();
+        }
+    } init_inittime;
+
+    int clock_gettime_monotonic(timespec& ts) // relative time since program start
+    {
+        const LARGE_INTEGER& sp = get_start_rel_point();
 
         if (sp.QuadPart == 0)
             return clock_gettime_realtime(ts);
@@ -177,7 +154,7 @@ namespace clock_gettime_impl
         if (0 == QueryPerformanceCounter(&end_point) || end_point.QuadPart < sp.QuadPart)
             return clock_gettime_realtime(ts);
 
-        const LARGE_INTEGER &cached_freq_sec = cache_freq();
+        const LARGE_INTEGER& cached_freq_sec = cache_freq();
         LARGE_INTEGER sec_to_ns_ratio;
         sec_to_ns_ratio.QuadPart = 1000 * 1000 * 1000;
         LARGE_INTEGER delta;
@@ -211,19 +188,18 @@ namespace clock_gettime_impl
         }
 
         return 0;
-    }
+}
 
-    int clock_gettime(int clk_id, mytimespec* ts) {
+    int clock_gettime(int clk_id, timespec* ts) {
         if (clk_id == _STDEX_CHRONO_CLOCK_MONOTONIC)
-            return clock_gettime_realtime(*ts);
+            return clock_gettime_monotonic(*ts);
         else if (clk_id == _STDEX_CHRONO_CLOCK_REALTIME)
             return clock_gettime_realtime(*ts);
         return -1;
 
     }
 }
-
-int(*clock_gettime_func_pointer)(int, mytimespec*) = &clock_gettime_impl::clock_gettime;
+int(*clock_gettime_func_pointer)(int, timespec*) = &clock_gettime_impl::clock_gettime;
 #elif defined(__MACH__) && !defined(CLOCK_REALTIME)
 #include <time.h>
 #include <sys/time.h>       /* gettimeofday */
@@ -251,10 +227,10 @@ void init()
     struct timeval  micro;      /* microseconds since 1 Jan 1970 */
 
     if (mach_timebase_info(&timebase) != 0)
-        abort();                            /* very unlikely error */
+        std::abort();                            /* very unlikely error */
 
     if (gettimeofday(&micro, NULL) != 0)
-        abort();                            /* very unlikely error */
+        std::abort();                            /* very unlikely error */
 
     initclock = mach_absolute_time();
 
@@ -284,9 +260,6 @@ struct timespec get_abs_future_time_fine(unsigned milli)
     NORMALISE_TIMESPEC( future, milli );
     return future;
 }
-struct mytimespec:
-    public timespec
-{};
 
 int clock_gettime(int X, timespec *tv)
 {
@@ -297,11 +270,7 @@ int clock_gettime(int X, timespec *tv)
 int(*clock_gettime_func_pointer)(int, timespec*) = &clock_gettime;
 #else
 
-typedef ::int64_t duration_long_long;
-
-struct mytimespec:
-    public timespec
-{};
+typedef long long duration_long_long;
 
 int clock_gettime(clockid_t, struct timespec*);
 int(*clock_gettime_func_pointer)(clockid_t, struct timespec*) = &clock_gettime;
@@ -548,7 +517,7 @@ namespace stdex {
 stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDEX_NOEXCEPT_FUNCTION
 {    // get current time
     {
-        mytimespec ts;
+        timespec ts;
         ts.tv_sec = 0;
         ts.tv_nsec = 0;
 
@@ -566,7 +535,7 @@ stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDE
 stdex::chrono::steady_clock::time_point stdex::chrono::steady_clock::now() _STDEX_NOEXCEPT_FUNCTION
 {    // get current time
     {
-        mytimespec ts;
+        timespec ts;
         ts.tv_sec = 0;
         ts.tv_nsec = 0;
 
