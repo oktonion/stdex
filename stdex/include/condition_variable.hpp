@@ -240,21 +240,8 @@ namespace stdex
                 _start_time_point = clock_t::now(),
                 _end_time_point = _start_time_point + stdex::chrono::duration_cast<clock_t::duration>(_rtime);
 
-            ::timespec _ts = 
-                clock_t::to_timespec(_end_time_point),
-                _ts2 = clock_t::to_timespec(_start_time_point);
-
-            
-            intmax_t std_sec =
-                stdex::chrono::time_point_cast<stdex::chrono::seconds>(_start_time_point).time_since_epoch().count(),
-                std_nsec = 
-                stdex::chrono::duration_cast<stdex::chrono::nanoseconds>(
-                    _start_time_point - stdex::chrono::time_point_cast<stdex::chrono::seconds>(_start_time_point)
-                ).count();
-
-            intmax_t
-                sec = _ts.tv_sec - _ts2.tv_sec,
-                nsec = _ts.tv_nsec - _ts2.tv_nsec;
+            ::timespec _ts =
+                clock_t::to_timespec(_end_time_point);
 
             if ((clock_t::now() - _start_time_point) > _rtime)
                 return cv_status::timeout;
