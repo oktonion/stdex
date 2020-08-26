@@ -463,8 +463,8 @@ const ::timespec& local_ts_to_system_ts(const ::timespec &ts)
 #if defined(WIN32) || defined(_WIN32)
     LARGE_INTEGER performanceFrequency;
 
-    const bool stdex::chrono::system_clock::is_steady = false;
     const bool stdex::chrono::steady_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency) != 0;
+    const bool stdex::chrono::system_clock::is_steady = false;
 
 #else
 
