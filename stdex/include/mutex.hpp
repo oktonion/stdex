@@ -501,16 +501,8 @@ namespace stdex
             static bool try_lock_until1(pthread_mutex_t& _mutex_handle,
                 const chrono::time_point<chrono::system_clock, _Duration>& _atime)
             {
-                chrono::time_point<chrono::system_clock, chrono::seconds> _s =
-                    chrono::time_point_cast<chrono::seconds>(_atime);
-                chrono::nanoseconds _ns = 
-                    chrono::duration_cast<chrono::nanoseconds>(_atime - _s);
-
-                timespec _ts;
-                _ts.tv_sec = 
-                    static_cast<stdex::time_t>(_s.time_since_epoch().count());
-                _ts.tv_nsec = 
-                    static_cast<long>(_ns.count());
+                ::timespec _ts = 
+                    chrono::system_clock::to_timespec(_atime);
 
                 bool success = 
                     (pthread_mutex_timedlock(&_mutex_handle, &_ts) == 0);
