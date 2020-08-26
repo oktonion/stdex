@@ -24,152 +24,178 @@
 
 #include <process.h>
 
-struct mytimespec
-{
-    stdex::time_t tv_sec;
-    long tv_nsec;
-};
-
 namespace clock_gettime_impl
 {
-    LARGE_INTEGER
-        getFILETIMEoffset()
+    static LARGE_INTEGER get_abs_start_point()
     {
-        SYSTEMTIME s;
-        FILETIME f;
-        LARGE_INTEGER t;
+        LARGE_INTEGER jan_1_1970;
 
-        s.wYear = 1970;
-        s.wMonth = 1;
-        s.wDay = 1;
-        s.wHour = 0;
-        s.wMinute = 0;
-        s.wSecond = 0;
-        s.wMilliseconds = 0;
-        if (SystemTimeToFileTime(&s, &f) == 0)
-            std::abort(); // never ever happens
-        t.QuadPart = f.dwHighDateTime;
-        t.QuadPart <<= 32;
-        t.QuadPart |= f.dwLowDateTime;
-        return (t);
+        // January 1, 1970 (start of Unix epoch) in "ticks"
+        // 116444736000000000 in ULARGE_INTEGER
+        jan_1_1970.LowPart  = 0xD53E8000;
+        jan_1_1970.HighPart = 0x019DB1DE;
+
+        return jan_1_1970;
     }
 
-#ifdef LLONG_MAX
-#define exp7           10000000i64     //1E+7     //C-file part
-#define exp9         1000000000i64     //1E+9
-#define w2ux 116444736000000000i64     //1.jan1601 to 1.jan1970
-    void unix_time(struct mytimespec *spec)
-    {
-        __int64 wintime; GetSystemTimeAsFileTime((FILETIME*) &wintime);
-        wintime -= w2ux;  spec->tv_sec = wintime / exp7;
-        spec->tv_nsec = wintime % exp7 * 100;
-    }
+#define _STDEX_CHRONO_CLOCK_REALTIME 0
+#define _STDEX_CHRONO_CLOCK_MONOTONIC 1
 
-    int clock_gettime_steady(int, mytimespec *spec)
+    int clock_gettime_realtime(timespec& ts) // unix time since January 1, 1970
     {
-        static  struct mytimespec startspec; static double ticks2nano;
-        static __int64 startticks, tps = 0;    __int64 tmp, curticks;
-        QueryPerformanceFrequency((LARGE_INTEGER*) &tmp); //some strange system can
-        if (tps != tmp) {
-            tps = tmp; //init ~~ONCE         //possibly change freq ?
-            QueryPerformanceCounter((LARGE_INTEGER*) &startticks);
-            unix_time(&startspec); ticks2nano = (double) exp9 / tps;
+        FILETIME    filetime;
+        LARGE_INTEGER today;
+        const LARGE_INTEGER start_point = get_abs_start_point();
+
+        GetSystemTimeAsFileTime(&filetime);
+
+        today.LowPart = filetime.dwLowDateTime;
+        today.HighPart = filetime.dwHighDateTime;
+
+        if (today.QuadPart < start_point.QuadPart)
+            std::terminate();
+
+        today.QuadPart -= start_point.QuadPart;
+
+        LARGE_INTEGER ticks_per_sec_in_filetime;
+        ticks_per_sec_in_filetime.QuadPart = 10000000; // a tick is 100ns
+
+        LARGE_INTEGER delta_sec, delta_nsec;
+
+        delta_sec.QuadPart = today.QuadPart / ticks_per_sec_in_filetime.QuadPart;
+        delta_nsec.QuadPart = (today.QuadPart % ticks_per_sec_in_filetime.QuadPart) * 100; // ticks * 100ns
+
+        while (delta_nsec.QuadPart > 999999999)
+        {
+            delta_nsec.QuadPart -= 999999999;
+            delta_sec.QuadPart++;
         }
-        QueryPerformanceCounter((LARGE_INTEGER*) &curticks); curticks -= startticks;
-        spec->tv_sec = startspec.tv_sec + (curticks / tps);
-        spec->tv_nsec = startspec.tv_nsec + (long)((double) (curticks % tps) * ticks2nano);
-        if (!(spec->tv_nsec < exp9)) { spec->tv_sec++; spec->tv_nsec -= exp9; }
+
+        const stdex::time_t _ts_sec_max =
+            (std::numeric_limits<stdex::time_t>::max)();
+
+        if (delta_sec.QuadPart < _ts_sec_max)
+        {
+            ts.tv_sec =
+                static_cast<stdex::time_t>(delta_sec.QuadPart);
+            ts.tv_nsec =
+                static_cast<long>(delta_nsec.QuadPart) + 1;
+        }
+        else
+        {
+            ts.tv_sec = _ts_sec_max;
+            ts.tv_nsec = 999999999;
+        }
+
         return 0;
     }
 
-    int
-        clock_gettime(int X, mytimespec *tv)
+    static const LARGE_INTEGER& cache_freq()
     {
-        LARGE_INTEGER           t;
-        FILETIME            f;
-        double                  microseconds;
-        static LARGE_INTEGER    offset;
-        static double           frequencyToMicroseconds;
-        static int              initialized = 0;
-        static BOOL             usePerformanceCounter = 0;
+        struct lambdas {
+            static LARGE_INTEGER get_qpf()
+            {
+                LARGE_INTEGER freq;
 
-        if (!initialized) {
-            LARGE_INTEGER performanceFrequency;
-            initialized = 1;
-            usePerformanceCounter = QueryPerformanceFrequency(&performanceFrequency);
-            if (!usePerformanceCounter) {
-                offset = getFILETIMEoffset();
-                frequencyToMicroseconds = 10.;
+                if (0 == QueryPerformanceFrequency(&freq))
+                    freq.QuadPart = 0;
+
+                return freq;
             }
-        }
-        if (usePerformanceCounter) 
-            return clock_gettime_steady(X, tv);
-        else {
-            GetSystemTimeAsFileTime(&f);
-            t.QuadPart = f.dwHighDateTime;
-            t.QuadPart <<= 32;
-            t.QuadPart |= f.dwLowDateTime;
-        }
+        };
 
-        t.QuadPart -= offset.QuadPart;
-        microseconds = (double) t.QuadPart / frequencyToMicroseconds;
-        t.QuadPart = LONGLONG(microseconds + 0.5);
-        tv->tv_sec = t.QuadPart / 1000000;
-        tv->tv_nsec = (t.QuadPart % 1000000) * 1000;
-        return (0);
+        static const LARGE_INTEGER freq_cached =
+            lambdas::get_qpf();
+
+        return freq_cached;
     }
-#define _STDEX_CHRONO_USE_MICROSECONDS
-#else
 
+    static const LARGE_INTEGER& get_start_rel_point() {
+        static const LARGE_INTEGER& cached_freq = cache_freq();
 
+        struct lambdas {
+            static LARGE_INTEGER get_qpc()
+            {
+                LARGE_INTEGER point;
 
+                if (0 == QueryPerformanceCounter(&point) || point.QuadPart < 0)
+                    point.QuadPart = 0;
 
-    int
-        clock_gettime(int X, mytimespec *tv)
+                return point;
+            }
+        };
+
+        static const LARGE_INTEGER point_cached =
+            lambdas::get_qpc();
+
+        return point_cached;
+    }
+
+    static struct _init_inittime
     {
-        LARGE_INTEGER           t;
-        FILETIME            f;
-        double                  microseconds;
-        static LARGE_INTEGER    offset;
-        static double           frequencyToMicroseconds;
-        static int              initialized = 0;
-        static BOOL             usePerformanceCounter = 0;
-
-        if (!initialized) {
-            LARGE_INTEGER performanceFrequency;
-            initialized = 1;
-            usePerformanceCounter = QueryPerformanceFrequency(&performanceFrequency);
-            if (usePerformanceCounter) {
-                QueryPerformanceCounter(&offset);
-                frequencyToMicroseconds = (double) performanceFrequency.QuadPart / 1000000.;
-            }
-            else {
-                offset = getFILETIMEoffset();
-                frequencyToMicroseconds = 10.;
-            }
+        _init_inittime()
+        {
+            get_start_rel_point();
         }
-        if (usePerformanceCounter) QueryPerformanceCounter(&t);
-        else {
-            GetSystemTimeAsFileTime(&f);
-            t.QuadPart = f.dwHighDateTime;
-            t.QuadPart <<= 32;
-            t.QuadPart |= f.dwLowDateTime;
+    } init_inittime;
+
+    int clock_gettime_monotonic(timespec& ts) // relative time since program start
+    {
+        const LARGE_INTEGER& sp = get_start_rel_point();
+
+        if (sp.QuadPart == 0)
+            return clock_gettime_realtime(ts);
+
+        LARGE_INTEGER end_point;
+        if (0 == QueryPerformanceCounter(&end_point) || end_point.QuadPart < sp.QuadPart)
+            return clock_gettime_realtime(ts);
+
+        const LARGE_INTEGER& cached_freq_sec = cache_freq();
+        LARGE_INTEGER sec_to_ns_ratio;
+        sec_to_ns_ratio.QuadPart = 1000 * 1000 * 1000;
+        LARGE_INTEGER delta;
+        delta.QuadPart = (end_point.QuadPart - sp.QuadPart);
+
+        LARGE_INTEGER delta_sec, delta_nsec;
+
+        delta_sec.QuadPart = delta.QuadPart / cached_freq_sec.QuadPart;
+        delta_nsec.QuadPart = (delta.QuadPart % cached_freq_sec.QuadPart) * sec_to_ns_ratio.QuadPart / cached_freq_sec.QuadPart;
+
+        while (delta_nsec.QuadPart > 999999999)
+        {
+            delta_nsec.QuadPart -= 999999999;
+            delta_sec.QuadPart++;
         }
 
-        t.QuadPart -= offset.QuadPart;
-        microseconds = (double) t.QuadPart / frequencyToMicroseconds;
-        t.QuadPart = LONGLONG(microseconds + 0.5);
-        tv->tv_sec = t.QuadPart / 1000000;
-        tv->tv_nsec = (t.QuadPart % 1000000) * 1000;
-        return (0);
-    }
-#define _STDEX_CHRONO_USE_MICROSECONDS
-#endif
+        const stdex::time_t _ts_sec_max =
+            (std::numeric_limits<stdex::time_t>::max)();
+
+        if (delta_sec.QuadPart < _ts_sec_max)
+        {
+            ts.tv_sec =
+                static_cast<stdex::time_t>(delta_sec.QuadPart);
+            ts.tv_nsec =
+                static_cast<long>(delta_nsec.QuadPart) + 1;
+        }
+        else
+        {
+            ts.tv_sec = _ts_sec_max;
+            ts.tv_nsec = 999999999;
+        }
+
+        return 0;
 }
 
-#define _STDEX_CHRONO_CLOCK_REALTIME 0
-#define _STDEX_CHRONO_CLOCK_MONOTONIC 0
-int(*clock_gettime_func_pointer)(int, mytimespec*) = &clock_gettime_impl::clock_gettime;
+    int clock_gettime(int clk_id, timespec* ts) {
+        if (clk_id == _STDEX_CHRONO_CLOCK_MONOTONIC)
+            return clock_gettime_monotonic(*ts);
+        else if (clk_id == _STDEX_CHRONO_CLOCK_REALTIME)
+            return clock_gettime_realtime(*ts);
+        return -1;
+
+    }
+}
+int(*clock_gettime_func_pointer)(int, timespec*) = &clock_gettime_impl::clock_gettime;
 #elif defined(__MACH__) && !defined(CLOCK_REALTIME)
 #include <time.h>
 #include <sys/time.h>       /* gettimeofday */
@@ -195,10 +221,10 @@ void init()
     struct timeval  micro;      /* microseconds since 1 Jan 1970 */
 
     if (mach_timebase_info(&timebase) != 0)
-        abort();                            /* very unlikely error */
+        std::abort();                            /* very unlikely error */
 
     if (gettimeofday(&micro, NULL) != 0)
-        abort();                            /* very unlikely error */
+        std::abort();                            /* very unlikely error */
 
     initclock = mach_absolute_time();
 
@@ -228,9 +254,6 @@ struct timespec get_abs_future_time_fine(unsigned milli)
     NORMALISE_TIMESPEC( future, milli );
     return future;
 }
-struct mytimespec:
-    public timespec
-{};
 
 int clock_gettime(int X, timespec *tv)
 {
@@ -241,9 +264,6 @@ int clock_gettime(int X, timespec *tv)
 int(*clock_gettime_func_pointer)(int, timespec*) = &clock_gettime;
 #else
 
-struct mytimespec:
-    public timespec
-{};
 
 int clock_gettime(clockid_t, struct timespec*);
 int(*clock_gettime_func_pointer)(clockid_t, struct timespec*) = &clock_gettime;
@@ -320,10 +340,13 @@ int(*clock_gettime_func_pointer)(clockid_t, struct timespec*) = &clock_gettime;
 
 #endif
 
+
+
+
 stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDEX_NOEXCEPT_FUNCTION
 {    // get current time
     {
-        mytimespec ts;
+        timespec ts;
         ts.tv_sec = 0;
         ts.tv_nsec = 0;
 
@@ -341,7 +364,7 @@ stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDE
 stdex::chrono::steady_clock::time_point stdex::chrono::steady_clock::now() _STDEX_NOEXCEPT_FUNCTION
 {    // get current time
     {
-        mytimespec ts;
+        timespec ts;
         ts.tv_sec = 0;
         ts.tv_nsec = 0;
 
