@@ -321,7 +321,8 @@ namespace stdex
             inline
             typename
             conditional<
-                is_scalar<_Tp>::value,
+                is_scalar<_Tp>::value == bool(true) && 
+                is_null_pointer<_Tp>::value == bool(false),
                 _ref_wrapper<_Tp>,
                 _Tp&
             >::type _arg(_Tp &value)
@@ -333,7 +334,8 @@ namespace stdex
             inline
             typename
             conditional<
-                is_scalar<_Tp>::value,
+                is_scalar<_Tp>::value == bool(true) &&
+                is_null_pointer<_Tp>::value == bool(false),
                 _ref_wrapper<const _Tp>,
                 const _Tp&
             >::type _arg(const _Tp& value)
