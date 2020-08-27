@@ -463,7 +463,7 @@ namespace stdex
                         using thread_detail::operator,;
                         using thread_detail::_arg;
                         
-                        fp((_arg(args.arg1), (0)));
+                        fp((_arg(args.arg1), nullptr));
                     }
 
                     static 
@@ -552,8 +552,8 @@ namespace stdex
                         using thread_detail::operator,;
                         using thread_detail::_arg;
                         
-                        fp((_arg(args.arg1), (0)),
-                           (_arg(args.arg2), (0)));
+                        fp((_arg(args.arg1), nullptr),
+                           (_arg(args.arg2), nullptr));
                     }
 
                     static 
@@ -643,9 +643,9 @@ namespace stdex
                         using thread_detail::operator,;
                         using thread_detail::_arg;
                         
-                        fp((_arg(args.arg1), (0)),
-                           (_arg(args.arg2), (0)),
-                           (_arg(args.arg3), (0)));
+                        fp((_arg(args.arg1), nullptr),
+                           (_arg(args.arg2), nullptr),
+                           (_arg(args.arg3), nullptr));
                     }
 
                     static 
@@ -747,10 +747,10 @@ namespace stdex
                         using thread_detail::operator,;
                         using thread_detail::_arg;
                         
-                        fp((_arg(args.arg1), (0)),
-                           (_arg(args.arg2), (0)),
-                           (_arg(args.arg3), (0)),
-                           (_arg(args.arg4), (0)));
+                        fp((_arg(args.arg1), nullptr),
+                           (_arg(args.arg2), nullptr),
+                           (_arg(args.arg3), nullptr),
+                           (_arg(args.arg4), nullptr));
                     }
 
                     static 
@@ -872,11 +872,11 @@ namespace stdex
                         using thread_detail::operator,;
                         using thread_detail::_arg;
 
-                        fp((_arg(args.arg1), (0)),
-                           (_arg(args.arg2), (0)),
-                           (_arg(args.arg3), (0)),
-                           (_arg(args.arg4), (0)),
-                           (_arg(args.arg5), (0)));
+                        fp((_arg(args.arg1), nullptr),
+                           (_arg(args.arg2), nullptr),
+                           (_arg(args.arg3), nullptr),
+                           (_arg(args.arg4), nullptr),
+                           (_arg(args.arg5), nullptr));
                     }
 
                     static 
@@ -1034,12 +1034,12 @@ namespace stdex
                         using thread_detail::operator,;
                         using thread_detail::_arg;
                         
-                        fp((_arg(args.arg1), (0)),
-                           (_arg(args.arg2), (0)),
-                           (_arg(args.arg3), (0)),
-                           (_arg(args.arg4), (0)),
-                           (_arg(args.arg5), (0)),
-                           (_arg(args.arg6), (0)));
+                        fp((_arg(args.arg1), nullptr),
+                           (_arg(args.arg2), nullptr),
+                           (_arg(args.arg3), nullptr),
+                           (_arg(args.arg4), nullptr),
+                           (_arg(args.arg5), nullptr),
+                           (_arg(args.arg6), nullptr));
                     }
 
                     static 
@@ -1265,13 +1265,13 @@ namespace stdex
                         using thread_detail::operator,;
                         using thread_detail::_arg;
                         
-                        fp((_arg(args.arg1), (0)),
-                           (_arg(args.arg2), (0)),
-                           (_arg(args.arg3), (0)),
-                           (_arg(args.arg4), (0)),
-                           (_arg(args.arg5), (0)),
-                           (_arg(args.arg6), (0)),
-                           (_arg(args.arg7), (0)));
+                        fp((_arg(args.arg1), nullptr),
+                           (_arg(args.arg2), nullptr),
+                           (_arg(args.arg3), nullptr),
+                           (_arg(args.arg4), nullptr),
+                           (_arg(args.arg5), nullptr),
+                           (_arg(args.arg6), nullptr),
+                           (_arg(args.arg7), nullptr));
                     }
 
                     static 
@@ -1630,14 +1630,14 @@ namespace stdex
                         using thread_detail::operator,;
                         using thread_detail::_arg;
                         
-                        fp((_arg(args.arg1), (0)),
-                           (_arg(args.arg2), (0)),
-                           (_arg(args.arg3), (0)),
-                           (_arg(args.arg4), (0)),
-                           (_arg(args.arg5), (0)),
-                           (_arg(args.arg6), (0)),
-                           (_arg(args.arg7), (0)),
-                           (_arg(args.arg8), (0)));
+                        fp((_arg(args.arg1), nullptr),
+                           (_arg(args.arg2), nullptr),
+                           (_arg(args.arg3), nullptr),
+                           (_arg(args.arg4), nullptr),
+                           (_arg(args.arg5), nullptr),
+                           (_arg(args.arg6), nullptr),
+                           (_arg(args.arg7), nullptr),
+                           (_arg(args.arg8), nullptr));
                     }
 
                     static 
@@ -1923,7 +1923,7 @@ namespace stdex
         //! This function is useful for determining the optimal number of threads to
         //! use for a task.
         //! @return The number of hardware thread contexts in the system.
-        //! @note If this value is not defined, the function returns zero (0).
+        //! @note If this value is not defined, the function returns zero nullptr.
         static unsigned hardware_concurrency() _STDEX_NOEXCEPT_FUNCTION;
 
         void swap(thread &other) _STDEX_NOEXCEPT_FUNCTION;
