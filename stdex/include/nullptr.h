@@ -8,11 +8,11 @@
 #include <cstddef>
 #include <climits>
 
-#ifdef NULL
-#define STDEX_NULL NULL
-#else
+//#ifdef NULL
+//#define STDEX_NULL NULL
+//#else
 #define STDEX_NULL 0
-#endif
+//#endif
 
 namespace stdex
 {
