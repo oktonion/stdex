@@ -34,7 +34,7 @@
 namespace stdex
 {
     using ::time_t;
-    using ::timespec;
+    using ::timespec; // C++17 feature should be in <ctime> but whatever
 
     //! Minimal implementation of the @c chrono namespace.
     //! The @c chrono namespace provides types for specifying time intervals.
