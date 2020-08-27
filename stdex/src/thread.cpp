@@ -738,7 +738,7 @@ namespace thread_cpp_detail
 
             int err = 
                 ::clock_gettime(_STDEX_THREAD_CLOCK_MONOTONIC, &_begin);
-            if(err != 0)
+            //if(err != 0)
                 return nanosleep_impl1<false>::call(req, rem);
 
             tp = _begin;
