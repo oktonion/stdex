@@ -469,30 +469,38 @@ namespace timed_mutex_tests
 
 int main(void)
 {
-    using namespace stdex;
-    using namespace timed_mutex_tests;
+    try
+    {
+        using namespace stdex;
+        using namespace timed_mutex_tests;
 
-    typedef stdex::recursive_timed_mutex test_type;
-    typedef test_type::native_handle_type type;
-    
-    RUN_TEST(test1);
-    RUN_TEST(test2);
-    RUN_TEST(test3);
-    RUN_TEST(test4);
-    RUN_TEST(try_lock_test1);
-    RUN_TEST(try_lock_test2);
-    RUN_TEST(try_lock_for_test1);
-    RUN_TEST(try_lock_for_test2);
-    RUN_TEST(try_lock_for_test3);
-    RUN_TEST(try_lock_until_test1);
-    RUN_TEST(try_lock_until_test2);
-    RUN_TEST(try_lock_until_test3<stdex::chrono::system_clock>);
-    RUN_TEST(try_lock_until_test3<stdex::chrono::steady_clock>);
-    RUN_TEST(try_lock_until_test4<stdex::chrono::system_clock>);
-    RUN_TEST(try_lock_until_test4<stdex::chrono::steady_clock>);
-    RUN_TEST(try_lock_until_test5<stdex::chrono::system_clock>);
-    RUN_TEST(try_lock_until_test5<stdex::chrono::steady_clock>);
-    RUN_TEST(unlock_test1);
+        typedef stdex::recursive_timed_mutex test_type;
+        typedef test_type::native_handle_type type;
+        
+        RUN_TEST(test1);
+        RUN_TEST(test2);
+        RUN_TEST(test3);
+        RUN_TEST(test4);
+        RUN_TEST(try_lock_test1);
+        RUN_TEST(try_lock_test2);
+        RUN_TEST(try_lock_for_test1);
+        RUN_TEST(try_lock_for_test2);
+        RUN_TEST(try_lock_for_test3);
+        RUN_TEST(try_lock_until_test1);
+        RUN_TEST(try_lock_until_test2);
+        RUN_TEST(try_lock_until_test3<stdex::chrono::system_clock>);
+        RUN_TEST(try_lock_until_test3<stdex::chrono::steady_clock>);
+        RUN_TEST(try_lock_until_test4<stdex::chrono::system_clock>);
+        RUN_TEST(try_lock_until_test4<stdex::chrono::steady_clock>);
+        RUN_TEST(try_lock_until_test5<stdex::chrono::system_clock>);
+        RUN_TEST(try_lock_until_test5<stdex::chrono::steady_clock>);
+        RUN_TEST(unlock_test1);
+    }
+    catch(const std::exception& e)
+    {
+        std::cout << "std::exception " << e.what() << std::endl;
+        throw;
+    }
 
     return 0;
 }

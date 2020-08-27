@@ -18,7 +18,7 @@ int main(void)
         STATIC_ASSERT(is_member_object_pointer<mobj3>::value == (true), should_be_a_member_object_pointer);
     }
                                             
-    // Negative tests.	
+    // Negative tests.    
     {
         typedef int (ClassType::*mfunc1) ();
         typedef int (ClassType::*mfunc2) (int) const;
@@ -34,7 +34,7 @@ int main(void)
         
     }
                                             
-    // Sanity check.					  
+    // Sanity check.                      
     STATIC_ASSERT(is_member_object_pointer<ClassType>::value == (false), can_not_be_a_member_object_pointer);
     return 0;
 }

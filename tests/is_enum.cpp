@@ -6,31 +6,31 @@
 struct ClassType {};
 struct ConvType 
 {
-	template<class T>
-	operator T() { return T(); }
+    template<class T>
+    operator T() { return T(); }
 };
 enum EnumType {};
 
 struct ConvTypeInt
 {
-	ConvTypeInt(int) {}
-	template<class T>
-	operator T() { return T(); }
+    ConvTypeInt(int) {}
+    template<class T>
+    operator T() { return T(); }
 };
 
 struct ClassType1 { ClassType1(int); };
 
 union ConvUnionType {
-	float a;
-	ClassType b;
-	template<class T>
-	operator T() { return T(); }
-	ConvUnionType(int){}
+    float a;
+    ClassType b;
+    template<class T>
+    operator T() { return T(); }
+    ConvUnionType(int){}
 };
 
 typedef union {
-	float a;
-	ClassType b;
+    float a;
+    ClassType b;
 }
 UnionType;
 

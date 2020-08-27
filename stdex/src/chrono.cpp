@@ -5,10 +5,52 @@
 //#include <time.h> // for clock_gettime
 #include <pthread.h>
 
+
 // std includes
 #include <exception>
 #include <cstdlib>
 
+void timespec_add(timespec &result, const timespec &in)
+{
+    enum {BILLION = 1000000000};
+
+    const stdex::time_t _ts_sec_max = 
+        (std::numeric_limits<stdex::time_t>::max)();
+    
+    if(result.tv_sec == _ts_sec_max || result.tv_sec < 0 ||
+        in.tv_sec == _ts_sec_max)
+    {
+        result.tv_sec = _ts_sec_max;
+        result.tv_nsec = BILLION - 1;
+        return;
+    }
+
+    timespec t2 = in;
+    if (result.tv_nsec >= BILLION) {
+        result.tv_nsec -= BILLION;
+        result.tv_sec++;
+    }
+    if (t2.tv_nsec >= BILLION) {
+        t2.tv_nsec -= BILLION;
+        t2.tv_sec++;
+    }
+    result.tv_sec += t2.tv_sec;
+    result.tv_nsec += t2.tv_nsec;
+    if (result.tv_nsec >= BILLION) {
+        result.tv_nsec -= BILLION;
+        result.tv_sec++;
+    }
+
+    if(result.tv_sec < 0)
+    {
+        result.tv_sec = 0;
+        result.tv_nsec = 0;
+    }
+    if(result.tv_nsec < 0)
+    {
+        result.tv_nsec = 0;
+    }
+}
 
 #if defined(WIN32) || defined(_WIN32) // assuming we are on windows platform and have no realtime clock
 
@@ -24,152 +66,274 @@
 
 #include <process.h>
 
-struct mytimespec
+struct filetime_ptr
 {
-	stdex::time_t tv_sec;
-	long tv_nsec;
+    FILETIME* value;
+    filetime_ptr(FILETIME* input) :
+        value(input) {}
 };
+
+void GetSystemTimeAsFileTime(filetime_ptr SystemTimeAsFileTimePtr)
+{ // GetSystemTimeAsFileTime does not exist on WinCE
+    SYSTEMTIME st;
+
+    GetSystemTime(&st);
+    if (0 == SystemTimeToFileTime(&st, SystemTimeAsFileTimePtr.value))
+    {
+        SystemTimeAsFileTimePtr.value->dwLowDateTime = 0;
+        SystemTimeAsFileTimePtr.value->dwHighDateTime = 0;
+    }
+}
 
 namespace clock_gettime_impl
 {
-	LARGE_INTEGER
-		getFILETIMEoffset()
-	{
-		SYSTEMTIME s;
-		FILETIME f;
-		LARGE_INTEGER t;
+    static LARGE_INTEGER get_abs_start_point_system()
+    {
+        LARGE_INTEGER jan_1_1970;
 
-		s.wYear = 1970;
-		s.wMonth = 1;
-		s.wDay = 1;
-		s.wHour = 0;
-		s.wMinute = 0;
-		s.wSecond = 0;
-		s.wMilliseconds = 0;
-		if (SystemTimeToFileTime(&s, &f) == 0)
-			std::abort(); // never ever happens
-		t.QuadPart = f.dwHighDateTime;
-		t.QuadPart <<= 32;
-		t.QuadPart |= f.dwLowDateTime;
-		return (t);
-	}
+        // January 1, 1970 (start of Unix epoch) in "ticks"
+        // 116444736000000000 in ULARGE_INTEGER
+        jan_1_1970.LowPart  = 0xD53E8000;
+        jan_1_1970.HighPart = 0x019DB1DE;
 
-#ifdef LLONG_MAX
-#define exp7           10000000i64     //1E+7     //C-file part
-#define exp9         1000000000i64     //1E+9
-#define w2ux 116444736000000000i64     //1.jan1601 to 1.jan1970
-	void unix_time(struct mytimespec *spec)
-	{
-		__int64 wintime; GetSystemTimeAsFileTime((FILETIME*) &wintime);
-		wintime -= w2ux;  spec->tv_sec = wintime / exp7;
-		spec->tv_nsec = wintime % exp7 * 100;
-	}
+        return jan_1_1970;
+    }
 
-	int clock_gettime_steady(int, mytimespec *spec)
-	{
-		static  struct mytimespec startspec; static double ticks2nano;
-		static __int64 startticks, tps = 0;    __int64 tmp, curticks;
-		QueryPerformanceFrequency((LARGE_INTEGER*) &tmp); //some strange system can
-		if (tps != tmp) {
-			tps = tmp; //init ~~ONCE         //possibly change freq ?
-			QueryPerformanceCounter((LARGE_INTEGER*) &startticks);
-			unix_time(&startspec); ticks2nano = (double) exp9 / tps;
-		}
-		QueryPerformanceCounter((LARGE_INTEGER*) &curticks); curticks -= startticks;
-		spec->tv_sec = startspec.tv_sec + (curticks / tps);
-		spec->tv_nsec = startspec.tv_nsec + (long)((double) (curticks % tps) * ticks2nano);
-		if (!(spec->tv_nsec < exp9)) { spec->tv_sec++; spec->tv_nsec -= exp9; }
-		return 0;
-	}
+    static LARGE_INTEGER get_abs_start_point_local()
+    {
+        struct lambdas
+        {
+            static LARGE_INTEGER get_current_date()
+            {
+                LARGE_INTEGER current_date;
+                FILETIME ft;
 
-	int
-		clock_gettime(int X, mytimespec *tv)
-	{
-		LARGE_INTEGER           t;
-		FILETIME            f;
-		double                  microseconds;
-		static LARGE_INTEGER    offset;
-		static double           frequencyToMicroseconds;
-		static int              initialized = 0;
-		static BOOL             usePerformanceCounter = 0;
+                GetSystemTimeAsFileTime(&ft);
+                current_date.LowPart = ft.dwLowDateTime;
+                current_date.HighPart = ft.dwHighDateTime;
 
-		if (!initialized) {
-			LARGE_INTEGER performanceFrequency;
-			initialized = 1;
-			usePerformanceCounter = QueryPerformanceFrequency(&performanceFrequency);
-			if (!usePerformanceCounter) {
-				offset = getFILETIMEoffset();
-				frequencyToMicroseconds = 10.;
-			}
-		}
-		if (usePerformanceCounter) 
-			return clock_gettime_steady(X, tv);
-		else {
-			GetSystemTimeAsFileTime(&f);
-			t.QuadPart = f.dwHighDateTime;
-			t.QuadPart <<= 32;
-			t.QuadPart |= f.dwLowDateTime;
-		}
+                return current_date;
+            }
+        };
 
-		t.QuadPart -= offset.QuadPart;
-		microseconds = (double) t.QuadPart / frequencyToMicroseconds;
-		t.QuadPart = LONGLONG(microseconds + 0.5);
-		tv->tv_sec = t.QuadPart / 1000000;
-		tv->tv_nsec = (t.QuadPart % 1000000) * 1000;
-		return (0);
-	}
-#define _STDEX_CHRONO_USE_MICROSECONDS
-#else
+        static LARGE_INTEGER current_date = lambdas::get_current_date();
+
+        return current_date;
+    }
+
+    template<bool>
+    struct abs_start_point_impl
+    {
+        static LARGE_INTEGER get(){
+            return get_abs_start_point_system();
+        }
 
 
+    };
 
+    template<>
+    struct abs_start_point_impl<false>
+    {
+        static LARGE_INTEGER get(){
+            return get_abs_start_point_local();
+        }
+    };
 
-	int
-		clock_gettime(int X, mytimespec *tv)
-	{
-		LARGE_INTEGER           t;
-		FILETIME            f;
-		double                  microseconds;
-		static LARGE_INTEGER    offset;
-		static double           frequencyToMicroseconds;
-		static int              initialized = 0;
-		static BOOL             usePerformanceCounter = 0;
-
-		if (!initialized) {
-			LARGE_INTEGER performanceFrequency;
-			initialized = 1;
-			usePerformanceCounter = QueryPerformanceFrequency(&performanceFrequency);
-			if (usePerformanceCounter) {
-				QueryPerformanceCounter(&offset);
-				frequencyToMicroseconds = (double) performanceFrequency.QuadPart / 1000000.;
-			}
-			else {
-				offset = getFILETIMEoffset();
-				frequencyToMicroseconds = 10.;
-			}
-		}
-		if (usePerformanceCounter) QueryPerformanceCounter(&t);
-		else {
-			GetSystemTimeAsFileTime(&f);
-			t.QuadPart = f.dwHighDateTime;
-			t.QuadPart <<= 32;
-			t.QuadPart |= f.dwLowDateTime;
-		}
-
-		t.QuadPart -= offset.QuadPart;
-		microseconds = (double) t.QuadPart / frequencyToMicroseconds;
-		t.QuadPart = LONGLONG(microseconds + 0.5);
-		tv->tv_sec = t.QuadPart / 1000000;
-		tv->tv_nsec = (t.QuadPart % 1000000) * 1000;
-		return (0);
-	}
-#define _STDEX_CHRONO_USE_MICROSECONDS
-#endif
-}
+    typedef abs_start_point_impl<sizeof(stdex::intmax_t) * CHAR_BIT >= 64> abs_start_point;
 
 #define _STDEX_CHRONO_CLOCK_REALTIME 0
-#define _STDEX_CHRONO_CLOCK_MONOTONIC 0
-int(*clock_gettime_func_pointer)(int, mytimespec*) = &clock_gettime_impl::clock_gettime;
+#define _STDEX_CHRONO_CLOCK_MONOTONIC 1
+
+    ::timespec system_time_to_timespec(const LARGE_INTEGER &stime)
+    {
+        timespec ts;
+
+        LARGE_INTEGER ticks_per_sec_in_filetime;
+        ticks_per_sec_in_filetime.QuadPart = 10000000; // a tick is 100ns
+
+        LARGE_INTEGER delta_sec, delta_nsec;
+
+        delta_sec.QuadPart = stime.QuadPart / ticks_per_sec_in_filetime.QuadPart;
+        delta_nsec.QuadPart = (stime.QuadPart % ticks_per_sec_in_filetime.QuadPart) * 100; // ticks * 100ns
+
+        while (delta_nsec.QuadPart > 999999999)
+        {
+            delta_nsec.QuadPart -= 999999999;
+            delta_sec.QuadPart++;
+        }
+
+        const stdex::time_t _ts_sec_max =
+            (std::numeric_limits<stdex::time_t>::max)();
+
+        if (delta_sec.QuadPart < _ts_sec_max)
+        {
+            ts.tv_sec =
+                static_cast<stdex::time_t>(delta_sec.QuadPart);
+            ts.tv_nsec =
+                static_cast<long>(delta_nsec.QuadPart);
+        }
+        else
+        {
+            ts.tv_sec = _ts_sec_max;
+            ts.tv_nsec = 999999999;
+        }
+
+        return ts;
+    }
+
+    int clock_gettime_realtime(timespec& ts) // unix time since January 1, 1970
+    {
+        FILETIME    filetime;
+        LARGE_INTEGER today;
+        const LARGE_INTEGER start_point = abs_start_point::get();;
+
+        GetSystemTimeAsFileTime(&filetime);
+
+        today.LowPart = filetime.dwLowDateTime;
+        today.HighPart = filetime.dwHighDateTime;
+
+        if (today.QuadPart < start_point.QuadPart)
+            return -1;
+
+        today.QuadPart -= start_point.QuadPart;
+
+        ts = system_time_to_timespec(today);
+
+        return 0;
+    }
+
+    static const LARGE_INTEGER& cache_freq()
+    {
+        struct lambdas {
+            static LARGE_INTEGER get_qpf()
+            {
+                LARGE_INTEGER freq;
+
+                if (0 == QueryPerformanceFrequency(&freq))
+                    freq.QuadPart = 0;
+
+                return freq;
+            }
+        };
+
+        static const LARGE_INTEGER freq_cached =
+            lambdas::get_qpf();
+
+        return freq_cached;
+    }
+
+    static const LARGE_INTEGER& get_rel_start_point() {
+        static const LARGE_INTEGER& cached_freq = cache_freq();
+
+        struct lambdas {
+            static LARGE_INTEGER get_qpc()
+            {
+                LARGE_INTEGER point;
+
+                if (0 == QueryPerformanceCounter(&point) || point.QuadPart < 0)
+                    point.QuadPart = 0;
+
+                return point;
+            }
+        };
+
+        static const LARGE_INTEGER point_cached =
+            lambdas::get_qpc();
+
+        return point_cached;
+    }
+
+    struct rel_start_point
+    {
+        static const LARGE_INTEGER& get()
+        {
+            return get_rel_start_point();
+        }
+    };
+
+    static struct _init_inittime
+    {
+        _init_inittime()
+        {
+            rel_start_point::get();
+            abs_start_point::get();
+        }
+    } init_inittime;
+
+    int clock_gettime_monotonic(timespec& ts) // relative time since program start
+    {
+        const LARGE_INTEGER& sp = rel_start_point::get();
+
+        if (sp.QuadPart == 0)
+            return clock_gettime_realtime(ts);
+
+        LARGE_INTEGER end_point;
+        if (0 == QueryPerformanceCounter(&end_point) || end_point.QuadPart < sp.QuadPart)
+            return clock_gettime_realtime(ts);
+
+        const LARGE_INTEGER& cached_freq_sec = cache_freq();
+        LARGE_INTEGER sec_to_ns_ratio;
+        sec_to_ns_ratio.QuadPart = 1000 * 1000 * 1000;
+        LARGE_INTEGER delta;
+        delta.QuadPart = (end_point.QuadPart - sp.QuadPart);
+
+        LARGE_INTEGER delta_sec, delta_nsec;
+
+        delta_sec.QuadPart = delta.QuadPart / cached_freq_sec.QuadPart;
+        delta_nsec.QuadPart = (delta.QuadPart % cached_freq_sec.QuadPart) * sec_to_ns_ratio.QuadPart / cached_freq_sec.QuadPart;
+
+        while (delta_nsec.QuadPart > 999999999)
+        {
+            delta_nsec.QuadPart -= 999999999;
+            delta_sec.QuadPart++;
+        }
+
+        const stdex::time_t _ts_sec_max =
+            (std::numeric_limits<stdex::time_t>::max)();
+
+        if (delta_sec.QuadPart < _ts_sec_max)
+        {
+            ts.tv_sec =
+                static_cast<stdex::time_t>(delta_sec.QuadPart);
+            ts.tv_nsec =
+                static_cast<long>(delta_nsec.QuadPart) + 1;
+        }
+        else
+        {
+            ts.tv_sec = _ts_sec_max;
+            ts.tv_nsec = 999999999;
+        }
+
+        return 0;
+}
+
+    int clock_gettime(int clk_id, timespec* ts) {
+        if (clk_id == _STDEX_CHRONO_CLOCK_MONOTONIC)
+            return clock_gettime_monotonic(*ts);
+        else if (clk_id == _STDEX_CHRONO_CLOCK_REALTIME)
+            return clock_gettime_realtime(*ts);
+        return -1;
+
+    }
+
+    ::timespec local_ts_to_system_ts(const ::timespec &ts)
+    {
+        LARGE_INTEGER local_delta;
+        local_delta.QuadPart = 
+            abs_start_point::get().QuadPart - get_abs_start_point_system().QuadPart;
+
+        ::timespec result = 
+            system_time_to_timespec(local_delta);
+
+        timespec_add(result, ts);
+
+        return result;
+    }
+
+}
+int(*clock_gettime_func_pointer)(int, timespec*) = &clock_gettime_impl::clock_gettime;
+using clock_gettime_impl::local_ts_to_system_ts;
+
 #elif defined(__MACH__) && !defined(CLOCK_REALTIME)
 #include <time.h>
 #include <sys/time.h>       /* gettimeofday */
@@ -195,10 +359,10 @@ void init()
     struct timeval  micro;      /* microseconds since 1 Jan 1970 */
 
     if (mach_timebase_info(&timebase) != 0)
-        abort();                            /* very unlikely error */
+        std::abort();                            /* very unlikely error */
 
     if (gettimeofday(&micro, NULL) != 0)
-        abort();                            /* very unlikely error */
+        std::abort();                            /* very unlikely error */
 
     initclock = mach_absolute_time();
 
@@ -208,10 +372,10 @@ void init()
 
 static struct _init_inittime
 {
-	_init_inittime()
-	{
-		init();
-	}
+    _init_inittime()
+    {
+        init();
+    }
 } init_inittime;
 
 struct timespec get_abs_future_time_fine(unsigned milli)
@@ -228,84 +392,84 @@ struct timespec get_abs_future_time_fine(unsigned milli)
     NORMALISE_TIMESPEC( future, milli );
     return future;
 }
-struct mytimespec:
-	public timespec
-{};
 
 int clock_gettime(int X, timespec *tv)
 {
-	*tv = get_abs_future_time_fine(0);
+    *tv = get_abs_future_time_fine(0);
 
-	return (0);
+    return (0);
 }
 int(*clock_gettime_func_pointer)(int, timespec*) = &clock_gettime;
+
+::timespec local_ts_to_system_ts(const ::timespec &ts)
+{
+    return ts;
+}
 #else
 
-struct mytimespec:
-	public timespec
-{};
 
 int clock_gettime(clockid_t, struct timespec*);
 int(*clock_gettime_func_pointer)(clockid_t, struct timespec*) = &clock_gettime;
+
+const ::timespec& local_ts_to_system_ts(const ::timespec &ts)
+{
+    return ts;
+}
+
 #endif
 
 #ifdef CLOCK_MONOTONIC
-	#undef _STDEX_CHRONO_CLOCK_MONOTONIC
-	#define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_MONOTONIC
-	
-	#ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
-		#define _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
-	#endif
+    #undef _STDEX_CHRONO_CLOCK_MONOTONIC
+    #define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_MONOTONIC
+    
+    #ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+        #define _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+    #endif
 
 #endif
 
 #ifdef CLOCK_BOOTTIME 
-	#undef _STDEX_CHRONO_CLOCK_MONOTONIC
-	#define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_BOOTTIME
+    #undef _STDEX_CHRONO_CLOCK_MONOTONIC
+    #define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_BOOTTIME
 
-	#ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
-		#define _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
-	#endif
+    #ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+        #define _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+    #endif
 #endif
 
 #ifdef CLOCK_MONOTONIC_RAW  
-	#undef _STDEX_CHRONO_CLOCK_MONOTONIC
-	#define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_MONOTONIC_RAW
+    #undef _STDEX_CHRONO_CLOCK_MONOTONIC
+    #define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_MONOTONIC_RAW
 
-	#ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
-		#define _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
-	#endif
+    #ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+        #define _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+    #endif
 #endif
 
 #ifdef CLOCK_REALTIME
-	#undef _STDEX_CHRONO_CLOCK_REALTIME
-	#define _STDEX_CHRONO_CLOCK_REALTIME CLOCK_REALTIME
+    #undef _STDEX_CHRONO_CLOCK_REALTIME
+    #define _STDEX_CHRONO_CLOCK_REALTIME CLOCK_REALTIME
 
-	#ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
-		#define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_REALTIME
-	#endif
+    #ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+        #define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_REALTIME
+    #endif
 #endif
 
 #if defined(WIN32) || defined(_WIN32)
-#ifdef LLONG_MAX
-	LARGE_INTEGER performanceFrequency;
+    LARGE_INTEGER performanceFrequency;
 
-	const bool stdex::chrono::system_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency) != 0;
-	const bool stdex::chrono::steady_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency) != 0;
-#else
-	const bool stdex::chrono::system_clock::is_steady = false;
-	const bool stdex::chrono::steady_clock::is_steady = false;
-#endif
+    const bool stdex::chrono::steady_clock::is_steady = QueryPerformanceFrequency(&performanceFrequency) != 0;
+    const bool stdex::chrono::system_clock::is_steady = false;
 
 #else
 
 #ifdef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
-	const bool stdex::chrono::steady_clock::is_steady = true;
-	const bool stdex::chrono::system_clock::is_steady = 
-		(_STDEX_CHRONO_CLOCK_MONOTONIC == _STDEX_CHRONO_CLOCK_REALTIME);
+    const bool stdex::chrono::steady_clock::is_steady = true;
+    const bool stdex::chrono::system_clock::is_steady = 
+        (_STDEX_CHRONO_CLOCK_MONOTONIC == _STDEX_CHRONO_CLOCK_REALTIME);
 #else
-	const bool stdex::chrono::steady_clock::is_steady = false;
-	const bool stdex::chrono::system_clock::is_steady = false;
+    const bool stdex::chrono::steady_clock::is_steady = false;
+    const bool stdex::chrono::system_clock::is_steady = false;
 #endif
 
 #endif // not windows
@@ -320,50 +484,70 @@ int(*clock_gettime_func_pointer)(clockid_t, struct timespec*) = &clock_gettime;
 
 #endif
 
+
+stdex::timespec
+    stdex::chrono::system_clock::to_timespec(const time_point &_t) _STDEX_NOEXCEPT_FUNCTION
+{
+    chrono::time_point<system_clock, chrono::seconds> _s = 
+        chrono::time_point_cast<chrono::seconds>(_t);
+    chrono::nanoseconds _ns = 
+        chrono::duration_cast<chrono::nanoseconds>(_t - _s);
+
+    chrono::time_point<clock_t, chrono::seconds>::rep _s_count = 
+        _s.time_since_epoch().count();
+
+    ::timespec _ts;
+
+    const stdex::time_t _ts_sec_max = 
+        (std::numeric_limits<stdex::time_t>::max)();
+    if (_s_count < _ts_sec_max)
+    {
+        _ts.tv_sec = static_cast<stdex::time_t>(_s_count);
+        _ts.tv_nsec = static_cast<long>(_ns.count());
+
+        return local_ts_to_system_ts(_ts);
+    }
+    else
+    {
+        _ts.tv_sec = _ts_sec_max;
+        _ts.tv_nsec = 999999999;
+    }
+
+    return _ts;
+}
+
 stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDEX_NOEXCEPT_FUNCTION
-{	// get current time
-	{
-		mytimespec ts;
-		ts.tv_sec = 0;
-		ts.tv_nsec = 0;
+{    // get current time
+    {
+        timespec ts;
+        ts.tv_sec = 0;
+        ts.tv_nsec = 0;
 
-		if ((*clock_gettime_func_pointer)(_STDEX_CHRONO_CLOCK_REALTIME, &ts) != 0)
-		{
-			std::terminate();
-		}
-
-#ifdef _STDEX_CHRONO_USE_MICROSECONDS
-		return time_point(
-			duration_cast<duration>(
-				seconds(ts.tv_sec) + microseconds(ts.tv_nsec / 1000)) );
-#else
-		return time_point(
-			duration_cast<duration>(
-				seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec)) );
-#endif
-	}
+        if ((*clock_gettime_func_pointer)(_STDEX_CHRONO_CLOCK_REALTIME, &ts) != 0)
+        {
+            std::terminate();
+        }
+        
+        return
+        time_point( 
+            seconds(ts.tv_sec) + duration_cast<duration>(nanoseconds(ts.tv_nsec)) );
+    }
 }
 
 stdex::chrono::steady_clock::time_point stdex::chrono::steady_clock::now() _STDEX_NOEXCEPT_FUNCTION
-{	// get current time
-	{
-		mytimespec ts;
-		ts.tv_sec = 0;
-		ts.tv_nsec = 0;
+{    // get current time
+    {
+        timespec ts;
+        ts.tv_sec = 0;
+        ts.tv_nsec = 0;
 
-		if ((*clock_gettime_func_pointer)(_STDEX_CHRONO_CLOCK_MONOTONIC, &ts) != 0)
-		{
-			std::terminate();
-		}
+        if ((*clock_gettime_func_pointer)(_STDEX_CHRONO_CLOCK_MONOTONIC, &ts) != 0)
+        {
+            std::terminate();
+        }
 
-#ifdef _STDEX_CHRONO_USE_MICROSECONDS
-		return time_point(
-			duration_cast<duration>(
-				seconds(ts.tv_sec) + microseconds(ts.tv_nsec / 1000)) );
-#else
-		return time_point(
-			duration_cast<duration>(
-				seconds(ts.tv_sec) + nanoseconds(ts.tv_nsec)) );
-#endif
-	}
+        return
+        time_point(
+            seconds(ts.tv_sec) + duration_cast<duration>(nanoseconds(ts.tv_nsec)));
+    }
 }

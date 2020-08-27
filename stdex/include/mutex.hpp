@@ -82,7 +82,11 @@ namespace stdex
                 }
 
                 if (0 != _err)
-                    throw(stdex::system_error( stdex::errc::errc_t(_err)) );
+                    throw(
+                        stdex::system_error(
+                            stdex::make_error_code(stdex::errc::errc_t(_err))
+                        ) 
+                    );
             }
 
             ~_recursive_mutex_base() _STDEX_NOEXCEPT(false)
@@ -116,7 +120,9 @@ namespace stdex
 
             // EINVAL, EAGAIN, EBUSY, EINVAL, EDEADLK(may)
             if (0 != _err)
-                throw system_error( error_code(errc::errc_t(_err)) );
+                throw system_error( 
+                    stdex::make_error_code(stdex::errc::errc_t(_err))
+                );
         }
 
         inline bool try_lock() _STDEX_NOEXCEPT_FUNCTION
@@ -130,7 +136,9 @@ namespace stdex
             int _err = pthread_mutex_unlock(&_mutex_handle);
 
             if (0 != _err)
-                throw system_error( error_code(errc::errc_t(_err)) );
+                throw system_error( 
+                    stdex::make_error_code(stdex::errc::errc_t(_err))
+                );
         }
 
         native_handle_type native_handle() _STDEX_NOEXCEPT_FUNCTION
@@ -162,7 +170,9 @@ namespace stdex
 
             // EINVAL, EAGAIN, EBUSY, EINVAL, EDEADLK(may)
             if (0 != _err)
-                throw system_error(error_code(errc::errc_t(_err)));
+                throw system_error(
+                    stdex::make_error_code(stdex::errc::errc_t(_err))
+                );
         }
 
         inline bool try_lock()
@@ -176,7 +186,9 @@ namespace stdex
             int _err = pthread_mutex_unlock(&_mutex_handle);
             // XXX EINVAL, EAGAIN, EBUSY
             if (0 != _err)
-                throw system_error(error_code(errc::errc_t(_err)));
+                throw system_error(
+                    stdex::make_error_code(stdex::errc::errc_t(_err))
+                );
         }
 
         native_handle_type native_handle() _STDEX_NOEXCEPT_FUNCTION
@@ -312,9 +324,13 @@ namespace stdex
         void lock()
         {
             if (!_device)
-                throw system_error(error_code(errc::operation_not_permitted));
+                throw system_error(
+                    stdex::make_error_code(errc::operation_not_permitted)
+                );
             else if (_owns)
-                throw system_error(error_code(errc::resource_deadlock_would_occur));
+                throw system_error(
+                    stdex::make_error_code(errc::resource_deadlock_would_occur)
+                );
             else
             {
                 _device->lock();
@@ -325,9 +341,13 @@ namespace stdex
         bool try_lock()
         {
             if (!_device)
-                throw system_error(error_code(errc::operation_not_permitted));
+                throw system_error(
+                    stdex::make_error_code(errc::operation_not_permitted)
+                );
             else if (_owns)
-                throw system_error(error_code(errc::resource_deadlock_would_occur));
+                throw system_error(
+                    stdex::make_error_code(errc::resource_deadlock_would_occur)
+                );
             else
             {
                 _owns = _device->try_lock();
@@ -339,9 +359,13 @@ namespace stdex
         bool try_lock_until(const chrono::time_point<_Clock, _Duration> &atime)
         {
             if (!_device)
-                throw system_error(error_code(errc::operation_not_permitted));
+                throw system_error(
+                    stdex::make_error_code(errc::operation_not_permitted)
+                );
             else if (_owns)
-                throw system_error(error_code(errc::resource_deadlock_would_occur));
+                throw system_error(
+                    stdex::make_error_code(errc::resource_deadlock_would_occur)
+                );
             else
             {
                 _owns = _device->try_lock_until(atime);
@@ -353,9 +377,13 @@ namespace stdex
         bool try_lock_for(const chrono::duration<_Rep, _Period> &rtime)
         {
             if (!_device)
-                throw system_error(error_code(errc::operation_not_permitted));
+                throw system_error(
+                    stdex::make_error_code(errc::operation_not_permitted)
+                );
             else if (_owns)
-                throw system_error(error_code(errc::resource_deadlock_would_occur));
+                throw system_error(
+                    stdex::make_error_code(errc::resource_deadlock_would_occur)
+                );
             else
             {
                 _owns = _device->try_lock_for(rtime);
@@ -366,7 +394,9 @@ namespace stdex
         void unlock()
         {
             if (!_owns)
-                throw system_error(error_code(errc::operation_not_permitted));
+                throw system_error(
+                    stdex::make_error_code(errc::operation_not_permitted)
+                );
             else if (_device)
             {
                 _device->unlock();
@@ -471,16 +501,8 @@ namespace stdex
             static bool try_lock_until1(pthread_mutex_t& _mutex_handle,
                 const chrono::time_point<chrono::system_clock, _Duration>& _atime)
             {
-                chrono::time_point<chrono::system_clock, chrono::seconds> _s =
-                    chrono::time_point_cast<chrono::seconds>(_atime);
-                chrono::nanoseconds _ns = 
-                    chrono::duration_cast<chrono::nanoseconds>(_atime - _s);
-
-                timespec _ts;
-                _ts.tv_sec = 
-                    static_cast<stdex::time_t>(_s.time_since_epoch().count());
-                _ts.tv_nsec = 
-                    static_cast<long>(_ns.count());
+                ::timespec _ts = 
+                    chrono::system_clock::to_timespec(_atime);
 
                 bool success = 
                     (pthread_mutex_timedlock(&_mutex_handle, &_ts) == 0);
@@ -597,9 +619,9 @@ namespace stdex
 
         private:
 
-            mutex		_mut;
-            condition_variable	_cv;
-            bool		_locked;
+            mutex        _mut;
+            condition_variable    _cv;
+            bool        _locked;
         };
 
         template<>
@@ -639,7 +661,9 @@ namespace stdex
                 unique_lock<mutex> _lk(_mut);
                 _cv.wait(_lk, _can_lock);
                 if ((0u - 1u) == _count)
-                    throw system_error(error_code(errc::errc_t(EAGAIN)));// [thread.timedmutex.recursive]/3
+                    throw system_error(
+                        stdex::make_error_code(stdex::errc::errc_t(EAGAIN))
+                    );// [thread.timedmutex.recursive]/3
                 _owner = _id;
                 ++_count;
             }
@@ -723,10 +747,10 @@ namespace stdex
 
         private:
 
-            mutex		_mut;
-            condition_variable	_cv;
-            thread::id		_owner;
-            unsigned		_count;
+            mutex        _mut;
+            condition_variable    _cv;
+            thread::id        _owner;
+            unsigned        _count;
 
             _timed_mutex_impl_base(const _timed_mutex_impl_base&) _STDEX_DELETED_FUNCTION;
             _timed_mutex_impl_base& operator=(const _timed_mutex_impl_base&) _STDEX_DELETED_FUNCTION;
@@ -750,7 +774,9 @@ namespace stdex
 
                 // EINVAL, EAGAIN, EBUSY, EINVAL, EDEADLK(may)
                 if (_err)
-                    throw system_error(error_code(errc::errc_t(_err)));
+                    throw system_error(
+                        stdex::make_error_code(stdex::errc::errc_t(_err))
+                    );
             }
 
             inline bool try_lock() _STDEX_NOEXCEPT_FUNCTION
@@ -809,7 +835,9 @@ namespace stdex
 
                 // EINVAL, EAGAIN, EBUSY, EINVAL, EDEADLK(may)
                 if (_err)
-                    throw system_error(error_code(errc::errc_t(_err)));
+                    throw system_error(
+                        stdex::make_error_code(stdex::errc::errc_t(_err))
+                    );
             }
 
             inline bool try_lock()

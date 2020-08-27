@@ -10,7 +10,7 @@ int main(void)
     {
 
         typedef void (fn_type)();
-        typedef make_unsigned<fn_type>::type  	test4_type;
+        typedef make_unsigned<fn_type>::type      test4_type;
 
     }
     
