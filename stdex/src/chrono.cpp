@@ -3,6 +3,7 @@
 
 // POSIX includes
 //#include <time.h> // for clock_gettime
+#include <pthread.h>
 
 
 // std includes
@@ -661,7 +662,7 @@ namespace stdex {
     } // namespace chrono
 } // namespace stdex
 
-::timespec
+stdex::timespec
     stdex::chrono::system_clock::to_timespec(const time_point &_t) _STDEX_NOEXCEPT_FUNCTION
 {
     chrono::time_point<system_clock, chrono::seconds> _s = 

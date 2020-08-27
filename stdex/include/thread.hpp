@@ -1983,7 +1983,7 @@ namespace stdex
 
             chrono::seconds::rep _s_count = _sec.count();
 
-            timespec _ts;
+            ::timespec _ts;
 
             const stdex::time_t _ts_sec_max = 
                 (std::numeric_limits<stdex::time_t>::max)();

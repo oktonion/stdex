@@ -22,6 +22,7 @@ for file in ./tests/*.cpp; do
     else
       build_ok=0
       tests_failed="$tests_failed $filename;"
+      echo $output
     fi
   else
     if [[ $filename == *"fail"* ]]; then

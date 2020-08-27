@@ -11,7 +11,7 @@
 #include "./type_traits.hpp" // stdex::common_type, stdex::is_floating_point
 
 // POSIX includes
-#include <pthread.h>
+/*none*/
 
 // std includes
 #include <time.h> // ::time_t - need to be changed
@@ -34,7 +34,8 @@
 
 namespace stdex
 {
-    typedef ::time_t time_t;
+    using ::time_t;
+    using ::timespec;
 
     //! Minimal implementation of the @c chrono namespace.
     //! The @c chrono namespace provides types for specifying time intervals.
@@ -1262,7 +1263,7 @@ namespace stdex
                 now() _STDEX_NOEXCEPT_FUNCTION;
 
             // Map to POSIX API
-            static ::timespec
+            static stdex::timespec
                 to_timespec(const time_point&) _STDEX_NOEXCEPT_FUNCTION;
 
             // Map to C API
