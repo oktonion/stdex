@@ -54,15 +54,9 @@ int main(void)
 
         struct lambdas{
             static void npt_test(void*, float*, struct npt_classss*, void(*)()) {}
-            static void void_test(){}
         };
 
         lambdas::npt_test(nullptr, nullptr, nullptr, nullptr);
-        lambdas::npt_test(
-            (lambdas::void_test(), nullptr), 
-            (lambdas::void_test(), nullptr), 
-            (lambdas::void_test(), nullptr), 
-            (lambdas::void_test(), nullptr));
 
         // countof checks:
         {
