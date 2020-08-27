@@ -271,7 +271,7 @@ namespace stdex
             template<class _Tp>
             _Tp& operator,(_Tp &value, 
                 typename
-                conditional<is_same<typename remove_cv<_Tp>::type, nullptr_t>::value, class _dummy&, void*>::type)
+                conditional<is_null_pointer<_Tp>::value, class _disable1&, void*>::type)
             {
                 return value;
             }
@@ -279,7 +279,7 @@ namespace stdex
             template<class _Tp>
             const _Tp& operator,(const _Tp& value,
                 typename
-                conditional<is_same<typename remove_cv<_Tp>::type, nullptr_t>::value, class _dummy&, void*>::type)
+                conditional<is_null_pointer<_Tp>::value, class _disable2&, void*>::type)
             {
                 return value;
             }
@@ -312,7 +312,7 @@ namespace stdex
             };
 
             template<class _Tp>
-            _Tp& operator,(const _ref_wrapper<_Tp> &value, void*)
+            _Tp& operator,(const _ref_wrapper<_Tp> &value, ...)
             {
                 return value;
             }
@@ -463,7 +463,7 @@ namespace stdex
                         using thread_detail::operator,;
                         using thread_detail::_arg;
                         
-                        fp((_arg(args.arg1), nullptr));
+                        fp((_arg(args.arg1), (is_integral<nullptr_t>::value ? NULL : nullptr)));
                     }
 
                     static 
@@ -552,8 +552,8 @@ namespace stdex
                         using thread_detail::operator,;
                         using thread_detail::_arg;
                         
-                        fp((_arg(args.arg1), nullptr),
-                           (_arg(args.arg2), nullptr));
+                        fp((_arg(args.arg1), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg2), (is_integral<nullptr_t>::value ? NULL : nullptr)));
                     }
 
                     static 
@@ -643,9 +643,9 @@ namespace stdex
                         using thread_detail::operator,;
                         using thread_detail::_arg;
                         
-                        fp((_arg(args.arg1), nullptr),
-                           (_arg(args.arg2), nullptr),
-                           (_arg(args.arg3), nullptr));
+                        fp((_arg(args.arg1), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg2), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg3), (is_integral<nullptr_t>::value ? NULL : nullptr)));
                     }
 
                     static 
@@ -747,10 +747,10 @@ namespace stdex
                         using thread_detail::operator,;
                         using thread_detail::_arg;
                         
-                        fp((_arg(args.arg1), nullptr),
-                           (_arg(args.arg2), nullptr),
-                           (_arg(args.arg3), nullptr),
-                           (_arg(args.arg4), nullptr));
+                        fp((_arg(args.arg1), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg2), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg3), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg4), (is_integral<nullptr_t>::value ? NULL : nullptr)));
                     }
 
                     static 
@@ -872,11 +872,11 @@ namespace stdex
                         using thread_detail::operator,;
                         using thread_detail::_arg;
 
-                        fp((_arg(args.arg1), nullptr),
-                           (_arg(args.arg2), nullptr),
-                           (_arg(args.arg3), nullptr),
-                           (_arg(args.arg4), nullptr),
-                           (_arg(args.arg5), nullptr));
+                        fp((_arg(args.arg1), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg2), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg3), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg4), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg5), (is_integral<nullptr_t>::value ? NULL : nullptr)));
                     }
 
                     static 
@@ -1034,12 +1034,12 @@ namespace stdex
                         using thread_detail::operator,;
                         using thread_detail::_arg;
                         
-                        fp((_arg(args.arg1), nullptr),
-                           (_arg(args.arg2), nullptr),
-                           (_arg(args.arg3), nullptr),
-                           (_arg(args.arg4), nullptr),
-                           (_arg(args.arg5), nullptr),
-                           (_arg(args.arg6), nullptr));
+                        fp((_arg(args.arg1), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg2), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg3), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg4), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg5), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg6), (is_integral<nullptr_t>::value ? NULL : nullptr)));
                     }
 
                     static 
@@ -1265,13 +1265,13 @@ namespace stdex
                         using thread_detail::operator,;
                         using thread_detail::_arg;
                         
-                        fp((_arg(args.arg1), nullptr),
-                           (_arg(args.arg2), nullptr),
-                           (_arg(args.arg3), nullptr),
-                           (_arg(args.arg4), nullptr),
-                           (_arg(args.arg5), nullptr),
-                           (_arg(args.arg6), nullptr),
-                           (_arg(args.arg7), nullptr));
+                        fp((_arg(args.arg1), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg2), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg3), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg4), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg5), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg6), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg7), (is_integral<nullptr_t>::value ? NULL : nullptr)));
                     }
 
                     static 
@@ -1630,14 +1630,14 @@ namespace stdex
                         using thread_detail::operator,;
                         using thread_detail::_arg;
                         
-                        fp((_arg(args.arg1), nullptr),
-                           (_arg(args.arg2), nullptr),
-                           (_arg(args.arg3), nullptr),
-                           (_arg(args.arg4), nullptr),
-                           (_arg(args.arg5), nullptr),
-                           (_arg(args.arg6), nullptr),
-                           (_arg(args.arg7), nullptr),
-                           (_arg(args.arg8), nullptr));
+                        fp((_arg(args.arg1), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg2), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg3), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg4), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg5), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg6), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg7), (is_integral<nullptr_t>::value ? NULL : nullptr)),
+                           (_arg(args.arg8), (is_integral<nullptr_t>::value ? NULL : nullptr)));
                     }
 
                     static 
