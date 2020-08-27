@@ -311,8 +311,8 @@ namespace stdex
                 _Tp* _ptr;
             };
 
-            template<class _Tp>
-            _Tp& operator,(const _ref_wrapper<_Tp> &value, ...)
+            template<class _Tp, class _OtherT>
+            _Tp& operator,(const _ref_wrapper<_Tp> &value, const _OtherT&)
             {
                 return value;
             }
