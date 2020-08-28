@@ -882,7 +882,7 @@ namespace thread_cpp_detail
 
     struct nanosleep_impl:
         nanosleep_impl2<
-            sizeof(::clock_gettime(declval<::clockid_t>(), declval<::timespec*>())) != sizeof(char)
+            sizeof(::clock_gettime(declval< ::clockid_t >(), declval< ::timespec* >())) != sizeof(char)
         >
     { };
 } // namespace thread_cpp_detail
