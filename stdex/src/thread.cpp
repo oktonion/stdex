@@ -697,9 +697,10 @@ namespace thread_cpp_detail
     template<>
     struct nanosleep_impl1<true>
     {
-        enum {BILLION = 1000000000};
+        
         static void timespec_add(timespec &result, const timespec &in)
         {
+            enum {BILLION = 1000000000};
             const stdex::time_t _ts_sec_max = 
                 (std::numeric_limits<stdex::time_t>::max)();
             
@@ -738,16 +739,7 @@ namespace thread_cpp_detail
             }
         }
 
-        static inline void timespec_diff(const timespec &a, const timespec &b,
-            timespec &result) 
-        {
-            result.tv_sec  = a.tv_sec  - b.tv_sec;
-            result.tv_nsec = a.tv_nsec - b.tv_nsec;
-            if (result.tv_nsec < 0) {
-                --result.tv_sec;
-                result.tv_nsec += BILLION;
-            }
-        }
+
 
         static int clock_nanosleep_abs(const timespec* tp)
         {
@@ -823,6 +815,17 @@ namespace thread_cpp_detail
             sizeof(::clock_nanosleep(declval<clockid_t&>(), declval<int>(), declval<timespec*>(), declval<timespec*>())) != sizeof(char)
         >
     { 
+        static inline void timespec_diff(const timespec &a, const timespec &b,
+            timespec &result) 
+        {
+            result.tv_sec  = a.tv_sec  - b.tv_sec;
+            result.tv_nsec = a.tv_nsec - b.tv_nsec;
+            if (result.tv_nsec < 0) {
+                --result.tv_sec;
+                result.tv_nsec += BILLION;
+            }
+        }
+
         static int call(const ::timespec *req, ::timespec *rem)
         {
             timespec _begin;
@@ -872,7 +875,7 @@ namespace thread_cpp_detail
 
     struct nanosleep_impl:
         nanosleep_impl2<
-            sizeof(::clock_gettime(declval<clockid_t&>(), declval<timespec*>())) != sizeof(char)
+            sizeof(::clock_gettime(declval<::clockid_t>(), declval<::timespec*>())) != sizeof(char)
         >
     { };
 } // namespace thread_cpp_detail
