@@ -632,27 +632,67 @@ namespace thread_cpp_detail
         }
     };
 
+// for sleep impl
 #ifdef CLOCK_MONOTONIC
-    #undef _STDEX_THREAD_CLOCK_MONOTONIC
-    #define _STDEX_THREAD_CLOCK_MONOTONIC CLOCK_MONOTONIC
+    #undef _STDEX_THREAD_CLOCK_SLEEP_MONOTONIC
+    #define _STDEX_THREAD_CLOCK_SLEEP_MONOTONIC CLOCK_MONOTONIC
     
-    #ifndef _STDEX_THREAD_CLOCK_MONOTONIC_EXISTS
-        #define _STDEX_THREAD_CLOCK_MONOTONIC_EXISTS
+    #ifndef _STDEX_THREAD_CLOCK_SLEEP_MONOTONIC_EXISTS
+        #define _STDEX_THREAD_CLOCK_SLEEP_MONOTONIC_EXISTS
     #endif
 
 #endif
 
 #ifdef CLOCK_BOOTTIME 
-    #undef _STDEX_THREAD_CLOCK_MONOTONIC
-    #define _STDEX_THREAD_CLOCK_MONOTONIC CLOCK_BOOTTIME
+    #undef _STDEX_THREAD_CLOCK_SLEEP_MONOTONIC
+    #define _STDEX_THREAD_CLOCK_SLEEP_MONOTONIC CLOCK_BOOTTIME
 
-    #ifndef _STDEX_THREAD_CLOCK_MONOTONIC_EXISTS
-        #define _STDEX_THREAD_CLOCK_MONOTONIC_EXISTS
+    #ifndef _STDEX_THREAD_CLOCK_SLEEP_MONOTONIC_EXISTS
+        #define _STDEX_THREAD_CLOCK_SLEEP_MONOTONIC_EXISTS
+    #endif
+#endif
+
+// for time measurements impl
+
+#ifdef CLOCK_MONOTONIC
+    #undef _STDEX_CHRONO_CLOCK_MONOTONIC
+    #define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_MONOTONIC
+    
+    #ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+        #define _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+    #endif
+
+#endif
+
+#ifdef CLOCK_BOOTTIME 
+    #undef _STDEX_CHRONO_CLOCK_MONOTONIC
+    #define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_BOOTTIME
+
+    #ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+        #define _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+    #endif
+#endif
+
+#ifdef CLOCK_MONOTONIC_RAW  
+    #undef _STDEX_CHRONO_CLOCK_MONOTONIC
+    #define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_MONOTONIC_RAW
+
+    #ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+        #define _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+    #endif
+#endif
+
+#ifdef CLOCK_REALTIME
+    #undef _STDEX_CHRONO_CLOCK_REALTIME
+    #define _STDEX_CHRONO_CLOCK_REALTIME CLOCK_REALTIME
+
+    #ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+        #define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_REALTIME
     #endif
 #endif
 
 #if defined(CLOCK_MONOTONIC) && \
-        defined(_STDEX_THREAD_CLOCK_MONOTONIC_EXISTS) && \
+        defined(_STDEX_THREAD_CLOCK_SLEEP_MONOTONIC_EXISTS) && \
             defined(TIMER_ABSTIME)
     template<>
     struct nanosleep_impl1<true>
@@ -713,7 +753,7 @@ namespace thread_cpp_detail
         {
             errno = 0;
             int err =
-                ::clock_nanosleep(_STDEX_THREAD_CLOCK_MONOTONIC, TIMER_ABSTIME, tp, 0);
+                ::clock_nanosleep(_STDEX_THREAD_CLOCK_SLEEP_MONOTONIC, TIMER_ABSTIME, tp, 0);
 
             if (0 == err || ENOTSUP != errno)
                 return err;
@@ -737,21 +777,27 @@ namespace thread_cpp_detail
             timespec _begin, tp;
 
             int err = 
-                ::clock_gettime(_STDEX_THREAD_CLOCK_MONOTONIC, &_begin);
+                ::clock_gettime(_STDEX_CHRONO_CLOCK_MONOTONIC, &_begin);
             if(err != 0)
                 return nanosleep_impl1<false>::call(req, rem);
 
-            tp = _begin;
-            timespec_add(tp, *req);
-            rem->tv_sec = 0;
-            rem->tv_nsec = 0;
-
-            int nanosleep_err = 0;
+            err = 
+                ::clock_gettime(_STDEX_THREAD_CLOCK_SLEEP_MONOTONIC, &tp);
             
+            int nanosleep_err = -1;
 
             errno = 0;
-            nanosleep_err = 
-                clock_nanosleep_abs(&tp);
+            
+            if(err == 0)
+            {
+                timespec_add(tp, *req);
+                rem->tv_sec = 0;
+                rem->tv_nsec = 0;
+
+                
+                nanosleep_err = 
+                    clock_nanosleep_abs(&tp);
+            }
 
             if (0 != nanosleep_err && EINTR != errno)
             {
@@ -768,7 +814,7 @@ namespace thread_cpp_detail
             {
                 int myerrno = errno;
                 err = 
-                    ::clock_gettime(_STDEX_THREAD_CLOCK_MONOTONIC, &_end);
+                    ::clock_gettime(_STDEX_CHRONO_CLOCK_MONOTONIC, &_end);
                 errno = 0;
                 if (0 != err)
                 {
