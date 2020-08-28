@@ -863,15 +863,15 @@ namespace thread_cpp_detail
             }
 
             timespec_math::diff(_end, _begin, _passed);
-
+std::cout << "passed sec:" << _passed.tv_sec << "." << _passed.tv_nsec << std::endl;
             if (_passed.tv_sec > req->tv_sec ||
                 (_passed.tv_sec == req->tv_sec && _passed.tv_nsec > req->tv_nsec))
                 return 0;
 
             timespec_math::diff(*req, _passed, *rem);
 
-            std::cout << "passed sec:" << _passed.tv_sec << "." << _passed.tv_nsec << std::endl;
-            std::cout << "rem sec:" << rem->tv_sec << "." << rem->tv_nsec << std::endl;
+            
+std::cout << "rem sec:" << rem->tv_sec << "." << rem->tv_nsec << std::endl;
 
             if (rem->tv_sec < 0) rem->tv_sec = 0;
             if (rem->tv_nsec < 0) rem->tv_nsec = 0;
