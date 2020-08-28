@@ -230,14 +230,22 @@ namespace stdex
 
         namespace thread_detail
         {
-            _yes_type _is_able_to_pass_nullptr_with_comma_op_tester(void*);
-            _no_type _is_able_to_pass_nullptr_with_comma_op_tester(...);
+            class _dummy;
+            _yes_type _is_able_to_pass_nullptr_with_comma_op_tester1(void*);
+            _no_type _is_able_to_pass_nullptr_with_comma_op_tester1(...);
+            _yes_type _is_able_to_pass_nullptr_with_comma_op_tester2(void(_dummy::*)(float, int));
+            _no_type _is_able_to_pass_nullptr_with_comma_op_tester2(...);
+
+            void _dummy_void_f();
 
             struct _is_able_to_pass_nullptr_with_comma_op
             {
                 static const bool value = 
                     sizeof(
-                        _is_able_to_pass_nullptr_with_comma_op_tester((nullptr, nullptr))
+                        _is_able_to_pass_nullptr_with_comma_op_tester1((_dummy_void_f(), nullptr))
+                    ) == sizeof(_yes_type) &&
+                    sizeof(
+                        _is_able_to_pass_nullptr_with_comma_op_tester2((_dummy_void_f(), nullptr))
                     ) == sizeof(_yes_type);
             };
         }
