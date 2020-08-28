@@ -52,6 +52,12 @@ int main(void)
         mf = cmf; mf = mf;
         (void)(&f);
 
+        struct lambdas{
+            static void npt_test(void*, float*, struct npt_classss*, void(*)(), void (lambdas::*)()) {}
+        };
+
+        lambdas::npt_test(nullptr, nullptr, nullptr, nullptr, nullptr);
+
         // countof checks:
         {
             char carr[20];

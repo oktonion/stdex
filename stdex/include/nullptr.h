@@ -106,28 +106,28 @@ namespace stdex
             }
 
             template<bool>
-            struct _pointer_as_long_type { typedef long type; };
+            struct _pointer_as_long_type { typedef const long type; };
             template<>
-            struct _pointer_as_long_type<false> { typedef long type; };
+            struct _pointer_as_long_type<false> { typedef const long type; };
             template<bool>
-            struct _pointer_as_short_type { typedef short type; };
+            struct _pointer_as_short_type { typedef const short type; };
             template<>
             struct _pointer_as_short_type<false> { typedef _pointer_as_long_type<sizeof(long) == sizeof(void*)>::type type; };
             template<bool>
-            struct _pointer_as_int_type { typedef int type; };
+            struct _pointer_as_int_type { typedef const int type; };
             template<>
             struct _pointer_as_int_type<false> { typedef _pointer_as_short_type<sizeof(short) == sizeof(void*)>::type type; };
 
             template<bool>
-            struct _pointer_as_ulong_type { typedef unsigned long type; };
+            struct _pointer_as_ulong_type { typedef const unsigned long type; };
             template<>
-            struct _pointer_as_ulong_type<false> { typedef unsigned long type; };
+            struct _pointer_as_ulong_type<false> { typedef const unsigned long type; };
             template<bool>
-            struct _pointer_as_ushort_type { typedef unsigned short type; };
+            struct _pointer_as_ushort_type { typedef const unsigned short type; };
             template<>
             struct _pointer_as_ushort_type<false> { typedef _pointer_as_long_type<sizeof(unsigned long) == sizeof(void*)>::type type; };
             template<bool>
-            struct _pointer_as_uint_type { typedef unsigned int type; };
+            struct _pointer_as_uint_type { typedef const unsigned int type; };
             template<>
             struct _pointer_as_uint_type<false> { typedef _pointer_as_short_type<sizeof(unsigned short) == sizeof(void*)>::type type; };
 
@@ -147,7 +147,7 @@ namespace stdex
             };
 
             template<bool>
-            struct _pointer_as_ptrdiff_type { typedef ptrdiff_detail::ptrdiff_t type; };
+            struct _pointer_as_ptrdiff_type { typedef const ptrdiff_detail::ptrdiff_t type; };
             template<>
             struct _pointer_as_ptrdiff_type<false>:
                 _pointer_as_integral_type_impl<_ptrdiff_is_signed::value>
