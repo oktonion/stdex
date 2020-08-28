@@ -618,7 +618,7 @@ namespace thread_cpp_detail
     template<bool>
     struct nanosleep_impl1
     {
-        static int call(const timespec *req, timespec *rem)
+        static int call_impl(const timespec *req, timespec *rem)
         {
             errno = 0;
             int err = ::nanosleep(req, rem);
@@ -772,17 +772,15 @@ namespace thread_cpp_detail
             return err;
         }
 
-        static int call(const timespec *req, timespec *rem)
+        static int call_impl(const timespec *req, timespec *rem)
         {
-            timespec _begin, tp;
+            timespec tp;
 
             int err = 
-                ::clock_gettime(_STDEX_CHRONO_CLOCK_MONOTONIC, &_begin);
-            if(err != 0)
-                return nanosleep_impl1<false>::call(req, rem);
-
-            err = 
                 ::clock_gettime(_STDEX_THREAD_CLOCK_SLEEP_MONOTONIC, &tp);
+
+            if(err != 0)
+                return nanosleep_impl1<false>::call_impl(req, rem);
             
             int nanosleep_err = -1;
 
@@ -803,10 +801,36 @@ namespace thread_cpp_detail
             {
                 errno = 0;
                 nanosleep_err =
-                    nanosleep_impl1<false>::call(req, rem);
+                    nanosleep_impl1<false>::call_impl(req, rem);
                 if (0 != nanosleep_err)
                     return nanosleep_err;
             }
+
+            return nanosleep_err;
+        }
+    };
+#endif
+} // namespace thread_cpp_detail
+
+namespace thread_cpp_detail
+{
+    template<class _Tp>
+    static _Tp declval(); 
+
+    template<bool>
+    struct nanosleep_impl2:
+        nanosleep_impl1<
+            sizeof(::clock_nanosleep(declval<clockid_t&>(), declval<int>(), declval<timespec*>(), declval<timespec*>())) != sizeof(char)
+        >
+    { 
+        static int call(const ::timespec *req, ::timespec *rem)
+        {
+            timespec _begin;
+            int err = 
+                ::clock_gettime(_STDEX_CHRONO_CLOCK_MONOTONIC, &_begin);
+            
+            int nanosleep_err = 
+                call_impl(req, rem);
 
             timespec _end, _passed;
 
@@ -833,22 +857,22 @@ namespace thread_cpp_detail
 
             if (rem->tv_sec < 0) rem->tv_sec = 0;
             if (rem->tv_nsec < 0) rem->tv_nsec = 0;
-
-            return nanosleep_err;
         }
     };
-#endif
-} // namespace thread_cpp_detail
 
-namespace thread_cpp_detail
-{
-    template<class _Tp>
-    static _Tp declval(); 
+    template<>
+    struct nanosleep_impl2<false>:
+        nanosleep_impl1<false> 
+    {
+        static int call(const ::timespec *req, ::timespec *rem)
+        {
+            return call_impl(req, rem);
+        }
+    };
 
     struct nanosleep_impl:
-        nanosleep_impl1<
-            sizeof(::clock_gettime(declval<clockid_t&>(), declval<timespec*>())) != sizeof(char) &&
-            sizeof(::clock_nanosleep(declval<clockid_t&>(), declval<int>(), declval<timespec*>(), declval<timespec*>())) != sizeof(char)
+        nanosleep_impl2<
+            sizeof(::clock_gettime(declval<clockid_t&>(), declval<timespec*>())) != sizeof(char)
         >
     { };
 } // namespace thread_cpp_detail
