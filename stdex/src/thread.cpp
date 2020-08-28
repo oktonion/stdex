@@ -14,8 +14,6 @@
 #include <cerrno>
 #include <time.h>
 
-#include <iostream>
-
 #ifdef __GLIBC__
 #include <sys/sysinfo.h>
 #elif defined(__APPLE__) || defined(__FreeBSD__)
@@ -871,10 +869,13 @@ std::cout << "passed sec:" << _passed.tv_sec << "." << _passed.tv_nsec << std::e
             timespec_math::diff(*req, _passed, *rem);
 
             
-std::cout << "rem sec:" << rem->tv_sec << "." << rem->tv_nsec << std::endl;
-
-            if (rem->tv_sec < 0) rem->tv_sec = 0;
-            if (rem->tv_nsec < 0) rem->tv_nsec = 0;
+            int myerrno = EINTR;
+            if (rem->tv_sec < 0) 
+            {rem->tv_sec = 0; myerrno = 0;}
+            if (rem->tv_nsec < 0) 
+            {rem->tv_nsec = 0; myerrno = 0;}
+            errno = myerrno;
+            return -1;
         }
     };
 
