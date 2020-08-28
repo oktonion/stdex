@@ -14,6 +14,8 @@
 #include <cerrno>
 #include <time.h>
 
+#include <iostream>
+
 #ifdef __GLIBC__
 #include <sys/sysinfo.h>
 #elif defined(__APPLE__) || defined(__FreeBSD__)
@@ -695,7 +697,7 @@ namespace thread_cpp_detail
         {
                 enum {BILLION = 1000000000};
                 
-                static inline void add(timespec &result, const timespec &in)
+                static inline void add(::timespec &result, const ::timespec &in)
                 {
                     const stdex::time_t _ts_sec_max = 
                         (std::numeric_limits<stdex::time_t>::max)();
@@ -735,15 +737,18 @@ namespace thread_cpp_detail
                     }
                 }
 
-                static inline void diff(const timespec &a, const timespec &b,
-                    timespec &result) 
+                static inline void diff(const ::timespec &a, const ::timespec &b,
+                    ::timespec &out) 
                 {
+                    ::timespec result;
                     result.tv_sec  = a.tv_sec  - b.tv_sec;
                     result.tv_nsec = a.tv_nsec - b.tv_nsec;
                     if (result.tv_nsec < 0) {
                         --result.tv_sec;
                         result.tv_nsec += BILLION;
                     }
+
+                    out = result;
                 }
         } // namespace timespec_math
 
@@ -864,6 +869,9 @@ namespace thread_cpp_detail
                 return 0;
 
             timespec_math::diff(*req, _passed, *rem);
+
+            std::cout << "passed sec:" << _passed.tv_sec << "." << _passed.tv_nsec << std::endl;
+            std::cout << "rem sec:" << rem->tv_sec << "." << rem->tv_nsec << std::endl;
 
             if (rem->tv_sec < 0) rem->tv_sec = 0;
             if (rem->tv_nsec < 0) rem->tv_nsec = 0;
