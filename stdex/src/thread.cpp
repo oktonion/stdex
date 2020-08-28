@@ -691,6 +691,62 @@ namespace thread_cpp_detail
     #endif
 #endif
 
+        namespace timespec_math
+        {
+                enum {BILLION = 1000000000};
+                
+                static inline void add(timespec &result, const timespec &in)
+                {
+                    const stdex::time_t _ts_sec_max = 
+                        (std::numeric_limits<stdex::time_t>::max)();
+                    
+                    if(result.tv_sec == _ts_sec_max || result.tv_sec < 0 ||
+                        in.tv_sec == _ts_sec_max)
+                    {
+                        result.tv_sec = _ts_sec_max;
+                        result.tv_nsec = BILLION - 1;
+                        return;
+                    }
+
+                    timespec t2 = in;
+                    if (result.tv_nsec >= BILLION) {
+                        result.tv_nsec -= BILLION;
+                        result.tv_sec++;
+                    }
+                    if (t2.tv_nsec >= BILLION) {
+                        t2.tv_nsec -= BILLION;
+                        t2.tv_sec++;
+                    }
+                    result.tv_sec += t2.tv_sec;
+                    result.tv_nsec += t2.tv_nsec;
+                    if (result.tv_nsec >= BILLION) {
+                        result.tv_nsec -= BILLION;
+                        result.tv_sec++;
+                    }
+
+                    if(result.tv_sec < 0)
+                    {
+                        result.tv_sec = 0;
+                        result.tv_nsec = 0;
+                    }
+                    if(result.tv_nsec < 0)
+                    {
+                        result.tv_nsec = 0;
+                    }
+                }
+
+                static inline void diff(const timespec &a, const timespec &b,
+                    timespec &result) 
+                {
+                    result.tv_sec  = a.tv_sec  - b.tv_sec;
+                    result.tv_nsec = a.tv_nsec - b.tv_nsec;
+                    if (result.tv_nsec < 0) {
+                        --result.tv_sec;
+                        result.tv_nsec += BILLION;
+                    }
+                }
+        } // namespace timespec_math
+
 #if defined(CLOCK_MONOTONIC) && \
         defined(_STDEX_THREAD_CLOCK_SLEEP_MONOTONIC_EXISTS) && \
             defined(TIMER_ABSTIME)
@@ -698,46 +754,6 @@ namespace thread_cpp_detail
     struct nanosleep_impl1<true>
     {
         
-        static void timespec_add(timespec &result, const timespec &in)
-        {
-            enum {BILLION = 1000000000};
-            const stdex::time_t _ts_sec_max = 
-                (std::numeric_limits<stdex::time_t>::max)();
-            
-            if(result.tv_sec == _ts_sec_max || result.tv_sec < 0 ||
-                in.tv_sec == _ts_sec_max)
-            {
-                result.tv_sec = _ts_sec_max;
-                result.tv_nsec = BILLION - 1;
-                return;
-            }
-
-            timespec t2 = in;
-            if (result.tv_nsec >= BILLION) {
-                result.tv_nsec -= BILLION;
-                result.tv_sec++;
-            }
-            if (t2.tv_nsec >= BILLION) {
-                t2.tv_nsec -= BILLION;
-                t2.tv_sec++;
-            }
-            result.tv_sec += t2.tv_sec;
-            result.tv_nsec += t2.tv_nsec;
-            if (result.tv_nsec >= BILLION) {
-                result.tv_nsec -= BILLION;
-                result.tv_sec++;
-            }
-
-            if(result.tv_sec < 0)
-            {
-                result.tv_sec = 0;
-                result.tv_nsec = 0;
-            }
-            if(result.tv_nsec < 0)
-            {
-                result.tv_nsec = 0;
-            }
-        }
 
 
 
@@ -780,7 +796,7 @@ namespace thread_cpp_detail
             
             if(err == 0)
             {
-                timespec_add(tp, *req);
+                timespec_math::add(tp, *req);
                 rem->tv_sec = 0;
                 rem->tv_nsec = 0;
 
@@ -815,16 +831,7 @@ namespace thread_cpp_detail
             sizeof(::clock_nanosleep(declval<clockid_t&>(), declval<int>(), declval<timespec*>(), declval<timespec*>())) != sizeof(char)
         >
     { 
-        static inline void timespec_diff(const timespec &a, const timespec &b,
-            timespec &result) 
-        {
-            result.tv_sec  = a.tv_sec  - b.tv_sec;
-            result.tv_nsec = a.tv_nsec - b.tv_nsec;
-            if (result.tv_nsec < 0) {
-                --result.tv_sec;
-                result.tv_nsec += BILLION;
-            }
-        }
+
 
         static int call(const ::timespec *req, ::timespec *rem)
         {
@@ -850,13 +857,13 @@ namespace thread_cpp_detail
                 }
             }
 
-            timespec_diff(_end, _begin, _passed);
+            timespec_math::diff(_end, _begin, _passed);
 
             if (_passed.tv_sec > req->tv_sec ||
                 (_passed.tv_sec == req->tv_sec && _passed.tv_nsec > req->tv_nsec))
                 return 0;
 
-            timespec_diff(*req, _passed, *rem);
+            timespec_math::diff(*req, _passed, *rem);
 
             if (rem->tv_sec < 0) rem->tv_sec = 0;
             if (rem->tv_nsec < 0) rem->tv_nsec = 0;
