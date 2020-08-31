@@ -603,12 +603,17 @@ struct dummy_functor{
 
 struct dummy_functor2
 {
-    void operator()(int check1, long check2, unsigned int check3, std::ptrdiff_t check4)
+    void operator()(
+        int check1, long check2, std::ptrdiff_t check3, short check4,
+        unsigned int check5, unsigned long check6, unsigned short check7)
     {
         DYNAMIC_VERIFY_ABORT(check1 != 0);
         DYNAMIC_VERIFY_ABORT(check2 != 0);
         DYNAMIC_VERIFY_ABORT(check3 != 0);
         DYNAMIC_VERIFY_ABORT(check4 != 0);
+        DYNAMIC_VERIFY_ABORT(check5 != 0);
+        DYNAMIC_VERIFY_ABORT(check6 != 0);
+        DYNAMIC_VERIFY_ABORT(check7 != 0);
     }
 };
 
@@ -710,25 +715,29 @@ int test13()
     {
         struct lambdas
         {
-            static void call(int check1, long check2, unsigned int check3, std::ptrdiff_t check4)
+            static void call(
+                int check1, long check2, std::ptrdiff_t check3, short check4,
+                unsigned int check5, unsigned long check6, unsigned short check7)
             {
                 DYNAMIC_VERIFY_ABORT(check1 != 0);
                 DYNAMIC_VERIFY_ABORT(check2 != 0);
                 DYNAMIC_VERIFY_ABORT(check3 != 0);
                 DYNAMIC_VERIFY_ABORT(check4 != 0);
+                DYNAMIC_VERIFY_ABORT(check5 != 0);
+                DYNAMIC_VERIFY_ABORT(check6 != 0);
+                DYNAMIC_VERIFY_ABORT(check7 != 0);
             }
         };
-        thread tt(&lambdas::call, 1, 2, 3, 4);
+        thread tt(&lambdas::call, 1, 2, 3, 4, 5, 6, 7);
         tt.join();
     }
     {
         // for some reason GCC can not use local class as functor for templated thread constructor
-        // so we are improvising
+        // so we have to improvise
         typedef dummy_functor2 dummy_functor_local;
         dummy_functor_local ff;
 
-        thread tt(ff, 1, 2, 3, 4);
-        ff(1, 2, 3, 4);
+        thread tt(ff, 1, 2, 3, 4, 5, 6, 7);
         tt.join();
     }
     
