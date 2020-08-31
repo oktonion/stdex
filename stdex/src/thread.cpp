@@ -618,7 +618,7 @@ namespace thread_cpp_detail
     template<bool>
     struct nanosleep_impl1
     {
-        static int call_impl(const timespec *req, timespec *rem)
+        static int call_impl(const ::timespec *req, ::timespec *rem)
         {
             errno = 0;
             int err = ::nanosleep(req, rem);
@@ -760,7 +760,7 @@ namespace thread_cpp_detail
 
 
 
-        static int clock_nanosleep_abs(const timespec* tp)
+        static int clock_nanosleep_abs(const ::timespec* tp)
         {
             errno = 0;
             int err =
@@ -783,7 +783,7 @@ namespace thread_cpp_detail
             return err;
         }
 
-        static int call_impl(const timespec *req, timespec *rem)
+        static int call_impl(const ::timespec *req, ::timespec *rem)
         {
             timespec tp;
 
@@ -831,7 +831,7 @@ namespace thread_cpp_detail
     template<bool>
     struct nanosleep_impl2:
         nanosleep_impl1<
-            sizeof(::clock_nanosleep(declval<clockid_t&>(), declval<int>(), declval<timespec*>(), declval<timespec*>())) != sizeof(char)
+            sizeof(::clock_nanosleep(declval<clockid_t&>(), declval<int>(), declval< ::timespec*>(), declval< ::timespec*>())) != sizeof(char)
         >
     { 
 
@@ -861,7 +861,6 @@ namespace thread_cpp_detail
             }
 
             timespec_math::diff(_end, _begin, _passed);
-
             if (_passed.tv_sec > req->tv_sec ||
                 (_passed.tv_sec == req->tv_sec && _passed.tv_nsec > req->tv_nsec))
                 return 0;
@@ -898,10 +897,12 @@ namespace thread_cpp_detail
 
 
 
-void detail::sleep_for_impl(const struct timespec *reltime)
+void detail::sleep_for_impl(const stdex::timespec *reltime)
 {
     using namespace std;
-    timespec remaining = *reltime;
+    ::timespec remaining;
+    remaining.tv_sec = reltime->tv_sec;
+    remaining.tv_nsec = reltime->tv_nsec;
     
     using namespace stdex::chrono;
     typedef stdex::chrono::steady_clock st_cl;
