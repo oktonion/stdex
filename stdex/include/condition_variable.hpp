@@ -205,8 +205,13 @@ namespace stdex
             if (!detail::_lock_owns_lock(_lock))
                 std::terminate();
 
-            ::timespec _ts = 
+            stdex::timespec _tp_as_ts = 
                 clock_t::to_timespec(chrono::time_point_cast<clock_t::duration>(_atime));
+            
+            ::timespec _ts;
+
+            _ts.tv_nsec = _tp_as_ts.tv_nsec;
+            _ts.tv_sec = _tp_as_ts.tv_sec;
 
             int _err =
                 pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
@@ -240,8 +245,12 @@ namespace stdex
                 _start_time_point = clock_t::now(),
                 _end_time_point = _start_time_point + stdex::chrono::duration_cast<clock_t::duration>(_rtime);
 
-            ::timespec _ts =
+            stdex::timespec _tp_as_ts =
                 clock_t::to_timespec(_end_time_point);
+
+            ::timespec _ts;
+            _ts.tv_sec = _tp_as_ts.tv_sec;
+            _ts.tv_nsec = _tp_as_ts.tv_nsec;
 
             if ((clock_t::now() - _start_time_point) > _rtime)
                 return cv_status::timeout;

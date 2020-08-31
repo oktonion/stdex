@@ -563,7 +563,7 @@ private:
     HANDLE m_timer;
 };
 
-void detail::sleep_for_impl(const struct timespec *reltime)
+void detail::sleep_for_impl(const stdex::timespec *reltime)
 {
     WaitableTimer timer;
 
