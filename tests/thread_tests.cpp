@@ -601,6 +601,17 @@ struct dummy_functor{
 
 };
 
+struct dummy_functor2
+{
+    void operator()(int check1, long check2, unsigned int check3, std::ptrdiff_t check4)
+    {
+        DYNAMIC_VERIFY_ABORT(check1 != 0);
+        DYNAMIC_VERIFY_ABORT(check2 != 0);
+        DYNAMIC_VERIFY_ABORT(check3 != 0);
+        DYNAMIC_VERIFY_ABORT(check4 != 0);
+    }
+};
+
 int test13()
 {
     using namespace stdex;
@@ -711,21 +722,10 @@ int test13()
         tt.join();
     }
     {
-        struct lambdas
-        {
-            struct dummy_functor
-            {
-                void operator()(int check1, long check2, unsigned int check3, std::ptrdiff_t check4)
-                {
-                    DYNAMIC_VERIFY_ABORT(check1 != 0);
-                    DYNAMIC_VERIFY_ABORT(check2 != 0);
-                    DYNAMIC_VERIFY_ABORT(check3 != 0);
-                    DYNAMIC_VERIFY_ABORT(check4 != 0);
-                }
-            };
-        };
-
-        lambdas::dummy_functor ff;
+        // for some reason GCC can not use local class as functor for templated thread constructor
+        // so we are improvising
+        typedef dummy_functor2 dummy_functor_local;
+        dummy_functor_local ff;
 
         thread tt(ff, 1, 2, 3, 4);
         ff(1, 2, 3, 4);
