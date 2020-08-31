@@ -472,7 +472,7 @@ namespace stdex
                         _pthread_func_tester(
                             pthread_mutex_timedlock(
                                 declval<pthread_mutex_t*>(), 
-                                declval<struct timespec*>()
+                                declval< ::timespec* >()
                         )
                     ) 
                 ) == sizeof(_yes_type);
