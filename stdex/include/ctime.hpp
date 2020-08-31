@@ -94,20 +94,16 @@ namespace stdex
             };
         };
     }
-
-    namespace ctime_cpp17
-    {
-        typedef
-        detail::_timespec_impl<
-            detail::ctime_std_dummy::_has_timespec::value>::timespec
-        timespec;
-    }
+    
+    typedef
+    detail::_timespec_impl<
+        detail::ctime_std_dummy::_has_timespec::value>::timespec
+    timespec;
 
     // Time manipulation
     using std::clock;
     using std::time;
     using std::difftime;
-    using ctime_cpp17::timespec;
 
     namespace ctime_cpp17
     {
