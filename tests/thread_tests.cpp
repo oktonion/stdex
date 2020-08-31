@@ -590,14 +590,90 @@ void dummy_func_8(struct dummy_func_8_t0*, struct dummy_func_8_t1*, struct dummy
 
 struct dummy_functor{
     int operator()() {return 0;}
-    void operator()(void*) {}
-    void operator()(void*, int*) {}
-    int operator()(void*, double*, float*) {return 0;}
-    void operator()(struct dummy_func_4_t0*, struct dummy_func_4_t1*, struct dummy_func_4_t2*, struct dummy_func_4_t3*) {}
-    void operator()(struct dummy_func_5_t0*, struct dummy_func_5_t1*, struct dummy_func_5_t2*, struct dummy_func_5_t3*, struct dummy_func_5_t4*) {}
-    float operator()(struct dummy_func_6_t0*, struct dummy_func_6_t1*, struct dummy_func_6_t2 const*, struct dummy_func_6_t3*, struct dummy_func_6_t4*, struct dummy_func_6_t5 const*) {return 0.f;}
-    void operator()(struct dummy_func_7_t0*, struct dummy_func_7_t1*, struct dummy_func_7_t2 const*, struct dummy_func_7_t3*, struct dummy_func_7_t4*, struct dummy_func_7_t5 const*, struct dummy_func_7_t6 const*) {}
-    void operator()(struct dummy_func_8_t0*, struct dummy_func_8_t1*, struct dummy_func_8_t2 const*, struct dummy_func_8_t3*, struct dummy_func_8_t4*, struct dummy_func_8_t5 const*, struct dummy_func_8_t6 const**, void*) {}
+    void operator()(void* check1) {
+        DYNAMIC_VERIFY_ABORT(check1 == 0);
+    }
+    void operator()(void* check1, int* check2) {
+        DYNAMIC_VERIFY_ABORT(check1 == 0);
+        DYNAMIC_VERIFY_ABORT(check2 == 0);
+    }
+    int operator()(void* check1, double* check2, float* check3) {
+        DYNAMIC_VERIFY_ABORT(check1 == 0);
+        DYNAMIC_VERIFY_ABORT(check2 == 0);
+        DYNAMIC_VERIFY_ABORT(check3 == 0);
+        return 0;
+    }
+    void operator()(
+        struct dummy_func_4_t0* check1, 
+        struct dummy_func_4_t1* check2, 
+        struct dummy_func_4_t2* check3, 
+        struct dummy_func_4_t3* check4) {
+        DYNAMIC_VERIFY_ABORT(check1 == 0);
+        DYNAMIC_VERIFY_ABORT(check2 == 0);
+        DYNAMIC_VERIFY_ABORT(check3 == 0);
+        DYNAMIC_VERIFY_ABORT(check4 == 0);
+    }
+    void operator()(
+        struct dummy_func_5_t0* check1, 
+        struct dummy_func_5_t1* check2, 
+        struct dummy_func_5_t2* check3, 
+        struct dummy_func_5_t3* check4, 
+        struct dummy_func_5_t4* check5) {
+        DYNAMIC_VERIFY_ABORT(check1 == 0);
+        DYNAMIC_VERIFY_ABORT(check2 == 0);
+        DYNAMIC_VERIFY_ABORT(check3 == 0);
+        DYNAMIC_VERIFY_ABORT(check4 == 0);
+        DYNAMIC_VERIFY_ABORT(check5 == 0);
+    }
+    float operator()(
+        struct dummy_func_6_t0* check1, 
+        struct dummy_func_6_t1* check2, 
+        struct dummy_func_6_t2 const* check3, 
+        struct dummy_func_6_t3* check4, 
+        struct dummy_func_6_t4* check5, 
+        struct dummy_func_6_t5 const* check6) {
+            DYNAMIC_VERIFY_ABORT(check1 == 0);
+            DYNAMIC_VERIFY_ABORT(check2 == 0);
+            DYNAMIC_VERIFY_ABORT(check3 == 0);
+            DYNAMIC_VERIFY_ABORT(check4 == 0);
+            DYNAMIC_VERIFY_ABORT(check5 == 0);
+            DYNAMIC_VERIFY_ABORT(check6 == 0);
+            return 0.f;
+        }
+    void operator()(
+        struct dummy_func_7_t0* check1, 
+        struct dummy_func_7_t1* check2, 
+        struct dummy_func_7_t2 const* check3, 
+        struct dummy_func_7_t3* check4, 
+        struct dummy_func_7_t4* check5, 
+        struct dummy_func_7_t5 const* check6, 
+        struct dummy_func_7_t6 const* check7) {
+            DYNAMIC_VERIFY_ABORT(check1 == 0);
+            DYNAMIC_VERIFY_ABORT(check2 == 0);
+            DYNAMIC_VERIFY_ABORT(check3 == 0);
+            DYNAMIC_VERIFY_ABORT(check4 == 0);
+            DYNAMIC_VERIFY_ABORT(check5 == 0);
+            DYNAMIC_VERIFY_ABORT(check6 == 0);
+            DYNAMIC_VERIFY_ABORT(check7 == 0);
+        }
+    void operator()(
+        struct dummy_func_8_t0* check1, 
+        struct dummy_func_8_t1* check2, 
+        struct dummy_func_8_t2 const* check3, 
+        struct dummy_func_8_t3* check4, 
+        struct dummy_func_8_t4* check5, 
+        struct dummy_func_8_t5 const* check6, 
+        struct dummy_func_8_t6 const** check7, 
+        void* check8) {
+            DYNAMIC_VERIFY_ABORT(check1 == 0);
+            DYNAMIC_VERIFY_ABORT(check2 == 0);
+            DYNAMIC_VERIFY_ABORT(check3 == 0);
+            DYNAMIC_VERIFY_ABORT(check4 == 0);
+            DYNAMIC_VERIFY_ABORT(check5 == 0);
+            DYNAMIC_VERIFY_ABORT(check6 == 0);
+            DYNAMIC_VERIFY_ABORT(check7 == 0);
+            DYNAMIC_VERIFY_ABORT(check8 == 0);
+        }
 
 };
 
