@@ -1951,7 +1951,7 @@ namespace stdex
 
     namespace detail
     {
-        void sleep_for_impl(const struct timespec *reltime);
+        void sleep_for_impl(const stdex::timespec *reltime);
     }
 
     //! The namespace @c this_thread provides methods for dealing with the
@@ -1993,7 +1993,7 @@ namespace stdex
 
             chrono::seconds::rep _s_count = _sec.count();
 
-            ::timespec _ts;
+            stdex::timespec _ts;
 
             const stdex::time_t _ts_sec_max = 
                 (std::numeric_limits<stdex::time_t>::max)();
