@@ -834,14 +834,14 @@ namespace thread_cpp_detail
 
         static int call(const ::timespec *req, ::timespec *rem)
         {
-            timespec _begin;
+            ::timespec _begin;
             int err = 
                 ::clock_gettime(_STDEX_CHRONO_CLOCK_MONOTONIC, &_begin);
             
             int nanosleep_err = 
                 call_impl(req, rem);
 
-            timespec _end, _passed;
+            ::timespec _end, _passed;
 
             if (0 == nanosleep_err || EINTR == errno)
             {
