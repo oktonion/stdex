@@ -708,7 +708,7 @@ namespace thread_cpp_detail
                         return;
                     }
 
-                    timespec t2 = in;
+                    ::timespec t2 = in;
                     if (result.tv_nsec >= BILLION) {
                         result.tv_nsec -= BILLION;
                         result.tv_sec++;
@@ -756,10 +756,6 @@ namespace thread_cpp_detail
     template<>
     struct nanosleep_impl1<true>
     {
-        
-
-
-
         static int clock_nanosleep_abs(const ::timespec* tp)
         {
             errno = 0;
@@ -785,7 +781,7 @@ namespace thread_cpp_detail
 
         static int call_impl(const ::timespec *req, ::timespec *rem)
         {
-            timespec tp;
+            ::timespec tp;
 
             int err = 
                 ::clock_gettime(_STDEX_THREAD_CLOCK_SLEEP_MONOTONIC, &tp);
