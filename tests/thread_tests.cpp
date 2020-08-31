@@ -14,6 +14,7 @@
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
 #define DYNAMIC_VERIFY_FAIL {std::cout << "check condition " << "failed at line " << __LINE__ << std::endl; return -1;}
+#define DYNAMIC_VERIFY_ABORT(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; std::abort();}
 using std::size_t;
 
 namespace thread_tests_std
@@ -691,6 +692,43 @@ int test13()
     {
         dummy_functor ff;
         thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+        tt.join();
+    }
+
+    // lambdas
+    {
+        struct lambdas
+        {
+            static void call(int check1, long check2, unsigned int check3, std::ptrdiff_t check4)
+            {
+                DYNAMIC_VERIFY_ABORT(check1 != 0);
+                DYNAMIC_VERIFY_ABORT(check2 != 0);
+                DYNAMIC_VERIFY_ABORT(check3 != 0);
+                DYNAMIC_VERIFY_ABORT(check4 != 0);
+            }
+        };
+        thread tt(&lambdas::call, 1, 2, 3, 4);
+        tt.join();
+    }
+    {
+        struct lambdas
+        {
+            struct dummy_functor
+            {
+                void operator()(int check1, long check2, unsigned int check3, std::ptrdiff_t check4)
+                {
+                    DYNAMIC_VERIFY_ABORT(check1 != 0);
+                    DYNAMIC_VERIFY_ABORT(check2 != 0);
+                    DYNAMIC_VERIFY_ABORT(check3 != 0);
+                    DYNAMIC_VERIFY_ABORT(check4 != 0);
+                }
+            };
+        };
+
+        lambdas::dummy_functor ff;
+
+        thread tt(ff, 1, 2, 3, 4);
+        ff(1, 2, 3, 4);
         tt.join();
     }
     
