@@ -903,15 +903,33 @@ void detail::sleep_for_impl(const struct timespec *reltime)
     using namespace std;
     timespec remaining = *reltime;
     
+    using namespace stdex::chrono;
+    typedef stdex::chrono::steady_clock st_cl;
+
+    const st_cl::time_point _end = 
+        st_cl::now() + stdex::chrono::seconds(reltime->tv_sec) + stdex::chrono::nanoseconds(reltime->tv_nsec);
+    
     int err = 0;
-    do
+
+    while(0 == err)
     {
-        using thread_cpp_detail::nanosleep_impl;
-        if(remaining.tv_sec < 0 || remaining.tv_nsec < 0)
+        do
+        {
+            using thread_cpp_detail::nanosleep_impl;
+            if(remaining.tv_sec < 0 || remaining.tv_nsec < 0)
+                break;
+            err = nanosleep_impl::call(&remaining, &remaining);
+        }
+        while (err == -1 && errno == EINTR);
+
+        const st_cl::duration _rem = _end - st_cl::now();
+
+        if(_rem.count() < 0)
             break;
-        err = nanosleep_impl::call(&remaining, &remaining);
+
+        remaining.tv_sec = duration_cast<seconds>(_rem).count();
+        remaining.tv_nsec = duration_cast<nanoseconds>(_rem).count();
     }
-    while (err == -1 && errno == EINTR);
 }
 
 #endif
