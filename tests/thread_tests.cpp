@@ -807,6 +807,27 @@ int test13()
         thread tt(&lambdas::call, 1, 2, 3, 4, 5, 6, 7);
         tt.join();
     }
+
+    {
+        struct lambdas
+        {
+            static void call(
+                int arg1, long arg2, std::ptrdiff_t arg3, short arg4,
+                unsigned int arg5, unsigned long arg6, unsigned short arg7)
+            {
+                DYNAMIC_VERIFY_ABORT(arg1 == 0);
+                DYNAMIC_VERIFY_ABORT(arg2 == 1);
+                DYNAMIC_VERIFY_ABORT(arg3 == 2);
+                DYNAMIC_VERIFY_ABORT(arg4 == 3);
+                DYNAMIC_VERIFY_ABORT(arg5 == 4);
+                DYNAMIC_VERIFY_ABORT(arg6 == 0);
+                DYNAMIC_VERIFY_ABORT(arg7 == 5);
+            }
+        };
+        thread tt(&lambdas::call, 0, 1, 2, 3, 4, 0, 5);
+        tt.join();
+    }
+
     {
         // for some reason GCC can not use local class as functor for templated thread constructor
         // so we have to improvise
