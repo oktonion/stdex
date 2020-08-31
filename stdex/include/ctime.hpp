@@ -116,7 +116,7 @@ namespace stdex
     using std::ctime;
     using std::asctime;
     using std::strftime;
-    using std::wcsftime; // Defined in header <cwchar>
+    //using std::wcsftime; // Defined in header <cwchar>
     using std::gmtime;
     using std::localtime;
     using std::mktime;
