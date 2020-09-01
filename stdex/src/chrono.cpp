@@ -310,17 +310,27 @@ namespace clock_gettime_impl
         return 0;
 }
 
-    int clock_gettime(int clk_id, timespec* ts) {
+    int clock_gettime(int clk_id, stdex::timespec* _ts) {
+        ::timespec ts;
+        ts.tv_sec = _ts->tv_sec;
+        ts.tv_nsec = _ts->tv_nsec;
+        int err = -1;
         if (clk_id == _STDEX_CHRONO_CLOCK_MONOTONIC)
-            return clock_gettime_monotonic(*ts);
+            err = clock_gettime_monotonic(ts);
         else if (clk_id == _STDEX_CHRONO_CLOCK_REALTIME)
-            return clock_gettime_realtime(*ts);
-        return -1;
+            err = clock_gettime_realtime(ts);
+        _ts->tv_nsec = ts.tv_nsec;
+        _ts->tv_sec = ts.tv_sec;
+        return err;
 
     }
 
-    ::timespec local_ts_to_system_ts(const ::timespec &ts)
+    stdex::timespec local_ts_to_system_ts(const stdex::timespec &_ts)
     {
+        ::timespec ts;
+        ts.tv_nsec = _ts.tv_nsec;
+        ts.tv_sec = _ts.tv_sec;
+
         LARGE_INTEGER local_delta;
         local_delta.QuadPart = 
             abs_start_point::get().QuadPart - get_abs_start_point_system().QuadPart;
@@ -330,11 +340,15 @@ namespace clock_gettime_impl
 
         timespec_add(result, ts);
 
-        return result;
+        stdex::timespec out;
+        out.tv_sec = result.tv_sec;
+        out.tv_nsec = result.tv_nsec;
+
+        return out;
     }
 
 }
-int(*clock_gettime_func_pointer)(int, timespec*) = &clock_gettime_impl::clock_gettime;
+int(*clock_gettime_func_pointer)(int, stdex::timespec*) = &clock_gettime_impl::clock_gettime;
 using clock_gettime_impl::local_ts_to_system_ts;
 
 #elif defined(__MACH__) && !defined(CLOCK_REALTIME)
@@ -398,15 +412,18 @@ struct timespec get_abs_future_time_fine(unsigned milli)
     return future;
 }
 
-int clock_gettime(int X, timespec *tv)
+int clock_gettime(int X, stdex::timespec *tv)
 {
-    *tv = get_abs_future_time_fine(0);
+    ::timespec result = get_abs_future_time_fine(0);
+
+    tv->tv_sec = result.tv_sec;
+    tv->tv_nsec = result.tv_nsec;
 
     return (0);
 }
-int(*clock_gettime_func_pointer)(int, timespec*) = &clock_gettime;
+int(*clock_gettime_func_pointer)(int, stdex::timespec*) = &clock_gettime;
 
-::timespec local_ts_to_system_ts(const ::timespec &ts)
+stdex::timespec local_ts_to_system_ts(const stdex::timespec &ts)
 {
     return ts;
 }
@@ -415,9 +432,22 @@ int(*clock_gettime_func_pointer)(int, timespec*) = &clock_gettime;
 typedef long long duration_long_long;
 
 int clock_gettime(clockid_t, struct timespec*);
-int(*clock_gettime_func_pointer)(clockid_t, struct timespec*) = &clock_gettime;
+int my_clock_gettime(clockid_t X, stdex::timespec *tv)
+{
+    ::timespec result;
+    result.tv_sec = tv->tv_sec;
+    result.tv_nsec = tv->tv_nsec;
 
-const ::timespec& local_ts_to_system_ts(const ::timespec &ts)
+    int err = clock_gettime(X, &result);
+
+    tv->tv_sec = result.tv_sec;
+    tv->tv_nsec = result.tv_nsec;
+
+    return err;
+}
+int(*clock_gettime_func_pointer)(clockid_t, stdex::timespec*) = &my_clock_gettime;
+
+const stdex::timespec& local_ts_to_system_ts(const stdex::timespec &ts)
 {
     return ts;
 }
@@ -673,7 +703,7 @@ stdex::timespec
     chrono::time_point<clock_t, chrono::seconds>::rep _s_count = 
         _s.time_since_epoch().count();
 
-    ::timespec _ts;
+    stdex::timespec _ts;
 
     const stdex::time_t _ts_sec_max = 
         (std::numeric_limits<stdex::time_t>::max)();
@@ -696,7 +726,7 @@ stdex::timespec
 stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDEX_NOEXCEPT_FUNCTION
 {    // get current time
     {
-        timespec ts;
+        stdex::timespec ts;
         ts.tv_sec = 0;
         ts.tv_nsec = 0;
 
@@ -714,7 +744,7 @@ stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDE
 stdex::chrono::steady_clock::time_point stdex::chrono::steady_clock::now() _STDEX_NOEXCEPT_FUNCTION
 {    // get current time
     {
-        timespec ts;
+        stdex::timespec ts;
         ts.tv_sec = 0;
         ts.tv_nsec = 0;
 

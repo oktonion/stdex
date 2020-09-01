@@ -563,7 +563,7 @@ private:
     HANDLE m_timer;
 };
 
-void detail::sleep_for_impl(const struct timespec *reltime)
+void detail::sleep_for_impl(const stdex::timespec *reltime)
 {
     WaitableTimer timer;
 
@@ -618,7 +618,7 @@ namespace thread_cpp_detail
     template<bool>
     struct nanosleep_impl1
     {
-        static int call_impl(const timespec *req, timespec *rem)
+        static int call_impl(const ::timespec *req, ::timespec *rem)
         {
             errno = 0;
             int err = ::nanosleep(req, rem);
@@ -708,7 +708,7 @@ namespace thread_cpp_detail
                         return;
                     }
 
-                    timespec t2 = in;
+                    ::timespec t2 = in;
                     if (result.tv_nsec >= BILLION) {
                         result.tv_nsec -= BILLION;
                         result.tv_sec++;
@@ -756,11 +756,7 @@ namespace thread_cpp_detail
     template<>
     struct nanosleep_impl1<true>
     {
-        
-
-
-
-        static int clock_nanosleep_abs(const timespec* tp)
+        static int clock_nanosleep_abs(const ::timespec* tp)
         {
             errno = 0;
             int err =
@@ -783,9 +779,9 @@ namespace thread_cpp_detail
             return err;
         }
 
-        static int call_impl(const timespec *req, timespec *rem)
+        static int call_impl(const ::timespec *req, ::timespec *rem)
         {
-            timespec tp;
+            ::timespec tp;
 
             int err = 
                 ::clock_gettime(_STDEX_THREAD_CLOCK_SLEEP_MONOTONIC, &tp);
@@ -831,21 +827,21 @@ namespace thread_cpp_detail
     template<bool>
     struct nanosleep_impl2:
         nanosleep_impl1<
-            sizeof(::clock_nanosleep(declval<clockid_t&>(), declval<int>(), declval<timespec*>(), declval<timespec*>())) != sizeof(char)
+            sizeof(::clock_nanosleep(declval<clockid_t&>(), declval<int>(), declval< ::timespec*>(), declval< ::timespec*>())) != sizeof(char)
         >
     { 
 
 
         static int call(const ::timespec *req, ::timespec *rem)
         {
-            timespec _begin;
+            ::timespec _begin;
             int err = 
                 ::clock_gettime(_STDEX_CHRONO_CLOCK_MONOTONIC, &_begin);
             
             int nanosleep_err = 
                 call_impl(req, rem);
 
-            timespec _end, _passed;
+            ::timespec _end, _passed;
 
             if (0 == nanosleep_err || EINTR == errno)
             {
@@ -897,10 +893,12 @@ namespace thread_cpp_detail
 
 
 
-void detail::sleep_for_impl(const struct timespec *reltime)
+void detail::sleep_for_impl(const stdex::timespec *reltime)
 {
     using namespace std;
-    timespec remaining = *reltime;
+    ::timespec remaining;
+    remaining.tv_sec = reltime->tv_sec;
+    remaining.tv_nsec = reltime->tv_nsec;
     
     using namespace stdex::chrono;
     typedef stdex::chrono::steady_clock st_cl;

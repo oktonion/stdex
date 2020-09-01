@@ -9,12 +9,12 @@
 #include "./cstdint.hpp" // stdex::intmax_t, STDEX_INTMAX_MAX, STDEX_INTMAX_MIN
 #include "./ratio.hpp" // all ratio
 #include "./type_traits.hpp" // stdex::common_type, stdex::is_floating_point
+#include "./ctime.hpp"
 
 // POSIX includes
 /*none*/
 
 // std includes
-#include <time.h> // ::time_t - need to be changed
 //#include <climits> //???
 #include <limits> // std::numeric_limit
 #include <stdexcept>
@@ -34,9 +34,6 @@
 
 namespace stdex
 {
-    using ::time_t;
-    using ::timespec; // C++17 feature should be in <ctime> but whatever
-
     //! Minimal implementation of the @c chrono namespace.
     //! The @c chrono namespace provides types for specifying time intervals.
     namespace chrono
@@ -1270,7 +1267,7 @@ namespace stdex
             static stdex::time_t
                 to_time_t(const time_point &_t) _STDEX_NOEXCEPT_FUNCTION
             {
-                ::timespec _ts = to_timespec(_t);
+                stdex::timespec _ts = to_timespec(_t);
 
                 return stdex::time_t(_ts.tv_sec);
             }
