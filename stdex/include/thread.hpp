@@ -329,9 +329,13 @@ namespace stdex
             inline
             typename
             conditional<
-                is_scalar<_Tp>::value == bool(true) && 
-                is_null_pointer<_Tp>::value == bool(false),
-                _ref_wrapper<_Tp>,
+                is_scalar<_Tp>::value, 
+                typename
+                conditional<
+                    _and_<is_null_pointer<_Tp>, _or_<is_class<_Tp>, is_enum<_Tp>/**/>/**/>::value,
+                    _ref_wrapper<_Tp>,
+                    void
+                >::type,
                 _Tp&
             >::type _arg(_Tp &value)
             {
@@ -342,16 +346,20 @@ namespace stdex
             inline
             typename
             conditional<
-                is_scalar<_Tp>::value == bool(true) &&
-                is_null_pointer<_Tp>::value == bool(false),
-                _ref_wrapper<const _Tp>,
+                is_scalar<_Tp>::value, 
+                typename
+                conditional<
+                    _and_<is_null_pointer<_Tp>, _or_<is_class<_Tp>, is_enum<_Tp>/**/>/**/>::value,
+                    _ref_wrapper<const _Tp>,
+                    void
+                >::type,
                 const _Tp&
             >::type _arg(const _Tp& value)
             {
                 return _ref_wrapper<const _Tp>(value);
             }
 
-            inline void _arg(nullptr_t) {}
+            //inline void _arg(nullptr_t) {}
             
             template<class _Tp>
             _yes_type _is_same_return_type(_Tp, _Tp);
@@ -1931,7 +1939,7 @@ namespace stdex
         //! This function is useful for determining the optimal number of threads to
         //! use for a task.
         //! @return The number of hardware thread contexts in the system.
-        //! @note If this value is not defined, the function returns zero nullptr.
+        //! @note If this value is not defined, the function returns zero.
         static unsigned hardware_concurrency() _STDEX_NOEXCEPT_FUNCTION;
 
         void swap(thread &other) _STDEX_NOEXCEPT_FUNCTION;
