@@ -107,7 +107,7 @@ namespace stdex
 
     namespace ctime_cpp17
     {
-        //int timespec_get(stdex::timespec* ts, int base); // C++ 17
+        int timespec_get(stdex::timespec* ts, int base); // C++ 17
     }
 
     using ctime_cpp17::timespec_get;
