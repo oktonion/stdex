@@ -230,14 +230,22 @@ namespace stdex
 
         namespace thread_detail
         {
-            _yes_type _is_able_to_pass_nullptr_with_comma_op_tester(void*);
-            _no_type _is_able_to_pass_nullptr_with_comma_op_tester(...);
+            class _dummy;
+            _yes_type _is_able_to_pass_nullptr_with_comma_op_tester1(void*);
+            _no_type _is_able_to_pass_nullptr_with_comma_op_tester1(...);
+            _yes_type _is_able_to_pass_nullptr_with_comma_op_tester2(void(_dummy::*)(float, int));
+            _no_type _is_able_to_pass_nullptr_with_comma_op_tester2(...);
+
+            void _dummy_void_f();
 
             struct _is_able_to_pass_nullptr_with_comma_op
             {
                 static const bool value = 
                     sizeof(
-                        _is_able_to_pass_nullptr_with_comma_op_tester((nullptr, nullptr))
+                        _is_able_to_pass_nullptr_with_comma_op_tester1((_dummy_void_f(), nullptr))
+                    ) == sizeof(_yes_type) &&
+                    sizeof(
+                        _is_able_to_pass_nullptr_with_comma_op_tester2((_dummy_void_f(), nullptr))
                     ) == sizeof(_yes_type);
             };
         }
@@ -271,7 +279,7 @@ namespace stdex
             template<class _Tp>
             _Tp& operator,(_Tp &value, 
                 typename
-                conditional<is_same<typename remove_cv<_Tp>::type, nullptr_t>::value, class _dummy&, void*>::type)
+                conditional<is_null_pointer<_Tp>::value, class _disable1&, void*>::type)
             {
                 return value;
             }
@@ -279,7 +287,7 @@ namespace stdex
             template<class _Tp>
             const _Tp& operator,(const _Tp& value,
                 typename
-                conditional<is_same<typename remove_cv<_Tp>::type, nullptr_t>::value, class _dummy&, void*>::type)
+                conditional<is_null_pointer<_Tp>::value, class _disable2&, void*>::type)
             {
                 return value;
             }
@@ -311,8 +319,8 @@ namespace stdex
                 _Tp* _ptr;
             };
 
-            template<class _Tp>
-            _Tp& operator,(const _ref_wrapper<_Tp> &value, void*)
+            template<class _Tp, class _OtherT>
+            _Tp& operator,(const _ref_wrapper<_Tp> &value, const _OtherT&)
             {
                 return value;
             }
@@ -321,8 +329,13 @@ namespace stdex
             inline
             typename
             conditional<
-                is_scalar<_Tp>::value,
-                _ref_wrapper<_Tp>,
+                is_scalar<_Tp>::value, 
+                typename
+                conditional<
+                    _and_<is_null_pointer<_Tp>, _or_<is_class<_Tp>, is_enum<_Tp>/**/>/**/>::value,
+                    _ref_wrapper<_Tp>,
+                    void
+                >::type,
                 _Tp&
             >::type _arg(_Tp &value)
             {
@@ -333,15 +346,20 @@ namespace stdex
             inline
             typename
             conditional<
-                is_scalar<_Tp>::value,
-                _ref_wrapper<const _Tp>,
+                is_scalar<_Tp>::value, 
+                typename
+                conditional<
+                    _and_<is_null_pointer<_Tp>, _or_<is_class<_Tp>, is_enum<_Tp>/**/>/**/>::value,
+                    _ref_wrapper<const _Tp>,
+                    void
+                >::type,
                 const _Tp&
             >::type _arg(const _Tp& value)
             {
                 return _ref_wrapper<const _Tp>(value);
             }
 
-            inline void _arg(nullptr_t) {}
+            //inline void _arg(nullptr_t) {}
             
             template<class _Tp>
             _yes_type _is_same_return_type(_Tp, _Tp);
@@ -1921,7 +1939,7 @@ namespace stdex
         //! This function is useful for determining the optimal number of threads to
         //! use for a task.
         //! @return The number of hardware thread contexts in the system.
-        //! @note If this value is not defined, the function returns zero (0).
+        //! @note If this value is not defined, the function returns zero.
         static unsigned hardware_concurrency() _STDEX_NOEXCEPT_FUNCTION;
 
         void swap(thread &other) _STDEX_NOEXCEPT_FUNCTION;
@@ -1941,7 +1959,7 @@ namespace stdex
 
     namespace detail
     {
-        void sleep_for_impl(const struct timespec *reltime);
+        void sleep_for_impl(const stdex::timespec *reltime);
     }
 
     //! The namespace @c this_thread provides methods for dealing with the
@@ -1983,7 +2001,7 @@ namespace stdex
 
             chrono::seconds::rep _s_count = _sec.count();
 
-            timespec _ts;
+            stdex::timespec _ts;
 
             const stdex::time_t _ts_sec_max = 
                 (std::numeric_limits<stdex::time_t>::max)();

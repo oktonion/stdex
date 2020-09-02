@@ -472,7 +472,7 @@ namespace stdex
                         _pthread_func_tester(
                             pthread_mutex_timedlock(
                                 declval<pthread_mutex_t*>(), 
-                                declval<struct timespec*>()
+                                declval< ::timespec* >()
                         )
                     ) 
                 ) == sizeof(_yes_type);
@@ -501,16 +501,13 @@ namespace stdex
             static bool try_lock_until1(pthread_mutex_t& _mutex_handle,
                 const chrono::time_point<chrono::system_clock, _Duration>& _atime)
             {
-                chrono::time_point<chrono::system_clock, chrono::seconds> _s =
-                    chrono::time_point_cast<chrono::seconds>(_atime);
-                chrono::nanoseconds _ns = 
-                    chrono::duration_cast<chrono::nanoseconds>(_atime - _s);
+                stdex::timespec _tp_as_ts = 
+                    chrono::system_clock::to_timespec(_atime);
+                
+                ::timespec _ts;
 
-                timespec _ts;
-                _ts.tv_sec = 
-                    static_cast<stdex::time_t>(_s.time_since_epoch().count());
-                _ts.tv_nsec = 
-                    static_cast<long>(_ns.count());
+                _ts.tv_nsec = _tp_as_ts.tv_nsec;
+                _ts.tv_sec = _tp_as_ts.tv_sec;
 
                 bool success = 
                     (pthread_mutex_timedlock(&_mutex_handle, &_ts) == 0);
