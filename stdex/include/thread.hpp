@@ -333,8 +333,8 @@ namespace stdex
                 typename
                 conditional<
                     _and_<is_null_pointer<_Tp>, _or_<is_class<_Tp>, is_enum<_Tp>/**/>/**/>::value,
-                    _ref_wrapper<_Tp>,
-                    void
+                    void,
+                    _ref_wrapper<_Tp>
                 >::type,
                 _Tp&
             >::type _arg(_Tp &value)
@@ -350,8 +350,8 @@ namespace stdex
                 typename
                 conditional<
                     _and_<is_null_pointer<_Tp>, _or_<is_class<_Tp>, is_enum<_Tp>/**/>/**/>::value,
-                    _ref_wrapper<const _Tp>,
-                    void
+                    void,
+                    _ref_wrapper<const _Tp>
                 >::type,
                 const _Tp&
             >::type _arg(const _Tp& value)
