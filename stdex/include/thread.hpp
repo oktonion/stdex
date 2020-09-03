@@ -334,12 +334,6 @@ namespace stdex
                 return value;
             }
 
-            inline
-            const nullptr_t& operator,(const _ref_wrapper<const nullptr_t> &value, const nullptr_t&)
-            {
-                return value;
-            }
-
             template<class _Tp>
             inline
             typename
