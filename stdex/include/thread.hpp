@@ -277,22 +277,6 @@ namespace stdex
         namespace thread_detail
         {
             template<class _Tp>
-            _Tp& operator,(_Tp &value, 
-                typename
-                conditional<is_null_pointer<_Tp>::value, class _disable1&, nullptr_t>::type)
-            {
-                return value;
-            }
-
-            template<class _Tp>
-            const _Tp& operator,(const _Tp& value,
-                typename
-                conditional<is_null_pointer<_Tp>::value, class _disable2&, nullptr_t>::type)
-            {
-                return value;
-            }
-
-            template<class _Tp>
             class _ref_wrapper
             {
             public:
@@ -319,8 +303,39 @@ namespace stdex
                 _Tp* _ptr;
             };
 
-            template<class _Tp, class _OtherT>
-            _Tp& operator,(const _ref_wrapper<_Tp> &value, const _OtherT&)
+            template<class _Tp>
+            inline
+            _Tp& operator,(_Tp &value, 
+                typename
+                conditional<is_null_pointer<_Tp>::value, class _disable1&, nullptr_t>::type)
+            {
+                return value;
+            }
+
+            template<class _Tp>
+            inline
+            const _Tp& operator,(const _Tp& value,
+                typename
+                conditional<is_null_pointer<_Tp>::value, class _disable2&, nullptr_t>::type)
+            {
+                return value;
+            }
+            
+            template<class _Tp>
+            inline
+            _Tp& operator,(const _ref_wrapper<_Tp> &value, const nullptr_t&)
+            {
+                return value;
+            }
+
+            inline
+            nullptr_t& operator,(const _ref_wrapper<nullptr_t> &value, const nullptr_t&)
+            {
+                return value;
+            }
+
+            inline
+            const nullptr_t& operator,(const _ref_wrapper<const nullptr_t> &value, const nullptr_t&)
             {
                 return value;
             }
