@@ -279,7 +279,7 @@ namespace stdex
             template<class _Tp>
             _Tp& operator,(_Tp &value, 
                 typename
-                conditional<is_null_pointer<_Tp>::value, class _disable1&, void*>::type)
+                conditional<is_null_pointer<_Tp>::value, class _disable1&, nullptr_t>::type)
             {
                 return value;
             }
@@ -287,7 +287,7 @@ namespace stdex
             template<class _Tp>
             const _Tp& operator,(const _Tp& value,
                 typename
-                conditional<is_null_pointer<_Tp>::value, class _disable2&, void*>::type)
+                conditional<is_null_pointer<_Tp>::value, class _disable2&, nullptr_t>::type)
             {
                 return value;
             }
