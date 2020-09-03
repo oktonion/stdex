@@ -836,6 +836,9 @@ int test13()
 
         thread tt(ff, 1, 2, 3, 4, 5, 6, 7);
         tt.join();
+
+        thread tt2(ff, int(1), long(2), std::ptrdiff_t(3), short(4), (unsigned int)(5), (unsigned long)(6), (unsigned short)(7));
+        tt.join();
     }
     
     return 0;
