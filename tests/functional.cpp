@@ -6,6 +6,7 @@
 #include <iostream>
 #include <string>
 #include <bitset>
+#include <limits>
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
@@ -90,11 +91,14 @@ int main()
     RUN_TEST(test01);
     RUN_TEST(test02);
 
-    const std::size_t big = std::size_t(1) << 31;
+    const std::string::size_type big = 
+        std::numeric_limits<std::string::size_type>::max();
     std::string s;
     try {
         s.resize(big, 'a');
     } catch (const std::bad_alloc&) {
+        return 0; // try to avoid a FAIL if memory allocation fails
+    } catch (const std::length_error&) {
         return 0; // try to avoid a FAIL if memory allocation fails
     }
     // PR libstdc++/89629
