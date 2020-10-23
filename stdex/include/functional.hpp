@@ -64,12 +64,13 @@
 
         template<>
         struct _nullptr_place_holder<false>{
-            static stdex::nullptr_t value;
+            static stdex::nullptr_t value1;
         };
 
         template<int _N>
         struct _arg<stdex::nullptr_t, _N>:
-            _nullptr_place_holder<stdex::is_arithmetic<stdex::nullptr_t>::value>
+            _nullptr_place_holder<
+                stdex::is_class<stdex::nullptr_t>::value == bool(false)>
         { 
             _arg(stdex::nullptr_t value_ = nullptr){}
         };
