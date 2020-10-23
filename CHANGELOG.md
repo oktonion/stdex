@@ -12,15 +12,22 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 - - `stdex::try_lock`
 - - `stdex::lock`
 
+- `stdex::timespec`
 - moar tests to the god of tests
 
 ### Changed
 
 - trying to be more clear why `std::terminate` has been raised (affects DEBUG mode only)
+- `stdex::condition_variable` correct waitable functions
+- `stdex::chrono::high_resolution_clock` defined in compile-time as most accurate clock from `stdex::chrono::system_clock` and `stdex::chrono::steady_clock`
 
 ### Fixed
 
-- some serious fixes
+- `stdex::chrono` clocks in general now are more precise and correct
+- `stdex::chrono::system_clock::is_steady` and `stdex::chrono::steady_clock::is_steady` flags are now correct for Windows
+- `stdex::chrono::system_clock` now converts to and from `time_t` properly
+- `stdex::error_code` and `stdex::error_condition` have now proper comparison operators. That fix restrict compiler from using this comparison operators for user-provided types.
+- `stdex::is_error_code_enum` overload for `stdex::errc` is now correct
 
 ## [0.2.7] - 2020-07-14
 

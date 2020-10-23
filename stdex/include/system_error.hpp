@@ -868,7 +868,7 @@ namespace stdex
             class _disabled4>::type _lhs,
         const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
     {    // test errors for equality
-        stdex::operator==(_lhs, error_condition(_rhs));
+        return stdex::operator==(_lhs, error_condition(_rhs));
     }
 
     template<class _LhsT>

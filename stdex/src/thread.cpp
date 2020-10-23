@@ -563,7 +563,7 @@ private:
     HANDLE m_timer;
 };
 
-void detail::sleep_for_impl(const struct timespec *reltime)
+void detail::sleep_for_impl(const stdex::timespec *reltime)
 {
     WaitableTimer timer;
 
@@ -618,7 +618,7 @@ namespace thread_cpp_detail
     template<bool>
     struct nanosleep_impl1
     {
-        static int call(const timespec *req, timespec *rem)
+        static int call_impl(const ::timespec *req, ::timespec *rem)
         {
             errno = 0;
             int err = ::nanosleep(req, rem);
@@ -632,88 +632,135 @@ namespace thread_cpp_detail
         }
     };
 
+// for sleep impl
 #ifdef CLOCK_MONOTONIC
-    #undef _STDEX_THREAD_CLOCK_MONOTONIC
-    #define _STDEX_THREAD_CLOCK_MONOTONIC CLOCK_MONOTONIC
+    #undef _STDEX_THREAD_CLOCK_SLEEP_MONOTONIC
+    #define _STDEX_THREAD_CLOCK_SLEEP_MONOTONIC CLOCK_MONOTONIC
     
-    #ifndef _STDEX_THREAD_CLOCK_MONOTONIC_EXISTS
-        #define _STDEX_THREAD_CLOCK_MONOTONIC_EXISTS
+    #ifndef _STDEX_THREAD_CLOCK_SLEEP_MONOTONIC_EXISTS
+        #define _STDEX_THREAD_CLOCK_SLEEP_MONOTONIC_EXISTS
     #endif
 
 #endif
 
 #ifdef CLOCK_BOOTTIME 
-    #undef _STDEX_THREAD_CLOCK_MONOTONIC
-    #define _STDEX_THREAD_CLOCK_MONOTONIC CLOCK_BOOTTIME
+    #undef _STDEX_THREAD_CLOCK_SLEEP_MONOTONIC
+    #define _STDEX_THREAD_CLOCK_SLEEP_MONOTONIC CLOCK_BOOTTIME
 
-    #ifndef _STDEX_THREAD_CLOCK_MONOTONIC_EXISTS
-        #define _STDEX_THREAD_CLOCK_MONOTONIC_EXISTS
+    #ifndef _STDEX_THREAD_CLOCK_SLEEP_MONOTONIC_EXISTS
+        #define _STDEX_THREAD_CLOCK_SLEEP_MONOTONIC_EXISTS
     #endif
 #endif
 
+// for time measurements impl
+
+#ifdef CLOCK_MONOTONIC
+    #undef _STDEX_CHRONO_CLOCK_MONOTONIC
+    #define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_MONOTONIC
+    
+    #ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+        #define _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+    #endif
+
+#endif
+
+#ifdef CLOCK_BOOTTIME 
+    #undef _STDEX_CHRONO_CLOCK_MONOTONIC
+    #define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_BOOTTIME
+
+    #ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+        #define _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+    #endif
+#endif
+
+#ifdef CLOCK_MONOTONIC_RAW  
+    #undef _STDEX_CHRONO_CLOCK_MONOTONIC
+    #define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_MONOTONIC_RAW
+
+    #ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+        #define _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+    #endif
+#endif
+
+#ifdef CLOCK_REALTIME
+    #undef _STDEX_CHRONO_CLOCK_REALTIME
+    #define _STDEX_CHRONO_CLOCK_REALTIME CLOCK_REALTIME
+
+    #ifndef _STDEX_CHRONO_CLOCK_MONOTONIC_EXISTS
+        #define _STDEX_CHRONO_CLOCK_MONOTONIC CLOCK_REALTIME
+    #endif
+#endif
+
+        namespace timespec_math
+        {
+                enum {BILLION = 1000000000};
+                
+                static inline void add(::timespec &result, const ::timespec &in)
+                {
+                    const stdex::time_t _ts_sec_max = 
+                        (std::numeric_limits<stdex::time_t>::max)();
+                    
+                    if(result.tv_sec == _ts_sec_max || result.tv_sec < 0 ||
+                        in.tv_sec == _ts_sec_max)
+                    {
+                        result.tv_sec = _ts_sec_max;
+                        result.tv_nsec = BILLION - 1;
+                        return;
+                    }
+
+                    ::timespec t2 = in;
+                    if (result.tv_nsec >= BILLION) {
+                        result.tv_nsec -= BILLION;
+                        result.tv_sec++;
+                    }
+                    if (t2.tv_nsec >= BILLION) {
+                        t2.tv_nsec -= BILLION;
+                        t2.tv_sec++;
+                    }
+                    result.tv_sec += t2.tv_sec;
+                    result.tv_nsec += t2.tv_nsec;
+                    if (result.tv_nsec >= BILLION) {
+                        result.tv_nsec -= BILLION;
+                        result.tv_sec++;
+                    }
+
+                    if(result.tv_sec < 0)
+                    {
+                        result.tv_sec = 0;
+                        result.tv_nsec = 0;
+                    }
+                    if(result.tv_nsec < 0)
+                    {
+                        result.tv_nsec = 0;
+                    }
+                }
+
+                static inline void diff(const ::timespec &a, const ::timespec &b,
+                    ::timespec &out) 
+                {
+                    ::timespec result;
+                    result.tv_sec  = a.tv_sec  - b.tv_sec;
+                    result.tv_nsec = a.tv_nsec - b.tv_nsec;
+                    if (result.tv_nsec < 0) {
+                        --result.tv_sec;
+                        result.tv_nsec += BILLION;
+                    }
+
+                    out = result;
+                }
+        } // namespace timespec_math
+
 #if defined(CLOCK_MONOTONIC) && \
-        defined(_STDEX_THREAD_CLOCK_MONOTONIC_EXISTS) && \
+        defined(_STDEX_THREAD_CLOCK_SLEEP_MONOTONIC_EXISTS) && \
             defined(TIMER_ABSTIME)
     template<>
     struct nanosleep_impl1<true>
     {
-        enum {BILLION = 1000000000};
-        static void timespec_add(timespec &result, const timespec &in)
-        {
-            const stdex::time_t _ts_sec_max = 
-                (std::numeric_limits<stdex::time_t>::max)();
-            
-            if(result.tv_sec == _ts_sec_max || result.tv_sec < 0 ||
-                in.tv_sec == _ts_sec_max)
-            {
-                result.tv_sec = _ts_sec_max;
-                result.tv_nsec = BILLION - 1;
-                return;
-            }
-
-            timespec t2 = in;
-            if (result.tv_nsec >= BILLION) {
-                result.tv_nsec -= BILLION;
-                result.tv_sec++;
-            }
-            if (t2.tv_nsec >= BILLION) {
-                t2.tv_nsec -= BILLION;
-                t2.tv_sec++;
-            }
-            result.tv_sec += t2.tv_sec;
-            result.tv_nsec += t2.tv_nsec;
-            if (result.tv_nsec >= BILLION) {
-                result.tv_nsec -= BILLION;
-                result.tv_sec++;
-            }
-
-            if(result.tv_sec < 0)
-            {
-                result.tv_sec = 0;
-                result.tv_nsec = 0;
-            }
-            if(result.tv_nsec < 0)
-            {
-                result.tv_nsec = 0;
-            }
-        }
-
-        static inline void timespec_diff(const timespec &a, const timespec &b,
-            timespec &result) 
-        {
-            result.tv_sec  = a.tv_sec  - b.tv_sec;
-            result.tv_nsec = a.tv_nsec - b.tv_nsec;
-            if (result.tv_nsec < 0) {
-                --result.tv_sec;
-                result.tv_nsec += BILLION;
-            }
-        }
-
-        static int clock_nanosleep_abs(const timespec* tp)
+        static int clock_nanosleep_abs(const ::timespec* tp)
         {
             errno = 0;
             int err =
-                ::clock_nanosleep(_STDEX_THREAD_CLOCK_MONOTONIC, TIMER_ABSTIME, tp, 0);
+                ::clock_nanosleep(_STDEX_THREAD_CLOCK_SLEEP_MONOTONIC, TIMER_ABSTIME, tp, 0);
 
             if (0 == err || ENOTSUP != errno)
                 return err;
@@ -732,61 +779,39 @@ namespace thread_cpp_detail
             return err;
         }
 
-        static int call(const timespec *req, timespec *rem)
+        static int call_impl(const ::timespec *req, ::timespec *rem)
         {
-            timespec _begin, tp;
+            ::timespec tp;
 
             int err = 
-                ::clock_gettime(_STDEX_THREAD_CLOCK_MONOTONIC, &_begin);
+                ::clock_gettime(_STDEX_THREAD_CLOCK_SLEEP_MONOTONIC, &tp);
+
             if(err != 0)
-                return nanosleep_impl1<false>::call(req, rem);
-
-            tp = _begin;
-            timespec_add(tp, *req);
-            rem->tv_sec = 0;
-            rem->tv_nsec = 0;
-
-            int nanosleep_err = 0;
+                return nanosleep_impl1<false>::call_impl(req, rem);
             
+            int nanosleep_err = -1;
 
             errno = 0;
-            nanosleep_err = 
-                clock_nanosleep_abs(&tp);
+            
+            if(err == 0)
+            {
+                timespec_math::add(tp, *req);
+                rem->tv_sec = 0;
+                rem->tv_nsec = 0;
+
+                
+                nanosleep_err = 
+                    clock_nanosleep_abs(&tp);
+            }
 
             if (0 != nanosleep_err && EINTR != errno)
             {
                 errno = 0;
                 nanosleep_err =
-                    nanosleep_impl1<false>::call(req, rem);
+                    nanosleep_impl1<false>::call_impl(req, rem);
                 if (0 != nanosleep_err)
                     return nanosleep_err;
             }
-
-            timespec _end, _passed;
-
-            if (0 == nanosleep_err || EINTR == errno)
-            {
-                int myerrno = errno;
-                err = 
-                    ::clock_gettime(_STDEX_THREAD_CLOCK_MONOTONIC, &_end);
-                errno = 0;
-                if (0 != err)
-                {
-                    errno = myerrno;
-                    return nanosleep_err;
-                }
-            }
-
-            timespec_diff(_end, _begin, _passed);
-
-            if (_passed.tv_sec > req->tv_sec ||
-                (_passed.tv_sec == req->tv_sec && _passed.tv_nsec > req->tv_nsec))
-                return 0;
-
-            timespec_diff(*req, _passed, *rem);
-
-            if (rem->tv_sec < 0) rem->tv_sec = 0;
-            if (rem->tv_nsec < 0) rem->tv_nsec = 0;
 
             return nanosleep_err;
         }
@@ -799,30 +824,109 @@ namespace thread_cpp_detail
     template<class _Tp>
     static _Tp declval(); 
 
-    struct nanosleep_impl:
+    template<bool>
+    struct nanosleep_impl2:
         nanosleep_impl1<
-            sizeof(::clock_gettime(declval<clockid_t&>(), declval<timespec*>())) != sizeof(char) &&
-            sizeof(::clock_nanosleep(declval<clockid_t&>(), declval<int>(), declval<timespec*>(), declval<timespec*>())) != sizeof(char)
+            sizeof(::clock_nanosleep(declval<clockid_t&>(), declval<int>(), declval< ::timespec*>(), declval< ::timespec*>())) != sizeof(char)
+        >
+    { 
+
+
+        static int call(const ::timespec *req, ::timespec *rem)
+        {
+            ::timespec _begin;
+            int err = 
+                ::clock_gettime(_STDEX_CHRONO_CLOCK_MONOTONIC, &_begin);
+            
+            int nanosleep_err = 
+                call_impl(req, rem);
+
+            ::timespec _end, _passed;
+
+            if (0 == nanosleep_err || EINTR == errno)
+            {
+                int myerrno = errno;
+                err = 
+                    ::clock_gettime(_STDEX_CHRONO_CLOCK_MONOTONIC, &_end);
+                errno = 0;
+                if (0 != err)
+                {
+                    errno = myerrno;
+                    return nanosleep_err;
+                }
+            }
+
+            timespec_math::diff(_end, _begin, _passed);
+            if (_passed.tv_sec > req->tv_sec ||
+                (_passed.tv_sec == req->tv_sec && _passed.tv_nsec > req->tv_nsec))
+                return 0;
+
+            timespec_math::diff(*req, _passed, *rem);
+
+            
+            int myerrno = EINTR;
+            if (rem->tv_sec < 0) 
+            {rem->tv_sec = 0; myerrno = 0;}
+            if (rem->tv_nsec < 0) 
+            {rem->tv_nsec = 0; myerrno = 0;}
+            errno = myerrno;
+            return -1;
+        }
+    };
+
+    template<>
+    struct nanosleep_impl2<false>:
+        nanosleep_impl1<false> 
+    {
+        static int call(const ::timespec *req, ::timespec *rem)
+        {
+            return call_impl(req, rem);
+        }
+    };
+
+    struct nanosleep_impl:
+        nanosleep_impl2<
+            sizeof(::clock_gettime(declval< ::clockid_t >(), declval< ::timespec* >())) != sizeof(char)
         >
     { };
 } // namespace thread_cpp_detail
 
 
 
-void detail::sleep_for_impl(const struct timespec *reltime)
+void detail::sleep_for_impl(const stdex::timespec *reltime)
 {
     using namespace std;
-    timespec remaining = *reltime;
+    ::timespec remaining;
+    remaining.tv_sec = reltime->tv_sec;
+    remaining.tv_nsec = reltime->tv_nsec;
+    
+    using namespace stdex::chrono;
+    typedef stdex::chrono::steady_clock st_cl;
+
+    const st_cl::time_point _end = 
+        st_cl::now() + stdex::chrono::seconds(reltime->tv_sec) + stdex::chrono::nanoseconds(reltime->tv_nsec);
     
     int err = 0;
-    do
+
+    while(0 == err)
     {
-        using thread_cpp_detail::nanosleep_impl;
-        if(remaining.tv_sec < 0 || remaining.tv_nsec < 0)
+        do
+        {
+            using thread_cpp_detail::nanosleep_impl;
+            if(remaining.tv_sec < 0 || remaining.tv_nsec < 0)
+                break;
+            err = nanosleep_impl::call(&remaining, &remaining);
+        }
+        while (err == -1 && errno == EINTR);
+
+        const st_cl::duration _rem = _end - st_cl::now();
+
+        if(_rem.count() < 0)
             break;
-        err = nanosleep_impl::call(&remaining, &remaining);
+
+        remaining.tv_sec = duration_cast<seconds>(_rem).count();
+        remaining.tv_nsec = duration_cast<nanoseconds>(_rem).count();
     }
-    while (err == -1 && errno == EINTR);
 }
 
 #endif

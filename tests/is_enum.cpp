@@ -65,6 +65,7 @@ int main(void)
     // Sanity check.
     STATIC_ASSERT(is_enum<ClassType>::value == (false), should_not_be_enum);
     STATIC_ASSERT(is_enum<std::string>::value == (false), should_not_be_enum);
+    STATIC_ASSERT(is_enum<nullptr_t>::value == (false), should_not_be_enum);
 
     return 0;
 }
