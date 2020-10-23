@@ -64,11 +64,31 @@ int test01()
   return 0;
 }
 
+int test02()
+{
+    struct lambdas
+    {
+        static void func(int& a, void*){a++;}
+    };
+
+    int a = 0;
+    stdex::function f(&lambdas::func, a, nullptr);
+
+    DYNAMIC_VERIFY(a == 1);
+
+    stdex::function ff(&lambdas::func, a, nullptr);
+
+    DYNAMIC_VERIFY(a == 2);
+
+    return 0;
+}
+
 
 int main()
 {
 
     RUN_TEST(test01);
+    RUN_TEST(test02);
 
     const std::size_t big = std::size_t(1) << 31;
     std::string s;
