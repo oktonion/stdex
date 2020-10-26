@@ -203,8 +203,9 @@
                 {
                     _functor(_ResArgsT &other) : _ResArgsT(other) {}
                     void operator()(_FuncT &fx) {fx(_arg<_ArgT0, 0>::value, _arg<_ArgT1, 1>::value);}
-                } f(res);
-
+                };
+                
+                _functor f = res;
                 f(fx);
             }
             
