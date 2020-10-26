@@ -88,7 +88,7 @@
             _nullptr_place_holder
         { 
             typedef stdex::nullptr_t type;
-            _arg(stdex::nullptr_t value_ = nullptr){}
+            _arg(stdex::nullptr_t){}
             
             _arg& self(_arg_tag<_N>&) { return *this; }
         };
@@ -102,10 +102,7 @@
         template<class _ArgsT, class _ArgT, int _N>
         struct _args: _ArgsT, _arg<_ArgT, _N>
         {
-            typedef _ArgsT base_type;
-            base_type::arg;
-            _arg<_ArgT, _N> &arg(const _arg_tag<_N>&) {return static_cast<_arg<_ArgT, _N>&>(*this);}
-            //using _arg<_ArgT, _N>::get;
+            _arg<_ArgT, _N> &arg(const _arg_tag<_N>&) {return *this;}
 
             typedef _args type;
             _args(const _ArgsT &other, _ArgT arg):
@@ -126,6 +123,19 @@
                 _arg<_ArgT, 0>(other) {}
         };
 
+        template<class, int _End>
+        struct _get_args;
+
+        template<class _ArgsT, class _ArgT, int _Index, int _End>
+        struct _get_args<_args<_ArgsT, _ArgT, _Index>, _End>:
+            _get_args<_ArgsT, _End>
+        { };
+
+        template<class _ArgsT, class _ArgT, int _End>
+        struct _get_args<_args<_ArgsT, _ArgT, _End>, _End>
+        { 
+            typedef _args<_ArgsT, _ArgT, _End> type;
+        };
 
         template<class _FuncT, int _Index, int _Count>
         struct _check_args_for_null
@@ -142,13 +152,14 @@
             static void call(_FuncT &fx, _RawArgsT &args, _CheckedArgT &arg, _ResArgsT &res)
             {
                 _arg_tag<_Index> tag;
+                typedef typename _get_args<_RawArgsT, _Index>::type args_type;
                 if(&arg != &args)
                 {
                     _args<_ResArgsT, _CheckedArgT, _Index> checked_args(res, arg);
-                    check(fx, args, args.arg(tag), checked_args);
+                    check(fx, args, static_cast<args_type&>(args).arg(tag), checked_args);
                 }
                 else
-                    check(fx, args, args.arg(tag), args);
+                    check(fx, args, static_cast<args_type&>(args).arg(tag), args);
             }
         };
 
@@ -200,13 +211,15 @@
             template<class _RawArgsT, class _CheckedArgT, class _ResArgsT>
             static void call(_FuncT &fx, _RawArgsT &args, _CheckedArgT &arg, _ResArgsT &res)
             {
+                typedef typename _get_args<_RawArgsT, 0>::type args0_type;
+                typedef typename _get_args<_RawArgsT, 1>::type args1_type;
                 if(&arg != &args)
                 {
                     _args<_ResArgsT, _CheckedArgT, 1> checked_args(res, arg);
-                    func(fx, args.arg(_arg_tag<0>()), args.arg(_arg_tag<1>()), checked_args);
+                    func(fx, static_cast<args0_type&>(args).arg(_arg_tag<0>()), static_cast<args1_type&>(args).arg(_arg_tag<1>()), checked_args);
                 }
                 else
-                    func(fx, args.arg(_arg_tag<0>()), args.arg(_arg_tag<1>()), args);
+                    func(fx, static_cast<args0_type&>(args).arg(_arg_tag<0>()), static_cast<args1_type&>(args).arg(_arg_tag<1>()), args);
             }
         };
 
