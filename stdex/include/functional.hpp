@@ -50,11 +50,13 @@
         template<class _Tp, int _N>
         struct _arg
         {
+            typedef _Tp type;
             _Tp value;
             _arg(_Tp value_): value(value_) {}
+            _arg(const _arg &other) : value(other.value) {}
         };
 
-        template<class _FuncT, int _Count>
+        template<class _FuncT, class _ArgsT, int _Count>
         struct _function;
 
         template<bool>
@@ -72,35 +74,31 @@
             _nullptr_place_holder<
                 stdex::is_class<stdex::nullptr_t>::value == bool(false)>
         { 
+            typedef stdex::nullptr_t type;
             _arg(stdex::nullptr_t value_ = nullptr){}
         };
 
         template<class _FuncT>
-        struct _function<_FuncT, 0>{
-            static void call(_FuncT &fx) {fx();}
+        struct _function<_FuncT, void, 0>{
+            void call(_FuncT &fx) {fx();}
         };
 
         #define _STDEX_FUNCTION_CALL_DEFINE(N)  \
-        template<class _FuncT>                   \
-        struct _function<_FuncT, N>{              \
-            template<_STDEX_TYPES>              \
-            static void call(_FuncT &fx, _STDEX_ARGS) {fx(_STDEX_VALUES);}\
+        template<class _FuncT, class _ArgsT>    \
+        struct _function<_FuncT, _ArgsT, N>: _ArgsT {   \
+            _function(_ArgsT &args): \
+                _ArgsT(args) {} \
+            void call(_FuncT &fx) {fx(_STDEX_VALUES);}\
         };
+        
+        #define _STDEX_ARG(N) _arg<N>::value
 
-            #define _STDEX_TYPES  class _T0
-            #define _STDEX_ARGS   _T0 &arg0
-            #define _STDEX_VALUES arg0.value
+        #define _STDEX_VALUES _STDEX_ARG(0)
             _STDEX_FUNCTION_CALL_DEFINE(1)
-        #undef _STDEX_TYPES
-        #undef _STDEX_ARGS
         #undef _STDEX_VALUES
 
-            #define _STDEX_TYPES  class _T0, class _T1
-            #define _STDEX_ARGS   _T0 &arg0, _T1 &arg1
-            #define _STDEX_VALUES arg0.value, arg1.value
+        #define _STDEX_VALUES _STDEX_ARG(0), _STDEX_ARG(1)
             _STDEX_FUNCTION_CALL_DEFINE(2)
-        #undef _STDEX_TYPES
-        #undef _STDEX_ARGS
         #undef _STDEX_VALUES
     } // namespace detail
     
@@ -112,16 +110,28 @@
         
         function(fx0_type fx)
         {
-            detail::_function<fx0_type, 0>::call(fx);
+            struct _functor
+            {
+                void operator()(fx0_type fx) {fx();}
+            }; 
+            _functor()(fx);
         }
 
-        typedef void(*fx2_type)(int&, void*);
-        
-        function(fx2_type fx, int& val, stdex::nullptr_t)
+        typedef void(*fx2_type)(int&, void*);      
+        function(fx2_type fx, int& val, stdex::nullptr_t np)
         {
-            detail::_arg<int&, 0> arg0(val);
-            detail::_arg<stdex::nullptr_t, 1> arg1;
-            detail::_function<fx2_type, 2>::call(fx, arg0, arg1);
+            typedef ::stdex::detail::_arg<int&, 0> arg0;
+            typedef ::stdex::detail::_arg<stdex::nullptr_t, 1> arg1;
+            struct _functor:
+                arg0, arg1
+            {
+                typedef ::stdex::detail::_arg<int&, 0> arg0;
+                typedef ::stdex::detail::_arg<stdex::nullptr_t, 1> arg1;
+                _functor(arg0::type _0, arg1::type _1):
+                    arg0(_0), arg1(_1) {}
+                void operator()(fx2_type fx) {fx(arg0::value, arg1::value);}
+            }; 
+            _functor(val, np)(fx);
         }
 
     private:
