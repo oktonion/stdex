@@ -115,8 +115,8 @@ namespace stdex
             struct _pointer_as_short_type<false> { typedef _pointer_as_long_type<sizeof(long) == sizeof(void*)>::type type; };
             template<bool>
             struct _pointer_as_int_type { typedef const int type; };
-            //template<>
-            //struct _pointer_as_int_type<false> { typedef _pointer_as_short_type<sizeof(short) == sizeof(void*)>::type type; };
+            template<>
+            struct _pointer_as_int_type<false> { typedef _pointer_as_short_type<sizeof(short) == sizeof(void*)>::type type; };
 
             template<bool>
             struct _pointer_as_ulong_type { typedef const unsigned long type; };
@@ -128,8 +128,8 @@ namespace stdex
             struct _pointer_as_ushort_type<false> { typedef _pointer_as_long_type<sizeof(unsigned long) == sizeof(void*)>::type type; };
             template<bool>
             struct _pointer_as_uint_type { typedef const unsigned int type; };
-            //template<>
-            //struct _pointer_as_uint_type<false> { typedef _pointer_as_short_type<sizeof(unsigned short) == sizeof(void*)>::type type; };
+            template<>
+            struct _pointer_as_uint_type<false> { typedef _pointer_as_short_type<sizeof(unsigned short) == sizeof(void*)>::type type; };
 
             template<bool>
             struct _pointer_as_integral_type_impl { typedef _pointer_as_int_type<sizeof(int) == sizeof(void*)>::type type; };
