@@ -95,32 +95,37 @@
 
         template<int>
         class void_type_n;
-        #define _STDEX_VTN(N) class _T##N = void_type_n<##N##>
+        #define _STDEX_VTN(N) class _T##N = void_type_n< N >
         template<_STDEX_VTN(0), _STDEX_VTN(1)>
         struct _derived: _T0, _T1{};
 
         template<class _ArgsT, class _ArgT, int _N>
         struct _args: _ArgsT, _arg<_ArgT, _N>
         {
-            //using _arg<_ArgT, _N>::self;
+            typedef _ArgsT base_type;
+            base_type::arg;
+            _arg<_ArgT, _N> &arg(const _arg_tag<_N>&) {return static_cast<_arg<_ArgT, _N>&>(*this);}
             //using _arg<_ArgT, _N>::get;
 
             typedef _args type;
             _args(const _ArgsT &other, _ArgT arg):
                 _ArgsT(other), _arg<_ArgT, _N>(arg) {}
             _args(const _args &other):
-                _ArgsT(other), _arg<_ArgT, _N>(other) {}
+                _ArgsT(other), _arg<_ArgT, _N>(static_cast<const _arg<_ArgT, _N>&>(other)) {}
         };
 
-        template<class _ArgT, int _N>
-        struct _args<void, _ArgT, _N> : _arg<_ArgT, _N>
+        template<class _ArgT>
+        struct _args<void, _ArgT, 0> : _arg<_ArgT, 0>
         {
+            _arg<_ArgT, 0> &arg(const _arg_tag<0>&) {return *this;}
+            
             typedef _args type;
             _args(_ArgT arg) :
-                _arg<_ArgT, _N>(arg) {}
+                _arg<_ArgT, 0>(arg) {}
             _args(const _args& other) :
-                _arg<_ArgT, _N>(other) {}
+                _arg<_ArgT, 0>(other) {}
         };
+
 
         template<class _FuncT, int _Index, int _Count>
         struct _check_args_for_null
@@ -140,10 +145,10 @@
                 if(&arg != &args)
                 {
                     _args<_ResArgsT, _CheckedArgT, _Index> checked_args(res, arg);
-                    check(fx, args, args.self(tag), checked_args);
+                    check(fx, args, args.arg(tag), checked_args);
                 }
                 else
-                    check(fx, args, args.self(tag), args);
+                    check(fx, args, args.arg(tag), args);
             }
         };
 
@@ -198,10 +203,10 @@
                 if(&arg != &args)
                 {
                     _args<_ResArgsT, _CheckedArgT, 1> checked_args(res, arg);
-                    func(fx, args, args, checked_args);
+                    func(fx, args.arg(_arg_tag<0>()), args.arg(_arg_tag<1>()), checked_args);
                 }
                 else
-                    func(fx, args, args, args);
+                    func(fx, args.arg(_arg_tag<0>()), args.arg(_arg_tag<1>()), args);
             }
         };
 
