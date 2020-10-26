@@ -47,6 +47,9 @@
 
     namespace detail
     {
+        template<int _Index>
+        struct _arg_tag {};
+
         template<class _Tp, int _N>
         struct _arg
         {
@@ -54,52 +57,154 @@
             _Tp value;
             _arg(_Tp value_): value(value_) {}
             _arg(const _arg &other) : value(other.value) {}
+
+            _arg& self(_arg_tag<_N>&) { return *this; }
         };
 
-        template<class _FuncT, class _ArgsT, int _Count>
-        struct _function;
-
-        template<bool>
-        struct _nullptr_place_holder{
-            static const stdex::nullptr_t value = nullptr;
+        template<class _NullptrT, bool>
+        struct _nullptr_place_holder_impl{
+            static const _NullptrT value = nullptr;
         };
 
-        template<>
-        struct _nullptr_place_holder<false>{
-            static stdex::nullptr_t value1;
+
+        template<class _NullptrT>
+        struct _nullptr_place_holder_impl<_NullptrT, false>{
+            static _NullptrT value;
         };
+
+        template<class _NullptrT>
+        _NullptrT _nullptr_place_holder_impl<_NullptrT, false>::value = _NullptrT();
+
+        struct _nullptr_place_holder:
+            _nullptr_place_holder_impl<
+                stdex::nullptr_t,
+                stdex::is_class<stdex::nullptr_t>::value == bool(false) &&
+                (stdex::is_integral<stdex::nullptr_t>::value == bool(true) ||
+                stdex::is_enum<stdex::nullptr_t>::value == bool(true))>
+        { };
 
         template<int _N>
         struct _arg<stdex::nullptr_t, _N>:
-            _nullptr_place_holder<
-                stdex::is_class<stdex::nullptr_t>::value == bool(false)>
+            _nullptr_place_holder
         { 
             typedef stdex::nullptr_t type;
             _arg(stdex::nullptr_t value_ = nullptr){}
+            
+            _arg& self(_arg_tag<_N>&) { return *this; }
+        };
+
+        template<int>
+        class void_type_n;
+        #define _STDEX_VTN(N) class _T##N = void_type_n<##N##>
+        template<_STDEX_VTN(0), _STDEX_VTN(1)>
+        struct _derived: _T0, _T1{};
+
+        template<class _ArgsT, class _ArgT, int _N>
+        struct _args: _ArgsT, _arg<_ArgT, _N>
+        {
+            //using _arg<_ArgT, _N>::self;
+            //using _arg<_ArgT, _N>::get;
+
+            typedef _args type;
+            _args(const _ArgsT &other, _ArgT arg):
+                _ArgsT(other), _arg<_ArgT, _N>(arg) {}
+            _args(const _args &other):
+                _ArgsT(other), _arg<_ArgT, _N>(other) {}
+        };
+
+        template<class _ArgT, int _N>
+        struct _args<void, _ArgT, _N> : _arg<_ArgT, _N>
+        {
+            typedef _args type;
+            _args(_ArgT arg) :
+                _arg<_ArgT, _N>(arg) {}
+            _args(const _args& other) :
+                _arg<_ArgT, _N>(other) {}
+        };
+
+        template<class _FuncT, int _Index, int _Count>
+        struct _check_args_for_null
+        {
+            
+            template<class _RawArgsT, class _Tp, class _ResArgsT>
+            static void check(_FuncT &fx, _RawArgsT &args, _arg<_Tp, _Index> &arg, _ResArgsT &res)
+            {
+                typedef _Tp checked_arg_t;
+                _check_args_for_null<_FuncT, _Index + 1, _Count>::call(fx, args, arg, res);
+            }
+
+            template<class _RawArgsT, class _CheckedArgT, class _ResArgsT>
+            static void call(_FuncT &fx, _RawArgsT &args, _CheckedArgT &arg, _ResArgsT &res)
+            {
+                _arg_tag<_Index> tag;
+                if(&arg != &args)
+                {
+                    _args<_ResArgsT, _CheckedArgT, _Index> checked_args(res, arg);
+                    check(fx, args, args.self(tag), checked_args);
+                }
+                else
+                    check(fx, args, args.self(tag), args);
+            }
+        };
+
+        template<class _FuncT, int _Count>
+        struct _check_args_for_null<_FuncT, 0, _Count>
+        {
+            template<class _RawArgsT, class _Tp, class _ResArgsT>
+            static void check(_FuncT &fx, _RawArgsT &args, _arg<_Tp, 0> &arg, _ResArgsT &res)
+            {
+                typedef _Tp checked_arg_t;
+                _check_args_for_null<_FuncT, 1, _Count>::call(fx, args, arg, res);
+            }
+
+            template<class _RawArgsT>
+            static void call(_FuncT &fx, _RawArgsT &args)
+            {
+                check(fx, args, args, args);
+            }
         };
 
         template<class _FuncT>
-        struct _function<_FuncT, void, 0>{
-            void call(_FuncT &fx) {fx();}
+        struct _check_args_for_null<_FuncT, 0, 0>
+        {
+            static void call(_FuncT &fx)
+            {
+                struct _functor
+                {
+                    void operator()(_FuncT &fx) {fx();}
+                }; 
+                _functor()(fx);
+            }
         };
 
-        #define _STDEX_FUNCTION_CALL_DEFINE(N)  \
-        template<class _FuncT, class _ArgsT>    \
-        struct _function<_FuncT, _ArgsT, N>: _ArgsT {   \
-            _function(_ArgsT &args): \
-                _ArgsT(args) {} \
-            void call(_FuncT &fx) {fx(_STDEX_VALUES);}\
+        template<class _FuncT>
+        struct _check_args_for_null<_FuncT, 2, 2>
+        {
+            template<class _ArgT0, class _ArgT1, class _ResArgsT>
+            static void func(_FuncT &fx, _arg<_ArgT0, 0>&, _arg<_ArgT1, 1>&, _ResArgsT &res)
+            {
+                struct _functor: _ResArgsT
+                {
+                    _functor(_ResArgsT &other) : _ResArgsT(other) {}
+                    void operator()(_FuncT &fx) {fx(_arg<_ArgT0, 0>::value, _arg<_ArgT1, 1>::value);}
+                } f(res);
+
+                f(fx);
+            }
+            
+            template<class _RawArgsT, class _CheckedArgT, class _ResArgsT>
+            static void call(_FuncT &fx, _RawArgsT &args, _CheckedArgT &arg, _ResArgsT &res)
+            {
+                if(&arg != &args)
+                {
+                    _args<_ResArgsT, _CheckedArgT, 1> checked_args(res, arg);
+                    func(fx, args, args, checked_args);
+                }
+                else
+                    func(fx, args, args, args);
+            }
         };
-        
-        #define _STDEX_ARG(N) _arg<N>::value
 
-        /*#define _STDEX_VALUES _STDEX_ARG(0)
-            _STDEX_FUNCTION_CALL_DEFINE(1)
-        #undef _STDEX_VALUES
-
-        #define _STDEX_VALUES _STDEX_ARG(0), _STDEX_ARG(1)
-            _STDEX_FUNCTION_CALL_DEFINE(2)
-        #undef _STDEX_VALUES*/
     } // namespace detail
     
     //template<class>
@@ -110,28 +215,20 @@
         
         function(fx0_type fx)
         {
-            struct _functor
-            {
-                void operator()(fx0_type fx) {fx();}
-            }; 
-            _functor()(fx);
+            typedef detail::_check_args_for_null<fx0_type, 0, 0> functor;
+            functor::call(fx);
         }
 
-        typedef void(*fx2_type)(int&, void*);      
+        typedef void(*fx2_type)(int&, void*);
         function(fx2_type fx, int& val, stdex::nullptr_t np)
         {
-            typedef ::stdex::detail::_arg<int&, 0> arg0;
-            typedef ::stdex::detail::_arg<stdex::nullptr_t, 1> arg1;
-            struct _functor:
-                arg0, arg1
-            {
-                typedef ::stdex::detail::_arg<int&, 0> arg0;
-                typedef ::stdex::detail::_arg<stdex::nullptr_t, 1> arg1;
-                _functor(arg0::type _0, arg1::type _1):
-                    arg0(_0), arg1(_1) {}
-                void operator()(fx2_type fx) {fx(arg0::value, arg1::value);}
-            }; 
-            _functor(val, np)(fx);
+            typedef detail::_check_args_for_null<fx2_type, 0, 2> functor;
+            typedef detail::_args<void, int&, 0> args1_type;
+            typedef detail::_args<args1_type, stdex::nullptr_t, 1> args2_type;
+
+            args2_type args = args2_type(args1_type(val), np);
+
+            functor::call(fx, args);
         }
 
     private:
