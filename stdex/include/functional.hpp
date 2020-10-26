@@ -93,13 +93,13 @@
         
         #define _STDEX_ARG(N) _arg<N>::value
 
-        #define _STDEX_VALUES _STDEX_ARG(0)
+        /*#define _STDEX_VALUES _STDEX_ARG(0)
             _STDEX_FUNCTION_CALL_DEFINE(1)
         #undef _STDEX_VALUES
 
         #define _STDEX_VALUES _STDEX_ARG(0), _STDEX_ARG(1)
             _STDEX_FUNCTION_CALL_DEFINE(2)
-        #undef _STDEX_VALUES
+        #undef _STDEX_VALUES*/
     } // namespace detail
     
     //template<class>
