@@ -505,34 +505,35 @@
                 typedef _args<void,    _Arg0T, 0> args_x1;               
 
                 using stdex::detail::functional_std::forward;
+                using stdex::detail::functional_std::move;
 
                 args_type args = 
                     args_x1(forward<_Arg0T>(arg0))
-                    .make(arg1 )
-                    .make(arg2 )
-                    .make(arg3 )
-                    .make(arg4 )
-                    .make(arg5 )
-                    .make(arg6 )
-                    .make(arg7 )
-                    .make(arg8 )
-                    .make(arg9 )
-                    .make(arg10)
-                    .make(arg11)
-                    .make(arg12)
-                    .make(arg13)
-                    .make(arg14)
-                    .make(arg15)
-                    .make(arg16)
-                    .make(arg17)
-                    .make(arg18)
-                    .make(arg19)
-                    .make(arg20)
-                    .make(arg21)
-                    .make(arg22)
-                    .make(arg23)
+                    .make(forward<_Arg1T >(arg1 ))
+                    .make(forward<_Arg2T >(arg2 ))
+                    .make(forward<_Arg3T >(arg3 ))
+                    .make(forward<_Arg4T >(arg4 ))
+                    .make(forward<_Arg5T >(arg5 ))
+                    .make(forward<_Arg6T >(arg6 ))
+                    .make(forward<_Arg7T >(arg7 ))
+                    .make(forward<_Arg8T >(arg8 ))
+                    .make(forward<_Arg9T >(arg9 ))
+                    .make(forward<_Arg10T>(arg10))
+                    .make(forward<_Arg11T>(arg11))
+                    .make(forward<_Arg12T>(arg12))
+                    .make(forward<_Arg13T>(arg13))
+                    .make(forward<_Arg14T>(arg14))
+                    .make(forward<_Arg15T>(arg15))
+                    .make(forward<_Arg16T>(arg16))
+                    .make(forward<_Arg17T>(arg17))
+                    .make(forward<_Arg18T>(arg18))
+                    .make(forward<_Arg19T>(arg19))
+                    .make(forward<_Arg20T>(arg20))
+                    .make(forward<_Arg21T>(arg21))
+                    .make(forward<_Arg22T>(arg22))
+                    .make(forward<_Arg23T>(arg23))
                     ;
-                return _fx->_co_call(args);
+                return _fx->_co_call(move(args));
             }
 
         private:
