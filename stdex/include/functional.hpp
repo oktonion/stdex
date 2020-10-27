@@ -134,6 +134,10 @@
                 _ArgsT(other), _arg<_ArgT, _N>(arg) {}
             _args(const _args &other):
                 _ArgsT(other), _arg<_ArgT, _N>(static_cast<const _arg<_ArgT, _N>&>(other)) {}
+            template<class _NextArgT>
+            _args<type, _NextArgT, _N + 1> make(_NextArgT arg) const {return _args<type, _NextArgT, _N + 1>(*this, arg);}
+
+            const type& make(void_type arg) const { return *this; }
         };
 
         template<class _ArgT>
@@ -145,6 +149,11 @@
                 _arg<_ArgT, 0>(arg) {}
             _args(const _args& other) :
                 _arg<_ArgT, 0>(other) {}
+
+            template<class _NextArgT>
+            _args<type, _NextArgT, 1> make(_NextArgT arg) const {return _args<type, _NextArgT, 1>(*this, arg);}
+
+            const type& make(void_type arg) const { return *this; }
         };
 
         /*template<class _ArgsT, int _N>
@@ -380,13 +389,32 @@
         >
         class _function
         {
-            
-            typedef typename _make_args< _Arg0T>::type::
-                    template add       < _Arg1T>::type::
-                    template add       < _Arg2T>::type::
-                    template add       < _Arg3T>::type::
-                    template add       < _Arg4T>::type::
-                    args args_type;
+            typedef
+                typename _make_args< _Arg0T >::type::
+                template add       < _Arg1T >::type::
+                template add       < _Arg2T >::type::
+                template add       < _Arg3T >::type::
+                template add       < _Arg4T >::type::
+                template add       < _Arg5T >::type::
+                template add       < _Arg6T >::type::
+                template add       < _Arg7T >::type::
+                template add       < _Arg8T >::type::
+                template add       < _Arg9T >::type::
+                template add       < _Arg10T>::type::
+                template add       < _Arg11T>::type::
+                template add       < _Arg12T>::type::
+                template add       < _Arg13T>::type::
+                template add       < _Arg14T>::type::
+                template add       < _Arg15T>::type::
+                template add       < _Arg16T>::type::
+                template add       < _Arg17T>::type::
+                template add       < _Arg18T>::type::
+                template add       < _Arg19T>::type::
+                template add       < _Arg20T>::type::
+                template add       < _Arg21T>::type::
+                template add       < _Arg22T>::type::
+                template add       < _Arg23T>::type::
+            args args_type;
 
             struct func_base {
                 virtual func_base* _copy() const = 0;
@@ -448,16 +476,62 @@
                 _fx = new _functor(stdex::detail::functional_std::move(func));
             }
 
-            _R operator()(_Arg0T arg0, _Arg1T arg1) const
+            _R operator()(
+                _Arg0T  arg0  = void_type(),
+                _Arg1T  arg1  = void_type(),
+                _Arg2T  arg2  = void_type(),
+                _Arg3T  arg3  = void_type(),
+                _Arg4T  arg4  = void_type(),
+                _Arg5T  arg5  = void_type(),
+                _Arg6T  arg6  = void_type(),
+                _Arg7T  arg7  = void_type(),
+                _Arg8T  arg8  = void_type(),
+                _Arg9T  arg9  = void_type(),
+                _Arg10T arg10 = void_type(),
+                _Arg11T arg11 = void_type(),
+                _Arg12T arg12 = void_type(),
+                _Arg13T arg13 = void_type(),
+                _Arg14T arg14 = void_type(),
+                _Arg15T arg15 = void_type(),
+                _Arg16T arg16 = void_type(),
+                _Arg17T arg17 = void_type(),
+                _Arg18T arg18 = void_type(),
+                _Arg19T arg19 = void_type(),
+                _Arg20T arg20 = void_type(),
+                _Arg21T arg21 = void_type(),
+                _Arg22T arg22 = void_type(),
+                _Arg23T arg23 = void_type() ) const
             {
-                typedef _args<void,    _Arg0T, 0> args_x1;
-                typedef _args<args_x1, _Arg1T, 1> args_x2;
+                typedef _args<void,    _Arg0T, 0> args_x1;               
 
                 using stdex::detail::functional_std::forward;
 
-                args_x2 args = 
-                    args_x2(args_x1(forward<_Arg0T>(arg0)), forward<_Arg1T>(arg1));
-
+                args_type args = 
+                    args_x1(forward<_Arg0T>(arg0))
+                    .make(arg1 )
+                    .make(arg2 )
+                    .make(arg3 )
+                    .make(arg4 )
+                    .make(arg5 )
+                    .make(arg6 )
+                    .make(arg7 )
+                    .make(arg8 )
+                    .make(arg9 )
+                    .make(arg10)
+                    .make(arg11)
+                    .make(arg12)
+                    .make(arg13)
+                    .make(arg14)
+                    .make(arg15)
+                    .make(arg16)
+                    .make(arg17)
+                    .make(arg18)
+                    .make(arg19)
+                    .make(arg20)
+                    .make(arg21)
+                    .make(arg22)
+                    .make(arg23)
+                    ;
                 return _fx->_co_call(args);
             }
 
