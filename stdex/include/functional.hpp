@@ -265,11 +265,26 @@
                     func(fx, _get_arg<0>(args), _get_arg<1>(args), args);
             }
         };
+    } // namespace detail
+
+    namespace detail{
+
+        template<class>
+        class _function_base;
+
+        template<class _R>
+        class _function_base
+        {
+            
+        };
 
     } // namespace detail
     
-    //template<class>
-    class function
+    template<class>
+    class function ; // undefined
+
+    template<class _R>
+    class function<_R()
     {
     public:
         typedef void(*fx0_type)();
@@ -316,7 +331,7 @@
 
                 _SizeT _val = _FNV_offset_basis;
                 for (_SizeT _next = 0; _next < _count; ++_next)
-                    {	// fold in another byte
+                    {    // fold in another byte
                     _val ^= (_SizeT)_first[_next];
                     _val *= _FNV_prime;
                     }
@@ -334,7 +349,7 @@
 
                 _SizeT _val = _FNV_offset_basis;
                 for (_SizeT _next = 0; _next < _count; ++_next)
-                    {	// fold in another byte
+                    {    // fold in another byte
                     _val ^= (_SizeT)_first[_next];
                     _val *= _FNV_prime;
                     }
@@ -344,12 +359,12 @@
 
         template<class _KeyT, class>
         struct _bitwise_hash_impl
-        {	// hash functor for plain old data
+        {    // hash functor for plain old data
             typedef _KeyT argument_type;
             typedef std::size_t result_type;
 
             std::size_t operator()(const _KeyT& _keyval) const
-            {	// hash _keyval to std::size_t value by pseudorandomizing transform
+            {    // hash _keyval to std::size_t value by pseudorandomizing transform
                 return (_bitwise_hash_seq<std::size_t, sizeof(std::size_t)>::call((const unsigned char *)&_keyval, sizeof (_KeyT)));
             }
         };
@@ -361,7 +376,7 @@
             typedef std::size_t result_type;
 
             std::size_t operator()(const argument_type& _keyval) const
-            {	// hash _keyval to std::size_t value by pseudorandomizing transform
+            {    // hash _keyval to std::size_t value by pseudorandomizing transform
                 struct labdas{
                     static std::size_t hash_seq(const argument_type &keyval)
                     {
@@ -370,7 +385,7 @@
                 };
 
                 return (labdas::hash_seq(
-                    _keyval == 0 ? 0 : _keyval));	// map -0 to 0
+                    _keyval == 0 ? 0 : _keyval));    // map -0 to 0
             }
         };
 
@@ -412,7 +427,7 @@
     template<class _KeyT>
     struct hash
         : public detail::_hash_impl<_KeyT>::type
-    {	// hash functor for enums
+    {    // hash functor for enums
         typedef intern::functional_asserts check;
         typedef typename check::the_cpp_standard_does_not_provide_a_hash_for_enum_types_assert<is_enum<_KeyT>::value == bool(false)>::
             the_cpp_standard_does_not_provide_a_hash_for_enum_types_assert_failed
@@ -425,110 +440,110 @@
     template<>
     struct hash<bool>
         : public detail::_hash_impl<bool>::type
-    {	// hash functor for bool
+    {    // hash functor for bool
     };
 
     template<>
     struct hash<char>
         : public detail::_hash_impl<char>::type
-    {	// hash functor for char
+    {    // hash functor for char
     };
 
     template<>
     struct hash<signed char>
         : public detail::_hash_impl<signed char>::type
-    {	// hash functor for signed char
+    {    // hash functor for signed char
     };
 
     template<>
     struct hash<unsigned char>
         : public detail::_hash_impl<unsigned char>::type
-    {	// hash functor for unsigned char
+    {    // hash functor for unsigned char
     };
 
     template<>
     struct hash<wchar_t>
         : public detail::_hash_impl<wchar_t>::type
-    {	// hash functor for wchar_t
+    {    // hash functor for wchar_t
     };
 
     template<>
     struct hash<short>
         : public detail::_hash_impl<short>::type
-    {	// hash functor for short
+    {    // hash functor for short
     };
 
     template<>
     struct hash<unsigned short>
         : public detail::_hash_impl<unsigned short>::type
-    {	// hash functor for unsigned short
+    {    // hash functor for unsigned short
     };
 
     template<>
     struct hash<int>
         : public detail::_hash_impl<int>::type
-    {	// hash functor for int
+    {    // hash functor for int
     };
 
     template<>
     struct hash<unsigned int>
         : public detail::_hash_impl<unsigned int>::type
-    {	// hash functor for unsigned int
+    {    // hash functor for unsigned int
     };
 
     template<>
     struct hash<long>
         : public detail::_hash_impl<long>::type
-    {	// hash functor for long
+    {    // hash functor for long
     };
 
     template<>
     struct hash<unsigned long>
         : public detail::_hash_impl<unsigned long>::type
-    {	// hash functor for unsigned long
+    {    // hash functor for unsigned long
     };
 
     template<>
     struct hash<long long>
         : public detail::_hash_impl<long long>::type
-    {	// hash functor for long long
+    {    // hash functor for long long
     };
 
     template<>
     struct hash<unsigned long long>
         : public detail::_hash_impl<unsigned long long>::type
-    {	// hash functor for unsigned long long
+    {    // hash functor for unsigned long long
     };
 
     template<>
     struct hash<float>
         : public detail::_hash_impl<float>::type
-    {	// hash functor for float
+    {    // hash functor for float
     };
 
     template<>
     struct hash<double>
         : public detail::_hash_impl<double>::type
-    {	// hash functor for double
+    {    // hash functor for double
     };
 
     template<>
     struct hash<long double>
         : public detail::_hash_impl<long double>::type
-    {	// hash functor for long double
+    {    // hash functor for long double
     };
 
     template<class _KeyT>
     struct hash<_KeyT *>
         : public detail::_hash_impl<_KeyT *>::type
-    {	// hash functor for _KeyT *
+    {    // hash functor for _KeyT *
     };
 
     // standard hash overloads for std headers
 
     template<std::size_t _Bits>
-	struct hash<std::bitset<_Bits>/**/>;
-	//{	// hash functor for bitset<_Bits>
+    struct hash<std::bitset<_Bits>/**/>;
+    //{    // hash functor for bitset<_Bits>
     //    typedef std::bitset<_Bits> argument_type;
     //    typedef std::size_t result_type;
     //
@@ -536,11 +551,11 @@
     //    {
     //        return (_keyval.hash());
     //    }
-	//};
+    //};
 
     template<class _AllocatorT>
-	struct hash<std::vector<bool, _AllocatorT>/**/>;
-	//{	// hash functor for vector<bool, _AllocatorT>
+    struct hash<std::vector<bool, _AllocatorT>/**/>;
+    //{    // hash functor for vector<bool, _AllocatorT>
     //    typedef std::vector<bool, _AllocatorT> argument_type;
     //    typedef std::size_t result_type;
     //
@@ -548,7 +563,7 @@
     //    {
     //        return (_keyval.hash());
     //    }
-	//};
+    //};
 
     
     // Arithmetic operations
@@ -578,55 +593,55 @@
     // Bitwise operations
 
     template<class _Tp>
-	struct bit_and
-	{	// functor for operator&
+    struct bit_and
+    {    // functor for operator&
         typedef _Tp first_argument_type;
         typedef _Tp second_argument_type;
         typedef _Tp result_type;
 
         _Tp operator()(const _Tp& _left, const _Tp& _right) const
-        {	// apply operator& to operands
+        {    // apply operator& to operands
             return (_left & _right);
         }
-	};
+    };
 
     template<class _Tp>
-	struct bit_or
-	{	// functor for operator|
+    struct bit_or
+    {    // functor for operator|
         typedef _Tp first_argument_type;
         typedef _Tp second_argument_type;
         typedef _Tp result_type;
 
         _Tp operator()(const _Tp& _left, const _Tp& _right) const
-        {	// apply operator| to operands
+        {    // apply operator| to operands
             return (_left | _right);
         }
-	};
+    };
 
     template<class _Tp>
-	struct bit_xor
-	{	// functor for operator^
+    struct bit_xor
+    {    // functor for operator^
         typedef _Tp first_argument_type;
         typedef _Tp second_argument_type;
         typedef _Tp result_type;
 
         _Tp operator()(const _Tp& _left, const _Tp& _right) const
-        {	// apply operator^ to operands
+        {    // apply operator^ to operands
             return (_left ^ _right);
         }
-	};
+    };
 
     template<class _Tp>
-	struct bit_not
-	{	// functor for unary operator~
+    struct bit_not
+    {    // functor for unary operator~
         typedef _Tp argument_type;
         typedef _Tp result_type;
 
         _Tp operator()(const _Tp& _left) const
-        {	// apply operator~ to operand
+        {    // apply operator~ to operand
             return (~_left);
         }
-	};
+    };
     
  } // namespace stdex
  
