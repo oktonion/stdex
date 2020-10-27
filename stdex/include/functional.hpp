@@ -165,8 +165,16 @@
         template<class _ArgsT, class _ArgT, int _End>
         struct _get_args<_args<_ArgsT, _ArgT, _End>, _End>
         { 
-            typedef _args<_ArgsT, _ArgT, _End> type;
+            typedef _args<_ArgsT, _ArgT, _End> args;
+            typedef _arg<_ArgT, _End> arg;
         };
+
+        template<int _Index, class _ArgsT>
+        typename _get_args<_ArgsT, _Index>::arg&
+        _get_arg(_ArgsT &args)
+        {
+            return args;
+        }
 
         template<class _FuncT, int _Index, int _Count>
         struct _check_args_for_null
@@ -182,15 +190,13 @@
             template<class _RawArgsT, class _CheckedArgT, class _ResArgsT>
             static void call(_FuncT &fx, _RawArgsT &args, _CheckedArgT &arg, _ResArgsT &res)
             {
-                _arg_tag<_Index> tag;
-                typedef typename _get_args<_RawArgsT, _Index>::type args_type;
                 if(&arg != &args)
                 {
                     _args<_ResArgsT, _CheckedArgT, _Index> checked_args(res, arg);
-                    check(fx, args, static_cast<args_type&>(args).arg(tag), checked_args);
+                    check(fx, args, _get_arg<_Index>(args), checked_args);
                 }
                 else
-                    check(fx, args, static_cast<args_type&>(args).arg(tag), args);
+                    check(fx, args, _get_arg<_Index>(args), args);
             }
         };
 
@@ -250,15 +256,13 @@
             template<class _RawArgsT, class _CheckedArgT, class _ResArgsT>
             static void call(_FuncT &fx, _RawArgsT &args, _CheckedArgT &arg, _ResArgsT &res)
             {
-                typedef typename _get_args<_RawArgsT, 0>::type args0_type;
-                typedef typename _get_args<_RawArgsT, 1>::type args1_type;
                 if(&arg != &args)
                 {
                     _args<_ResArgsT, _CheckedArgT, 1> checked_args(res, arg);
-                    func(fx, static_cast<args0_type&>(args).arg(_arg_tag<0>()), static_cast<args1_type&>(args).arg(_arg_tag<1>()), checked_args);
+                    func(fx, _get_arg<0>(args), _get_arg<1>(args), checked_args);
                 }
                 else
-                    func(fx, static_cast<args0_type&>(args).arg(_arg_tag<0>()), static_cast<args1_type&>(args).arg(_arg_tag<1>()), args);
+                    func(fx, _get_arg<0>(args), _get_arg<1>(args), args);
             }
         };
 
