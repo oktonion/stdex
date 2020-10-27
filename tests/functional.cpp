@@ -69,17 +69,33 @@ int test02()
 {
     struct lambdas
     {
-        static void func(int& a, void*){a++;}
+        static void func(int& a, void* ptr){
+            a++;
+            DYNAMIC_VERIFY_ABORT(ptr == nullptr);
+        }
+
+        static void func1(int& a, void* ptr) {
+            a++;
+            DYNAMIC_VERIFY_ABORT(ptr != nullptr);
+        }
     };
 
     int a = 0;
-    stdex::function f(&lambdas::func, a, nullptr);
+    stdex::function f1(&lambdas::func, a, nullptr);
 
     DYNAMIC_VERIFY(a == 1);
 
-    stdex::function ff(&lambdas::func, a, nullptr);
+    stdex::function f2(&lambdas::func, a, nullptr);
 
     DYNAMIC_VERIFY(a == 2);
+
+    stdex::function f3(&lambdas::func1, a, &a);
+
+    DYNAMIC_VERIFY(a == 3);
+
+    stdex::function f4(&lambdas::func1, a, &a);
+
+    DYNAMIC_VERIFY(a == 4);
 
     return 0;
 }
