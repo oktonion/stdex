@@ -128,9 +128,8 @@
         template<class _ArgsT, class _ArgT, int _N>
         struct _args: _ArgsT, _arg<_ArgT, _N>
         {
-            _arg<_ArgT, _N> &arg(const _arg_tag<_N>&) {return *this;}
-
             typedef _args type;
+            static const int count = _N + 1;
             _args(const _ArgsT &other, _ArgT arg):
                 _ArgsT(other), _arg<_ArgT, _N>(arg) {}
             _args(const _args &other):
@@ -140,14 +139,23 @@
         template<class _ArgT>
         struct _args<void, _ArgT, 0> : _arg<_ArgT, 0>
         {
-            _arg<_ArgT, 0> &arg(const _arg_tag<0>&) {return *this;}
-            
             typedef _args type;
+            static const int count = 1;
             _args(_ArgT arg) :
                 _arg<_ArgT, 0>(arg) {}
             _args(const _args& other) :
                 _arg<_ArgT, 0>(other) {}
         };
+
+        /*template<class _ArgsT, int _N>
+        struct _args<_ArgsT, void_type, _N> : _ArgsT
+        {
+            typedef _args type;
+            _args(const _ArgsT& other) :
+                _ArgsT(other) {}
+            _args(const _args& other) :
+                _ArgsT(other) {}
+        };*/
 
         template<class, int _End>
         struct _get_args_impl;
@@ -269,22 +277,176 @@
 
     namespace detail{
 
-        template<class>
-        class _function_base;
+        template<class _ArgT>
+        struct _arg_is_void:
+            bool_constant<
+                is_same<_ArgT, void_type>::value == bool(true) ||
+                is_void<_ArgT>::value == bool(true)
+            >
+        { };
 
-        template<class _R>
-        class _function_base
+        template<class _ArgsT, class _ArgT, int _Index, bool>
+        struct _make_args_impl;
+
+        template<class _ArgsT, class _ArgT, class _NextArgT, int _Index>
+        struct _add;
+
+        template<class _ArgsT>
+        struct _make_args_impl1;
+
+        template<class _ArgsT, class _ArgT, int _Index>
+        struct _make_args_impl1<_args<_ArgsT, _ArgT, _Index>/**/>
         {
-            
+            template<class _NextArgT>
+            struct add
+            {
+                typedef _add<_ArgsT, _ArgT, _NextArgT, _Index> type;
+            };
+        };
+
+        template<class _ArgsT, class _ArgT, int _Index, bool VVV>
+        struct _make_args_impl:
+            _make_args_impl1<_ArgsT>
+        {
+            typedef _make_args_impl<_ArgsT, _ArgT, _Index, VVV> type;
+            typedef _ArgsT args;
+        };
+
+        template<class _ArgsT, class _ArgT, int _Index>
+        struct _make_args_impl<_ArgsT, _ArgT, _Index, false>:
+            _make_args_impl1<_args<_ArgsT, _ArgT, _Index>/**/>
+        { 
+            typedef _make_args_impl<_ArgsT, _ArgT, _Index, false> type;
+            typedef _args<_ArgsT, _ArgT, _Index> args;
+        };
+
+        template<class _ArgsT, class _ArgT, class _NextArgT, int _Index>
+        struct _add :
+            _make_args_impl<_args<_ArgsT, _ArgT, _Index>, _NextArgT, _Index + 1, _arg_is_void<_NextArgT>::value == bool(true)>
+        { };
+
+        template<class _ArgT>
+        struct _make_args:
+            _make_args_impl<void, _ArgT, 0, _arg_is_void<_ArgT>::value>
+        { };
+
+        namespace functional_std {
+            using namespace std;
+            using namespace stdex;
+        }
+
+        template<
+            class _R, 
+            class _Arg0T  = void_type, 
+            class _Arg1T  = void_type, 
+            class _Arg2T  = void_type,
+            class _Arg3T  = void_type,
+            class _Arg4T  = void_type,
+            class _Arg5T  = void_type,
+            class _Arg6T  = void_type,
+            class _Arg7T  = void_type,
+            class _Arg8T  = void_type,
+            class _Arg9T  = void_type,
+            class _Arg10T = void_type,
+            class _Arg11T = void_type,
+            class _Arg12T = void_type,
+            class _Arg13T = void_type,
+            class _Arg14T = void_type,
+            class _Arg15T = void_type,
+            class _Arg16T = void_type,
+            class _Arg17T = void_type,
+            class _Arg18T = void_type,
+            class _Arg19T = void_type,
+            class _Arg20T = void_type,
+            class _Arg21T = void_type,
+            class _Arg22T = void_type,
+            class _Arg23T = void_type // up to 24 args
+        >
+        class _function
+        {
+        public:
+            typedef typename _make_args< _Arg0T>::type::
+                    template add       < _Arg1T>::type::
+                    template add       < _Arg2T>::type::
+                    template add       < _Arg3T>::type::
+                    template add       < _Arg4T>::type::
+                    args args_type;
+        
+            typedef _R return_type;
+
+            _function() _STDEX_NOEXCEPT_FUNCTION : _fx(nullptr)  {}
+            _function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : _fx(nullptr)  {}
+
+            _function(const _function& other) : 
+                _fx(nullptr)
+            { 
+                if (!other._fx)
+                    return;
+                _fx = other._fx->_copy();
+            }
+            //_function(_function&& other) _STDEX_NOEXCEPT_FUNCTION;
+
+
+            template<class _FuncT>
+            _function(_FuncT func)
+            {
+                struct _functor :
+                    func_base
+                {
+                    typedef _FuncT func_type;
+
+                    _functor(func_type func) :
+                        _func(functional_std::move(func)) {}
+
+                    virtual func_base* _copy() const { return new _functor(_func); }
+                    virtual func_base* _move() _STDEX_NOEXCEPT_FUNCTION { return new _functor(functional_std::move(_func)); }
+                    virtual _R _co_call(args_type &args)
+                    {
+                        typedef _check_args_for_null<func_type, 0, args_type::count> functor;
+                        functor::call(_func, args);
+                    }
+                    virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION { delete this; }
+                    // dtor non-virtual due to _delete_this()
+
+                    func_type _func;
+                };
+
+                delete _fx;
+                _fx = new _functor(functional_std::move(func));
+            }
+
+            _R operator()(_Arg0T arg0, _Arg1T arg1) const
+            {
+                typedef _args<void,    _Arg0T, 0> args_x1;
+                typedef _args<args_x1, _Arg1T, 1> args_x2;
+
+                args_x2 args = 
+                    args_x2(args_x1(functional_std::forward<_Arg0T>(arg0)), functional_std::forward<_Arg1T>(arg1));
+
+                return _fx->_co_call(args);
+            }
+
+        private:
+            struct func_base {
+            public:
+                virtual func_base* _copy() const = 0;
+                virtual func_base* _move() _STDEX_NOEXCEPT_FUNCTION = 0;
+                virtual _R _co_call(args_type&) = 0;
+                virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION = 0;
+
+                func_base() {}
+                func_base(const func_base&) _STDEX_DELETED_FUNCTION;
+                func_base& operator=(const func_base&) _STDEX_DELETED_FUNCTION;
+                // dtor non-virtual due to _delete_this()
+            };
+
+            func_base* _fx;
         };
 
     } // namespace detail
     
-    template<class>
-    class function ; // undefined
 
-    template<class _R>
-    class function<_R()
+    class function
     {
     public:
         typedef void(*fx0_type)();
