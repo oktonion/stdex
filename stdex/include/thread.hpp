@@ -323,13 +323,13 @@ namespace stdex
             
             template<class _Tp>
             inline
-            _Tp& operator,(const _ref_wrapper<_Tp> &value, const nullptr_t&)
+            _Tp& operator,(const _ref_wrapper<_Tp> &value, nullptr_t)
             {
                 return value;
             }
 
             inline
-            nullptr_t& operator,(const _ref_wrapper<nullptr_t> &value, const nullptr_t&)
+            stdex::nullptr_t& operator,(const _ref_wrapper<stdex::nullptr_t> &value, nullptr_t)
             {
                 return value;
             }
