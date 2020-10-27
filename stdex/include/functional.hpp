@@ -331,8 +331,24 @@
         { };
 
         namespace functional_std {
-            using namespace std;
-            using namespace stdex;
+            // since there is no move-semantic
+            template<class _Tp>
+            _Tp& move(_Tp &ref)
+            {
+                using namespace std;
+                using namespace stdex;
+
+                return ref;
+            }
+
+            template<class _Tp>
+            typename remove_reference<_Tp>::type& forward(typename remove_reference<_Tp>::type &ref)
+            {
+                using namespace std;
+                using namespace stdex;
+
+                return ref;
+            }
         }
 
         template<
@@ -364,14 +380,28 @@
         >
         class _function
         {
-        public:
+            
             typedef typename _make_args< _Arg0T>::type::
                     template add       < _Arg1T>::type::
                     template add       < _Arg2T>::type::
                     template add       < _Arg3T>::type::
                     template add       < _Arg4T>::type::
                     args args_type;
-        
+
+            struct func_base {
+                virtual func_base* _copy() const = 0;
+                virtual func_base* _move() _STDEX_NOEXCEPT_FUNCTION = 0;
+                virtual _R _co_call(args_type&) = 0;
+                virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION = 0;
+
+                func_base() {}
+            private:
+                func_base(const func_base&) _STDEX_DELETED_FUNCTION;
+                func_base& operator=(const func_base&) _STDEX_DELETED_FUNCTION;
+                // dtor non-virtual due to _delete_this()
+            };
+
+        public:
             typedef _R return_type;
 
             _function() _STDEX_NOEXCEPT_FUNCTION : _fx(nullptr)  {}
@@ -394,15 +424,18 @@
                     func_base
                 {
                     typedef _FuncT func_type;
+                    typedef _function::func_base func_base_type;
+                    typedef _function::args_type args_type;
+                    typedef _functor type;
 
                     _functor(func_type func) :
-                        _func(functional_std::move(func)) {}
+                        _func(stdex::detail::functional_std::move(func)) {}
 
-                    virtual func_base* _copy() const { return new _functor(_func); }
-                    virtual func_base* _move() _STDEX_NOEXCEPT_FUNCTION { return new _functor(functional_std::move(_func)); }
+                    virtual func_base_type* _copy() const { return (new type(_func)); }
+                    virtual func_base_type* _move() _STDEX_NOEXCEPT_FUNCTION { return (new type(stdex::detail::functional_std::move(_func))); }
                     virtual _R _co_call(args_type &args)
                     {
-                        typedef _check_args_for_null<func_type, 0, args_type::count> functor;
+                        typedef stdex::detail::_check_args_for_null<func_type, 0, args_type::count> functor;
                         functor::call(_func, args);
                     }
                     virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION { delete this; }
@@ -412,7 +445,7 @@
                 };
 
                 delete _fx;
-                _fx = new _functor(functional_std::move(func));
+                _fx = new _functor(stdex::detail::functional_std::move(func));
             }
 
             _R operator()(_Arg0T arg0, _Arg1T arg1) const
@@ -420,25 +453,16 @@
                 typedef _args<void,    _Arg0T, 0> args_x1;
                 typedef _args<args_x1, _Arg1T, 1> args_x2;
 
+                using stdex::detail::functional_std::forward;
+
                 args_x2 args = 
-                    args_x2(args_x1(functional_std::forward<_Arg0T>(arg0)), functional_std::forward<_Arg1T>(arg1));
+                    args_x2(args_x1(forward<_Arg0T>(arg0)), forward<_Arg1T>(arg1));
 
                 return _fx->_co_call(args);
             }
 
         private:
-            struct func_base {
-            public:
-                virtual func_base* _copy() const = 0;
-                virtual func_base* _move() _STDEX_NOEXCEPT_FUNCTION = 0;
-                virtual _R _co_call(args_type&) = 0;
-                virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION = 0;
 
-                func_base() {}
-                func_base(const func_base&) _STDEX_DELETED_FUNCTION;
-                func_base& operator=(const func_base&) _STDEX_DELETED_FUNCTION;
-                // dtor non-virtual due to _delete_this()
-            };
 
             func_base* _fx;
         };
