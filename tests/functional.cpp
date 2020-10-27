@@ -7,6 +7,7 @@
 #include <string>
 #include <bitset>
 #include <limits>
+#include <functional>
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
@@ -96,6 +97,10 @@ int test02()
     stdex::function f4(&lambdas::func1, a, &a);
 
     DYNAMIC_VERIFY(a == 4);
+
+    stdex::detail::_function<void, int&, void*> f5(&lambdas::func);
+
+    f5(a, nullptr);
 
     return 0;
 }
