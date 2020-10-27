@@ -387,7 +387,7 @@
             class _Arg22T = void_type,
             class _Arg23T = void_type // up to 24 args
         >
-        class _function
+        class function
         {
             typedef
                 typename _make_args< _Arg0T >::type::
@@ -432,28 +432,28 @@
         public:
             typedef _R return_type;
 
-            _function() _STDEX_NOEXCEPT_FUNCTION : _fx(nullptr)  {}
-            _function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : _fx(nullptr)  {}
+            function() _STDEX_NOEXCEPT_FUNCTION : _fx(nullptr)  {}
+            function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : _fx(nullptr)  {}
 
-            _function(const _function& other) : 
+            function(const function& other) :
                 _fx(nullptr)
             { 
                 if (!other._fx)
                     return;
                 _fx = other._fx->_copy();
             }
-            //_function(_function&& other) _STDEX_NOEXCEPT_FUNCTION;
+            //function(function&& other) _STDEX_NOEXCEPT_FUNCTION;
 
 
             template<class _FuncT>
-            _function(_FuncT func)
+            function(_FuncT func)
             {
                 struct _functor :
                     func_base
                 {
                     typedef _FuncT func_type;
-                    typedef _function::func_base func_base_type;
-                    typedef _function::args_type args_type;
+                    typedef function::func_base func_base_type;
+                    typedef function::args_type args_type;
                     typedef _functor type;
 
                     _functor(func_type func) :
@@ -545,35 +545,7 @@
     } // namespace detail
     
 
-    class function
-    {
-    public:
-        typedef void(*fx0_type)();
-        
-        function(fx0_type fx)
-        {
-            typedef detail::_check_args_for_null<fx0_type, 0, 0> functor;
-            functor::call(fx);
-        }
-
-        typedef void(*fx2_type)(int&, void*);
-
-        template<class _PointerT>
-        function(fx2_type fx, int& val, _PointerT np)
-        {
-            typedef detail::_check_args_for_null<fx2_type, 0, 2> functor;
-            typedef detail::_args<void, int&, 0> args1_type;
-            typedef detail::_args<args1_type, _PointerT, 1> args2_type;
-
-            args2_type args = args2_type(args1_type(val), np);
-
-            functor::call(fx, args);
-        }
-
-    private:
-
-        
-    };
+    using detail::function;
 
     // Hashing
 
