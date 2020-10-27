@@ -277,11 +277,13 @@
         }
 
         typedef void(*fx2_type)(int&, void*);
-        function(fx2_type fx, int& val, stdex::nullptr_t np)
+
+        template<class _PointerT>
+        function(fx2_type fx, int& val, _PointerT np)
         {
             typedef detail::_check_args_for_null<fx2_type, 0, 2> functor;
             typedef detail::_args<void, int&, 0> args1_type;
-            typedef detail::_args<args1_type, stdex::nullptr_t, 1> args2_type;
+            typedef detail::_args<args1_type, _PointerT, 1> args2_type;
 
             args2_type args = args2_type(args1_type(val), np);
 
