@@ -68,19 +68,45 @@
 
 
         template<class _NullptrT>
-        struct _nullptr_place_holder_impl<_NullptrT, false>{
+        struct _nullptr_place_holder_impl<_NullptrT, true>{
             static _NullptrT value;
         };
 
         template<class _NullptrT>
-        _NullptrT _nullptr_place_holder_impl<_NullptrT, false>::value = _NullptrT();
+        _NullptrT _nullptr_place_holder_impl<_NullptrT, true>::value = _NullptrT();
 
+        _yes_type _rt_nullptr_can_be_ptr_checker(class _dummy*);
+        _no_type _rt_nullptr_can_be_ptr_checker(...);
+
+        struct _rt_nullptr_can_be_ptr
+        {
+            static stdex::nullptr_t declnull();
+            static const bool value = 
+                sizeof(_rt_nullptr_can_be_ptr_checker(declnull())) == sizeof(_yes_type);
+        };
+    } // namespace detail
+
+    namespace intern
+    {
+        template<class>
+        struct _has_feature;
+
+        template<>
+        struct _has_feature<class _stdex_has_native_nullptr>:
+            integral_constant<
+                bool,
+                detail::_rt_nullptr_can_be_ptr::value == bool(true) &&
+                is_class<stdex::nullptr_t>::value == bool(false)
+            >
+        { };
+    } // namespace intern
+
+    namespace detail
+    {
         struct _nullptr_place_holder:
             _nullptr_place_holder_impl<
                 stdex::nullptr_t,
-                stdex::is_class<stdex::nullptr_t>::value == bool(false) &&
-                (stdex::is_integral<stdex::nullptr_t>::value == bool(true) ||
-                stdex::is_enum<stdex::nullptr_t>::value == bool(true))>
+                intern::_has_feature<intern::_stdex_has_native_nullptr>::value>
         { };
 
         template<int _N>
@@ -124,10 +150,15 @@
         };
 
         template<class, int _End>
-        struct _get_args;
+        struct _get_args_impl;
+
+        template<class _ArgsT, int _End>
+        struct _get_args :
+            _get_args_impl<_ArgsT, _End>
+        { };
 
         template<class _ArgsT, class _ArgT, int _Index, int _End>
-        struct _get_args<_args<_ArgsT, _ArgT, _Index>, _End>:
+        struct _get_args_impl<_args<_ArgsT, _ArgT, _Index>, _End>:
             _get_args<_ArgsT, _End>
         { };
 
@@ -189,7 +220,8 @@
                 {
                     void operator()(_FuncT &fx) {fx();}
                 }; 
-                _functor()(fx);
+                _functor _f;
+                _f(fx);
             }
         };
 
@@ -201,12 +233,18 @@
             {
                 struct _functor: _ResArgsT
                 {
-                    _functor(_ResArgsT &other) : _ResArgsT(other) {}
-                    void operator()(_FuncT &fx) {fx(_arg<_ArgT0, 0>::value, _arg<_ArgT1, 1>::value);}
+                    typedef _ResArgsT base_type;
+                    typedef _ArgT0 arg0_type;
+                    typedef _ArgT1 arg1_type;
+                    _functor(const base_type &other) : base_type(other) {}
+                    void operator()(_FuncT &fx) {
+                        using ::stdex::detail::_arg;
+                        fx(_arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value);
+                    }
                 };
                 
-                _functor f = res;
-                f(fx);
+                _functor _f = res;
+                _f(fx);
             }
             
             template<class _RawArgsT, class _CheckedArgT, class _ResArgsT>
