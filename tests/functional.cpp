@@ -7,7 +7,6 @@
 #include <string>
 #include <bitset>
 #include <limits>
-#include <functional>
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
@@ -68,6 +67,8 @@ int test01()
 
 int test02()
 {
+    typedef stdex::function<void, int&, void*> function;
+    //typedef std::function<void(int&, void*)> function;
     struct lambdas
     {
         static void func(int& a, void* ptr){
@@ -82,25 +83,31 @@ int test02()
     };
 
     int a = 0;
-    stdex::function f1(&lambdas::func, a, nullptr);
+    function f1(&lambdas::func);
+    f1(a, nullptr);
 
     DYNAMIC_VERIFY(a == 1);
 
-    stdex::function f2(&lambdas::func, a, nullptr);
+    function f2(&lambdas::func);
+    f2(a, nullptr);
 
     DYNAMIC_VERIFY(a == 2);
 
-    stdex::function f3(&lambdas::func1, a, &a);
+    function f3(&lambdas::func1);
+    f3(a, &a);
 
     DYNAMIC_VERIFY(a == 3);
 
-    stdex::function f4(&lambdas::func1, a, &a);
+    function f4(&lambdas::func1);
+    f4(a, &a);
 
     DYNAMIC_VERIFY(a == 4);
 
-    stdex::detail::_function<void, int&, void*> f5(&lambdas::func);
+    function f5(&lambdas::func);
 
     f5(a, nullptr);
+
+    DYNAMIC_VERIFY(a == 5);
 
     return 0;
 }
