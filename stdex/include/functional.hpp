@@ -57,8 +57,6 @@
             _Tp value;
             _arg(_Tp value_): value(value_) {}
             _arg(const _arg &other) : value(other.value) {}
-
-            _arg& self(_arg_tag<_N>&) { return *this; }
         };
 
         template<class _NullptrT, bool>
@@ -110,20 +108,12 @@
         { };
 
         template<int _N>
-        struct _arg<stdex::nullptr_t, _N>:
+        struct _arg<_nullptr_place_holder, _N>:
             _nullptr_place_holder
         { 
             typedef stdex::nullptr_t type;
             _arg(stdex::nullptr_t){}
-            
-            _arg& self(_arg_tag<_N>&) { return *this; }
         };
-
-        template<int>
-        class void_type_n;
-        #define _STDEX_VTN(N) class _T##N = void_type_n< N >
-        template<_STDEX_VTN(0), _STDEX_VTN(1)>
-        struct _derived: _T0, _T1{};
 
         template<class _ArgsT, class _ArgT, int _N>
         struct _args: _ArgsT, _arg<_ArgT, _N>
@@ -194,15 +184,34 @@
         }
 
         template<class _FuncT, int _Index, int _Count>
+        struct _check_args_for_null;
+
+        template<class _FuncT, int _Index, int _Count>
+        struct _func_invoker;
+
+        template<class _FuncT, int _Index, int _Count>
         struct _check_args_for_null
         {
-            
+            typedef _func_invoker<_FuncT, _Index + 1, _Count> func_invoker;
+
             template<class _RawArgsT, class _Tp, class _ResArgsT>
-            static void check(_FuncT &fx, _RawArgsT &args, _arg<_Tp, _Index> &arg, _ResArgsT &res)
+            static void call(_FuncT &fx, _RawArgsT &args, _arg<_Tp, _Index> &arg, _ResArgsT &res)
             {
-                typedef _Tp checked_arg_t;
-                _check_args_for_null<_FuncT, _Index + 1, _Count>::call(fx, args, arg, res);
+                if(is_null_pointer<typename remove_reference<_Tp>::type>::value)
+                {
+                    //_arg<_nullptr_place_holder, _Index> checked_arg(nullptr);
+                    func_invoker::call(fx, args, arg, res);
+                }
+                else
+                    func_invoker::call(fx, args, arg, res);
             }
+        };
+
+
+        template<class _FuncT, int _Index, int _Count>
+        struct _func_invoker
+        {
+            typedef _check_args_for_null<_FuncT, _Index, _Count> null_checker;
 
             template<class _RawArgsT, class _CheckedArgT, class _ResArgsT>
             static void call(_FuncT &fx, _RawArgsT &args, _CheckedArgT &arg, _ResArgsT &res)
@@ -210,32 +219,27 @@
                 if(&arg != &args)
                 {
                     _args<_ResArgsT, _CheckedArgT, _Index> checked_args(res, arg);
-                    check(fx, args, _get_arg<_Index>(args), checked_args);
+                    null_checker::call(fx, args, _get_arg<_Index>(args), checked_args);
                 }
                 else
-                    check(fx, args, _get_arg<_Index>(args), args);
+                    null_checker::call(fx, args, _get_arg<_Index>(args), args);
             }
         };
 
         template<class _FuncT, int _Count>
-        struct _check_args_for_null<_FuncT, 0, _Count>
+        struct _func_invoker<_FuncT, 0, _Count>
         {
-            template<class _RawArgsT, class _Tp, class _ResArgsT>
-            static void check(_FuncT &fx, _RawArgsT &args, _arg<_Tp, 0> &arg, _ResArgsT &res)
-            {
-                typedef _Tp checked_arg_t;
-                _check_args_for_null<_FuncT, 1, _Count>::call(fx, args, arg, res);
-            }
+            typedef _check_args_for_null<_FuncT, 0, _Count> null_checker;
 
             template<class _RawArgsT>
             static void call(_FuncT &fx, _RawArgsT &args)
             {
-                check(fx, args, args, args);
+                null_checker::call(fx, args, args, args);
             }
         };
 
         template<class _FuncT>
-        struct _check_args_for_null<_FuncT, 0, 0>
+        struct _func_invoker<_FuncT, 0, 0>
         {
             static void call(_FuncT &fx)
             {
@@ -249,7 +253,7 @@
         };
 
         template<class _FuncT>
-        struct _check_args_for_null<_FuncT, 2, 2>
+        struct _func_invoker<_FuncT, 2, 2>
         {
             template<class _ArgT0, class _ArgT1, class _ResArgsT>
             static void func(_FuncT &fx, _arg<_ArgT0, 0>&, _arg<_ArgT1, 1>&, _ResArgsT &res)
@@ -463,8 +467,8 @@
                     virtual function_func_base* _move() _STDEX_NOEXCEPT_FUNCTION { return (new type(stdex::detail::functional_std::move(_func))); }
                     virtual _R _co_call(function_args_type &args)
                     {
-                        typedef stdex::detail::_check_args_for_null<func_type, 0, function_args_type::count> functor;
-                        functor::call(_func, args);
+                        typedef stdex::detail::_func_invoker<func_type, 0, function_args_type::count> func_invoker;
+                        func_invoker::call(_func, args);
                     }
                     virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION { delete this; }
                     // dtor non-virtual due to _delete_this()
