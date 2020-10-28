@@ -248,11 +248,20 @@ namespace stdex
             typedef _CheckedArgsT type;
         };
 
+        template<class _FuncT, int _Index, int _Count, class _CheckedArgsT>
+        struct _check_args_for_null_impl_helper
+        {
+            template<class _RawArgsT>
+            static void call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>& checked_args)
+            {
+                typedef _func_invoker_impl<_FuncT, _Index + 1, _Count> func_invoker;
+                func_invoker::call(fx, args, checked_args);
+            }
+        };
+
         template<class _FuncT, int _Index, int _Count, bool>
         struct _check_args_for_null_impl
         {
-            typedef _func_invoker_impl<_FuncT, _Index + 1, _Count> func_invoker;
-
             template<class _RawArgsT, class _CheckedArgsT>
             static void call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>& checked_args)
             {
@@ -264,10 +273,15 @@ namespace stdex
                     typename _get_args<_CheckedArgsT, _Index>::args args_type;
 
                     typedef _args<args_type, _nullptr_place_holder, _Index> checked_args_t;
-                    func_invoker::call(fx, args, _checked_args<checked_args_t>());
+                    typedef _check_args_for_null_impl_helper<_FuncT, _Index, _Count, checked_args_t> helper;
+                    helper::call(fx, args, _checked_args<checked_args_t>());
                 }
                 else
-                    _check_args_for_null_impl<_FuncT, _Index, _Count, true>::call(fx, args, checked_args);
+                {
+                    typedef _CheckedArgsT checked_args_t;
+                    typedef _check_args_for_null_impl_helper<_FuncT, _Index, _Count, checked_args_t> helper;
+                    helper::call(fx, args, checked_args);
+                }
             }
         };
 
