@@ -66,7 +66,7 @@ int test01()
 
   return 0;
 }
-
+/*
 int test02()
 {
     typedef stdex::function<void, int&, void*> function;
@@ -113,13 +113,32 @@ int test02()
 
     return 0;
 }
+*/
+int test03()
+{
+    typedef stdex::function<void, float, stdex::nullptr_t> function;
+
+    struct lambdas{
+        static void func(float, void* ptr)
+        {
+            DYNAMIC_VERIFY_ABORT(ptr == nullptr);
+        }
+    };
+
+    function f(&lambdas::func);
+
+    f(0, nullptr);
+
+    return 0;
+}
 
 
 int main()
 {
 
     RUN_TEST(test01);
-    RUN_TEST(test02);
+    //RUN_TEST(test02);
+    RUN_TEST(test03);
 
     const std::string::size_type big = 
         std::numeric_limits<std::string::size_type>::max();
