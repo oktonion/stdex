@@ -19,8 +19,10 @@ template struct stdex::hash<bool>;
 template struct stdex::hash<char>;
 template struct stdex::hash<signed char>;
 template struct stdex::hash<unsigned char>;
+#ifdef _STDEX_NATIVE_CPP11_TYPES_SUPPORT
 template struct stdex::hash<stdex_char16_t>;
 template struct stdex::hash<stdex_char32_t>;
+#endif
 template struct stdex::hash<short>;
 template struct stdex::hash<int>;
 template struct stdex::hash<long>;
