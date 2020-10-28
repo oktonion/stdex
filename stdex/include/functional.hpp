@@ -56,7 +56,8 @@ namespace stdex
             typedef _Tp type;
             _Tp value;
             _arg(_Tp value_): value(value_) {}
-            _arg(const _arg &other) : value(other.value) {}
+            template<class _OtherTp, int _OtherN>
+            _arg(const _arg<_OtherTp, _OtherN> &other) : value(other.value) {}
         };
 
         template<class _NullptrT, bool>
@@ -113,6 +114,9 @@ namespace stdex
         { 
             typedef stdex::nullptr_t type;
             _arg(stdex::nullptr_t){}
+            _arg(const _arg&){}
+            template<int _OtherN>
+            _arg(const _arg<stdex::nullptr_t, _OtherN>&){}
         };
 
         template<class, int _End>
@@ -256,11 +260,14 @@ namespace stdex
 
                 if(nullptr == arg.value)
                 {
-                    typedef _args<_CheckedArgsT, _nullptr_place_holder, _Index> checked_args_t;
+                    typedef 
+                    typename _get_args<_CheckedArgsT, _Index>::args args_type;
+
+                    typedef _args<args_type, _nullptr_place_holder, _Index> checked_args_t;
                     func_invoker::call(fx, args, _checked_args<checked_args_t>());
                 }
                 else
-                    func_invoker::call(fx, args, checked_args);
+                    _check_args_for_null_impl<_FuncT, _Index, _Count, true>::call(fx, args, checked_args);
             }
         };
 
@@ -268,7 +275,7 @@ namespace stdex
         struct _check_args_for_null_impl<_FuncT, _Index, _Count, false>
         {
             typedef _func_invoker_impl<_FuncT, _Index + 1, _Count> func_invoker;
-
+            
             template<class _RawArgsT, class _CheckedArgsT>
             static void call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>& checked_args)
             {
@@ -282,7 +289,12 @@ namespace stdex
             template<class _RawArgsT, class _CheckedArgsT>
             static void call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>& checked_args)
             {
-                typedef typename _get_args<_RawArgsT, _Index>::arg arg_type;
+                typedef 
+                typename _get_args<_RawArgsT, _Index>::arg arg;
+
+                typedef 
+                typename arg::type arg_type;
+
                 _check_args_for_null_impl
                 <
                     _FuncT, _Index, _Count,
