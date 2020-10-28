@@ -423,10 +423,10 @@
                 virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION = 0;
 
                 func_base() {}
+                virtual ~func_base() {}
             private:
                 func_base(const func_base&) _STDEX_DELETED_FUNCTION;
                 func_base& operator=(const func_base&) _STDEX_DELETED_FUNCTION;
-                // dtor non-virtual due to _delete_this()
             };
 
         public:
@@ -452,18 +452,18 @@
                     func_base
                 {
                     typedef _FuncT func_type;
-                    typedef function::func_base func_base_type;
-                    typedef function::args_type args_type;
+                    typedef func_base function_func_base;
+                    typedef args_type function_args_type;
                     typedef _functor type;
 
                     _functor(func_type func) :
                         _func(stdex::detail::functional_std::move(func)) {}
 
-                    virtual func_base_type* _copy() const { return (new type(_func)); }
-                    virtual func_base_type* _move() _STDEX_NOEXCEPT_FUNCTION { return (new type(stdex::detail::functional_std::move(_func))); }
-                    virtual _R _co_call(args_type &args)
+                    virtual function_func_base* _copy() const { return (new type(_func)); }
+                    virtual function_func_base* _move() _STDEX_NOEXCEPT_FUNCTION { return (new type(stdex::detail::functional_std::move(_func))); }
+                    virtual _R _co_call(function_args_type &args)
                     {
-                        typedef stdex::detail::_check_args_for_null<func_type, 0, args_type::count> functor;
+                        typedef stdex::detail::_check_args_for_null<func_type, 0, function_args_type::count> functor;
                         functor::call(_func, args);
                     }
                     virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION { delete this; }
@@ -882,3 +882,4 @@
  #undef _STDEX_NOEXCEPT_FUNCTION
  
  #endif // _STDEX_FUNCTIONAL_H
+ 
