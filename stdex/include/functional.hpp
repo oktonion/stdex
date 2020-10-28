@@ -115,15 +115,33 @@ namespace stdex
             _arg(stdex::nullptr_t){}
         };
 
+        template<class, int _End>
+        struct _get_args_impl;
+
+        template<class _ArgsT, int _End>
+        struct _get_args;
+
+        template<int _Index, class _ArgsT>
+        typename _get_args<_ArgsT, _Index>::arg&
+        _get_arg(_ArgsT &args);
+
+        template<int _Index, class _ArgsT>
+        const
+        typename _get_args<_ArgsT, _Index>::arg&
+        _get_const_arg(const _ArgsT &args);
+
         template<class _ArgsT, class _ArgT, int _N>
         struct _args: _ArgsT, _arg<_ArgT, _N>
         {
             typedef _args type;
             static const int count = _N + 1;
-            _args(const _ArgsT &other, _ArgT arg):
+
+            template<class _OtherArgsT, class _OtherArgT>
+            _args(const _args<_OtherArgsT, _OtherArgT, _N - 1> &other, _ArgT arg):
                 _ArgsT(other), _arg<_ArgT, _N>(arg) {}
-            _args(const _args &other):
-                _ArgsT(other), _arg<_ArgT, _N>(static_cast<const _arg<_ArgT, _N>&>(other)) {}
+            template<class _OtherArgsT, class _OtherArgT>
+            _args(const _args<_OtherArgsT, _OtherArgT, _N> &other):
+                _ArgsT(other), _arg<_ArgT, _N>(_get_const_arg<_N>(other)) {}
             template<class _NextArgT>
             _args<type, _NextArgT, _N + 1> make(_NextArgT arg) const {return _args<type, _NextArgT, _N + 1>(*this, arg);}
 
@@ -135,16 +153,39 @@ namespace stdex
         {
             typedef _args type;
             static const int count = 1;
-            _args(_ArgT arg) :
+
+            _args(_ArgT arg):
                 _arg<_ArgT, 0>(arg) {}
-            _args(const _args& other) :
-                _arg<_ArgT, 0>(other) {}
+            template<class _OtherArgT>
+            _args(const _args<void, _OtherArgT, 0> &other):
+                _arg<_ArgT, 0>(_get_const_arg<0>(other)) {}
 
             template<class _NextArgT>
             _args<type, _NextArgT, 1> make(_NextArgT arg) const {return _args<type, _NextArgT, 1>(*this, arg);}
 
             const type& make(void_type) const { return *this; }
         };
+
+        namespace functional_std {
+            // since there is no move-semantic
+            template<class _Tp>
+            _Tp& move(_Tp &ref)
+            {
+                using namespace std;
+                using namespace stdex;
+
+                return ref;
+            }
+
+            template<class _Tp>
+            typename remove_reference<_Tp>::type& forward(typename remove_reference<_Tp>::type &ref)
+            {
+                using namespace std;
+                using namespace stdex;
+
+                return ref;
+            }
+        }
 
         /*template<class _ArgsT, int _N>
         struct _args<_ArgsT, void_type, _N> : _ArgsT
@@ -179,6 +220,14 @@ namespace stdex
         template<int _Index, class _ArgsT>
         typename _get_args<_ArgsT, _Index>::arg&
         _get_arg(_ArgsT &args)
+        {
+            return args;
+        }
+
+        template<int _Index, class _ArgsT>
+        const
+        typename _get_args<_ArgsT, _Index>::arg&
+        _get_const_arg(const _ArgsT &args)
         {
             return args;
         }
@@ -364,27 +413,6 @@ namespace stdex
         struct _make_args:
             _make_args_impl<void, _ArgT, 0, _arg_is_void<_ArgT>::value>
         { };
-
-        namespace functional_std {
-            // since there is no move-semantic
-            template<class _Tp>
-            _Tp& move(_Tp &ref)
-            {
-                using namespace std;
-                using namespace stdex;
-
-                return ref;
-            }
-
-            template<class _Tp>
-            typename remove_reference<_Tp>::type& forward(typename remove_reference<_Tp>::type &ref)
-            {
-                using namespace std;
-                using namespace stdex;
-
-                return ref;
-            }
-        }
 
         template<
             class _R, 
