@@ -344,7 +344,8 @@ namespace stdex
             template<class _RawArgsT, class _CheckedArgsT>
             static void call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>&)
             {
-                func(fx, _get_arg<0>(args), _get_arg<1>(args), args);
+                _CheckedArgsT checked_args(args);
+                func(fx, _get_arg<0>(checked_args), _get_arg<1>(checked_args), checked_args);
             }
         };
 
@@ -524,7 +525,7 @@ namespace stdex
                         stdex::detail::_func_invoker<func_type, function_args_type::count, function_args_type::count> 
                         func_invoker_without_null_checks;
 
-                        func_invoker_without_null_checks::call(_func, args);
+                        func_invoker_with_null_checks::call(_func, args);
                     }
                     virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION { delete this; }
                     // dtor non-virtual due to _delete_this()
