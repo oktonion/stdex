@@ -116,10 +116,10 @@ int test02()
 */
 int test03()
 {
-    typedef stdex::function<void, float, stdex::nullptr_t> function;
+    typedef stdex::function<void, stdex::nullptr_t, float> function;
 
     struct lambdas{
-        static void func(float, void* ptr)
+        static void func(void* ptr, float)
         {
             DYNAMIC_VERIFY_ABORT(ptr == nullptr);
         }
@@ -127,7 +127,7 @@ int test03()
 
     function f(&lambdas::func);
 
-    f(0, nullptr);
+    f(nullptr, 0);
 
     return 0;
 }
