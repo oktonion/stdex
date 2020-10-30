@@ -724,14 +724,14 @@ namespace stdex
 
             std::size_t operator()(const argument_type& _keyval) const
             {    // hash _keyval to std::size_t value by pseudorandomizing transform
-                struct labdas{
+                struct lambdas{
                     static std::size_t hash_seq(const argument_type &keyval)
                     {
                         return (_bitwise_hash_seq<std::size_t, sizeof(std::size_t)>::call((const unsigned char *)&keyval, sizeof (argument_type)));
                     }
                 };
 
-                return (labdas::hash_seq(
+                return (lambdas::hash_seq(
                     _keyval == 0 ? 0 : _keyval));    // map -0 to 0
             }
         };
