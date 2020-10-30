@@ -587,7 +587,6 @@ namespace stdex
                     func_type _func;
                 };
 
-                delete _fx;
                 _fx = new _functor(stdex::detail::functional_std::move(func));
             }
 
