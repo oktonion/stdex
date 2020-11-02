@@ -194,24 +194,61 @@ namespace stdex
             }
 
             template<class _Tp>
-            typename remove_reference<_Tp>::type& forward(typename remove_reference<_Tp>::type &ref)
+            struct _forward_params
             {
-                using namespace std;
-                using namespace stdex;
+                typedef typename remove_reference<_Tp>::type return_type;
+                typedef const typename remove_reference<_Tp>::type& arg_type;
+            };
 
-                return ref;
-            }
+            template<class _Tp>
+            struct _forward_params<_Tp&>
+            {
+                typedef _Tp& return_type;
+                typedef _Tp& arg_type;
+            };
+
+            template<class _Tp>
+            struct _forward_params<const _Tp&>
+            {
+                typedef const _Tp& return_type;
+                typedef const _Tp& arg_type;
+            };
+
+            template<class _Tp>
+            struct _forward_params<const _Tp>
+            {
+                typedef const typename remove_reference<_Tp>::type& return_type;
+                typedef const typename remove_reference<_Tp>::type& arg_type;
+            };
+
+            template<>
+            struct _forward_params<void>
+            {
+                typedef void return_type;
+                typedef void arg_type;
+            };
+
+            template<class _Tp>
+            struct _forward
+            {
+                static
+                typename _forward_params<_Tp>::return_type call(typename _forward_params<_Tp>::arg_type ref)
+                {
+                    using namespace std;
+                    using namespace stdex;
+
+                    typedef typename _forward_params<_Tp>::return_type return_type;
+
+                    return (ref);
+                }
+            };
         }
 
-        /*template<class _ArgsT, int _N>
-        struct _args<_ArgsT, void_type, _N> : _ArgsT
+        namespace functional_detail
         {
-            typedef _args type;
-            _args(const _ArgsT& other) :
-                _ArgsT(other) {}
-            _args(const _args& other) :
-                _ArgsT(other) {}
-        };*/
+            template<class _Tp>
+            static _Tp operator,(_Tp value, void_type) { return functional_std::_forward<_Tp>::call(value); }
+        }
 
         template<class, int _End>
         struct _get_args_impl;
@@ -249,10 +286,10 @@ namespace stdex
             return args;
         }
 
-        template<class _FuncT, int _Index, int _Count>
+        template<class _R, class _FuncT, int _Index, int _Count>
         struct _check_args_for_null;
 
-        template<class _FuncT, int _Index, int _Count>
+        template<class _R, class _FuncT, int _Index, int _Count>
         struct _func_invoker_impl;
 
         template<class _CheckedArgsT>
@@ -261,66 +298,73 @@ namespace stdex
             typedef _CheckedArgsT type;
         };
 
-        template< class _FuncT, int _Index, int _Count, bool>
+        template<class _R, class _FuncT, int _Index, int _Count, bool>
         struct _check_args_for_null_impl_helper
         {
             template<class _CheckedArgsT, class _RawArgsT>
-            static void call(_FuncT &fx, _RawArgsT &args, 
+            static _R call(_FuncT &fx, _RawArgsT &args, 
                 const _CheckedArgsT &checked_args)
             {
-                typedef _func_invoker_impl<_FuncT, _Index + 1, _Count> func_invoker;
-                func_invoker::call(fx, args, checked_args);
+                typedef _func_invoker_impl<_R, _FuncT, _Index + 1, _Count> func_invoker;
+                return functional_std::_forward<_R>::call(
+                    func_invoker::call(fx, args, checked_args) );
             }
         };
 
-        template< class _FuncT, int _Index, int _Count>
-        struct _check_args_for_null_impl_helper<_FuncT, _Index, _Count, true>
+        template<class _R, class _FuncT, int _Index, int _Count>
+        struct _check_args_for_null_impl_helper<_R, _FuncT, _Index, _Count, true>
         {
             template<class _CheckedArgsT, class _RawArgsT>
-            static void call(_FuncT &fx, _RawArgsT &args, 
+            static _R call(_FuncT &fx, _RawArgsT &args, 
                 const _CheckedArgsT &checked_args)
             {
                     typedef 
                     typename _get_args<_CheckedArgsT, _Index>::base_args args_type;
 
                     typedef _args<args_type, _nullptr_place_holder, _Index> checked_args_t;
-                    typedef _func_invoker_impl<_FuncT, _Index + 1, _Count> func_invoker;
+                    typedef _func_invoker_impl<_R, _FuncT, _Index + 1, _Count> func_invoker;
 
-                    func_invoker::call(fx, args, _checked_args<checked_args_t>());
+                    return
+                    functional_std::_forward<_R>::call(
+                        func_invoker::call(fx, args, _checked_args<checked_args_t>()) );
             }
         };
 
-        template<class _FuncT, int _Index, int _Count, bool>
+        template<class _R, class _FuncT, int _Index, int _Count, bool>
         struct _check_args_for_null_impl
         {
             template<class _RawArgsT, class _CheckedArgsT>
-            static void call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>& checked_args)
+            static _R call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>& checked_args)
             {
                 typedef _check_args_for_null_impl_helper<
-                    _FuncT, _Index, _Count,
+                    _R, _FuncT, _Index, _Count,
                     intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value == bool(true)
                 > helper;
-                helper::call(fx, args, checked_args);
+                return
+                functional_std::_forward<_R>::call(
+                    helper::call(fx, args, checked_args) );
             }
         };
 
-        template<class _FuncT, int _Index, int _Count>
-        struct _check_args_for_null_impl<_FuncT, _Index, _Count, false>
+        template<class _R, class _FuncT, int _Index, int _Count>
+        struct _check_args_for_null_impl<_R, _FuncT, _Index, _Count, false>
         {
-            typedef _func_invoker_impl<_FuncT, _Index + 1, _Count> func_invoker;
+            typedef _func_invoker_impl<_R, _FuncT, _Index + 1, _Count> func_invoker;
             
             template<class _RawArgsT, class _CheckedArgsT>
-            static void call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>& checked_args)
+            static _R call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>& checked_args)
             {
-                func_invoker::call(fx, args, checked_args);
+                return
+                functional_std::_forward<_R>::call(
+                    func_invoker::call(fx, args, checked_args) );
             }
         };
 
-        template<class _FuncT, int _Index, int _Count>
+        template<class _R, class _FuncT, int _Index, int _Count>
         struct _check_args_for_null
         {
             template<class _RawArgsT, class _CheckedArgsT>
-            static void call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>& checked_args)
+            static _R call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>& checked_args)
             {
                 typedef 
                 typename _get_args<_RawArgsT, _Index>::arg arg;
@@ -328,79 +372,114 @@ namespace stdex
                 typedef 
                 typename arg::type arg_type;
 
-                _check_args_for_null_impl
-                <
-                    _FuncT, _Index, _Count,
-                    is_null_pointer<typename remove_reference<arg_type>::type>::value == bool(true)
-                    && intern::_has_feature<intern::_stdex_has_native_nullptr>::value == bool(false)
-                >::call(fx, args, checked_args);
+                return
+                functional_std::_forward<_R>::call(
+                    _check_args_for_null_impl
+                    <
+                        _R, _FuncT, _Index, _Count,
+                        is_null_pointer<typename remove_reference<arg_type>::type>::value == bool(true)
+                        && intern::_has_feature<intern::_stdex_has_native_nullptr>::value == bool(false)
+                    >::call(fx, args, checked_args) );
             }
         };
 
 
-        template<class _FuncT, int _Index, int _Count>
+        template<class _R, class _FuncT, int _Index, int _Count>
         struct _func_invoker_impl
         {
-            typedef _check_args_for_null<_FuncT, _Index, _Count> null_checker;
+            typedef _check_args_for_null<_R, _FuncT, _Index, _Count> null_checker;
 
             template<class _RawArgsT, class _CheckedArgsT>
-            static void call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>& checked_args)
+            static _R call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>& checked_args)
             {
-                null_checker::call(fx, args, checked_args);
+                return
+                functional_std::_forward<_R>::call(
+                    null_checker::call(fx, args, checked_args) );
             }
         };
 
-        template<class _FuncT>
-        struct _func_invoker_impl<_FuncT, 0, 0>
+        template<class _R, class _FuncT>
+        struct _func_invoker_impl<_R, _FuncT, 0, 0>
         {
-            static void call(_FuncT &fx)
+            static _R call(_FuncT &fx)
             {
                 struct _functor
                 {
-                    void operator()(_FuncT &fx) {fx();}
+                    typedef _R return_type;
+
+                    return_type operator()(_FuncT &fx) {
+                        using ::stdex::detail::functional_detail::operator,;
+                        ::stdex::detail::void_type dummy;
+                        return 
+                            (fx(), dummy);
+                    }
                 }; 
                 _functor _f;
-                _f(fx);
+                return functional_std::_forward<_R>::call( _f(fx) );
             }
         };
 
-        template<class _FuncT>
-        struct _func_invoker_impl<_FuncT, 2, 2>
+        template<class _R, class _FuncT>
+        struct _func_invoker_impl<_R, _FuncT, 2, 2>
         {
             template<class _ArgT0, class _ArgT1, class _ResArgsT>
-            static void func(_FuncT &fx, _arg<_ArgT0, 0>& arg0, _arg<_ArgT1, 1>& arg1, _ResArgsT &res)
+            static _R func(_FuncT &fx, _arg<_ArgT0, 0>& arg0, _arg<_ArgT1, 1>& arg1, _ResArgsT &res)
             {
                 struct _functor: _ResArgsT
                 {
                     typedef _ResArgsT base_type;
+                    typedef _R return_type;
                     typedef _ArgT0 arg0_type;
                     typedef _ArgT1 arg1_type;
                     _functor(const base_type &other) : base_type(other) {}
-                    void operator()(_FuncT &fx) {
+                    return_type operator()(_FuncT &fx) {
                         using ::stdex::detail::_arg;
-                        fx(_arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value);
+                        using ::stdex::detail::functional_detail::operator,;
+                        ::stdex::detail::void_type dummy;
+                        return 
+                            ( fx(_arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value), dummy );
                     }
                 };
                 
                 _functor _f = res;
-                _f(fx);
+                return functional_std::_forward<_R>::call( _f(fx) );
             }
             
             template<class _RawArgsT, class _CheckedArgsT>
-            static void call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>&)
+            static _R call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>&)
             {
                 _CheckedArgsT checked_args(args);
-                func(fx, _get_arg<0>(args), _get_arg<1>(args), args);
+                return functional_std::_forward<_R>::call(
+                    func(fx, _get_arg<0>(checked_args), _get_arg<1>(checked_args), checked_args) );
+            }
+
+            template<class _RawArgsT>
+            static _R call(_FuncT &fx, _RawArgsT &args, const _checked_args<_RawArgsT>&)
+            {
+                return functional_std::_forward<_R>::call(
+                    func(fx, _get_arg<0>(args), _get_arg<1>(args), args) );
+            }
+        };
+
+        template<class _R, class _FuncT, int _Index, int _Count>
+        struct _func_invoker
+        {
+            template<class _RawArgsT>
+            static _R call(_FuncT &fx, _RawArgsT &args)
+            {
+                return 
+                    functional_std::_forward<_R>::call(
+                        _func_invoker_impl<_R, _FuncT, _Index, _Count>::call(fx, args, _checked_args<_RawArgsT>()) );
             }
         };
 
         template<class _FuncT, int _Index, int _Count>
-        struct _func_invoker
+        struct _func_invoker<void, _FuncT, _Index, _Count>
         {
             template<class _RawArgsT>
             static void call(_FuncT &fx, _RawArgsT &args)
             {
-                _func_invoker_impl<_FuncT, _Index, _Count>::call(fx, args, _checked_args<_RawArgsT>());
+                _func_invoker_impl<void_type, _FuncT, _Index, _Count>::call(fx, args, _checked_args<_RawArgsT>());
             }
         };
     } // namespace detail
@@ -552,6 +631,7 @@ namespace stdex
                     func_base
                 {
                     typedef _FuncT func_type;
+                    typedef return_type function_return_type;
                     typedef func_base function_func_base;
                     typedef args_type function_args_type;
                     typedef _functor type;
@@ -564,13 +644,13 @@ namespace stdex
                     virtual _R _co_call(function_args_type &args)
                     {
                         typedef 
-                        stdex::detail::_func_invoker<func_type, 0, function_args_type::count> 
+                        stdex::detail::_func_invoker<function_return_type, func_type, 0, function_args_type::count> 
                         func_invoker_with_null_checks;
                         typedef 
-                        stdex::detail::_func_invoker<func_type, function_args_type::count, function_args_type::count> 
+                        stdex::detail::_func_invoker<function_return_type, func_type, function_args_type::count, function_args_type::count> 
                         func_invoker_without_null_checks;
 
-                        func_invoker_with_null_checks::call(_func, args);
+                        return func_invoker_with_null_checks::call(_func, args);
                     }
                     virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION { delete this; }
                     // dtor non-virtual due to _delete_this()
@@ -609,34 +689,33 @@ namespace stdex
             {
                 typedef _args<void,    _Arg0T, 0> args_x1;               
 
-                using stdex::detail::functional_std::forward;
                 using stdex::detail::functional_std::move;
 
                 args_type args = 
-                    args_x1(forward<_Arg0T>(arg0))
-                    .make(forward<_Arg1T >(arg1 ))
-                    .make(forward<_Arg2T >(arg2 ))
-                    .make(forward<_Arg3T >(arg3 ))
-                    .make(forward<_Arg4T >(arg4 ))
-                    .make(forward<_Arg5T >(arg5 ))
-                    .make(forward<_Arg6T >(arg6 ))
-                    .make(forward<_Arg7T >(arg7 ))
-                    .make(forward<_Arg8T >(arg8 ))
-                    .make(forward<_Arg9T >(arg9 ))
-                    .make(forward<_Arg10T>(arg10))
-                    .make(forward<_Arg11T>(arg11))
-                    .make(forward<_Arg12T>(arg12))
-                    .make(forward<_Arg13T>(arg13))
-                    .make(forward<_Arg14T>(arg14))
-                    .make(forward<_Arg15T>(arg15))
-                    .make(forward<_Arg16T>(arg16))
-                    .make(forward<_Arg17T>(arg17))
-                    .make(forward<_Arg18T>(arg18))
-                    .make(forward<_Arg19T>(arg19))
-                    .make(forward<_Arg20T>(arg20))
-                    .make(forward<_Arg21T>(arg21))
-                    .make(forward<_Arg22T>(arg22))
-                    .make(forward<_Arg23T>(arg23))
+                    args_x1(functional_std::_forward<_Arg0T>::call(arg0))
+                    .make(functional_std::_forward<_Arg1T >::call(arg1 ))
+                    .make(functional_std::_forward<_Arg2T >::call(arg2 ))
+                    .make(functional_std::_forward<_Arg3T >::call(arg3 ))
+                    .make(functional_std::_forward<_Arg4T >::call(arg4 ))
+                    .make(functional_std::_forward<_Arg5T >::call(arg5 ))
+                    .make(functional_std::_forward<_Arg6T >::call(arg6 ))
+                    .make(functional_std::_forward<_Arg7T >::call(arg7 ))
+                    .make(functional_std::_forward<_Arg8T >::call(arg8 ))
+                    .make(functional_std::_forward<_Arg9T >::call(arg9 ))
+                    .make(functional_std::_forward<_Arg10T>::call(arg10))
+                    .make(functional_std::_forward<_Arg11T>::call(arg11))
+                    .make(functional_std::_forward<_Arg12T>::call(arg12))
+                    .make(functional_std::_forward<_Arg13T>::call(arg13))
+                    .make(functional_std::_forward<_Arg14T>::call(arg14))
+                    .make(functional_std::_forward<_Arg15T>::call(arg15))
+                    .make(functional_std::_forward<_Arg16T>::call(arg16))
+                    .make(functional_std::_forward<_Arg17T>::call(arg17))
+                    .make(functional_std::_forward<_Arg18T>::call(arg18))
+                    .make(functional_std::_forward<_Arg19T>::call(arg19))
+                    .make(functional_std::_forward<_Arg20T>::call(arg20))
+                    .make(functional_std::_forward<_Arg21T>::call(arg21))
+                    .make(functional_std::_forward<_Arg22T>::call(arg22))
+                    .make(functional_std::_forward<_Arg23T>::call(arg23))
                     ;
                 return _fx->_co_call(move(args));
             }
