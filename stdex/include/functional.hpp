@@ -47,9 +47,6 @@ namespace stdex
 
     namespace detail
     {
-        template<int _Index>
-        struct _arg_tag {};
-
         template<class _Tp, int _N>
         struct _arg
         {
@@ -96,6 +93,21 @@ namespace stdex
                 bool,
                 detail::_rt_nullptr_can_be_ptr::value == bool(true) &&
                 is_class<stdex::nullptr_t>::value == bool(false)
+            >
+        { };
+
+        template<class>
+        struct _has_feature;
+
+        template<>
+        struct _has_feature<class _stdex_nullptr_implemented_as_distinct_type>:
+            integral_constant<
+                bool,
+                _has_feature<_stdex_has_native_nullptr>::value == bool(true) ||
+                is_union<stdex::nullptr_t>::value == bool(true) ||
+                (is_arithmetic<stdex::nullptr_t>::value == bool(false) &&
+                 is_arithmetic<remove_pointer<stdex::nullptr_t>::type>::value == bool(false) &&
+                 is_void<remove_pointer<stdex::nullptr_t>::type>::value == bool(false) )
             >
         { };
     } // namespace intern
@@ -249,7 +261,7 @@ namespace stdex
             typedef _CheckedArgsT type;
         };
 
-        template< class _FuncT, int _Index, int _Count>
+        template< class _FuncT, int _Index, int _Count, bool>
         struct _check_args_for_null_impl_helper
         {
             template<class _CheckedArgsT, class _RawArgsT>
@@ -261,31 +273,34 @@ namespace stdex
             }
         };
 
+        template< class _FuncT, int _Index, int _Count>
+        struct _check_args_for_null_impl_helper<_FuncT, _Index, _Count, true>
+        {
+            template<class _CheckedArgsT, class _RawArgsT>
+            static void call(_FuncT &fx, _RawArgsT &args, 
+                const _CheckedArgsT &checked_args)
+            {
+                    typedef 
+                    typename _get_args<_CheckedArgsT, _Index>::base_args args_type;
+
+                    typedef _args<args_type, _nullptr_place_holder, _Index> checked_args_t;
+                    typedef _func_invoker_impl<_FuncT, _Index + 1, _Count> func_invoker;
+
+                    func_invoker::call(fx, args, _checked_args<checked_args_t>());
+            }
+        };
+
         template<class _FuncT, int _Index, int _Count, bool>
         struct _check_args_for_null_impl
         {
             template<class _RawArgsT, class _CheckedArgsT>
             static void call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>& checked_args)
             {
-                _arg<stdex::nullptr_t, _Index> &arg = args;
-
-                if(nullptr == arg.value)
-                {
-                    typedef 
-                    typename _get_args<_CheckedArgsT, _Index>::base_args args_type;
-
-                    typedef _args<args_type, _nullptr_place_holder, _Index> checked_args_t;
-                    typedef _check_args_for_null_impl_helper<_FuncT, _Index, _Count> helper;
-
-                    helper::call(fx, args, _checked_args<checked_args_t>());
-                }
-                else
-                {
-                    typedef _CheckedArgsT checked_args_t;
-                    typedef _check_args_for_null_impl_helper<_FuncT, _Index, _Count> helper;
-
-                    helper::call(fx, args, checked_args);
-                }
+                typedef _check_args_for_null_impl_helper<
+                    _FuncT, _Index, _Count,
+                    intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value == bool(true)
+                > helper;
+                helper::call(fx, args, checked_args);
             }
         };
 
@@ -349,45 +364,21 @@ namespace stdex
             }
         };
 
-        template<class _FuncT, int>
-        struct _func_tester;
-
-        template<class _Tp>
-        _Tp declval();
-
-        template<class _TestFuncT, class _ArgT0, class _ArgT1>
-        static
-        _func_tester<
-            _TestFuncT, 
-            sizeof((declval<_TestFuncT>())((declval<_ArgT0>()), (declval<_ArgT1>())), 0)
-        >* _tester(_TestFuncT, _arg<_ArgT0, 0>&, _arg<_ArgT1, 1>&);
-        static char _tester(...);
-
         template<class _FuncT>
         struct _func_invoker_impl<_FuncT, 2, 2>
         {
             template<class _ArgT0, class _ArgT1, class _ResArgsT>
             static void func(_FuncT &fx, _arg<_ArgT0, 0>& arg0, _arg<_ArgT1, 1>& arg1, _ResArgsT &res)
             {
-                typedef
-                typename
-                conditional<
-                    sizeof(_tester(fx, arg0, arg1)) != sizeof(char),
-                    _FuncT,
-                    int
-                >::type func_type;
-
                 struct _functor: _ResArgsT
                 {
                     typedef _ResArgsT base_type;
                     typedef _ArgT0 arg0_type;
                     typedef _ArgT1 arg1_type;
                     _functor(const base_type &other) : base_type(other) {}
-                    void operator()(func_type &fx) {
+                    void operator()(_FuncT &fx) {
                         using ::stdex::detail::_arg;
                         fx(_arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value);
-                    }
-                    void operator()(_FuncT&) {
                     }
                 };
                 
