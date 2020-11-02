@@ -66,7 +66,7 @@ int test01()
 
   return 0;
 }
-/*
+
 int test02()
 {
     typedef stdex::function<void, int&, void*> function;
@@ -113,28 +113,41 @@ int test02()
 
     return 0;
 }
-*/
-int test03()
+
+template<bool Value = 
+    stdex::intern::_has_feature<stdex::intern::_stdex_nullptr_implemented_as_distinct_type>::value>
+struct np_tests_impl
 {
-    typedef stdex::function<void, stdex::nullptr_t, float> function;
+    static int test01()
+    {
+        typedef stdex::function<void, stdex::nullptr_t, float> function;
 
-    struct lambdas{
-        static void func(void* ptr, float &val)
-        {
-            DYNAMIC_VERIFY_ABORT(ptr == nullptr);
-            val = 1.f;
-        }
-    };
+        struct lambdas{
+            static void func(void* ptr, float &val)
+            {
+                DYNAMIC_VERIFY_ABORT(ptr == 0);
+                val = 1.f;
+            }
+        };
 
-    function f(&lambdas::func);
+        function f(&lambdas::func);
 
-    float val = 0.0f;
-    f(nullptr, val);
+        float val = 0.0f;
+        f(nullptr, val);
 
-    DYNAMIC_VERIFY(val != 0.0f);
+        DYNAMIC_VERIFY(val != 0.0f);
 
-    return 0;
-}
+        return 0;
+    }
+};
+
+template<>
+struct np_tests_impl<false>
+{
+    static int test01(){return 0;}
+};
+
+struct np_tests: np_tests_impl<> {};
 
 
 int main()
@@ -142,7 +155,7 @@ int main()
 
     RUN_TEST(test01);
     //RUN_TEST(test02);
-    RUN_TEST(test03);
+    RUN_TEST(np_tests::test01);
 
     const std::string::size_type big = 
         std::numeric_limits<std::string::size_type>::max();
