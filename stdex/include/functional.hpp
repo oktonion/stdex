@@ -598,7 +598,7 @@ namespace stdex
             struct func_base {
                 virtual func_base* _copy() const = 0;
                 virtual func_base* _move() _STDEX_NOEXCEPT_FUNCTION = 0;
-                virtual _R _co_call(function::args_type&) = 0;
+                virtual _R _co_call(args_type&) = 0;
                 virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION = 0;
 
                 func_base() {}
