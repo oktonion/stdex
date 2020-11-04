@@ -928,7 +928,7 @@ namespace wstring_tests
     }
 
 #ifdef LLONG_MAX
-	int stoull_test()
+    int stoull_test()
     {
         bool test = false;
         using namespace stdex;

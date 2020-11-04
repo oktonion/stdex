@@ -122,7 +122,7 @@ int main(void)
 #endif
     }
                                 
-    // Negative tests.		
+    // Negative tests.        
     {
         STATIC_ASSERT(is_function<int&>::value == (false), can_not_be_function);
         STATIC_ASSERT(is_function<void>::value == (false), can_not_be_function);

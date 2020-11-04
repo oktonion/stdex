@@ -8,9 +8,9 @@ struct PODType { int data; };
 
 struct ConvTypeInt
 {
-	ConvTypeInt(int) {}
-	template<class T>
-	operator T() { return T(); }
+    ConvTypeInt(int) {}
+    template<class T>
+    operator T() { return T(); }
 };
 
 struct ClassType1 { ClassType1(int); };
@@ -43,8 +43,8 @@ int main(void)
     STATIC_ASSERT(is_fundamental<long>::value == (true), should_be_fundamental);
     STATIC_ASSERT(is_fundamental<unsigned long>::value == (true), should_be_fundamental);
     #ifdef LLONG_MAX
-	// such strange check is due to Embarcadero C++ Builder
-	// that has LLONG_MAX macro but 'long long' is not integral constant!
+    // such strange check is due to Embarcadero C++ Builder
+    // that has LLONG_MAX macro but 'long long' is not integral constant!
     STATIC_ASSERT(is_fundamental<long long>::value == is_integral<long long>::value, should_be_fundamental);
     STATIC_ASSERT(is_fundamental<unsigned long long>::value == is_integral<unsigned long long>::value, should_be_fundamental);
     #endif

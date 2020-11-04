@@ -7,10 +7,10 @@
 int main(void)
 {
     using namespace stdex;
-		{
-			// Negative tests:
-			volatile ratio<STDEX_INTMAX_MIN, 1> r3; //??
-		}
+        {
+            // Negative tests:
+            volatile ratio<STDEX_INTMAX_MIN, 1> r3; //??
+        }
 
     return 0;
 }

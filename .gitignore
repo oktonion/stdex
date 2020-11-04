@@ -47,3 +47,4 @@ tests/bin/*
 
 #object files
 stdex/obj/*
+*.log

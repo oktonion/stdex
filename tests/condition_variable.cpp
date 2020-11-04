@@ -11,53 +11,53 @@
 
 namespace cond_var_tests
 {
-	int counter = 0;
+    int counter = 0;
 
-	struct Inc
-	{
-		Inc() { ++counter; }
-		~Inc() { ++counter; }
-	};
+    struct Inc
+    {
+        Inc() { ++counter; }
+        ~Inc() { ++counter; }
+    };
 
-	stdex::mutex mx;
-	stdex::condition_variable cv;
+    stdex::mutex mx;
+    stdex::condition_variable cv;
 
-	bool val = false;
+    bool val = false;
 
-	bool func_val() { return cond_var_tests::val; }
+    bool func_val() { return cond_var_tests::val; }
 
-	void func()
-	{
-		stdex::this_thread::sleep_for(stdex::chrono::milliseconds(10000));
-		stdex::unique_lock<stdex::mutex> lock(cond_var_tests::mx);
-		stdex::notify_all_at_thread_exit(cv, lock);
+    void func()
+    {
+        stdex::this_thread::sleep_for(stdex::chrono::milliseconds(10000));
+        stdex::unique_lock<stdex::mutex> lock(cond_var_tests::mx);
+        stdex::notify_all_at_thread_exit(cv, lock);
 
-		Inc inc;
-	}
+        Inc inc;
+    }
 
-	bool condition_func()
-	{
-		return cond_var_tests::counter == 2;
-	}
+    bool condition_func()
+    {
+        return cond_var_tests::counter == 2;
+    }
 
 
-	struct FPClock : stdex::chrono::system_clock
-	{
-		typedef double rep;
-		typedef stdex::ratio<1> period;
-		typedef stdex::chrono::duration<rep, period> duration;
-		typedef stdex::chrono::time_point<FPClock> time_point;
+    struct FPClock : stdex::chrono::system_clock
+    {
+        typedef double rep;
+        typedef stdex::ratio<1> period;
+        typedef stdex::chrono::duration<rep, period> duration;
+        typedef stdex::chrono::time_point<FPClock> time_point;
 
-		static time_point now()
-		{
-			return time_point(duration(stdex::chrono::system_clock::now().time_since_epoch()));
-		}
-	};
+        static time_point now()
+        {
+            return time_point(duration(stdex::chrono::system_clock::now().time_since_epoch()));
+        }
+    };
 }
 
 bool false_predicate()
 {
-	return false;
+    return false;
 }
 
 int test1()
@@ -122,7 +122,8 @@ int test3()
 
         chrono::steady_clock::time_point then = chrono::steady_clock::now();
         bool result = c1.wait_for(l, ms, &false_predicate);
-        const chrono::steady_clock::duration t = chrono::steady_clock::now() - then;
+        chrono::steady_clock::time_point now = chrono::steady_clock::now();
+        const chrono::steady_clock::duration t = now - then;
         DYNAMIC_VERIFY(result == false);
         std::cout << stdex::chrono::duration_cast<chrono::microseconds>(t).count() << " >= " << ms.count() << std::endl;
         DYNAMIC_VERIFY((chrono::steady_clock::now() - then) >= ms);
@@ -190,12 +191,20 @@ int main(void)
     
     // condition_variable
 
+try
+{
     RUN_TEST(test1);
     RUN_TEST(test2);
     RUN_TEST(test3);
     RUN_TEST(test4);
     RUN_TEST(test5);
     RUN_TEST(test6);
+}
+catch(const std::exception& e)
+{
+    std::cout << "std::exception " << e.what() << std::endl;
+    throw;
+}
 
     return 0;
 }

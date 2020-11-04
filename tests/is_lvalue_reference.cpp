@@ -12,7 +12,7 @@ int main(void)
     STATIC_ASSERT(is_lvalue_reference<ClassType&>::value == (true), should_be_lvalue_reference);
     STATIC_ASSERT(is_lvalue_reference<int(&)(int)>::value == (true), should_be_lvalue_reference);
                                         
-    // Sanity check.			 
+    // Sanity check.             
 
     STATIC_ASSERT(is_lvalue_reference<ClassType>::value == (false), can_not_be_lvalue_reference);
     return 0;

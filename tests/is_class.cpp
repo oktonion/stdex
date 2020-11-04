@@ -13,13 +13,13 @@ struct DerivedType : ClassType {};
 
 struct ConvType 
 {
-	template<class T>
-	operator T() { return T(); }
+    template<class T>
+    operator T() { return T(); }
 };
 
 class PolymorphicClass
 {
-	virtual int func() { return 0; }
+    virtual int func() { return 0; }
 };
 
 class DerivedPolymorphic : PolymorphicClass {};
@@ -32,9 +32,9 @@ typedef PODType TType;
 
 struct ConvTypeInt
 {
-	ConvTypeInt(int) {}
-	template<class T>
-	operator T() { return T(); }
+    ConvTypeInt(int) {}
+    template<class T>
+    operator T() { return T(); }
 };
 
 struct ClassType1 { ClassType1(int); };
@@ -51,16 +51,16 @@ struct ConvClassPtrLike {
 };
 
 union ConvUnionType {
-	float a;
-	ClassType b;
-	template<class T>
-	operator T() { return T(); }
-	ConvUnionType(int){}
+    float a;
+    ClassType b;
+    template<class T>
+    operator T() { return T(); }
+    ConvUnionType(int){}
 };
 
 typedef union {
-	float a;
-	ClassType b;
+    float a;
+    ClassType b;
 }
 UnionType;
 
@@ -121,6 +121,7 @@ int main(void)
         STATIC_ASSERT(is_class<member5_t>::value == (false), can_not_be_class);
         STATIC_ASSERT(is_class<member6_t>::value == (false), can_not_be_class);
         STATIC_ASSERT(is_class<EnumType>::value == (false), can_not_be_class);
+        STATIC_ASSERT(is_class<nullptr_t>::value == (false), can_not_be_class);
 
         UnionTests::test();
     }

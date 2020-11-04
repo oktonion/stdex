@@ -7,7 +7,7 @@ int main(void)
 
     // Negative  tests.
     {
-        typedef make_signed<bool>::type     	test1_type;
+        typedef make_signed<bool>::type         test1_type;
     }
     return 0;
 }

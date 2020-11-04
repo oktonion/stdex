@@ -8,13 +8,13 @@
 
 #define TEST3(TI1, TI2, TO1, TO2)               \
   DYNAMIC_VERIFY( (TI1 == TI2) == (TO1 == TO2) );       \
-  DYNAMIC_VERIFY( (TI1 != TI2) == (TO1 != TO2) );	\
+  DYNAMIC_VERIFY( (TI1 != TI2) == (TO1 != TO2) );    \
   DYNAMIC_VERIFY( (TI1 < TI2) == (TO1.before(TO2)) );   \
   DYNAMIC_VERIFY( (TI1 <= TI2) == (!TO2.before(TO1)) ); \
-  DYNAMIC_VERIFY( (TI1 > TI2) == (TO2.before(TO1)) );	\
+  DYNAMIC_VERIFY( (TI1 > TI2) == (TO2.before(TO1)) );    \
   DYNAMIC_VERIFY( (TI1 >= TI2) == (!TO1.before(TO2)) );
 
-#define TEST2(TI, TO)	  \
+#define TEST2(TI, TO)      \
   TEST3(TI, ti1, TO, to1) \
   TEST3(TI, ti2, TO, to2) \
   TEST3(TI, ti3, TO, to3) \

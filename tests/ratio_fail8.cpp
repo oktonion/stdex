@@ -7,10 +7,10 @@
 int main(void)
 {
     using namespace stdex;
-		{
-			// Negative tests:
-			volatile ratio_multiply<ratio<STDEX_INTMAX_MAX>, ratio<STDEX_INTMAX_MAX> >::type r8; // error
-		}
+        {
+            // Negative tests:
+            volatile ratio_multiply<ratio<STDEX_INTMAX_MAX>, ratio<STDEX_INTMAX_MAX> >::type r8; // error
+        }
 
     return 0;
 }

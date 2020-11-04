@@ -39,6 +39,10 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
     if not "!origin_str!"=="!replaced_str!" (
       set has_compile_error=!true!
     )
+    set "replaced_str=!origin_str:Assertion failed=!"
+    if not "!origin_str!"=="!replaced_str!" (
+      set has_compile_error=!true!
+    )
     set "replaced_str=!origin_str:Warning W=!"
     if not "!origin_str!"=="!replaced_str!" (
       set has_compile_warn=!true!
@@ -86,7 +90,11 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
       echo !MYOUTPUT!
       set "tests_failed=!tests_failed! !origin_str!"
     ) else (
-      if !has_compile_warn!==!true! echo !MYOUTPUT!
+      if !has_compile_warn!==!true! (
+        echo !MYOUTPUT3!
+        echo !MYOUTPUT2!
+        echo !MYOUTPUT!
+      )
     )
   )
   
@@ -110,11 +118,15 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
       set /A line_n=!line_n!+1
       if !line_n! GEQ 50 (
         if !line_n! GEQ 100 (
-          set "MYOUTPUT2=!MYOUTPUT!"
-          set "MYOUTPUT="
+          if "!MYOUTPUT2!"=="" (
+            set "MYOUTPUT2=!MYOUTPUT!"
+            set "MYOUTPUT="
+          )
         ) else (
-          set "MYOUTPUT3=!MYOUTPUT!"
-          set "MYOUTPUT="
+          if "!MYOUTPUT3!"=="" (
+            set "MYOUTPUT3=!MYOUTPUT!"
+            set "MYOUTPUT="
+          )
         )
       )
     )

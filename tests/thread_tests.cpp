@@ -14,48 +14,49 @@
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
 #define DYNAMIC_VERIFY_FAIL {std::cout << "check condition " << "failed at line " << __LINE__ << std::endl; return -1;}
+#define DYNAMIC_VERIFY_ABORT(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; std::abort();}
 using std::size_t;
 
 namespace thread_tests_std
 {
-	template<class T>
-	class reference_wrapper
-	{
-	public:
-		reference_wrapper(T &ref_) :
-			_ptr(&ref_)
-		{ }
+    template<class T>
+    class reference_wrapper
+    {
+    public:
+        reference_wrapper(T &ref_) :
+            _ptr(&ref_)
+        { }
 
-		reference_wrapper(const reference_wrapper &other): 
-			_ptr(other._ptr)
-		{ }
+        reference_wrapper(const reference_wrapper &other): 
+            _ptr(other._ptr)
+        { }
 
-		reference_wrapper& operator=(const reference_wrapper &other)
-		{
-			_ptr = other._ptr;
-			return (*this);
-		}
+        reference_wrapper& operator=(const reference_wrapper &other)
+        {
+            _ptr = other._ptr;
+            return (*this);
+        }
 
-		operator T&() const
-		{
-			return *_ptr;
-		}
+        operator T&() const
+        {
+            return *_ptr;
+        }
 
-	private:
-		T *_ptr;
-	};
+    private:
+        T *_ptr;
+    };
 
-	template<class T>
-	reference_wrapper<T> ref(T &ref_)
-	{
-		return reference_wrapper<T>(ref_);
-	}
+    template<class T>
+    reference_wrapper<T> ref(T &ref_)
+    {
+        return reference_wrapper<T>(ref_);
+    }
 
-	template<class T>
-	reference_wrapper<T> ref(reference_wrapper<T> &ref_)
-	{
-		return ref_;
-	}
+    template<class T>
+    reference_wrapper<T> ref(reference_wrapper<T> &ref_)
+    {
+        return ref_;
+    }
 }
 
 size_t active_thread_left = 0;
@@ -63,36 +64,36 @@ size_t active_thread_left = 0;
 void
 free_function(stdex::thread::id& id)
 {
-	id = stdex::this_thread::get_id();
-	std::cout << "[id]=" << id << std::endl;
-	static int i = 0;
+    id = stdex::this_thread::get_id();
+    std::cout << "[id]=" << id << std::endl;
+    static int i = 0;
 
-	++i;
+    ++i;
 
-	if (i % 4 == 0)
-	{
-		std::srand( (unsigned int)(std::time(nullptr)) );
+    if (i % 4 == 0)
+    {
+        std::srand( (unsigned int)(std::time(nullptr)) );
 
-		stdex::this_thread::sleep_for(stdex::chrono::milliseconds(1 + (std::rand() % (330 - 1 + 1))));
-	}
-	active_thread_left--;
+        stdex::this_thread::sleep_for(stdex::chrono::milliseconds(1 + (std::rand() % (330 - 1 + 1))));
+    }
+    active_thread_left--;
 }
 
 struct copyable
 {
-	copyable() {}
-	~copyable() {}
-	copyable(const copyable&)
-	{
-		++copy_count;
-	}
+    copyable() {}
+    ~copyable() {}
+    copyable(const copyable&)
+    {
+        ++copy_count;
+    }
 
-	void operator()(stdex::thread::id& id) const
-	{
-		free_function(id);
-	}
+    void operator()(stdex::thread::id& id) const
+    {
+        id = stdex::this_thread::get_id();
+    }
 
-	static int copy_count;
+    static int copy_count;
 };
 
 int copyable::copy_count = 0;
@@ -101,8 +102,8 @@ bool f_was_called = false;
 
 void f()
 {
-	f_was_called = true;
-	active_thread_left--;
+    f_was_called = true;
+    active_thread_left--;
 }
 
 struct ClassType {};
@@ -119,11 +120,11 @@ int thread_func_nullptr_check_ret = 0;
 
 struct functor
 {
-	functor() {}
-	~functor() {}
+    functor() {}
+    ~functor() {}
 
-	int operator()(float *arg1, double *arg2, void(*arg3)(int, float, int*), float(functor::*arg4)(int, void*), ClassType *arg5)
-	{
+    int operator()(float *arg1, double *arg2, void(*arg3)(int, float, int*), float(functor::*arg4)(int, void*), ClassType *arg5)
+    {
         if (arg1 == nullptr)
         {
             thread_func_nullptr_check_ret = __LINE__;
@@ -156,8 +157,8 @@ struct functor
         }
 
         thread_func_nullptr_check_ret = 0;
-		return 0;
-	}
+        return 0;
+    }
 };
 
 
@@ -197,17 +198,17 @@ int total = 0;
 // Functor has internal state.
 struct moveable
 {
-	int i;
+    int i;
 
-	moveable() {};
-	~moveable() {};
-	//moveable(const moveable& c) = delete;
-	//moveable& operator=(const moveable&) = delete;
+    moveable() {};
+    ~moveable() {};
+    //moveable(const moveable& c) = delete;
+    //moveable& operator=(const moveable&) = delete;
 
-	moveable(int j) : i(j) { }
-	//moveable(moveable&& m) : i(m.i) { }
+    moveable(int j) : i(j) { }
+    //moveable(moveable&& m) : i(m.i) { }
 
-	void operator()() const { total += i; active_thread_left--;}
+    void operator()() const { total += i; active_thread_left--;}
 };
 
 int test0()
@@ -499,46 +500,46 @@ int test10()
 {
     using namespace stdex;
 #if CHECK_FOR_THROW_EVENTS != 0
-		{
-			bool test = false;
+        {
+            bool test = false;
 
-			thread t;
-			try
-			{
-				t.join();
-			}
-			catch (const system_error&)
-			{
-				test = true;
-			}
-			catch (const char *)
-			{
-				DYNAMIC_VERIFY_FAIL ;
-			}
+            thread t;
+            try
+            {
+                t.join();
+            }
+            catch (const system_error&)
+            {
+                test = true;
+            }
+            catch (const char *)
+            {
+                DYNAMIC_VERIFY_FAIL ;
+            }
 
-			DYNAMIC_VERIFY(test);
-		}
+            DYNAMIC_VERIFY(test);
+        }
 
-		{
-			bool test = false;
+        {
+            bool test = false;
 
-			thread t;
+            thread t;
 
-			try
-			{
-				t.detach();
-			}
-			catch (const system_error&)
-			{
-				test = true;
-			}
-			catch (const char *)
-			{
-				DYNAMIC_VERIFY_FAIL ;
-			}
+            try
+            {
+                t.detach();
+            }
+            catch (const system_error&)
+            {
+                test = true;
+            }
+            catch (const char *)
+            {
+                DYNAMIC_VERIFY_FAIL ;
+            }
 
-			DYNAMIC_VERIFY(test);
-		}
+            DYNAMIC_VERIFY(test);
+        }
 #endif
     return 0;
 }
@@ -589,15 +590,107 @@ void dummy_func_8(struct dummy_func_8_t0*, struct dummy_func_8_t1*, struct dummy
 
 struct dummy_functor{
     int operator()() {return 0;}
-    void operator()(void*) {}
-    void operator()(void*, int*) {}
-    int operator()(void*, double*, float*) {return 0;}
-    void operator()(struct dummy_func_4_t0*, struct dummy_func_4_t1*, struct dummy_func_4_t2*, struct dummy_func_4_t3*) {}
-    void operator()(struct dummy_func_5_t0*, struct dummy_func_5_t1*, struct dummy_func_5_t2*, struct dummy_func_5_t3*, struct dummy_func_5_t4*) {}
-    float operator()(struct dummy_func_6_t0*, struct dummy_func_6_t1*, struct dummy_func_6_t2 const*, struct dummy_func_6_t3*, struct dummy_func_6_t4*, struct dummy_func_6_t5 const*) {return 0.f;}
-    void operator()(struct dummy_func_7_t0*, struct dummy_func_7_t1*, struct dummy_func_7_t2 const*, struct dummy_func_7_t3*, struct dummy_func_7_t4*, struct dummy_func_7_t5 const*, struct dummy_func_7_t6 const*) {}
-    void operator()(struct dummy_func_8_t0*, struct dummy_func_8_t1*, struct dummy_func_8_t2 const*, struct dummy_func_8_t3*, struct dummy_func_8_t4*, struct dummy_func_8_t5 const*, struct dummy_func_8_t6 const**, void*) {}
+    void operator()(void* arg1) {
+        DYNAMIC_VERIFY_ABORT(arg1 == 0);
+    }
+    void operator()(void* arg1, int* arg2) {
+        DYNAMIC_VERIFY_ABORT(arg1 == 0);
+        DYNAMIC_VERIFY_ABORT(arg2 == 0);
+    }
+    int operator()(void* arg1, double* arg2, float* arg3) {
+        DYNAMIC_VERIFY_ABORT(arg1 == 0);
+        DYNAMIC_VERIFY_ABORT(arg2 == 0);
+        DYNAMIC_VERIFY_ABORT(arg3 == 0);
+        return 0;
+    }
+    void operator()(
+        struct dummy_func_4_t0* arg1, 
+        struct dummy_func_4_t1* arg2, 
+        struct dummy_func_4_t2* arg3, 
+        struct dummy_func_4_t3* arg4) {
+        DYNAMIC_VERIFY_ABORT(arg1 == 0);
+        DYNAMIC_VERIFY_ABORT(arg2 == 0);
+        DYNAMIC_VERIFY_ABORT(arg3 == 0);
+        DYNAMIC_VERIFY_ABORT(arg4 == 0);
+    }
+    void operator()(
+        struct dummy_func_5_t0* arg1, 
+        struct dummy_func_5_t1* arg2, 
+        struct dummy_func_5_t2* arg3, 
+        struct dummy_func_5_t3* arg4, 
+        struct dummy_func_5_t4* arg5) {
+        DYNAMIC_VERIFY_ABORT(arg1 == 0);
+        DYNAMIC_VERIFY_ABORT(arg2 == 0);
+        DYNAMIC_VERIFY_ABORT(arg3 == 0);
+        DYNAMIC_VERIFY_ABORT(arg4 == 0);
+        DYNAMIC_VERIFY_ABORT(arg5 == 0);
+    }
+    float operator()(
+        struct dummy_func_6_t0* arg1, 
+        struct dummy_func_6_t1* arg2, 
+        struct dummy_func_6_t2 const* arg3, 
+        struct dummy_func_6_t3* arg4, 
+        struct dummy_func_6_t4* arg5, 
+        struct dummy_func_6_t5 const* arg6) {
+            DYNAMIC_VERIFY_ABORT(arg1 == 0);
+            DYNAMIC_VERIFY_ABORT(arg2 == 0);
+            DYNAMIC_VERIFY_ABORT(arg3 == 0);
+            DYNAMIC_VERIFY_ABORT(arg4 == 0);
+            DYNAMIC_VERIFY_ABORT(arg5 == 0);
+            DYNAMIC_VERIFY_ABORT(arg6 == 0);
+            return 0.f;
+        }
+    void operator()(
+        struct dummy_func_7_t0* arg1, 
+        struct dummy_func_7_t1* arg2, 
+        struct dummy_func_7_t2 const* arg3, 
+        struct dummy_func_7_t3* arg4, 
+        struct dummy_func_7_t4* arg5, 
+        struct dummy_func_7_t5 const* arg6, 
+        struct dummy_func_7_t6 const* arg7) {
+            DYNAMIC_VERIFY_ABORT(arg1 == 0);
+            DYNAMIC_VERIFY_ABORT(arg2 == 0);
+            DYNAMIC_VERIFY_ABORT(arg3 == 0);
+            DYNAMIC_VERIFY_ABORT(arg4 == 0);
+            DYNAMIC_VERIFY_ABORT(arg5 == 0);
+            DYNAMIC_VERIFY_ABORT(arg6 == 0);
+            DYNAMIC_VERIFY_ABORT(arg7 == 0);
+        }
+    void operator()(
+        struct dummy_func_8_t0* arg1, 
+        struct dummy_func_8_t1* arg2, 
+        struct dummy_func_8_t2 const* arg3, 
+        struct dummy_func_8_t3* arg4, 
+        struct dummy_func_8_t4* arg5, 
+        struct dummy_func_8_t5 const* arg6, 
+        struct dummy_func_8_t6 const** arg7, 
+        void* arg8) {
+            DYNAMIC_VERIFY_ABORT(arg1 == 0);
+            DYNAMIC_VERIFY_ABORT(arg2 == 0);
+            DYNAMIC_VERIFY_ABORT(arg3 == 0);
+            DYNAMIC_VERIFY_ABORT(arg4 == 0);
+            DYNAMIC_VERIFY_ABORT(arg5 == 0);
+            DYNAMIC_VERIFY_ABORT(arg6 == 0);
+            DYNAMIC_VERIFY_ABORT(arg7 == 0);
+            DYNAMIC_VERIFY_ABORT(arg8 == 0);
+        }
 
+};
+
+struct dummy_functor2
+{
+    void operator()(
+        int arg1, long arg2, std::ptrdiff_t arg3, short arg4,
+        unsigned int arg5, unsigned long arg6, unsigned short arg7)
+    {
+        DYNAMIC_VERIFY_ABORT(arg1 != 0);
+        DYNAMIC_VERIFY_ABORT(arg2 != 0);
+        DYNAMIC_VERIFY_ABORT(arg3 != 0);
+        DYNAMIC_VERIFY_ABORT(arg4 != 0);
+        DYNAMIC_VERIFY_ABORT(arg5 != 0);
+        DYNAMIC_VERIFY_ABORT(arg6 != 0);
+        DYNAMIC_VERIFY_ABORT(arg7 != 0);
+    }
 };
 
 int test13()
@@ -693,6 +786,90 @@ int test13()
         thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
         tt.join();
     }
+
+    // lambdas
+    {
+        struct lambdas
+        {
+            static void call(
+                int arg1, long arg2, std::ptrdiff_t arg3, short arg4,
+                unsigned int arg5, unsigned long arg6, unsigned short arg7)
+            {
+                DYNAMIC_VERIFY_ABORT(arg1 != 0);
+                DYNAMIC_VERIFY_ABORT(arg2 != 0);
+                DYNAMIC_VERIFY_ABORT(arg3 != 0);
+                DYNAMIC_VERIFY_ABORT(arg4 != 0);
+                DYNAMIC_VERIFY_ABORT(arg5 != 0);
+                DYNAMIC_VERIFY_ABORT(arg6 != 0);
+                DYNAMIC_VERIFY_ABORT(arg7 != 0);
+            }
+        };
+        thread tt(&lambdas::call, 1, 2, 3, 4, 5, 6, 7);
+        tt.join();
+    }
+
+    {
+        struct lambdas
+        {
+            static void call(
+                int arg1, long arg2, std::ptrdiff_t arg3, short arg4,
+                unsigned int arg5, unsigned long arg6, unsigned short arg7)
+            {
+                DYNAMIC_VERIFY_ABORT(arg1 == 0);
+                DYNAMIC_VERIFY_ABORT(arg2 == 1);
+                DYNAMIC_VERIFY_ABORT(arg3 == 2);
+                DYNAMIC_VERIFY_ABORT(arg4 == 3);
+                DYNAMIC_VERIFY_ABORT(arg5 == 4);
+                DYNAMIC_VERIFY_ABORT(arg6 == 0);
+                DYNAMIC_VERIFY_ABORT(arg7 == 5);
+            }
+        };
+        thread tt(&lambdas::call, 0, 1, 2, 3, 4, 0, 5);
+        tt.join();
+    }
+
+    {
+        struct lambdas
+        {
+            static void call(
+                int arg1, long arg2, std::ptrdiff_t arg3, short arg4,
+                unsigned int arg5, unsigned long arg6, unsigned short arg7, void *arg8)
+            {
+                DYNAMIC_VERIFY_ABORT(arg1 == 1);
+                DYNAMIC_VERIFY_ABORT(arg2 == 2);
+                DYNAMIC_VERIFY_ABORT(arg3 == 3);
+                DYNAMIC_VERIFY_ABORT(arg4 == 4);
+                DYNAMIC_VERIFY_ABORT(arg5 == 5);
+                DYNAMIC_VERIFY_ABORT(arg6 == 6);
+                DYNAMIC_VERIFY_ABORT(arg7 == 7);
+                DYNAMIC_VERIFY_ABORT(arg8);
+            }
+        };
+        char wild_ptr[1];
+        thread tt(
+            &lambdas::call, 
+            int(1), long(2), 
+            std::ptrdiff_t(3), 
+            short(4), 
+            (unsigned int)(5), 
+            (unsigned long)(6), 
+            (unsigned short)(7), 
+            static_cast<void*>(&wild_ptr[0]));
+        tt.join();
+    }
+
+    {
+        // for some reason GCC can not use local class as functor for templated thread constructor
+        // so we have to improvise
+        typedef dummy_functor2 dummy_functor_local;
+        dummy_functor_local ff;
+
+        thread tt(ff, 1, 2, 3, 4, 5, 6, 7);
+        tt.join();
+
+        thread tt2(ff, int(1), long(2), std::ptrdiff_t(3), short(4), (unsigned int)(5), (unsigned long)(6), (unsigned short)(7));
+        tt2.join();
+    }
     
     return 0;
 }
@@ -725,7 +902,7 @@ int test14()
         }
         dur = 
             steady_clock::now() - start;
-        std::cout << "std::duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired is " << desired_dur << " ms" << std::endl;
+        std::cout << "std-measured duration is " << duration_cast<milliseconds>(dur).count() << " ms, std-measured desired is " << desired_dur << " ms" << std::endl;
         DYNAMIC_VERIFY(desired_dur >= intmax_type(25000));
         DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= intmax_type(25000));
         //DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + intmax_type(2000)); // 2 sec is bullshit but better than nothing
@@ -759,14 +936,16 @@ int test14()
             steady_clock::now() - start;
         std::cout << "duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired is " << desired_dur << " ms" << std::endl;
 
+        intmax_type treshold = 2500; // 2.5 sec is bullshit but better than nothing
         #if defined(_STDEX_NATIVE_CPP11_SUPPORT) || defined(__MACH__)
         std::cout << "std::duration is " << std_dur << " ms, stdex::duration is " << duration_cast<milliseconds>(dur).count() << " ms" << std::endl;
         std::cout << "std::desired is " << std_desired_dur << " ms, stdex::desired is " << desired_dur << " ms" << std::endl;
+        treshold = std_dur - std_desired_dur + 700;
         #endif
 
         DYNAMIC_VERIFY(desired_dur >= intmax_type(25000));
         DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() >= intmax_type(25000));
-        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + intmax_type(2500)); // 2.5 sec is bullshit but better than nothing
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + treshold); 
     }
 
     return 0;

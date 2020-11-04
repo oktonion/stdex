@@ -8,7 +8,7 @@ int main(void)
     using namespace stdex;
 
     STATIC_ASSERT(is_void<void>::value == (true), void_should_be_void);
-							 
+                             
     STATIC_ASSERT(is_void<char>::value == (false), can_not_be_void);
     STATIC_ASSERT(is_void<signed char>::value == (false), can_not_be_void);
     STATIC_ASSERT(is_void<unsigned char>::value == (false), can_not_be_void);
