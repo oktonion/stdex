@@ -830,8 +830,8 @@ namespace stdex
     public:
         using typename base_type::return_type;
 
-        function() _STDEX_NOEXCEPT_FUNCTION : detail::function() {}
-        function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : detail::function(nullptr) {}
+        function() _STDEX_NOEXCEPT_FUNCTION : base_type() {}
+        function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : base_type(nullptr) {}
 
         function(const function& other) : base_type(other) { }
         //function(function&& other) _STDEX_NOEXCEPT_FUNCTION;
@@ -850,8 +850,8 @@ namespace stdex
     public:
         using typename base_type::return_type;
 
-        function() _STDEX_NOEXCEPT_FUNCTION : detail::function() {}
-        function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : detail::function(nullptr) {}
+        function() _STDEX_NOEXCEPT_FUNCTION : base_type() {}
+        function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : base_type(nullptr) {}
 
         function(const function& other) : base_type(other) { }
         //function(function&& other) _STDEX_NOEXCEPT_FUNCTION;
@@ -870,8 +870,8 @@ namespace stdex
     public:
         using typename base_type::return_type;
 
-        function() _STDEX_NOEXCEPT_FUNCTION : detail::function()  {}
-        function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : detail::function(nullptr)  {}
+        function() _STDEX_NOEXCEPT_FUNCTION : base_type()  {}
+        function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : base_type(nullptr)  {}
 
         function(const function& other) : base_type(other) { }
         //function(function&& other) _STDEX_NOEXCEPT_FUNCTION;
@@ -879,7 +879,7 @@ namespace stdex
         template<class _FuncT>
         function(_FuncT func): base_type(func) { }
 
-        _R operator()() { return base_type::operator()(); }
+        return_type operator()() { return base_type::operator()(); }
     };
 
     template<class _R, class _Arg0T, class _Arg1T>
@@ -890,8 +890,8 @@ namespace stdex
     public:
         using typename base_type::return_type;
 
-        function() _STDEX_NOEXCEPT_FUNCTION : detail::function()  {}
-        function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : detail::function(nullptr)  {}
+        function() _STDEX_NOEXCEPT_FUNCTION : base_type()  {}
+        function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : base_type(nullptr)  {}
 
         function(const function& other) : base_type(other) { }
         //function(function&& other) _STDEX_NOEXCEPT_FUNCTION;
@@ -900,7 +900,7 @@ namespace stdex
         template<class _FuncT>
         function(_FuncT func): base_type(func) { }
 
-        _R operator()(_Arg0T arg0, _Arg1T arg1) { return base_type::operator()(arg0, arg1); }
+        return_type operator()(_Arg0T arg0, _Arg1T arg1) { return base_type::operator()(arg0, arg1); }
     };
 
     // Hashing
