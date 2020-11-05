@@ -69,7 +69,7 @@ int test01()
 
 int test02()
 {
-    typedef stdex::function<void, int&, void*> function;
+    typedef stdex::function<stdex::remove_pointer<void(*)(int&, void*)>::type> function;
     //typedef std::function<void(int&, void*)> function;
     struct lambdas
     {
@@ -120,7 +120,7 @@ struct np_tests_impl
 {
     static int test01()
     {
-        typedef stdex::function<void, stdex::nullptr_t, float> function;
+        typedef stdex::function<void(*)(stdex::nullptr_t, float&)> function;
 
         struct lambdas{
             static void func(void* ptr, float &val)
