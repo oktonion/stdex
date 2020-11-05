@@ -161,6 +161,9 @@ namespace stdex
             typedef const _args<void, _OtherArgT, 0>& type;
         };
 
+        template<class _Tp>
+        struct _next_arg_tag{};
+
         template<class _ArgsT, class _ArgT, int _N>
         struct _args: _ArgsT, _arg<_ArgT, _N>
         {
@@ -192,11 +195,10 @@ namespace stdex
                 _arg<_ArgT, _N>(_get_const_arg<_N>(other)) 
             { }
 
-            template<class _NextArgT>
-            _args<type, _NextArgT, _N + 1> make(_NextArgT arg) const {return _args<type, _NextArgT, _N + 1>(*this, arg);}
+            template<class _NextArgT, class _NArgT>
+            _args<type, _NextArgT, _N + 1> make(const _next_arg_tag<_NextArgT>&, _NArgT arg) const {return _args<type, _NextArgT, _N + 1>(*this, arg);}
 
-            template<class>
-            const type& make(void_type) const { return *this; }
+            const type& make(const _next_arg_tag<void_type>&, void_type) const { return *this; }
         };
 
         template<class _ArgT>
@@ -211,11 +213,10 @@ namespace stdex
             _args(const _args<void, _OtherArgT, 0> &other):
                 _arg<_ArgT, 0>(_get_const_arg<0>(other)) {}
 
-            template<class _NextArgT>
-            _args<type, _NextArgT, 1> make(_NextArgT arg) const {return _args<type, _NextArgT, 1>(*this, arg);}
+            template<class _NextArgT, class _NArgT>
+            _args<type, _NextArgT, 1> make(const _next_arg_tag<_NextArgT>&, _NArgT arg) const {return _args<type, _NextArgT, 1>(*this, arg);}
 
-            template<class>
-            const type& make(void_type) const { return *this; }
+            const type& make(const _next_arg_tag<void_type>&, void_type) const { return *this; }
         };
 
         namespace functional_std {
@@ -783,30 +784,30 @@ namespace stdex
                 using stdex::detail::functional_std::move;
 
                 args_type args = 
-                    args_x1(functional_std::_forward<_Arg0T>::call(arg0))
-                    .make<_Arg1T >(functional_std::_forward<_Arg1T >::call(arg1))
-                    .make<_Arg2T >(functional_std::_forward<_Arg2T >::call(arg2))
-                    .make<_Arg3T >(functional_std::_forward<_Arg3T >::call(arg3))
-                    .make<_Arg4T >(functional_std::_forward<_Arg4T >::call(arg4))
-                    .make<_Arg5T >(functional_std::_forward<_Arg5T >::call(arg5))
-                    .make<_Arg6T >(functional_std::_forward<_Arg6T >::call(arg6))
-                    .make<_Arg7T >(functional_std::_forward<_Arg7T >::call(arg7))
-                    .make<_Arg8T >(functional_std::_forward<_Arg8T >::call(arg8))
-                    .make<_Arg9T >(functional_std::_forward<_Arg9T >::call(arg9))
-                    .make<_Arg10T>(functional_std::_forward<_Arg10T>::call(arg10))
-                    .make<_Arg11T>(functional_std::_forward<_Arg11T>::call(arg11))
-                    .make<_Arg12T>(functional_std::_forward<_Arg12T>::call(arg12))
-                    .make<_Arg13T>(functional_std::_forward<_Arg13T>::call(arg13))
-                    .make<_Arg14T>(functional_std::_forward<_Arg14T>::call(arg14))
-                    .make<_Arg15T>(functional_std::_forward<_Arg15T>::call(arg15))
-                    .make<_Arg16T>(functional_std::_forward<_Arg16T>::call(arg16))
-                    .make<_Arg17T>(functional_std::_forward<_Arg17T>::call(arg17))
-                    .make<_Arg18T>(functional_std::_forward<_Arg18T>::call(arg18))
-                    .make<_Arg19T>(functional_std::_forward<_Arg19T>::call(arg19))
-                    .make<_Arg20T>(functional_std::_forward<_Arg20T>::call(arg20))
-                    .make<_Arg21T>(functional_std::_forward<_Arg21T>::call(arg21))
-                    .make<_Arg22T>(functional_std::_forward<_Arg22T>::call(arg22))
-                    .make<_Arg23T>(functional_std::_forward<_Arg23T>::call(arg23))
+                    args_x1(functional_std::_forward< _Arg0T >::call(arg0))
+                    .make(_next_arg_tag< _Arg1T >(), functional_std::_forward< _Arg1T >::call(arg1))
+                    .make(_next_arg_tag< _Arg2T >(), functional_std::_forward< _Arg2T >::call(arg2))
+                    .make(_next_arg_tag< _Arg3T >(), functional_std::_forward< _Arg3T >::call(arg3))
+                    .make(_next_arg_tag< _Arg4T >(), functional_std::_forward< _Arg4T >::call(arg4))
+                    .make(_next_arg_tag< _Arg5T >(), functional_std::_forward< _Arg5T >::call(arg5))
+                    .make(_next_arg_tag< _Arg6T >(), functional_std::_forward< _Arg6T >::call(arg6))
+                    .make(_next_arg_tag< _Arg7T >(), functional_std::_forward< _Arg7T >::call(arg7))
+                    .make(_next_arg_tag< _Arg8T >(), functional_std::_forward< _Arg8T >::call(arg8))
+                    .make(_next_arg_tag< _Arg9T >(), functional_std::_forward< _Arg9T >::call(arg9))
+                    .make(_next_arg_tag< _Arg10T>(), functional_std::_forward< _Arg10T>::call(arg10))
+                    .make(_next_arg_tag< _Arg11T>(), functional_std::_forward< _Arg11T>::call(arg11))
+                    .make(_next_arg_tag< _Arg12T>(), functional_std::_forward< _Arg12T>::call(arg12))
+                    .make(_next_arg_tag< _Arg13T>(), functional_std::_forward< _Arg13T>::call(arg13))
+                    .make(_next_arg_tag< _Arg14T>(), functional_std::_forward< _Arg14T>::call(arg14))
+                    .make(_next_arg_tag< _Arg15T>(), functional_std::_forward< _Arg15T>::call(arg15))
+                    .make(_next_arg_tag< _Arg16T>(), functional_std::_forward< _Arg16T>::call(arg16))
+                    .make(_next_arg_tag< _Arg17T>(), functional_std::_forward< _Arg17T>::call(arg17))
+                    .make(_next_arg_tag< _Arg18T>(), functional_std::_forward< _Arg18T>::call(arg18))
+                    .make(_next_arg_tag< _Arg19T>(), functional_std::_forward< _Arg19T>::call(arg19))
+                    .make(_next_arg_tag< _Arg20T>(), functional_std::_forward< _Arg20T>::call(arg20))
+                    .make(_next_arg_tag< _Arg21T>(), functional_std::_forward< _Arg21T>::call(arg21))
+                    .make(_next_arg_tag< _Arg22T>(), functional_std::_forward< _Arg22T>::call(arg22))
+                    .make(_next_arg_tag< _Arg23T>(), functional_std::_forward< _Arg23T>::call(arg23))
                     ;
 
                 return _fx->_co_call(move(args));
