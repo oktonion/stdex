@@ -494,7 +494,7 @@ namespace stdex
         struct _func_invoker_impl<_R, _FuncT, 2, 2>
         {
             template<class _ArgT0, class _ArgT1, class _ResArgsT>
-            static _R func(_FuncT &fx, _arg<_ArgT0, 0>& arg0, _arg<_ArgT1, 1>& arg1, _ResArgsT &res)
+            static _R func(_FuncT &fx, _arg<_ArgT0, 0>&, _arg<_ArgT1, 1>&, _ResArgsT &res)
             {
                 struct _functor: _ResArgsT
                 {
