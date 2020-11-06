@@ -15,10 +15,10 @@
 #define DYNAMIC_VERIFY_ABORT(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; std::abort();}
 
 #ifndef NTESTS
-#define NTESTS 5
+#define NTESTS 15
 #endif
 #ifndef NSTRINGS
-#define NSTRINGS 200
+#define NSTRINGS 400
 #endif
 #ifndef STRSIZE
 #define STRSIZE 42
@@ -139,13 +139,13 @@ quality_test()
       double score = quality_test(num_strings_for_quality_tests,
 				  string_size);
       sum_of_scores += score;
-      DYNAMIC_VERIFY_ABORT( score > 0.98 ? true : (std::cout << score << " < 0.98" << std::endl, false) );
+      DYNAMIC_VERIFY_ABORT( score > 0.97 ? true : (std::cout << score << " < 0.97" << std::endl, false) );
     }
 
   if (num_quality_tests > 1)
     {
       double mean_quality = sum_of_scores / num_quality_tests;
-      DYNAMIC_VERIFY_ABORT( mean_quality > 0.98 ? true : (std::cout << mean_quality << " < 0.98" << std::endl, false) );
+      DYNAMIC_VERIFY_ABORT( mean_quality > 0.97 ? true : (std::cout << mean_quality << " < 0.97" << std::endl, false) );
     }
 }
 
