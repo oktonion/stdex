@@ -149,12 +149,45 @@ struct np_tests_impl<false>
 
 struct np_tests: np_tests_impl<> {};
 
+struct copy_counter{
+    static std::size_t count;
+
+    copy_counter(){}
+    copy_counter(const copy_counter& other)
+    {
+        count++;
+    }
+};
+
+std::size_t copy_counter::count = 0;
+
+int test03()
+{
+    typedef stdex::function<void(*)(copy_counter&)> function;
+
+    struct lambdas{
+        static void func(copy_counter &value)
+        {
+            DYNAMIC_VERIFY_ABORT(value.count == 2 ? true : (std::cout << value.count << " != 2" << std::endl, false));
+        }
+    };
+
+    {
+        function f(&lambdas::func);
+        copy_counter cc;
+        f(cc);
+    }
+
+    return 0;
+}
+
 
 int main()
 {
 
     RUN_TEST(test01);
-    //RUN_TEST(test02);
+    RUN_TEST(test02);
+    RUN_TEST(test03);
     RUN_TEST(np_tests::test01);
 
     const std::string::size_type big = 
