@@ -9,6 +9,7 @@
 #include "./core.h"
 #include "./cstdint.hpp"
 #include "./type_traits.hpp"
+#include "./string.hpp"
 
 // POSIX includes
 
@@ -905,6 +906,31 @@ namespace stdex
 
     // Hashing
 
+    namespace intern
+    {
+        // since we have no static_assert in pre-C++11 we just compile-time assert this way:
+        struct functional_asserts
+        {
+            template<bool>
+            struct the_cpp_standard_does_not_provide_a_hash_for_this_type_assert;
+
+            template<bool>
+            struct the_cpp_standard_does_not_provide_a_hash_for_non_trivial_types_array_assert;
+        };
+
+        template<>
+        struct functional_asserts::the_cpp_standard_does_not_provide_a_hash_for_this_type_assert<true>
+        {
+            typedef bool the_cpp_standard_does_not_provide_a_hash_for_this_type_assert_failed;
+        };
+
+        template<>
+        struct functional_asserts::the_cpp_standard_does_not_provide_a_hash_for_non_trivial_types_array_assert<true>
+        {
+            typedef bool the_cpp_standard_does_not_provide_a_hash_for_non_trivial_types_array_assert_failed;
+        };
+    } // namespace intern
+
     namespace detail
     {
         template<class _SizeT, int>
@@ -921,7 +947,7 @@ namespace stdex
                 _SizeT _val = _FNV_offset_basis;
                 for (_SizeT _next = 0; _next < _count; ++_next)
                     {    // fold in another byte
-                    _val ^= (_SizeT)_first[_next];
+                    _val ^= static_cast<_SizeT>(_first[_next]);
                     _val *= _FNV_prime;
                     }
                 return (_val);
@@ -939,7 +965,7 @@ namespace stdex
                 _SizeT _val = _FNV_offset_basis;
                 for (_SizeT _next = 0; _next < _count; ++_next)
                     {    // fold in another byte
-                    _val ^= (_SizeT)_first[_next];
+                    _val ^= static_cast<_SizeT>(_first[_next]);
                     _val *= _FNV_prime;
                     }
                 return (_val);
@@ -954,7 +980,7 @@ namespace stdex
 
             std::size_t operator()(const _KeyT& _keyval) const
             {    // hash _keyval to std::size_t value by pseudorandomizing transform
-                return (_bitwise_hash_seq<std::size_t, sizeof(std::size_t)>::call((const unsigned char *)&_keyval, sizeof (_KeyT)));
+                return (_bitwise_hash_seq<std::size_t, sizeof(std::size_t)>::call(&reinterpret_cast<const unsigned char&>(_keyval), sizeof (argument_type)));
             }
         };
         
@@ -969,7 +995,7 @@ namespace stdex
                 struct lambdas{
                     static std::size_t hash_seq(const argument_type &keyval)
                     {
-                        return (_bitwise_hash_seq<std::size_t, sizeof(std::size_t)>::call((const unsigned char *)&keyval, sizeof (argument_type)));
+                        return (_bitwise_hash_seq<std::size_t, sizeof(std::size_t)>::call(&reinterpret_cast<const unsigned char&>(keyval), sizeof (_KeyT)));
                     }
                 };
 
@@ -995,32 +1021,34 @@ namespace stdex
         { 
             typedef _bitwise_hash_impl<_KeyT, _KeyT> type;
         };
+
+        template<class _KeyT>
+        struct _hash_array_impl
+        {
+            typedef intern::functional_asserts check;
+            typedef typename check::the_cpp_standard_does_not_provide_a_hash_for_non_trivial_types_array_assert<is_class<_KeyT>::value == bool(false)>::
+                the_cpp_standard_does_not_provide_a_hash_for_non_trivial_types_array_assert_failed
+                check1; // if you are there means you tried to calculate hash for unsupported type
+
+            static std::size_t call(const _KeyT* const _first, const std::size_t _count)
+            {
+                return (_bitwise_hash_seq<std::size_t, sizeof(std::size_t)>::call(reinterpret_cast<const unsigned char*>(_first), _count * sizeof(_KeyT)));
+            }
+        };
     }
 
-    namespace intern
-    {
-        // since we have no static_assert in pre-C++11 we just compile-time assert this way:
-        struct functional_asserts
-        {
-            template<bool>
-            struct the_cpp_standard_does_not_provide_a_hash_for_enum_types_assert;
-        };
 
-        template<>
-        struct functional_asserts::the_cpp_standard_does_not_provide_a_hash_for_enum_types_assert<true>
-        {
-            typedef bool the_cpp_standard_does_not_provide_a_hash_for_enum_types_assert_failed;
-        };
-    } // namespace intern
 
     template<class _KeyT>
     struct hash
         : public detail::_hash_impl<_KeyT>::type
     {    // hash functor for enums
         typedef intern::functional_asserts check;
-        typedef typename check::the_cpp_standard_does_not_provide_a_hash_for_enum_types_assert<is_enum<_KeyT>::value == bool(false)>::
-            the_cpp_standard_does_not_provide_a_hash_for_enum_types_assert_failed
-        check1; // if you are there means you tried to calculate hash for enum type
+        typedef typename check::the_cpp_standard_does_not_provide_a_hash_for_this_type_assert<
+            is_const<_KeyT>::value == bool(false) && is_volatile<_KeyT>::value == bool(false) && 
+            ( is_enum<_KeyT>::value == bool(true) || is_integral<_KeyT>::value == bool(true) || is_pointer<_KeyT>::value == bool(true) )
+        >::the_cpp_standard_does_not_provide_a_hash_for_this_type_assert_failed
+        check1; // if you are there means you tried to calculate hash for unsupported type
     };
 
     template<>
@@ -1131,28 +1159,42 @@ namespace stdex
     // standard hash overloads for std headers
 
     template<std::size_t _Bits>
-    struct hash<std::bitset<_Bits>/**/>;
-    //{    // hash functor for bitset<_Bits>
-    //    typedef std::bitset<_Bits> argument_type;
-    //    typedef std::size_t result_type;
-    //
-    //    std::size_t operator()(const argument_type& _keyval) const
-    //    {
-    //        return (_keyval.hash());
-    //    }
-    //};
+    struct hash<std::bitset<_Bits>/**/>
+    {    // hash functor for bitset<_Bits>
+        typedef std::bitset<_Bits> argument_type;
+        typedef std::size_t result_type;
+    
+        std::size_t operator()(const argument_type& _keyval) const
+        {
+            return hash<std::string>()(_keyval.to_string());
+        }
+    };
 
-    template<class _AllocatorT>
-    struct hash<std::vector<bool, _AllocatorT>/**/>;
-    //{    // hash functor for vector<bool, _AllocatorT>
-    //    typedef std::vector<bool, _AllocatorT> argument_type;
-    //    typedef std::size_t result_type;
-    //
-    //    std::size_t operator()(const argument_type& _keyval) const
-    //    {
-    //        return (_keyval.hash());
-    //    }
-    //};
+    template<class _ElementT, class _AllocatorT>
+    struct hash<std::vector<_ElementT, _AllocatorT>/**/>
+    {    // hash functor for vector
+        typedef std::vector<_ElementT, _AllocatorT> argument_type;
+        typedef std::size_t result_type;
+    
+        std::size_t operator()(const argument_type& _keyval) const
+        {
+            if(_keyval.size())
+                return detail::_hash_array_impl<_ElementT>::call(&_keyval[0], _keyval.size());
+            return 0;
+        }
+    };
+
+    template<class _ElementT, class _TraitsT, class _AllocatorT>
+    struct hash<basic_string<_ElementT, _TraitsT, _AllocatorT>/**/>
+    {    // hash functor for basic_string
+        typedef basic_string<_ElementT, _TraitsT, _AllocatorT> argument_type;
+        typedef std::size_t result_type;
+    
+        std::size_t operator()(const argument_type& _keyval) const
+        {
+            return detail::_hash_array_impl<_ElementT>::call(_keyval.c_str(), _keyval.size());
+        }
+    };
 
 
     // Arithmetic operations
