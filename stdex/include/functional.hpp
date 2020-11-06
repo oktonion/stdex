@@ -1202,8 +1202,8 @@ namespace stdex
         std::size_t operator()(const argument_type& _keyval) const
         {
             
-            stringstream tmp; tmp << _keyval;
-            return hash<std::string>()(tmp.str());
+            stringstream _tmp; _tmp << _keyval;
+            return hash<std::string>()(_tmp.str());
         }
     };
 
@@ -1232,7 +1232,7 @@ namespace stdex
             if(_keyval.empty())
                 return 0;
             typedef std::vector<unsigned char> tr_argument_type;
-            tr_argument_type tmp(_keyval.size());
+            tr_argument_type _tmp(_keyval.size());
 
             struct lambdas{
                 static unsigned char bool_to_uchar(bool value){
@@ -1240,10 +1240,10 @@ namespace stdex
                 }
             };
 
-            std::transform(_keyval.begin(), _keyval.end(), tmp.begin(), 
+            std::transform(_keyval.begin(), _keyval.end(), _tmp.begin(), 
                 &lambdas::bool_to_uchar);
             
-            return hash<tr_argument_type>()(tmp);
+            return hash<tr_argument_type>()(_tmp);
         }
     };
 
