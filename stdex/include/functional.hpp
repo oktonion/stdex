@@ -828,7 +828,7 @@ namespace stdex
     { 
         typedef function<_FuncSignatureT*> base_type;
     public:
-        using typename base_type::return_type;
+        typedef typename base_type::return_type return_type;
 
         function() _STDEX_NOEXCEPT_FUNCTION : base_type() {}
         function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : base_type(nullptr) {}
@@ -848,7 +848,7 @@ namespace stdex
     {
         typedef function<_FuncSignatureT*> base_type;
     public:
-        using typename base_type::return_type;
+        typedef typename base_type::return_type return_type;
 
         function() _STDEX_NOEXCEPT_FUNCTION : base_type() {}
         function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : base_type(nullptr) {}
@@ -868,7 +868,7 @@ namespace stdex
     {
         typedef detail::function<_R> base_type;
     public:
-        using typename base_type::return_type;
+        typedef typename base_type::return_type return_type;
 
         function() _STDEX_NOEXCEPT_FUNCTION : base_type()  {}
         function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : base_type(nullptr)  {}
@@ -888,7 +888,7 @@ namespace stdex
     {
         typedef detail::function<_R, _Arg0T, _Arg1T> base_type;
     public:
-        using typename base_type::return_type;
+        typedef typename base_type::return_type return_type;
 
         function() _STDEX_NOEXCEPT_FUNCTION : base_type()  {}
         function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : base_type(nullptr)  {}
