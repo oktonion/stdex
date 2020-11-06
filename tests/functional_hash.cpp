@@ -5,7 +5,16 @@
 
 #include <iostream>
 #include <string>
+#include <bitset>
 #include <vector>
+
+std::size_t
+test_compile01()
+{
+  std::bitset<1> b;
+  stdex::hash<std::bitset<1>/**/> h;
+  return h(b);
+}
 
 std::size_t
 test_compile02()
