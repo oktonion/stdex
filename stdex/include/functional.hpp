@@ -1200,7 +1200,7 @@ namespace stdex
     
         std::size_t operator()(const argument_type& _keyval) const
         {
-            return hash<std::string>()(_keyval.to_string());
+            return hash<std::string>()(_keyval.to_string<std::string::value_type>());
         }
     };
 
@@ -1217,6 +1217,9 @@ namespace stdex
             return 0;
         }
     };
+
+    template<class _AllocatorT>
+    struct hash<std::vector<bool, _AllocatorT>/**/>;
 
     template<class _ElementT, class _TraitsT, class _AllocatorT>
     struct hash<basic_string<_ElementT, _TraitsT, _AllocatorT>/**/>
