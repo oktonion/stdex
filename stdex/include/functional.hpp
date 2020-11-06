@@ -492,6 +492,68 @@ namespace stdex
         };
 
         template<class _R, class _FuncT>
+        struct _func_invoker_impl<_R, _FuncT, 1, 1>
+        {
+            template<class _ArgT0, class _ResArgsT>
+            static _R func(_FuncT &fx, _arg<_ArgT0, 0>&, _ResArgsT &res)
+            {
+                struct _functor: _ResArgsT
+                {
+                    typedef _ResArgsT base_type;
+                    typedef _R return_type;
+                    typedef _ArgT0 arg0_type;
+                    typedef return_type(&disable)(...);
+
+                    _functor(const base_type &other) : base_type(other) {}
+                    return_type operator()(
+                        typename 
+                        conditional<
+                            is_same<return_type, void_type>::value,
+                            disable,
+                            _FuncT &>::type fx) 
+                    {
+                        using ::stdex::detail::_arg;
+
+                        return fx(_arg<arg0_type, 0>::value);
+                    }
+
+                    return_type operator()(
+                        typename 
+                        conditional<
+                            is_same<return_type, void_type>::value,
+                            _FuncT &,
+                            disable>::type fx) 
+                    {
+                        using ::stdex::detail::_arg;
+
+                        fx(_arg<arg0_type, 0>::value);
+                        return_type dummy;
+                        return dummy;
+                    }
+                };
+                
+                _functor _f = res;
+                return functional_std::_forward<_R>::call( _f(fx) );
+            }
+            
+            template<class _RawArgsT, class _CheckedArgsT>
+            static _R call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>&)
+            {
+                _CheckedArgsT checked_args(functional_std::move(args));
+                return functional_std::_forward<_R>::call(
+                    func(fx, _get_arg<0>(checked_args), checked_args));
+            }
+
+            template<class _RawArgsT>
+            static _R call(_FuncT &fx, _RawArgsT &args, const _checked_args<_RawArgsT>&)
+            {
+                return functional_std::_forward<_R>::call(
+                    func(fx, _get_arg<0>(args), args) );
+            }
+        };
+
+
+        template<class _R, class _FuncT>
         struct _func_invoker_impl<_R, _FuncT, 2, 2>
         {
             template<class _ArgT0, class _ArgT1, class _ResArgsT>
@@ -881,6 +943,27 @@ namespace stdex
         function(_FuncT func): base_type(func) { }
 
         return_type operator()() { return base_type::operator()(); }
+    };
+
+    template<class _R, class _Arg0T>
+    class function<_R(*)(_Arg0T)>:
+        detail::function<_R, _Arg0T>
+    {
+        typedef detail::function<_R, _Arg0T> base_type;
+    public:
+        typedef typename base_type::return_type return_type;
+
+        function() _STDEX_NOEXCEPT_FUNCTION : base_type()  {}
+        function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : base_type(nullptr)  {}
+
+        function(const function& other) : base_type(other) { }
+        //function(function&& other) _STDEX_NOEXCEPT_FUNCTION;
+
+
+        template<class _FuncT>
+        function(_FuncT func): base_type(func) { }
+
+        return_type operator()(_Arg0T arg0) { return base_type::operator()(arg0); }
     };
 
     template<class _R, class _Arg0T, class _Arg1T>
