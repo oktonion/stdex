@@ -1156,18 +1156,6 @@ namespace stdex
     };
 
     template<>
-    struct hash<long long>
-        : public detail::_hash_impl<long long>::type
-    {    // hash functor for long long
-    };
-
-    template<>
-    struct hash<unsigned long long>
-        : public detail::_hash_impl<unsigned long long>::type
-    {    // hash functor for unsigned long long
-    };
-
-    template<>
     struct hash<float>
         : public detail::_hash_impl<float>::type
     {    // hash functor for float
@@ -1192,20 +1180,6 @@ namespace stdex
     };
 
     // standard hash overloads for std headers
-
-    template<std::size_t _Bits>
-    struct hash<std::bitset<_Bits>/**/>
-    {    // hash functor for bitset<_Bits>
-        typedef std::bitset<_Bits> argument_type;
-        typedef std::size_t result_type;
-    
-        std::size_t operator()(const argument_type& _keyval) const
-        {
-            
-            stringstream _tmp; _tmp << _keyval;
-            return hash<std::string>()(_tmp.str());
-        }
-    };
 
     template<class _ElementT, class _AllocatorT>
     struct hash<std::vector<_ElementT, _AllocatorT>/**/>
@@ -1256,6 +1230,20 @@ namespace stdex
         std::size_t operator()(const argument_type& _keyval) const
         {
             return detail::_hash_array_impl<_ElementT>::call(_keyval.c_str(), _keyval.size());
+        }
+    };
+    
+    template<std::size_t _Bits>
+    struct hash<std::bitset<_Bits>/**/>
+    {    // hash functor for bitset<_Bits>
+        typedef std::bitset<_Bits> argument_type;
+        typedef std::size_t result_type;
+    
+        std::size_t operator()(const argument_type& _keyval) const
+        {
+            
+            stringstream _tmp; _tmp << _keyval;
+            return hash<std::string>()(_tmp.str());
         }
     };
 
