@@ -17,6 +17,7 @@
 #include <functional>
 #include <bitset> // for hash
 #include <vector> // for hash
+#include <algorithm>
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
@@ -1219,7 +1220,30 @@ namespace stdex
     };
 
     template<class _AllocatorT>
-    struct hash<std::vector<bool, _AllocatorT>/**/>;
+    struct hash<std::vector<bool, _AllocatorT>/**/>
+    {    // hash functor for vector
+        typedef std::vector<bool, _AllocatorT> argument_type;
+        typedef std::size_t result_type;
+    
+        std::size_t operator()(const argument_type& _keyval) const
+        {
+            if(_keyval.empty())
+                return 0;
+            typedef std::vector<unsigned char> tr_argument_type;
+            tr_argument_type tmp(_keyval.size());
+
+            struct lambdas{
+                static unsigned char bool_to_uchar(bool &value){
+                    return (value ? 1 : 0);
+                }
+            };
+
+            std::transform(_keyval.begin(), _keyval.end(), tmp.begin(), 
+                &lambdas::bool_to_uchar);
+            
+            return hash<tr_argument_type>()(tmp);
+        }
+    };
 
     template<class _ElementT, class _TraitsT, class _AllocatorT>
     struct hash<basic_string<_ElementT, _TraitsT, _AllocatorT>/**/>
