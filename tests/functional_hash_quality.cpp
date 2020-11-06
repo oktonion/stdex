@@ -145,7 +145,7 @@ quality_test()
   if (num_quality_tests > 1)
     {
       double mean_quality = sum_of_scores / num_quality_tests;
-      DYNAMIC_VERIFY_ABORT( mean_quality > 0.9999 );
+      DYNAMIC_VERIFY_ABORT( mean_quality > 0.98 ? true : (std::cout << mean_quality << " < 0.98" << std::endl, false) );
     }
 }
 
