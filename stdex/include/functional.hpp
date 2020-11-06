@@ -721,7 +721,7 @@ namespace stdex
             struct func_base {
                 virtual func_base* _copy() const = 0;
                 virtual func_base* _move() _STDEX_NOEXCEPT_FUNCTION = 0;
-                virtual _R _co_call(function::args_type&) = 0;
+                virtual _R _co_call(args_type&) = 0;
                 virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION = 0;
 
                 func_base() {}
@@ -1034,21 +1034,56 @@ namespace stdex
                 return (_bitwise_hash_seq<std::size_t, sizeof(std::size_t)>::call(reinterpret_cast<const unsigned char*>(_first), _count * sizeof(_KeyT)));
             }
         };
-    }
 
+        template<class _KeyT, bool>
+        struct _hash_base
+            : public detail::_hash_impl<_KeyT>::type
+        {    // hash functor for enums
+            typedef intern::functional_asserts check;
+            typedef typename check::the_cpp_standard_does_not_provide_a_hash_for_this_type_assert<
+                is_const<_KeyT>::value == bool(false) && is_volatile<_KeyT>::value == bool(false) &&
+                (is_enum<_KeyT>::value == bool(true) || is_integral<_KeyT>::value == bool(true) || is_pointer<_KeyT>::value == bool(true))
+            >::the_cpp_standard_does_not_provide_a_hash_for_this_type_assert_failed
+                check1; // if you are there means you tried to calculate hash for unsupported type
+        };
+
+        template<class _BasicStringT>
+        struct _hash_basic_string
+        {    // hash functor for basic_string
+            typedef _BasicStringT argument_type;
+            typedef std::size_t result_type;
+
+            std::size_t operator()(const argument_type& _keyval) const
+            {
+                typedef typename _BasicStringT::value_type value_type;
+                return detail::_hash_array_impl<value_type>::call(_keyval.c_str(), _keyval.size());
+            }
+        };
+
+        template<class _KeyT>
+        struct _hash_base<_KeyT, true>:
+            _hash_basic_string<_KeyT>
+        { };
+
+        template<class _ElementT, class _TraitsT, class _AllocatorT>
+        _yes_type _is_convertable_to_basic_string_tester(basic_string<_ElementT, _TraitsT, _AllocatorT>*);
+        _no_type _is_convertable_to_basic_string_tester(...);
+
+        template<class _KeyT>
+        struct _is_convertable_to_basic_string
+        {
+            static const bool value =
+                sizeof(_is_convertable_to_basic_string_tester(_declptr<_KeyT>())) == sizeof(_yes_type);
+        };
+    }
 
 
     template<class _KeyT>
     struct hash
-        : public detail::_hash_impl<_KeyT>::type
-    {    // hash functor for enums
-        typedef intern::functional_asserts check;
-        typedef typename check::the_cpp_standard_does_not_provide_a_hash_for_this_type_assert<
-            is_const<_KeyT>::value == bool(false) && is_volatile<_KeyT>::value == bool(false) && 
-            ( is_enum<_KeyT>::value == bool(true) || is_integral<_KeyT>::value == bool(true) || is_pointer<_KeyT>::value == bool(true) )
-        >::the_cpp_standard_does_not_provide_a_hash_for_this_type_assert_failed
-        check1; // if you are there means you tried to calculate hash for unsupported type
-    };
+        : public detail::_hash_base<_KeyT, 
+            detail::_is_convertable_to_basic_string<_KeyT>::value>
+    { };
+
 
     template<>
     struct hash<void>;
