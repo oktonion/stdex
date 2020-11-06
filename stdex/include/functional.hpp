@@ -1201,7 +1201,9 @@ namespace stdex
     
         std::size_t operator()(const argument_type& _keyval) const
         {
-            return hash<std::string>()(_keyval.template to_string<std::string::value_type>());
+            
+            stringstream tmp; tmp << _keyval;
+            return hash<std::string>()(tmp.str());
         }
     };
 
