@@ -1233,7 +1233,7 @@ namespace stdex
             tr_argument_type tmp(_keyval.size());
 
             struct lambdas{
-                static unsigned char bool_to_uchar(bool &value){
+                static unsigned char bool_to_uchar(bool value){
                     return (value ? 1 : 0);
                 }
             };
