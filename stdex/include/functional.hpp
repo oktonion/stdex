@@ -491,12 +491,13 @@ namespace stdex
         template<class _R, class _FuncT>
         struct _func_invoker_impl<_R, _FuncT, 0, 0>
         {
-            static _R call(_FuncT &fx)
+            template<class _RawArgsT>
+            static _R call(_FuncT &fx, _RawArgsT&, const _checked_args<_RawArgsT>&)
             {
                 struct _functor
                 {
                     typedef _R return_type;
-                    typedef return_type(&disable)();
+                    typedef return_type(&disable)(...);
 
                     return_type operator()(
                         typename 
