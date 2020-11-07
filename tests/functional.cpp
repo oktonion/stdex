@@ -263,7 +263,7 @@ int test05()
         copy_counter cc;
         cc.count = 0;
         f(0);
-        DYNAMIC_VERIFY(cc.count == 1 ? true : (std::cout << cc.count << " != 0" << std::endl, false));
+        DYNAMIC_VERIFY(cc.count == 1 ? true : (std::cout << cc.count << " != 1" << std::endl, false));
     }
 
     {
@@ -272,7 +272,7 @@ int test05()
         copy_counter cc;
         cc.count = 0;
         f();
-        DYNAMIC_VERIFY(cc.count == 1 ? true : (std::cout << cc.count << " != 0" << std::endl, false));
+        DYNAMIC_VERIFY(cc.count == 1 ? true : (std::cout << cc.count << " != 1" << std::endl, false));
     }
 
     return 0;
