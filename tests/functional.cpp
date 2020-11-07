@@ -166,24 +166,79 @@ int test03()
    
 
     struct lambdas{
-        static void func(copy_counter &value)
+        static void func1(copy_counter &value)
+        { }
+
+        static void func2(const copy_counter& value)
         { }
     };
 
     {
         typedef stdex::function<void(*)(copy_counter&)> function;
-        function f(&lambdas::func);
+        function f(&lambdas::func1);
         copy_counter cc;
+        cc.count = 0;
         f(cc);
         DYNAMIC_VERIFY(cc.count == 0 ? true : (std::cout << cc.count << " != 0" << std::endl, false));
     }
 
     {
         typedef stdex::function<void(*)(copy_counter)> function;
-        function f(&lambdas::func);
+        function f(&lambdas::func1);
         copy_counter cc;
         cc.count = 0;
         f(cc);
+        DYNAMIC_VERIFY(cc.count == 1 ? true : (std::cout << cc.count << " != 1" << std::endl, false));
+    }
+
+    {
+        typedef stdex::function<void(*)(copy_counter)> function;
+        function f(&lambdas::func2);
+        copy_counter cc;
+        cc.count = 0;
+        f(cc);
+        DYNAMIC_VERIFY(cc.count == 1 ? true : (std::cout << cc.count << " != 1" << std::endl, false));
+    }
+
+    return 0;
+}
+
+int test04()
+{
+
+
+    struct lambdas {
+        static void func1(int, copy_counter& value)
+        { }
+
+        static void func2(copy_counter& value, int)
+        { }
+    };
+
+    {
+        typedef stdex::function<void(*)(int, copy_counter&)> function;
+        function f(&lambdas::func1);
+        copy_counter cc;
+        cc.count = 0;
+        f(0, cc);
+        DYNAMIC_VERIFY(cc.count == 0 ? true : (std::cout << cc.count << " != 0" << std::endl, false));
+    }
+
+    {
+        typedef stdex::function<void(*)(int, copy_counter)> function;
+        function f(&lambdas::func1);
+        copy_counter cc;
+        cc.count = 0;
+        f(0, cc);
+        DYNAMIC_VERIFY(cc.count == 1 ? true : (std::cout << cc.count << " != 1" << std::endl, false));
+    }
+
+    {
+        typedef stdex::function<void(*)(copy_counter, int)> function;
+        function f(&lambdas::func2);
+        copy_counter cc;
+        cc.count = 0;
+        f(cc, 0);
         DYNAMIC_VERIFY(cc.count == 1 ? true : (std::cout << cc.count << " != 1" << std::endl, false));
     }
 
@@ -197,6 +252,7 @@ int main()
     RUN_TEST(test01);
     RUN_TEST(test02);
     RUN_TEST(test03);
+    RUN_TEST(test04);
     RUN_TEST(np_tests::test01);
 
     const std::string::size_type big = 
