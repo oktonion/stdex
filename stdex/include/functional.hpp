@@ -163,11 +163,26 @@ namespace stdex
             typedef const _args<void, _OtherArgT, 0>& type;
         };
 
+        template<class _ArgT>
+        struct _arg_is_void:
+            bool_constant<
+                is_same<_ArgT, void_type>::value == bool(true) ||
+                is_void<_ArgT>::value == bool(true)
+            >
+        { };
+
+        template<class _ArgT>
+        struct _args_count_incr
+        {
+            static const int value = 
+                _arg_is_void<_ArgT>::value ? 0 : 1;
+        };
+
         template<class _ArgsT, class _ArgT, int _N>
         struct _args: _ArgsT, _arg<_ArgT, _N>
         {
             typedef _args type;
-            static const int count = _N + 1;
+            static const int count = _N + _args_count_incr<_ArgT>::value;
 
             template<class _OtherArgsT, class _OtherArgT>
             _args(const _args<_OtherArgsT, _OtherArgT, _N - 1> &other, _ArgT arg):
@@ -205,7 +220,8 @@ namespace stdex
         struct _args<void, _ArgT, 0> : _arg<_ArgT, 0>
         {
             typedef _args type;
-            static const int count = 1;
+            static const int count = 
+                _args_count_incr<_ArgT>::value;
 
             _args(_ArgT arg):
                 _arg<_ArgT, 0>(arg) {}
@@ -665,14 +681,6 @@ namespace stdex
     } // namespace detail
 
     namespace detail{
-
-        template<class _ArgT>
-        struct _arg_is_void:
-            bool_constant<
-                is_same<_ArgT, void_type>::value == bool(true) ||
-                is_void<_ArgT>::value == bool(true)
-            >
-        { };
 
         template<class _ArgsT, class _ArgT, int _Index, bool>
         struct _make_args_impl;
