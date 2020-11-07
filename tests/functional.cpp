@@ -208,15 +208,15 @@ int test04()
 
 
     struct lambdas {
-        static void func1(int, copy_counter& value)
+        static void func1(int*, copy_counter& value)
         { }
 
-        static void func2(copy_counter& value, int)
+        static void func2(copy_counter& value, int*)
         { }
     };
 
     {
-        typedef stdex::function<void(*)(int, copy_counter&)> function;
+        typedef stdex::function<void(*)(int*, copy_counter&)> function;
         function f(&lambdas::func1);
         copy_counter cc;
         cc.count = 0;
@@ -225,7 +225,7 @@ int test04()
     }
 
     {
-        typedef stdex::function<void(*)(int, copy_counter)> function;
+        typedef stdex::function<void(*)(int*, copy_counter)> function;
         function f(&lambdas::func1);
         copy_counter cc;
         cc.count = 0;
@@ -234,7 +234,7 @@ int test04()
     }
 
     {
-        typedef stdex::function<void(*)(copy_counter, int)> function;
+        typedef stdex::function<void(*)(copy_counter, int*)> function;
         function f(&lambdas::func2);
         copy_counter cc;
         cc.count = 0;
