@@ -251,10 +251,16 @@ int test05()
 
     struct lambdas {
         static copy_counter func1(int*)
-        { }
+        { 
+            copy_counter value;
+            return value;
+        }
 
         static copy_counter func2()
-        { }
+        { 
+            copy_counter value;
+            return value;
+        }
     };
 
     {
