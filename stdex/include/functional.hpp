@@ -947,9 +947,9 @@ namespace stdex
 
     template<class _R, class _Arg0T>
     class function<_R(*)(_Arg0T)>:
-        detail::function<_R, _Arg0T>
+        detail::function<_R, typename remove_reference<_Arg0T>::type&>
     {
-        typedef detail::function<_R, _Arg0T> base_type;
+        typedef detail::function<_R, typename remove_reference<_Arg0T>::type&> base_type;
     public:
         typedef typename base_type::return_type return_type;
 
@@ -968,9 +968,11 @@ namespace stdex
 
     template<class _R, class _Arg0T, class _Arg1T>
     class function<_R(*)(_Arg0T, _Arg1T)>:
-        detail::function<_R, _Arg0T, _Arg1T>
+        detail::function<_R, 
+            typename remove_reference<_Arg0T>::type&, typename remove_reference<_Arg1T>::type&>
     {
-        typedef detail::function<_R, _Arg0T, _Arg1T> base_type;
+        typedef detail::function<_R, 
+            typename remove_reference<_Arg0T>::type&, typename remove_reference<_Arg1T>::type&> base_type;
     public:
         typedef typename base_type::return_type return_type;
 
