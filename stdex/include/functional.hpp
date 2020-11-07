@@ -701,6 +701,13 @@ namespace stdex
             typedef _ArgsT args;
         };
 
+        template<class _ArgsT, class _ArgT>
+        struct _make_args_impl<_ArgsT, _ArgT, 0, true>
+        {
+            typedef _args<void, void_type, 0> args;
+            typedef _make_args_impl1<args> type;
+        };
+
         template<class _ArgsT, class _ArgT, int _Index>
         struct _make_args_impl<_ArgsT, _ArgT, _Index, false>:
             _make_args_impl1<_args<_ArgsT, _ArgT, _Index>/**/>
