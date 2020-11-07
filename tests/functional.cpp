@@ -184,7 +184,7 @@ int test03()
         copy_counter cc;
         cc.count = 0;
         f(cc);
-        DYNAMIC_VERIFY(cc.count == 1 ? true : (std::cout << cc.count << " != 2" << std::endl, false));
+        DYNAMIC_VERIFY(cc.count == 1 ? true : (std::cout << cc.count << " != 1" << std::endl, false));
     }
 
     return 0;
