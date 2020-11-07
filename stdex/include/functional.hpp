@@ -509,6 +509,12 @@ namespace stdex
             }
         };
 
+        struct _any_type
+        {
+            template<class _Tp>
+            _any_type(const _Tp&) {}
+        };
+
         template<class _R, class _FuncT>
         struct _func_invoker_impl<_R, _FuncT, 1, 1>
         {
@@ -520,7 +526,7 @@ namespace stdex
                     typedef _ResArgsT base_type;
                     typedef _R return_type;
                     typedef _ArgT0 arg0_type;
-                    typedef return_type(&disable)(const arg0_type&);
+                    typedef return_type(&disable)(_any_type);
 
                     _functor(const base_type &other) : base_type(other) {}
                     return_type operator()(
@@ -584,7 +590,7 @@ namespace stdex
                     typedef _R return_type;
                     typedef _ArgT0 arg0_type;
                     typedef _ArgT1 arg1_type;
-                    typedef return_type(&disable)(const arg0_type&, const arg1_type&);
+                    typedef return_type(&disable)(_any_type, _any_type);
 
                     _functor(const base_type &other) : base_type(other) {}
                     return_type operator()(
