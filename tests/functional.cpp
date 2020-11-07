@@ -167,9 +167,7 @@ int test03()
 
     struct lambdas{
         static void func(copy_counter &value)
-        {
-            DYNAMIC_VERIFY_ABORT(value.count == 0 ? true : (std::cout << value.count << " != 2" << std::endl, false));
-        }
+        { }
     };
 
     {
@@ -177,15 +175,16 @@ int test03()
         function f(&lambdas::func);
         copy_counter cc;
         f(cc);
+        DYNAMIC_VERIFY(cc.count == 0 ? true : (std::cout << cc.count << " != 0" << std::endl, false));
     }
 
     {
         typedef stdex::function<void(*)(copy_counter)> function;
         function f(&lambdas::func);
         copy_counter cc;
-        cc.counter = 0;
+        cc.count = 0;
         f(cc);
-        DYNAMIC_VERIFY(cc.count == 2 ? true : (std::cout << cc.count << " != 2" << std::endl, false));
+        DYNAMIC_VERIFY(cc.count == 1 ? true : (std::cout << cc.count << " != 2" << std::endl, false));
     }
 
     return 0;
