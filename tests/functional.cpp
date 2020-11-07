@@ -163,19 +163,29 @@ std::size_t copy_counter::count = 0;
 
 int test03()
 {
-    typedef stdex::function<void(*)(copy_counter&)> function;
+   
 
     struct lambdas{
         static void func(copy_counter &value)
         {
-            DYNAMIC_VERIFY_ABORT(value.count == 2 ? true : (std::cout << value.count << " != 2" << std::endl, false));
+            DYNAMIC_VERIFY_ABORT(value.count == 0 ? true : (std::cout << value.count << " != 2" << std::endl, false));
         }
     };
 
     {
+        typedef stdex::function<void(*)(copy_counter&)> function;
         function f(&lambdas::func);
         copy_counter cc;
         f(cc);
+    }
+
+    {
+        typedef stdex::function<void(*)(copy_counter)> function;
+        function f(&lambdas::func);
+        copy_counter cc;
+        cc.counter = 0;
+        f(cc);
+        DYNAMIC_VERIFY(cc.count == 2 ? true : (std::cout << cc.count << " != 2" << std::endl, false));
     }
 
     return 0;
