@@ -489,7 +489,7 @@ namespace stdex
                             disable,
                             _FuncT &>::type fx) 
                     {
-                        return functional_std::_forward<return_type>::call(fx());
+                        return ::stdex::detail::functional_std::_forward<return_type>::call(fx());
                     }
 
                     return_type operator()(
@@ -501,7 +501,7 @@ namespace stdex
                     {
                         fx();
                         return_type dummy;
-                        return functional_std::_forward<return_type>::call(dummy);
+                        return ::stdex::detail::functional_std::_forward<return_type>::call(dummy);
                     }
                 }; 
                 _functor _f;
@@ -538,7 +538,7 @@ namespace stdex
                     {
                         using ::stdex::detail::_arg;
 
-                        return functional_std::_forward<return_type>::call(
+                        return ::stdex::detail::functional_std::_forward<return_type>::call(
                             fx(_arg<arg0_type, 0>::value) );
                     }
 
@@ -553,7 +553,7 @@ namespace stdex
 
                         fx(_arg<arg0_type, 0>::value);
                         return_type dummy;
-                        return functional_std::_forward<return_type>::call(dummy);
+                        return ::stdex::detail::functional_std::_forward<return_type>::call(dummy);
                     }
                 };
                 
@@ -602,7 +602,7 @@ namespace stdex
                     {
                         using ::stdex::detail::_arg;
 
-                        return functional_std::_forward<return_type>::call(
+                        return ::stdex::detail::functional_std::_forward<return_type>::call(
                             fx(_arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value) );
                     }
 
@@ -617,7 +617,7 @@ namespace stdex
 
                         fx(_arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value);
                         return_type dummy;
-                        return functional_std::_forward<return_type>::call(dummy);
+                        return ::stdex::detail::functional_std::_forward<return_type>::call(dummy);
                     }
                 };
                 
