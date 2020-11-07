@@ -153,7 +153,7 @@ struct copy_counter{
     static std::size_t count;
 
     copy_counter(){}
-    copy_counter(const copy_counter& other)
+    copy_counter(const copy_counter&)
     {
         count++;
     }
@@ -166,10 +166,10 @@ int test03()
    
 
     struct lambdas{
-        static void func1(copy_counter &value)
+        static void func1(copy_counter&)
         { }
 
-        static void func2(const copy_counter& value)
+        static void func2(const copy_counter&)
         { }
     };
 
@@ -208,10 +208,10 @@ int test04()
 
 
     struct lambdas {
-        static void func1(int*, copy_counter& value)
+        static void func1(int*, copy_counter&)
         { }
 
-        static void func2(copy_counter& value, int*)
+        static void func2(copy_counter&, int*)
         { }
     };
 
