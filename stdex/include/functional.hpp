@@ -263,7 +263,7 @@ namespace stdex
             struct _forward_params<void>
             {
                 typedef void return_type;
-                typedef void arg_type;
+                typedef int arg_type;
             };
 
             template<class _Tp>
@@ -279,6 +279,8 @@ namespace stdex
 
                     return (ref);
                 }
+
+                static void call(...) {}
             };
         }
 
@@ -478,12 +480,28 @@ namespace stdex
                 struct _functor
                 {
                     typedef _R return_type;
+                    typedef return_type(&disable)();
 
-                    return_type operator()(_FuncT &fx) {
-                        using ::stdex::detail::functional_detail::operator,;
-                        ::stdex::detail::void_type dummy;
-                        return 
-                            (fx(), dummy);
+                    return_type operator()(
+                        typename 
+                        conditional<
+                            is_same<return_type, void_type>::value,
+                            disable,
+                            _FuncT &>::type fx) 
+                    {
+                        return functional_std::_forward<return_type>::call(fx());
+                    }
+
+                    return_type operator()(
+                        typename 
+                        conditional<
+                            is_same<return_type, void_type>::value,
+                            _FuncT &,
+                            disable>::type fx) 
+                    {
+                        fx();
+                        return_type dummy;
+                        return functional_std::_forward<return_type>::call(dummy);
                     }
                 }; 
                 _functor _f;
@@ -502,7 +520,7 @@ namespace stdex
                     typedef _ResArgsT base_type;
                     typedef _R return_type;
                     typedef _ArgT0 arg0_type;
-                    typedef return_type(&disable)(...);
+                    typedef return_type(&disable)(const arg0_type&);
 
                     _functor(const base_type &other) : base_type(other) {}
                     return_type operator()(
@@ -514,7 +532,8 @@ namespace stdex
                     {
                         using ::stdex::detail::_arg;
 
-                        return fx(_arg<arg0_type, 0>::value);
+                        return functional_std::_forward<return_type>::call(
+                            fx(_arg<arg0_type, 0>::value) );
                     }
 
                     return_type operator()(
@@ -528,7 +547,7 @@ namespace stdex
 
                         fx(_arg<arg0_type, 0>::value);
                         return_type dummy;
-                        return dummy;
+                        return functional_std::_forward<return_type>::call(dummy);
                     }
                 };
                 
@@ -541,7 +560,7 @@ namespace stdex
             {
                 _CheckedArgsT checked_args(functional_std::move(args));
                 return functional_std::_forward<_R>::call(
-                    func(fx, _get_arg<0>(checked_args), checked_args));
+                    func(fx, _get_arg<0>(checked_args), checked_args) );
             }
 
             template<class _RawArgsT>
@@ -565,7 +584,7 @@ namespace stdex
                     typedef _R return_type;
                     typedef _ArgT0 arg0_type;
                     typedef _ArgT1 arg1_type;
-                    typedef return_type(&disable)(...);
+                    typedef return_type(&disable)(const arg0_type&, const arg1_type&);
 
                     _functor(const base_type &other) : base_type(other) {}
                     return_type operator()(
@@ -577,7 +596,8 @@ namespace stdex
                     {
                         using ::stdex::detail::_arg;
 
-                        return fx(_arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value);
+                        return functional_std::_forward<return_type>::call(
+                            fx(_arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value) );
                     }
 
                     return_type operator()(
@@ -591,7 +611,7 @@ namespace stdex
 
                         fx(_arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value);
                         return_type dummy;
-                        return dummy;
+                        return functional_std::_forward<return_type>::call(dummy);
                     }
                 };
                 
@@ -693,14 +713,14 @@ namespace stdex
             _make_args_impl<void, _ArgT, 0, _arg_is_void<_ArgT>::value>
         { };
 
-        template<class func_base, class _FuncT, class return_type, class args_type>
+        template<class func_base, class _FuncT, class args_type>
         struct _functor :
             func_base
         {
             typedef _FuncT func_type;
-            typedef return_type function_return_type;
             typedef func_base function_func_base;
             typedef args_type function_args_type;
+            typedef typename func_base::_return_type function_return_type;
             typedef _functor type;
 
             _functor(func_type func) :
@@ -708,7 +728,7 @@ namespace stdex
 
             virtual function_func_base* _copy() const { return (new type(_func)); }
             virtual function_func_base* _move() _STDEX_NOEXCEPT_FUNCTION { return (new type(stdex::detail::functional_std::move(_func))); }
-            virtual return_type _co_call(function_args_type& args)
+            virtual function_return_type _co_call(function_args_type& args)
             {
                 typedef
                     stdex::detail::_func_invoker<function_return_type, func_type, 0, function_args_type::count>
@@ -717,7 +737,9 @@ namespace stdex
                     stdex::detail::_func_invoker<function_return_type, func_type, function_args_type::count, function_args_type::count>
                     func_invoker_without_null_checks;
 
-                return func_invoker_with_null_checks::call(_func, args);
+                return 
+                    functional_std::_forward<function_return_type>::call(
+                        func_invoker_with_null_checks::call(_func, args) );
             }
             virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION { delete this; }
             // dtor non-virtual due to _delete_this()
@@ -782,9 +804,17 @@ namespace stdex
             args args_type;
 
             struct func_base {
+                typedef 
+                typename 
+                conditional<
+                    is_void<_R>::value,
+                    void_type, 
+                    _R
+                >::type _return_type;
+
                 virtual func_base* _copy() const = 0;
                 virtual func_base* _move() _STDEX_NOEXCEPT_FUNCTION = 0;
-                virtual _R _co_call(args_type&) = 0;
+                virtual _return_type _co_call(args_type&) = 0;
                 virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION = 0;
 
                 func_base() {}
@@ -796,6 +826,7 @@ namespace stdex
 
         public:
             typedef _R return_type;
+
 
             function() _STDEX_NOEXCEPT_FUNCTION : _fx(nullptr)  {}
             function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : _fx(nullptr)  {}
@@ -813,10 +844,12 @@ namespace stdex
             template<class _FuncT>
             function(_FuncT func)
             {
-                _fx = new _functor<func_base, _FuncT, return_type, args_type>(stdex::detail::functional_std::move(func));
+                _fx = new _functor<func_base, _FuncT, args_type>(stdex::detail::functional_std::move(func));
             }
 
-            _R operator()(
+            typename
+            func_base::_return_type 
+                operator()(
                 _Arg0T  arg0  = void_type(),
                 _Arg1T  arg1  = void_type(),
                 _Arg2T  arg2  = void_type(),
@@ -873,7 +906,8 @@ namespace stdex
                     .template make< _Arg23T>(functional_std::_forward< _Arg23T>::call(arg23))
                     ;
 
-                return _fx->_co_call(move(args));
+                return functional_std::_forward<typename func_base::_return_type>::call(
+                    _fx->_co_call(move(args)) );
             }
 
         private:
@@ -942,7 +976,11 @@ namespace stdex
         template<class _FuncT>
         function(_FuncT func): base_type(func) { }
 
-        return_type operator()() { return base_type::operator()(); }
+        return_type operator()() { 
+            return 
+            detail::functional_std::_forward<return_type>::call(
+                base_type::operator()() ); 
+        }
     };
 
     template<class _R, class _Arg0T>
@@ -963,7 +1001,11 @@ namespace stdex
         template<class _FuncT>
         function(_FuncT func): base_type(func) { }
 
-        return_type operator()(_Arg0T arg0) { return base_type::operator()(arg0); }
+        return_type operator()(_Arg0T arg0) { 
+            return 
+            detail::functional_std::_forward<return_type>::call(
+                base_type::operator()(arg0) ); 
+        }
     };
 
     template<class _R, class _Arg0T, class _Arg1T>
@@ -986,7 +1028,11 @@ namespace stdex
         template<class _FuncT>
         function(_FuncT func): base_type(func) { }
 
-        return_type operator()(_Arg0T arg0, _Arg1T arg1) { return base_type::operator()(arg0, arg1); }
+        return_type operator()(_Arg0T arg0, _Arg1T arg1) { 
+            return 
+            detail::functional_std::_forward<return_type>::call(
+                base_type::operator()(arg0, arg1) ); 
+        }
     };
 
     // Hashing
