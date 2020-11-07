@@ -245,6 +245,39 @@ int test04()
     return 0;
 }
 
+int test05()
+{
+
+
+    struct lambdas {
+        static copy_counter func1(int*)
+        { }
+
+        static copy_counter func2()
+        { }
+    };
+
+    {
+        typedef stdex::function<copy_counter(*)(int*)> function;
+        function f(&lambdas::func1);
+        copy_counter cc;
+        cc.count = 0;
+        f(0);
+        DYNAMIC_VERIFY(cc.count == 1 ? true : (std::cout << cc.count << " != 0" << std::endl, false));
+    }
+
+    {
+        typedef stdex::function<copy_counter(*)()> function;
+        function f(&lambdas::func2);
+        copy_counter cc;
+        cc.count = 0;
+        f();
+        DYNAMIC_VERIFY(cc.count == 1 ? true : (std::cout << cc.count << " != 0" << std::endl, false));
+    }
+
+    return 0;
+}
+
 
 int main()
 {
@@ -253,6 +286,7 @@ int main()
     RUN_TEST(test02);
     RUN_TEST(test03);
     RUN_TEST(test04);
+    RUN_TEST(test05);
     RUN_TEST(np_tests::test01);
 
     const std::string::size_type big = 
