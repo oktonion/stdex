@@ -149,55 +149,69 @@ struct np_tests_impl<false>
 
 struct np_tests: np_tests_impl<> {};
 
-struct copy_counter{
-    static std::size_t count;
+struct operations_counter{
+    static std::size_t copy_count;
+    static std::size_t delete_count;
+    static std::size_t construct_count;
 
-    copy_counter(){}
-    copy_counter(const copy_counter&)
+    operations_counter() { 
+        construct_count++; 
+    }
+    operations_counter(const operations_counter&)
     {
-        count++;
+        construct_count++;
+        copy_count++;
+    }
+    ~operations_counter() { 
+        delete_count++; 
+    }
+
+    static void reset() {
+        copy_count = 0; delete_count = 0; construct_count = 0;
     }
 };
 
-std::size_t copy_counter::count = 0;
+std::size_t operations_counter::copy_count = 0;
+std::size_t operations_counter::delete_count = 0;
+std::size_t operations_counter::construct_count = 0;
 
 int test03()
 {
    
 
     struct lambdas{
-        static void func1(copy_counter&)
+        static void func1(operations_counter&)
         { }
 
-        static void func2(const copy_counter&)
+        static void func2(const operations_counter&)
         { }
     };
 
     {
-        typedef stdex::function<void(*)(copy_counter&)> function;
+        typedef stdex::function<void(*)(operations_counter&)> function;
         function f(&lambdas::func1);
-        copy_counter cc;
-        cc.count = 0;
+        operations_counter cc;
+        cc.reset();
         f(cc);
-        DYNAMIC_VERIFY(cc.count == 0 ? true : (std::cout << cc.count << " != 0" << std::endl, false));
+        DYNAMIC_VERIFY(cc.copy_count == 0 ? true : (std::cout << cc.copy_count << " != 0" << std::endl, false));
     }
 
     {
-        typedef stdex::function<void(*)(copy_counter)> function;
+        typedef stdex::function<void(*)(operations_counter)> function;
         function f(&lambdas::func1);
-        copy_counter cc;
-        cc.count = 0;
+        operations_counter cc;
+        cc.reset();
         f(cc);
-        DYNAMIC_VERIFY(cc.count == 1 ? true : (std::cout << cc.count << " != 1" << std::endl, false));
+        DYNAMIC_VERIFY(cc.copy_count == 1 ? true : (std::cout << cc.copy_count << " != 1" << std::endl, false));
     }
 
     {
-        typedef stdex::function<void(*)(copy_counter)> function;
+        typedef stdex::function<void(*)(operations_counter)> function;
         function f(&lambdas::func2);
-        copy_counter cc;
-        cc.count = 0;
+        operations_counter cc;
+        cc.reset();
         f(cc);
-        DYNAMIC_VERIFY(cc.count == 1 ? true : (std::cout << cc.count << " != 1" << std::endl, false));
+        DYNAMIC_VERIFY(cc.copy_count == 1 ? true : (std::cout << cc.copy_count << " != 1" << std::endl, false));
     }
 
     return 0;
@@ -208,38 +222,38 @@ int test04()
 
 
     struct lambdas {
-        static void func1(int*, copy_counter&)
+        static void func1(int*, operations_counter&)
         { }
 
-        static void func2(copy_counter&, int*)
+        static void func2(operations_counter&, int*)
         { }
     };
 
     {
-        typedef stdex::function<void(*)(int*, copy_counter&)> function;
+        typedef stdex::function<void(*)(int*, operations_counter&)> function;
         function f(&lambdas::func1);
-        copy_counter cc;
-        cc.count = 0;
+        operations_counter cc;
+        cc.reset();
         f(0, cc);
-        DYNAMIC_VERIFY(cc.count == 0 ? true : (std::cout << cc.count << " != 0" << std::endl, false));
+        DYNAMIC_VERIFY(cc.copy_count == 0 ? true : (std::cout << cc.copy_count << " != 0" << std::endl, false));
     }
 
     {
-        typedef stdex::function<void(*)(int*, copy_counter)> function;
+        typedef stdex::function<void(*)(int*, operations_counter)> function;
         function f(&lambdas::func1);
-        copy_counter cc;
-        cc.count = 0;
+        operations_counter cc;
+        cc.reset();
         f(0, cc);
-        DYNAMIC_VERIFY(cc.count == 1 ? true : (std::cout << cc.count << " != 1" << std::endl, false));
+        DYNAMIC_VERIFY(cc.copy_count == 1 ? true : (std::cout << cc.copy_count << " != 1" << std::endl, false));
     }
 
     {
-        typedef stdex::function<void(*)(copy_counter, int*)> function;
+        typedef stdex::function<void(*)(operations_counter, int*)> function;
         function f(&lambdas::func2);
-        copy_counter cc;
-        cc.count = 0;
+        operations_counter cc;
+        cc.reset();
         f(cc, 0);
-        DYNAMIC_VERIFY(cc.count == 1 ? true : (std::cout << cc.count << " != 1" << std::endl, false));
+        DYNAMIC_VERIFY(cc.copy_count == 1 ? true : (std::cout << cc.copy_count << " != 1" << std::endl, false));
     }
 
     return 0;
@@ -250,35 +264,54 @@ int test05()
 
 
     struct lambdas {
-        static copy_counter func1(int*)
+        static operations_counter func1(int*)
         { 
-            copy_counter value;
+            operations_counter value;
             return value;
         }
 
-        static copy_counter func2()
+        static operations_counter func2()
         { 
-            copy_counter value;
+            operations_counter value;
             return value;
+        }
+
+        static operations_counter* func3()
+        {
+            static operations_counter value;
+            value.construct_count--;
+            return &value;
         }
     };
 
     {
-        typedef stdex::function<copy_counter(*)(int*)> function;
+        typedef stdex::function<operations_counter(*)(int*)> function;
         function f(&lambdas::func1);
-        copy_counter cc;
-        cc.count = 0;
+        operations_counter cc;
+        cc.reset();
         f(0);
-        //DYNAMIC_VERIFY(cc.count == 2 ? true : (std::cout << cc.count << " != 2" << std::endl, false));
+        DYNAMIC_VERIFY(cc.construct_count == cc.delete_count ? true : (std::cout << cc.construct_count << " != " << cc.delete_count << std::endl, false));
+        DYNAMIC_VERIFY(cc.copy_count == 4 ? true : (std::cout << cc.copy_count << " != 4" << std::endl, false));
     }
 
     {
-        typedef stdex::function<copy_counter(*)()> function;
+        typedef stdex::function<operations_counter(*)()> function;
         function f(&lambdas::func2);
-        copy_counter cc;
-        cc.count = 0;
+        operations_counter cc;
+        cc.reset();
         f();
-        //DYNAMIC_VERIFY(cc.count == 2 ? true : (std::cout << cc.count << " != 2" << std::endl, false));
+        DYNAMIC_VERIFY(cc.construct_count == cc.delete_count ? true : (std::cout << cc.construct_count << " != " << cc.delete_count << std::endl, false));
+        DYNAMIC_VERIFY(cc.copy_count == 4 ? true : (std::cout << cc.copy_count << " != 4" << std::endl, false));
+    }
+
+    {
+        typedef stdex::function<operations_counter*(*)()> function;
+        function f(&lambdas::func3);
+        operations_counter cc;
+        cc.reset();
+        f();
+        DYNAMIC_VERIFY(cc.construct_count == cc.delete_count ? true : (std::cout << cc.construct_count << " != " << cc.delete_count << std::endl, false));
+        DYNAMIC_VERIFY(cc.copy_count == 0 ? true : (std::cout << cc.copy_count << " != 0" << std::endl, false));
     }
 
     return 0;
