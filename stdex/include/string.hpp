@@ -157,7 +157,7 @@ namespace stdex
             struct _has_4arg_swprintf
             {
                 static const bool value = 
-                    sizeof(_has_4arg_swprintf_tester(swprintf(_declptr<wchar_t>(), 0, _declptr<wchar_t>(), 0 ))) == sizeof(_yes_type);
+                    sizeof(_has_4arg_swprintf_tester(swprintf(_declptr<wchar_t>(), 42, _declptr<wchar_t>(), 0 ))) == sizeof(_yes_type);
             };
         }
 
