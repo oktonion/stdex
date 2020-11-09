@@ -370,16 +370,16 @@ namespace stdex
         template<class _R>
         struct _return_arg
         {
-            _R* ptr;
+            _R* _ptr;
 
-            _return_arg(const _R& ref) :ptr( new _R(ref)) {}
-            _return_arg(_R* ptr_) :ptr(ptr_) {}
-            void swap(_return_arg& other) { using std::swap; swap(ptr, other.ptr); }
-            ~_return_arg() { delete ptr; }
-            _return_arg(_return_arg& other): ptr(0) { swap(other); }
+            _return_arg(const _R& ref) :_ptr( new _R(ref)) {}
+            _return_arg(_R* ptr_) :_ptr(ptr_) {}
+            void swap(_return_arg& other) { using std::swap; swap(_ptr, other._ptr); }
+            ~_return_arg() { delete _ptr; }
+            _return_arg(_return_arg& other): _ptr(0) { swap(other); }
 
-            _R* release() { _R* tmp = ptr; ptr = 0; return tmp; }
-            _R& get() { return *ptr; }
+            _R* release() { _R* tmp = _ptr; _ptr = 0; return tmp; }
+            _R& get() { return *_ptr; }
 
         private:
             _return_arg(const _return_arg&) _STDEX_DELETED_FUNCTION;
@@ -388,11 +388,11 @@ namespace stdex
         template<class _R>
         struct _return_arg<_R*>
         {
-            _R* ptr;
+            _R* _ptr;
 
-            _return_arg(_R* ptr_) :ptr(ptr_) {}
+            _return_arg(_R* ptr_) :_ptr(ptr_) {}
 
-            _R* release() { return ptr; }
+            _R* release() { return _ptr; }
             _R* get() { return release(); }
 
         private:
@@ -402,7 +402,7 @@ namespace stdex
         template<>
         struct _return_arg<void>
         {
-            _return_arg() {}
+            _return_arg(...) {}
             _return_arg(void_type) {}
 
             void_type release() { void_type dummy;  return dummy; }
@@ -415,7 +415,7 @@ namespace stdex
         template<>
         struct _return_arg<void_type>
         {
-            _return_arg() {}
+            _return_arg(...) {}
             _return_arg(void_type) {}
 
             void_type release() { void_type dummy;  return dummy; }
@@ -522,7 +522,7 @@ namespace stdex
                     _R, _FuncT, _Index, _Count,
                     is_null_pointer<typename remove_reference<arg_type>::type>::value == bool(true)
                     && intern::_has_feature<intern::_stdex_has_native_nullptr>::value == bool(false)
-                >::call(fx, args, checked_args).release() ;
+                >::call(fx, args, checked_args).release();
             }
         };
 
@@ -560,17 +560,20 @@ namespace stdex
                     typename 
                     conditional<_arg_is_void<return_type>::value, _FuncT&, disable>::type func_noreturn_type;
 
-                    _return_arg<return_type> operator()(func_return_type& fx)
+                    _return_arg<return_type> operator()(func_return_type fx)
                     {
+                        using ::stdex::detail::_return_arg;
                         return 
                         _return_arg<return_type>(
                             ::stdex::detail::functional_std::_forward<return_type>::call(fx()) ).release();
                     }
 
-                    _return_arg<void> operator()(func_noreturn_type& fx)
+                    _return_arg<return_type> operator()(func_noreturn_type fx)
                     {
+                        using ::stdex::detail::_return_arg;
                         fx();
-                        return  _return_arg<void>().release();
+                        _return_arg<return_type> result(0);
+                        return  result.release();
                     }
                 }; 
                 _functor _f;
@@ -606,9 +609,10 @@ namespace stdex
                     conditional<_arg_is_void<return_type>::value, _FuncT&, disable>::type func_noreturn_type;
 
                     _functor(const base_type &other) : base_type(other) {}
-                    _return_arg<return_type> operator()(func_return_type& fx)
+                    _return_arg<return_type> operator()(func_return_type fx)
                     {
                         using ::stdex::detail::_arg;
+                        using ::stdex::detail::_return_arg;
 
                         return 
                         _return_arg<return_type>(
@@ -617,12 +621,14 @@ namespace stdex
                         ).release();
                     }
 
-                    _return_arg<void> operator()(func_noreturn_type& fx)
+                    _return_arg<return_type> operator()(func_noreturn_type fx)
                     {
                         using ::stdex::detail::_arg;
+                        using ::stdex::detail::_return_arg;
 
                         fx(_arg<arg0_type, 0>::value);
-                        return  _return_arg<void>().release();
+                        _return_arg<return_type> result(0);
+                        return  result.release();
                     }
                 };
                 
@@ -668,9 +674,10 @@ namespace stdex
                     conditional<_arg_is_void<return_type>::value, _FuncT&, disable>::type func_noreturn_type;
 
                     _functor(const base_type &other) : base_type(other) {}
-                    _return_arg<return_type> operator()(func_return_type& fx)
+                    _return_arg<return_type> operator()(func_return_type fx)
                     {
                         using ::stdex::detail::_arg;
+                        using ::stdex::detail::_return_arg;
 
                         return 
                         _return_arg<return_type>(
@@ -679,12 +686,14 @@ namespace stdex
                         ).release();
                     }
 
-                    _return_arg<void> operator()(func_noreturn_type& fx)
+                    _return_arg<return_type> operator()(func_noreturn_type fx)
                     {
                         using ::stdex::detail::_arg;
+                        using ::stdex::detail::_return_arg;
 
                         fx(_arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value);
-                        return  _return_arg<void>().release();
+                        _return_arg<return_type> result(0);
+                        return  result.release();
                     }
                 };
                 
