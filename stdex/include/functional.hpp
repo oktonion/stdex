@@ -857,7 +857,7 @@ namespace stdex
             class _Arg22T = void_type,
             class _Arg23T = void_type // up to 24 args
         >
-        class function
+        class _function_impl
         {
             typedef
                 typename _make_args< _Arg0T >::type::
@@ -884,9 +884,9 @@ namespace stdex
                 template add       < _Arg21T>::type::
                 template add       < _Arg22T>::type::
                 template add       < _Arg23T>::type::
-            args args_type;
+            args _args_type;
 
-            struct func_base {
+            struct _func_base {
                 typedef 
                 typename 
                 conditional<
@@ -895,26 +895,26 @@ namespace stdex
                     _R
                 >::type _return_type;
 
-                virtual func_base* _copy() const = 0;
-                virtual func_base* _move() _STDEX_NOEXCEPT_FUNCTION = 0;
-                virtual _return_arg<_return_type> _co_call(args_type&) = 0;
+                virtual _func_base* _copy() const = 0;
+                virtual _func_base* _move() _STDEX_NOEXCEPT_FUNCTION = 0;
+                virtual _return_arg<_return_type> _co_call(_args_type&) = 0;
                 virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION = 0;
 
-                func_base() {}
-                virtual ~func_base() {}
+                _func_base() {}
+                virtual ~_func_base() {}
             private:
-                func_base(const func_base&) _STDEX_DELETED_FUNCTION;
-                func_base& operator=(const func_base&) _STDEX_DELETED_FUNCTION;
+                _func_base(const _func_base&) _STDEX_DELETED_FUNCTION;
+                _func_base& operator=(const _func_base&) _STDEX_DELETED_FUNCTION;
             };
 
         public:
             typedef _R return_type;
 
 
-            function() _STDEX_NOEXCEPT_FUNCTION : _fx(nullptr)  {}
-            function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : _fx(nullptr)  {}
+            _function_impl() _STDEX_NOEXCEPT_FUNCTION : _fx(nullptr)  {}
+            _function_impl(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : _fx(nullptr)  {}
 
-            function(const function& other) :
+            _function_impl(const _function_impl& other) :
                 _fx(nullptr)
             { 
                 if (!other._fx)
@@ -925,9 +925,14 @@ namespace stdex
 
 
             template<class _FuncT>
-            function(_FuncT func)
+            _function_impl(_FuncT func)
             {
-                _fx = new _functor<func_base, _FuncT, args_type>(stdex::detail::functional_std::move(func));
+                _fx = new _functor<_func_base, _FuncT, _args_type>(stdex::detail::functional_std::move(func));
+            }
+
+            ~_function_impl()
+            {
+                delete _fx;
             }
 
             _return_arg<return_type>
@@ -961,7 +966,7 @@ namespace stdex
 
                 using stdex::detail::functional_std::move;
 
-                args_type args = 
+                _args_type args =
                     args_x1(functional_std::_forward< _Arg0T >::call(arg0))
                     .template make< _Arg1T >(functional_std::_forward< _Arg1T >::call(arg1))
                     .template make< _Arg2T >(functional_std::_forward< _Arg2T >::call(arg2))
@@ -995,7 +1000,7 @@ namespace stdex
         private:
 
 
-            func_base* _fx;
+            _func_base* _fx;
         };
 
     } // namespace detail
@@ -1043,9 +1048,9 @@ namespace stdex
 
     template<class _R>
     class function<_R(*)()>:
-        detail::function<_R>
+        detail::_function_impl<_R>
     {
-        typedef detail::function<_R> base_type;
+        typedef detail::_function_impl<_R> base_type;
     public:
         typedef typename base_type::return_type return_type;
 
@@ -1067,9 +1072,9 @@ namespace stdex
 
     template<class _R, class _Arg0T>
     class function<_R(*)(_Arg0T)>:
-        detail::function<_R, typename remove_reference<_Arg0T>::type&>
+        detail::_function_impl<_R, typename remove_reference<_Arg0T>::type&>
     {
-        typedef detail::function<_R, typename remove_reference<_Arg0T>::type&> base_type;
+        typedef detail::_function_impl<_R, typename remove_reference<_Arg0T>::type&> base_type;
     public:
         typedef typename base_type::return_type return_type;
 
@@ -1092,10 +1097,10 @@ namespace stdex
 
     template<class _R, class _Arg0T, class _Arg1T>
     class function<_R(*)(_Arg0T, _Arg1T)>:
-        detail::function<_R, 
+        detail::_function_impl<_R,
             typename remove_reference<_Arg0T>::type&, typename remove_reference<_Arg1T>::type&>
     {
-        typedef detail::function<_R, 
+        typedef detail::_function_impl<_R,
             typename remove_reference<_Arg0T>::type&, typename remove_reference<_Arg1T>::type&> base_type;
     public:
         typedef typename base_type::return_type return_type;
