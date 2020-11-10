@@ -373,13 +373,13 @@ namespace stdex
         {
             _R* _ptr;
 
-            _return_arg(const _R& ref) :_ptr( new _R(ref)) {}
+            _return_arg(const _R& ref_) :_ptr( new _R(ref_)) {}
             _return_arg(_R* ptr_) :_ptr(ptr_) {}
             void swap(_return_arg& other) { using std::swap; swap(_ptr, other._ptr); }
             ~_return_arg() { delete _ptr; }
             _return_arg(_return_arg& other): _ptr(0) { swap(other); }
 
-            _R* release() { _R* tmp = _ptr; _ptr = 0; return tmp; }
+            _R* release() { _R* _tmp = _ptr; _ptr = 0; return _tmp; }
             _R& get() { return *_ptr; }
 
             _return_arg(const _return_arg& other):
@@ -1995,6 +1995,14 @@ _STDEX_INVOKE(31)
 #undef     _STDEX_TYPES31
 #undef    _STDEX_PARAMS31
 #undef      _STDEX_ARGS31
+
+#undef _STDEX_TMPL_ARGS
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
+#undef _STDEX_PARAMS
+
+#undef _STDEX_INVOKE 
+#undef _STDEX_INVOKE_IMPL
 
 #undef _STDEX_DELETED_FUNCTION
 #undef _STDEX_NOEXCEPT_FUNCTION
