@@ -297,7 +297,7 @@ int test05()
         cc.reset();
         f(0);
         DYNAMIC_VERIFY(cc.construct_count == cc.delete_count ? true : (std::cout << cc.construct_count << " != " << cc.delete_count << std::endl, false));
-        DYNAMIC_VERIFY(cc.copy_count == 4 ? true : (std::cout << cc.copy_count << " != 4" << std::endl, false));
+        DYNAMIC_VERIFY(cc.copy_count <= 4 ? true : (std::cout << cc.copy_count << " > 4" << std::endl, false));
     }
 
     {
@@ -307,7 +307,7 @@ int test05()
         cc.reset();
         f();
         DYNAMIC_VERIFY(cc.construct_count == cc.delete_count ? true : (std::cout << cc.construct_count << " != " << cc.delete_count << std::endl, false));
-        DYNAMIC_VERIFY(cc.copy_count == 4 ? true : (std::cout << cc.copy_count << " != 4" << std::endl, false));
+        DYNAMIC_VERIFY(cc.copy_count <= 4 ? true : (std::cout << cc.copy_count << " > 4" << std::endl, false));
     }
 
     {
