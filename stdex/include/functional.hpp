@@ -414,8 +414,9 @@ namespace stdex
         template<>
         struct _return_arg<void>
         {
-            _return_arg(...) {}
+            _return_arg(void*) {}
             _return_arg(void_type) {}
+            _return_arg(const _return_arg<void_type>&) {}
 
             void_type release() { void_type dummy;  return dummy; }
             void_type get() { return release(); }
@@ -427,8 +428,9 @@ namespace stdex
         template<>
         struct _return_arg<void_type>
         {
-            _return_arg(...) {}
+            _return_arg(void*) {}
             _return_arg(void_type) {}
+            _return_arg(const _return_arg<void>&) {}
 
             void_type release() { void_type dummy;  return dummy; }
             void_type get() { return release(); }
