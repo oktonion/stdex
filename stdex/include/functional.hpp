@@ -387,7 +387,6 @@ namespace stdex
             { 
                 using std::swap;
                 swap(other._ptr, _ptr);
-                return *this;
             }
 
             _return_arg& operator=(const _return_arg& other)
