@@ -112,6 +112,8 @@ matrix:
       - BUILD_LIB_SCRIPT="./build_lib.sh"
       - BUILD_SCRIPT="./build_tests.sh"
       - RUN_SCRIPT="./run_tests.sh"
+      ignore:
+      - "*/tests/*"  # ignore folders and all its contents
       before_install: 
       - sudo pip install codecov
       after_success:
