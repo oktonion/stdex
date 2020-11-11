@@ -385,6 +385,12 @@ namespace stdex
             _return_arg(const _return_arg& other):
                 _ptr(const_cast<_return_arg&>(other).release())
             { }
+
+            _return_arg& operator=(const _return_arg& other)
+            {
+                swap(const_cast<_return_arg&>(other));
+                return *this;
+            }
         };
 
         template<class _R>
@@ -435,7 +441,7 @@ namespace stdex
                 const _CheckedArgsT &checked_args)
             {
                 typedef _func_invoker_impl<_R, _FuncT, _Index + 1, _Count> func_invoker;
-                return func_invoker::call(fx, args, checked_args).release();
+                return func_invoker::call(fx, args, checked_args);
             }
         };
 
@@ -449,7 +455,7 @@ namespace stdex
                     typedef _args<_CheckedArgsT, _nullptr_place_holder, _Index> checked_args_t;
                     typedef _func_invoker_impl<_R, _FuncT, _Index + 1, _Count> func_invoker;
 
-                    return func_invoker::call(fx, args, _checked_args<checked_args_t>()).release();
+                    return func_invoker::call(fx, args, _checked_args<checked_args_t>());
             }
 
             template<class _RawArgsT>
@@ -462,7 +468,7 @@ namespace stdex
                 typedef _args<args_type, _nullptr_place_holder, _Index> checked_args_t;
                 typedef _func_invoker_impl<_R, _FuncT, _Index + 1, _Count> func_invoker;
 
-                return func_invoker::call(fx, args, _checked_args<checked_args_t>()).release();
+                return func_invoker::call(fx, args, _checked_args<checked_args_t>());
             }
         };
 
@@ -476,7 +482,7 @@ namespace stdex
                     _R, _FuncT, _Index, _Count,
                     intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value == bool(true)
                 > helper;
-                return helper::call(fx, args, checked_args).release();
+                return helper::call(fx, args, checked_args);
             }
         };
 
@@ -496,13 +502,13 @@ namespace stdex
 
                 typedef _args<_CheckedArgsT, arg_type, _Index> checked_args_t;
 
-                return func_invoker::call(fx, args, _checked_args<checked_args_t>()).release();
+                return func_invoker::call(fx, args, _checked_args<checked_args_t>());
             }
 
             template<class _RawArgsT>
             static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_RawArgsT>& checked_args)
             {
-                return func_invoker::call(fx, args, checked_args).release();
+                return func_invoker::call(fx, args, checked_args);
             }
         };
 
@@ -524,7 +530,7 @@ namespace stdex
                     _R, _FuncT, _Index, _Count,
                     is_null_pointer<typename remove_reference<arg_type>::type>::value == bool(true)
                     && intern::_has_feature<intern::_stdex_has_native_nullptr>::value == bool(false)
-                >::call(fx, args, checked_args).release();
+                >::call(fx, args, checked_args);
             }
         };
 
@@ -537,7 +543,7 @@ namespace stdex
             template<class _RawArgsT, class _CheckedArgsT>
             static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>& checked_args)
             {
-                return null_checker::call(fx, args, checked_args).release();
+                return null_checker::call(fx, args, checked_args);
             }
         };
 
@@ -567,7 +573,7 @@ namespace stdex
                         using ::stdex::detail::_return_arg;
                         return 
                         _return_arg<return_type>(
-                            ::stdex::detail::functional_std::_forward<return_type>::call(fx()) ).release();
+                            ::stdex::detail::functional_std::_forward<return_type>::call(fx()) );
                     }
 
                     _return_arg<return_type> operator()(func_noreturn_type fx)
@@ -575,11 +581,11 @@ namespace stdex
                         using ::stdex::detail::_return_arg;
                         fx();
                         _return_arg<return_type> result = 0;
-                        return  result.release();
+                        return  result;
                     }
                 }; 
                 _functor _f;
-                return _f(fx).release();
+                return _f(fx);
             }
         };
 
@@ -620,7 +626,7 @@ namespace stdex
                         _return_arg<return_type>(
                             ::stdex::detail::functional_std::_forward<return_type>::call(
                                 fx(_arg<arg0_type, 0>::value) ) 
-                        ).release();
+                        );
                     }
 
                     _return_arg<return_type> operator()(func_noreturn_type fx)
@@ -630,25 +636,25 @@ namespace stdex
 
                         fx(_arg<arg0_type, 0>::value);
                         _return_arg<return_type> result = 0;
-                        return  result.release();
+                        return  result;
                     }
                 };
                 
                 _functor _f = res;
-                return _f(fx).release();
+                return _f(fx);
             }
             
             template<class _RawArgsT, class _CheckedArgsT>
             static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>&)
             {
                 _CheckedArgsT checked_args(functional_std::move(args));
-                return func(fx, _get_arg<0>(checked_args), checked_args).release();
+                return func(fx, _get_arg<0>(checked_args), checked_args);
             }
 
             template<class _RawArgsT>
             static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_RawArgsT>&)
             {
-                return func(fx, _get_arg<0>(args), args).release();
+                return func(fx, _get_arg<0>(args), args);
             }
         };
 
@@ -685,7 +691,7 @@ namespace stdex
                         _return_arg<return_type>(
                             ::stdex::detail::functional_std::_forward<return_type>::call(
                                 fx(_arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value) )
-                        ).release();
+                        );
                     }
 
                     _return_arg<return_type> operator()(func_noreturn_type fx)
@@ -695,12 +701,12 @@ namespace stdex
 
                         fx(_arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value);
                         _return_arg<return_type> result = 0;
-                        return  result.release();
+                        return  result;
                     }
                 };
                 
                 _functor _f = res;
-                return _f(fx).release();
+                return _f(fx);
             }
             
             template<class _RawArgsT, class _CheckedArgsT>
@@ -708,14 +714,14 @@ namespace stdex
             {
                 _CheckedArgsT checked_args(functional_std::move(args));
                 return 
-                    func(fx, _get_arg<0>(checked_args), _get_arg<1>(checked_args), checked_args).release();
+                    func(fx, _get_arg<0>(checked_args), _get_arg<1>(checked_args), checked_args);
             }
 
             template<class _RawArgsT>
             static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_RawArgsT>&)
             {
                 return 
-                    func(fx, _get_arg<0>(args), _get_arg<1>(args), args).release();
+                    func(fx, _get_arg<0>(args), _get_arg<1>(args), args);
             }
         };
 
@@ -726,7 +732,7 @@ namespace stdex
             static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args)
             {
                 return 
-                    _func_invoker_impl<_R, _FuncT, _Index, _Count>::call(fx, args, _checked_args<_RawArgsT>()).release();
+                    _func_invoker_impl<_R, _FuncT, _Index, _Count>::call(fx, args, _checked_args<_RawArgsT>());
             }
         };
 
@@ -828,7 +834,7 @@ namespace stdex
             virtual _return_arg<function_return_type> _co_call(function_args_type& args)
             {
                 _return_arg<function_return_type> result = 0;
-                return _invoke(_func, args, result).release();
+                return _invoke(_func, args, result);
             }
             virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION { delete this; }
             // dtor non-virtual due to _delete_this()
@@ -1003,7 +1009,7 @@ namespace stdex
                     ;
 
                 return 
-                    _fx->_co_call(move(args)).release();
+                    _fx->_co_call(move(args));
             }
 
         private:
