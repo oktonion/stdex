@@ -371,7 +371,7 @@ namespace stdex
         template<class _R>
         struct _return_arg
         {
-            volatile _R* _ptr;
+            mutable _R* _ptr;
 
             _return_arg(const _R& ref_) :_ptr( new _R(ref_)) {}
             _return_arg(_R* ptr_) :_ptr(ptr_) {}
