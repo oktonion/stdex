@@ -371,7 +371,7 @@ namespace stdex
         template<class _R>
         struct _return_arg
         {
-            _R* _ptr;
+            volatile _R* _ptr;
 
             _return_arg(const _R& ref_) :_ptr( new _R(ref_)) {}
             _return_arg(_R* ptr_) :_ptr(ptr_) {}
@@ -383,12 +383,17 @@ namespace stdex
             _R& get() { return *_ptr; }
 
             _return_arg(const _return_arg& other):
-                _ptr(const_cast<_return_arg&>(other).release())
-            { }
+                _ptr(0)
+            { 
+                using std::swap;
+                swap(other._ptr, _ptr);
+                return *this;
+            }
 
             _return_arg& operator=(const _return_arg& other)
             {
-                swap(const_cast<_return_arg&>(other));
+                using std::swap;
+                swap(other._ptr, _ptr);
                 return *this;
             }
         };
