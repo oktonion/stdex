@@ -731,17 +731,18 @@ namespace stdex
         };
 
         template<class _R, class _FuncT, class _ArgsT>
-        _R& _invoke(const _FuncT& fx, const _ArgsT& args, _R &result)
+        _return_arg<_R>& _invoke(_FuncT& fx, _ArgsT& args, _return_arg<_R> &result)
         {
-            result = functional_std::_forward<_R>::call(
-                _func_invoker<_R, const _FuncT, 0, _ArgsT::count>::call(fx, args) );
+            result = 
+                _func_invoker<_R, _FuncT, 0, _ArgsT::count>::call(fx, args).release();
             return result;
         }
 
         template<class _FuncT, class _ArgsT>
-        void _invoke(const _FuncT& fx, const _ArgsT& args, void_type)
+        _return_arg<void>& _invoke(_FuncT& fx, _ArgsT& args, _return_arg<void> &result)
         {
-            _func_invoker<void, const _FuncT, 0, _ArgsT::count>::call(fx, args);
+            _func_invoker<void, _FuncT, 0, _ArgsT::count>::call(fx, args);
+            return result;
         }
     } // namespace detail
 
@@ -826,15 +827,8 @@ namespace stdex
             virtual function_func_base* _move() _STDEX_NOEXCEPT_FUNCTION { return (new type(stdex::detail::functional_std::move(_func))); }
             virtual _return_arg<function_return_type> _co_call(function_args_type& args)
             {
-                typedef
-                    stdex::detail::_func_invoker<function_return_type, func_type, 0, function_args_type::count>
-                    func_invoker_with_null_checks;
-                typedef
-                    stdex::detail::_func_invoker<function_return_type, func_type, function_args_type::count, function_args_type::count>
-                    func_invoker_without_null_checks;
-
-                return 
-                    func_invoker_with_null_checks::call(_func, args).release();
+                _return_arg<function_return_type> result = 0;
+                return _invoke(_func, args, result);
             }
             virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION { delete this; }
             // dtor non-virtual due to _delete_this()
@@ -1095,7 +1089,13 @@ namespace stdex
         detail::functional_std::_forward<_R>::call(\
             _func(_STDEX_ARGS##N) );\
     }\
-
+\
+    template<class _FuncT _STDEX_TMPL_ARGS##N>\
+    void invoke(_FuncT &_func _STDEX_PARAMS##N)\
+    {\
+        detail::functional_std::_forward<void>::call(\
+            _func(_STDEX_ARGS##N) );\
+    }\
 
     namespace detail
     {
