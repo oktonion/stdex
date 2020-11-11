@@ -745,8 +745,9 @@ namespace stdex
         template<class _R, class _FuncT, class _ArgsT>
         _return_arg<_R>& _invoke(_FuncT& fx, _ArgsT& args, _return_arg<_R> &result)
         {
+            typedef _func_invoker<_R, _FuncT, 0, _ArgsT::count> invoker;
             result = 
-                _func_invoker<_R, _FuncT, 0, _ArgsT::count>::call(fx, args).release();
+                invoker::call(fx, args).release();
             return result;
         }
 
