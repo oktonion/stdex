@@ -828,7 +828,7 @@ namespace stdex
             virtual _return_arg<function_return_type> _co_call(function_args_type& args)
             {
                 _return_arg<function_return_type> result = 0;
-                return _invoke(_func, args, result);
+                return _invoke(_func, args, result).release();
             }
             virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION { delete this; }
             // dtor non-virtual due to _delete_this()
