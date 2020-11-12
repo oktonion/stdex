@@ -601,10 +601,9 @@ namespace stdex
             _any_type(const _Tp&) {}
         };
 
-        template<class _R, class _FuncT>
-        struct _func_invoker_impl<_R, _FuncT, 1, 1>
+        namespace func_invoker_calls
         {
-            template<class _ArgT0, class _ResArgsT>
+            template<class _R, class _FuncT, class _ArgT0, class _ResArgsT>
             static _return_arg<_R> func(_FuncT &fx, _arg<_ArgT0, 0>&, _ResArgsT &res)
             {
                 struct _functor: _ResArgsT
@@ -649,26 +648,8 @@ namespace stdex
                 _functor _f = res;
                 return _f(fx);
             }
-            
-            template<class _RawArgsT, class _CheckedArgsT>
-            static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>&)
-            {
-                _CheckedArgsT checked_args(functional_std::move(args));
-                return func(fx, _get_arg<0>(checked_args), checked_args);
-            }
 
-            template<class _RawArgsT>
-            static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_RawArgsT>&)
-            {
-                return func(fx, _get_arg<0>(args), args);
-            }
-        };
-
-
-        template<class _R, class _FuncT>
-        struct _func_invoker_impl<_R, _FuncT, 2, 2>
-        {
-            template<class _ArgT0, class _ArgT1, class _ResArgsT>
+            template<class _R, class _FuncT, class _ArgT0, class _ArgT1, class _ResArgsT>
             static _return_arg<_R> func(_FuncT &fx, _arg<_ArgT0, 0>&, _arg<_ArgT1, 1>&, _ResArgsT &res)
             {
                 struct _functor: _ResArgsT
@@ -714,20 +695,44 @@ namespace stdex
                 _functor _f = res;
                 return _f(fx);
             }
+        }
+
+        template<class _R, class _FuncT>
+        struct _func_invoker_impl<_R, _FuncT, 1, 1>
+        {
+            template<class _RawArgsT, class _CheckedArgsT>
+            static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>&)
+            {
+                _CheckedArgsT checked_args(functional_std::move(args));
+                return func_invoker_calls::func<_R>(fx, _get_arg<0>(checked_args), checked_args);
+            }
+
+            template<class _RawArgsT>
+            static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_RawArgsT>&)
+            {
+                return func_invoker_calls::func<_R>(fx, _get_arg<0>(args), args);
+            }
+        };
+
+
+        template<class _R, class _FuncT>
+        struct _func_invoker_impl<_R, _FuncT, 2, 2>
+        {
+
             
             template<class _RawArgsT, class _CheckedArgsT>
             static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>&)
             {
                 _CheckedArgsT checked_args(functional_std::move(args));
                 return 
-                    func(fx, _get_arg<0>(checked_args), _get_arg<1>(checked_args), checked_args);
+                    func_invoker_calls::func<_R>(fx, _get_arg<0>(checked_args), _get_arg<1>(checked_args), checked_args);
             }
 
             template<class _RawArgsT>
             static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_RawArgsT>&)
             {
                 return 
-                    func(fx, _get_arg<0>(args), _get_arg<1>(args), args);
+                    func_invoker_calls::func<_R>(fx, _get_arg<0>(args), _get_arg<1>(args), args);
             }
         };
 
