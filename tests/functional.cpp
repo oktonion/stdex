@@ -318,9 +318,8 @@ int test05()
         f();
         DYNAMIC_VERIFY(cc.construct_count == cc.delete_count ? true : (std::cout << cc.construct_count << " != " << cc.delete_count << std::endl, false));
         DYNAMIC_VERIFY(cc.copy_count == 0 ? true : (std::cout << cc.copy_count << " != 0" << std::endl, false));
-        
-        int* ptr = 0;
-        stdex::invoke(&lambdas::func4, ptr);
+
+        DYNAMIC_VERIFY(f.target< operations_counter* ()>() == &lambdas::func3);
     }
 
     
