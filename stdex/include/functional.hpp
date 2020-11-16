@@ -19,6 +19,7 @@
 #include <vector> // for hash
 #include <algorithm>
 #include <exception>
+#include <typeinfo> // for function::target_type()
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
@@ -850,7 +851,42 @@ namespace stdex
                 return _invoke(_func, args, result);
             }
             virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION { delete this; }
-            // dtor non-virtual due to _delete_this()
+
+            static std::size_t func_ptr_copy(void* &_dst,
+                typename
+                conditional<
+                    is_pointer<func_type>::value,
+                    func_type,
+                    _dummy>::type _src)
+            {
+                func_type* _ptr_to_ptr = new func_type();
+                (*_ptr_to_ptr) = _src;
+                _dst = _ptr_to_ptr;
+                return sizeof(func_type);
+            }
+
+            static std::size_t func_ptr_copy(void* &_dst,
+                typename
+                conditional<
+                    is_pointer<func_type>::value,
+                    _dummy,
+                    func_type&>::type _src)
+            {
+                func_type** _ptr_to_ptr = new func_type*();
+                (*_ptr_to_ptr) = &_src;
+                _dst = _ptr_to_ptr;
+                return sizeof(func_type);
+            }
+
+            virtual std::size_t _target(void* &_dst) const _STDEX_NOEXCEPT_FUNCTION
+            {
+                return func_ptr_copy(_dst, _func);
+            }
+
+            virtual const std::type_info& _target_type() const _STDEX_NOEXCEPT_FUNCTION
+            {
+                return typeid(typename remove_pointer<func_type>::type);
+            }
 
             func_type _func;
         };
@@ -924,6 +960,8 @@ namespace stdex
                 virtual _func_base* _move() _STDEX_NOEXCEPT_FUNCTION = 0;
                 virtual _return_arg<_return_type> _co_call(_args_type&) = 0;
                 virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION = 0;
+                virtual std::size_t _target(void*&) const _STDEX_NOEXCEPT_FUNCTION = 0;
+                virtual const std::type_info& _target_type() const _STDEX_NOEXCEPT_FUNCTION = 0;
 
                 _func_base() {}
                 virtual ~_func_base() {}
@@ -932,7 +970,7 @@ namespace stdex
                 _func_base& operator=(const _func_base&) _STDEX_DELETED_FUNCTION;
             };
 
-        public:
+        protected:
             typedef _R return_type;
 
 
@@ -1023,6 +1061,43 @@ namespace stdex
 
                 return 
                     _fx->_co_call(move(args));
+            }
+
+            void swap(_function_impl& other) _STDEX_NOEXCEPT_FUNCTION
+            {
+                using std::swap;
+                swap(_fx, other._fx);
+            }
+
+            operator bool() const _STDEX_NOEXCEPT_FUNCTION
+            {
+                return _fx != nullptr;
+            }
+
+            const std::type_info& target_type() const _STDEX_NOEXCEPT_FUNCTION
+            {
+                if(_fx)
+                    return _fx->_target_type();
+                return typeid(void);
+            }
+
+            template<class _FuncT>
+            _FuncT* target() _STDEX_NOEXCEPT_FUNCTION
+            {
+                if (_fx && typeid(_FuncT) == target_type())
+                {
+                    void* _ptr_to_ptr = nullptr;
+                    std::size_t _size = _fx->_target(_ptr_to_ptr);
+
+                    if (_ptr_to_ptr && _size == sizeof(_FuncT*))
+                    {
+                        _FuncT *_result = *static_cast<_FuncT**>(_ptr_to_ptr);
+                        
+                        return _result;
+                    }
+                }
+
+                return nullptr;
             }
 
         private:
@@ -1345,6 +1420,7 @@ _STDEX_INVOKE(30)
 #define _STDEX_ARGS31 _STDEX_ARGS30 _STDEX_ARGS(31)
 _STDEX_INVOKE(31)
 
+    
 
 
     template<class _FuncSignatureT>
@@ -1364,7 +1440,32 @@ _STDEX_INVOKE(31)
         template<class _FuncT>
         function(_FuncT func) : base_type(func) { }
 
-        //using base_type::operator();
+        void swap(function& other) _STDEX_NOEXCEPT_FUNCTION
+        {
+            base_type::swap(other);
+        }
+
+        operator bool() const _STDEX_NOEXCEPT_FUNCTION
+        {
+            return static_cast<const base_type&>(*this);
+        }
+
+        const std::type_info& target_type() const _STDEX_NOEXCEPT_FUNCTION
+        {
+            return base_type::target_type();
+        }
+
+        template<class _FuncT>
+        _FuncT* target() _STDEX_NOEXCEPT_FUNCTION
+        {
+            return base_type::target<_FuncT>();
+        }
+
+        template<class _FuncT>
+        const _FuncT* target() const _STDEX_NOEXCEPT_FUNCTION
+        {
+            return base_type::target<_FuncT>();
+        }
     };
 
     template<class _FuncSignatureT>
@@ -1384,7 +1485,32 @@ _STDEX_INVOKE(31)
         template<class _FuncT>
         function(_FuncT func) : base_type(func) { }
 
-        //using base_type::operator();
+        void swap(function& other) _STDEX_NOEXCEPT_FUNCTION
+        {
+            base_type::swap(other);
+        }
+
+        operator bool() const _STDEX_NOEXCEPT_FUNCTION
+        {
+            return static_cast<const base_type&>(*this);
+        }
+
+        const std::type_info& target_type() const _STDEX_NOEXCEPT_FUNCTION
+        {
+            return base_type::target_type();
+        }
+
+        template<class _FuncT>
+        _FuncT* target() _STDEX_NOEXCEPT_FUNCTION
+        {
+            return base_type::target<_FuncT>();
+        }
+
+        template<class _FuncT>
+        const _FuncT* target() const _STDEX_NOEXCEPT_FUNCTION
+        {
+            return base_type::target<_FuncT>();
+        }
     };
 
     template<class _R>
@@ -1392,6 +1518,7 @@ _STDEX_INVOKE(31)
         detail::_function_impl<_R>
     {
         typedef detail::_function_impl<_R> base_type;
+        typedef typename stdex::remove_pointer<_R(*)()>::type function_signature;
     public:
         typedef typename base_type::return_type return_type;
 
@@ -1409,6 +1536,33 @@ _STDEX_INVOKE(31)
             detail::functional_std::_forward<return_type>::call(
                 base_type::operator()().get() ); 
         }
+
+        void swap(function& other) _STDEX_NOEXCEPT_FUNCTION
+        {
+            base_type::swap(other);
+        }
+
+        operator bool() const _STDEX_NOEXCEPT_FUNCTION
+        {
+            return static_cast<const base_type&>(*this);
+        }
+
+        const std::type_info& target_type() const _STDEX_NOEXCEPT_FUNCTION
+        {
+            return base_type::target_type();
+        }
+
+        template<class _FuncT>
+        _FuncT* target() _STDEX_NOEXCEPT_FUNCTION
+        {
+            return base_type::target<_FuncT>();
+        }
+
+        template<class _FuncT>
+        const _FuncT* target() const _STDEX_NOEXCEPT_FUNCTION
+        {
+            return base_type::target<_FuncT>();
+        }
     };
 
     template<class _R, class _Arg0T>
@@ -1416,6 +1570,7 @@ _STDEX_INVOKE(31)
         detail::_function_impl<_R, typename remove_reference<_Arg0T>::type&>
     {
         typedef detail::_function_impl<_R, typename remove_reference<_Arg0T>::type&> base_type;
+        typedef typename stdex::remove_pointer<_R(*)(_Arg0T)>::type function_signature;
     public:
         typedef typename base_type::return_type return_type;
 
@@ -1434,6 +1589,33 @@ _STDEX_INVOKE(31)
             detail::functional_std::_forward<return_type>::call(
                 base_type::operator()(arg0).get() );
         }
+
+        void swap(function& other) _STDEX_NOEXCEPT_FUNCTION
+        {
+            base_type::swap(other);
+        }
+
+        operator bool() const _STDEX_NOEXCEPT_FUNCTION
+        {
+            return static_cast<const base_type&>(*this);
+        }
+
+        const std::type_info& target_type() const _STDEX_NOEXCEPT_FUNCTION
+        {
+            return base_type::target_type();
+        }
+
+        template<class _FuncT>
+        _FuncT* target() _STDEX_NOEXCEPT_FUNCTION
+        {
+            return base_type::target<_FuncT>();
+        }
+
+        template<class _FuncT>
+        const _FuncT* target() const _STDEX_NOEXCEPT_FUNCTION
+        {
+            return base_type::target<_FuncT>();
+        }
     };
 
     template<class _R, class _Arg0T, class _Arg1T>
@@ -1443,6 +1625,8 @@ _STDEX_INVOKE(31)
     {
         typedef detail::_function_impl<_R,
             typename remove_reference<_Arg0T>::type&, typename remove_reference<_Arg1T>::type&> base_type;
+        typedef typename stdex::remove_pointer<_R(*)(
+            _Arg0T, _Arg1T)>::type function_signature;
     public:
         typedef typename base_type::return_type return_type;
 
@@ -1460,6 +1644,33 @@ _STDEX_INVOKE(31)
             return 
             detail::functional_std::_forward<return_type>::call(
                 base_type::operator()(arg0, arg1).get() ); 
+        }
+
+        void swap(function& other) _STDEX_NOEXCEPT_FUNCTION
+        {
+            base_type::swap(other);
+        }
+
+        operator bool() const _STDEX_NOEXCEPT_FUNCTION
+        {
+            return static_cast<const base_type&>(*this);
+        }
+
+        const std::type_info& target_type() const _STDEX_NOEXCEPT_FUNCTION
+        {
+            return base_type::target_type();
+        }
+
+        template<class _FuncT>
+        _FuncT* target() _STDEX_NOEXCEPT_FUNCTION
+        {
+            return base_type::target<_FuncT>();
+        }
+
+        template<class _FuncT>
+        const _FuncT* target() const _STDEX_NOEXCEPT_FUNCTION
+        {
+            return base_type::target<_FuncT>();
         }
     };
 
