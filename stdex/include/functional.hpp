@@ -1458,13 +1458,13 @@ _STDEX_INVOKE(31)
         template<class _FuncT>
         _FuncT* target() _STDEX_NOEXCEPT_FUNCTION
         {
-            return base_type::target<_FuncT>();
+            return base_type::template target<_FuncT>();
         }
 
         template<class _FuncT>
         const _FuncT* target() const _STDEX_NOEXCEPT_FUNCTION
         {
-            return base_type::target<_FuncT>();
+            return base_type::template target<_FuncT>();
         }
     };
 
@@ -1503,13 +1503,13 @@ _STDEX_INVOKE(31)
         template<class _FuncT>
         _FuncT* target() _STDEX_NOEXCEPT_FUNCTION
         {
-            return base_type::target<_FuncT>();
+            return base_type::template target<_FuncT>();
         }
 
         template<class _FuncT>
         const _FuncT* target() const _STDEX_NOEXCEPT_FUNCTION
         {
-            return base_type::target<_FuncT>();
+            return base_type::template target<_FuncT>();
         }
     };
 
@@ -1555,13 +1555,13 @@ _STDEX_INVOKE(31)
         template<class _FuncT>
         _FuncT* target() _STDEX_NOEXCEPT_FUNCTION
         {
-            return base_type::target<_FuncT>();
+            return base_type::template target<_FuncT>();
         }
 
         template<class _FuncT>
         const _FuncT* target() const _STDEX_NOEXCEPT_FUNCTION
         {
-            return base_type::target<_FuncT>();
+            return base_type::template target<_FuncT>();
         }
     };
 
@@ -1608,13 +1608,13 @@ _STDEX_INVOKE(31)
         template<class _FuncT>
         _FuncT* target() _STDEX_NOEXCEPT_FUNCTION
         {
-            return base_type::target<_FuncT>();
+            return base_type::template target<_FuncT>();
         }
 
         template<class _FuncT>
         const _FuncT* target() const _STDEX_NOEXCEPT_FUNCTION
         {
-            return base_type::target<_FuncT>();
+            return base_type::template target<_FuncT>();
         }
     };
 
@@ -1664,13 +1664,13 @@ _STDEX_INVOKE(31)
         template<class _FuncT>
         _FuncT* target() _STDEX_NOEXCEPT_FUNCTION
         {
-            return base_type::target<_FuncT>();
+            return base_type::template target<_FuncT>();
         }
 
         template<class _FuncT>
         const _FuncT* target() const _STDEX_NOEXCEPT_FUNCTION
         {
-            return base_type::target<_FuncT>();
+            return base_type::template target<_FuncT>();
         }
     };
 
