@@ -835,6 +835,9 @@ namespace stdex
         public detail::_is_pointer_helper<typename remove_cv<_Tp>::type>::type
     { };
 
+    template<class _Tp>
+    struct remove_pointer;
+
     // is_lvalue_reference
     template<class>
     struct is_lvalue_reference :
@@ -847,7 +850,12 @@ namespace stdex
     namespace detail
     {
         template <class _R>
-        struct _is_function_ptr_helper_cdecl : false_type {};
+        struct _is_function_ptr_helper_cdecl
+        {
+            typedef typename remove_pointer<_R>::type function_type;
+            static const bool value = 
+                is_const<const function_type>::value == bool(false);
+        };
         template <class _R>
         struct _is_function_ptr_helper_fastcall : _is_function_ptr_helper_cdecl<_R> {};
         template <class _R>

@@ -60,6 +60,7 @@ namespace stdex
                     void wcstoull(); // dummy
                     void strtold(); // dummy
                     void wcstold(); // dummy
+                    float swprintf(...);
                 }
                 using namespace std;
                 using namespace std_dummy;
@@ -150,15 +151,13 @@ namespace stdex
 
             using std_cpp11::swprintf;
 
-            template<class RetT, class Arg2T>
-            _yes_type _has_4arg_swprintf_tester(RetT(*)(wchar_t*, Arg2T, const wchar_t*, ...));
-            template<class RetT, class Arg2T, class Arg4T>
-            _yes_type _has_4arg_swprintf_tester(RetT(*)(wchar_t*, Arg2T, const wchar_t*, Arg4T));
-            _no_type _has_4arg_swprintf_tester(...);
+            _yes_type _has_4arg_swprintf_tester(int);
+            _no_type _has_4arg_swprintf_tester(float);
 
             struct _has_4arg_swprintf
             {
-                static const bool value = sizeof(_has_4arg_swprintf_tester(&swprintf)) == sizeof(_yes_type);
+                static const bool value = 
+                    sizeof(_has_4arg_swprintf_tester(swprintf(_declptr<wchar_t>(), 42, _declptr<wchar_t>(), 0 ))) == sizeof(_yes_type);
             };
         }
 
