@@ -328,7 +328,9 @@ int test05()
 }
 
 struct dummy_functor {
-    void call(operations_counter&) {}
+    std::size_t call_count;
+    void call(operations_counter&) { call_count++; }
+    void reset() { call_count = 0; }
 };
 
 int test06()
@@ -339,8 +341,22 @@ int test06()
         operations_counter cc;
         dummy_functor func;
         cc.reset();
+        func.reset();
         f(func, cc);
         DYNAMIC_VERIFY(cc.copy_count == 0 ? true : (std::cout << cc.copy_count << " != 0" << std::endl, false));
+        DYNAMIC_VERIFY(func.call_count == 1 ? true : (std::cout << func.call_count << " != 1" << std::endl, false));
+    }
+
+    {
+        typedef stdex::function<void(*)(dummy_functor*, operations_counter&)> function;
+        function f(&dummy_functor::call);
+        operations_counter cc;
+        dummy_functor func;
+        cc.reset();
+        func.reset();
+        f(&func, cc);
+        DYNAMIC_VERIFY(cc.copy_count == 0 ? true : (std::cout << cc.copy_count << " != 0" << std::endl, false));
+        DYNAMIC_VERIFY(func.call_count == 1 ? true : (std::cout << func.call_count << " != 1" << std::endl, false));
     }
     return 0;
 }
