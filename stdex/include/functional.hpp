@@ -1193,6 +1193,125 @@ namespace stdex
     template< class _Tp >
     class reference_wrapper;
 
+    template<class _R> 
+    inline
+    _R invoke( _R(*_func)())
+    {
+        return
+        detail::functional_std::_forward<_R>::call(
+            _func() );
+    }
+
+    template<>
+    inline
+    void invoke( void(*_func)())
+    {
+        _func();
+    }
+
+    template<class _R, class _ObjectT>
+    inline
+    _R invoke( _R(_ObjectT::*_func)(), _ObjectT &_obj)
+    {
+        return
+        detail::functional_std::_forward<_R>::call(
+            (_obj.*_func)() );
+    }
+
+    template<class _ObjectT>
+    inline
+    void invoke( void(_ObjectT::*_func)(), _ObjectT &_obj)
+    {
+        (_obj.*_func)();
+    }
+
+    template<class _R, class _ObjectT>
+    inline
+    _R invoke( _R(_ObjectT::*_func)() const, const _ObjectT &_obj)
+    {
+        return
+        detail::functional_std::_forward<_R>::call(
+            (_obj.*_func)() );
+    }
+
+    template<class _ObjectT>
+    inline
+    void invoke( void(_ObjectT::*_func)() const, const _ObjectT &_obj)
+    {
+        (_obj.*_func)();
+    }
+
+    template<class _R, class _ObjectT>
+    inline
+    _R invoke( _R(_ObjectT::*_func)(), _ObjectT *_obj)
+    {
+        return
+        detail::functional_std::_forward<_R>::call(
+            ((*_obj).*_func)() );
+    }
+
+    template<class _ObjectT>
+    inline
+    void invoke( void(_ObjectT::*_func)(), _ObjectT *_obj)
+    {
+        ((*_obj).*_func)();
+    }
+
+    template<class _R, class _ObjectT>
+    inline
+    _R invoke( _R(_ObjectT::*_func)() const, const _ObjectT *_obj)
+    {
+        return
+        detail::functional_std::_forward<_R>::call(
+            ((*_obj).*_func)() );
+    }
+
+    template<class _ObjectT>
+    inline
+    void invoke( void(_ObjectT::*_func)() const, const _ObjectT *_obj)
+    {
+        ((*_obj).*_func)();
+    }
+
+    template<class _R, class _ObjectT>
+    inline
+    _R invoke( _R(_ObjectT::*_func)(), reference_wrapper<_ObjectT> &_ref)
+    {
+        return
+        detail::functional_std::_forward<_R>::call(
+            (_ref.get().*_func)() );
+    }
+
+    template<class _ObjectT>
+    inline
+    void invoke( void(_ObjectT::*_func)(), reference_wrapper<_ObjectT> &_ref)
+    {
+        (_ref.get().*_func)();
+    }
+
+    template<class _R, class _ObjectT>
+    inline
+    _R invoke( _R(_ObjectT::*_func)() const, reference_wrapper<_ObjectT> &_ref)
+    {
+        return
+        detail::functional_std::_forward<_R>::call(
+            (_ref.get().*_func)() );
+    }
+
+    template<class _ObjectT>
+    inline
+    void invoke( void(_ObjectT::*_func)() const, reference_wrapper<_ObjectT> &_ref)
+    {
+        (_ref.get().*_func)();
+    }
+
+    template<class _R, class _FuncT>
+    inline
+    _R invoke(_FuncT &_func)
+    {
+        return _func();
+    }
+
 #define _STDEX_INVOKE_IMPL(N) \
     template<class _R, _STDEX_TMPL_ARGS##N> \
     _R invoke( _R(*_func)(_STDEX_TYPES##N), _STDEX_FUNC_PARAMS##N)\
@@ -1295,8 +1414,9 @@ namespace stdex
     template<class _R, class _FuncT, _STDEX_TMPL_ARGS##N>\
     _R invoke(_FuncT &_func, _STDEX_CLEAR_PARAMS##N)\
     {\
+        stdex::function<_FuncT> _f(_func); \
         return\
-            _func(_STDEX_ARGS##N);\
+            _f(_STDEX_ARGS##N);\
     }\
 
     namespace detail
