@@ -327,6 +327,23 @@ int test05()
     return 0;
 }
 
+int test06()
+{
+    struct functor {
+        void call(operations_counter&) {}
+    };
+
+    {
+        typedef stdex::function<void(*)(functor&, operations_counter&)> function;
+        function f(&functor::call);
+        operations_counter cc;
+        functor func;
+        cc.reset();
+        f(func, cc);
+        DYNAMIC_VERIFY(cc.copy_count == 0 ? true : (std::cout << cc.copy_count << " != 0" << std::endl, false));
+    }
+    return 0;
+}
 
 int main()
 {
@@ -336,6 +353,7 @@ int main()
     RUN_TEST(test03);
     RUN_TEST(test04);
     RUN_TEST(test05);
+    RUN_TEST(test06);
     RUN_TEST(np_tests::test01);
 
     const std::string::size_type big = 
