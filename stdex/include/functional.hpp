@@ -1190,8 +1190,11 @@ namespace stdex
 
     } // namespace detail
 
-    template< class _Tp >
+    template<class _Tp>
     class reference_wrapper;
+
+    template<class _FuncSignatureT>
+    class function;
 
     template<class _R> 
     inline
