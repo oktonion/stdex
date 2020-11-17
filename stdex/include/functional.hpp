@@ -2354,6 +2354,20 @@ _STDEX_INVOKE(31)
 
 } // namespace stdex
 
+#undef _STDEX_TMPL_ARGS_IMPL
+#undef _STDEX_TYPES_IMPL
+#undef _STDEX_FUNC_PARAMS_IMPL
+#undef _STDEX_CLEAR_PARAMS_IMPL
+#undef _STDEX_ARGS_IMPL
+
+#undef _STDEX_TMPL_ARGS
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
+#undef _STDEX_PARAMS
+
+#undef _STDEX_INVOKE 
+#undef _STDEX_INVOKE_IMPL
+
 #undef       _STDEX_TMPL_ARGS1
 #undef           _STDEX_TYPES1
 #undef     _STDEX_FUNC_PARAMS1
@@ -2509,15 +2523,6 @@ _STDEX_INVOKE(31)
 #undef     _STDEX_FUNC_PARAMS31
 #undef    _STDEX_CLEAR_PARAMS31
 #undef            _STDEX_ARGS31
-
-
-#undef _STDEX_TMPL_ARGS
-#undef _STDEX_TYPES
-#undef _STDEX_ARGS
-#undef _STDEX_PARAMS
-
-#undef _STDEX_INVOKE 
-#undef _STDEX_INVOKE_IMPL
 
 #undef _STDEX_DELETED_FUNCTION
 #undef _STDEX_NOEXCEPT_FUNCTION
