@@ -47,6 +47,10 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
     if not "!origin_str!"=="!replaced_str!" (
       set has_compile_error=!true!
     )
+    set "replaced_str=!origin_str:Internal compiler error=!"
+    if not "!origin_str!"=="!replaced_str!" (
+      set has_compile_error=!true!
+    )
     set "replaced_str=!origin_str:Warning W=!"
     if not "!origin_str!"=="!replaced_str!" (
       set has_compile_warn=!true!
@@ -116,6 +120,10 @@ for /f %%f in ('dir /b ".\tests\*.cpp"') do (
         set has_compile_error=!true!
       )
       set "replaced_str=!origin_str:Fatal:=!"
+      if not "!origin_str!"=="!replaced_str!" (
+        set has_compile_error=!true!
+      )
+      set "replaced_str=!origin_str:Internal compiler error=!"
       if not "!origin_str!"=="!replaced_str!" (
         set has_compile_error=!true!
       )
