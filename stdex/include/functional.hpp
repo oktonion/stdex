@@ -116,6 +116,503 @@ namespace stdex
         { };
     } // namespace intern
 
+    template<class _FuncSignatureT>
+    class function;
+
+    template<class _Tp>
+    class reference_wrapper;
+
+    namespace detail
+    {
+        template<class _Tp>
+        struct _dummy_trait
+        {
+            typedef _Tp type;
+        };
+
+        template<class _Tp>
+        struct _dummy_trait<_Tp*>
+        {
+            typedef _Tp* type;
+        };
+    } // namespace detail
+
+    namespace functional_cpp11
+    {
+
+        template<class _R>
+        inline
+            _R invoke(_R(*_func)())
+        {
+            return
+                detail::functional_std::_forward<_R>::call(
+                    _func());
+        }
+
+        template<class _R, class _ObjectT>
+        inline
+            _R invoke(_R(_ObjectT::* _func)(), _ObjectT& _obj)
+        {
+            return
+                detail::functional_std::_forward<_R>::call(
+                    (_obj.*_func)());
+        }
+
+        template<class _ObjectT>
+        inline
+            void invoke(void(_ObjectT::* _func)(), _ObjectT& _obj)
+        {
+            (_obj.*_func)();
+        }
+
+        template<class _R, class _ObjectT>
+        inline
+            _R invoke(_R(_ObjectT::* _func)() const, const _ObjectT& _obj)
+        {
+            return
+                detail::functional_std::_forward<_R>::call(
+                    (_obj.*_func)());
+        }
+
+        template<class _ObjectT>
+        inline
+            void invoke(void(_ObjectT::* _func)() const, const _ObjectT& _obj)
+        {
+            (_obj.*_func)();
+        }
+
+        template<class _R, class _ObjectT>
+        inline
+            _R invoke(_R(_ObjectT::* _func)(), _ObjectT* _obj)
+        {
+            return
+                detail::functional_std::_forward<_R>::call(
+                    ((*_obj).*_func)());
+        }
+
+        template<class _ObjectT>
+        inline
+            void invoke(void(_ObjectT::* _func)(), _ObjectT* _obj)
+        {
+            ((*_obj).*_func)();
+        }
+
+        template<class _R, class _ObjectT>
+        inline
+            _R invoke(_R(_ObjectT::* _func)() const, const _ObjectT* _obj)
+        {
+            return
+                detail::functional_std::_forward<_R>::call(
+                    ((*_obj).*_func)());
+        }
+
+        template<class _ObjectT>
+        inline
+            void invoke(void(_ObjectT::* _func)() const, const _ObjectT* _obj)
+        {
+            ((*_obj).*_func)();
+        }
+
+        template<class _R, class _ObjectT>
+        inline
+            _R invoke(_R(_ObjectT::* _func)(), reference_wrapper<_ObjectT>& _ref)
+        {
+            return
+                detail::functional_std::_forward<_R>::call(
+                    (_ref.get().*_func)());
+        }
+
+        template<class _ObjectT>
+        inline
+            void invoke(void(_ObjectT::* _func)(), reference_wrapper<_ObjectT>& _ref)
+        {
+            (_ref.get().*_func)();
+        }
+
+        template<class _R, class _ObjectT>
+        inline
+            _R invoke(_R(_ObjectT::* _func)() const, reference_wrapper<_ObjectT>& _ref)
+        {
+            return
+                detail::functional_std::_forward<_R>::call(
+                    (_ref.get().*_func)());
+        }
+
+        template<class _ObjectT>
+        inline
+            void invoke(void(_ObjectT::* _func)() const, reference_wrapper<_ObjectT>& _ref)
+        {
+            (_ref.get().*_func)();
+        }
+
+        template<class _R, class _FuncT>
+        inline
+            _R invoke(_FuncT& _func)
+        {
+            return _func();
+        }
+
+#define _STDEX_INVOKE_IMPL(N) \
+    template<class _R, _STDEX_TMPL_ARGS##N> \
+    _R invoke( _R(*_func)(_STDEX_TYPES##N), _STDEX_FUNC_PARAMS##N)\
+    {\
+        return\
+        detail::functional_std::_forward<_R>::call(\
+            _func(_STDEX_ARGS##N) );\
+    }\
+\
+    template<_STDEX_TMPL_ARGS##N> \
+    void invoke( void(*_func)(_STDEX_TYPES##N), _STDEX_FUNC_PARAMS##N)\
+    {\
+        _func(_STDEX_ARGS##N);\
+    }\
+\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N), _ObjectT &_obj, _STDEX_FUNC_PARAMS##N)\
+    {\
+        return\
+        detail::functional_std::_forward<_R>::call(\
+            (_obj.*_func)(_STDEX_ARGS##N) );\
+    }\
+\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##N>\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N), _ObjectT &_obj, _STDEX_FUNC_PARAMS##N)\
+    {\
+        (_obj.*_func)(_STDEX_ARGS##N);\
+    }\
+\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N) const, const _ObjectT &_obj, _STDEX_FUNC_PARAMS##N)\
+    {\
+        return\
+        detail::functional_std::_forward<_R>::call(\
+            (_obj.*_func)(_STDEX_ARGS##N) );\
+    }\
+\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##N>\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N) const, const _ObjectT &_obj, _STDEX_FUNC_PARAMS##N)\
+    {\
+        (_obj.*_func)(_STDEX_ARGS##N);\
+    }\
+\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N), _ObjectT *_obj, _STDEX_FUNC_PARAMS##N)\
+    {\
+        return\
+        detail::functional_std::_forward<_R>::call(\
+            ((*_obj).*_func)(_STDEX_ARGS##N) );\
+    }\
+\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##N>\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N), _ObjectT *_obj, _STDEX_FUNC_PARAMS##N)\
+    {\
+        ((*_obj).*_func)(_STDEX_ARGS##N);\
+    }\
+\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N) const, const _ObjectT *_obj, _STDEX_FUNC_PARAMS##N)\
+    {\
+        return\
+        detail::functional_std::_forward<_R>::call(\
+            ((*_obj).*_func)(_STDEX_ARGS##N) );\
+    }\
+\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##N>\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N) const, const _ObjectT *_obj, _STDEX_FUNC_PARAMS##N)\
+    {\
+        ((*_obj).*_func)(_STDEX_ARGS##N);\
+    }\
+\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N), reference_wrapper<_ObjectT> &_ref, _STDEX_FUNC_PARAMS##N)\
+    {\
+        return\
+        detail::functional_std::_forward<_R>::call(\
+            (_ref.get().*_func)(_STDEX_ARGS##N) );\
+    }\
+\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##N>\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N), reference_wrapper<_ObjectT> &_ref, _STDEX_FUNC_PARAMS##N)\
+    {\
+        (_ref.get().*_func)(_STDEX_ARGS##N);\
+    }\
+\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N) const, reference_wrapper<_ObjectT> &_ref, _STDEX_FUNC_PARAMS##N)\
+    {\
+        return\
+        detail::functional_std::_forward<_R>::call(\
+            (_ref.get().*_func)(_STDEX_ARGS##N) );\
+    }\
+\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##N>\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N) const, reference_wrapper<_ObjectT> &_ref, _STDEX_FUNC_PARAMS##N)\
+    {\
+        (_ref.get().*_func)(_STDEX_ARGS##N);\
+    }\
+\
+    template<class _R, class _FuncT, _STDEX_TMPL_ARGS##N>\
+    _R invoke(_FuncT &_func, _STDEX_CLEAR_PARAMS##N)\
+    {\
+        stdex::function<_FuncT> _f(_func); \
+        return\
+            _f(_STDEX_ARGS##N);\
+    }\
+
+
+#define _STDEX_INVOKE(N) _STDEX_INVOKE_IMPL(N)
+
+#define _STDEX_TMPL_ARGS_IMPL(N) ,class _Arg##N##T
+#define _STDEX_TYPES_IMPL(N) ,_Arg##N##T 
+#define _STDEX_FUNC_PARAMS_IMPL(N) ,typename stdex::detail::_dummy_trait<_Arg##N##T>::type arg##N
+#define _STDEX_CLEAR_PARAMS_IMPL(N) ,_Arg##N##T arg##N
+#define _STDEX_ARGS_IMPL(N) ,arg##N
+
+#undef _STDEX_TMPL_ARGS
+#undef _STDEX_TYPES
+#undef _STDEX_ARGS
+#undef _STDEX_PARAMS
+
+#define _STDEX_TMPL_ARGS(N) _STDEX_TMPL_ARGS_IMPL(N)
+#define _STDEX_TYPES(N) _STDEX_TYPES_IMPL(N)
+#define _STDEX_FUNC_PARAMS(N) _STDEX_FUNC_PARAMS_IMPL(N)
+#define _STDEX_CLEAR_PARAMS(N) _STDEX_CLEAR_PARAMS_IMPL(N)
+#define _STDEX_ARGS(N) _STDEX_ARGS_IMPL(N)
+
+#define _STDEX_TMPL_ARGS0 class _Arg0T
+#define _STDEX_TYPES0 _Arg0T
+#define _STDEX_FUNC_PARAMS0 typename stdex::detail::_dummy_trait<_Arg0T>::type arg0
+#define _STDEX_CLEAR_PARAMS0 _Arg0T arg0
+#define _STDEX_ARGS0 arg0
+        _STDEX_INVOKE(0)
+
+#define _STDEX_TMPL_ARGS1 _STDEX_TMPL_ARGS0 _STDEX_TMPL_ARGS(1)
+#define _STDEX_TYPES1 _STDEX_TYPES0 _STDEX_TYPES(1)
+#define _STDEX_FUNC_PARAMS1 _STDEX_FUNC_PARAMS0 _STDEX_FUNC_PARAMS(1)
+#define _STDEX_CLEAR_PARAMS1 _STDEX_CLEAR_PARAMS0 _STDEX_CLEAR_PARAMS(1)
+#define _STDEX_ARGS1 _STDEX_ARGS0 _STDEX_ARGS(1)
+            _STDEX_INVOKE(1)
+
+#define _STDEX_TMPL_ARGS2 _STDEX_TMPL_ARGS1 _STDEX_TMPL_ARGS(2)
+#define _STDEX_TYPES2 _STDEX_TYPES1 _STDEX_TYPES(2)
+#define _STDEX_FUNC_PARAMS2 _STDEX_FUNC_PARAMS1 _STDEX_FUNC_PARAMS(2)
+#define _STDEX_CLEAR_PARAMS2 _STDEX_CLEAR_PARAMS1 _STDEX_CLEAR_PARAMS(2)
+#define _STDEX_ARGS2 _STDEX_ARGS1 _STDEX_ARGS(2)
+            _STDEX_INVOKE(2)
+
+#define _STDEX_TMPL_ARGS3 _STDEX_TMPL_ARGS2 _STDEX_TMPL_ARGS(3)
+#define _STDEX_TYPES3 _STDEX_TYPES2 _STDEX_TYPES(3)
+#define _STDEX_FUNC_PARAMS3 _STDEX_FUNC_PARAMS2 _STDEX_FUNC_PARAMS(3)
+#define _STDEX_CLEAR_PARAMS3 _STDEX_CLEAR_PARAMS2 _STDEX_CLEAR_PARAMS(3)
+#define _STDEX_ARGS3 _STDEX_ARGS2 _STDEX_ARGS(3)
+            _STDEX_INVOKE(3)
+
+#define _STDEX_TMPL_ARGS4 _STDEX_TMPL_ARGS3 _STDEX_TMPL_ARGS(4)
+#define _STDEX_TYPES4 _STDEX_TYPES3 _STDEX_TYPES(4)
+#define _STDEX_FUNC_PARAMS4 _STDEX_FUNC_PARAMS3 _STDEX_FUNC_PARAMS(4)
+#define _STDEX_CLEAR_PARAMS4 _STDEX_CLEAR_PARAMS3 _STDEX_CLEAR_PARAMS(4)
+#define _STDEX_ARGS4 _STDEX_ARGS3 _STDEX_ARGS(4)
+            _STDEX_INVOKE(4)
+
+#define _STDEX_TMPL_ARGS5 _STDEX_TMPL_ARGS4 _STDEX_TMPL_ARGS(5)
+#define _STDEX_TYPES5 _STDEX_TYPES4 _STDEX_TYPES(5)
+#define _STDEX_FUNC_PARAMS5 _STDEX_FUNC_PARAMS4 _STDEX_FUNC_PARAMS(5)
+#define _STDEX_CLEAR_PARAMS5 _STDEX_CLEAR_PARAMS4 _STDEX_CLEAR_PARAMS(5)
+#define _STDEX_ARGS5 _STDEX_ARGS4 _STDEX_ARGS(5)
+            _STDEX_INVOKE(5)
+
+#define _STDEX_TMPL_ARGS6 _STDEX_TMPL_ARGS5 _STDEX_TMPL_ARGS(6)
+#define _STDEX_TYPES6 _STDEX_TYPES5 _STDEX_TYPES(6)
+#define _STDEX_FUNC_PARAMS6 _STDEX_FUNC_PARAMS5 _STDEX_FUNC_PARAMS(6)
+#define _STDEX_CLEAR_PARAMS6 _STDEX_CLEAR_PARAMS5 _STDEX_CLEAR_PARAMS(6)
+#define _STDEX_ARGS6 _STDEX_ARGS5 _STDEX_ARGS(6)
+            _STDEX_INVOKE(6)
+
+#define _STDEX_TMPL_ARGS7 _STDEX_TMPL_ARGS6 _STDEX_TMPL_ARGS(7)
+#define _STDEX_TYPES7 _STDEX_TYPES6 _STDEX_TYPES(7)
+#define _STDEX_FUNC_PARAMS7 _STDEX_FUNC_PARAMS6 _STDEX_FUNC_PARAMS(7)
+#define _STDEX_CLEAR_PARAMS7 _STDEX_CLEAR_PARAMS6 _STDEX_CLEAR_PARAMS(7)
+#define _STDEX_ARGS7 _STDEX_ARGS6 _STDEX_ARGS(7)
+            _STDEX_INVOKE(7)
+
+#define _STDEX_TMPL_ARGS8 _STDEX_TMPL_ARGS7 _STDEX_TMPL_ARGS(8)
+#define _STDEX_TYPES8 _STDEX_TYPES7 _STDEX_TYPES(8)
+#define _STDEX_FUNC_PARAMS8 _STDEX_FUNC_PARAMS7 _STDEX_FUNC_PARAMS(8)
+#define _STDEX_CLEAR_PARAMS8 _STDEX_CLEAR_PARAMS7 _STDEX_CLEAR_PARAMS(8)
+#define _STDEX_ARGS8 _STDEX_ARGS7 _STDEX_ARGS(8)
+            _STDEX_INVOKE(8)
+
+#define _STDEX_TMPL_ARGS9 _STDEX_TMPL_ARGS8 _STDEX_TMPL_ARGS(9)
+#define _STDEX_TYPES9 _STDEX_TYPES8 _STDEX_TYPES(9)
+#define _STDEX_FUNC_PARAMS9 _STDEX_FUNC_PARAMS8 _STDEX_FUNC_PARAMS(9)
+#define _STDEX_CLEAR_PARAMS9 _STDEX_CLEAR_PARAMS8 _STDEX_CLEAR_PARAMS(9)
+#define _STDEX_ARGS9 _STDEX_ARGS8 _STDEX_ARGS(9)
+            _STDEX_INVOKE(9)
+
+#define _STDEX_TMPL_ARGS10 _STDEX_TMPL_ARGS9 _STDEX_TMPL_ARGS(10)
+#define _STDEX_TYPES10 _STDEX_TYPES9 _STDEX_TYPES(10)
+#define _STDEX_FUNC_PARAMS10 _STDEX_FUNC_PARAMS9 _STDEX_FUNC_PARAMS(10)
+#define _STDEX_CLEAR_PARAMS10 _STDEX_CLEAR_PARAMS9 _STDEX_CLEAR_PARAMS(10)
+#define _STDEX_ARGS10 _STDEX_ARGS9 _STDEX_ARGS(10)
+            _STDEX_INVOKE(10)
+
+#define _STDEX_TMPL_ARGS11 _STDEX_TMPL_ARGS10 _STDEX_TMPL_ARGS(11)
+#define _STDEX_TYPES11 _STDEX_TYPES10 _STDEX_TYPES(11)
+#define _STDEX_FUNC_PARAMS11 _STDEX_FUNC_PARAMS10 _STDEX_FUNC_PARAMS(11)
+#define _STDEX_CLEAR_PARAMS11 _STDEX_CLEAR_PARAMS10 _STDEX_CLEAR_PARAMS(11)
+#define _STDEX_ARGS11 _STDEX_ARGS10 _STDEX_ARGS(11)
+            _STDEX_INVOKE(11)
+
+#define _STDEX_TMPL_ARGS12 _STDEX_TMPL_ARGS11 _STDEX_TMPL_ARGS(12)
+#define _STDEX_TYPES12 _STDEX_TYPES11 _STDEX_TYPES(12)
+#define _STDEX_FUNC_PARAMS12 _STDEX_FUNC_PARAMS11 _STDEX_FUNC_PARAMS(12)
+#define _STDEX_CLEAR_PARAMS12 _STDEX_CLEAR_PARAMS11 _STDEX_CLEAR_PARAMS(12)
+#define _STDEX_ARGS12 _STDEX_ARGS11 _STDEX_ARGS(12)
+            _STDEX_INVOKE(12)
+
+#define _STDEX_TMPL_ARGS13 _STDEX_TMPL_ARGS12 _STDEX_TMPL_ARGS(13)
+#define _STDEX_TYPES13 _STDEX_TYPES12 _STDEX_TYPES(13)
+#define _STDEX_FUNC_PARAMS13 _STDEX_FUNC_PARAMS12 _STDEX_FUNC_PARAMS(13)
+#define _STDEX_CLEAR_PARAMS13 _STDEX_CLEAR_PARAMS12 _STDEX_CLEAR_PARAMS(13)
+#define _STDEX_ARGS13 _STDEX_ARGS12 _STDEX_ARGS(13)
+            _STDEX_INVOKE(13)
+
+#define _STDEX_TMPL_ARGS14 _STDEX_TMPL_ARGS13 _STDEX_TMPL_ARGS(14)
+#define _STDEX_TYPES14 _STDEX_TYPES13 _STDEX_TYPES(14)
+#define _STDEX_FUNC_PARAMS14 _STDEX_FUNC_PARAMS13 _STDEX_FUNC_PARAMS(14)
+#define _STDEX_CLEAR_PARAMS14 _STDEX_CLEAR_PARAMS13 _STDEX_CLEAR_PARAMS(14)
+#define _STDEX_ARGS14 _STDEX_ARGS13 _STDEX_ARGS(14)
+            _STDEX_INVOKE(14)
+
+#define _STDEX_TMPL_ARGS15 _STDEX_TMPL_ARGS14 _STDEX_TMPL_ARGS(15)
+#define _STDEX_TYPES15 _STDEX_TYPES14 _STDEX_TYPES(15)
+#define _STDEX_FUNC_PARAMS15 _STDEX_FUNC_PARAMS14 _STDEX_FUNC_PARAMS(15)
+#define _STDEX_CLEAR_PARAMS15 _STDEX_CLEAR_PARAMS14 _STDEX_CLEAR_PARAMS(15)
+#define _STDEX_ARGS15 _STDEX_ARGS14 _STDEX_ARGS(15)
+            _STDEX_INVOKE(15)
+
+#define _STDEX_TMPL_ARGS16 _STDEX_TMPL_ARGS15 _STDEX_TMPL_ARGS(16)
+#define _STDEX_TYPES16 _STDEX_TYPES15 _STDEX_TYPES(16)
+#define _STDEX_FUNC_PARAMS16 _STDEX_FUNC_PARAMS15 _STDEX_FUNC_PARAMS(16)
+#define _STDEX_CLEAR_PARAMS16 _STDEX_CLEAR_PARAMS15 _STDEX_CLEAR_PARAMS(16)
+#define _STDEX_ARGS16 _STDEX_ARGS15 _STDEX_ARGS(16)
+            _STDEX_INVOKE(16)
+
+#define _STDEX_TMPL_ARGS17 _STDEX_TMPL_ARGS16 _STDEX_TMPL_ARGS(17)
+#define _STDEX_TYPES17 _STDEX_TYPES16 _STDEX_TYPES(17)
+#define _STDEX_FUNC_PARAMS17 _STDEX_FUNC_PARAMS16 _STDEX_FUNC_PARAMS(17)
+#define _STDEX_CLEAR_PARAMS17 _STDEX_CLEAR_PARAMS16 _STDEX_CLEAR_PARAMS(17)
+#define _STDEX_ARGS17 _STDEX_ARGS16 _STDEX_ARGS(17)
+            _STDEX_INVOKE(17)
+
+#define _STDEX_TMPL_ARGS18 _STDEX_TMPL_ARGS17 _STDEX_TMPL_ARGS(18)
+#define _STDEX_TYPES18 _STDEX_TYPES17 _STDEX_TYPES(18)
+#define _STDEX_FUNC_PARAMS18 _STDEX_FUNC_PARAMS17 _STDEX_FUNC_PARAMS(18)
+#define _STDEX_CLEAR_PARAMS18 _STDEX_CLEAR_PARAMS17 _STDEX_CLEAR_PARAMS(18)
+#define _STDEX_ARGS18 _STDEX_ARGS17 _STDEX_ARGS(18)
+            _STDEX_INVOKE(18)
+
+#define _STDEX_TMPL_ARGS19 _STDEX_TMPL_ARGS18 _STDEX_TMPL_ARGS(19)
+#define _STDEX_TYPES19 _STDEX_TYPES18 _STDEX_TYPES(19)
+#define _STDEX_FUNC_PARAMS19 _STDEX_FUNC_PARAMS18 _STDEX_FUNC_PARAMS(19)
+#define _STDEX_CLEAR_PARAMS19 _STDEX_CLEAR_PARAMS18 _STDEX_CLEAR_PARAMS(19)
+#define _STDEX_ARGS19 _STDEX_ARGS18 _STDEX_ARGS(19)
+            _STDEX_INVOKE(19)
+
+#define _STDEX_TMPL_ARGS20 _STDEX_TMPL_ARGS19 _STDEX_TMPL_ARGS(20)
+#define _STDEX_TYPES20 _STDEX_TYPES19 _STDEX_TYPES(20)
+#define _STDEX_FUNC_PARAMS20 _STDEX_FUNC_PARAMS19 _STDEX_FUNC_PARAMS(20)
+#define _STDEX_CLEAR_PARAMS20 _STDEX_CLEAR_PARAMS19 _STDEX_CLEAR_PARAMS(20)
+#define _STDEX_ARGS20 _STDEX_ARGS19 _STDEX_ARGS(20)
+            _STDEX_INVOKE(20)
+
+#define _STDEX_TMPL_ARGS21 _STDEX_TMPL_ARGS20 _STDEX_TMPL_ARGS(21)
+#define _STDEX_TYPES21 _STDEX_TYPES20 _STDEX_TYPES(21)
+#define _STDEX_FUNC_PARAMS21 _STDEX_FUNC_PARAMS20 _STDEX_FUNC_PARAMS(21)
+#define _STDEX_CLEAR_PARAMS21 _STDEX_CLEAR_PARAMS20 _STDEX_CLEAR_PARAMS(21)
+#define _STDEX_ARGS21 _STDEX_ARGS20 _STDEX_ARGS(21)
+            _STDEX_INVOKE(21)
+
+#define _STDEX_TMPL_ARGS22 _STDEX_TMPL_ARGS21 _STDEX_TMPL_ARGS(22)
+#define _STDEX_TYPES22 _STDEX_TYPES21 _STDEX_TYPES(22)
+#define _STDEX_FUNC_PARAMS22 _STDEX_FUNC_PARAMS21 _STDEX_FUNC_PARAMS(22)
+#define _STDEX_CLEAR_PARAMS22 _STDEX_CLEAR_PARAMS21 _STDEX_CLEAR_PARAMS(22)
+#define _STDEX_ARGS22 _STDEX_ARGS21 _STDEX_ARGS(22)
+            _STDEX_INVOKE(22)
+
+#define _STDEX_TMPL_ARGS23 _STDEX_TMPL_ARGS22 _STDEX_TMPL_ARGS(23)
+#define _STDEX_TYPES23 _STDEX_TYPES22 _STDEX_TYPES(23)
+#define _STDEX_FUNC_PARAMS23 _STDEX_FUNC_PARAMS22 _STDEX_FUNC_PARAMS(23)
+#define _STDEX_CLEAR_PARAMS23 _STDEX_CLEAR_PARAMS22 _STDEX_CLEAR_PARAMS(23)
+#define _STDEX_ARGS23 _STDEX_ARGS22 _STDEX_ARGS(23)
+            _STDEX_INVOKE(23)
+
+#define _STDEX_TMPL_ARGS24 _STDEX_TMPL_ARGS23 _STDEX_TMPL_ARGS(24)
+#define _STDEX_TYPES24 _STDEX_TYPES23 _STDEX_TYPES(24)
+#define _STDEX_FUNC_PARAMS24 _STDEX_FUNC_PARAMS23 _STDEX_FUNC_PARAMS(24)
+#define _STDEX_CLEAR_PARAMS24 _STDEX_CLEAR_PARAMS23 _STDEX_CLEAR_PARAMS(24)
+#define _STDEX_ARGS24 _STDEX_ARGS23 _STDEX_ARGS(24)
+            _STDEX_INVOKE(24)
+
+#define _STDEX_TMPL_ARGS25 _STDEX_TMPL_ARGS24 _STDEX_TMPL_ARGS(25)
+#define _STDEX_TYPES25 _STDEX_TYPES24 _STDEX_TYPES(25)
+#define _STDEX_FUNC_PARAMS25 _STDEX_FUNC_PARAMS24 _STDEX_FUNC_PARAMS(25)
+#define _STDEX_CLEAR_PARAMS25 _STDEX_CLEAR_PARAMS24 _STDEX_CLEAR_PARAMS(25)
+#define _STDEX_ARGS25 _STDEX_ARGS24 _STDEX_ARGS(25)
+            _STDEX_INVOKE(25)
+
+#define _STDEX_TMPL_ARGS26 _STDEX_TMPL_ARGS25 _STDEX_TMPL_ARGS(26)
+#define _STDEX_TYPES26 _STDEX_TYPES25 _STDEX_TYPES(26)
+#define _STDEX_FUNC_PARAMS26 _STDEX_FUNC_PARAMS25 _STDEX_FUNC_PARAMS(26)
+#define _STDEX_CLEAR_PARAMS26 _STDEX_CLEAR_PARAMS25 _STDEX_CLEAR_PARAMS(26)
+#define _STDEX_ARGS26 _STDEX_ARGS25 _STDEX_ARGS(26)
+            _STDEX_INVOKE(26)
+
+#define _STDEX_TMPL_ARGS27 _STDEX_TMPL_ARGS26 _STDEX_TMPL_ARGS(27)
+#define _STDEX_TYPES27 _STDEX_TYPES26 _STDEX_TYPES(27)
+#define _STDEX_FUNC_PARAMS27 _STDEX_FUNC_PARAMS26 _STDEX_FUNC_PARAMS(27)
+#define _STDEX_CLEAR_PARAMS27 _STDEX_CLEAR_PARAMS26 _STDEX_CLEAR_PARAMS(27)
+#define _STDEX_ARGS27 _STDEX_ARGS26 _STDEX_ARGS(27)
+            _STDEX_INVOKE(27)
+
+#define _STDEX_TMPL_ARGS28 _STDEX_TMPL_ARGS27 _STDEX_TMPL_ARGS(28)
+#define _STDEX_TYPES28 _STDEX_TYPES27 _STDEX_TYPES(28)
+#define _STDEX_FUNC_PARAMS28 _STDEX_FUNC_PARAMS27 _STDEX_FUNC_PARAMS(28)
+#define _STDEX_CLEAR_PARAMS28 _STDEX_CLEAR_PARAMS27 _STDEX_CLEAR_PARAMS(28)
+#define _STDEX_ARGS28 _STDEX_ARGS27 _STDEX_ARGS(28)
+            _STDEX_INVOKE(28)
+
+#define _STDEX_TMPL_ARGS29 _STDEX_TMPL_ARGS28 _STDEX_TMPL_ARGS(29)
+#define _STDEX_TYPES29 _STDEX_TYPES28 _STDEX_TYPES(29)
+#define _STDEX_FUNC_PARAMS29 _STDEX_FUNC_PARAMS28 _STDEX_FUNC_PARAMS(29)
+#define _STDEX_CLEAR_PARAMS29 _STDEX_CLEAR_PARAMS28 _STDEX_CLEAR_PARAMS(29)
+#define _STDEX_ARGS29 _STDEX_ARGS28 _STDEX_ARGS(29)
+            _STDEX_INVOKE(29)
+
+#define _STDEX_TMPL_ARGS30 _STDEX_TMPL_ARGS29 _STDEX_TMPL_ARGS(30)
+#define _STDEX_TYPES30 _STDEX_TYPES29 _STDEX_TYPES(30)
+#define _STDEX_FUNC_PARAMS30 _STDEX_FUNC_PARAMS29 _STDEX_FUNC_PARAMS(30)
+#define _STDEX_CLEAR_PARAMS30 _STDEX_CLEAR_PARAMS29 _STDEX_CLEAR_PARAMS(30)
+#define _STDEX_ARGS30 _STDEX_ARGS29 _STDEX_ARGS(30)
+            _STDEX_INVOKE(30)
+
+#define _STDEX_TMPL_ARGS31 _STDEX_TMPL_ARGS30 _STDEX_TMPL_ARGS(31)
+#define _STDEX_TYPES31 _STDEX_TYPES30 _STDEX_TYPES(31)
+#define _STDEX_FUNC_PARAMS31 _STDEX_FUNC_PARAMS30 _STDEX_FUNC_PARAMS(31)
+#define _STDEX_CLEAR_PARAMS31 _STDEX_CLEAR_PARAMS30 _STDEX_CLEAR_PARAMS(31)
+#define _STDEX_ARGS31 _STDEX_ARGS30 _STDEX_ARGS(31)
+            _STDEX_INVOKE(31)
+    }
+
+    template<>
+    inline
+    void functional_cpp11::invoke(void(*_func)())
+    {
+        _func();
+    }
+
+    using functional_cpp11::invoke;
+
     namespace detail
     {
         struct _nullptr_place_holder:
@@ -680,7 +1177,7 @@ namespace stdex
                         return 
                         _return_arg<return_type>(
                             ::stdex::detail::functional_std::_forward<return_type>::call(
-                                invoke(fx, _arg<arg0_type, 0>::value) ) 
+                                stdex::invoke(fx, _arg<arg0_type, 0>::value) )
                         );
                     }
 
@@ -698,7 +1195,7 @@ namespace stdex
                         using ::stdex::detail::_arg;
                         using ::stdex::detail::_return_arg;
 
-                        invoke(fx, _arg<arg0_type, 0>::value);
+                        stdex::invoke(fx, _arg<arg0_type, 0>::value);
                         _return_arg<return_type> _result = 0;
                         return  _result;
                     }
@@ -748,7 +1245,7 @@ namespace stdex
                         return 
                         _return_arg<return_type>(
                             ::stdex::detail::functional_std::_forward<return_type>::call(
-                                invoke(fx, _arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value) )
+                                stdex::invoke(fx, _arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value) )
                         );
                     }
 
@@ -767,7 +1264,7 @@ namespace stdex
                         using ::stdex::detail::_arg;
                         using ::stdex::detail::_return_arg;
 
-                        invoke(fx, _arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value);
+                        stdex::invoke(fx, _arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value);
                         _return_arg<return_type> result = 0;
                         return  result;
                     }
@@ -939,7 +1436,7 @@ namespace stdex
                     is_pointer<func_type>::value == bool(true) ||
                     is_member_function_pointer<func_type>::value == bool(true),
                     func_type,
-                    _dummy>::type _src)
+                    class _dummy>::type _src)
             {
                 func_type* _ptr_to_ptr = new func_type();
                 (*_ptr_to_ptr) = _src;
@@ -951,7 +1448,7 @@ namespace stdex
                 typename
                 conditional<
                     is_pointer<func_type>::value,
-                    _dummy,
+                    class _dummy,
                     func_type&>::type _src)
             {
                 func_type** _ptr_to_ptr = new func_type*();
@@ -962,7 +1459,7 @@ namespace stdex
 
             virtual std::size_t _target(void* &_dst) const _STDEX_NOEXCEPT_FUNCTION
             {
-                return func_ptr_copy(_dst, _func);
+                return 0;//func_ptr_copy(_dst, _func);
             }
 
             virtual const std::type_info& _target_type() const _STDEX_NOEXCEPT_FUNCTION
@@ -1191,494 +1688,41 @@ namespace stdex
     } // namespace detail
 
     template<class _Tp>
-    class reference_wrapper;
+    class reference_wrapper
+    /*{
+    public:
+        static_assert(is_object_v<_Ty> || is_function_v<_Ty>,
+            "reference_wrapper<T> requires T to be an object type or a function type.");
 
-    template<class _FuncSignatureT>
-    class function;
+        using type = _Ty;
 
-    template<class _R> 
-    inline
-    _R invoke( _R(*_func)())
-    {
-        return
-        detail::functional_std::_forward<_R>::call(
-            _func() );
-    }
+        template <class _Uty, enable_if_t<conjunction_v<negation<is_same<_Remove_cvref_t<_Uty>, reference_wrapper>>,
+                                              _Refwrap_has_ctor_from<_Ty, _Uty>>,
+                                  int> = 0>
+        _CONSTEXPR20 reference_wrapper(_Uty&& _Val) noexcept(noexcept(_Refwrap_ctor_fun<_Ty>(_STD declval<_Uty>()))) {
+            _Ty& _Ref = static_cast<_Uty&&>(_Val);
+            _Ptr      = _STD addressof(_Ref);
+        }
 
-    template<>
-    inline
-    void invoke( void(*_func)())
-    {
-        _func();
-    }
+        _CONSTEXPR20 operator _Ty&() const noexcept {
+            return *_Ptr;
+        }
 
-    template<class _R, class _ObjectT>
-    inline
-    _R invoke( _R(_ObjectT::*_func)(), _ObjectT &_obj)
-    {
-        return
-        detail::functional_std::_forward<_R>::call(
-            (_obj.*_func)() );
-    }
+        _NODISCARD _CONSTEXPR20 _Ty& get() const noexcept {
+            return *_Ptr;
+        }
 
-    template<class _ObjectT>
-    inline
-    void invoke( void(_ObjectT::*_func)(), _ObjectT &_obj)
-    {
-        (_obj.*_func)();
-    }
+    private:
+        _Ty* _Ptr{};
 
-    template<class _R, class _ObjectT>
-    inline
-    _R invoke( _R(_ObjectT::*_func)() const, const _ObjectT &_obj)
-    {
-        return
-        detail::functional_std::_forward<_R>::call(
-            (_obj.*_func)() );
-    }
-
-    template<class _ObjectT>
-    inline
-    void invoke( void(_ObjectT::*_func)() const, const _ObjectT &_obj)
-    {
-        (_obj.*_func)();
-    }
-
-    template<class _R, class _ObjectT>
-    inline
-    _R invoke( _R(_ObjectT::*_func)(), _ObjectT *_obj)
-    {
-        return
-        detail::functional_std::_forward<_R>::call(
-            ((*_obj).*_func)() );
-    }
-
-    template<class _ObjectT>
-    inline
-    void invoke( void(_ObjectT::*_func)(), _ObjectT *_obj)
-    {
-        ((*_obj).*_func)();
-    }
-
-    template<class _R, class _ObjectT>
-    inline
-    _R invoke( _R(_ObjectT::*_func)() const, const _ObjectT *_obj)
-    {
-        return
-        detail::functional_std::_forward<_R>::call(
-            ((*_obj).*_func)() );
-    }
-
-    template<class _ObjectT>
-    inline
-    void invoke( void(_ObjectT::*_func)() const, const _ObjectT *_obj)
-    {
-        ((*_obj).*_func)();
-    }
-
-    template<class _R, class _ObjectT>
-    inline
-    _R invoke( _R(_ObjectT::*_func)(), reference_wrapper<_ObjectT> &_ref)
-    {
-        return
-        detail::functional_std::_forward<_R>::call(
-            (_ref.get().*_func)() );
-    }
-
-    template<class _ObjectT>
-    inline
-    void invoke( void(_ObjectT::*_func)(), reference_wrapper<_ObjectT> &_ref)
-    {
-        (_ref.get().*_func)();
-    }
-
-    template<class _R, class _ObjectT>
-    inline
-    _R invoke( _R(_ObjectT::*_func)() const, reference_wrapper<_ObjectT> &_ref)
-    {
-        return
-        detail::functional_std::_forward<_R>::call(
-            (_ref.get().*_func)() );
-    }
-
-    template<class _ObjectT>
-    inline
-    void invoke( void(_ObjectT::*_func)() const, reference_wrapper<_ObjectT> &_ref)
-    {
-        (_ref.get().*_func)();
-    }
-
-    template<class _R, class _FuncT>
-    inline
-    _R invoke(_FuncT &_func)
-    {
-        return _func();
-    }
-
-#define _STDEX_INVOKE_IMPL(N) \
-    template<class _R, _STDEX_TMPL_ARGS##N> \
-    _R invoke( _R(*_func)(_STDEX_TYPES##N), _STDEX_FUNC_PARAMS##N)\
-    {\
-        return\
-        detail::functional_std::_forward<_R>::call(\
-            _func(_STDEX_ARGS##N) );\
-    }\
-\
-    template<_STDEX_TMPL_ARGS##N> \
-    void invoke( void(*_func)(_STDEX_TYPES##N), _STDEX_FUNC_PARAMS##N)\
-    {\
-        _func(_STDEX_ARGS##N);\
-    }\
-\
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N), _ObjectT &_obj, _STDEX_FUNC_PARAMS##N)\
-    {\
-        return\
-        detail::functional_std::_forward<_R>::call(\
-            (_obj.*_func)(_STDEX_ARGS##N) );\
-    }\
-\
-    template<class _ObjectT, _STDEX_TMPL_ARGS##N>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N), _ObjectT &_obj, _STDEX_FUNC_PARAMS##N)\
-    {\
-        (_obj.*_func)(_STDEX_ARGS##N);\
-    }\
-\
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N) const, const _ObjectT &_obj, _STDEX_FUNC_PARAMS##N)\
-    {\
-        return\
-        detail::functional_std::_forward<_R>::call(\
-            (_obj.*_func)(_STDEX_ARGS##N) );\
-    }\
-\
-    template<class _ObjectT, _STDEX_TMPL_ARGS##N>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N) const, const _ObjectT &_obj, _STDEX_FUNC_PARAMS##N)\
-    {\
-        (_obj.*_func)(_STDEX_ARGS##N);\
-    }\
-\
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N), _ObjectT *_obj, _STDEX_FUNC_PARAMS##N)\
-    {\
-        return\
-        detail::functional_std::_forward<_R>::call(\
-            ((*_obj).*_func)(_STDEX_ARGS##N) );\
-    }\
-\
-    template<class _ObjectT, _STDEX_TMPL_ARGS##N>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N), _ObjectT *_obj, _STDEX_FUNC_PARAMS##N)\
-    {\
-        ((*_obj).*_func)(_STDEX_ARGS##N);\
-    }\
-\
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N) const, const _ObjectT *_obj, _STDEX_FUNC_PARAMS##N)\
-    {\
-        return\
-        detail::functional_std::_forward<_R>::call(\
-            ((*_obj).*_func)(_STDEX_ARGS##N) );\
-    }\
-\
-    template<class _ObjectT, _STDEX_TMPL_ARGS##N>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N) const, const _ObjectT *_obj, _STDEX_FUNC_PARAMS##N)\
-    {\
-        ((*_obj).*_func)(_STDEX_ARGS##N);\
-    }\
-\
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N), reference_wrapper<_ObjectT> &_ref, _STDEX_FUNC_PARAMS##N)\
-    {\
-        return\
-        detail::functional_std::_forward<_R>::call(\
-            (_ref.get().*_func)(_STDEX_ARGS##N) );\
-    }\
-\
-    template<class _ObjectT, _STDEX_TMPL_ARGS##N>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N), reference_wrapper<_ObjectT> &_ref, _STDEX_FUNC_PARAMS##N)\
-    {\
-        (_ref.get().*_func)(_STDEX_ARGS##N);\
-    }\
-\
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N) const, reference_wrapper<_ObjectT> &_ref, _STDEX_FUNC_PARAMS##N)\
-    {\
-        return\
-        detail::functional_std::_forward<_R>::call(\
-            (_ref.get().*_func)(_STDEX_ARGS##N) );\
-    }\
-\
-    template<class _ObjectT, _STDEX_TMPL_ARGS##N>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N) const, reference_wrapper<_ObjectT> &_ref, _STDEX_FUNC_PARAMS##N)\
-    {\
-        (_ref.get().*_func)(_STDEX_ARGS##N);\
-    }\
-\
-    template<class _R, class _FuncT, _STDEX_TMPL_ARGS##N>\
-    _R invoke(_FuncT &_func, _STDEX_CLEAR_PARAMS##N)\
-    {\
-        stdex::function<_FuncT> _f(_func); \
-        return\
-            _f(_STDEX_ARGS##N);\
-    }\
-
-    namespace detail
-    {
-        template<class _Tp>
-        struct _dummy_trait
-        {
-            typedef _Tp type;
-        };
-
-        template<class _Tp>
-        struct _dummy_trait<_Tp*>
-        {
-            typedef _Tp* type;
-        };
-    } // namespace detail
-
-#define _STDEX_INVOKE(N) _STDEX_INVOKE_IMPL(N)
-
-#define _STDEX_TMPL_ARGS_IMPL(N) ,class _Arg##N##T
-#define _STDEX_TYPES_IMPL(N) ,_Arg##N##T 
-#define _STDEX_FUNC_PARAMS_IMPL(N) ,typename stdex::detail::_dummy_trait<_Arg##N##T>::type arg##N
-#define _STDEX_CLEAR_PARAMS_IMPL(N) ,_Arg##N##T arg##N
-#define _STDEX_ARGS_IMPL(N) ,arg##N
-
-#undef _STDEX_TMPL_ARGS
-#undef _STDEX_TYPES
-#undef _STDEX_ARGS
-#undef _STDEX_PARAMS
-
-#define _STDEX_TMPL_ARGS(N) _STDEX_TMPL_ARGS_IMPL(N)
-#define _STDEX_TYPES(N) _STDEX_TYPES_IMPL(N)
-#define _STDEX_FUNC_PARAMS(N) _STDEX_FUNC_PARAMS_IMPL(N)
-#define _STDEX_CLEAR_PARAMS(N) _STDEX_CLEAR_PARAMS_IMPL(N)
-#define _STDEX_ARGS(N) _STDEX_ARGS_IMPL(N)
-
-#define _STDEX_TMPL_ARGS0 class _Arg0T
-#define _STDEX_TYPES0 _Arg0T
-#define _STDEX_FUNC_PARAMS0 typename stdex::detail::_dummy_trait<_Arg0T>::type arg0
-#define _STDEX_CLEAR_PARAMS0 _Arg0T arg0
-#define _STDEX_ARGS0 arg0
-_STDEX_INVOKE(0)
-
-#define _STDEX_TMPL_ARGS1 _STDEX_TMPL_ARGS0 _STDEX_TMPL_ARGS(1)
-#define _STDEX_TYPES1 _STDEX_TYPES0 _STDEX_TYPES(1)
-#define _STDEX_FUNC_PARAMS1 _STDEX_FUNC_PARAMS0 _STDEX_FUNC_PARAMS(1)
-#define _STDEX_CLEAR_PARAMS1 _STDEX_CLEAR_PARAMS0 _STDEX_CLEAR_PARAMS(1)
-#define _STDEX_ARGS1 _STDEX_ARGS0 _STDEX_ARGS(1)
-_STDEX_INVOKE(1)
-
-#define _STDEX_TMPL_ARGS2 _STDEX_TMPL_ARGS1 _STDEX_TMPL_ARGS(2)
-#define _STDEX_TYPES2 _STDEX_TYPES1 _STDEX_TYPES(2)
-#define _STDEX_FUNC_PARAMS2 _STDEX_FUNC_PARAMS1 _STDEX_FUNC_PARAMS(2)
-#define _STDEX_CLEAR_PARAMS2 _STDEX_CLEAR_PARAMS1 _STDEX_CLEAR_PARAMS(2)
-#define _STDEX_ARGS2 _STDEX_ARGS1 _STDEX_ARGS(2)
-_STDEX_INVOKE(2)
-
-#define _STDEX_TMPL_ARGS3 _STDEX_TMPL_ARGS2 _STDEX_TMPL_ARGS(3)
-#define _STDEX_TYPES3 _STDEX_TYPES2 _STDEX_TYPES(3)
-#define _STDEX_FUNC_PARAMS3 _STDEX_FUNC_PARAMS2 _STDEX_FUNC_PARAMS(3)
-#define _STDEX_CLEAR_PARAMS3 _STDEX_CLEAR_PARAMS2 _STDEX_CLEAR_PARAMS(3)
-#define _STDEX_ARGS3 _STDEX_ARGS2 _STDEX_ARGS(3)
-_STDEX_INVOKE(3)
-
-#define _STDEX_TMPL_ARGS4 _STDEX_TMPL_ARGS3 _STDEX_TMPL_ARGS(4)
-#define _STDEX_TYPES4 _STDEX_TYPES3 _STDEX_TYPES(4)
-#define _STDEX_FUNC_PARAMS4 _STDEX_FUNC_PARAMS3 _STDEX_FUNC_PARAMS(4)
-#define _STDEX_CLEAR_PARAMS4 _STDEX_CLEAR_PARAMS3 _STDEX_CLEAR_PARAMS(4)
-#define _STDEX_ARGS4 _STDEX_ARGS3 _STDEX_ARGS(4)
-_STDEX_INVOKE(4)
-
-#define _STDEX_TMPL_ARGS5 _STDEX_TMPL_ARGS4 _STDEX_TMPL_ARGS(5)
-#define _STDEX_TYPES5 _STDEX_TYPES4 _STDEX_TYPES(5)
-#define _STDEX_FUNC_PARAMS5 _STDEX_FUNC_PARAMS4 _STDEX_FUNC_PARAMS(5)
-#define _STDEX_CLEAR_PARAMS5 _STDEX_CLEAR_PARAMS4 _STDEX_CLEAR_PARAMS(5)
-#define _STDEX_ARGS5 _STDEX_ARGS4 _STDEX_ARGS(5)
-_STDEX_INVOKE(5)
-
-#define _STDEX_TMPL_ARGS6 _STDEX_TMPL_ARGS5 _STDEX_TMPL_ARGS(6)
-#define _STDEX_TYPES6 _STDEX_TYPES5 _STDEX_TYPES(6)
-#define _STDEX_FUNC_PARAMS6 _STDEX_FUNC_PARAMS5 _STDEX_FUNC_PARAMS(6)
-#define _STDEX_CLEAR_PARAMS6 _STDEX_CLEAR_PARAMS5 _STDEX_CLEAR_PARAMS(6)
-#define _STDEX_ARGS6 _STDEX_ARGS5 _STDEX_ARGS(6)
-_STDEX_INVOKE(6)
-
-#define _STDEX_TMPL_ARGS7 _STDEX_TMPL_ARGS6 _STDEX_TMPL_ARGS(7)
-#define _STDEX_TYPES7 _STDEX_TYPES6 _STDEX_TYPES(7)
-#define _STDEX_FUNC_PARAMS7 _STDEX_FUNC_PARAMS6 _STDEX_FUNC_PARAMS(7)
-#define _STDEX_CLEAR_PARAMS7 _STDEX_CLEAR_PARAMS6 _STDEX_CLEAR_PARAMS(7)
-#define _STDEX_ARGS7 _STDEX_ARGS6 _STDEX_ARGS(7)
-_STDEX_INVOKE(7)
-
-#define _STDEX_TMPL_ARGS8 _STDEX_TMPL_ARGS7 _STDEX_TMPL_ARGS(8)
-#define _STDEX_TYPES8 _STDEX_TYPES7 _STDEX_TYPES(8)
-#define _STDEX_FUNC_PARAMS8 _STDEX_FUNC_PARAMS7 _STDEX_FUNC_PARAMS(8)
-#define _STDEX_CLEAR_PARAMS8 _STDEX_CLEAR_PARAMS7 _STDEX_CLEAR_PARAMS(8)
-#define _STDEX_ARGS8 _STDEX_ARGS7 _STDEX_ARGS(8)
-_STDEX_INVOKE(8)
-
-#define _STDEX_TMPL_ARGS9 _STDEX_TMPL_ARGS8 _STDEX_TMPL_ARGS(9)
-#define _STDEX_TYPES9 _STDEX_TYPES8 _STDEX_TYPES(9)
-#define _STDEX_FUNC_PARAMS9 _STDEX_FUNC_PARAMS8 _STDEX_FUNC_PARAMS(9)
-#define _STDEX_CLEAR_PARAMS9 _STDEX_CLEAR_PARAMS8 _STDEX_CLEAR_PARAMS(9)
-#define _STDEX_ARGS9 _STDEX_ARGS8 _STDEX_ARGS(9)
-_STDEX_INVOKE(9)
-
-#define _STDEX_TMPL_ARGS10 _STDEX_TMPL_ARGS9 _STDEX_TMPL_ARGS(10)
-#define _STDEX_TYPES10 _STDEX_TYPES9 _STDEX_TYPES(10)
-#define _STDEX_FUNC_PARAMS10 _STDEX_FUNC_PARAMS9 _STDEX_FUNC_PARAMS(10)
-#define _STDEX_CLEAR_PARAMS10 _STDEX_CLEAR_PARAMS9 _STDEX_CLEAR_PARAMS(10)
-#define _STDEX_ARGS10 _STDEX_ARGS9 _STDEX_ARGS(10)
-_STDEX_INVOKE(10)
-
-#define _STDEX_TMPL_ARGS11 _STDEX_TMPL_ARGS10 _STDEX_TMPL_ARGS(11)
-#define _STDEX_TYPES11 _STDEX_TYPES10 _STDEX_TYPES(11)
-#define _STDEX_FUNC_PARAMS11 _STDEX_FUNC_PARAMS10 _STDEX_FUNC_PARAMS(11)
-#define _STDEX_CLEAR_PARAMS11 _STDEX_CLEAR_PARAMS10 _STDEX_CLEAR_PARAMS(11)
-#define _STDEX_ARGS11 _STDEX_ARGS10 _STDEX_ARGS(11)
-_STDEX_INVOKE(11)
-
-#define _STDEX_TMPL_ARGS12 _STDEX_TMPL_ARGS11 _STDEX_TMPL_ARGS(12)
-#define _STDEX_TYPES12 _STDEX_TYPES11 _STDEX_TYPES(12)
-#define _STDEX_FUNC_PARAMS12 _STDEX_FUNC_PARAMS11 _STDEX_FUNC_PARAMS(12)
-#define _STDEX_CLEAR_PARAMS12 _STDEX_CLEAR_PARAMS11 _STDEX_CLEAR_PARAMS(12)
-#define _STDEX_ARGS12 _STDEX_ARGS11 _STDEX_ARGS(12)
-_STDEX_INVOKE(12)
-
-#define _STDEX_TMPL_ARGS13 _STDEX_TMPL_ARGS12 _STDEX_TMPL_ARGS(13)
-#define _STDEX_TYPES13 _STDEX_TYPES12 _STDEX_TYPES(13)
-#define _STDEX_FUNC_PARAMS13 _STDEX_FUNC_PARAMS12 _STDEX_FUNC_PARAMS(13)
-#define _STDEX_CLEAR_PARAMS13 _STDEX_CLEAR_PARAMS12 _STDEX_CLEAR_PARAMS(13)
-#define _STDEX_ARGS13 _STDEX_ARGS12 _STDEX_ARGS(13)
-_STDEX_INVOKE(13)
-
-#define _STDEX_TMPL_ARGS14 _STDEX_TMPL_ARGS13 _STDEX_TMPL_ARGS(14)
-#define _STDEX_TYPES14 _STDEX_TYPES13 _STDEX_TYPES(14)
-#define _STDEX_FUNC_PARAMS14 _STDEX_FUNC_PARAMS13 _STDEX_FUNC_PARAMS(14)
-#define _STDEX_CLEAR_PARAMS14 _STDEX_CLEAR_PARAMS13 _STDEX_CLEAR_PARAMS(14)
-#define _STDEX_ARGS14 _STDEX_ARGS13 _STDEX_ARGS(14)
-_STDEX_INVOKE(14)
-
-#define _STDEX_TMPL_ARGS15 _STDEX_TMPL_ARGS14 _STDEX_TMPL_ARGS(15)
-#define _STDEX_TYPES15 _STDEX_TYPES14 _STDEX_TYPES(15)
-#define _STDEX_FUNC_PARAMS15 _STDEX_FUNC_PARAMS14 _STDEX_FUNC_PARAMS(15)
-#define _STDEX_CLEAR_PARAMS15 _STDEX_CLEAR_PARAMS14 _STDEX_CLEAR_PARAMS(15)
-#define _STDEX_ARGS15 _STDEX_ARGS14 _STDEX_ARGS(15)
-_STDEX_INVOKE(15)
-
-#define _STDEX_TMPL_ARGS16 _STDEX_TMPL_ARGS15 _STDEX_TMPL_ARGS(16)
-#define _STDEX_TYPES16 _STDEX_TYPES15 _STDEX_TYPES(16)
-#define _STDEX_FUNC_PARAMS16 _STDEX_FUNC_PARAMS15 _STDEX_FUNC_PARAMS(16)
-#define _STDEX_CLEAR_PARAMS16 _STDEX_CLEAR_PARAMS15 _STDEX_CLEAR_PARAMS(16)
-#define _STDEX_ARGS16 _STDEX_ARGS15 _STDEX_ARGS(16)
-_STDEX_INVOKE(16)
-
-#define _STDEX_TMPL_ARGS17 _STDEX_TMPL_ARGS16 _STDEX_TMPL_ARGS(17)
-#define _STDEX_TYPES17 _STDEX_TYPES16 _STDEX_TYPES(17)
-#define _STDEX_FUNC_PARAMS17 _STDEX_FUNC_PARAMS16 _STDEX_FUNC_PARAMS(17)
-#define _STDEX_CLEAR_PARAMS17 _STDEX_CLEAR_PARAMS16 _STDEX_CLEAR_PARAMS(17)
-#define _STDEX_ARGS17 _STDEX_ARGS16 _STDEX_ARGS(17)
-_STDEX_INVOKE(17)
-
-#define _STDEX_TMPL_ARGS18 _STDEX_TMPL_ARGS17 _STDEX_TMPL_ARGS(18)
-#define _STDEX_TYPES18 _STDEX_TYPES17 _STDEX_TYPES(18)
-#define _STDEX_FUNC_PARAMS18 _STDEX_FUNC_PARAMS17 _STDEX_FUNC_PARAMS(18)
-#define _STDEX_CLEAR_PARAMS18 _STDEX_CLEAR_PARAMS17 _STDEX_CLEAR_PARAMS(18)
-#define _STDEX_ARGS18 _STDEX_ARGS17 _STDEX_ARGS(18)
-_STDEX_INVOKE(18)
-
-#define _STDEX_TMPL_ARGS19 _STDEX_TMPL_ARGS18 _STDEX_TMPL_ARGS(19)
-#define _STDEX_TYPES19 _STDEX_TYPES18 _STDEX_TYPES(19)
-#define _STDEX_FUNC_PARAMS19 _STDEX_FUNC_PARAMS18 _STDEX_FUNC_PARAMS(19)
-#define _STDEX_CLEAR_PARAMS19 _STDEX_CLEAR_PARAMS18 _STDEX_CLEAR_PARAMS(19)
-#define _STDEX_ARGS19 _STDEX_ARGS18 _STDEX_ARGS(19)
-_STDEX_INVOKE(19)
-
-#define _STDEX_TMPL_ARGS20 _STDEX_TMPL_ARGS19 _STDEX_TMPL_ARGS(20)
-#define _STDEX_TYPES20 _STDEX_TYPES19 _STDEX_TYPES(20)
-#define _STDEX_FUNC_PARAMS20 _STDEX_FUNC_PARAMS19 _STDEX_FUNC_PARAMS(20)
-#define _STDEX_CLEAR_PARAMS20 _STDEX_CLEAR_PARAMS19 _STDEX_CLEAR_PARAMS(20)
-#define _STDEX_ARGS20 _STDEX_ARGS19 _STDEX_ARGS(20)
-_STDEX_INVOKE(20)
-
-#define _STDEX_TMPL_ARGS21 _STDEX_TMPL_ARGS20 _STDEX_TMPL_ARGS(21)
-#define _STDEX_TYPES21 _STDEX_TYPES20 _STDEX_TYPES(21)
-#define _STDEX_FUNC_PARAMS21 _STDEX_FUNC_PARAMS20 _STDEX_FUNC_PARAMS(21)
-#define _STDEX_CLEAR_PARAMS21 _STDEX_CLEAR_PARAMS20 _STDEX_CLEAR_PARAMS(21)
-#define _STDEX_ARGS21 _STDEX_ARGS20 _STDEX_ARGS(21)
-_STDEX_INVOKE(21)
-
-#define _STDEX_TMPL_ARGS22 _STDEX_TMPL_ARGS21 _STDEX_TMPL_ARGS(22)
-#define _STDEX_TYPES22 _STDEX_TYPES21 _STDEX_TYPES(22)
-#define _STDEX_FUNC_PARAMS22 _STDEX_FUNC_PARAMS21 _STDEX_FUNC_PARAMS(22)
-#define _STDEX_CLEAR_PARAMS22 _STDEX_CLEAR_PARAMS21 _STDEX_CLEAR_PARAMS(22)
-#define _STDEX_ARGS22 _STDEX_ARGS21 _STDEX_ARGS(22)
-_STDEX_INVOKE(22)
-
-#define _STDEX_TMPL_ARGS23 _STDEX_TMPL_ARGS22 _STDEX_TMPL_ARGS(23)
-#define _STDEX_TYPES23 _STDEX_TYPES22 _STDEX_TYPES(23)
-#define _STDEX_FUNC_PARAMS23 _STDEX_FUNC_PARAMS22 _STDEX_FUNC_PARAMS(23)
-#define _STDEX_CLEAR_PARAMS23 _STDEX_CLEAR_PARAMS22 _STDEX_CLEAR_PARAMS(23)
-#define _STDEX_ARGS23 _STDEX_ARGS22 _STDEX_ARGS(23)
-_STDEX_INVOKE(23)
-
-#define _STDEX_TMPL_ARGS24 _STDEX_TMPL_ARGS23 _STDEX_TMPL_ARGS(24)
-#define _STDEX_TYPES24 _STDEX_TYPES23 _STDEX_TYPES(24)
-#define _STDEX_FUNC_PARAMS24 _STDEX_FUNC_PARAMS23 _STDEX_FUNC_PARAMS(24)
-#define _STDEX_CLEAR_PARAMS24 _STDEX_CLEAR_PARAMS23 _STDEX_CLEAR_PARAMS(24)
-#define _STDEX_ARGS24 _STDEX_ARGS23 _STDEX_ARGS(24)
-_STDEX_INVOKE(24)
-
-#define _STDEX_TMPL_ARGS25 _STDEX_TMPL_ARGS24 _STDEX_TMPL_ARGS(25)
-#define _STDEX_TYPES25 _STDEX_TYPES24 _STDEX_TYPES(25)
-#define _STDEX_FUNC_PARAMS25 _STDEX_FUNC_PARAMS24 _STDEX_FUNC_PARAMS(25)
-#define _STDEX_CLEAR_PARAMS25 _STDEX_CLEAR_PARAMS24 _STDEX_CLEAR_PARAMS(25)
-#define _STDEX_ARGS25 _STDEX_ARGS24 _STDEX_ARGS(25)
-_STDEX_INVOKE(25)
-
-#define _STDEX_TMPL_ARGS26 _STDEX_TMPL_ARGS25 _STDEX_TMPL_ARGS(26)
-#define _STDEX_TYPES26 _STDEX_TYPES25 _STDEX_TYPES(26)
-#define _STDEX_FUNC_PARAMS26 _STDEX_FUNC_PARAMS25 _STDEX_FUNC_PARAMS(26)
-#define _STDEX_CLEAR_PARAMS26 _STDEX_CLEAR_PARAMS25 _STDEX_CLEAR_PARAMS(26)
-#define _STDEX_ARGS26 _STDEX_ARGS25 _STDEX_ARGS(26)
-_STDEX_INVOKE(26)
-
-#define _STDEX_TMPL_ARGS27 _STDEX_TMPL_ARGS26 _STDEX_TMPL_ARGS(27)
-#define _STDEX_TYPES27 _STDEX_TYPES26 _STDEX_TYPES(27)
-#define _STDEX_FUNC_PARAMS27 _STDEX_FUNC_PARAMS26 _STDEX_FUNC_PARAMS(27)
-#define _STDEX_CLEAR_PARAMS27 _STDEX_CLEAR_PARAMS26 _STDEX_CLEAR_PARAMS(27)
-#define _STDEX_ARGS27 _STDEX_ARGS26 _STDEX_ARGS(27)
-_STDEX_INVOKE(27)
-
-#define _STDEX_TMPL_ARGS28 _STDEX_TMPL_ARGS27 _STDEX_TMPL_ARGS(28)
-#define _STDEX_TYPES28 _STDEX_TYPES27 _STDEX_TYPES(28)
-#define _STDEX_FUNC_PARAMS28 _STDEX_FUNC_PARAMS27 _STDEX_FUNC_PARAMS(28)
-#define _STDEX_CLEAR_PARAMS28 _STDEX_CLEAR_PARAMS27 _STDEX_CLEAR_PARAMS(28)
-#define _STDEX_ARGS28 _STDEX_ARGS27 _STDEX_ARGS(28)
-_STDEX_INVOKE(28)
-
-#define _STDEX_TMPL_ARGS29 _STDEX_TMPL_ARGS28 _STDEX_TMPL_ARGS(29)
-#define _STDEX_TYPES29 _STDEX_TYPES28 _STDEX_TYPES(29)
-#define _STDEX_FUNC_PARAMS29 _STDEX_FUNC_PARAMS28 _STDEX_FUNC_PARAMS(29)
-#define _STDEX_CLEAR_PARAMS29 _STDEX_CLEAR_PARAMS28 _STDEX_CLEAR_PARAMS(29)
-#define _STDEX_ARGS29 _STDEX_ARGS28 _STDEX_ARGS(29)
-_STDEX_INVOKE(29)
-
-#define _STDEX_TMPL_ARGS30 _STDEX_TMPL_ARGS29 _STDEX_TMPL_ARGS(30)
-#define _STDEX_TYPES30 _STDEX_TYPES29 _STDEX_TYPES(30)
-#define _STDEX_FUNC_PARAMS30 _STDEX_FUNC_PARAMS29 _STDEX_FUNC_PARAMS(30)
-#define _STDEX_CLEAR_PARAMS30 _STDEX_CLEAR_PARAMS29 _STDEX_CLEAR_PARAMS(30)
-#define _STDEX_ARGS30 _STDEX_ARGS29 _STDEX_ARGS(30)
-_STDEX_INVOKE(30)
-
-#define _STDEX_TMPL_ARGS31 _STDEX_TMPL_ARGS30 _STDEX_TMPL_ARGS(31)
-#define _STDEX_TYPES31 _STDEX_TYPES30 _STDEX_TYPES(31)
-#define _STDEX_FUNC_PARAMS31 _STDEX_FUNC_PARAMS30 _STDEX_FUNC_PARAMS(31)
-#define _STDEX_CLEAR_PARAMS31 _STDEX_CLEAR_PARAMS30 _STDEX_CLEAR_PARAMS(31)
-#define _STDEX_ARGS31 _STDEX_ARGS30 _STDEX_ARGS(31)
-_STDEX_INVOKE(31)
+    public:
+        template <class... _Types>
+        _CONSTEXPR20 auto operator()(_Types&&... _Args) const
+            noexcept(noexcept(_STD invoke(*_Ptr, static_cast<_Types&&>(_Args)...))) // strengthened
+            -> decltype(_STD invoke(*_Ptr, static_cast<_Types&&>(_Args)...)) {
+            return _STD invoke(*_Ptr, static_cast<_Types&&>(_Args)...);
+        }
+    }*/;
 
     
 
