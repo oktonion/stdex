@@ -1410,6 +1410,46 @@ namespace stdex
             _make_args_impl<void, _ArgT, 0, _arg_is_void<_ArgT>::value>
         { };
 
+        template<class _FuncT>
+        struct _functor_pointer_copy
+        {
+            typedef
+            typename
+            conditional<
+                is_pointer<_FuncT>::value == bool(true) ||
+                is_member_function_pointer<_FuncT>::value == bool(true),
+                _FuncT,
+                int&
+            >::type func_ptr_type;
+
+            typedef
+            typename
+            conditional<
+                is_pointer<_FuncT>::value == bool(false) &&
+                is_member_function_pointer<_FuncT>::value == bool(false),
+                _FuncT,
+                int&
+            >::type func_obj_type;
+
+            static std::size_t call(void* &_dst,
+                func_ptr_type _src)
+            {
+                _FuncT *_ptr_to_ptr = new _FuncT(0);
+                (*_ptr_to_ptr) = _src;
+                _dst = _ptr_to_ptr;
+                return sizeof(_FuncT);
+            }
+
+            static std::size_t call(void* &_dst,
+                func_obj_type _src)
+            {
+                _FuncT** _ptr_to_ptr = new _FuncT *();
+                (*_ptr_to_ptr) = &_src;
+                _dst = _ptr_to_ptr;
+                return sizeof(_FuncT);
+            }
+        };
+
         template<class func_base, class _FuncT, class args_type>
         struct _functor :
             func_base
@@ -1433,36 +1473,10 @@ namespace stdex
             }
             virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION { delete this; }
 
-            static std::size_t func_ptr_copy(void* &_dst,
-                typename
-                conditional<
-                    is_pointer<func_type>::value == bool(true) ||
-                    is_member_function_pointer<func_type>::value == bool(true),
-                    func_type,
-                    class _dummy>::type _src)
-            {
-                func_type* _ptr_to_ptr = new func_type();
-                (*_ptr_to_ptr) = _src;
-                _dst = _ptr_to_ptr;
-                return sizeof(func_type);
-            }
-
-            static std::size_t func_ptr_copy(void* &_dst,
-                typename
-                conditional<
-                    is_pointer<func_type>::value,
-                    class _dummy,
-                    func_type&>::type _src)
-            {
-                func_type** _ptr_to_ptr = new func_type*();
-                (*_ptr_to_ptr) = &_src;
-                _dst = _ptr_to_ptr;
-                return sizeof(func_type);
-            }
 
             virtual std::size_t _target(void* &_dst) const _STDEX_NOEXCEPT_FUNCTION
             {
-                return 0;//func_ptr_copy(_dst, _func);
+                return _functor_pointer_copy<func_type>::call(_dst, _func);
             }
 
             virtual const std::type_info& _target_type() const _STDEX_NOEXCEPT_FUNCTION
