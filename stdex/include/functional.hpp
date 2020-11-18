@@ -135,6 +135,79 @@ namespace stdex
         {
             typedef _Tp* type;
         };
+
+        
+        namespace functional_std {
+            // since there is no move-semantic
+            template<class _Tp>
+            _Tp& move(_Tp &ref)
+            {
+                using namespace std;
+                using namespace stdex;
+
+                return ref;
+            }
+
+            template<class _Tp>
+            struct _forward_params
+            {
+                typedef typename remove_reference<_Tp>::type return_type;
+                typedef const typename remove_reference<_Tp>::type& arg_type;
+            };
+
+            template<class _Tp>
+            struct _forward_params<_Tp&>
+            {
+                typedef _Tp& return_type;
+                typedef _Tp& arg_type;
+            };
+
+            template<class _Tp>
+            struct _forward_params<const _Tp&>
+            {
+                typedef const _Tp& return_type;
+                typedef const _Tp& arg_type;
+            };
+
+            template<class _Tp>
+            struct _forward_params<const _Tp>
+            {
+                typedef const typename remove_reference<_Tp>::type& return_type;
+                typedef const typename remove_reference<_Tp>::type& arg_type;
+            };
+
+            template<>
+            struct _forward_params<void>
+            {
+                typedef void return_type;
+                typedef float arg_type;
+            };
+
+            template<class _Tp>
+            struct _forward
+            {
+                static
+                typename _forward_params<_Tp>::return_type call(typename _forward_params<_Tp>::arg_type ref)
+                {
+                    using namespace std;
+                    using namespace stdex;
+
+                    typedef typename _forward_params<_Tp>::return_type return_type;
+
+                    return (ref);
+                }
+
+                static void call() {}
+            };
+
+            template<>
+            struct _forward<void>
+            {
+                static void call(void_type) {}
+                static void call() {}
+            };
+        }
+
     } // namespace detail
 
     namespace functional_cpp11
@@ -734,77 +807,6 @@ namespace stdex
             template<class>
             const type& make(void_type) const { return *this; }
         };
-
-        namespace functional_std {
-            // since there is no move-semantic
-            template<class _Tp>
-            _Tp& move(_Tp &ref)
-            {
-                using namespace std;
-                using namespace stdex;
-
-                return ref;
-            }
-
-            template<class _Tp>
-            struct _forward_params
-            {
-                typedef typename remove_reference<_Tp>::type return_type;
-                typedef const typename remove_reference<_Tp>::type& arg_type;
-            };
-
-            template<class _Tp>
-            struct _forward_params<_Tp&>
-            {
-                typedef _Tp& return_type;
-                typedef _Tp& arg_type;
-            };
-
-            template<class _Tp>
-            struct _forward_params<const _Tp&>
-            {
-                typedef const _Tp& return_type;
-                typedef const _Tp& arg_type;
-            };
-
-            template<class _Tp>
-            struct _forward_params<const _Tp>
-            {
-                typedef const typename remove_reference<_Tp>::type& return_type;
-                typedef const typename remove_reference<_Tp>::type& arg_type;
-            };
-
-            template<>
-            struct _forward_params<void>
-            {
-                typedef void return_type;
-                typedef float arg_type;
-            };
-
-            template<class _Tp>
-            struct _forward
-            {
-                static
-                typename _forward_params<_Tp>::return_type call(typename _forward_params<_Tp>::arg_type ref)
-                {
-                    using namespace std;
-                    using namespace stdex;
-
-                    typedef typename _forward_params<_Tp>::return_type return_type;
-
-                    return (ref);
-                }
-
-                static void call() {}
-            };
-
-            template<>
-            struct _forward<void>
-            {
-                static void call(void_type) {}
-                static void call() {}
-            };
-        }
 
         namespace functional_detail
         {
