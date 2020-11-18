@@ -325,6 +325,13 @@ namespace stdex
             return _func();
         }
 
+        template<>
+        inline
+            void invoke(void(*_func)())
+        {
+            _func();
+        }
+
 #define _STDEX_INVOKE_IMPL(N) \
     template<class _R, _STDEX_TMPL_ARGS##N> \
     _R invoke( _R(*_func)(_STDEX_TYPES##N), _STDEX_FUNC_PARAMS##N)\
@@ -677,12 +684,6 @@ namespace stdex
             _STDEX_INVOKE(31)
     }
 
-    template<>
-    inline
-    void functional_cpp11::invoke(void(*_func)())
-    {
-        _func();
-    }
 
     using functional_cpp11::invoke;
 
