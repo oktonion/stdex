@@ -247,9 +247,6 @@
 #undef _STDEX_PARAMS_MAX
 #undef _STDEX_ARGS_MAX
 
-#undef _STDEX_INVOKE 
-#undef _STDEX_INVOKE_IMPL
-
 #undef       _STDEX_TMPL_ARGS0
 #undef           _STDEX_TYPES0
 #undef          _STDEX_PARAMS0
