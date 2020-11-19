@@ -482,6 +482,9 @@ namespace stdex
         _STDEX_INVOKE(31)
 
 #undef _STDEX_DELIM
+
+#undef _STDEX_INVOKE 
+#undef _STDEX_INVOKE_IMPL
  }
 
 
@@ -1736,6 +1739,8 @@ namespace stdex
     _STDEX_FUNCTION(31)
 
 #undef _STDEX_DELIM
+
+#undef _STDEX_FUNCTION 
 
     // Hashing
 
