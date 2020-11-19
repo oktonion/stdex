@@ -870,33 +870,8 @@ namespace stdex
         template <class _R >
         struct _is_function_ptr_helper<_R(*)()> : true_type {};
 
-#ifdef _STDEX_STDCALL
-        template <class _R >
-        struct _is_function_ptr_helper_stdcall<_R(_STDEX_STDCALL *)() > : true_type {};
-#endif
-#ifdef _STDEX_FASTCALL
-        template <class _R >
-        struct _is_function_ptr_helper_fastcall<_R(_STDEX_FASTCALL *)() > : true_type {};
-#endif
-#ifdef _STDEX_CDECL
-        template <class _R >
-        struct _is_function_ptr_helper_cdecl<_R(_STDEX_CDECL *)() > : true_type {};
-#endif
-
         template <class _R >
         struct _is_function_ptr_helper<_R(*)(...)> : true_type {};
-#ifdef _STDEX_STDCALL
-        template <class _R >
-        struct _is_function_ptr_helper_stdcall<_R(_STDEX_STDCALL *)(...) > : true_type {};
-#endif
-#ifdef _STDEX_FASTCALL
-        template <class _R >
-        struct _is_function_ptr_helper_fastcall<_R(_STDEX_FASTCALL *)(...) > : true_type {};
-#endif
-#ifdef _STDEX_CDECL
-        template <class _R >
-        struct _is_function_ptr_helper_cdecl<_R(_STDEX_CDECL *)(...) > : true_type {};
-#endif
 
 #define _STDEX_IS_FUNCTION_PTR_HELPER_IMPL(N) \
         template<class _R, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
@@ -905,6 +880,11 @@ namespace stdex
         struct _is_function_ptr_helper<_R(*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)...)>: true_type {};
 
 #ifdef _STDEX_STDCALL
+        template <class _R >
+        struct _is_function_ptr_helper_stdcall<_R(_STDEX_STDCALL*)() > : true_type {};
+        template <class _R >
+        struct _is_function_ptr_helper_stdcall<_R(_STDEX_STDCALL*)(...) > : true_type {};
+
 #define _STDEX_IS_FUNCTION_PTR_HELPER_STDCALL(N) \
         template<class _R, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
         struct _is_function_ptr_helper_stdcall<_R(_STDEX_STDCALL *)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK))>: true_type {}; \
@@ -915,6 +895,11 @@ namespace stdex
 #endif
 
 #ifdef _STDEX_FASTCALL
+        template <class _R >
+        struct _is_function_ptr_helper_fastcall<_R(_STDEX_FASTCALL*)() > : true_type {};
+        template <class _R >
+        struct _is_function_ptr_helper_fastcall<_R(_STDEX_FASTCALL*)(...) > : true_type {};
+
 #define _STDEX_IS_FUNCTION_PTR_HELPER_FASTCALL(N) \
         template<class _R, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
         struct _is_function_ptr_helper_fastcall<_R(_STDEX_FASTCALL *)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK))>: true_type {}; \
@@ -925,6 +910,11 @@ namespace stdex
 #endif
 
 #ifdef _STDEX_CDECL
+        template <class _R >
+        struct _is_function_ptr_helper_cdecl<_R(_STDEX_CDECL*)() > : true_type {};
+        template <class _R >
+        struct _is_function_ptr_helper_cdecl<_R(_STDEX_CDECL*)(...) > : true_type {};
+
 #define _STDEX_IS_FUNCTION_PTR_HELPER_CDECL(N) \
         template<class _R, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
         struct _is_function_ptr_helper_cdecl<_R(_STDEX_CDECL *)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK))>: true_type {}; \
