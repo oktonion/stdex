@@ -620,38 +620,38 @@ namespace stdex
 
 #define _STDEX_DELIM ,
 
-_STDEX_INVOKE(0)
-_STDEX_INVOKE(1)
-_STDEX_INVOKE(2)
-_STDEX_INVOKE(3)
-_STDEX_INVOKE(4)
-_STDEX_INVOKE(5)
-_STDEX_INVOKE(6)
-_STDEX_INVOKE(7)
-_STDEX_INVOKE(8)
-_STDEX_INVOKE(9)
-_STDEX_INVOKE(10)
-_STDEX_INVOKE(11)
-_STDEX_INVOKE(12)
-_STDEX_INVOKE(13)
-_STDEX_INVOKE(14)
-_STDEX_INVOKE(15)
-_STDEX_INVOKE(16)
-_STDEX_INVOKE(17)
-_STDEX_INVOKE(18)
-_STDEX_INVOKE(19)
-_STDEX_INVOKE(20)
-_STDEX_INVOKE(21)
-_STDEX_INVOKE(22)
-_STDEX_INVOKE(23)
-_STDEX_INVOKE(24)
-_STDEX_INVOKE(25)
-_STDEX_INVOKE(26)
-_STDEX_INVOKE(27)
-_STDEX_INVOKE(28)
-_STDEX_INVOKE(29)
-_STDEX_INVOKE(30)
-_STDEX_INVOKE(31)
+        _STDEX_INVOKE(0)
+        _STDEX_INVOKE(1)
+        _STDEX_INVOKE(2)
+        _STDEX_INVOKE(3)
+        _STDEX_INVOKE(4)
+        _STDEX_INVOKE(5)
+        _STDEX_INVOKE(6)
+        _STDEX_INVOKE(7)
+        _STDEX_INVOKE(8)
+        _STDEX_INVOKE(9)
+        _STDEX_INVOKE(10)
+        _STDEX_INVOKE(11)
+        _STDEX_INVOKE(12)
+        _STDEX_INVOKE(13)
+        _STDEX_INVOKE(14)
+        _STDEX_INVOKE(15)
+        _STDEX_INVOKE(16)
+        _STDEX_INVOKE(17)
+        _STDEX_INVOKE(18)
+        _STDEX_INVOKE(19)
+        _STDEX_INVOKE(20)
+        _STDEX_INVOKE(21)
+        _STDEX_INVOKE(22)
+        _STDEX_INVOKE(23)
+        _STDEX_INVOKE(24)
+        _STDEX_INVOKE(25)
+        _STDEX_INVOKE(26)
+        _STDEX_INVOKE(27)
+        _STDEX_INVOKE(28)
+        _STDEX_INVOKE(29)
+        _STDEX_INVOKE(30)
+        _STDEX_INVOKE(31)
 
 #undef _STDEX_DELIM
 
@@ -1568,6 +1568,14 @@ _STDEX_INVOKE(31)
                     .template make< _Arg21T>(functional_std::_forward< _Arg21T>::call(arg21))
                     .template make< _Arg22T>(functional_std::_forward< _Arg22T>::call(arg22))
                     .template make< _Arg23T>(functional_std::_forward< _Arg23T>::call(arg23))
+                    .template make< _Arg24T>(functional_std::_forward< _Arg24T>::call(arg24))
+                    .template make< _Arg25T>(functional_std::_forward< _Arg25T>::call(arg25))
+                    .template make< _Arg26T>(functional_std::_forward< _Arg26T>::call(arg26))
+                    .template make< _Arg27T>(functional_std::_forward< _Arg27T>::call(arg27))
+                    .template make< _Arg28T>(functional_std::_forward< _Arg28T>::call(arg28))
+                    .template make< _Arg29T>(functional_std::_forward< _Arg29T>::call(arg29))
+                    .template make< _Arg30T>(functional_std::_forward< _Arg30T>::call(arg30))
+                    .template make< _Arg31T>(functional_std::_forward< _Arg31T>::call(arg31))
                     ;
 
                 return 
@@ -1801,114 +1809,112 @@ _STDEX_INVOKE(31)
         }
     };
 
-    template<class _R, class _Arg0T>
-    class function<_R(*)(_Arg0T)>:
-        detail::_function_impl<_R, typename remove_reference<_Arg0T>::type&>
-    {
-        typedef detail::_function_impl<_R, typename remove_reference<_Arg0T>::type&> base_type;
-        typedef typename stdex::remove_pointer<_R(*)(_Arg0T)>::type function_signature;
-    public:
-        typedef typename base_type::return_type return_type;
-
-        function() _STDEX_NOEXCEPT_FUNCTION : base_type()  {}
-        function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : base_type(nullptr)  {}
-
-        function(const function& other) : base_type(other) { }
-        //function(function&& other) _STDEX_NOEXCEPT_FUNCTION;
-
-
-        template<class _FuncT>
-        function(_FuncT func): base_type(func) { }
-
-        return_type operator()(_Arg0T arg0) { 
-            return 
-            detail::functional_std::_forward<return_type>::call(
-                base_type::operator()(arg0).get() );
-        }
-
-        void swap(function& other) _STDEX_NOEXCEPT_FUNCTION
-        {
-            base_type::swap(other);
-        }
-
-        operator bool() const _STDEX_NOEXCEPT_FUNCTION
-        {
-            return static_cast<const base_type&>(*this);
-        }
-
-        const std::type_info& target_type() const _STDEX_NOEXCEPT_FUNCTION
-        {
-            return base_type::target_type();
-        }
-
-        template<class _FuncT>
-        _FuncT* target() _STDEX_NOEXCEPT_FUNCTION
-        {
-            return base_type::template target<_FuncT>();
-        }
-
-        template<class _FuncT>
-        const _FuncT* target() const _STDEX_NOEXCEPT_FUNCTION
-        {
-            return base_type::template target<_FuncT>();
-        }
+#define _STDEX_FUNCTION(N) \
+    template<class _R,  \
+        _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) \
+    > \
+    class function<_R(*)( \
+        _STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK) \
+        )>: \
+        detail::_function_impl<_R,  \
+            _STDEX_TYPES##N(typename remove_reference <, >::type&) \
+        > \
+    { \
+        typedef  \
+        detail::_function_impl<_R, \
+            _STDEX_TYPES##N(typename remove_reference <, >::type&) \
+        > base_type; \
+ \
+        typedef typename stdex::remove_pointer< \
+            _R(*)( _STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK) ) \
+        >::type function_signature; \
+    public: \
+        typedef typename base_type::return_type return_type; \
+ \
+        function() _STDEX_NOEXCEPT_FUNCTION : base_type()  {} \
+        function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : base_type(nullptr)  {} \
+ \
+        function(const function& other) : base_type(other) { } \
+        /*function(function&& other) _STDEX_NOEXCEPT_FUNCTION;*/ \
+ \
+ \
+        template<class _FuncT> \
+        function(_FuncT func): base_type(func) { } \
+ \
+        return_type operator()( \
+            _STDEX_PARAMS##N(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK) \
+            ) {  \
+            return  \
+            detail::functional_std::_forward<return_type>::call( \
+                base_type::operator()( \
+                    _STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) \
+                    ).get() ); \
+        } \
+ \
+        void swap(function& other) _STDEX_NOEXCEPT_FUNCTION \
+        { \
+            base_type::swap(other); \
+        } \
+ \
+        operator bool() const _STDEX_NOEXCEPT_FUNCTION \
+        { \
+            return static_cast<const base_type&>(*this); \
+        } \
+ \
+        const std::type_info& target_type() const _STDEX_NOEXCEPT_FUNCTION \
+        { \
+            return base_type::target_type(); \
+        } \
+ \
+        template<class _FuncT> \
+        _FuncT* target() _STDEX_NOEXCEPT_FUNCTION \
+        { \
+            return base_type::template target<_FuncT>(); \
+        } \
+ \
+        template<class _FuncT> \
+        const _FuncT* target() const _STDEX_NOEXCEPT_FUNCTION \
+        { \
+            return base_type::template target<_FuncT>(); \
+        } \
     };
 
-    template<class _R, class _Arg0T, class _Arg1T>
-    class function<_R(*)(_Arg0T, _Arg1T)>:
-        detail::_function_impl<_R,
-            typename remove_reference<_Arg0T>::type&, typename remove_reference<_Arg1T>::type&>
-    {
-        typedef detail::_function_impl<_R,
-            typename remove_reference<_Arg0T>::type&, typename remove_reference<_Arg1T>::type&> base_type;
-        typedef typename stdex::remove_pointer<_R(*)(
-            _Arg0T, _Arg1T)>::type function_signature;
-    public:
-        typedef typename base_type::return_type return_type;
+#define _STDEX_DELIM ,
 
-        function() _STDEX_NOEXCEPT_FUNCTION : base_type()  {}
-        function(stdex::nullptr_t) _STDEX_NOEXCEPT_FUNCTION : base_type(nullptr)  {}
+    _STDEX_FUNCTION(0)
+    _STDEX_FUNCTION(1)
+    _STDEX_FUNCTION(2)
+    _STDEX_FUNCTION(3)
+    _STDEX_FUNCTION(4)
+    _STDEX_FUNCTION(5)
+    _STDEX_FUNCTION(6)
+    _STDEX_FUNCTION(7)
+    _STDEX_FUNCTION(8)
+    _STDEX_FUNCTION(9)
+    _STDEX_FUNCTION(10)
+    _STDEX_FUNCTION(11)
+    _STDEX_FUNCTION(12)
+    _STDEX_FUNCTION(13)
+    _STDEX_FUNCTION(14)
+    _STDEX_FUNCTION(15)
+    _STDEX_FUNCTION(16)
+    _STDEX_FUNCTION(17)
+    _STDEX_FUNCTION(18)
+    _STDEX_FUNCTION(19)
+    _STDEX_FUNCTION(20)
+    _STDEX_FUNCTION(21)
+    _STDEX_FUNCTION(22)
+    _STDEX_FUNCTION(23)
+    _STDEX_FUNCTION(24)
+    _STDEX_FUNCTION(25)
+    _STDEX_FUNCTION(26)
+    _STDEX_FUNCTION(27)
+    _STDEX_FUNCTION(28)
+    _STDEX_FUNCTION(29)
+    _STDEX_FUNCTION(30)
+    _STDEX_FUNCTION(31)
 
-        function(const function& other) : base_type(other) { }
-        //function(function&& other) _STDEX_NOEXCEPT_FUNCTION;
-
-
-        template<class _FuncT>
-        function(_FuncT func): base_type(func) { }
-
-        return_type operator()(_Arg0T arg0, _Arg1T arg1) { 
-            return 
-            detail::functional_std::_forward<return_type>::call(
-                base_type::operator()(arg0, arg1).get() ); 
-        }
-
-        void swap(function& other) _STDEX_NOEXCEPT_FUNCTION
-        {
-            base_type::swap(other);
-        }
-
-        operator bool() const _STDEX_NOEXCEPT_FUNCTION
-        {
-            return static_cast<const base_type&>(*this);
-        }
-
-        const std::type_info& target_type() const _STDEX_NOEXCEPT_FUNCTION
-        {
-            return base_type::target_type();
-        }
-
-        template<class _FuncT>
-        _FuncT* target() _STDEX_NOEXCEPT_FUNCTION
-        {
-            return base_type::template target<_FuncT>();
-        }
-
-        template<class _FuncT>
-        const _FuncT* target() const _STDEX_NOEXCEPT_FUNCTION
-        {
-            return base_type::template target<_FuncT>();
-        }
-    };
+#undef _STDEX_DELIM
 
     // Hashing
 
