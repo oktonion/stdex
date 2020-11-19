@@ -200,13 +200,13 @@
 #endif
 
 #define _STDEX_TMPL_ARGS_MAX_IMPL(N, prefix, postfix) \
-    _STDEX_TMPL_ARGS##N##(prefix, postfix)
+    _STDEX_TMPL_ARGS##N (prefix, postfix)
 #define _STDEX_TYPES_MAX_IMPL(N, prefix, postfix) \
-    _STDEX_TYPES##N##(prefix, postfix)
+    _STDEX_TYPES##N (prefix, postfix)
 #define _STDEX_PARAMS_MAX_IMPL(N, prefix1, postfix1, prefix2, postfix2) \
-    _STDEX_PARAMS##N##(prefix1, postfix1, prefix2, postfix2)
+    _STDEX_PARAMS##N (prefix1, postfix1, prefix2, postfix2)
 #define _STDEX_ARGS_MAX_IMPL(N, prefix, postfix) \
-    _STDEX_ARGS##N##(prefix, postfix)
+    _STDEX_ARGS##N (prefix, postfix)
 
 #define _STDEX_TMPL_ARGS_MAX(prefix, postfix) \
     _STDEX_TMPL_ARGS_MAX_IMPL(31, prefix, postfix)
