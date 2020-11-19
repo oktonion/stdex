@@ -463,160 +463,162 @@ namespace stdex
 #define _STDEX_PARAMS0(prefix, postfix) _STDEX_PARAMS(prefix, 0, postfix)
 #define _STDEX_ARGS0(prefix, postfix) _STDEX_ARGS(prefix, 0, postfix)
 
-#define _STDEX_TMPL_ARGS1(prefix, postfix) _STDEX_TMPL_ARGS0(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 1, postfix)
-#define _STDEX_TYPES1(prefix, postfix) _STDEX_TYPES0(prefix, postfix), _STDEX_TYPES(prefix, 1, postfix)
-#define _STDEX_PARAMS1(prefix, postfix) _STDEX_PARAMS0(prefix, postfix), _STDEX_PARAMS(prefix, 1, postfix)
-#define _STDEX_ARGS1(prefix, postfix) _STDEX_ARGS0(prefix, postfix), _STDEX_ARGS(prefix, 1, postfix)
+#define _STDEX_TMPL_ARGS1(prefix, postfix) _STDEX_TMPL_ARGS0(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 1, postfix)
+#define _STDEX_TYPES1(prefix, postfix) _STDEX_TYPES0(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 1, postfix)
+#define _STDEX_PARAMS1(prefix, postfix) _STDEX_PARAMS0(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 1, postfix)
+#define _STDEX_ARGS1(prefix, postfix) _STDEX_ARGS0(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 1, postfix)
 
-#define _STDEX_TMPL_ARGS2(prefix, postfix) _STDEX_TMPL_ARGS1(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 2, postfix)
-#define _STDEX_TYPES2(prefix, postfix) _STDEX_TYPES1(prefix, postfix), _STDEX_TYPES(prefix, 2, postfix)
-#define _STDEX_PARAMS2(prefix, postfix) _STDEX_PARAMS1(prefix, postfix), _STDEX_PARAMS(prefix, 2, postfix)
-#define _STDEX_ARGS2(prefix, postfix) _STDEX_ARGS1(prefix, postfix), _STDEX_ARGS(prefix, 2, postfix)
+#define _STDEX_TMPL_ARGS2(prefix, postfix) _STDEX_TMPL_ARGS1(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 2, postfix)
+#define _STDEX_TYPES2(prefix, postfix) _STDEX_TYPES1(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 2, postfix)
+#define _STDEX_PARAMS2(prefix, postfix) _STDEX_PARAMS1(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 2, postfix)
+#define _STDEX_ARGS2(prefix, postfix) _STDEX_ARGS1(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 2, postfix)
 
-#define _STDEX_TMPL_ARGS3(prefix, postfix) _STDEX_TMPL_ARGS2(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 3, postfix)
-#define _STDEX_TYPES3(prefix, postfix) _STDEX_TYPES2(prefix, postfix), _STDEX_TYPES(prefix, 3, postfix)
-#define _STDEX_PARAMS3(prefix, postfix) _STDEX_PARAMS2(prefix, postfix), _STDEX_PARAMS(prefix, 3, postfix)
-#define _STDEX_ARGS3(prefix, postfix) _STDEX_ARGS2(prefix, postfix), _STDEX_ARGS(prefix, 3, postfix)
+#define _STDEX_TMPL_ARGS3(prefix, postfix) _STDEX_TMPL_ARGS2(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 3, postfix)
+#define _STDEX_TYPES3(prefix, postfix) _STDEX_TYPES2(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 3, postfix)
+#define _STDEX_PARAMS3(prefix, postfix) _STDEX_PARAMS2(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 3, postfix)
+#define _STDEX_ARGS3(prefix, postfix) _STDEX_ARGS2(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 3, postfix)
 
-#define _STDEX_TMPL_ARGS4(prefix, postfix) _STDEX_TMPL_ARGS3(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 4, postfix)
-#define _STDEX_TYPES4(prefix, postfix) _STDEX_TYPES3(prefix, postfix), _STDEX_TYPES(prefix, 4, postfix)
-#define _STDEX_PARAMS4(prefix, postfix) _STDEX_PARAMS3(prefix, postfix), _STDEX_PARAMS(prefix, 4, postfix)
-#define _STDEX_ARGS4(prefix, postfix) _STDEX_ARGS3(prefix, postfix), _STDEX_ARGS(prefix, 4, postfix)
+#define _STDEX_TMPL_ARGS4(prefix, postfix) _STDEX_TMPL_ARGS3(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 4, postfix)
+#define _STDEX_TYPES4(prefix, postfix) _STDEX_TYPES3(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 4, postfix)
+#define _STDEX_PARAMS4(prefix, postfix) _STDEX_PARAMS3(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 4, postfix)
+#define _STDEX_ARGS4(prefix, postfix) _STDEX_ARGS3(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 4, postfix)
 
-#define _STDEX_TMPL_ARGS5(prefix, postfix) _STDEX_TMPL_ARGS4(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 5, postfix)
-#define _STDEX_TYPES5(prefix, postfix) _STDEX_TYPES4(prefix, postfix), _STDEX_TYPES(prefix, 5, postfix)
-#define _STDEX_PARAMS5(prefix, postfix) _STDEX_PARAMS4(prefix, postfix), _STDEX_PARAMS(prefix, 5, postfix)
-#define _STDEX_ARGS5(prefix, postfix) _STDEX_ARGS4(prefix, postfix), _STDEX_ARGS(prefix, 5, postfix)
+#define _STDEX_TMPL_ARGS5(prefix, postfix) _STDEX_TMPL_ARGS4(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 5, postfix)
+#define _STDEX_TYPES5(prefix, postfix) _STDEX_TYPES4(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 5, postfix)
+#define _STDEX_PARAMS5(prefix, postfix) _STDEX_PARAMS4(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 5, postfix)
+#define _STDEX_ARGS5(prefix, postfix) _STDEX_ARGS4(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 5, postfix)
 
-#define _STDEX_TMPL_ARGS6(prefix, postfix) _STDEX_TMPL_ARGS5(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 6, postfix)
-#define _STDEX_TYPES6(prefix, postfix) _STDEX_TYPES5(prefix, postfix), _STDEX_TYPES(prefix, 6, postfix)
-#define _STDEX_PARAMS6(prefix, postfix) _STDEX_PARAMS5(prefix, postfix), _STDEX_PARAMS(prefix, 6, postfix)
-#define _STDEX_ARGS6(prefix, postfix) _STDEX_ARGS5(prefix, postfix), _STDEX_ARGS(prefix, 6, postfix)
+#define _STDEX_TMPL_ARGS6(prefix, postfix) _STDEX_TMPL_ARGS5(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 6, postfix)
+#define _STDEX_TYPES6(prefix, postfix) _STDEX_TYPES5(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 6, postfix)
+#define _STDEX_PARAMS6(prefix, postfix) _STDEX_PARAMS5(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 6, postfix)
+#define _STDEX_ARGS6(prefix, postfix) _STDEX_ARGS5(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 6, postfix)
 
-#define _STDEX_TMPL_ARGS7(prefix, postfix) _STDEX_TMPL_ARGS6(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 7, postfix)
-#define _STDEX_TYPES7(prefix, postfix) _STDEX_TYPES6(prefix, postfix), _STDEX_TYPES(prefix, 7, postfix)
-#define _STDEX_PARAMS7(prefix, postfix) _STDEX_PARAMS6(prefix, postfix), _STDEX_PARAMS(prefix, 7, postfix)
-#define _STDEX_ARGS7(prefix, postfix) _STDEX_ARGS6(prefix, postfix), _STDEX_ARGS(prefix, 7, postfix)
+#define _STDEX_TMPL_ARGS7(prefix, postfix) _STDEX_TMPL_ARGS6(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 7, postfix)
+#define _STDEX_TYPES7(prefix, postfix) _STDEX_TYPES6(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 7, postfix)
+#define _STDEX_PARAMS7(prefix, postfix) _STDEX_PARAMS6(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 7, postfix)
+#define _STDEX_ARGS7(prefix, postfix) _STDEX_ARGS6(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 7, postfix)
 
-#define _STDEX_TMPL_ARGS8(prefix, postfix) _STDEX_TMPL_ARGS7(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 8, postfix)
-#define _STDEX_TYPES8(prefix, postfix) _STDEX_TYPES7(prefix, postfix), _STDEX_TYPES(prefix, 8, postfix)
-#define _STDEX_PARAMS8(prefix, postfix) _STDEX_PARAMS7(prefix, postfix), _STDEX_PARAMS(prefix, 8, postfix)
-#define _STDEX_ARGS8(prefix, postfix) _STDEX_ARGS7(prefix, postfix), _STDEX_ARGS(prefix, 8, postfix)
+#define _STDEX_TMPL_ARGS8(prefix, postfix) _STDEX_TMPL_ARGS7(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 8, postfix)
+#define _STDEX_TYPES8(prefix, postfix) _STDEX_TYPES7(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 8, postfix)
+#define _STDEX_PARAMS8(prefix, postfix) _STDEX_PARAMS7(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 8, postfix)
+#define _STDEX_ARGS8(prefix, postfix) _STDEX_ARGS7(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 8, postfix)
 
-#define _STDEX_TMPL_ARGS9(prefix, postfix) _STDEX_TMPL_ARGS8(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 9, postfix)
-#define _STDEX_TYPES9(prefix, postfix) _STDEX_TYPES8(prefix, postfix), _STDEX_TYPES(prefix, 9, postfix)
-#define _STDEX_PARAMS9(prefix, postfix) _STDEX_PARAMS8(prefix, postfix), _STDEX_PARAMS(prefix, 9, postfix)
-#define _STDEX_ARGS9(prefix, postfix) _STDEX_ARGS8(prefix, postfix), _STDEX_ARGS(prefix, 9, postfix)
+#define _STDEX_TMPL_ARGS9(prefix, postfix) _STDEX_TMPL_ARGS8(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 9, postfix)
+#define _STDEX_TYPES9(prefix, postfix) _STDEX_TYPES8(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 9, postfix)
+#define _STDEX_PARAMS9(prefix, postfix) _STDEX_PARAMS8(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 9, postfix)
+#define _STDEX_ARGS9(prefix, postfix) _STDEX_ARGS8(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 9, postfix)
 
-#define _STDEX_TMPL_ARGS10(prefix, postfix) _STDEX_TMPL_ARGS9(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 10, postfix)
-#define _STDEX_TYPES10(prefix, postfix) _STDEX_TYPES9(prefix, postfix), _STDEX_TYPES(prefix, 10, postfix)
-#define _STDEX_PARAMS10(prefix, postfix) _STDEX_PARAMS9(prefix, postfix), _STDEX_PARAMS(prefix, 10, postfix)
-#define _STDEX_ARGS10(prefix, postfix) _STDEX_ARGS9(prefix, postfix), _STDEX_ARGS(prefix, 10, postfix)
+#define _STDEX_TMPL_ARGS10(prefix, postfix) _STDEX_TMPL_ARGS9(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 10, postfix)
+#define _STDEX_TYPES10(prefix, postfix) _STDEX_TYPES9(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 10, postfix)
+#define _STDEX_PARAMS10(prefix, postfix) _STDEX_PARAMS9(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 10, postfix)
+#define _STDEX_ARGS10(prefix, postfix) _STDEX_ARGS9(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 10, postfix)
 
-#define _STDEX_TMPL_ARGS11(prefix, postfix) _STDEX_TMPL_ARGS10(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 11, postfix)
-#define _STDEX_TYPES11(prefix, postfix) _STDEX_TYPES10(prefix, postfix), _STDEX_TYPES(prefix, 11, postfix)
-#define _STDEX_PARAMS11(prefix, postfix) _STDEX_PARAMS10(prefix, postfix), _STDEX_PARAMS(prefix, 11, postfix)
-#define _STDEX_ARGS11(prefix, postfix) _STDEX_ARGS10(prefix, postfix), _STDEX_ARGS(prefix, 11, postfix)
+#define _STDEX_TMPL_ARGS11(prefix, postfix) _STDEX_TMPL_ARGS10(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 11, postfix)
+#define _STDEX_TYPES11(prefix, postfix) _STDEX_TYPES10(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 11, postfix)
+#define _STDEX_PARAMS11(prefix, postfix) _STDEX_PARAMS10(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 11, postfix)
+#define _STDEX_ARGS11(prefix, postfix) _STDEX_ARGS10(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 11, postfix)
 
-#define _STDEX_TMPL_ARGS12(prefix, postfix) _STDEX_TMPL_ARGS11(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 12, postfix)
-#define _STDEX_TYPES12(prefix, postfix) _STDEX_TYPES11(prefix, postfix), _STDEX_TYPES(prefix, 12, postfix)
-#define _STDEX_PARAMS12(prefix, postfix) _STDEX_PARAMS11(prefix, postfix), _STDEX_PARAMS(prefix, 12, postfix)
-#define _STDEX_ARGS12(prefix, postfix) _STDEX_ARGS11(prefix, postfix), _STDEX_ARGS(prefix, 12, postfix)
+#define _STDEX_TMPL_ARGS12(prefix, postfix) _STDEX_TMPL_ARGS11(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 12, postfix)
+#define _STDEX_TYPES12(prefix, postfix) _STDEX_TYPES11(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 12, postfix)
+#define _STDEX_PARAMS12(prefix, postfix) _STDEX_PARAMS11(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 12, postfix)
+#define _STDEX_ARGS12(prefix, postfix) _STDEX_ARGS11(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 12, postfix)
 
-#define _STDEX_TMPL_ARGS13(prefix, postfix) _STDEX_TMPL_ARGS12(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 13, postfix)
-#define _STDEX_TYPES13(prefix, postfix) _STDEX_TYPES12(prefix, postfix), _STDEX_TYPES(prefix, 13, postfix)
-#define _STDEX_PARAMS13(prefix, postfix) _STDEX_PARAMS12(prefix, postfix), _STDEX_PARAMS(prefix, 13, postfix)
-#define _STDEX_ARGS13(prefix, postfix) _STDEX_ARGS12(prefix, postfix), _STDEX_ARGS(prefix, 13, postfix)
+#define _STDEX_TMPL_ARGS13(prefix, postfix) _STDEX_TMPL_ARGS12(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 13, postfix)
+#define _STDEX_TYPES13(prefix, postfix) _STDEX_TYPES12(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 13, postfix)
+#define _STDEX_PARAMS13(prefix, postfix) _STDEX_PARAMS12(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 13, postfix)
+#define _STDEX_ARGS13(prefix, postfix) _STDEX_ARGS12(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 13, postfix)
 
-#define _STDEX_TMPL_ARGS14(prefix, postfix) _STDEX_TMPL_ARGS13(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 14, postfix)
-#define _STDEX_TYPES14(prefix, postfix) _STDEX_TYPES13(prefix, postfix), _STDEX_TYPES(prefix, 14, postfix)
-#define _STDEX_PARAMS14(prefix, postfix) _STDEX_PARAMS13(prefix, postfix), _STDEX_PARAMS(prefix, 14, postfix)
-#define _STDEX_ARGS14(prefix, postfix) _STDEX_ARGS13(prefix, postfix), _STDEX_ARGS(prefix, 14, postfix)
+#define _STDEX_TMPL_ARGS14(prefix, postfix) _STDEX_TMPL_ARGS13(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 14, postfix)
+#define _STDEX_TYPES14(prefix, postfix) _STDEX_TYPES13(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 14, postfix)
+#define _STDEX_PARAMS14(prefix, postfix) _STDEX_PARAMS13(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 14, postfix)
+#define _STDEX_ARGS14(prefix, postfix) _STDEX_ARGS13(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 14, postfix)
 
-#define _STDEX_TMPL_ARGS15(prefix, postfix) _STDEX_TMPL_ARGS14(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 15, postfix)
-#define _STDEX_TYPES15(prefix, postfix) _STDEX_TYPES14(prefix, postfix), _STDEX_TYPES(prefix, 15, postfix)
-#define _STDEX_PARAMS15(prefix, postfix) _STDEX_PARAMS14(prefix, postfix), _STDEX_PARAMS(prefix, 15, postfix)
-#define _STDEX_ARGS15(prefix, postfix) _STDEX_ARGS14(prefix, postfix), _STDEX_ARGS(prefix, 15, postfix)
+#define _STDEX_TMPL_ARGS15(prefix, postfix) _STDEX_TMPL_ARGS14(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 15, postfix)
+#define _STDEX_TYPES15(prefix, postfix) _STDEX_TYPES14(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 15, postfix)
+#define _STDEX_PARAMS15(prefix, postfix) _STDEX_PARAMS14(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 15, postfix)
+#define _STDEX_ARGS15(prefix, postfix) _STDEX_ARGS14(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 15, postfix)
 
-#define _STDEX_TMPL_ARGS16(prefix, postfix) _STDEX_TMPL_ARGS15(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 16, postfix)
-#define _STDEX_TYPES16(prefix, postfix) _STDEX_TYPES15(prefix, postfix), _STDEX_TYPES(prefix, 16, postfix)
-#define _STDEX_PARAMS16(prefix, postfix) _STDEX_PARAMS15(prefix, postfix), _STDEX_PARAMS(prefix, 16, postfix)
-#define _STDEX_ARGS16(prefix, postfix) _STDEX_ARGS15(prefix, postfix), _STDEX_ARGS(prefix, 16, postfix)
+#define _STDEX_TMPL_ARGS16(prefix, postfix) _STDEX_TMPL_ARGS15(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 16, postfix)
+#define _STDEX_TYPES16(prefix, postfix) _STDEX_TYPES15(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 16, postfix)
+#define _STDEX_PARAMS16(prefix, postfix) _STDEX_PARAMS15(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 16, postfix)
+#define _STDEX_ARGS16(prefix, postfix) _STDEX_ARGS15(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 16, postfix)
 
-#define _STDEX_TMPL_ARGS17(prefix, postfix) _STDEX_TMPL_ARGS16(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 17, postfix)
-#define _STDEX_TYPES17(prefix, postfix) _STDEX_TYPES16(prefix, postfix), _STDEX_TYPES(prefix, 17, postfix)
-#define _STDEX_PARAMS17(prefix, postfix) _STDEX_PARAMS16(prefix, postfix), _STDEX_PARAMS(prefix, 17, postfix)
-#define _STDEX_ARGS17(prefix, postfix) _STDEX_ARGS16(prefix, postfix), _STDEX_ARGS(prefix, 17, postfix)
+#define _STDEX_TMPL_ARGS17(prefix, postfix) _STDEX_TMPL_ARGS16(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 17, postfix)
+#define _STDEX_TYPES17(prefix, postfix) _STDEX_TYPES16(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 17, postfix)
+#define _STDEX_PARAMS17(prefix, postfix) _STDEX_PARAMS16(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 17, postfix)
+#define _STDEX_ARGS17(prefix, postfix) _STDEX_ARGS16(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 17, postfix)
 
-#define _STDEX_TMPL_ARGS18(prefix, postfix) _STDEX_TMPL_ARGS17(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 18, postfix)
-#define _STDEX_TYPES18(prefix, postfix) _STDEX_TYPES17(prefix, postfix), _STDEX_TYPES(prefix, 18, postfix)
-#define _STDEX_PARAMS18(prefix, postfix) _STDEX_PARAMS17(prefix, postfix), _STDEX_PARAMS(prefix, 18, postfix)
-#define _STDEX_ARGS18(prefix, postfix) _STDEX_ARGS17(prefix, postfix), _STDEX_ARGS(prefix, 18, postfix)
+#define _STDEX_TMPL_ARGS18(prefix, postfix) _STDEX_TMPL_ARGS17(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 18, postfix)
+#define _STDEX_TYPES18(prefix, postfix) _STDEX_TYPES17(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 18, postfix)
+#define _STDEX_PARAMS18(prefix, postfix) _STDEX_PARAMS17(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 18, postfix)
+#define _STDEX_ARGS18(prefix, postfix) _STDEX_ARGS17(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 18, postfix)
 
-#define _STDEX_TMPL_ARGS19(prefix, postfix) _STDEX_TMPL_ARGS18(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 19, postfix)
-#define _STDEX_TYPES19(prefix, postfix) _STDEX_TYPES18(prefix, postfix), _STDEX_TYPES(prefix, 19, postfix)
-#define _STDEX_PARAMS19(prefix, postfix) _STDEX_PARAMS18(prefix, postfix), _STDEX_PARAMS(prefix, 19, postfix)
-#define _STDEX_ARGS19(prefix, postfix) _STDEX_ARGS18(prefix, postfix), _STDEX_ARGS(prefix, 19, postfix)
+#define _STDEX_TMPL_ARGS19(prefix, postfix) _STDEX_TMPL_ARGS18(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 19, postfix)
+#define _STDEX_TYPES19(prefix, postfix) _STDEX_TYPES18(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 19, postfix)
+#define _STDEX_PARAMS19(prefix, postfix) _STDEX_PARAMS18(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 19, postfix)
+#define _STDEX_ARGS19(prefix, postfix) _STDEX_ARGS18(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 19, postfix)
 
-#define _STDEX_TMPL_ARGS20(prefix, postfix) _STDEX_TMPL_ARGS19(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 20, postfix)
-#define _STDEX_TYPES20(prefix, postfix) _STDEX_TYPES19(prefix, postfix), _STDEX_TYPES(prefix, 20, postfix)
-#define _STDEX_PARAMS20(prefix, postfix) _STDEX_PARAMS19(prefix, postfix), _STDEX_PARAMS(prefix, 20, postfix)
-#define _STDEX_ARGS20(prefix, postfix) _STDEX_ARGS19(prefix, postfix), _STDEX_ARGS(prefix, 20, postfix)
+#define _STDEX_TMPL_ARGS20(prefix, postfix) _STDEX_TMPL_ARGS19(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 20, postfix)
+#define _STDEX_TYPES20(prefix, postfix) _STDEX_TYPES19(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 20, postfix)
+#define _STDEX_PARAMS20(prefix, postfix) _STDEX_PARAMS19(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 20, postfix)
+#define _STDEX_ARGS20(prefix, postfix) _STDEX_ARGS19(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 20, postfix)
 
-#define _STDEX_TMPL_ARGS21(prefix, postfix) _STDEX_TMPL_ARGS20(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 21, postfix)
-#define _STDEX_TYPES21(prefix, postfix) _STDEX_TYPES20(prefix, postfix), _STDEX_TYPES(prefix, 21, postfix)
-#define _STDEX_PARAMS21(prefix, postfix) _STDEX_PARAMS20(prefix, postfix), _STDEX_PARAMS(prefix, 21, postfix)
-#define _STDEX_ARGS21(prefix, postfix) _STDEX_ARGS20(prefix, postfix), _STDEX_ARGS(prefix, 21, postfix)
+#define _STDEX_TMPL_ARGS21(prefix, postfix) _STDEX_TMPL_ARGS20(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 21, postfix)
+#define _STDEX_TYPES21(prefix, postfix) _STDEX_TYPES20(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 21, postfix)
+#define _STDEX_PARAMS21(prefix, postfix) _STDEX_PARAMS20(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 21, postfix)
+#define _STDEX_ARGS21(prefix, postfix) _STDEX_ARGS20(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 21, postfix)
 
-#define _STDEX_TMPL_ARGS22(prefix, postfix) _STDEX_TMPL_ARGS21(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 22, postfix)
-#define _STDEX_TYPES22(prefix, postfix) _STDEX_TYPES21(prefix, postfix), _STDEX_TYPES(prefix, 22, postfix)
-#define _STDEX_PARAMS22(prefix, postfix) _STDEX_PARAMS21(prefix, postfix), _STDEX_PARAMS(prefix, 22, postfix)
-#define _STDEX_ARGS22(prefix, postfix) _STDEX_ARGS21(prefix, postfix), _STDEX_ARGS(prefix, 22, postfix)
+#define _STDEX_TMPL_ARGS22(prefix, postfix) _STDEX_TMPL_ARGS21(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 22, postfix)
+#define _STDEX_TYPES22(prefix, postfix) _STDEX_TYPES21(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 22, postfix)
+#define _STDEX_PARAMS22(prefix, postfix) _STDEX_PARAMS21(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 22, postfix)
+#define _STDEX_ARGS22(prefix, postfix) _STDEX_ARGS21(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 22, postfix)
 
-#define _STDEX_TMPL_ARGS23(prefix, postfix) _STDEX_TMPL_ARGS22(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 23, postfix)
-#define _STDEX_TYPES23(prefix, postfix) _STDEX_TYPES22(prefix, postfix), _STDEX_TYPES(prefix, 23, postfix)
-#define _STDEX_PARAMS23(prefix, postfix) _STDEX_PARAMS22(prefix, postfix), _STDEX_PARAMS(prefix, 23, postfix)
-#define _STDEX_ARGS23(prefix, postfix) _STDEX_ARGS22(prefix, postfix), _STDEX_ARGS(prefix, 23, postfix)
+#define _STDEX_TMPL_ARGS23(prefix, postfix) _STDEX_TMPL_ARGS22(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 23, postfix)
+#define _STDEX_TYPES23(prefix, postfix) _STDEX_TYPES22(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 23, postfix)
+#define _STDEX_PARAMS23(prefix, postfix) _STDEX_PARAMS22(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 23, postfix)
+#define _STDEX_ARGS23(prefix, postfix) _STDEX_ARGS22(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 23, postfix)
 
-#define _STDEX_TMPL_ARGS24(prefix, postfix) _STDEX_TMPL_ARGS23(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 24, postfix)
-#define _STDEX_TYPES24(prefix, postfix) _STDEX_TYPES23(prefix, postfix), _STDEX_TYPES(prefix, 24, postfix)
-#define _STDEX_PARAMS24(prefix, postfix) _STDEX_PARAMS23(prefix, postfix), _STDEX_PARAMS(prefix, 24, postfix)
-#define _STDEX_ARGS24(prefix, postfix) _STDEX_ARGS23(prefix, postfix), _STDEX_ARGS(prefix, 24, postfix)
+#define _STDEX_TMPL_ARGS24(prefix, postfix) _STDEX_TMPL_ARGS23(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 24, postfix)
+#define _STDEX_TYPES24(prefix, postfix) _STDEX_TYPES23(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 24, postfix)
+#define _STDEX_PARAMS24(prefix, postfix) _STDEX_PARAMS23(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 24, postfix)
+#define _STDEX_ARGS24(prefix, postfix) _STDEX_ARGS23(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 24, postfix)
 
-#define _STDEX_TMPL_ARGS25(prefix, postfix) _STDEX_TMPL_ARGS24(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 25, postfix)
-#define _STDEX_TYPES25(prefix, postfix) _STDEX_TYPES24(prefix, postfix), _STDEX_TYPES(prefix, 25, postfix)
-#define _STDEX_PARAMS25(prefix, postfix) _STDEX_PARAMS24(prefix, postfix), _STDEX_PARAMS(prefix, 25, postfix)
-#define _STDEX_ARGS25(prefix, postfix) _STDEX_ARGS24(prefix, postfix), _STDEX_ARGS(prefix, 25, postfix)
+#define _STDEX_TMPL_ARGS25(prefix, postfix) _STDEX_TMPL_ARGS24(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 25, postfix)
+#define _STDEX_TYPES25(prefix, postfix) _STDEX_TYPES24(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 25, postfix)
+#define _STDEX_PARAMS25(prefix, postfix) _STDEX_PARAMS24(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 25, postfix)
+#define _STDEX_ARGS25(prefix, postfix) _STDEX_ARGS24(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 25, postfix)
 
-#define _STDEX_TMPL_ARGS26(prefix, postfix) _STDEX_TMPL_ARGS25(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 26, postfix)
-#define _STDEX_TYPES26(prefix, postfix) _STDEX_TYPES25(prefix, postfix), _STDEX_TYPES(prefix, 26, postfix)
-#define _STDEX_PARAMS26(prefix, postfix) _STDEX_PARAMS25(prefix, postfix), _STDEX_PARAMS(prefix, 26, postfix)
-#define _STDEX_ARGS26(prefix, postfix) _STDEX_ARGS25(prefix, postfix), _STDEX_ARGS(prefix, 26, postfix)
+#define _STDEX_TMPL_ARGS26(prefix, postfix) _STDEX_TMPL_ARGS25(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 26, postfix)
+#define _STDEX_TYPES26(prefix, postfix) _STDEX_TYPES25(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 26, postfix)
+#define _STDEX_PARAMS26(prefix, postfix) _STDEX_PARAMS25(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 26, postfix)
+#define _STDEX_ARGS26(prefix, postfix) _STDEX_ARGS25(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 26, postfix)
 
-#define _STDEX_TMPL_ARGS27(prefix, postfix) _STDEX_TMPL_ARGS26(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 27, postfix)
-#define _STDEX_TYPES27(prefix, postfix) _STDEX_TYPES26(prefix, postfix), _STDEX_TYPES(prefix, 27, postfix)
-#define _STDEX_PARAMS27(prefix, postfix) _STDEX_PARAMS26(prefix, postfix), _STDEX_PARAMS(prefix, 27, postfix)
-#define _STDEX_ARGS27(prefix, postfix) _STDEX_ARGS26(prefix, postfix), _STDEX_ARGS(prefix, 27, postfix)
+#define _STDEX_TMPL_ARGS27(prefix, postfix) _STDEX_TMPL_ARGS26(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 27, postfix)
+#define _STDEX_TYPES27(prefix, postfix) _STDEX_TYPES26(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 27, postfix)
+#define _STDEX_PARAMS27(prefix, postfix) _STDEX_PARAMS26(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 27, postfix)
+#define _STDEX_ARGS27(prefix, postfix) _STDEX_ARGS26(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 27, postfix)
 
-#define _STDEX_TMPL_ARGS28(prefix, postfix) _STDEX_TMPL_ARGS27(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 28, postfix)
-#define _STDEX_TYPES28(prefix, postfix) _STDEX_TYPES27(prefix, postfix), _STDEX_TYPES(prefix, 28, postfix)
-#define _STDEX_PARAMS28(prefix, postfix) _STDEX_PARAMS27(prefix, postfix), _STDEX_PARAMS(prefix, 28, postfix)
-#define _STDEX_ARGS28(prefix, postfix) _STDEX_ARGS27(prefix, postfix), _STDEX_ARGS(prefix, 28, postfix)
+#define _STDEX_TMPL_ARGS28(prefix, postfix) _STDEX_TMPL_ARGS27(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 28, postfix)
+#define _STDEX_TYPES28(prefix, postfix) _STDEX_TYPES27(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 28, postfix)
+#define _STDEX_PARAMS28(prefix, postfix) _STDEX_PARAMS27(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 28, postfix)
+#define _STDEX_ARGS28(prefix, postfix) _STDEX_ARGS27(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 28, postfix)
 
-#define _STDEX_TMPL_ARGS29(prefix, postfix) _STDEX_TMPL_ARGS28(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 29, postfix)
-#define _STDEX_TYPES29(prefix, postfix) _STDEX_TYPES28(prefix, postfix), _STDEX_TYPES(prefix, 29, postfix)
-#define _STDEX_PARAMS29(prefix, postfix) _STDEX_PARAMS28(prefix, postfix), _STDEX_PARAMS(prefix, 29, postfix)
-#define _STDEX_ARGS29(prefix, postfix) _STDEX_ARGS28(prefix, postfix), _STDEX_ARGS(prefix, 29, postfix)
+#define _STDEX_TMPL_ARGS29(prefix, postfix) _STDEX_TMPL_ARGS28(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 29, postfix)
+#define _STDEX_TYPES29(prefix, postfix) _STDEX_TYPES28(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 29, postfix)
+#define _STDEX_PARAMS29(prefix, postfix) _STDEX_PARAMS28(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 29, postfix)
+#define _STDEX_ARGS29(prefix, postfix) _STDEX_ARGS28(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 29, postfix)
 
-#define _STDEX_TMPL_ARGS30(prefix, postfix) _STDEX_TMPL_ARGS29(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 30, postfix)
-#define _STDEX_TYPES30(prefix, postfix) _STDEX_TYPES29(prefix, postfix), _STDEX_TYPES(prefix, 30, postfix)
-#define _STDEX_PARAMS30(prefix, postfix) _STDEX_PARAMS29(prefix, postfix), _STDEX_PARAMS(prefix, 30, postfix)
-#define _STDEX_ARGS30(prefix, postfix) _STDEX_ARGS29(prefix, postfix), _STDEX_ARGS(prefix, 30, postfix)
+#define _STDEX_TMPL_ARGS30(prefix, postfix) _STDEX_TMPL_ARGS29(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 30, postfix)
+#define _STDEX_TYPES30(prefix, postfix) _STDEX_TYPES29(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 30, postfix)
+#define _STDEX_PARAMS30(prefix, postfix) _STDEX_PARAMS29(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 30, postfix)
+#define _STDEX_ARGS30(prefix, postfix) _STDEX_ARGS29(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 30, postfix)
 
-#define _STDEX_TMPL_ARGS31(prefix, postfix) _STDEX_TMPL_ARGS30(prefix, postfix), _STDEX_TMPL_ARGS(prefix, 31, postfix)
-#define _STDEX_TYPES31(prefix, postfix) _STDEX_TYPES30(prefix, postfix), _STDEX_TYPES(prefix, 31, postfix)
-#define _STDEX_PARAMS31(prefix, postfix) _STDEX_PARAMS30(prefix, postfix), _STDEX_PARAMS(prefix, 31, postfix)
-#define _STDEX_ARGS31(prefix, postfix) _STDEX_ARGS30(prefix, postfix), _STDEX_ARGS(prefix, 31, postfix)
+#define _STDEX_TMPL_ARGS31(prefix, postfix) _STDEX_TMPL_ARGS30(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 31, postfix)
+#define _STDEX_TYPES31(prefix, postfix) _STDEX_TYPES30(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 31, postfix)
+#define _STDEX_PARAMS31(prefix, postfix) _STDEX_PARAMS30(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 31, postfix)
+#define _STDEX_ARGS31(prefix, postfix) _STDEX_ARGS30(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 31, postfix)
+
+#define _STDEX_DELIM ,
 
 _STDEX_INVOKE(0)
 _STDEX_INVOKE(1)
@@ -650,6 +652,8 @@ _STDEX_INVOKE(28)
 _STDEX_INVOKE(29)
 _STDEX_INVOKE(30)
 _STDEX_INVOKE(31)
+
+#undef _STDEX_DELIM
 
 
     }
@@ -1375,10 +1379,12 @@ _STDEX_INVOKE(31)
             _make_args_impl<_args<_ArgsT, _ArgT, _Index>, _NextArgT, _Index + 1, _arg_is_void<_NextArgT>::value == bool(true)>
         { };
 
-        template<class _ArgT>
-        struct _make_args:
-            _make_args_impl<void, _ArgT, 0, _arg_is_void<_ArgT>::value>
-        { };
+        struct _make_args
+        { 
+            template<class _ArgT>
+            struct add :
+                _make_args_impl<void, _ArgT, 0, _arg_is_void<_ArgT>::value> {};
+        };
 
         template<class _FuncT>
         struct _functor_pointer_copy
@@ -1459,58 +1465,17 @@ _STDEX_INVOKE(31)
 
         template<
             class _R, 
-            class _Arg0T  = void_type, 
-            class _Arg1T  = void_type, 
-            class _Arg2T  = void_type,
-            class _Arg3T  = void_type,
-            class _Arg4T  = void_type,
-            class _Arg5T  = void_type,
-            class _Arg6T  = void_type,
-            class _Arg7T  = void_type,
-            class _Arg8T  = void_type,
-            class _Arg9T  = void_type,
-            class _Arg10T = void_type,
-            class _Arg11T = void_type,
-            class _Arg12T = void_type,
-            class _Arg13T = void_type,
-            class _Arg14T = void_type,
-            class _Arg15T = void_type,
-            class _Arg16T = void_type,
-            class _Arg17T = void_type,
-            class _Arg18T = void_type,
-            class _Arg19T = void_type,
-            class _Arg20T = void_type,
-            class _Arg21T = void_type,
-            class _Arg22T = void_type,
-            class _Arg23T = void_type // up to 24 args
+#define _STDEX_DELIM ,
+            _STDEX_TMPL_ARGS31(_STDEX_BLANK, = void_type)
+#undef _STDEX_DELIM
         >
         class _function_impl
         {
             typedef
-                typename _make_args< _Arg0T >::type::
-                template add       < _Arg1T >::type::
-                template add       < _Arg2T >::type::
-                template add       < _Arg3T >::type::
-                template add       < _Arg4T >::type::
-                template add       < _Arg5T >::type::
-                template add       < _Arg6T >::type::
-                template add       < _Arg7T >::type::
-                template add       < _Arg8T >::type::
-                template add       < _Arg9T >::type::
-                template add       < _Arg10T>::type::
-                template add       < _Arg11T>::type::
-                template add       < _Arg12T>::type::
-                template add       < _Arg13T>::type::
-                template add       < _Arg14T>::type::
-                template add       < _Arg15T>::type::
-                template add       < _Arg16T>::type::
-                template add       < _Arg17T>::type::
-                template add       < _Arg18T>::type::
-                template add       < _Arg19T>::type::
-                template add       < _Arg20T>::type::
-                template add       < _Arg21T>::type::
-                template add       < _Arg22T>::type::
-                template add       < _Arg23T>::type::
+                typename _make_args::
+#define _STDEX_DELIM ::
+                _STDEX_TYPES31(template add <, >::type)::
+#undef _STDEX_DELIM
             args _args_type;
 
             struct _func_base {
