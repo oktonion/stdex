@@ -2333,6 +2333,8 @@ _STDEX_INVOKE(31)
 
 } // namespace stdex
 
+#undef _STDEX_BLANK
+
 #undef _STDEX_TMPL_ARGS_IMPL
 #undef _STDEX_TYPES_IMPL
 #undef _STDEX_PARAMS_IMPL
