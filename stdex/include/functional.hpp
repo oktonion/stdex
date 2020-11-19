@@ -623,7 +623,7 @@ namespace stdex
 #define _STDEX_ARGS31(prefix, postfix) _STDEX_ARGS30(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 31, postfix)
 
 #ifndef STDEX_ARGS_MAX_COUNT
-    #define STDEX_ARGS_MAX_COUNT 31
+    #define STDEX_ARGS_MAX_COUNT 32
 #endif
 
 #define _STDEX_TMPL_ARGS_MAX_IMPL(N, prefix, postfix) \
