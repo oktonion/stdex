@@ -334,7 +334,7 @@ namespace stdex
 
 #define _STDEX_INVOKE_IMPL(N) \
     template<class _R, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
-    _R invoke( _R(*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type))\
+    _R invoke( _R(*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
@@ -342,13 +342,13 @@ namespace stdex
     }\
 \
     template<_STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
-    void invoke( void(*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type))\
+    void invoke( void(*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         _func(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type))\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
@@ -356,13 +356,13 @@ namespace stdex
     }\
 \
     template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type))\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         (_obj.*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const, const _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type))\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const, const _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
@@ -370,13 +370,13 @@ namespace stdex
     }\
 \
     template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const, const _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type))\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const, const _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         (_obj.*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type))\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
@@ -384,13 +384,13 @@ namespace stdex
     }\
 \
     template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type))\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         ((*_obj).*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const, const _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type))\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const, const _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
@@ -398,13 +398,13 @@ namespace stdex
     }\
 \
     template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const, const _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type))\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const, const _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         ((*_obj).*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type))\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
@@ -412,13 +412,13 @@ namespace stdex
     }\
 \
     template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type))\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         (_ref.get().*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type))\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
@@ -426,13 +426,13 @@ namespace stdex
     }\
 \
     template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type))\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         (_ref.get().*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
     template<class _R, class _FuncT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke(_FuncT &_func, _STDEX_PARAMS##N(_STDEX_BLANK, _STDEX_BLANK))\
+    _R invoke(_FuncT &_func, _STDEX_PARAMS##N(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         stdex::function<_FuncT> _f(_func); \
         return\
@@ -444,7 +444,7 @@ namespace stdex
 
 #define _STDEX_TMPL_ARGS_IMPL(prefix, N, postfix) class prefix _Arg##N##T postfix
 #define _STDEX_TYPES_IMPL(prefix, N, postfix) prefix _Arg##N##T postfix
-#define _STDEX_PARAMS_IMPL(prefix, N, postfix) prefix _Arg##N##T postfix arg##N
+#define _STDEX_PARAMS_IMPL(prefix1, prefix2, N, postfix1, postfix2) prefix1 _Arg##N##T postfix1 prefix2 arg##N postfix2
 #define _STDEX_ARGS_IMPL(prefix, N, postfix) prefix arg##N postfix
 #define _STDEX_BLANK
 
@@ -455,167 +455,167 @@ namespace stdex
 
 #define _STDEX_TMPL_ARGS(prefix, N, postfix) _STDEX_TMPL_ARGS_IMPL(prefix, N, postfix)
 #define _STDEX_TYPES(prefix, N, postfix) _STDEX_TYPES_IMPL(prefix, N, postfix)
-#define _STDEX_PARAMS(prefix, N, postfix) _STDEX_PARAMS_IMPL(prefix, N, postfix)
+#define _STDEX_PARAMS(prefix1, prefix2, N, postfix1, postfix2) _STDEX_PARAMS_IMPL(prefix1, prefix2, N, postfix1, postfix2)
 #define _STDEX_ARGS(prefix, N, postfix) _STDEX_ARGS_IMPL(prefix, N, postfix)
 
 #define _STDEX_TMPL_ARGS0(prefix, postfix) _STDEX_TMPL_ARGS(prefix, 0, postfix)
 #define _STDEX_TYPES0(prefix, postfix) _STDEX_TYPES(prefix, 0, postfix)
-#define _STDEX_PARAMS0(prefix, postfix) _STDEX_PARAMS(prefix, 0, postfix)
+#define _STDEX_PARAMS0(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS(prefix1, prefix2,0, postfix1, postfix2)
 #define _STDEX_ARGS0(prefix, postfix) _STDEX_ARGS(prefix, 0, postfix)
 
 #define _STDEX_TMPL_ARGS1(prefix, postfix) _STDEX_TMPL_ARGS0(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 1, postfix)
 #define _STDEX_TYPES1(prefix, postfix) _STDEX_TYPES0(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 1, postfix)
-#define _STDEX_PARAMS1(prefix, postfix) _STDEX_PARAMS0(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 1, postfix)
+#define _STDEX_PARAMS1(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS0(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,1, postfix1, postfix2)
 #define _STDEX_ARGS1(prefix, postfix) _STDEX_ARGS0(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 1, postfix)
 
 #define _STDEX_TMPL_ARGS2(prefix, postfix) _STDEX_TMPL_ARGS1(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 2, postfix)
 #define _STDEX_TYPES2(prefix, postfix) _STDEX_TYPES1(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 2, postfix)
-#define _STDEX_PARAMS2(prefix, postfix) _STDEX_PARAMS1(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 2, postfix)
+#define _STDEX_PARAMS2(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS1(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,2, postfix1, postfix2)
 #define _STDEX_ARGS2(prefix, postfix) _STDEX_ARGS1(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 2, postfix)
 
 #define _STDEX_TMPL_ARGS3(prefix, postfix) _STDEX_TMPL_ARGS2(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 3, postfix)
 #define _STDEX_TYPES3(prefix, postfix) _STDEX_TYPES2(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 3, postfix)
-#define _STDEX_PARAMS3(prefix, postfix) _STDEX_PARAMS2(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 3, postfix)
+#define _STDEX_PARAMS3(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS2(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,3, postfix1, postfix2)
 #define _STDEX_ARGS3(prefix, postfix) _STDEX_ARGS2(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 3, postfix)
 
 #define _STDEX_TMPL_ARGS4(prefix, postfix) _STDEX_TMPL_ARGS3(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 4, postfix)
 #define _STDEX_TYPES4(prefix, postfix) _STDEX_TYPES3(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 4, postfix)
-#define _STDEX_PARAMS4(prefix, postfix) _STDEX_PARAMS3(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 4, postfix)
+#define _STDEX_PARAMS4(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS3(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,4, postfix1, postfix2)
 #define _STDEX_ARGS4(prefix, postfix) _STDEX_ARGS3(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 4, postfix)
 
 #define _STDEX_TMPL_ARGS5(prefix, postfix) _STDEX_TMPL_ARGS4(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 5, postfix)
 #define _STDEX_TYPES5(prefix, postfix) _STDEX_TYPES4(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 5, postfix)
-#define _STDEX_PARAMS5(prefix, postfix) _STDEX_PARAMS4(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 5, postfix)
+#define _STDEX_PARAMS5(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS4(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,5, postfix1, postfix2)
 #define _STDEX_ARGS5(prefix, postfix) _STDEX_ARGS4(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 5, postfix)
 
 #define _STDEX_TMPL_ARGS6(prefix, postfix) _STDEX_TMPL_ARGS5(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 6, postfix)
 #define _STDEX_TYPES6(prefix, postfix) _STDEX_TYPES5(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 6, postfix)
-#define _STDEX_PARAMS6(prefix, postfix) _STDEX_PARAMS5(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 6, postfix)
+#define _STDEX_PARAMS6(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS5(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,6, postfix1, postfix2)
 #define _STDEX_ARGS6(prefix, postfix) _STDEX_ARGS5(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 6, postfix)
 
 #define _STDEX_TMPL_ARGS7(prefix, postfix) _STDEX_TMPL_ARGS6(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 7, postfix)
 #define _STDEX_TYPES7(prefix, postfix) _STDEX_TYPES6(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 7, postfix)
-#define _STDEX_PARAMS7(prefix, postfix) _STDEX_PARAMS6(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 7, postfix)
+#define _STDEX_PARAMS7(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS6(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,7, postfix1, postfix2)
 #define _STDEX_ARGS7(prefix, postfix) _STDEX_ARGS6(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 7, postfix)
 
 #define _STDEX_TMPL_ARGS8(prefix, postfix) _STDEX_TMPL_ARGS7(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 8, postfix)
 #define _STDEX_TYPES8(prefix, postfix) _STDEX_TYPES7(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 8, postfix)
-#define _STDEX_PARAMS8(prefix, postfix) _STDEX_PARAMS7(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 8, postfix)
+#define _STDEX_PARAMS8(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS7(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,8, postfix1, postfix2)
 #define _STDEX_ARGS8(prefix, postfix) _STDEX_ARGS7(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 8, postfix)
 
 #define _STDEX_TMPL_ARGS9(prefix, postfix) _STDEX_TMPL_ARGS8(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 9, postfix)
 #define _STDEX_TYPES9(prefix, postfix) _STDEX_TYPES8(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 9, postfix)
-#define _STDEX_PARAMS9(prefix, postfix) _STDEX_PARAMS8(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 9, postfix)
+#define _STDEX_PARAMS9(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS8(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,9, postfix1, postfix2)
 #define _STDEX_ARGS9(prefix, postfix) _STDEX_ARGS8(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 9, postfix)
 
 #define _STDEX_TMPL_ARGS10(prefix, postfix) _STDEX_TMPL_ARGS9(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 10, postfix)
 #define _STDEX_TYPES10(prefix, postfix) _STDEX_TYPES9(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 10, postfix)
-#define _STDEX_PARAMS10(prefix, postfix) _STDEX_PARAMS9(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 10, postfix)
+#define _STDEX_PARAMS10(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS9(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,10, postfix1, postfix2)
 #define _STDEX_ARGS10(prefix, postfix) _STDEX_ARGS9(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 10, postfix)
 
 #define _STDEX_TMPL_ARGS11(prefix, postfix) _STDEX_TMPL_ARGS10(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 11, postfix)
 #define _STDEX_TYPES11(prefix, postfix) _STDEX_TYPES10(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 11, postfix)
-#define _STDEX_PARAMS11(prefix, postfix) _STDEX_PARAMS10(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 11, postfix)
+#define _STDEX_PARAMS11(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS10(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,11, postfix1, postfix2)
 #define _STDEX_ARGS11(prefix, postfix) _STDEX_ARGS10(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 11, postfix)
 
 #define _STDEX_TMPL_ARGS12(prefix, postfix) _STDEX_TMPL_ARGS11(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 12, postfix)
 #define _STDEX_TYPES12(prefix, postfix) _STDEX_TYPES11(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 12, postfix)
-#define _STDEX_PARAMS12(prefix, postfix) _STDEX_PARAMS11(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 12, postfix)
+#define _STDEX_PARAMS12(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS11(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,12, postfix1, postfix2)
 #define _STDEX_ARGS12(prefix, postfix) _STDEX_ARGS11(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 12, postfix)
 
 #define _STDEX_TMPL_ARGS13(prefix, postfix) _STDEX_TMPL_ARGS12(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 13, postfix)
 #define _STDEX_TYPES13(prefix, postfix) _STDEX_TYPES12(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 13, postfix)
-#define _STDEX_PARAMS13(prefix, postfix) _STDEX_PARAMS12(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 13, postfix)
+#define _STDEX_PARAMS13(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS12(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,13, postfix1, postfix2)
 #define _STDEX_ARGS13(prefix, postfix) _STDEX_ARGS12(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 13, postfix)
 
 #define _STDEX_TMPL_ARGS14(prefix, postfix) _STDEX_TMPL_ARGS13(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 14, postfix)
 #define _STDEX_TYPES14(prefix, postfix) _STDEX_TYPES13(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 14, postfix)
-#define _STDEX_PARAMS14(prefix, postfix) _STDEX_PARAMS13(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 14, postfix)
+#define _STDEX_PARAMS14(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS13(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,14, postfix1, postfix2)
 #define _STDEX_ARGS14(prefix, postfix) _STDEX_ARGS13(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 14, postfix)
 
 #define _STDEX_TMPL_ARGS15(prefix, postfix) _STDEX_TMPL_ARGS14(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 15, postfix)
 #define _STDEX_TYPES15(prefix, postfix) _STDEX_TYPES14(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 15, postfix)
-#define _STDEX_PARAMS15(prefix, postfix) _STDEX_PARAMS14(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 15, postfix)
+#define _STDEX_PARAMS15(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS14(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,15, postfix1, postfix2)
 #define _STDEX_ARGS15(prefix, postfix) _STDEX_ARGS14(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 15, postfix)
 
 #define _STDEX_TMPL_ARGS16(prefix, postfix) _STDEX_TMPL_ARGS15(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 16, postfix)
 #define _STDEX_TYPES16(prefix, postfix) _STDEX_TYPES15(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 16, postfix)
-#define _STDEX_PARAMS16(prefix, postfix) _STDEX_PARAMS15(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 16, postfix)
+#define _STDEX_PARAMS16(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS15(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,16, postfix1, postfix2)
 #define _STDEX_ARGS16(prefix, postfix) _STDEX_ARGS15(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 16, postfix)
 
 #define _STDEX_TMPL_ARGS17(prefix, postfix) _STDEX_TMPL_ARGS16(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 17, postfix)
 #define _STDEX_TYPES17(prefix, postfix) _STDEX_TYPES16(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 17, postfix)
-#define _STDEX_PARAMS17(prefix, postfix) _STDEX_PARAMS16(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 17, postfix)
+#define _STDEX_PARAMS17(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS16(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,17, postfix1, postfix2)
 #define _STDEX_ARGS17(prefix, postfix) _STDEX_ARGS16(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 17, postfix)
 
 #define _STDEX_TMPL_ARGS18(prefix, postfix) _STDEX_TMPL_ARGS17(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 18, postfix)
 #define _STDEX_TYPES18(prefix, postfix) _STDEX_TYPES17(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 18, postfix)
-#define _STDEX_PARAMS18(prefix, postfix) _STDEX_PARAMS17(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 18, postfix)
+#define _STDEX_PARAMS18(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS17(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,18, postfix1, postfix2)
 #define _STDEX_ARGS18(prefix, postfix) _STDEX_ARGS17(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 18, postfix)
 
 #define _STDEX_TMPL_ARGS19(prefix, postfix) _STDEX_TMPL_ARGS18(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 19, postfix)
 #define _STDEX_TYPES19(prefix, postfix) _STDEX_TYPES18(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 19, postfix)
-#define _STDEX_PARAMS19(prefix, postfix) _STDEX_PARAMS18(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 19, postfix)
+#define _STDEX_PARAMS19(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS18(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,19, postfix1, postfix2)
 #define _STDEX_ARGS19(prefix, postfix) _STDEX_ARGS18(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 19, postfix)
 
 #define _STDEX_TMPL_ARGS20(prefix, postfix) _STDEX_TMPL_ARGS19(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 20, postfix)
 #define _STDEX_TYPES20(prefix, postfix) _STDEX_TYPES19(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 20, postfix)
-#define _STDEX_PARAMS20(prefix, postfix) _STDEX_PARAMS19(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 20, postfix)
+#define _STDEX_PARAMS20(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS19(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,20, postfix1, postfix2)
 #define _STDEX_ARGS20(prefix, postfix) _STDEX_ARGS19(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 20, postfix)
 
 #define _STDEX_TMPL_ARGS21(prefix, postfix) _STDEX_TMPL_ARGS20(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 21, postfix)
 #define _STDEX_TYPES21(prefix, postfix) _STDEX_TYPES20(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 21, postfix)
-#define _STDEX_PARAMS21(prefix, postfix) _STDEX_PARAMS20(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 21, postfix)
+#define _STDEX_PARAMS21(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS20(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,21, postfix1, postfix2)
 #define _STDEX_ARGS21(prefix, postfix) _STDEX_ARGS20(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 21, postfix)
 
 #define _STDEX_TMPL_ARGS22(prefix, postfix) _STDEX_TMPL_ARGS21(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 22, postfix)
 #define _STDEX_TYPES22(prefix, postfix) _STDEX_TYPES21(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 22, postfix)
-#define _STDEX_PARAMS22(prefix, postfix) _STDEX_PARAMS21(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 22, postfix)
+#define _STDEX_PARAMS22(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS21(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,22, postfix1, postfix2)
 #define _STDEX_ARGS22(prefix, postfix) _STDEX_ARGS21(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 22, postfix)
 
 #define _STDEX_TMPL_ARGS23(prefix, postfix) _STDEX_TMPL_ARGS22(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 23, postfix)
 #define _STDEX_TYPES23(prefix, postfix) _STDEX_TYPES22(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 23, postfix)
-#define _STDEX_PARAMS23(prefix, postfix) _STDEX_PARAMS22(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 23, postfix)
+#define _STDEX_PARAMS23(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS22(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,23, postfix1, postfix2)
 #define _STDEX_ARGS23(prefix, postfix) _STDEX_ARGS22(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 23, postfix)
 
 #define _STDEX_TMPL_ARGS24(prefix, postfix) _STDEX_TMPL_ARGS23(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 24, postfix)
 #define _STDEX_TYPES24(prefix, postfix) _STDEX_TYPES23(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 24, postfix)
-#define _STDEX_PARAMS24(prefix, postfix) _STDEX_PARAMS23(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 24, postfix)
+#define _STDEX_PARAMS24(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS23(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,24, postfix1, postfix2)
 #define _STDEX_ARGS24(prefix, postfix) _STDEX_ARGS23(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 24, postfix)
 
 #define _STDEX_TMPL_ARGS25(prefix, postfix) _STDEX_TMPL_ARGS24(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 25, postfix)
 #define _STDEX_TYPES25(prefix, postfix) _STDEX_TYPES24(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 25, postfix)
-#define _STDEX_PARAMS25(prefix, postfix) _STDEX_PARAMS24(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 25, postfix)
+#define _STDEX_PARAMS25(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS24(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,25, postfix1, postfix2)
 #define _STDEX_ARGS25(prefix, postfix) _STDEX_ARGS24(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 25, postfix)
 
 #define _STDEX_TMPL_ARGS26(prefix, postfix) _STDEX_TMPL_ARGS25(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 26, postfix)
 #define _STDEX_TYPES26(prefix, postfix) _STDEX_TYPES25(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 26, postfix)
-#define _STDEX_PARAMS26(prefix, postfix) _STDEX_PARAMS25(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 26, postfix)
+#define _STDEX_PARAMS26(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS25(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,26, postfix1, postfix2)
 #define _STDEX_ARGS26(prefix, postfix) _STDEX_ARGS25(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 26, postfix)
 
 #define _STDEX_TMPL_ARGS27(prefix, postfix) _STDEX_TMPL_ARGS26(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 27, postfix)
 #define _STDEX_TYPES27(prefix, postfix) _STDEX_TYPES26(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 27, postfix)
-#define _STDEX_PARAMS27(prefix, postfix) _STDEX_PARAMS26(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 27, postfix)
+#define _STDEX_PARAMS27(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS26(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,27, postfix1, postfix2)
 #define _STDEX_ARGS27(prefix, postfix) _STDEX_ARGS26(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 27, postfix)
 
 #define _STDEX_TMPL_ARGS28(prefix, postfix) _STDEX_TMPL_ARGS27(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 28, postfix)
 #define _STDEX_TYPES28(prefix, postfix) _STDEX_TYPES27(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 28, postfix)
-#define _STDEX_PARAMS28(prefix, postfix) _STDEX_PARAMS27(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 28, postfix)
+#define _STDEX_PARAMS28(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS27(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,28, postfix1, postfix2)
 #define _STDEX_ARGS28(prefix, postfix) _STDEX_ARGS27(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 28, postfix)
 
 #define _STDEX_TMPL_ARGS29(prefix, postfix) _STDEX_TMPL_ARGS28(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 29, postfix)
 #define _STDEX_TYPES29(prefix, postfix) _STDEX_TYPES28(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 29, postfix)
-#define _STDEX_PARAMS29(prefix, postfix) _STDEX_PARAMS28(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 29, postfix)
+#define _STDEX_PARAMS29(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS28(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,29, postfix1, postfix2)
 #define _STDEX_ARGS29(prefix, postfix) _STDEX_ARGS28(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 29, postfix)
 
 #define _STDEX_TMPL_ARGS30(prefix, postfix) _STDEX_TMPL_ARGS29(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 30, postfix)
 #define _STDEX_TYPES30(prefix, postfix) _STDEX_TYPES29(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 30, postfix)
-#define _STDEX_PARAMS30(prefix, postfix) _STDEX_PARAMS29(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 30, postfix)
+#define _STDEX_PARAMS30(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS29(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,30, postfix1, postfix2)
 #define _STDEX_ARGS30(prefix, postfix) _STDEX_ARGS29(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 30, postfix)
 
 #define _STDEX_TMPL_ARGS31(prefix, postfix) _STDEX_TMPL_ARGS30(prefix, postfix) _STDEX_DELIM _STDEX_TMPL_ARGS(prefix, 31, postfix)
 #define _STDEX_TYPES31(prefix, postfix) _STDEX_TYPES30(prefix, postfix) _STDEX_DELIM _STDEX_TYPES(prefix, 31, postfix)
-#define _STDEX_PARAMS31(prefix, postfix) _STDEX_PARAMS30(prefix, postfix) _STDEX_DELIM _STDEX_PARAMS(prefix, 31, postfix)
+#define _STDEX_PARAMS31(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS30(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,31, postfix1, postfix2)
 #define _STDEX_ARGS31(prefix, postfix) _STDEX_ARGS30(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 31, postfix)
 
 #define _STDEX_DELIM ,
@@ -1531,30 +1531,10 @@ _STDEX_INVOKE(31)
 
             _return_arg<return_type>
                 operator()(
-                _Arg0T  arg0  = void_type(),
-                _Arg1T  arg1  = void_type(),
-                _Arg2T  arg2  = void_type(),
-                _Arg3T  arg3  = void_type(),
-                _Arg4T  arg4  = void_type(),
-                _Arg5T  arg5  = void_type(),
-                _Arg6T  arg6  = void_type(),
-                _Arg7T  arg7  = void_type(),
-                _Arg8T  arg8  = void_type(),
-                _Arg9T  arg9  = void_type(),
-                _Arg10T arg10 = void_type(),
-                _Arg11T arg11 = void_type(),
-                _Arg12T arg12 = void_type(),
-                _Arg13T arg13 = void_type(),
-                _Arg14T arg14 = void_type(),
-                _Arg15T arg15 = void_type(),
-                _Arg16T arg16 = void_type(),
-                _Arg17T arg17 = void_type(),
-                _Arg18T arg18 = void_type(),
-                _Arg19T arg19 = void_type(),
-                _Arg20T arg20 = void_type(),
-                _Arg21T arg21 = void_type(),
-                _Arg22T arg22 = void_type(),
-                _Arg23T arg23 = void_type() ) const
+#define _STDEX_DELIM ,
+                _STDEX_PARAMS31(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = void_type())
+#undef _STDEX_DELIM 
+                    ) const
             {
                 if (!_fx)
                     throw(bad_function_call());
