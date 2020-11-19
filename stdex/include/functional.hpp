@@ -444,9 +444,13 @@ namespace stdex
 
 #define _STDEX_TMPL_ARGS_IMPL(prefix, N, postfix) class prefix _Arg##N##T postfix
 #define _STDEX_TYPES_IMPL(prefix, N, postfix) prefix _Arg##N##T postfix
-#define _STDEX_PARAMS_IMPL(prefix1, prefix2, N, postfix1, postfix2) prefix1 _Arg##N##T postfix1 prefix2 arg##N postfix2
+#define _STDEX_PARAMS_IMPL(prefix1, prefix2, N, postfix1, postfix2) prefix1 _STDEX_PARAMS_TYPE_PREFIX(N) _Arg##N##T _STDEX_PARAMS_TYPE_POSTFIX(N) postfix1 prefix2 _STDEX_PARAMS_ARG_PREFIX(N) arg##N _STDEX_PARAMS_ARG_POSTFIX(N) postfix2
 #define _STDEX_ARGS_IMPL(prefix, N, postfix) prefix arg##N postfix
-#define _STDEX_BLANK
+#define _STDEX_BLANK  
+#define _STDEX_PARAMS_TYPE_PREFIX(N) 
+#define _STDEX_PARAMS_TYPE_POSTFIX(N) 
+#define _STDEX_PARAMS_ARG_PREFIX(N) 
+#define _STDEX_PARAMS_ARG_POSTFIX(N)
 
 #undef _STDEX_TMPL_ARGS
 #undef _STDEX_TYPES
@@ -618,7 +622,29 @@ namespace stdex
 #define _STDEX_PARAMS31(prefix1, postfix1, prefix2, postfix2) _STDEX_PARAMS30(prefix1, postfix1, prefix2, postfix2) _STDEX_DELIM _STDEX_PARAMS(prefix1, prefix2,31, postfix1, postfix2)
 #define _STDEX_ARGS31(prefix, postfix) _STDEX_ARGS30(prefix, postfix) _STDEX_DELIM _STDEX_ARGS(prefix, 31, postfix)
 
-#define _STDEX_DELIM ,
+#ifndef STDEX_ARGS_MAX_COUNT
+    #define STDEX_ARGS_MAX_COUNT 31
+#endif
+
+#define _STDEX_TMPL_ARGS_MAX_IMPL(N, prefix, postfix) \
+    _STDEX_TMPL_ARGS##N##(prefix, postfix)
+#define _STDEX_TYPES_MAX_IMPL(N, prefix, postfix) \
+    _STDEX_TYPES##N##(prefix, postfix)
+#define _STDEX_PARAMS_MAX_IMPL(N, prefix1, postfix1, prefix2, postfix2) \
+    _STDEX_PARAMS##N##(prefix1, postfix1, prefix2, postfix2)
+#define _STDEX_ARGS_MAX_IMPL(N, prefix, postfix) \
+    _STDEX_ARGS##N##(prefix, postfix)
+
+#define _STDEX_TMPL_ARGS_MAX(prefix, postfix) \
+    _STDEX_TMPL_ARGS_MAX_IMPL(31, prefix, postfix)
+#define _STDEX_TYPES_MAX(prefix, postfix) \
+    _STDEX_TYPES_MAX_IMPL(31, prefix, postfix)
+#define _STDEX_PARAMS_MAX(prefix1, postfix1, prefix2, postfix2) \
+    _STDEX_PARAMS_MAX_IMPL(31, prefix1, postfix1, prefix2, postfix2)
+#define _STDEX_ARGS_MAX(prefix, postfix) \
+    _STDEX_ARGS_MAX_IMPL(31, prefix, postfix)
+
+#define _STDEX_DELIM , 
 
         _STDEX_INVOKE(0)
         _STDEX_INVOKE(1)
@@ -654,9 +680,7 @@ namespace stdex
         _STDEX_INVOKE(31)
 
 #undef _STDEX_DELIM
-
-
-    }
+ }
 
 
     using functional_cpp11::invoke;
@@ -781,6 +805,13 @@ namespace stdex
 
             template<class>
             const type& make(void_type) const { return *this; }
+        };
+
+        template<>
+        struct _args<void, void, 0>
+        {
+            template<class _NextArgT>
+            _args<void, _NextArgT, 0> make(_NextArgT arg) const { return _args<void, _NextArgT, 0>(arg); }
         };
 
         namespace functional_detail
@@ -1466,7 +1497,7 @@ namespace stdex
         template<
             class _R, 
 #define _STDEX_DELIM ,
-            _STDEX_TMPL_ARGS31(_STDEX_BLANK, = void_type)
+            _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, = void_type)
 #undef _STDEX_DELIM
         >
         class _function_impl
@@ -1474,7 +1505,7 @@ namespace stdex
             typedef
                 typename _make_args::
 #define _STDEX_DELIM ::
-                _STDEX_TYPES31(template add <, >::type)::
+                _STDEX_TYPES_MAX(template add <, >::type)::
 #undef _STDEX_DELIM
             args _args_type;
 
@@ -1532,50 +1563,38 @@ namespace stdex
             _return_arg<return_type>
                 operator()(
 #define _STDEX_DELIM ,
-                _STDEX_PARAMS31(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = void_type())
+                _STDEX_PARAMS_MAX(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = void_type())
 #undef _STDEX_DELIM 
                     ) const
             {
                 if (!_fx)
                     throw(bad_function_call());
 
-                typedef _args<void,    _Arg0T, 0> args_x1;               
+                typedef _args<void, void, 0> args_maker;               
 
                 using stdex::detail::functional_std::move;
 
                 _args_type args =
-                    args_x1(functional_std::_forward< _Arg0T >::call(arg0))
-                    .template make< _Arg1T >(functional_std::_forward< _Arg1T >::call(arg1))
-                    .template make< _Arg2T >(functional_std::_forward< _Arg2T >::call(arg2))
-                    .template make< _Arg3T >(functional_std::_forward< _Arg3T >::call(arg3))
-                    .template make< _Arg4T >(functional_std::_forward< _Arg4T >::call(arg4))
-                    .template make< _Arg5T >(functional_std::_forward< _Arg5T >::call(arg5))
-                    .template make< _Arg6T >(functional_std::_forward< _Arg6T >::call(arg6))
-                    .template make< _Arg7T >(functional_std::_forward< _Arg7T >::call(arg7))
-                    .template make< _Arg8T >(functional_std::_forward< _Arg8T >::call(arg8))
-                    .template make< _Arg9T >(functional_std::_forward< _Arg9T >::call(arg9))
-                    .template make< _Arg10T>(functional_std::_forward< _Arg10T>::call(arg10))
-                    .template make< _Arg11T>(functional_std::_forward< _Arg11T>::call(arg11))
-                    .template make< _Arg12T>(functional_std::_forward< _Arg12T>::call(arg12))
-                    .template make< _Arg13T>(functional_std::_forward< _Arg13T>::call(arg13))
-                    .template make< _Arg14T>(functional_std::_forward< _Arg14T>::call(arg14))
-                    .template make< _Arg15T>(functional_std::_forward< _Arg15T>::call(arg15))
-                    .template make< _Arg16T>(functional_std::_forward< _Arg16T>::call(arg16))
-                    .template make< _Arg17T>(functional_std::_forward< _Arg17T>::call(arg17))
-                    .template make< _Arg18T>(functional_std::_forward< _Arg18T>::call(arg18))
-                    .template make< _Arg19T>(functional_std::_forward< _Arg19T>::call(arg19))
-                    .template make< _Arg20T>(functional_std::_forward< _Arg20T>::call(arg20))
-                    .template make< _Arg21T>(functional_std::_forward< _Arg21T>::call(arg21))
-                    .template make< _Arg22T>(functional_std::_forward< _Arg22T>::call(arg22))
-                    .template make< _Arg23T>(functional_std::_forward< _Arg23T>::call(arg23))
-                    .template make< _Arg24T>(functional_std::_forward< _Arg24T>::call(arg24))
-                    .template make< _Arg25T>(functional_std::_forward< _Arg25T>::call(arg25))
-                    .template make< _Arg26T>(functional_std::_forward< _Arg26T>::call(arg26))
-                    .template make< _Arg27T>(functional_std::_forward< _Arg27T>::call(arg27))
-                    .template make< _Arg28T>(functional_std::_forward< _Arg28T>::call(arg28))
-                    .template make< _Arg29T>(functional_std::_forward< _Arg29T>::call(arg29))
-                    .template make< _Arg30T>(functional_std::_forward< _Arg30T>::call(arg30))
-                    .template make< _Arg31T>(functional_std::_forward< _Arg31T>::call(arg31))
+                    args_maker().
+#define _STDEX_DELIM .
+#undef _STDEX_PARAMS_TYPE_PREFIX
+#undef _STDEX_PARAMS_TYPE_POSTFIX
+#undef _STDEX_PARAMS_ARG_PREFIX
+#undef _STDEX_PARAMS_ARG_POSTFIX   
+#define _STDEX_PARAMS_TYPE_PREFIX(N) 
+#define _STDEX_PARAMS_TYPE_POSTFIX(N) 
+#define _STDEX_PARAMS_ARG_PREFIX(N) (stdex::detail::functional_std::_forward< _Arg##N##T >::call(
+#define _STDEX_PARAMS_ARG_POSTFIX(N) ))
+                    _STDEX_PARAMS_MAX(template make <, >, _STDEX_BLANK, _STDEX_BLANK)
+#undef _STDEX_DELIM 
+#undef _STDEX_PARAMS_TYPE_PREFIX
+#undef _STDEX_PARAMS_TYPE_POSTFIX
+#undef _STDEX_PARAMS_ARG_PREFIX
+#undef _STDEX_PARAMS_ARG_POSTFIX   
+#define _STDEX_PARAMS_TYPE_PREFIX(N) 
+#define _STDEX_PARAMS_TYPE_POSTFIX(N) 
+#define _STDEX_PARAMS_ARG_PREFIX(N)
+#define _STDEX_PARAMS_ARG_POSTFIX(N)
                     ;
 
                 return 
@@ -2340,6 +2359,10 @@ namespace stdex
 } // namespace stdex
 
 #undef _STDEX_BLANK
+#undef _STDEX_PARAMS_TYPE_PREFIX
+#undef _STDEX_PARAMS_TYPE_POSTFIX
+#undef _STDEX_PARAMS_ARG_PREFIX
+#undef _STDEX_PARAMS_ARG_POSTFIX 
 
 #undef _STDEX_TMPL_ARGS_IMPL
 #undef _STDEX_TYPES_IMPL
@@ -2350,6 +2373,16 @@ namespace stdex
 #undef _STDEX_TYPES
 #undef _STDEX_PARAMS
 #undef _STDEX_ARGS
+
+#undef _STDEX_TMPL_ARGS_MAX_IMPL
+#undef _STDEX_TYPES_MAX_IMPL
+#undef _STDEX_PARAMS_MAX_IMPL
+#undef _STDEX_ARGS_MAX_IMPL
+
+#undef _STDEX_TMPL_ARGS_MAX
+#undef _STDEX_TYPES_MAX
+#undef _STDEX_PARAMS_MAX
+#undef _STDEX_ARGS_MAX
 
 #undef _STDEX_INVOKE 
 #undef _STDEX_INVOKE_IMPL
