@@ -7,7 +7,7 @@
 // #include "./parameter_pack.h"
 // #undef _STDEX_PARAMETER_PACK_DEFINE
 // 
-// #define MY_FUNC(N) \
+// #define MY_FUNC(N)
 //     template<_STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) /*class _Arg0T, ...class _ArgNT*/> 
 //     void my_func( _STDEX_PARAMS_MAX(_STDEX_BLANK, _STDEX_BLANK) /*_Arg0T arg0, ..._ArgNT argN*/)
 //     { }
