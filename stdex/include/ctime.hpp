@@ -55,27 +55,32 @@ namespace stdex
 
     namespace detail
     {
-        namespace std_dummy
+        namespace ctime_detail
         {
-            using namespace std;
-
-            struct _dummy_2int
+            namespace std_dummy
             {
-                int _dummy[2];
-            };
+                using namespace std;
 
-            _dummy_2int timespec_get(...);
-        }
+                struct _dummy_2int
+                {
+                    int _dummy[2];
+                };
 
-        namespace ctime_std_dummy
-        {
-            using namespace std_dummy;
+                _dummy_2int timespec_get(...);
+            }
 
-            struct _has_timespec
+            namespace ctime_std_dummy
             {
-                static const bool value = 
-                    sizeof(timespec_get(0, 0)) != sizeof(_dummy_2int);
-            };
+                using namespace std_dummy;
+
+                struct _has_timespec
+                {
+                    static const bool value = 
+                        sizeof(timespec_get(0, 0)) != sizeof(_dummy_2int);
+                };
+            }
+
+            using ctime_std_dummy::_has_timespec;
         }
 
         template<bool>
@@ -97,7 +102,7 @@ namespace stdex
     
     typedef
     detail::_timespec_impl<
-        detail::ctime_std_dummy::_has_timespec::value>::timespec
+        detail::ctime_detail::_has_timespec::value>::timespec
     timespec;
 
     // Time manipulation
