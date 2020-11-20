@@ -361,9 +361,11 @@ int test06()
     return 0;
 }
 
+void ff(...) {}
+
 int main()
 {
-
+    std::invoke(ff);
     RUN_TEST(test01);
     RUN_TEST(test02);
     RUN_TEST(test03);
