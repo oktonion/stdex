@@ -361,11 +361,12 @@ int test06()
     return 0;
 }
 
-void ff(...) {}
+void ff(const float&, ...) {}
 
 int main()
 {
-    std::invoke(ff);
+    float a = 0;
+    stdex::invoke(ff, a, 0, 0);
     RUN_TEST(test01);
     RUN_TEST(test02);
     RUN_TEST(test03);

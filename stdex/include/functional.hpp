@@ -409,7 +409,7 @@ namespace stdex
         }
 
 #define _STDEX_PARAMS_TYPE_CUSTOM(N) stdex::detail::functional_detail::_any
-#define _STDEX_ELIPSIS_PARAMS _STDEX_PARAMS31_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = detail::void_type(), _STDEX_PARAMS_TYPE_CUSTOM, _STDEX_PARAMS_ARG_DEFAULT)
+#define _STDEX_ELIPSIS_PARAMS _STDEX_PARAMS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = detail::void_type(), _STDEX_PARAMS_TYPE_CUSTOM, _STDEX_PARAMS_ARG_DEFAULT)
 #define _STDEX_ELIPSIS_ARGS _STDEX_ARGS_MAX(_STDEX_BLANK, .get() )
 
         template<class _R>
@@ -523,6 +523,10 @@ namespace stdex
             _func(_STDEX_ELIPSIS_ARGS);
         }
 
+#undef _STDEX_PARAMS_TYPE_CUSTOM
+#undef _STDEX_ELIPSIS_PARAMS
+#undef _STDEX_ELIPSIS_ARGS
+
 #define _STDEX_INVOKE_IMPL(N) \
     template<class _R, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
     _R invoke( _R(*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
@@ -630,9 +634,9 @@ namespace stdex
             _f(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 
-#define _STDEX_INVOKE_ELIPSIS_IMPL(N) \
+#define _STDEX_INVOKE_ELIPSIS_IMPL(N, M) \
     template<class _R, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
-    _R invoke( _R(*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    _R invoke( _R(*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
@@ -640,13 +644,13 @@ namespace stdex
     }\
 \
     template<_STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
-    void invoke( void(*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    void invoke( void(*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
     {\
         _func(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
@@ -654,13 +658,13 @@ namespace stdex
     }\
 \
     template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
     {\
         (_obj.*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...) const, const _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...) const, const _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
@@ -668,13 +672,13 @@ namespace stdex
     }\
 \
     template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...) const, const _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...) const, const _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
     {\
         (_obj.*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
@@ -682,13 +686,13 @@ namespace stdex
     }\
 \
     template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
     {\
         ((*_obj).*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...) const, const _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...) const, const _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
@@ -696,13 +700,13 @@ namespace stdex
     }\
 \
     template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...) const, const _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...) const, const _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
     {\
         ((*_obj).*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
@@ -710,13 +714,13 @@ namespace stdex
     }\
 \
     template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
     {\
         (_ref.get().*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
@@ -724,56 +728,60 @@ namespace stdex
     }\
 \
     template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
     {\
         (_ref.get().*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
     }\
-\
-    template<class _R, class _FuncT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke(_FuncT &_func, _STDEX_PARAMS##N(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK))\
-    {\
-        stdex::function<_FuncT> _f(_func); \
-        return\
-            _f(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
-    }\
 
-#define _STDEX_INVOKE(N) _STDEX_INVOKE_IMPL(N)
+#define _STDEX_PARAMS_TYPE_CUSTOM(N) stdex::detail::functional_detail::_any
+#define _STDEX_PARAMS_ARG_CUSTOM(N) _elipsis_arg##N
+#define _STDEX_ELIPSIS_PARAMS(N) _STDEX_PARAMS##N##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = detail::void_type(), _STDEX_PARAMS_TYPE_CUSTOM, _STDEX_PARAMS_ARG_CUSTOM)
+#define _STDEX_ELIPSIS_ARGS(N) _STDEX_ARGS##N##_IMPL(_STDEX_BLANK, .get(), _STDEX_PARAMS_ARG_CUSTOM)
 
-        _STDEX_INVOKE(0)
-        _STDEX_INVOKE(1)
-        _STDEX_INVOKE(2)
-        _STDEX_INVOKE(3)
-        _STDEX_INVOKE(4)
-        _STDEX_INVOKE(5)
-        _STDEX_INVOKE(6)
-        _STDEX_INVOKE(7)
-        _STDEX_INVOKE(8)
-        _STDEX_INVOKE(9)
-        _STDEX_INVOKE(10)
-        _STDEX_INVOKE(11)
-        _STDEX_INVOKE(12)
-        _STDEX_INVOKE(13)
-        _STDEX_INVOKE(14)
-        _STDEX_INVOKE(15)
-        _STDEX_INVOKE(16)
-        _STDEX_INVOKE(17)
-        _STDEX_INVOKE(18)
-        _STDEX_INVOKE(19)
-        _STDEX_INVOKE(20)
-        _STDEX_INVOKE(21)
-        _STDEX_INVOKE(22)
-        _STDEX_INVOKE(23)
-        _STDEX_INVOKE(24)
-        _STDEX_INVOKE(25)
-        _STDEX_INVOKE(26)
-        _STDEX_INVOKE(27)
-        _STDEX_INVOKE(28)
-        _STDEX_INVOKE(29)
-        _STDEX_INVOKE(30)
-        _STDEX_INVOKE(31)
+#define _STDEX_INVOKE(N, M) \
+         _STDEX_INVOKE_IMPL(N)\
+        _STDEX_INVOKE_ELIPSIS_IMPL(N, M)
+
+        _STDEX_INVOKE(0, 31)
+        _STDEX_INVOKE(1, 30)
+        _STDEX_INVOKE(2, 29)
+        _STDEX_INVOKE(3, 28)
+        _STDEX_INVOKE(4, 27)
+        _STDEX_INVOKE(5, 26)
+        _STDEX_INVOKE(6, 25)
+        _STDEX_INVOKE(7, 24)
+        _STDEX_INVOKE(8, 23)
+        _STDEX_INVOKE(9, 22)
+        _STDEX_INVOKE(10, 21)
+        _STDEX_INVOKE(11, 20)
+        _STDEX_INVOKE(12, 19)
+        _STDEX_INVOKE(13, 18)
+        _STDEX_INVOKE(14, 17)
+        _STDEX_INVOKE(15, 16)
+        _STDEX_INVOKE(16, 15)
+        _STDEX_INVOKE(17, 14)
+        _STDEX_INVOKE(18, 13)
+        _STDEX_INVOKE(19, 12)
+        _STDEX_INVOKE(20, 11)
+        _STDEX_INVOKE(21, 10)
+        _STDEX_INVOKE(22, 9)
+        _STDEX_INVOKE(23, 8)
+        _STDEX_INVOKE(24, 7)
+        _STDEX_INVOKE(25, 6)
+        _STDEX_INVOKE(26, 5)
+        _STDEX_INVOKE(27, 4)
+        _STDEX_INVOKE(28, 3)
+        _STDEX_INVOKE(29, 2)
+        _STDEX_INVOKE(30, 1)
+        _STDEX_INVOKE(31, 0)
 
 #undef _STDEX_INVOKE 
 #undef _STDEX_INVOKE_IMPL
+
+#undef _STDEX_PARAMS_TYPE_CUSTOM
+#undef _STDEX_PARAMS_ARG_CUSTOM
+#undef _STDEX_ELIPSIS_PARAMS
+#undef _STDEX_ELIPSIS_ARGS
  }
 
 
