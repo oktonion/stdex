@@ -4,6 +4,7 @@ build_ok=1
 exclude_warn=""
 tests_failed="unsuccessful tests:"
 build_libs="-lrt"
+compiler_options="-std=c++03"
 
 $COMPILER -v
 
@@ -25,9 +26,9 @@ case "$(uname -s)" in
      build_libs="-lrt -lpthread"
      ;;
 
-   CYGWIN*|MINGW32*|MSYS*)
+   CYGWIN*|MINGW32*|MSYS*|MINGW64*)
      echo 'MS Windows'
-     exit 13
+     compiler_options="-I./pthread/ -fms-extensions -Wno-language-extension-token"
      ;;
 
    # Add here more strings to compare
@@ -35,7 +36,6 @@ case "$(uname -s)" in
 
    *)
      echo 'other OS' 
-     exit 13
      ;;
 esac
 
@@ -48,7 +48,7 @@ else
     filename=$(basename -- "$file")
     filename="${filename%.*}"
     echo "compiling test c++03 $filename"
-    output=$(($COMPILER -std=c++03 -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
+    output=$(($COMPILER $compiler_options -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
     if [[ $? -ne 0 ]]; then
       if [[ $filename == *"fail"* ]]; then
         echo "failed as expected"
@@ -72,13 +72,28 @@ if [ $build_ok -eq 0 ]; then
   exit 3
 fi
 
+case "$(uname -s)" in
+
+   CYGWIN*|MINGW32*|MSYS*|MINGW64*)
+     echo 'MS Windows'
+     compiler_options="-I./pthread/ -fms-extensions -Wno-language-extension-token"
+     ;;
+
+   # Add here more strings to compare
+   # See correspondence table at the bottom of this answer
+
+   *) 
+   compiler_options="-std=c++98"
+     ;;
+esac
+
 tests_failed="failed tests for c++98:"
 
 for file in ./tests/*.cpp; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
   echo "compiling test c++98 $filename"
-  output=$(($COMPILER -std=c++98 -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
+  output=$(($COMPILER $compiler_options -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
   if [[ $? -ne 0 ]]; then
     if [[ $filename == *"fail"* ]]; then
       echo "failed as expected"
