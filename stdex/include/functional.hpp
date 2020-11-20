@@ -1429,7 +1429,7 @@ namespace stdex
             {
                 if (_fx && typeid(_FuncT) == target_type())
                 {
-                    void* _ptr_to_ptr = nullptr;
+                    void* _ptr_to_ptr = 0;
                     std::size_t _size = _fx->_target(_ptr_to_ptr);
 
                     if (_ptr_to_ptr && _size == sizeof(_FuncT*))
@@ -1440,7 +1440,7 @@ namespace stdex
                     }
                 }
 
-                return nullptr;
+                return 0;
             }
 
         private:
