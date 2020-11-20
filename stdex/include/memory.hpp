@@ -48,18 +48,19 @@ namespace stdex
 
     namespace detail
     {
-        template<bool>
+        template<bool, class _DummyT = int>
         struct _addressof_impl
         {
             template<class _Tp>
             static _Tp* call(_Tp &ref) _STDEX_NOEXCEPT_FUNCTION
             {
-                return std::addressof(ref);
+                using namespace std;
+                return addressof(ref);
             }
         };
 
-        template<>
-        struct _addressof_impl<false>
+        template<class _DummyT>
+        struct _addressof_impl<false, _DummyT>
         {
             template<class _Tp>
             _Tp* call(_Tp &ref) _STDEX_NOEXCEPT_FUNCTION
