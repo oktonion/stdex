@@ -279,6 +279,9 @@ namespace stdex
                     if(data)
                         deleter(data);
                 }
+
+                char& get() { static char zero = 0; return data ? *data : zero; }
+                char& operator()() { return get(); }
             };
         }
     }
@@ -303,14 +306,9 @@ namespace stdex
         {
 #undef _STDEX_PARAMS_TYPE
 #define _STDEX_PARAMS_TYPE _STDEX_PARAMS_TYPE_DEFAULT
-
-#undef _STDEX_PARAMS_ARG
-#define _STDEX_PARAMS_ARG(N) (arg##N.data ? (*(arg##N.data)) : 0)
             return
                 detail::functional_std::_forward<_R>::call(
-                    _func(_STDEX_ARGS1(_STDEX_BLANK, _STDEX_BLANK)) );
-#undef _STDEX_PARAMS_ARG
-#define _STDEX_PARAMS_ARG _STDEX_PARAMS_ARG_DEFAULT
+                    _func(_STDEX_ARGS_MAX(_STDEX_BLANK, .get() )) );
 
         }
 
