@@ -930,8 +930,6 @@ namespace stdex
         _STDEX_IS_FUNCTION_PTR_HELPER_FASTCALL(N) \
         _STDEX_IS_FUNCTION_PTR_HELPER_CDECL(N)
 
-#define _STDEX_DELIM , 
-
         _STDEX_IS_FUNCTION_PTR_HELPER(0)
         _STDEX_IS_FUNCTION_PTR_HELPER(1)
         _STDEX_IS_FUNCTION_PTR_HELPER(2)
@@ -964,8 +962,6 @@ namespace stdex
         _STDEX_IS_FUNCTION_PTR_HELPER(29)
         _STDEX_IS_FUNCTION_PTR_HELPER(30)
         _STDEX_IS_FUNCTION_PTR_HELPER(31)
-
-#undef _STDEX_DELIM
 
 #undef _STDEX_IS_FUNCTION_PTR_HELPER
 
@@ -1086,8 +1082,6 @@ namespace stdex
         _STDEX_IS_MEM_FUN_STDCALL_PTR(N) \
         _STDEX_IS_MEM_FUN_FASTCALL_PTR(N)
 
-#define _STDEX_DELIM , 
-
         _STDEX_IS_MEM_FUN_PTR(0)
         _STDEX_IS_MEM_FUN_PTR(1)
         _STDEX_IS_MEM_FUN_PTR(2)
@@ -1120,8 +1114,6 @@ namespace stdex
         _STDEX_IS_MEM_FUN_PTR(29)
         _STDEX_IS_MEM_FUN_PTR(30)
         _STDEX_IS_MEM_FUN_PTR(31)
-
-#undef _STDEX_DELIM
 
 #undef _STDEX_IS_MEM_FUN_PTR
 #undef _STDEX_IS_MEM_FUN_PTR_CLR         

@@ -10,6 +10,7 @@
 #include "./cstdint.hpp"
 #include "./type_traits.hpp"
 #include "./string.hpp"
+#include "./memory.hpp"
 
 #define _STDEX_PARAMETER_PACK_DEFINE
 #include "./parameter_pack.h"
@@ -45,6 +46,40 @@ namespace stdex
         using namespace std;
     #endif
     }
+
+    namespace intern
+    {
+        // since we have no static_assert in pre-C++11 we just compile-time assert this way:
+        struct functional_asserts
+        {
+            template<bool>
+            struct the_cpp_standard_does_not_provide_a_hash_for_this_type_assert;
+
+            template<bool>
+            struct the_cpp_standard_does_not_provide_a_hash_for_non_trivial_types_array_assert;
+
+            template<bool>
+            struct reference_wrapper_requires_T_to_be_an_object_type_or_a_function_type_assert;
+        };
+
+        template<>
+        struct functional_asserts::the_cpp_standard_does_not_provide_a_hash_for_this_type_assert<true>
+        {
+            typedef bool the_cpp_standard_does_not_provide_a_hash_for_this_type_assert_failed;
+        };
+
+        template<>
+        struct functional_asserts::the_cpp_standard_does_not_provide_a_hash_for_non_trivial_types_array_assert<true>
+        {
+            typedef bool the_cpp_standard_does_not_provide_a_hash_for_non_trivial_types_array_assert_failed;
+        };
+
+        template<>
+        struct functional_asserts::reference_wrapper_requires_T_to_be_an_object_type_or_a_function_type_assert<true>
+        {
+            typedef bool reference_wrapper_requires_T_to_be_an_object_type_or_a_function_type_assert_failed;
+        };
+    } // namespace intern
 
     namespace placeholders
     {
@@ -214,9 +249,42 @@ namespace stdex
 
     } // namespace detail
 
+    namespace detail
+    {
+        namespace functional_detail
+        {
+            struct _any
+            {
+                char* data;
+                void (*deleter)(void*);
+
+                template<class _Tp>
+                _any(_Tp value) : data(reinterpret_cast<char*>(new _Tp(value)))
+                { 
+                    struct lambdas
+                    {
+                        typedef _Tp type;
+                        static void type_deleter(void* ptr)
+                        {
+                            delete reinterpret_cast<type*>(ptr);
+                        }
+                    };
+                    deleter = &lambdas::type_deleter;
+                }
+                
+                _any(void_type) : data(0) {}
+
+                ~_any()
+                {
+                    if(data)
+                        deleter(data);
+                }
+            };
+        }
+    }
+
     namespace functional_cpp11
     {
-
         template<class _R>
         inline
             _R invoke(_R(*_func)())
@@ -226,9 +294,38 @@ namespace stdex
                     _func());
         }
 
+#undef _STDEX_PARAMS_TYPE
+#define _STDEX_PARAMS_TYPE(N) detail::functional_detail::_any
+
+        template<class _R>
+        inline
+            _R invoke(_R(*_func)(...), _STDEX_PARAMS_MAX(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = detail::void_type()))
+        {
+#undef _STDEX_PARAMS_TYPE
+#define _STDEX_PARAMS_TYPE _STDEX_PARAMS_TYPE_DEFAULT
+
+#undef _STDEX_PARAMS_ARG
+#define _STDEX_PARAMS_ARG(N) (arg##N.data ? (*(arg##N.data)) : 0)
+            return
+                detail::functional_std::_forward<_R>::call(
+                    _func(_STDEX_ARGS1(_STDEX_BLANK, _STDEX_BLANK)) );
+#undef _STDEX_PARAMS_ARG
+#define _STDEX_PARAMS_ARG _STDEX_PARAMS_ARG_DEFAULT
+
+        }
+
         template<class _R, class _ObjectT>
         inline
             _R invoke(_R(_ObjectT::* _func)(), _ObjectT& _obj)
+        {
+            return
+                detail::functional_std::_forward<_R>::call(
+                    (_obj.*_func)());
+        }
+
+        template<class _R, class _ObjectT>
+        inline
+            _R invoke(_R(_ObjectT::* _func)(...), _ObjectT& _obj)
         {
             return
                 detail::functional_std::_forward<_R>::call(
@@ -242,9 +339,25 @@ namespace stdex
             (_obj.*_func)();
         }
 
+        template<class _ObjectT>
+        inline
+            void invoke(void(_ObjectT::* _func)(...), _ObjectT& _obj)
+        {
+            (_obj.*_func)();
+        }
+
         template<class _R, class _ObjectT>
         inline
             _R invoke(_R(_ObjectT::* _func)() const, const _ObjectT& _obj)
+        {
+            return
+                detail::functional_std::_forward<_R>::call(
+                    (_obj.*_func)());
+        }
+
+        template<class _R, class _ObjectT>
+        inline
+            _R invoke(_R(_ObjectT::* _func)(...) const, const _ObjectT& _obj)
         {
             return
                 detail::functional_std::_forward<_R>::call(
@@ -258,9 +371,25 @@ namespace stdex
             (_obj.*_func)();
         }
 
+        template<class _ObjectT>
+        inline
+            void invoke(void(_ObjectT::* _func)(...) const, const _ObjectT& _obj)
+        {
+            (_obj.*_func)();
+        }
+
         template<class _R, class _ObjectT>
         inline
             _R invoke(_R(_ObjectT::* _func)(), _ObjectT* _obj)
+        {
+            return
+                detail::functional_std::_forward<_R>::call(
+                    ((*_obj).*_func)());
+        }
+
+        template<class _R, class _ObjectT>
+        inline
+            _R invoke(_R(_ObjectT::* _func)(...), _ObjectT* _obj)
         {
             return
                 detail::functional_std::_forward<_R>::call(
@@ -274,9 +403,25 @@ namespace stdex
             ((*_obj).*_func)();
         }
 
+        template<class _ObjectT>
+        inline
+            void invoke(void(_ObjectT::* _func)(...), _ObjectT* _obj)
+        {
+            ((*_obj).*_func)();
+        }
+
         template<class _R, class _ObjectT>
         inline
             _R invoke(_R(_ObjectT::* _func)() const, const _ObjectT* _obj)
+        {
+            return
+                detail::functional_std::_forward<_R>::call(
+                    ((*_obj).*_func)());
+        }
+
+        template<class _R, class _ObjectT>
+        inline
+            _R invoke(_R(_ObjectT::* _func)(...) const, const _ObjectT* _obj)
         {
             return
                 detail::functional_std::_forward<_R>::call(
@@ -290,9 +435,25 @@ namespace stdex
             ((*_obj).*_func)();
         }
 
+        template<class _ObjectT>
+        inline
+            void invoke(void(_ObjectT::* _func)(...) const, const _ObjectT* _obj)
+        {
+            ((*_obj).*_func)();
+        }
+
         template<class _R, class _ObjectT>
         inline
             _R invoke(_R(_ObjectT::* _func)(), reference_wrapper<_ObjectT>& _ref)
+        {
+            return
+                detail::functional_std::_forward<_R>::call(
+                    (_ref.get().*_func)());
+        }
+
+        template<class _R, class _ObjectT>
+        inline
+            _R invoke(_R(_ObjectT::* _func)(...), reference_wrapper<_ObjectT>& _ref)
         {
             return
                 detail::functional_std::_forward<_R>::call(
@@ -306,6 +467,13 @@ namespace stdex
             (_ref.get().*_func)();
         }
 
+        template<class _ObjectT>
+        inline
+            void invoke(void(_ObjectT::* _func)(...), reference_wrapper<_ObjectT>& _ref)
+        {
+            (_ref.get().*_func)();
+        }
+
         template<class _R, class _ObjectT>
         inline
             _R invoke(_R(_ObjectT::* _func)() const, reference_wrapper<_ObjectT>& _ref)
@@ -315,9 +483,25 @@ namespace stdex
                     (_ref.get().*_func)());
         }
 
+        template<class _R, class _ObjectT>
+        inline
+            _R invoke(_R(_ObjectT::* _func)(...) const, reference_wrapper<_ObjectT>& _ref)
+        {
+            return
+                detail::functional_std::_forward<_R>::call(
+                    (_ref.get().*_func)());
+        }
+
         template<class _ObjectT>
         inline
             void invoke(void(_ObjectT::* _func)() const, reference_wrapper<_ObjectT>& _ref)
+        {
+            (_ref.get().*_func)();
+        }
+
+        template<class _ObjectT>
+        inline
+            void invoke(void(_ObjectT::* _func)(...) const, reference_wrapper<_ObjectT>& _ref)
         {
             (_ref.get().*_func)();
         }
@@ -332,6 +516,12 @@ namespace stdex
         template<>
         inline
             void invoke(void(*_func)())
+        {
+            _func();
+        }
+
+        inline
+        void invoke(void(*_func)(...))
         {
             _func();
         }
@@ -446,8 +636,6 @@ namespace stdex
 
 #define _STDEX_INVOKE(N) _STDEX_INVOKE_IMPL(N)
 
-#define _STDEX_DELIM , 
-
         _STDEX_INVOKE(0)
         _STDEX_INVOKE(1)
         _STDEX_INVOKE(2)
@@ -480,8 +668,6 @@ namespace stdex
         _STDEX_INVOKE(29)
         _STDEX_INVOKE(30)
         _STDEX_INVOKE(31)
-
-#undef _STDEX_DELIM
 
 #undef _STDEX_INVOKE 
 #undef _STDEX_INVOKE_IMPL
@@ -1301,17 +1487,17 @@ namespace stdex
 
         template<
             class _R, 
-#define _STDEX_DELIM ,
             _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, = void_type)
-#undef _STDEX_DELIM
         >
         class _function_impl
         {
             typedef
                 typename _make_args::
+#undef _STDEX_DELIM
 #define _STDEX_DELIM ::
                 _STDEX_TYPES_MAX(template add <, >::type)::
 #undef _STDEX_DELIM
+#define _STDEX_DELIM _STDEX_DELIM_DEFAULT
             args _args_type;
 
             struct _func_base {
@@ -1367,9 +1553,7 @@ namespace stdex
 
             _return_arg<return_type>
                 operator()(
-#define _STDEX_DELIM ,
                 _STDEX_PARAMS_MAX(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = void_type())
-#undef _STDEX_DELIM 
                     ) const
             {
                 if (!_fx)
@@ -1381,6 +1565,7 @@ namespace stdex
 
                 _args_type args =
                     args_maker().
+#undef _STDEX_DELIM
 #define _STDEX_DELIM .
 #undef _STDEX_PARAMS_TYPE_PREFIX
 #undef _STDEX_PARAMS_TYPE_POSTFIX
@@ -1391,15 +1576,16 @@ namespace stdex
 #define _STDEX_PARAMS_ARG_PREFIX(N) (stdex::detail::functional_std::_forward< _Arg##N##T >::call(
 #define _STDEX_PARAMS_ARG_POSTFIX(N) ))
                     _STDEX_PARAMS_MAX(template make <, >, _STDEX_BLANK, _STDEX_BLANK)
-#undef _STDEX_DELIM 
+#undef _STDEX_DELIM
+#define _STDEX_DELIM _STDEX_DELIM_DEFAULT
 #undef _STDEX_PARAMS_TYPE_PREFIX
 #undef _STDEX_PARAMS_TYPE_POSTFIX
 #undef _STDEX_PARAMS_ARG_PREFIX
 #undef _STDEX_PARAMS_ARG_POSTFIX   
-#define _STDEX_PARAMS_TYPE_PREFIX(N) 
-#define _STDEX_PARAMS_TYPE_POSTFIX(N) 
-#define _STDEX_PARAMS_ARG_PREFIX(N)
-#define _STDEX_PARAMS_ARG_POSTFIX(N)
+#define _STDEX_PARAMS_TYPE_PREFIX(N)  _STDEX_PARAMS_TYPE_PREFIX_DEFAULT(N) 
+#define _STDEX_PARAMS_TYPE_POSTFIX(N) _STDEX_PARAMS_TYPE_POSTFIX_DEFAULT(N)
+#define _STDEX_PARAMS_ARG_PREFIX(N)   _STDEX_PARAMS_ARG_PREFIX_DEFAULT(N)
+#define _STDEX_PARAMS_ARG_POSTFIX(N)  _STDEX_PARAMS_ARG_POSTFIX_DEFAULT(N)
                     ;
 
                 return 
@@ -1451,42 +1637,64 @@ namespace stdex
 
     } // namespace detail
 
+    namespace detail
+    {
+        template<class _Tp>
+        class _reference_wrapper_impl
+        {
+            explicit _reference_wrapper_impl(_Tp& ref) _STDEX_NOEXCEPT_FUNCTION :
+                _ptr(addressof(ref))
+            { }
+
+        protected:
+            _Tp* _ptr;
+
+        };
+
+        template<class _R>
+        class _reference_wrapper_impl<_R(&)()>
+        {
+            typedef _R(type)();
+
+            explicit _reference_wrapper_impl(type& ref) _STDEX_NOEXCEPT_FUNCTION :
+                _ptr(addressof(ref))
+            { }
+
+        protected:
+            type* _ptr;
+
+        public:
+            _R operator()() { return invoke(*_ptr); }
+        };
+    }
     template<class _Tp>
     class reference_wrapper
-    /*{
+    {
     public:
-        static_assert(is_object_v<_Ty> || is_function_v<_Ty>,
-            "reference_wrapper<T> requires T to be an object type or a function type.");
+        typedef intern::functional_asserts check;
+        typedef typename check::reference_wrapper_requires_T_to_be_an_object_type_or_a_function_type_assert<is_object<_Tp>::value == bool(true) || is_function<_Tp>::value == bool(true)>::
+            reference_wrapper_requires_T_to_be_an_object_type_or_a_function_type_assert_failed
+            check1; // if you are there means you tried to use reference_wrapper for unsupported type
 
-        using type = _Ty;
+        typedef _Tp type;
 
-        template <class _Uty, enable_if_t<conjunction_v<negation<is_same<_Remove_cvref_t<_Uty>, reference_wrapper>>,
-                                              _Refwrap_has_ctor_from<_Ty, _Uty>>,
-                                  int> = 0>
-        _CONSTEXPR20 reference_wrapper(_Uty&& _Val) noexcept(noexcept(_Refwrap_ctor_fun<_Ty>(_STD declval<_Uty>()))) {
-            _Ty& _Ref = static_cast<_Uty&&>(_Val);
-            _Ptr      = _STD addressof(_Ref);
+        explicit reference_wrapper(type &ref) _STDEX_NOEXCEPT_FUNCTION:
+            _ptr( addressof(ref) )
+        { }
+
+        operator _Tp&() const _STDEX_NOEXCEPT_FUNCTION {
+            return *_ptr;
         }
 
-        _CONSTEXPR20 operator _Ty&() const noexcept {
-            return *_Ptr;
-        }
-
-        _NODISCARD _CONSTEXPR20 _Ty& get() const noexcept {
-            return *_Ptr;
+        _Tp& get() const _STDEX_NOEXCEPT_FUNCTION {
+            return *_ptr;
         }
 
     private:
-        _Ty* _Ptr{};
+        _Tp* _ptr;
 
-    public:
-        template <class... _Types>
-        _CONSTEXPR20 auto operator()(_Types&&... _Args) const
-            noexcept(noexcept(_STD invoke(*_Ptr, static_cast<_Types&&>(_Args)...))) // strengthened
-            -> decltype(_STD invoke(*_Ptr, static_cast<_Types&&>(_Args)...)) {
-            return _STD invoke(*_Ptr, static_cast<_Types&&>(_Args)...);
-        }
-    }*/;
+        //reference_wrapper(type&&) _STDEX_DELETED_FUNCTION;
+    };
 
     
 
@@ -1703,8 +1911,6 @@ namespace stdex
         } \
     };
 
-#define _STDEX_DELIM ,
-
     _STDEX_FUNCTION(0)
     _STDEX_FUNCTION(1)
     _STDEX_FUNCTION(2)
@@ -1738,36 +1944,11 @@ namespace stdex
     _STDEX_FUNCTION(30)
     _STDEX_FUNCTION(31)
 
-#undef _STDEX_DELIM
-
 #undef _STDEX_FUNCTION 
 
     // Hashing
 
-    namespace intern
-    {
-        // since we have no static_assert in pre-C++11 we just compile-time assert this way:
-        struct functional_asserts
-        {
-            template<bool>
-            struct the_cpp_standard_does_not_provide_a_hash_for_this_type_assert;
 
-            template<bool>
-            struct the_cpp_standard_does_not_provide_a_hash_for_non_trivial_types_array_assert;
-        };
-
-        template<>
-        struct functional_asserts::the_cpp_standard_does_not_provide_a_hash_for_this_type_assert<true>
-        {
-            typedef bool the_cpp_standard_does_not_provide_a_hash_for_this_type_assert_failed;
-        };
-
-        template<>
-        struct functional_asserts::the_cpp_standard_does_not_provide_a_hash_for_non_trivial_types_array_assert<true>
-        {
-            typedef bool the_cpp_standard_does_not_provide_a_hash_for_non_trivial_types_array_assert_failed;
-        };
-    } // namespace intern
 
     namespace detail
     {
