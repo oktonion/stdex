@@ -197,7 +197,7 @@ namespace stdex
 
         static pointer pointer_to(element_type &ref)
         {
-            return _Tp::pointer_to(_Val);
+            return _Tp::pointer_to(ref);
         }
     };
 
