@@ -256,17 +256,56 @@ namespace stdex
             struct _any
             {
                 char* data;
-                void (*deleter)(void*);
+                void (*deleter)(void*); 
 
                 template<class _Tp>
-                _any(_Tp value) : data(reinterpret_cast<char*>(new _Tp(value)))
+                _any(const _Tp &value) : data(reinterpret_cast<char*>(new _Tp(value)))
                 { 
                     struct lambdas
                     {
                         typedef _Tp type;
-                        static void type_deleter(void* ptr)
+                        static void type_deleter(void* ptr_)
                         {
-                            delete reinterpret_cast<type*>(ptr);
+                            delete reinterpret_cast<type*>(ptr_);
+                        }
+                    };
+                    deleter = &lambdas::type_deleter;
+                }
+
+                template<class _Tp>
+                _any(_Tp *ptr_) : data(reinterpret_cast<char*>(new _Tp*(ptr_)))
+                { 
+                    struct lambdas
+                    {
+                        typedef _Tp* type;
+                        static void type_deleter(void* ptr_)
+                        {
+                            delete reinterpret_cast<type*>(ptr_);
+                        }
+                    };
+                    deleter = &lambdas::type_deleter;
+                }
+
+                explicit _any(const float &fvalue) : data(reinterpret_cast<char*>(new double(fvalue)))
+                { 
+                    struct lambdas
+                    {
+                        typedef double type;
+                        static void type_deleter(void* ptr_)
+                        {
+                            delete reinterpret_cast<type*>(ptr_);
+                        }
+                    };
+                    deleter = &lambdas::type_deleter;
+                }
+                explicit _any(const int &ivalue) : data(reinterpret_cast<char*>(new int(ivalue)))
+                { 
+                    struct lambdas
+                    {
+                        typedef int type;
+                        static void type_deleter(void* ptr_)
+                        {
+                            delete reinterpret_cast<type*>(ptr_);
                         }
                     };
                     deleter = &lambdas::type_deleter;
