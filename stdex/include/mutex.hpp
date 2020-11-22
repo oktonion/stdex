@@ -980,15 +980,15 @@ namespace stdex
 #undef _STDEX_ARGS
 #undef _STDEX_ARGS_NAMES
 
-#define _STDEX_TRY_LOCK(N) \
-            template <class _Lockbl1, _STDEX_TYPES##N > \
-            unsigned int _try_lock(_Lockbl1 &_m1, _STDEX_ARGS##N ) \
+#define _STDEX_TRY_LOCK(count) \
+            template <class _Lockbl1, _STDEX_TYPES##count > \
+            unsigned int _try_lock(_Lockbl1 &_m1, _STDEX_ARGS##count ) \
             { \
                 stdex::unique_lock<_Lockbl1> _l1(_m1, stdex::try_to_lock); \
                 if (!_l1) \
                     return 1; \
                 \
-                const unsigned int _failed_lock = _try_lock(_STDEX_ARGS_NAMES##N ); \
+                const unsigned int _failed_lock = _try_lock(_STDEX_ARGS_NAMES##count ); \
                 \
                 if (_failed_lock > 0) \
                     return _failed_lock + 1; \
@@ -996,18 +996,18 @@ namespace stdex
                 _l1.release();\
                 return 0;\
             } \
-            template <class _Lockbl1, _STDEX_TYPES##N > \
-            int try_lock(_Lockbl1 &_m1, _STDEX_ARGS##N ) \
+            template <class _Lockbl1, _STDEX_TYPES##count > \
+            int try_lock(_Lockbl1 &_m1, _STDEX_ARGS##count ) \
             { \
-                return ((int) _try_lock(_m1, _STDEX_ARGS_NAMES##N )) - 1; \
+                return ((int) _try_lock(_m1, _STDEX_ARGS_NAMES##count )) - 1; \
             }
 
-#define _STDEX_LOCK_HELPER(N) \
-            template <class _Lockbl1, _STDEX_TYPES##N > \
-            unsigned int _lock_helper(_Lockbl1 &_m1, _STDEX_ARGS##N ) \
+#define _STDEX_LOCK_HELPER(count) \
+            template <class _Lockbl1, _STDEX_TYPES##count > \
+            unsigned int _lock_helper(_Lockbl1 &_m1, _STDEX_ARGS##count ) \
             { \
                 stdex::unique_lock<_Lockbl1> _l1(_m1); \
-                const unsigned int _failed_lock = _try_lock(_STDEX_ARGS_NAMES##N ); \
+                const unsigned int _failed_lock = _try_lock(_STDEX_ARGS_NAMES##count ); \
                 if (_failed_lock > 0) \
                     return _failed_lock; \
                 \
@@ -1017,9 +1017,9 @@ namespace stdex
 
 
 
-#define _STDEX_TYPES_N(N)      class _Lockbl##N
-#define _STDEX_ARGS_N(N)       _Lockbl##N &_m##N
-#define _STDEX_ARGS_NAMES_N(N) _m##N
+#define _STDEX_TYPES_N(count)      class _Lockbl##count
+#define _STDEX_ARGS_N(count)       _Lockbl##count &_m##count
+#define _STDEX_ARGS_NAMES_N(count) _m##count
 
 #define      _STDEX_TYPES3  class _Lockbl2, class _Lockbl3
 #define       _STDEX_ARGS3  _Lockbl2 &_m2, _Lockbl3 &_m3
@@ -1088,9 +1088,9 @@ namespace stdex
 #define       _STDEX_ARGS24        _STDEX_ARGS23, _STDEX_ARGS_N       (24)
 #define _STDEX_ARGS_NAMES24  _STDEX_ARGS_NAMES23, _STDEX_ARGS_NAMES_N (24)
 
-#define _STDEX_LOCK_DEFINE(N) \
-    _STDEX_TRY_LOCK(N) \
-    _STDEX_LOCK_HELPER(N)
+#define _STDEX_LOCK_DEFINE(count) \
+    _STDEX_TRY_LOCK(count) \
+    _STDEX_LOCK_HELPER(count)
 
             _STDEX_LOCK_DEFINE(3)
             _STDEX_LOCK_DEFINE(4)

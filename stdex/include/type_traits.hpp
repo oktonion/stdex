@@ -873,11 +873,11 @@ namespace stdex
         template <class _R >
         struct _is_function_ptr_helper<_R(*)(...)> : true_type {};
 
-#define _STDEX_IS_FUNCTION_PTR_HELPER_IMPL(N) \
-        template<class _R, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
-        struct _is_function_ptr_helper<_R(*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK))>: true_type {};\
-        template<class _R, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
-        struct _is_function_ptr_helper<_R(*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)...)>: true_type {};
+#define _STDEX_IS_FUNCTION_PTR_HELPER_IMPL(count) \
+        template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+        struct _is_function_ptr_helper<_R(*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK))>: true_type {};\
+        template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+        struct _is_function_ptr_helper<_R(*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...)>: true_type {};
 
 #ifdef _STDEX_STDCALL
         template <class _R >
@@ -885,13 +885,13 @@ namespace stdex
         template <class _R >
         struct _is_function_ptr_helper_stdcall<_R(_STDEX_STDCALL*)(...) > : true_type {};
 
-#define _STDEX_IS_FUNCTION_PTR_HELPER_STDCALL(N) \
-        template<class _R, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
-        struct _is_function_ptr_helper_stdcall<_R(_STDEX_STDCALL *)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK))>: true_type {}; \
-        template<class _R, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
-        struct _is_function_ptr_helper_stdcall<_R(_STDEX_STDCALL *)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)...)>: true_type {};
+#define _STDEX_IS_FUNCTION_PTR_HELPER_STDCALL(count) \
+        template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+        struct _is_function_ptr_helper_stdcall<_R(_STDEX_STDCALL *)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK))>: true_type {}; \
+        template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+        struct _is_function_ptr_helper_stdcall<_R(_STDEX_STDCALL *)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...)>: true_type {};
 #else
-#define _STDEX_IS_FUNCTION_PTR_HELPER_STDCALL(N)
+#define _STDEX_IS_FUNCTION_PTR_HELPER_STDCALL(count)
 #endif
 
 #ifdef _STDEX_FASTCALL
@@ -900,13 +900,13 @@ namespace stdex
         template <class _R >
         struct _is_function_ptr_helper_fastcall<_R(_STDEX_FASTCALL*)(...) > : true_type {};
 
-#define _STDEX_IS_FUNCTION_PTR_HELPER_FASTCALL(N) \
-        template<class _R, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
-        struct _is_function_ptr_helper_fastcall<_R(_STDEX_FASTCALL *)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK))>: true_type {}; \
-        template<class _R, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
-        struct _is_function_ptr_helper_fastcall<_R(_STDEX_FASTCALL *)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)...)>: true_type {};
+#define _STDEX_IS_FUNCTION_PTR_HELPER_FASTCALL(count) \
+        template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+        struct _is_function_ptr_helper_fastcall<_R(_STDEX_FASTCALL *)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK))>: true_type {}; \
+        template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+        struct _is_function_ptr_helper_fastcall<_R(_STDEX_FASTCALL *)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...)>: true_type {};
 #else
-#define _STDEX_IS_FUNCTION_PTR_HELPER_FASTCALL(N)
+#define _STDEX_IS_FUNCTION_PTR_HELPER_FASTCALL(count)
 #endif
 
 #ifdef _STDEX_CDECL
@@ -915,20 +915,20 @@ namespace stdex
         template <class _R >
         struct _is_function_ptr_helper_cdecl<_R(_STDEX_CDECL*)(...) > : true_type {};
 
-#define _STDEX_IS_FUNCTION_PTR_HELPER_CDECL(N) \
-        template<class _R, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
-        struct _is_function_ptr_helper_cdecl<_R(_STDEX_CDECL *)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK))>: true_type {}; \
-        template<class _R, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
-        struct _is_function_ptr_helper_cdecl<_R(_STDEX_CDECL *)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)...)>: true_type {};
+#define _STDEX_IS_FUNCTION_PTR_HELPER_CDECL(count) \
+        template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+        struct _is_function_ptr_helper_cdecl<_R(_STDEX_CDECL *)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK))>: true_type {}; \
+        template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+        struct _is_function_ptr_helper_cdecl<_R(_STDEX_CDECL *)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...)>: true_type {};
 #else
-#define _STDEX_IS_FUNCTION_PTR_HELPER_CDECL(N)
+#define _STDEX_IS_FUNCTION_PTR_HELPER_CDECL(count)
 #endif
 
-#define _STDEX_IS_FUNCTION_PTR_HELPER(N) \
-        _STDEX_IS_FUNCTION_PTR_HELPER_IMPL(N) \
-        _STDEX_IS_FUNCTION_PTR_HELPER_STDCALL(N) \
-        _STDEX_IS_FUNCTION_PTR_HELPER_FASTCALL(N) \
-        _STDEX_IS_FUNCTION_PTR_HELPER_CDECL(N)
+#define _STDEX_IS_FUNCTION_PTR_HELPER(count) \
+        _STDEX_IS_FUNCTION_PTR_HELPER_IMPL(count) \
+        _STDEX_IS_FUNCTION_PTR_HELPER_STDCALL(count) \
+        _STDEX_IS_FUNCTION_PTR_HELPER_FASTCALL(count) \
+        _STDEX_IS_FUNCTION_PTR_HELPER_CDECL(count)
 
         _STDEX_IS_FUNCTION_PTR_HELPER(0)
         _STDEX_IS_FUNCTION_PTR_HELPER(1)
@@ -982,23 +982,23 @@ namespace stdex
         template <class _R, class _ObjectT> 
         _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(...) const volatile);
 
-#define _STDEX_IS_MEM_FUN_PTR_CLR(N) \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK))); \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)...)); \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const); \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) volatile); \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
-        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const volatile); \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)...) const); \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)...) volatile); \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)...) const volatile);
+#define _STDEX_IS_MEM_FUN_PTR_CLR(count) \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK))); \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...)); \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) const); \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) volatile); \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) const volatile); \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...) const); \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...) volatile); \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...) const volatile);
 
 #ifdef _STDEX_CDECL
     _no_type _STDEX_CDECL _is_mem_function_ptr(...);
@@ -1017,17 +1017,17 @@ namespace stdex
         template <class _R, class _ObjectT> 
         _yes_type _is_mem_function_ptr( _R(_STDEX_CDECL _ObjectT::*const volatile*)() const volatile) ;
 
-#define _STDEX_IS_MEM_FUN_CDECL_PTR(N) \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R(_STDEX_CDECL _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK))) ; \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R(_STDEX_CDECL _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const) ; \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R(_STDEX_CDECL _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) volatile) ; \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R(_STDEX_CDECL _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const volatile) ;
+#define _STDEX_IS_MEM_FUN_CDECL_PTR(count) \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R(_STDEX_CDECL _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK))) ; \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R(_STDEX_CDECL _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) const) ; \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R(_STDEX_CDECL _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) volatile) ; \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R(_STDEX_CDECL _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) const volatile) ;
 #else
-#define _STDEX_IS_MEM_FUN_CDECL_PTR(N)
+#define _STDEX_IS_MEM_FUN_CDECL_PTR(count)
 #endif
 
 #ifdef _STDEX_STDCALL
@@ -1040,17 +1040,17 @@ namespace stdex
         template <class _R, class _ObjectT> 
         _yes_type _is_mem_function_ptr( _R(_STDEX_STDCALL _ObjectT::*const volatile*)() const volatile) ;
 
-#define _STDEX_IS_MEM_FUN_STDCALL_PTR(N) \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R(_STDEX_STDCALL _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK))) ; \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R(_STDEX_STDCALL _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const) ; \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R(_STDEX_STDCALL _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) volatile) ; \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R(_STDEX_STDCALL _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const volatile) ;
+#define _STDEX_IS_MEM_FUN_STDCALL_PTR(count) \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R(_STDEX_STDCALL _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK))) ; \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R(_STDEX_STDCALL _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) const) ; \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R(_STDEX_STDCALL _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) volatile) ; \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R(_STDEX_STDCALL _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) const volatile) ;
 #else
-#define _STDEX_IS_MEM_FUN_STDCALL_PTR(N)
+#define _STDEX_IS_MEM_FUN_STDCALL_PTR(count)
 #endif
 
 #ifdef _STDEX_FASTCALL
@@ -1063,24 +1063,24 @@ namespace stdex
         template <class _R, class _ObjectT> 
         _yes_type _is_mem_function_ptr( _R(_STDEX_FASTCALL _ObjectT::*const volatile*)() const volatile) ;
 
-#define _STDEX_IS_MEM_FUN_FASTCALL_PTR(N) \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R(_STDEX_FASTCALL _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK))) ; \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R(_STDEX_FASTCALL _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const) ; \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R(_STDEX_FASTCALL _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) volatile) ; \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R(_STDEX_FASTCALL _ObjectT::*const volatile*)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const volatile) ;
+#define _STDEX_IS_MEM_FUN_FASTCALL_PTR(count) \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R(_STDEX_FASTCALL _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK))) ; \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R(_STDEX_FASTCALL _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) const) ; \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R(_STDEX_FASTCALL _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) volatile) ; \
+        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
+        _yes_type _is_mem_function_ptr( _R(_STDEX_FASTCALL _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) const volatile) ;
 #else
-#define _STDEX_IS_MEM_FUN_FASTCALL_PTR(N)
+#define _STDEX_IS_MEM_FUN_FASTCALL_PTR(count)
 #endif
 
-#define _STDEX_IS_MEM_FUN_PTR(N) \
-        _STDEX_IS_MEM_FUN_PTR_CLR(N) \
-        _STDEX_IS_MEM_FUN_CDECL_PTR(N) \
-        _STDEX_IS_MEM_FUN_STDCALL_PTR(N) \
-        _STDEX_IS_MEM_FUN_FASTCALL_PTR(N)
+#define _STDEX_IS_MEM_FUN_PTR(count) \
+        _STDEX_IS_MEM_FUN_PTR_CLR(count) \
+        _STDEX_IS_MEM_FUN_CDECL_PTR(count) \
+        _STDEX_IS_MEM_FUN_STDCALL_PTR(count) \
+        _STDEX_IS_MEM_FUN_FASTCALL_PTR(count)
 
         _STDEX_IS_MEM_FUN_PTR(0)
         _STDEX_IS_MEM_FUN_PTR(1)

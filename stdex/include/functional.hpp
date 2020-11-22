@@ -566,220 +566,219 @@ namespace stdex
 #undef _STDEX_ELIPSIS_PARAMS
 #undef _STDEX_ELIPSIS_ARGS
 
-#define _STDEX_INVOKE_IMPL(N) \
-    template<class _R, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
-    _R invoke( _R(*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+#define _STDEX_INVOKE_IMPL(count) \
+    template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+    _R invoke( _R(*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)), _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
-            _func(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)) );\
+            _func(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)) );\
     }\
 \
-    template<_STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
-    void invoke( void(*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    template<_STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+    void invoke( void(*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)), _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
-        _func(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
+        _func(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
-    {\
-        return\
-        detail::functional_std::_forward<_R>::call(\
-            (_obj.*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)) );\
-    }\
-\
-    template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
-    {\
-        (_obj.*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
-    }\
-\
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const, const _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)), _ObjectT &_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
-            (_obj.*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)) );\
+            (_obj.*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)) );\
     }\
 \
-    template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const, const _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)), _ObjectT &_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
-        (_obj.*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
+        (_obj.*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
-    {\
-        return\
-        detail::functional_std::_forward<_R>::call(\
-            ((*_obj).*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)) );\
-    }\
-\
-    template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
-    {\
-        ((*_obj).*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
-    }\
-\
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const, const _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) const, const _ObjectT &_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
-            ((*_obj).*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)) );\
+            (_obj.*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)) );\
     }\
 \
-    template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const, const _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) const, const _ObjectT &_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
-        ((*_obj).*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
+        (_obj.*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
-    {\
-        return\
-        detail::functional_std::_forward<_R>::call(\
-            (_ref.get().*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)) );\
-    }\
-\
-    template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
-    {\
-        (_ref.get().*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
-    }\
-\
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)), _ObjectT *_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
-            (_ref.get().*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)) );\
+            ((*_obj).*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)) );\
     }\
 \
-    template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)), _ObjectT *_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
     {\
-        (_ref.get().*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
+        ((*_obj).*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
-    template<class _R, class _FuncT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke(_FuncT &_func, _STDEX_PARAMS##N(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK))\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) const, const _ObjectT *_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    {\
+        return\
+        detail::functional_std::_forward<_R>::call(\
+            ((*_obj).*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)) );\
+    }\
+\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) const, const _ObjectT *_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    {\
+        ((*_obj).*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK));\
+    }\
+\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    {\
+        return\
+        detail::functional_std::_forward<_R>::call(\
+            (_ref.get().*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)) );\
+    }\
+\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    {\
+        (_ref.get().*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK));\
+    }\
+\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    {\
+        return\
+        detail::functional_std::_forward<_R>::call(\
+            (_ref.get().*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)) );\
+    }\
+\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK))\
+    {\
+        (_ref.get().*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK));\
+    }\
+\
+    template<class _R, class _FuncT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    _R invoke(_FuncT &_func, _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         stdex::function<_FuncT> _f(_func); \
         return\
-            _f(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
+            _f(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 
-#define _STDEX_INVOKE_ELIPSIS_IMPL(N, M) \
-    template<class _R, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
-    _R invoke( _R(*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
+#define _STDEX_INVOKE_ELIPSIS_IMPL(count, left) \
+    template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+    _R invoke( _R(*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK), ...), _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(left))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
-            _func(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)) );\
+            _func(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)) );\
     }\
 \
-    template<_STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
-    void invoke( void(*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
+    template<_STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+    void invoke( void(*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK), ...), _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(left))\
     {\
-        _func(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
+        _func(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
-    {\
-        return\
-        detail::functional_std::_forward<_R>::call(\
-            (_obj.*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)) );\
-    }\
-\
-    template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
-    {\
-        (_obj.*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
-    }\
-\
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...) const, const _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK), ...), _ObjectT &_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(left))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
-            (_obj.*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)) );\
+            (_obj.*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)) );\
     }\
 \
-    template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...) const, const _ObjectT &_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK), ...), _ObjectT &_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(left))\
     {\
-        (_obj.*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
+        (_obj.*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
-    {\
-        return\
-        detail::functional_std::_forward<_R>::call(\
-            ((*_obj).*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)) );\
-    }\
-\
-    template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
-    {\
-        ((*_obj).*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
-    }\
-\
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...) const, const _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK), ...) const, const _ObjectT &_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(left))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
-            ((*_obj).*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)) );\
+            (_obj.*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)) );\
     }\
 \
-    template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...) const, const _ObjectT *_obj, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK), ...) const, const _ObjectT &_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(left))\
     {\
-        ((*_obj).*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
+        (_obj.*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 \
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
-    {\
-        return\
-        detail::functional_std::_forward<_R>::call(\
-            (_ref.get().*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)) );\
-    }\
-\
-    template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
-    {\
-        (_ref.get().*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
-    }\
-\
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK), ...), _ObjectT *_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(left))\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
-            (_ref.get().*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)) );\
+            ((*_obj).*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)) );\
     }\
 \
-    template<class _ObjectT, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK), ...) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##N(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(M))\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK), ...), _ObjectT *_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(left))\
     {\
-        (_ref.get().*_func)(_STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK));\
+        ((*_obj).*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK));\
+    }\
+\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK), ...) const, const _ObjectT *_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(left))\
+    {\
+        return\
+        detail::functional_std::_forward<_R>::call(\
+            ((*_obj).*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)) );\
+    }\
+\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK), ...) const, const _ObjectT *_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(left))\
+    {\
+        ((*_obj).*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK));\
+    }\
+\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK), ...), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(left))\
+    {\
+        return\
+        detail::functional_std::_forward<_R>::call(\
+            (_ref.get().*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)) );\
+    }\
+\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK), ...), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(left))\
+    {\
+        (_ref.get().*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK));\
+    }\
+\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK), ...) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(left))\
+    {\
+        return\
+        detail::functional_std::_forward<_R>::call(\
+            (_ref.get().*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)) );\
+    }\
+\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK), ...) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK), _STDEX_ELIPSIS_PARAMS(left))\
+    {\
+        (_ref.get().*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK));\
     }\
 
-#define _STDEX_PARAMS_TYPE_CUSTOM(N) stdex::detail::functional_detail::_any
-#define _STDEX_PARAMS_ARG_CUSTOM(N) _elipsis_arg##N
-#define _STDEX_ELIPSIS_PARAMS(N) _STDEX_PARAMS##N##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = detail::void_type(), _STDEX_PARAMS_TYPE_CUSTOM, _STDEX_PARAMS_ARG_CUSTOM)
-#define _STDEX_ELIPSIS_ARGS(N) _STDEX_ARGS##N##_IMPL(_STDEX_BLANK, .get(), _STDEX_PARAMS_ARG_CUSTOM)
+#define _STDEX_PARAMS_ARG_CUSTOM(count) _elipsis_arg##count
+#define _STDEX_ELIPSIS_PARAMS(count) _STDEX_PARAMS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_PARAMS_TYPE_DEFAULT, _STDEX_PARAMS_ARG_CUSTOM)
+#define _STDEX_ELIPSIS_ARGS(count) _STDEX_ARGS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_PARAMS_ARG_CUSTOM)
 
-#define _STDEX_INVOKE(N, M) \
-         _STDEX_INVOKE_IMPL(N)\
-        _STDEX_INVOKE_ELIPSIS_IMPL(N, M)
+#define _STDEX_INVOKE(count, left) \
+         _STDEX_INVOKE_IMPL(count)\
+        _STDEX_INVOKE_ELIPSIS_IMPL(count, left)
 
         _STDEX_INVOKE(0, 31)
         _STDEX_INVOKE(1, 30)
@@ -1721,10 +1720,10 @@ namespace stdex
 #undef _STDEX_PARAMS_TYPE_POSTFIX
 #undef _STDEX_PARAMS_ARG_PREFIX
 #undef _STDEX_PARAMS_ARG_POSTFIX   
-#define _STDEX_PARAMS_TYPE_PREFIX(N) 
-#define _STDEX_PARAMS_TYPE_POSTFIX(N) 
-#define _STDEX_PARAMS_ARG_PREFIX(N) (stdex::detail::functional_std::_forward< _Arg##N##T >::call(
-#define _STDEX_PARAMS_ARG_POSTFIX(N) ))
+#define _STDEX_PARAMS_TYPE_PREFIX(count) 
+#define _STDEX_PARAMS_TYPE_POSTFIX(count) 
+#define _STDEX_PARAMS_ARG_PREFIX(count) (stdex::detail::functional_std::_forward< _Arg##count##T >::call(
+#define _STDEX_PARAMS_ARG_POSTFIX(count) ))
                     _STDEX_PARAMS_MAX(template make <, >, _STDEX_BLANK, _STDEX_BLANK)
 #undef _STDEX_DELIM
 #define _STDEX_DELIM _STDEX_DELIM_DEFAULT
@@ -1732,10 +1731,10 @@ namespace stdex
 #undef _STDEX_PARAMS_TYPE_POSTFIX
 #undef _STDEX_PARAMS_ARG_PREFIX
 #undef _STDEX_PARAMS_ARG_POSTFIX   
-#define _STDEX_PARAMS_TYPE_PREFIX(N)  _STDEX_PARAMS_TYPE_PREFIX_DEFAULT(N) 
-#define _STDEX_PARAMS_TYPE_POSTFIX(N) _STDEX_PARAMS_TYPE_POSTFIX_DEFAULT(N)
-#define _STDEX_PARAMS_ARG_PREFIX(N)   _STDEX_PARAMS_ARG_PREFIX_DEFAULT(N)
-#define _STDEX_PARAMS_ARG_POSTFIX(N)  _STDEX_PARAMS_ARG_POSTFIX_DEFAULT(N)
+#define _STDEX_PARAMS_TYPE_PREFIX(count)  _STDEX_PARAMS_TYPE_PREFIX_DEFAULT(count) 
+#define _STDEX_PARAMS_TYPE_POSTFIX(count) _STDEX_PARAMS_TYPE_POSTFIX_DEFAULT(count)
+#define _STDEX_PARAMS_ARG_PREFIX(count)   _STDEX_PARAMS_ARG_PREFIX_DEFAULT(count)
+#define _STDEX_PARAMS_ARG_POSTFIX(count)  _STDEX_PARAMS_ARG_POSTFIX_DEFAULT(count)
                     ;
 
                 return 
@@ -1991,24 +1990,24 @@ namespace stdex
         }
     };
 
-#define _STDEX_FUNCTION(N) \
+#define _STDEX_FUNCTION(count) \
     template<class _R,  \
-        _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) \
+        _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) \
     > \
     class function<_R(*)( \
-        _STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK) \
+        _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) \
         )>: \
         detail::_function_impl<_R,  \
-            _STDEX_TYPES##N(typename remove_reference <, >::type&) \
+            _STDEX_TYPES##count(typename remove_reference <, >::type&) \
         > \
     { \
         typedef  \
         detail::_function_impl<_R, \
-            _STDEX_TYPES##N(typename remove_reference <, >::type&) \
+            _STDEX_TYPES##count(typename remove_reference <, >::type&) \
         > base_type; \
  \
         typedef typename stdex::remove_pointer< \
-            _R(*)( _STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK) ) \
+            _R(*)( _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) ) \
         >::type function_signature; \
     public: \
         typedef typename base_type::return_type return_type; \
@@ -2024,12 +2023,12 @@ namespace stdex
         function(_FuncT func): base_type(func) { } \
  \
         return_type operator()( \
-            _STDEX_PARAMS##N(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK) \
+            _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK) \
             ) {  \
             return  \
             detail::functional_std::_forward<return_type>::call( \
                 base_type::operator()( \
-                    _STDEX_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) \
+                    _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) \
                     ).get() ); \
         } \
  \

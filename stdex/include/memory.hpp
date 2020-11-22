@@ -89,9 +89,9 @@ namespace stdex
         template <class _Tp>
         struct _get_first_parameter;
 
-#define _STDEX_GET_FIRST_PARAMETER(N) \
-        template <template <_STDEX_REPEAT_TOKEN##N(class)> class _Tp, _STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK)> \
-        struct _get_first_parameter<_Tp<_STDEX_TYPES##N(_STDEX_BLANK, _STDEX_BLANK)>/**/> { \
+#define _STDEX_GET_FIRST_PARAMETER(count) \
+        template <template <_STDEX_REPEAT_TOKEN##count(class)> class _Tp, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+        struct _get_first_parameter<_Tp<_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)>/**/> { \
             typedef _Arg0T type; \
         };
 
@@ -103,15 +103,15 @@ namespace stdex
             typedef _Tp<_NewFirstArgT> type;
         };
 
-#define _STDEX_REPLACE_FIRST_PARAMETER(N, M) \
-        template <class _NewFirstArgT, template <_STDEX_REPEAT_TOKEN##N(class)> class _Tp,class _OldFirstArgT, _STDEX_TMPL_ARGS##M(_STDEX_BLANK, _STDEX_BLANK)> \
-        struct _replace_first_parameter<_NewFirstArgT, _Tp<_OldFirstArgT, _STDEX_TYPES##M(_STDEX_BLANK, _STDEX_BLANK)>/**/> { \
-            typedef _Tp<_NewFirstArgT, _STDEX_TYPES##M(_STDEX_BLANK, _STDEX_BLANK)> type;\
+#define _STDEX_REPLACE_FIRST_PARAMETER(count, left) \
+        template <class _NewFirstArgT, template <_STDEX_REPEAT_TOKEN##count(class)> class _Tp,class _OldFirstArgT, _STDEX_TMPL_ARGS##left(_STDEX_BLANK, _STDEX_BLANK)> \
+        struct _replace_first_parameter<_NewFirstArgT, _Tp<_OldFirstArgT, _STDEX_TYPES##left(_STDEX_BLANK, _STDEX_BLANK)>/**/> { \
+            typedef _Tp<_NewFirstArgT, _STDEX_TYPES##left(_STDEX_BLANK, _STDEX_BLANK)> type;\
         };
 
-#define _STDEX_GET_AND_REPLACE_FIRST_PARAMETER(N, M)\
-        _STDEX_GET_FIRST_PARAMETER(N)\
-        _STDEX_REPLACE_FIRST_PARAMETER(N, M)
+#define _STDEX_GET_AND_REPLACE_FIRST_PARAMETER(count, left)\
+        _STDEX_GET_FIRST_PARAMETER(count)\
+        _STDEX_REPLACE_FIRST_PARAMETER(count, left)
         
         _STDEX_GET_AND_REPLACE_FIRST_PARAMETER(1, 0)
         _STDEX_GET_AND_REPLACE_FIRST_PARAMETER(2, 1)

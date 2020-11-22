@@ -281,7 +281,7 @@ namespace stdex
     template<stdex::intmax_t _Num, stdex::intmax_t _Den = 1>
     struct ratio
     {
-        // Note: sign(N) * abs(N) == N
+        // Note: sign(count) * abs(count) == N
         static const stdex::intmax_t num =
             _Num * detail::_sign_of<_Den>::value / detail::_gcd<_Num, _Den>::value;
 

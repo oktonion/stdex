@@ -7,8 +7,8 @@
 // #include "./parameter_pack.h"
 // #undef _STDEX_PARAMETER_PACK_DEFINE
 // 
-// #define MY_FUNC(N)
-//     template<_STDEX_TMPL_ARGS##N(_STDEX_BLANK, _STDEX_BLANK) /*class _Arg0T, ...class _ArgNT*/> 
+// #define MY_FUNC(count)
+//     template<_STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) /*class _Arg0T, ...class _ArgNT*/> 
 //     void my_func( _STDEX_PARAMS_MAX(_STDEX_BLANK, _STDEX_BLANK) /*_Arg0T arg0, ..._ArgNT argN*/)
 //     { }
 //
@@ -20,31 +20,31 @@
 
 #ifdef _STDEX_PARAMETER_PACK_DEFINE
 
-#define _STDEX_TMPL_ARGS_IMPL(prefix, N, postfix, params_type) class prefix params_type(N) postfix
-#define _STDEX_TYPES_IMPL(prefix, N, postfix, params_type) prefix params_type(N) postfix
-#define _STDEX_PARAMS_IMPL(prefix1, prefix2, N, postfix1, postfix2, params_type, params_args) prefix1 _STDEX_PARAMS_TYPE_PREFIX(N) params_type(N) _STDEX_PARAMS_TYPE_POSTFIX(N) postfix1 prefix2 _STDEX_PARAMS_ARG_PREFIX(N) params_args(N) _STDEX_PARAMS_ARG_POSTFIX(N) postfix2
-#define _STDEX_ARGS_IMPL(prefix, N, postfix, params_args) prefix params_args(N) postfix
+#define _STDEX_TMPL_ARGS_IMPL(prefix, count, postfix, params_type) class prefix params_type(count) postfix
+#define _STDEX_TYPES_IMPL(prefix, count, postfix, params_type) prefix params_type(count) postfix
+#define _STDEX_PARAMS_IMPL(prefix1, prefix2, count, postfix1, postfix2, params_type, params_args) prefix1 _STDEX_PARAMS_TYPE_PREFIX(count) params_type(count) _STDEX_PARAMS_TYPE_POSTFIX(count) postfix1 prefix2 _STDEX_PARAMS_ARG_PREFIX(count) params_args(count) _STDEX_PARAMS_ARG_POSTFIX(count) postfix2
+#define _STDEX_ARGS_IMPL(prefix, count, postfix, params_args) prefix params_args(count) postfix
 #define _STDEX_REPEAT_TOKEN_IMPL(token) token
 
 #define _STDEX_DELIM_DEFAULT ,
-#define _STDEX_PARAMS_TYPE_DEFAULT(N) _Arg##N##T
-#define _STDEX_PARAMS_ARG_DEFAULT(N) arg##N
-#define _STDEX_PARAMS_TYPE_PREFIX_DEFAULT(N)
-#define _STDEX_PARAMS_TYPE_POSTFIX_DEFAULT(N) 
-#define _STDEX_PARAMS_ARG_PREFIX_DEFAULT(N) 
-#define _STDEX_PARAMS_ARG_POSTFIX_DEFAULT(N)
+#define _STDEX_PARAMS_TYPE_DEFAULT(count) _Arg##count##T
+#define _STDEX_PARAMS_ARG_DEFAULT(count) arg##count
+#define _STDEX_PARAMS_TYPE_PREFIX_DEFAULT(count)
+#define _STDEX_PARAMS_TYPE_POSTFIX_DEFAULT(count) 
+#define _STDEX_PARAMS_ARG_PREFIX_DEFAULT(count) 
+#define _STDEX_PARAMS_ARG_POSTFIX_DEFAULT(count)
 
 #define _STDEX_BLANK  
 #define _STDEX_DELIM _STDEX_DELIM_DEFAULT
-#define _STDEX_PARAMS_TYPE_PREFIX(N)  _STDEX_PARAMS_TYPE_PREFIX_DEFAULT(N) 
-#define _STDEX_PARAMS_TYPE_POSTFIX(N) _STDEX_PARAMS_TYPE_POSTFIX_DEFAULT(N) 
-#define _STDEX_PARAMS_ARG_PREFIX(N)   _STDEX_PARAMS_ARG_PREFIX_DEFAULT(N) 
-#define _STDEX_PARAMS_ARG_POSTFIX(N)  _STDEX_PARAMS_ARG_POSTFIX_DEFAULT(N)
+#define _STDEX_PARAMS_TYPE_PREFIX(count)  _STDEX_PARAMS_TYPE_PREFIX_DEFAULT(count) 
+#define _STDEX_PARAMS_TYPE_POSTFIX(count) _STDEX_PARAMS_TYPE_POSTFIX_DEFAULT(count) 
+#define _STDEX_PARAMS_ARG_PREFIX(count)   _STDEX_PARAMS_ARG_PREFIX_DEFAULT(count) 
+#define _STDEX_PARAMS_ARG_POSTFIX(count)  _STDEX_PARAMS_ARG_POSTFIX_DEFAULT(count)
 
-#define _STDEX_TMPL_ARGS(prefix, N, postfix, params_type) _STDEX_TMPL_ARGS_IMPL(prefix, N, postfix, params_type)
-#define _STDEX_TYPES(prefix, N, postfix, params_type) _STDEX_TYPES_IMPL(prefix, N, postfix, params_type)
-#define _STDEX_PARAMS(prefix1, prefix2, N, postfix1, postfix2, params_type, params_args) _STDEX_PARAMS_IMPL(prefix1, prefix2, N, postfix1, postfix2, params_type, params_args)
-#define _STDEX_ARGS(prefix, N, postfix, params_args) _STDEX_ARGS_IMPL(prefix, N, postfix, params_args)
+#define _STDEX_TMPL_ARGS(prefix, count, postfix, params_type) _STDEX_TMPL_ARGS_IMPL(prefix, count, postfix, params_type)
+#define _STDEX_TYPES(prefix, count, postfix, params_type) _STDEX_TYPES_IMPL(prefix, count, postfix, params_type)
+#define _STDEX_PARAMS(prefix1, prefix2, count, postfix1, postfix2, params_type, params_args) _STDEX_PARAMS_IMPL(prefix1, prefix2, count, postfix1, postfix2, params_type, params_args)
+#define _STDEX_ARGS(prefix, count, postfix, params_args) _STDEX_ARGS_IMPL(prefix, count, postfix, params_args)
 
 #define _STDEX_TMPL_ARGS0_IMPL(prefix, postfix, params_type) _STDEX_TMPL_ARGS(prefix, 0, postfix, params_type)
 #define _STDEX_TYPES0_IMPL(prefix, postfix, params_type) _STDEX_TYPES(prefix, 0, postfix, params_type)
