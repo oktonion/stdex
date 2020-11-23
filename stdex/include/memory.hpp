@@ -63,7 +63,7 @@ namespace stdex
         struct _addressof_impl<false, _DummyT>
         {
             template<class _Tp>
-            _Tp* call(_Tp &ref) _STDEX_NOEXCEPT_FUNCTION
+            static _Tp* call(_Tp &ref) _STDEX_NOEXCEPT_FUNCTION
             {
                 struct opaque_type;
                 return reinterpret_cast<_Tp*>(&const_cast<opaque_type&>(reinterpret_cast<const volatile opaque_type&>(ref)));
