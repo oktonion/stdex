@@ -447,126 +447,8 @@ namespace stdex
             _func();
         }
 
-#define _STDEX_ELIPSIS_PARAMS _STDEX_PARAMS_MAX(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK)
-#define _STDEX_ELIPSIS_ARGS _STDEX_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK )
-
-        template<class _R>
-        inline
-            _R invoke(_R(*_func)(...), _STDEX_ELIPSIS_PARAMS)
-        {
-            return
-                detail::functional_std::_forward<_R>::call(
-                    _func(_STDEX_ELIPSIS_ARGS));
-        }
-
-        template<class _R, class _ObjectT>
-        inline
-            _R invoke(_R(_ObjectT::* _func)(...), _ObjectT& _obj, _STDEX_ELIPSIS_PARAMS)
-        {
-            return
-                detail::functional_std::_forward<_R>::call(
-                    (_obj.*_func)(_STDEX_ELIPSIS_ARGS));
-        }
-
-        template<class _ObjectT>
-        inline
-            void invoke(void(_ObjectT::* _func)(...), _ObjectT& _obj, _STDEX_ELIPSIS_PARAMS)
-        {
-            (_obj.*_func)(_STDEX_ELIPSIS_ARGS);
-        }
-
-        template<class _R, class _ObjectT>
-        inline
-            _R invoke(_R(_ObjectT::* _func)(...) const, const _ObjectT& _obj, _STDEX_ELIPSIS_PARAMS)
-        {
-            return
-                detail::functional_std::_forward<_R>::call(
-                    (_obj.*_func)(_STDEX_ELIPSIS_ARGS));
-        }
-
-        template<class _ObjectT>
-        inline
-            void invoke(void(_ObjectT::* _func)(...) const, const _ObjectT& _obj, _STDEX_ELIPSIS_PARAMS)
-        {
-            (_obj.*_func)(_STDEX_ELIPSIS_ARGS);
-        }
-
-        template<class _R, class _ObjectT>
-        inline
-            _R invoke(_R(_ObjectT::* _func)(...), _ObjectT* _obj, _STDEX_ELIPSIS_PARAMS)
-        {
-            return
-                detail::functional_std::_forward<_R>::call(
-                    ((*_obj).*_func)(_STDEX_ELIPSIS_ARGS));
-        }
-
-        template<class _ObjectT>
-        inline
-            void invoke(void(_ObjectT::* _func)(...), _ObjectT* _obj, _STDEX_ELIPSIS_PARAMS)
-        {
-            ((*_obj).*_func)(_STDEX_ELIPSIS_ARGS);
-        }
-
-        template<class _R, class _ObjectT>
-        inline
-            _R invoke(_R(_ObjectT::* _func)(...) const, const _ObjectT* _obj, _STDEX_ELIPSIS_PARAMS)
-        {
-            return
-                detail::functional_std::_forward<_R>::call(
-                    ((*_obj).*_func)(_STDEX_ELIPSIS_ARGS));
-        }
-
-        template<class _ObjectT>
-        inline
-            void invoke(void(_ObjectT::* _func)(...) const, const _ObjectT* _obj, _STDEX_ELIPSIS_PARAMS)
-        {
-            ((*_obj).*_func)(_STDEX_ELIPSIS_ARGS);
-        }
-
-        template<class _R, class _ObjectT>
-        inline
-            _R invoke(_R(_ObjectT::* _func)(...), reference_wrapper<_ObjectT>& _ref, _STDEX_ELIPSIS_PARAMS)
-        {
-            return
-                detail::functional_std::_forward<_R>::call(
-                    (_ref.get().*_func)(_STDEX_ELIPSIS_ARGS));
-        }
-
-        template<class _ObjectT>
-        inline
-            void invoke(void(_ObjectT::* _func)(...), reference_wrapper<_ObjectT>& _ref, _STDEX_ELIPSIS_PARAMS)
-        {
-            (_ref.get().*_func)(_STDEX_ELIPSIS_ARGS);
-        }
-
-        template<class _R, class _ObjectT>
-        inline
-            _R invoke(_R(_ObjectT::* _func)(...) const, reference_wrapper<_ObjectT>& _ref, _STDEX_ELIPSIS_PARAMS)
-        {
-            return
-                detail::functional_std::_forward<_R>::call(
-                    (_ref.get().*_func)(_STDEX_ELIPSIS_ARGS));
-        }
-
-        template<class _ObjectT>
-        inline
-            void invoke(void(_ObjectT::* _func)(...) const, reference_wrapper<_ObjectT>& _ref, _STDEX_ELIPSIS_PARAMS)
-        {
-            (_ref.get().*_func)(_STDEX_ELIPSIS_ARGS);
-        }
-
-        inline
-            void invoke(void(*_func)(...), _STDEX_ELIPSIS_PARAMS)
-        {
-            _func(_STDEX_ELIPSIS_ARGS);
-        }
-
-#undef _STDEX_PARAMS_TYPE_CUSTOM
-#undef _STDEX_ELIPSIS_PARAMS
-#undef _STDEX_ELIPSIS_ARGS
-
-#define _STDEX_INVOKE_IMPL(count, vargs, elipsis_params, elipsis_args) \
-    template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+#define _STDEX_INVOKE_IMPL(count, vargs, elipsis_tmpl_args, elipsis_params, elipsis_args) \
+    template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_tmpl_args> \
     _R invoke( _R(*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) vargs ), _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK) elipsis_params)\
     {\
         return\
@@ -574,13 +456,13 @@ namespace stdex
             _func(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_args) );\
     }\
 \
-    template<_STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+    template<_STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_tmpl_args> \
     void invoke( void(*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) vargs ), _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK) elipsis_params)\
     {\
         _func(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_args);\
     }\
 \
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_tmpl_args>\
     _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) vargs ), _ObjectT &_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK) elipsis_params)\
     {\
         return\
@@ -588,13 +470,13 @@ namespace stdex
             (_obj.*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_args) );\
     }\
 \
-    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_tmpl_args>\
     void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) vargs ), _ObjectT &_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK) elipsis_params)\
     {\
         (_obj.*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_args);\
     }\
 \
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_tmpl_args>\
     _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) vargs ) const, const _ObjectT &_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK) elipsis_params)\
     {\
         return\
@@ -602,13 +484,13 @@ namespace stdex
             (_obj.*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_args) );\
     }\
 \
-    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_tmpl_args>\
     void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) vargs ) const, const _ObjectT &_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK) elipsis_params)\
     {\
         (_obj.*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_args);\
     }\
 \
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_tmpl_args>\
     _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) vargs ), _ObjectT *_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK) elipsis_params)\
     {\
         return\
@@ -616,13 +498,13 @@ namespace stdex
             ((*_obj).*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_args) );\
     }\
 \
-    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_tmpl_args>\
     void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) vargs ), _ObjectT *_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK) elipsis_params)\
     {\
         ((*_obj).*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_args);\
     }\
 \
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_tmpl_args>\
     _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) vargs ) const, const _ObjectT *_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK) elipsis_params)\
     {\
         return\
@@ -630,13 +512,13 @@ namespace stdex
             ((*_obj).*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_args) );\
     }\
 \
-    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_tmpl_args>\
     void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) vargs ) const, const _ObjectT *_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK) elipsis_params)\
     {\
         ((*_obj).*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_args);\
     }\
 \
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_tmpl_args>\
     _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) vargs ), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK) elipsis_params)\
     {\
         return\
@@ -644,13 +526,13 @@ namespace stdex
             (_ref.get().*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_args) );\
     }\
 \
-    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_tmpl_args>\
     void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) vargs ), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK) elipsis_params)\
     {\
         (_ref.get().*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_args);\
     }\
 \
-    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_tmpl_args>\
     _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) vargs ) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK) elipsis_params)\
     {\
         return\
@@ -658,11 +540,11 @@ namespace stdex
             (_ref.get().*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_args) );\
     }\
 \
-    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
+    template<class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_tmpl_args>\
     void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) vargs ) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, _STDEX_BLANK, _STDEX_BLANK) elipsis_params)\
     {\
         (_ref.get().*_func)(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) elipsis_args);\
-    }\
+    }
 
 #define _STDEX_INVOKE_FALLBACK(count) \
     template<class _R, class _FuncT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
@@ -671,48 +553,125 @@ namespace stdex
         stdex::function<_FuncT> _f(_func); \
         return\
             _f(_STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK));\
-    }\
+    }
 
+#define _STDEX_PARAMS_TYPE_CUSTOM(count) _ElipsisArg##count##T
 #define _STDEX_PARAMS_ARG_CUSTOM(count) _elipsis_arg##count
-#define _STDEX_ELIPSIS_PARAMS(count) _STDEX_PARAMS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_PARAMS_TYPE_DEFAULT, _STDEX_PARAMS_ARG_CUSTOM)
+#define _STDEX_ELIPSIS_TMPL_ARGS(count) _STDEX_TMPL_ARGS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_PARAMS_TYPE_CUSTOM)
+#define _STDEX_ELIPSIS_PARAMS(count) _STDEX_PARAMS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_PARAMS_TYPE_CUSTOM, _STDEX_PARAMS_ARG_CUSTOM)
 #define _STDEX_ELIPSIS_ARGS(count) _STDEX_ARGS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_PARAMS_ARG_CUSTOM)
 
-#define _STDEX_INVOKE(count, left) \
-         _STDEX_INVOKE_IMPL(count, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK)\
-         _STDEX_INVOKE_IMPL(count, ..., _STDEX_ELIPSIS_PARAMS(count), _STDEX_ELIPSIS_ARGS(count))
+#define _STDEX_ELIPSIS_TYPE_WITH_COMMA ,...
+#define _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(count) ,_STDEX_ELIPSIS_TMPL_ARGS(count)
+#define _STDEX_ELIPSIS_PARAMS_WITH_COMMA(count) ,_STDEX_ELIPSIS_PARAMS(count) 
+#define _STDEX_ELIPSIS_ARGS_WITH_COMMA(count) ,_STDEX_ELIPSIS_ARGS(count) 
 
-        _STDEX_INVOKE(0, 31)
-        _STDEX_INVOKE(1, 30)
-        _STDEX_INVOKE(2, 29)
-        _STDEX_INVOKE(3, 28)
-        _STDEX_INVOKE(4, 27)
-        _STDEX_INVOKE(5, 26)
-        _STDEX_INVOKE(6, 25)
-        _STDEX_INVOKE(7, 24)
-        _STDEX_INVOKE(8, 23)
-        _STDEX_INVOKE(9, 22)
-        _STDEX_INVOKE(10, 21)
-        _STDEX_INVOKE(11, 20)
-        _STDEX_INVOKE(12, 19)
-        _STDEX_INVOKE(13, 18)
-        _STDEX_INVOKE(14, 17)
-        _STDEX_INVOKE(15, 16)
-        _STDEX_INVOKE(16, 15)
-        _STDEX_INVOKE(17, 14)
-        _STDEX_INVOKE(18, 13)
-        _STDEX_INVOKE(19, 12)
-        _STDEX_INVOKE(20, 11)
-        _STDEX_INVOKE(21, 10)
-        _STDEX_INVOKE(22, 9)
-        _STDEX_INVOKE(23, 8)
-        _STDEX_INVOKE(24, 7)
-        _STDEX_INVOKE(25, 6)
-        _STDEX_INVOKE(26, 5)
-        _STDEX_INVOKE(27, 4)
-        _STDEX_INVOKE(28, 3)
-        _STDEX_INVOKE(29, 2)
-        _STDEX_INVOKE(30, 1)
-        _STDEX_INVOKE(31, 0)
+#define _STDEX_INVOKE_ELIPSIS_IMPL0(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA,  _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(31) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(31), _STDEX_ELIPSIS_ARGS_WITH_COMMA(31)) _STDEX_INVOKE_ELIPSIS_IMPL1(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL1(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA,  _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(30) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(30), _STDEX_ELIPSIS_ARGS_WITH_COMMA(30)) _STDEX_INVOKE_ELIPSIS_IMPL2(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL2(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA,  _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(29) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(29), _STDEX_ELIPSIS_ARGS_WITH_COMMA(29)) _STDEX_INVOKE_ELIPSIS_IMPL3(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL3(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA,  _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(28) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(28), _STDEX_ELIPSIS_ARGS_WITH_COMMA(28)) _STDEX_INVOKE_ELIPSIS_IMPL4(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL4(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA,  _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(27) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(27), _STDEX_ELIPSIS_ARGS_WITH_COMMA(27)) _STDEX_INVOKE_ELIPSIS_IMPL5(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL5(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA,  _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(26) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(26), _STDEX_ELIPSIS_ARGS_WITH_COMMA(26)) _STDEX_INVOKE_ELIPSIS_IMPL6(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL6(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA,  _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(25) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(25), _STDEX_ELIPSIS_ARGS_WITH_COMMA(25)) _STDEX_INVOKE_ELIPSIS_IMPL7(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL7(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA,  _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(24) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(24), _STDEX_ELIPSIS_ARGS_WITH_COMMA(24)) _STDEX_INVOKE_ELIPSIS_IMPL8(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL8(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA,  _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(23) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(23), _STDEX_ELIPSIS_ARGS_WITH_COMMA(23)) _STDEX_INVOKE_ELIPSIS_IMPL9(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL9(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA,  _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(22) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(22), _STDEX_ELIPSIS_ARGS_WITH_COMMA(22)) _STDEX_INVOKE_ELIPSIS_IMPL10(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL10(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(21) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(21), _STDEX_ELIPSIS_ARGS_WITH_COMMA(21)) _STDEX_INVOKE_ELIPSIS_IMPL11(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL11(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(20) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(20), _STDEX_ELIPSIS_ARGS_WITH_COMMA(20)) _STDEX_INVOKE_ELIPSIS_IMPL12(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL12(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(19) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(19), _STDEX_ELIPSIS_ARGS_WITH_COMMA(19)) _STDEX_INVOKE_ELIPSIS_IMPL13(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL13(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(18) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(18), _STDEX_ELIPSIS_ARGS_WITH_COMMA(18)) _STDEX_INVOKE_ELIPSIS_IMPL14(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL14(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(17) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(17), _STDEX_ELIPSIS_ARGS_WITH_COMMA(17)) _STDEX_INVOKE_ELIPSIS_IMPL15(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL15(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(16) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(16), _STDEX_ELIPSIS_ARGS_WITH_COMMA(16)) _STDEX_INVOKE_ELIPSIS_IMPL16(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL16(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(15) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(15), _STDEX_ELIPSIS_ARGS_WITH_COMMA(15)) _STDEX_INVOKE_ELIPSIS_IMPL17(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL17(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(14) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(14), _STDEX_ELIPSIS_ARGS_WITH_COMMA(14)) _STDEX_INVOKE_ELIPSIS_IMPL18(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL18(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(13) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(13), _STDEX_ELIPSIS_ARGS_WITH_COMMA(13)) _STDEX_INVOKE_ELIPSIS_IMPL19(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL19(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(12) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(12), _STDEX_ELIPSIS_ARGS_WITH_COMMA(12)) _STDEX_INVOKE_ELIPSIS_IMPL20(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL20(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(11) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(11), _STDEX_ELIPSIS_ARGS_WITH_COMMA(11)) _STDEX_INVOKE_ELIPSIS_IMPL21(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL21(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(10) , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(10), _STDEX_ELIPSIS_ARGS_WITH_COMMA(10)) _STDEX_INVOKE_ELIPSIS_IMPL22(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL22(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(9)  , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(9) , _STDEX_ELIPSIS_ARGS_WITH_COMMA(9) ) _STDEX_INVOKE_ELIPSIS_IMPL23(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL23(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(8)  , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(8) , _STDEX_ELIPSIS_ARGS_WITH_COMMA(8) ) _STDEX_INVOKE_ELIPSIS_IMPL24(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL24(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(7)  , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(7) , _STDEX_ELIPSIS_ARGS_WITH_COMMA(7) ) _STDEX_INVOKE_ELIPSIS_IMPL25(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL25(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(6)  , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(6) , _STDEX_ELIPSIS_ARGS_WITH_COMMA(6) ) _STDEX_INVOKE_ELIPSIS_IMPL26(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL26(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(5)  , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(5) , _STDEX_ELIPSIS_ARGS_WITH_COMMA(5) ) _STDEX_INVOKE_ELIPSIS_IMPL27(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL27(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(4)  , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(4) , _STDEX_ELIPSIS_ARGS_WITH_COMMA(4) ) _STDEX_INVOKE_ELIPSIS_IMPL28(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL28(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(3)  , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(3) , _STDEX_ELIPSIS_ARGS_WITH_COMMA(3) ) _STDEX_INVOKE_ELIPSIS_IMPL29(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL29(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(2)  , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(2) , _STDEX_ELIPSIS_ARGS_WITH_COMMA(2) ) _STDEX_INVOKE_ELIPSIS_IMPL30(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL30(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(1)  , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(1) , _STDEX_ELIPSIS_ARGS_WITH_COMMA(1) ) _STDEX_INVOKE_ELIPSIS_IMPL31(count)
+#define _STDEX_INVOKE_ELIPSIS_IMPL31(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(0)  , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(0) , _STDEX_ELIPSIS_ARGS_WITH_COMMA(0) ) 
+
+#define _STDEX_INVOKE(count) \
+        _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK) \
+        _STDEX_INVOKE_IMPL(count, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK)\
+
+#define _STDEX_INVOKE_ELIPSIS(count) \
+        _STDEX_INVOKE_ELIPSIS_IMPL##count(count)
+        
+        
+        _STDEX_INVOKE_ELIPSIS(0)
+        _STDEX_INVOKE_ELIPSIS(1)
+        _STDEX_INVOKE_ELIPSIS(2)
+        _STDEX_INVOKE_ELIPSIS(3)
+        _STDEX_INVOKE_ELIPSIS(4)
+        _STDEX_INVOKE_ELIPSIS(5)
+        _STDEX_INVOKE_ELIPSIS(6)
+        _STDEX_INVOKE_ELIPSIS(7)
+        _STDEX_INVOKE_ELIPSIS(8)
+        _STDEX_INVOKE_ELIPSIS(9)
+        _STDEX_INVOKE_ELIPSIS(10)
+        _STDEX_INVOKE_ELIPSIS(11)
+        _STDEX_INVOKE_ELIPSIS(12)
+        _STDEX_INVOKE_ELIPSIS(13)
+        _STDEX_INVOKE_ELIPSIS(14)
+        _STDEX_INVOKE_ELIPSIS(15)
+        _STDEX_INVOKE_ELIPSIS(16)
+        _STDEX_INVOKE_ELIPSIS(17)
+        _STDEX_INVOKE_ELIPSIS(18)
+        _STDEX_INVOKE_ELIPSIS(19)
+        _STDEX_INVOKE_ELIPSIS(20)
+        _STDEX_INVOKE_ELIPSIS(21)
+        _STDEX_INVOKE_ELIPSIS(22)
+        _STDEX_INVOKE_ELIPSIS(23)
+        _STDEX_INVOKE_ELIPSIS(24)
+        _STDEX_INVOKE_ELIPSIS(25)
+        _STDEX_INVOKE_ELIPSIS(26)
+        _STDEX_INVOKE_ELIPSIS(27)
+        _STDEX_INVOKE_ELIPSIS(28)
+        _STDEX_INVOKE_ELIPSIS(29)
+        _STDEX_INVOKE_ELIPSIS(30)
+        _STDEX_INVOKE_ELIPSIS(31)
+
+        _STDEX_INVOKE(0 )
+        _STDEX_INVOKE(1 )
+        _STDEX_INVOKE(2 )
+        _STDEX_INVOKE(3 )
+        _STDEX_INVOKE(4 )
+        _STDEX_INVOKE(5 )
+        _STDEX_INVOKE(6 )
+        _STDEX_INVOKE(7 )
+        _STDEX_INVOKE(8 )
+        _STDEX_INVOKE(9 )
+        _STDEX_INVOKE(10)
+        _STDEX_INVOKE(11)
+        _STDEX_INVOKE(12)
+        _STDEX_INVOKE(13)
+        _STDEX_INVOKE(14)
+        _STDEX_INVOKE(15)
+        _STDEX_INVOKE(16)
+        _STDEX_INVOKE(17)
+        _STDEX_INVOKE(18)
+        _STDEX_INVOKE(19)
+        _STDEX_INVOKE(20)
+        _STDEX_INVOKE(21)
+        _STDEX_INVOKE(22)
+        _STDEX_INVOKE(23)
+        _STDEX_INVOKE(24)
+        _STDEX_INVOKE(25)
+        _STDEX_INVOKE(26)
+        _STDEX_INVOKE(27)
+        _STDEX_INVOKE(28)
+        _STDEX_INVOKE(29)
+        _STDEX_INVOKE(30)
+        _STDEX_INVOKE(31)
 
 #undef _STDEX_INVOKE 
 #undef _STDEX_INVOKE_IMPL
