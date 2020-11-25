@@ -602,11 +602,11 @@ namespace stdex
 //#define _STDEX_INVOKE_ELIPSIS_IMPL31(count) _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, _STDEX_ELIPSIS_TMPL_ARGS_WITH_COMMA(0)  , _STDEX_ELIPSIS_PARAMS_WITH_COMMA(0) , _STDEX_ELIPSIS_ARGS_WITH_COMMA(0) ) 
 
 #define _STDEX_INVOKE(count) \
-        _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, /**/, /**/, /**/) \
         _STDEX_INVOKE_IMPL(count, /**/, /**/, /**/, /**/)\
+        //_STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, /**/, /**/, /**/) \
 
 #define _STDEX_INVOKE_ELIPSIS(count) \
-        _STDEX_INVOKE_ELIPSIS_IMPL##count(count)
+        //_STDEX_INVOKE_ELIPSIS_IMPL##count(count)
         
         
         _STDEX_INVOKE_ELIPSIS(0)
