@@ -47,7 +47,7 @@ else
   for file in ./tests/*.cpp; do
     filename=$(basename -- "$file")
     filename="${filename%.*}"
-    echo "compiling test c++03 $filename"
+    echo "$(date): compiling test c++03 $filename"
     output=$(($COMPILER $compiler_options -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
     if [[ $? -ne 0 ]]; then
       if [[ $filename == *"fail"* ]]; then
@@ -92,7 +92,7 @@ tests_failed="failed tests for c++98:"
 for file in ./tests/*.cpp; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
-  echo "compiling test c++98 $filename"
+  echo "$(date): compiling test c++98 $filename"
   output=$(($COMPILER $compiler_options -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
   if [[ $? -ne 0 ]]; then
     if [[ $filename == *"fail"* ]]; then
