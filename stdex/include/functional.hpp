@@ -606,7 +606,7 @@ namespace stdex
         _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, /**/, /**/, /**/) \
 
 #define _STDEX_INVOKE_ELIPSIS(count) \
-        //_STDEX_INVOKE_ELIPSIS_IMPL##count(count)
+        _STDEX_INVOKE_ELIPSIS_IMPL##count(count)
         
         
         _STDEX_INVOKE_ELIPSIS(0)
