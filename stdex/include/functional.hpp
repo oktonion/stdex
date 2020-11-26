@@ -603,7 +603,7 @@ namespace stdex
 
 #define _STDEX_INVOKE(count) \
         _STDEX_INVOKE_IMPL(count, /**/, /**/, /**/, /**/)\
-        //_STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, /**/, /**/, /**/) \
+        _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, /**/, /**/, /**/) \
 
 #define _STDEX_INVOKE_ELIPSIS(count) \
         //_STDEX_INVOKE_ELIPSIS_IMPL##count(count)
@@ -658,22 +658,22 @@ namespace stdex
         _STDEX_INVOKE(13)
         _STDEX_INVOKE(14)
         _STDEX_INVOKE(15)
-        //_STDEX_INVOKE(16)
-        //_STDEX_INVOKE(17)
-        //_STDEX_INVOKE(18)
-        //_STDEX_INVOKE(19)
-        //_STDEX_INVOKE(20)
-        //_STDEX_INVOKE(21)
-        //_STDEX_INVOKE(22)
-        //_STDEX_INVOKE(23)
-        //_STDEX_INVOKE(24)
-        //_STDEX_INVOKE(25)
-        //_STDEX_INVOKE(26)
-        //_STDEX_INVOKE(27)
-        //_STDEX_INVOKE(28)
-        //_STDEX_INVOKE(29)
-        //_STDEX_INVOKE(30)
-        //_STDEX_INVOKE(31)
+        _STDEX_INVOKE(16)
+        _STDEX_INVOKE(17)
+        _STDEX_INVOKE(18)
+        _STDEX_INVOKE(19)
+        _STDEX_INVOKE(20)
+        _STDEX_INVOKE(21)
+        _STDEX_INVOKE(22)
+        _STDEX_INVOKE(23)
+        _STDEX_INVOKE(24)
+        _STDEX_INVOKE(25)
+        _STDEX_INVOKE(26)
+        _STDEX_INVOKE(27)
+        _STDEX_INVOKE(28)
+        _STDEX_INVOKE(29)
+        _STDEX_INVOKE(30)
+        _STDEX_INVOKE(31)
 
 #undef _STDEX_INVOKE_ELIPSIS_IMPL0
 #undef _STDEX_INVOKE_ELIPSIS_IMPL1
