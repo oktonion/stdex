@@ -20,13 +20,10 @@
 
 #ifdef _STDEX_PARAMETER_PACK_DEFINE
 
-#define _STDEX_REPEAT_TOKEN_IMPL(token) token
-
 #define _STDEX_DELIM_DEFAULT ,
 #define _STDEX_PARAMS_TYPE_DEFAULT(count) _Arg##count##T
 #define _STDEX_PARAMS_ARG_DEFAULT(count) arg##count
 
-//#define /**/ /**/
 #define _STDEX_DELIM _STDEX_DELIM_DEFAULT
 
 #define _STDEX_TMPL_ARGS(prefix, count, postfix, params_type) _STDEX_TMPL_ARGS_IMPL(prefix, count, postfix, params_type)
