@@ -361,6 +361,23 @@ int test06()
     return 0;
 }
 
+struct classical_functor {
+    std::size_t call_count;
+    void operator()(operations_counter&) { call_count++; }
+    void reset() { call_count = 0; }
+};
+
+int test07()
+{
+    classical_functor func;
+    func.reset();
+    operations_counter cc;
+
+    stdex::invoke<void>(func, cc);
+    
+    return 0;
+}
+
 void ff(const float&, ...) {}
 
 int main()
@@ -373,6 +390,7 @@ int main()
     RUN_TEST(test04);
     RUN_TEST(test05);
     RUN_TEST(test06);
+    RUN_TEST(test07);
     RUN_TEST(np_tests::test01);
 
     const std::string::size_type big = 
