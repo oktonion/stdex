@@ -547,12 +547,17 @@ namespace stdex
     }
 
 #define _STDEX_INVOKE_FALLBACK(count) \
-    template<class _R, class _FuncT, _STDEX_TMPL_ARGS##count(/**/, /**/)>\
-    _R invoke(_FuncT &_func, _STDEX_PARAMS##count(/**/, /**/, /**/, /**/))\
+    template<class _R, _STDEX_TMPL_ARGS##count(/**/, /**/)>\
+    _R invoke(stdex::function<_R(*)(_STDEX_TYPES##count(/**/, /**/))> _func, _STDEX_PARAMS##count(/**/, /**/, /**/, /**/))\
     {\
-        stdex::function<_FuncT> _f(_func); \
         return\
-            _f(_STDEX_ARGS##count(/**/, /**/));\
+            _func(_STDEX_ARGS##count(/**/, /**/));\
+    } \
+\
+    template<_STDEX_TMPL_ARGS##count(/**/, /**/)>\
+    void invoke(stdex::function<void(*)(_STDEX_TYPES##count(/**/, /**/))> _func, _STDEX_PARAMS##count(/**/, /**/, /**/, /**/))\
+    {\
+        _func(_STDEX_ARGS##count(/**/, /**/));\
     }
 
 #define _STDEX_PARAMS_TYPE_CUSTOM(count) _ElipsisArg##count##T
@@ -586,6 +591,7 @@ namespace stdex
 #define _STDEX_INVOKE(count) \
         _STDEX_INVOKE_IMPL(count, /**/, /**/, /**/, /**/)\
         _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, /**/, /**/, /**/) \
+        _STDEX_INVOKE_FALLBACK(count)
 
 #define _STDEX_INVOKE_ELIPSIS(count) \
         _STDEX_INVOKE_ELIPSIS_IMPL##count(count)
@@ -694,6 +700,7 @@ namespace stdex
 #undef _STDEX_INVOKE 
 #undef _STDEX_INVOKE_IMPL
 #undef _STDEX_INVOKE_ELIPSIS
+#undef _STDEX_INVOKE_FALLBACK
 
 #undef _STDEX_PARAMS_TYPE_CUSTOM
 #undef _STDEX_PARAMS_ARG_CUSTOM
