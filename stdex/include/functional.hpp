@@ -445,6 +445,13 @@ namespace stdex
             (_ref.get().*_func)();
         }
 
+        template<class _R>
+        _R invoke(typename stdex::detail::_function_trait<_R(*)()>::type _func)
+        {
+            return
+                _func();
+        }
+
 #define _STDEX_INVOKE_IMPL(count, vargs, elipsis_tmpl_args, elipsis_params, elipsis_args) \
     template<class _R, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args> \
     _R invoke( _R(*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, /**/, /**/) elipsis_params)\
