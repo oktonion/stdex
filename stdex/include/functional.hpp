@@ -163,16 +163,17 @@ namespace stdex
 
     namespace detail
     {
-        template<class _Tp>
-        struct _dummy_trait
+        template<class _R, class _Tp>
+        struct _return_type_is_void_if
         {
-            typedef _Tp type;
+            typedef void yes_type;
+            typedef _Tp no_type; 
         };
-
         template<class _Tp>
-        struct _dummy_trait<_Tp*>
+        struct _return_type_is_void_if<void, _Tp>
         {
-            typedef _Tp* type;
+            typedef _Tp yes_type;
+            typedef void no_type; 
         };
 
         template<class _Tp>
@@ -451,102 +452,106 @@ namespace stdex
             return
                 _func();
         }
+#define _STDEX_ENABLE_IF_VOID typename stdex::detail::_return_type_is_void_if<_R,
+#define _STDEX_YES >::yes_type
+#define _STDEX_NO >::no_type
+
 
 #define _STDEX_INVOKE_IMPL(count, vargs, elipsis_tmpl_args, elipsis_params, elipsis_args) \
     template<class _R, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args> \
-    _R invoke( _R(*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, /**/, /**/) elipsis_params)\
+    _R invoke( _R(*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_NO, /**/, /**/) elipsis_params)\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
             _func(_STDEX_ARGS##count(/**/, /**/) elipsis_args) );\
     }\
 \
-    template<_STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args> \
-    void invoke( void(*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, /**/, /**/) elipsis_params)\
+    template<class _R, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args> \
+    _R invoke( _R(*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_YES, /**/, /**/) elipsis_params)\
     {\
         _func(_STDEX_ARGS##count(/**/, /**/) elipsis_args);\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), _ObjectT &_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, /**/, /**/) elipsis_params)\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), _ObjectT &_obj, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_NO, /**/, /**/) elipsis_params)\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
             (_obj.*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args) );\
     }\
 \
-    template<class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), _ObjectT &_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, /**/, /**/) elipsis_params)\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), _ObjectT &_obj, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_YES, /**/, /**/) elipsis_params)\
     {\
         (_obj.*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args);\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, const _ObjectT &_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, /**/, /**/) elipsis_params)\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, const _ObjectT &_obj, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_NO, /**/, /**/) elipsis_params)\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
             (_obj.*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args) );\
     }\
 \
-    template<class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, const _ObjectT &_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, /**/, /**/) elipsis_params)\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, const _ObjectT &_obj, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_YES, /**/, /**/) elipsis_params)\
     {\
         (_obj.*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args);\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), _ObjectT *_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, /**/, /**/) elipsis_params)\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), _ObjectT *_obj, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_NO, /**/, /**/) elipsis_params)\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
             ((*_obj).*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args) );\
     }\
 \
-    template<class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), _ObjectT *_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, /**/, /**/) elipsis_params)\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), _ObjectT *_obj, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_YES, /**/, /**/) elipsis_params)\
     {\
         ((*_obj).*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args);\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, const _ObjectT *_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, /**/, /**/) elipsis_params)\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, const _ObjectT *_obj, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_NO, /**/, /**/) elipsis_params)\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
             ((*_obj).*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args) );\
     }\
 \
-    template<class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, const _ObjectT *_obj, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, /**/, /**/) elipsis_params)\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, const _ObjectT *_obj, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_YES, /**/, /**/) elipsis_params)\
     {\
         ((*_obj).*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args);\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, /**/, /**/) elipsis_params)\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_NO, /**/, /**/) elipsis_params)\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
             (_ref.get().*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args) );\
     }\
 \
-    template<class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, /**/, /**/) elipsis_params)\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_YES, /**/, /**/) elipsis_params)\
     {\
         (_ref.get().*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args);\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, /**/, /**/) elipsis_params)\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_NO, /**/, /**/) elipsis_params)\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
             (_ref.get().*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args) );\
     }\
 \
-    template<class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
-    void invoke( void(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(typename stdex::detail::_dummy_trait<, >::type, /**/, /**/) elipsis_params)\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_YES, /**/, /**/) elipsis_params)\
     {\
         (_ref.get().*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args);\
     }
@@ -713,7 +718,6 @@ namespace stdex
 
 
     using functional_cpp11::invoke;
-
     namespace detail
     {
         struct _nullptr_place_holder:
