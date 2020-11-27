@@ -175,6 +175,18 @@ namespace stdex
             typedef _Tp* type;
         };
 
+        template<class _Tp>
+        struct _function_trait
+        {
+            typedef stdex::function<_Tp> type;
+        };
+
+        template<class _FuncSignatureT>
+        struct _function_trait<stdex::function<_FuncSignatureT>/**/>
+        {
+            typedef const stdex::function<_FuncSignatureT> &type;
+        };
+
         
         namespace functional_std {
             // since there is no move-semantic
@@ -428,23 +440,9 @@ namespace stdex
 
         template<class _ObjectT>
         inline
-            void invoke(void(_ObjectT::* _func)() const, reference_wrapper<_ObjectT>& _ref)
+            void invoke(void(_ObjectT::* _func)() const, const reference_wrapper<_ObjectT>& _ref)
         {
             (_ref.get().*_func)();
-        }
-
-        template<class _R, class _FuncT>
-        inline
-            _R invoke(_FuncT& _func)
-        {
-            return _func();
-        }
-
-        template<>
-        inline
-            void invoke(void(*_func)())
-        {
-            _func();
         }
 
 #define _STDEX_INVOKE_IMPL(count, vargs, elipsis_tmpl_args, elipsis_params, elipsis_args) \
@@ -548,16 +546,10 @@ namespace stdex
 
 #define _STDEX_INVOKE_FALLBACK(count) \
     template<class _R, _STDEX_TMPL_ARGS##count(/**/, /**/)>\
-    _R invoke(stdex::function<_R(*)(_STDEX_TYPES##count(/**/, /**/))> _func, _STDEX_PARAMS##count(/**/, /**/, /**/, /**/))\
+    _R invoke(typename stdex::detail::_function_trait<_R(*)(_STDEX_TYPES##count(/**/, /**/))>::type _func, _STDEX_PARAMS##count(/**/, /**/, /**/, /**/))\
     {\
         return\
             _func(_STDEX_ARGS##count(/**/, /**/));\
-    } \
-\
-    template<_STDEX_TMPL_ARGS##count(/**/, /**/)>\
-    void invoke(stdex::function<void(*)(_STDEX_TYPES##count(/**/, /**/))> _func, _STDEX_PARAMS##count(/**/, /**/, /**/, /**/))\
-    {\
-        _func(_STDEX_ARGS##count(/**/, /**/));\
     }
 
 #define _STDEX_PARAMS_TYPE_CUSTOM(count) _ElipsisArg##count##T
@@ -1832,7 +1824,7 @@ namespace stdex
         template<class _FuncT>
         function(_FuncT func): base_type(func) { }
 
-        return_type operator()() { 
+        return_type operator()() const {
             return 
             detail::functional_std::_forward<return_type>::call(
                 base_type::operator()().get() ); 
@@ -1900,7 +1892,7 @@ namespace stdex
  \
         return_type operator()( \
             _STDEX_PARAMS##count(/**/, /**/, /**/, /**/) \
-            ) {  \
+            ) const {  \
             return  \
             detail::functional_std::_forward<return_type>::call( \
                 base_type::operator()( \
