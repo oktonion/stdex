@@ -364,6 +364,7 @@ int test06()
 struct classical_functor {
     std::size_t call_count;
     void operator()(operations_counter&) { call_count++; }
+    void operator()() { call_count++; }
     void reset() { call_count = 0; }
 };
 
@@ -374,6 +375,7 @@ int test07()
     operations_counter cc;
 
     stdex::invoke<void>(func, cc);
+    stdex::invoke<void>(func);
     
     return 0;
 }
