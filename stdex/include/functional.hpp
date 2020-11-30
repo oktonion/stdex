@@ -2464,6 +2464,32 @@ namespace stdex
         }
     };
 
+    // functions
+
+    template<class _Tp>
+    stdex::reference_wrapper<_Tp> ref(_Tp& _ref) _STDEX_NOEXCEPT_FUNCTION
+    {
+        return stdex::reference_wrapper<_Tp>(_ref);
+    }
+
+    template<class _Tp>
+    stdex::reference_wrapper<_Tp> ref(stdex::reference_wrapper<_Tp> _ref) _STDEX_NOEXCEPT_FUNCTION
+    {
+        return _ref;
+    }
+
+    template<class _Tp>
+    stdex::reference_wrapper<const _Tp> cref(const _Tp& _ref) _STDEX_NOEXCEPT_FUNCTION
+    {
+        return stdex::reference_wrapper<const _Tp>(_ref);
+    }
+
+    template<class _Tp>
+    stdex::reference_wrapper<const _Tp> cref(stdex::reference_wrapper<_Tp> _ref) _STDEX_NOEXCEPT_FUNCTION
+    {
+        return stdex::reference_wrapper<const _Tp>(_ref.get());
+    }
+
 
     // Arithmetic operations
 
