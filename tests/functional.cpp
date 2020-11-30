@@ -366,6 +366,7 @@ struct classical_functor {
     void operator()(operations_counter&) { call_count++; }
     void operator()() { call_count++; }
     int operator()(int value) {return value;}
+    int operator()(int value) const {return value + 1;}
     void reset() { call_count = 0; }
 };
 
@@ -384,7 +385,7 @@ int test07()
     stdex::invoke<void>(func_const, cc);
     stdex::invoke<void>(func_const);
     DYNAMIC_VERIFY(stdex::invoke<int>(func_const, 2) == 2);
-    DYNAMIC_VERIFY(stdex::invoke<int>(stdex::cref(func), 2) == 2);
+    DYNAMIC_VERIFY(stdex::invoke<int>(stdex::cref(func), 2) == 3);
     
     return 0;
 }
