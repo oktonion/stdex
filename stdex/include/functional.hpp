@@ -179,7 +179,18 @@ namespace stdex
         template<class _Tp>
         struct _function_trait
         {
-            typedef stdex::function<_Tp> type;
+            typedef stdex::function<_Tp> base_type;
+            struct type:
+                public base_type
+            {
+                typedef base_type base;
+                template<class _FuncT>
+                type(_FuncT &func): base(func) {}
+
+            private:
+                template<class _FuncT>
+                type(_FuncT *func);
+            };
         };
 
         template<class _FuncSignatureT>
