@@ -1590,6 +1590,16 @@ namespace stdex
             }
         };
 
+        template<class _FuncT>
+        struct _functor_pointer_copy<_FuncT&>
+        {
+            static std::size_t call(const void* &_dst,
+                _FuncT& _src)
+            {
+                _dst = &_src;
+            }
+        };
+
         template<class func_base, class _FuncT, class args_type>
         struct _functor :
             func_base
@@ -1626,6 +1636,12 @@ namespace stdex
 
             func_type _func;
         };
+
+        namespace functional_detail
+        {
+            template<unsigned _Rank> struct _priority_tag : _priority_tag < _Rank - 1 > {};
+            template<> struct _priority_tag<0> {};
+        }
 
         template<
             class _R, 
@@ -1683,14 +1699,22 @@ namespace stdex
 
 
             template<class _FuncT>
-            _function_impl(_FuncT func)
+            _function_impl(_FuncT *func, 
+                functional_detail::_priority_tag<0>)
             {
                 _fx = new _functor<_func_base, _FuncT, _args_type>(stdex::detail::functional_std::move(func));
             }
 
             template<class _FuncT>
-            _function_impl(
-                const reference_wrapper<_FuncT> &func)
+            _function_impl(_FuncT &func, 
+                functional_detail::_priority_tag<1>)
+            {
+                _fx = new _functor<_func_base, _FuncT, _args_type>(stdex::detail::functional_std::move(func));
+            }
+
+            template<class _FuncT>
+            _function_impl(reference_wrapper<_FuncT> func,
+                functional_detail::_priority_tag<2>)
             {
                 _fx = new _functor<_func_base, _FuncT&, _args_type>(stdex::detail::functional_std::move(func.get()));
             }
@@ -1940,7 +1964,7 @@ namespace stdex
         //function(function&& other) _STDEX_NOEXCEPT_FUNCTION;
 
         template<class _FuncT>
-        function(_FuncT func): base_type(func) { }
+        function(_FuncT func): base_type(func, detail::functional_detail::_priority_tag<8>()) { }
 
         return_type operator()() const {
             return 
@@ -2006,7 +2030,7 @@ namespace stdex
  \
  \
         template<class _FuncT> \
-        function(_FuncT func): base_type(func) { } \
+        function(_FuncT func): base_type(func, detail::functional_detail::_priority_tag<8>()) { } \
  \
         return_type operator()( \
             _STDEX_PARAMS##count(/**/, /**/, /**/, /**/) \
