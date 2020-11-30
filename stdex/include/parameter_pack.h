@@ -8,8 +8,8 @@
 // #undef _STDEX_PARAMETER_PACK_DEFINE
 // 
 // #define MY_FUNC(count)
-//     template<_STDEX_TMPL_ARGS##count(/**/, /**/) /*class _Arg0T, ...class _ArgNT*/> 
-//     void my_func( _STDEX_PARAMS_MAX(/**/, /**/) /*_Arg0T arg0, ..._ArgNT argN*/)
+//     template<_STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) /*class _Arg0T, ...class _ArgNT*/> 
+//     void my_func( _STDEX_PARAMS_MAX(_STDEX_BLANK, _STDEX_BLANK) /*_Arg0T arg0, ..._ArgNT argN*/)
 //     { }
 //
 // MY_FUNC(0) /*template<class _Arg0T> void my_func(_Arg0T arg0) { }*/
@@ -27,6 +27,7 @@
 #define _STDEX_TYPE_DEFAULT _STDEX_PARAMS_TYPE_DEFAULT
 
 #define _STDEX_DELIM _STDEX_DELIM_DEFAULT
+#define _STDEX_BLANK
 
 #define _STDEX_TMPL_ARGS(prefix, count, postfix, params_type) _STDEX_TMPL_ARGS_IMPL(prefix, count, postfix, params_type)
 #define _STDEX_TYPES(prefix, count, postfix, params_type) _STDEX_TYPES_IMPL(prefix, count, postfix, params_type)
@@ -1594,7 +1595,7 @@
 #undef _STDEX_PARAMS_ARG_PREFIX_DEFAULT
 #undef _STDEX_PARAMS_ARG_POSTFIX_DEFAULT
 
-//#undef /**/  
+#undef _STDEX_BLANK  
 #undef _STDEX_DELIM
 #undef _STDEX_PARAMS_TYPE_PREFIX
 #undef _STDEX_PARAMS_TYPE_POSTFIX
