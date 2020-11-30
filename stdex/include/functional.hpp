@@ -2075,9 +2075,10 @@ namespace stdex
         public member_function<_ObjectT, _FuncT*>
     {
         typedef typename member_function<_ObjectT, _FuncT*>::pointer_type pointer_type;
+        typedef member_function<_ObjectT, _FuncT*> base_type;
     public:
         explicit member_function(pointer_type mem_ptr) _STDEX_NOEXCEPT_FUNCTION:
-            _mem_ptr(mem_ptr) {}      
+            base_type(mem_ptr) {}      
     };
 
 #define _STDEX_MEM_FN(count) \
