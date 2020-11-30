@@ -402,6 +402,16 @@ int test08()
     return 0;
 }
 
+int test09()
+{
+    dummy_functor func;
+    operations_counter counter;
+
+    //std::bind;
+
+    return 0;
+}
+
 void ff(const float&, ...) {}
 
 int main()

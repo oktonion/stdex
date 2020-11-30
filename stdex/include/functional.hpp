@@ -2551,6 +2551,76 @@ namespace stdex
         return stdex::reference_wrapper<const _Tp>(_ref.get());
     }
 
+    namespace placeholders
+    {
+        namespace detail
+        {
+            template<int _N>
+            struct _ph
+            {	// placeholder
+                static const _ph<_N> &instance(){static const _ph<_N> inst; return inst;}
+            };
+        }
+
+        static const detail::_ph<1>  &_1  = detail::_ph<1 >::instance();
+        static const detail::_ph<2>  &_2  = detail::_ph<2 >::instance();
+        static const detail::_ph<3>  &_3  = detail::_ph<3 >::instance();
+        static const detail::_ph<4>  &_4  = detail::_ph<4 >::instance();
+        static const detail::_ph<5>  &_5  = detail::_ph<5 >::instance();
+        static const detail::_ph<6>  &_6  = detail::_ph<6 >::instance();
+        static const detail::_ph<7>  &_7  = detail::_ph<7 >::instance();
+        static const detail::_ph<8>  &_8  = detail::_ph<8 >::instance();
+        static const detail::_ph<9>  &_9  = detail::_ph<9 >::instance();
+        static const detail::_ph<10> &_10 = detail::_ph<10>::instance();
+        static const detail::_ph<11> &_11 = detail::_ph<11>::instance();
+        static const detail::_ph<12> &_12 = detail::_ph<12>::instance();
+        static const detail::_ph<13> &_13 = detail::_ph<13>::instance();
+        static const detail::_ph<14> &_14 = detail::_ph<14>::instance();
+        static const detail::_ph<15> &_15 = detail::_ph<15>::instance();
+        static const detail::_ph<16> &_16 = detail::_ph<16>::instance();
+        static const detail::_ph<17> &_17 = detail::_ph<17>::instance();
+        static const detail::_ph<18> &_18 = detail::_ph<18>::instance();
+        static const detail::_ph<19> &_19 = detail::_ph<19>::instance();
+        static const detail::_ph<20> &_20 = detail::_ph<20>::instance();
+        static const detail::_ph<21> &_21 = detail::_ph<21>::instance();
+        static const detail::_ph<22> &_22 = detail::_ph<22>::instance();
+        static const detail::_ph<23> &_23 = detail::_ph<23>::instance();
+        static const detail::_ph<24> &_24 = detail::_ph<24>::instance();
+        static const detail::_ph<25> &_25 = detail::_ph<25>::instance();
+        static const detail::_ph<26> &_26 = detail::_ph<26>::instance();
+        static const detail::_ph<27> &_27 = detail::_ph<27>::instance();
+        static const detail::_ph<28> &_28 = detail::_ph<28>::instance();
+        static const detail::_ph<29> &_29 = detail::_ph<29>::instance();
+        static const detail::_ph<30> &_30 = detail::_ph<30>::instance();
+        static const detail::_ph<31> &_31 = detail::_ph<31>::instance();
+        static const detail::_ph<32> &_32 = detail::_ph<32>::instance();
+    }
+
+    template<class>
+    struct is_placeholder
+        : integral_constant<int, 0>
+    { };
+
+    template<int _N>
+    struct is_placeholder<placeholders::detail::_ph<_N>/**/>
+        : integral_constant<int, _N>
+    { };
+
+    template<class _Tp>
+    struct is_placeholder<const _Tp>
+        : is_placeholder<_Tp>
+    { };
+
+    template<class _Tp>
+    struct is_placeholder<volatile _Tp>
+        : is_placeholder<_Tp>
+    { };
+
+    template<class _Tp>
+    struct is_placeholder<const volatile _Tp>
+        : is_placeholder<_Tp>
+    { };
+
 
     // Arithmetic operations
 
