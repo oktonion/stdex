@@ -176,8 +176,19 @@ namespace stdex
             typedef void no_type; 
         };
 
-        template<class _Tp>
+        template<class _Tp, bool>
         struct _function_trait
+        {
+            typedef stdex::function<_Tp> base_type;
+            struct type:
+                public base_type
+            {
+                typedef base_type base;
+                type():base(0){}
+            };
+        };
+        template<class _Tp>
+        struct _function_trait<_Tp, true>
         {
             typedef stdex::function<_Tp> base_type;
             struct type:
@@ -194,7 +205,7 @@ namespace stdex
         };
 
         template<class _FuncSignatureT>
-        struct _function_trait<stdex::function<_FuncSignatureT>/**/>
+        struct _function_trait<stdex::function<_FuncSignatureT>/**/, true>
         {
             typedef const stdex::function<_FuncSignatureT> &type;
         };
@@ -458,10 +469,17 @@ namespace stdex
         }
 
         template<class _R>
-        _R invoke(typename stdex::detail::_function_trait<_R(*)()>::type _func)
+        _R invoke(typename stdex::detail::_function_trait<_R(*)(), is_void<_R>::value == bool(false)>::type  _func)
         {
             return
-                _func();
+            detail::functional_std::_forward<_R>::call(
+                _func() );
+        }
+
+        template<class _R>
+        _R invoke(typename stdex::detail::_function_trait<_R(*)(), is_void<_R>::value == bool(true)>::type _func)
+        {
+            _func();
         }
 #define _STDEX_ENABLE_IF_VOID typename stdex::detail::_return_type_is_void_if<_R,
 #define _STDEX_YES >::yes_type
@@ -569,10 +587,17 @@ namespace stdex
 
 #define _STDEX_INVOKE_FALLBACK(count) \
     template<class _R, _STDEX_TMPL_ARGS##count(/**/, /**/)>\
-    _R invoke(typename stdex::detail::_function_trait<_R(*)(_STDEX_TYPES##count(/**/, /**/))>::type _func, _STDEX_PARAMS##count(/**/, /**/, /**/, /**/))\
+    _R invoke(typename stdex::detail::_function_trait<_R(*)(_STDEX_TYPES##count(/**/, /**/) vargs ), is_void<_R>::value == bool(false)>::type  _func, _STDEX_PARAMS##count(/**/, /**/, /**/, /**/))\
     {\
         return\
-            _func(_STDEX_ARGS##count(/**/, /**/));\
+        detail::functional_std::_forward<_R>::call(\
+            _func(_STDEX_ARGS##count(/**/, /**/)) );\
+    } \
+\
+    template<class _R, _STDEX_TMPL_ARGS##count(/**/, /**/)>\
+    _R invoke(typename stdex::detail::_function_trait<_R(*)(_STDEX_TYPES##count(/**/, /**/) vargs ), is_void<_R>::value == bool(true)>::type  _func, _STDEX_PARAMS##count(/**/, /**/, /**/, /**/))\
+    {\
+        _func(_STDEX_ARGS##count(/**/, /**/));\
     }
 
 #define _STDEX_PARAMS_TYPE_CUSTOM(count) _ElipsisArg##count##T
