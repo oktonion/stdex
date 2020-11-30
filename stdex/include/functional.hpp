@@ -179,22 +179,22 @@ namespace stdex
         template<class _Tp, bool>
         struct _function_trait
         {
-            typedef stdex::function<_Tp> base_type;
+            typedef stdex::function<_Tp> function_base;
             struct type:
-                public base_type
+                public function_base
             {
-                typedef base_type base;
-                type():base(0){}
+                typedef function_base base;
+                type(): base(0){}
             };
         };
         template<class _Tp>
         struct _function_trait<_Tp, true>
         {
-            typedef stdex::function<_Tp> base_type;
+            typedef stdex::function<_Tp> function_base;
             struct type:
-                public base_type
+                public function_base
             {
-                typedef base_type base;
+                typedef function_base base;
                 template<class _FuncT>
                 type(_FuncT &func): base(func) {}
 
