@@ -481,10 +481,6 @@ namespace stdex
         {
             _func();
         }
-#define _STDEX_ENABLE_IF_VOID typename stdex::detail::_return_type_is_void_if<_R,
-#define _STDEX_YES >::yes_type
-#define _STDEX_NO >::no_type
-
 
 #define _STDEX_INVOKE_IMPL(count, vargs, elipsis_tmpl_args, elipsis_params, elipsis_args) \
     template<class _R, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args> \
@@ -599,6 +595,10 @@ namespace stdex
     {\
         _func(_STDEX_ARGS##count(/**/, /**/));\
     }
+
+#define _STDEX_ENABLE_IF_VOID typename stdex::detail::_return_type_is_void_if<_R,
+#define _STDEX_YES >::yes_type
+#define _STDEX_NO >::no_type
 
 #define _STDEX_PARAMS_TYPE_CUSTOM(count) _ElipsisArg##count##T
 #define _STDEX_PARAMS_ARG_CUSTOM(count) _elipsis_arg##count
@@ -736,6 +736,10 @@ namespace stdex
 #undef _STDEX_INVOKE_ELIPSIS_IMPL29
 #undef _STDEX_INVOKE_ELIPSIS_IMPL30
 #undef _STDEX_INVOKE_ELIPSIS_IMPL31
+
+#undef _STDEX_ENABLE_IF_VOID
+#undef _STDEX_YES
+#undef _STDEX_NO
 
 #undef _STDEX_INVOKE 
 #undef _STDEX_INVOKE_IMPL
