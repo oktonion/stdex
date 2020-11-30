@@ -2558,7 +2558,7 @@ namespace stdex
             template<int _N>
             struct _ph
             {	// placeholder
-                static const _ph<_N> &instance(){static const _ph<_N> inst; return inst;}
+                static const _ph<_N> &instance(){static _ph<_N> inst; return inst;}
             };
         }
 
