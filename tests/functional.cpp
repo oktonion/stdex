@@ -376,6 +376,10 @@ int test07()
 
     stdex::invoke<void>(func, cc);
     stdex::invoke<void>(func);
+
+    const classical_functor func_const = func;
+    stdex::invoke<void>(func_const, cc);
+    stdex::invoke<void>(func_const);
     
     return 0;
 }
