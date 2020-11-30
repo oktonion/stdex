@@ -201,6 +201,9 @@ namespace stdex
                 template<class _FuncT>
                 type(_FuncT &func): base(func) {}
 
+                template<class _RefT>
+                type(const reference_wrapper<_RefT> &func): base(func) {}
+
             private:
                 template<class _FuncT>
                 type(_FuncT *func);
@@ -1683,6 +1686,13 @@ namespace stdex
             _function_impl(_FuncT func)
             {
                 _fx = new _functor<_func_base, _FuncT, _args_type>(stdex::detail::functional_std::move(func));
+            }
+
+            template<class _FuncT>
+            _function_impl(
+                const reference_wrapper<_FuncT> &func)
+            {
+                _fx = new _functor<_func_base, _FuncT&, _args_type>(stdex::detail::functional_std::move(func.get()));
             }
 
             ~_function_impl()
