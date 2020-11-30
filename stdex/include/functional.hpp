@@ -158,6 +158,9 @@ namespace stdex
     template<class _FuncSignatureT>
     class function;
 
+    template<class, class>
+    class member_function;
+
     template<class _Tp>
     class reference_wrapper;
 
@@ -357,8 +360,8 @@ namespace stdex
                 char& get() { static char zero = 0; return data ? *data : zero; }
                 char& operator()() { return get(); }
             };
-        }
-    }
+        } // namespace functional_detail
+    } // namespace detail
 
     namespace functional_cpp11
     {
@@ -437,7 +440,7 @@ namespace stdex
 
         template<class _R, class _ObjectT>
         inline
-            _R invoke(_R(_ObjectT::* _func)(), reference_wrapper<_ObjectT>& _ref)
+            _R invoke(_R(_ObjectT::* _func)(), reference_wrapper<_ObjectT> _ref)
         {
             return
                 detail::functional_std::_forward<_R>::call(
@@ -447,14 +450,14 @@ namespace stdex
 
         template<class _ObjectT>
         inline
-            void invoke(void(_ObjectT::* _func)(), reference_wrapper<_ObjectT>& _ref)
+            void invoke(void(_ObjectT::* _func)(), reference_wrapper<_ObjectT> _ref)
         {
             (_ref.get().*_func)();
         }
 
         template<class _R, class _ObjectT>
         inline
-            _R invoke(_R(_ObjectT::* _func)() const, reference_wrapper<_ObjectT>& _ref)
+            _R invoke(_R(_ObjectT::* _func)() const, const reference_wrapper<_ObjectT>& _ref)
         {
             return
                 detail::functional_std::_forward<_R>::call(
@@ -554,7 +557,7 @@ namespace stdex
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_NO, /**/, /**/) elipsis_params)\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), reference_wrapper<_ObjectT> _ref, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_NO, /**/, /**/) elipsis_params)\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
@@ -562,13 +565,13 @@ namespace stdex
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_YES, /**/, /**/) elipsis_params)\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), reference_wrapper<_ObjectT> _ref, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_YES, /**/, /**/) elipsis_params)\
     {\
         (_ref.get().*_func)(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM) elipsis_args);\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_NO, /**/, /**/) elipsis_params)\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, const reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_NO, /**/, /**/) elipsis_params)\
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
@@ -576,7 +579,7 @@ namespace stdex
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
-    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_YES, /**/, /**/) elipsis_params)\
+    _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, const reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_YES, /**/, /**/) elipsis_params)\
     {\
         (_ref.get().*_func)(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM) elipsis_args);\
     }
@@ -594,6 +597,55 @@ namespace stdex
     _R invoke(typename stdex::detail::_function_trait<_R(*)(_STDEX_TYPES##count(/**/, /**/) vargs ), is_void<_R>::value == bool(true)>::type  _func, _STDEX_PARAMS##count(/**/, /**/, /**/, /**/))\
     {\
         _func(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM));\
+    }
+
+#define _STDEX_MEM_FN(count) \
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/)>\
+    stdex::member_function<_ObjectT, \
+        _R(*)(_STDEX_TYPES##count(/**/, /**/))> \
+    mem_fn( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) ) )\
+    {\
+        typedef stdex::member_function<_ObjectT, \
+            _R(*)(_STDEX_TYPES##count(/**/, /**/))> result_type; \
+        return\
+        detail::functional_std::_forward<result_type>::call(\
+            result_type(_func) );\
+    }\
+\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/)>\
+    stdex::member_function<const _ObjectT, \
+        _R(*)(_STDEX_TYPES##count(/**/, /**/))> \
+    mem_fn( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/)) const)\
+    {\
+        typedef stdex::member_function<const _ObjectT, \
+            _R(*)(_STDEX_TYPES##count(/**/, /**/))> result_type; \
+        return\
+        detail::functional_std::_forward<result_type>::call(\
+            result_type(_func) );\
+    }\
+\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/)>\
+    stdex::member_function<_ObjectT, \
+        _R(*)(_STDEX_TYPES##count(/**/, /**/)...)> \
+    mem_fn( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/)...))\
+    {\
+        typedef stdex::member_function<_ObjectT, \
+            _R(*)(_STDEX_TYPES##count(/**/, /**/)...)> result_type; \
+        return\
+        detail::functional_std::_forward<result_type>::call(\
+            result_type(_func) );\
+    }\
+\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/)>\
+    stdex::member_function<const _ObjectT, \
+        _R(*)(_STDEX_TYPES##count(/**/, /**/)...)> \
+    mem_fn( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/)...) const)\
+    {\
+        typedef stdex::member_function<const _ObjectT, \
+            _R(*)(_STDEX_TYPES##count(/**/, /**/)...)> result_type; \
+        return\
+        detail::functional_std::_forward<result_type>::call(\
+            result_type(_func) );\
     }
 
 #define _STDEX_ENABLE_IF_VOID typename stdex::detail::_return_type_is_void_if<_R,
@@ -629,10 +681,11 @@ namespace stdex
 #define _STDEX_INVOKE_ELIPSIS_IMPL7(count) _STDEX_INVOKE_ELIPSIS_IMPL(count, 0)
 
 
-#define _STDEX_INVOKE(count) \
+#define _STDEX_INVOKE_AND_MEM_FN(count) \
         _STDEX_INVOKE_IMPL(count, /**/, /**/, /**/, /**/)\
         _STDEX_INVOKE_IMPL(count, _STDEX_ELIPSIS_TYPE_WITH_COMMA, /**/, /**/, /**/) \
-        _STDEX_INVOKE_FALLBACK(count)
+        _STDEX_INVOKE_FALLBACK(count) \
+        _STDEX_MEM_FN(count)
 
 #define _STDEX_INVOKE_ELIPSIS(count) \
         _STDEX_INVOKE_ELIPSIS_IMPL##count(count)
@@ -671,38 +724,38 @@ namespace stdex
         //_STDEX_INVOKE_ELIPSIS(30)
         //_STDEX_INVOKE_ELIPSIS(31)
 
-        _STDEX_INVOKE(0 )
-        _STDEX_INVOKE(1 )
-        _STDEX_INVOKE(2 )
-        _STDEX_INVOKE(3 )
-        _STDEX_INVOKE(4 )
-        _STDEX_INVOKE(5 )
-        _STDEX_INVOKE(6 )
-        _STDEX_INVOKE(7 )
-        _STDEX_INVOKE(8 )
-        _STDEX_INVOKE(9 )
-        _STDEX_INVOKE(10)
-        _STDEX_INVOKE(11)
-        _STDEX_INVOKE(12)
-        _STDEX_INVOKE(13)
-        _STDEX_INVOKE(14)
-        _STDEX_INVOKE(15)
-        _STDEX_INVOKE(16)
-        _STDEX_INVOKE(17)
-        _STDEX_INVOKE(18)
-        _STDEX_INVOKE(19)
-        _STDEX_INVOKE(20)
-        _STDEX_INVOKE(21)
-        _STDEX_INVOKE(22)
-        _STDEX_INVOKE(23)
-        _STDEX_INVOKE(24)
-        _STDEX_INVOKE(25)
-        _STDEX_INVOKE(26)
-        _STDEX_INVOKE(27)
-        _STDEX_INVOKE(28)
-        _STDEX_INVOKE(29)
-        _STDEX_INVOKE(30)
-        _STDEX_INVOKE(31)
+        _STDEX_INVOKE_AND_MEM_FN(0 )
+        _STDEX_INVOKE_AND_MEM_FN(1 )
+        _STDEX_INVOKE_AND_MEM_FN(2 )
+        _STDEX_INVOKE_AND_MEM_FN(3 )
+        _STDEX_INVOKE_AND_MEM_FN(4 )
+        _STDEX_INVOKE_AND_MEM_FN(5 )
+        _STDEX_INVOKE_AND_MEM_FN(6 )
+        _STDEX_INVOKE_AND_MEM_FN(7 )
+        _STDEX_INVOKE_AND_MEM_FN(8 )
+        _STDEX_INVOKE_AND_MEM_FN(9 )
+        _STDEX_INVOKE_AND_MEM_FN(10)
+        _STDEX_INVOKE_AND_MEM_FN(11)
+        _STDEX_INVOKE_AND_MEM_FN(12)
+        _STDEX_INVOKE_AND_MEM_FN(13)
+        _STDEX_INVOKE_AND_MEM_FN(14)
+        _STDEX_INVOKE_AND_MEM_FN(15)
+        _STDEX_INVOKE_AND_MEM_FN(16)
+        _STDEX_INVOKE_AND_MEM_FN(17)
+        _STDEX_INVOKE_AND_MEM_FN(18)
+        _STDEX_INVOKE_AND_MEM_FN(19)
+        _STDEX_INVOKE_AND_MEM_FN(20)
+        _STDEX_INVOKE_AND_MEM_FN(21)
+        _STDEX_INVOKE_AND_MEM_FN(22)
+        _STDEX_INVOKE_AND_MEM_FN(23)
+        _STDEX_INVOKE_AND_MEM_FN(24)
+        _STDEX_INVOKE_AND_MEM_FN(25)
+        _STDEX_INVOKE_AND_MEM_FN(26)
+        _STDEX_INVOKE_AND_MEM_FN(27)
+        _STDEX_INVOKE_AND_MEM_FN(28)
+        _STDEX_INVOKE_AND_MEM_FN(29)
+        _STDEX_INVOKE_AND_MEM_FN(30)
+        _STDEX_INVOKE_AND_MEM_FN(31)
 
 #undef _STDEX_INVOKE_ELIPSIS_IMPL
 #undef _STDEX_INVOKE_ELIPSIS_IMPL0
@@ -742,8 +795,9 @@ namespace stdex
 #undef _STDEX_YES
 #undef _STDEX_NO
 
-#undef _STDEX_INVOKE 
+#undef _STDEX_INVOKE_AND_MEM_FN 
 #undef _STDEX_INVOKE_IMPL
+#undef _STDEX_MEM_FN
 #undef _STDEX_INVOKE_ELIPSIS
 #undef _STDEX_INVOKE_FALLBACK
 
@@ -760,6 +814,7 @@ namespace stdex
 
 
     using functional_cpp11::invoke;
+    using functional_cpp11::mem_fn;
     namespace detail
     {
         struct _nullptr_place_holder:
@@ -1911,7 +1966,7 @@ namespace stdex
         }
     };
 
-#define _STDEX_FUNCTION(count) \
+#define _STDEX_FUNCTION_IMPL(count) \
     template<class _R,  \
         _STDEX_TMPL_ARGS##count(/**/, /**/) \
     > \
@@ -1981,6 +2036,77 @@ namespace stdex
         } \
     };
 
+    template<class _ObjectT, class _FuncT>
+    class member_function:
+        public member_function<_ObjectT, _FuncT*>
+    {
+        typedef typename member_function<_ObjectT, _FuncT*>::pointer_type pointer_type;
+    public:
+        explicit member_function(pointer_type mem_ptr) _STDEX_NOEXCEPT_FUNCTION:
+            _mem_ptr(mem_ptr) {}      
+    };
+
+#define _STDEX_MEM_FN(count) \
+    template<class _ObjectT, class _R, _STDEX_TMPL_ARGS##count(/**/, /**/)> \
+    class member_function<_ObjectT, _R(*)(_STDEX_TYPES##count(/**/, /**/))> \
+    { \
+    protected: \
+        typedef _R(_ObjectT::*pointer_type)(_STDEX_TYPES##count(/**/, /**/)); \
+        typedef _R return_type; \
+\
+        pointer_type _mem_ptr; \
+    public: \
+        explicit member_function(pointer_type mem_ptr) _STDEX_NOEXCEPT_FUNCTION: \
+            _mem_ptr(mem_ptr) {}\
+\
+        return_type operator()(_ObjectT& _obj, \
+            _STDEX_PARAMS##count(/**/, /**/, /**/, /**/) \
+            ) const {  \
+            return  \
+            stdex::invoke(\
+                    _mem_ptr, _obj, \
+                    _STDEX_ARGS##count(/**/, /**/) \
+                    ); \
+        } \
+\
+        return_type operator()(_ObjectT* _obj_ptr, \
+            _STDEX_PARAMS##count(/**/, /**/, /**/, /**/) \
+            ) const {  \
+            return (*this)(*_obj_ptr, _STDEX_ARGS##count(/**/, /**/)); }\
+    }; \
+\
+    template<class _ObjectT, class _R, _STDEX_TMPL_ARGS##count(/**/, /**/)> \
+    class member_function<const _ObjectT, _R(*)(_STDEX_TYPES##count(/**/, /**/))> \
+    { \
+    protected: \
+        typedef _R(_ObjectT::*pointer_type)(_STDEX_TYPES##count(/**/, /**/)) const; \
+        typedef _R return_type; \
+\
+        pointer_type _mem_ptr; \
+    public: \
+        explicit member_function(pointer_type mem_ptr) _STDEX_NOEXCEPT_FUNCTION: \
+            _mem_ptr(mem_ptr) {}\
+\
+        return_type operator()(const _ObjectT& _obj, \
+            _STDEX_PARAMS##count(/**/, /**/, /**/, /**/) \
+            ) const {  \
+            return  \
+            stdex::invoke(\
+                    _mem_ptr, _obj, \
+                    _STDEX_ARGS##count(/**/, /**/) \
+                    ); \
+        } \
+\
+        return_type operator()(const _ObjectT* _obj_ptr, \
+            _STDEX_PARAMS##count(/**/, /**/, /**/, /**/) \
+            ) const {  \
+            return (*this)(*_obj_ptr, _STDEX_ARGS##count(/**/, /**/)); }\
+    };
+
+#define _STDEX_FUNCTION(count) \
+    _STDEX_FUNCTION_IMPL(count)\
+    _STDEX_MEM_FN(count)
+
     _STDEX_FUNCTION(0)
     _STDEX_FUNCTION(1)
     _STDEX_FUNCTION(2)
@@ -2015,6 +2141,8 @@ namespace stdex
     _STDEX_FUNCTION(31)
 
 #undef _STDEX_FUNCTION 
+#undef _STDEX_FUNCTION_IMPL
+#undef _STDEX_MEM_FN
 
     // Hashing
 

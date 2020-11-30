@@ -387,6 +387,20 @@ int test07()
     return 0;
 }
 
+int test08()
+{
+    dummy_functor func;
+    operations_counter counter;
+
+    stdex::mem_fn(&dummy_functor::call)(func, counter);
+    stdex::mem_fn(&dummy_functor::call)(&func, counter);
+
+    stdex::reference_wrapper<dummy_functor> ref(func);
+    stdex::mem_fn(&dummy_functor::call)(ref, counter);
+
+    return 0;
+}
+
 void ff(const float&, ...) {}
 
 int main()
@@ -400,6 +414,7 @@ int main()
     RUN_TEST(test05);
     RUN_TEST(test06);
     RUN_TEST(test07);
+    RUN_TEST(test08);
     RUN_TEST(np_tests::test01);
 
     const std::string::size_type big = 
