@@ -488,13 +488,13 @@ namespace stdex
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
-            _func(_STDEX_ARGS##count(/**/, /**/) elipsis_args) );\
+            _func(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM) elipsis_args) );\
     }\
 \
     template<class _R, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args> \
     _R invoke( _R(*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_YES, /**/, /**/) elipsis_params)\
     {\
-        _func(_STDEX_ARGS##count(/**/, /**/) elipsis_args);\
+        _func(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM) elipsis_args);\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
@@ -502,13 +502,13 @@ namespace stdex
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
-            (_obj.*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args) );\
+            (_obj.*_func)(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM) elipsis_args) );\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
     _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), _ObjectT &_obj, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_YES, /**/, /**/) elipsis_params)\
     {\
-        (_obj.*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args);\
+        (_obj.*_func)(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM) elipsis_args);\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
@@ -516,13 +516,13 @@ namespace stdex
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
-            (_obj.*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args) );\
+            (_obj.*_func)(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM) elipsis_args) );\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
     _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, const _ObjectT &_obj, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_YES, /**/, /**/) elipsis_params)\
     {\
-        (_obj.*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args);\
+        (_obj.*_func)(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM) elipsis_args);\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
@@ -530,13 +530,13 @@ namespace stdex
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
-            ((*_obj).*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args) );\
+            ((*_obj).*_func)(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM) elipsis_args) );\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
     _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), _ObjectT *_obj, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_YES, /**/, /**/) elipsis_params)\
     {\
-        ((*_obj).*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args);\
+        ((*_obj).*_func)(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM) elipsis_args);\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
@@ -544,13 +544,13 @@ namespace stdex
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
-            ((*_obj).*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args) );\
+            ((*_obj).*_func)(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM) elipsis_args) );\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
     _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, const _ObjectT *_obj, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_YES, /**/, /**/) elipsis_params)\
     {\
-        ((*_obj).*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args);\
+        ((*_obj).*_func)(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM) elipsis_args);\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
@@ -558,13 +558,13 @@ namespace stdex
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
-            (_ref.get().*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args) );\
+            (_ref.get().*_func)(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM) elipsis_args) );\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
     _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ), reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_YES, /**/, /**/) elipsis_params)\
     {\
-        (_ref.get().*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args);\
+        (_ref.get().*_func)(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM) elipsis_args);\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
@@ -572,13 +572,13 @@ namespace stdex
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
-            (_ref.get().*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args) );\
+            (_ref.get().*_func)(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM) elipsis_args) );\
     }\
 \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(/**/, /**/) elipsis_tmpl_args>\
     _R invoke( _R(_ObjectT::*_func)(_STDEX_TYPES##count(/**/, /**/) vargs ) const, reference_wrapper<_ObjectT> &_ref, _STDEX_PARAMS##count(_STDEX_ENABLE_IF_VOID, _STDEX_YES, /**/, /**/) elipsis_params)\
     {\
-        (_ref.get().*_func)(_STDEX_ARGS##count(/**/, /**/) elipsis_args);\
+        (_ref.get().*_func)(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM) elipsis_args);\
     }
 
 #define _STDEX_INVOKE_FALLBACK(count) \
@@ -587,13 +587,13 @@ namespace stdex
     {\
         return\
         detail::functional_std::_forward<_R>::call(\
-            _func(_STDEX_ARGS##count(/**/, /**/)) );\
+            _func(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM)) );\
     } \
 \
     template<class _R, _STDEX_TMPL_ARGS##count(/**/, /**/)>\
     _R invoke(typename stdex::detail::_function_trait<_R(*)(_STDEX_TYPES##count(/**/, /**/) vargs ), is_void<_R>::value == bool(true)>::type  _func, _STDEX_PARAMS##count(/**/, /**/, /**/, /**/))\
     {\
-        _func(_STDEX_ARGS##count(/**/, /**/));\
+        _func(_STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_ARG_CUSTOM));\
     }
 
 #define _STDEX_ENABLE_IF_VOID typename stdex::detail::_return_type_is_void_if<_R,
@@ -602,6 +602,7 @@ namespace stdex
 
 #define _STDEX_PARAMS_TYPE_CUSTOM(count) _ElipsisArg##count##T
 #define _STDEX_PARAMS_ARG_CUSTOM(count) _elipsis_arg##count
+#define _STDEX_ARG_CUSTOM(count) stdex::detail::functional_std::_forward< _STDEX_TYPE_DEFAULT(count) >::call( _STDEX_ARG_DEFAULT(count) )
 #define _STDEX_ELIPSIS_TMPL_ARGS(count) _STDEX_TMPL_ARGS##count##_IMPL(/**/, /**/, _STDEX_PARAMS_TYPE_CUSTOM)
 #define _STDEX_ELIPSIS_PARAMS(count) _STDEX_PARAMS##count##_IMPL(/**/, /**/, /**/, /**/, _STDEX_PARAMS_TYPE_CUSTOM, _STDEX_PARAMS_ARG_CUSTOM)
 #define _STDEX_ELIPSIS_ARGS(count) _STDEX_ARGS##count##_IMPL(/**/, /**/, _STDEX_PARAMS_ARG_CUSTOM)
@@ -746,6 +747,7 @@ namespace stdex
 #undef _STDEX_INVOKE_ELIPSIS
 #undef _STDEX_INVOKE_FALLBACK
 
+#undef _STDEX_ARG_CUSTOM
 #undef _STDEX_PARAMS_TYPE_CUSTOM
 #undef _STDEX_PARAMS_ARG_CUSTOM
 #undef _STDEX_ELIPSIS_PARAMS
