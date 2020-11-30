@@ -2069,6 +2069,16 @@ namespace stdex
                     ); \
         } \
 \
+        return_type operator()(const reference_wrapper<_ObjectT>& _obj, \
+            _STDEX_PARAMS##count(/**/, /**/, /**/, /**/) \
+            ) const {  \
+            return  \
+            stdex::invoke(\
+                    _mem_ptr, _obj, \
+                    _STDEX_ARGS##count(/**/, /**/) \
+                    ); \
+        } \
+\
         return_type operator()(_ObjectT* _obj_ptr, \
             _STDEX_PARAMS##count(/**/, /**/, /**/, /**/) \
             ) const {  \
@@ -2088,6 +2098,16 @@ namespace stdex
             _mem_ptr(mem_ptr) {}\
 \
         return_type operator()(const _ObjectT& _obj, \
+            _STDEX_PARAMS##count(/**/, /**/, /**/, /**/) \
+            ) const {  \
+            return  \
+            stdex::invoke(\
+                    _mem_ptr, _obj, \
+                    _STDEX_ARGS##count(/**/, /**/) \
+                    ); \
+        } \
+\
+        return_type operator()(const reference_wrapper<const _ObjectT>& _obj, \
             _STDEX_PARAMS##count(/**/, /**/, /**/, /**/) \
             ) const {  \
             return  \

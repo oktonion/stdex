@@ -378,11 +378,13 @@ int test07()
     stdex::invoke<void>(func, cc);
     stdex::invoke<void>(func);
     DYNAMIC_VERIFY(stdex::invoke<int>(func, 1) == 1);
+    DYNAMIC_VERIFY(stdex::invoke<int>(stdex::ref(func), 1) == 1);
 
     const classical_functor func_const = func;
     stdex::invoke<void>(func_const, cc);
     stdex::invoke<void>(func_const);
     DYNAMIC_VERIFY(stdex::invoke<int>(func_const, 2) == 2);
+    DYNAMIC_VERIFY(stdex::invoke<int>(stdex::cref(func), 2) == 2);
     
     return 0;
 }
@@ -394,9 +396,7 @@ int test08()
 
     stdex::mem_fn(&dummy_functor::call)(func, counter);
     stdex::mem_fn(&dummy_functor::call)(&func, counter);
-
-    stdex::reference_wrapper<dummy_functor> ref(func);
-    stdex::mem_fn(&dummy_functor::call)(ref, counter);
+    stdex::mem_fn(&dummy_functor::call)(stdex::ref(func), counter);
 
     return 0;
 }
