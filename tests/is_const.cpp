@@ -15,8 +15,6 @@ int main(void)
 {
     using namespace stdex;
 
-    STATIC_ASSERT(stdex::is_function<cFuncType>::value == (true), should_be);
-
     // is_const
     // Positive tests.
     STATIC_ASSERT(is_const<const int>::value == (true), should_be_const);
