@@ -1600,7 +1600,7 @@ namespace stdex
             }
 
             static std::size_t call(const void* &_dst,
-                typename add_const<func_obj_type>::type _src)
+                func_obj_type _src)
             {
                 typedef typename add_const<_FuncT>::type ctype;
                 ctype** _ptr_to_ptr = new ctype *();
@@ -1614,15 +1614,17 @@ namespace stdex
         struct _functor_pointer_copy<_FuncT&>
         {
             static std::size_t call(const void* &_dst,
-                typename add_const<_FuncT>::type& _src)
+                _FuncT& _src)
             {
                 _dst = &_src;
+                return sizeof(_FuncT);
             }
 
             static std::size_t call(void* &_dst,
-                typename remove_const<_FuncT>::type& _src)
+                _FuncT& _src)
             {
                 _dst = &_src;
+                return sizeof(_FuncT);
             }
         };
 
@@ -1662,17 +1664,17 @@ namespace stdex
 
             virtual std::size_t _target(void* &_dst) _STDEX_NOEXCEPT_FUNCTION
             {
-                typedef typename conditional<is_const<func_type>::value,
+                typedef typename conditional<is_const<typename remove_reference<func_type>::type>::value,
                     void,
                     func_type>::type ctype;
-                return 0;//_functor_pointer_copy<ctype>::call(_dst, _func);
+                return _functor_pointer_copy<ctype>::call(_dst, _func);
             }
 
             virtual std::size_t _target(const void* &_dst) const _STDEX_NOEXCEPT_FUNCTION
             {
                 typedef typename add_const<func_type>::type ctype;
                 typedef typename remove_reference<ctype>::type& ctype_ref;
-                return _functor_pointer_copy<ctype>::call(_dst, const_cast<ctype_ref>(_func));
+                return 0;//_functor_pointer_copy<ctype>::call(_dst, const_cast<ctype_ref>(_func));
             }
 
             virtual const std::type_info& _target_type() const _STDEX_NOEXCEPT_FUNCTION
