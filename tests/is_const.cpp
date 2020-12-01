@@ -7,14 +7,16 @@ typedef const ClassType& cClassTypeRef;
 typedef const volatile ClassType cvClassType;
 typedef volatile ClassType vClassType;
 typedef void(*FuncPtrType)(int);
-typedef typename stdex::remove_pointer<FuncPtrType>::type FuncType;
+typedef stdex::remove_pointer<FuncPtrType>::type FuncType;
 typedef const FuncPtrType cFuncPtrType;
 typedef const FuncType cFuncType;
 
 int main(void)
 {
     using namespace stdex;
-    
+
+    STATIC_ASSERT(stdex::is_function<cFuncType>::value == (true), should_be);
+
     // is_const
     // Positive tests.
     STATIC_ASSERT(is_const<const int>::value == (true), should_be_const);
@@ -39,5 +41,6 @@ int main(void)
     STATIC_ASSERT(is_const<cFuncType>::value == (false), can_not_be_const);
     STATIC_ASSERT(is_const<cFuncPtrType&>::value == (false), can_not_be_const);
     STATIC_ASSERT(is_const<cFuncType&>::value == (false), can_not_be_const);
+    
     return 0;
 }
