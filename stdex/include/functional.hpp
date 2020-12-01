@@ -1559,7 +1559,7 @@ namespace stdex
                 is_pointer<_FuncT>::value == bool(true) ||
                 is_member_function_pointer<_FuncT>::value == bool(true),
                 _FuncT,
-                int&
+                class _disable&
             >::type func_ptr_type;
 
             typedef
@@ -1567,8 +1567,8 @@ namespace stdex
             conditional<
                 is_pointer<_FuncT>::value == bool(false) &&
                 is_member_function_pointer<_FuncT>::value == bool(false),
-                _FuncT,
-                int&
+                _FuncT&,
+                class _disable
             >::type func_obj_type;
 
             static std::size_t call(void* &_dst,
@@ -1588,6 +1588,26 @@ namespace stdex
                 _dst = _ptr_to_ptr;
                 return sizeof(_FuncT);
             }
+
+            static std::size_t call(const void* &_dst,
+                typename add_const<func_ptr_type>::type _src)
+            {
+                typedef typename remove_const<_FuncT>::type ctype;
+                ctype *_ptr_to_ptr = new ctype(0);
+                (*_ptr_to_ptr) = _src;
+                _dst = _ptr_to_ptr;
+                return sizeof(ctype);
+            }
+
+            static std::size_t call(const void* &_dst,
+                typename add_const<func_obj_type>::type _src)
+            {
+                typedef typename add_const<_FuncT>::type ctype;
+                ctype** _ptr_to_ptr = new ctype *();
+                (*_ptr_to_ptr) = &_src;
+                _dst = _ptr_to_ptr;
+                return sizeof(ctype);
+            }
         };
 
         template<class _FuncT>
@@ -1604,11 +1624,15 @@ namespace stdex
             {
                 _dst = &_src;
             }
+        };
 
-            static std::size_t call(void* &_dst,
-                typename conditional<is_const<_FuncT>::value, _FuncT&, class _disable&>::type _src)
+        template<>
+        struct _functor_pointer_copy<void>
+        {
+            template<class _DstT, class _SrcT> 
+            static std::size_t call(const _DstT&, const _SrcT&)
             {
-                _dst = &_src;
+                return 0;
             }
         };
 
@@ -1636,9 +1660,18 @@ namespace stdex
             virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION { delete this; }
 
 
-            virtual std::size_t _target(void* &_dst) const _STDEX_NOEXCEPT_FUNCTION
+            virtual std::size_t _target(void* &_dst) _STDEX_NOEXCEPT_FUNCTION
             {
-                return _functor_pointer_copy<func_type>::call(_dst, _func);
+                typedef typename conditional<is_const<func_type>::value,
+                    void,
+                    func_type>::type ctype;
+                return _functor_pointer_copy<ctype>::call(_dst, _func);
+            }
+
+            virtual std::size_t _target(const void* &_dst) const _STDEX_NOEXCEPT_FUNCTION
+            {
+                typedef typename add_const<func_type>::type ctype;
+                return _functor_pointer_copy<ctype>::call(_dst, const_cast<ctype>(_func));
             }
 
             virtual const std::type_info& _target_type() const _STDEX_NOEXCEPT_FUNCTION
@@ -1683,7 +1716,8 @@ namespace stdex
                 virtual _func_base* _move() _STDEX_NOEXCEPT_FUNCTION = 0;
                 virtual _return_arg<_return_type> _co_call(_args_type&) = 0;
                 virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION = 0;
-                virtual std::size_t _target(void*&) const _STDEX_NOEXCEPT_FUNCTION = 0;
+                virtual std::size_t _target(void*&) _STDEX_NOEXCEPT_FUNCTION = 0;
+                virtual std::size_t _target(const void*&) const _STDEX_NOEXCEPT_FUNCTION = 0;
                 virtual const std::type_info& _target_type() const _STDEX_NOEXCEPT_FUNCTION = 0;
 
                 _func_base() {}
@@ -1786,7 +1820,9 @@ namespace stdex
             {
                 if (_fx && typeid(_FuncT) == target_type())
                 {
-                    void* _ptr_to_ptr = 0;
+                    typename 
+                    conditional<
+                        is_const<_FuncT>::value, const void*, void*>::type _ptr_to_ptr = 0;
                     std::size_t _size = _fx->_target(_ptr_to_ptr);
 
                     if (_ptr_to_ptr && _size == sizeof(_FuncT*))
