@@ -1590,7 +1590,7 @@ namespace stdex
             }
 
             static std::size_t call(const void* &_dst,
-                typename add_const<func_ptr_type>::type _src)
+                func_ptr_type _src)
             {
                 typedef typename remove_const<_FuncT>::type ctype;
                 ctype *_ptr_to_ptr = new ctype(0);
@@ -1614,7 +1614,7 @@ namespace stdex
         struct _functor_pointer_copy<_FuncT&>
         {
             static std::size_t call(const void* &_dst,
-                _FuncT& _src)
+                typename add_const<_FuncT>::type& _src)
             {
                 _dst = &_src;
             }
@@ -1665,13 +1665,14 @@ namespace stdex
                 typedef typename conditional<is_const<func_type>::value,
                     void,
                     func_type>::type ctype;
-                return _functor_pointer_copy<ctype>::call(_dst, _func);
+                return 0;//_functor_pointer_copy<ctype>::call(_dst, _func);
             }
 
             virtual std::size_t _target(const void* &_dst) const _STDEX_NOEXCEPT_FUNCTION
             {
                 typedef typename add_const<func_type>::type ctype;
-                return _functor_pointer_copy<ctype>::call(_dst, const_cast<ctype>(_func));
+                typedef typename remove_reference<ctype>::type& ctype_ref;
+                return _functor_pointer_copy<ctype>::call(_dst, const_cast<ctype_ref>(_func));
             }
 
             virtual const std::type_info& _target_type() const _STDEX_NOEXCEPT_FUNCTION
