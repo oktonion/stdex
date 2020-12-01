@@ -571,10 +571,29 @@ namespace stdex
         { 
             typedef void(*func_ptr_type)();
             typedef remove_pointer<void(*)()>::type func_type;
-            typedef remove_pointer<void(*const)()>::type func_type_const;
+            typedef const remove_pointer<void(*const)()>::type func_type_const;
 
             static const bool value = 
                 is_same<func_type_const, func_type>::value == bool(false);
+        };
+
+        template<>
+        struct _has_bug<class _stdex_function_ptr_can_be_volatile>
+        { 
+            typedef void(*func_ptr_type)();
+            typedef remove_pointer<void(*)()>::type func_type;
+            typedef volatile remove_pointer<void(*const)()>::type func_type_const;
+
+            static const bool value = 
+                is_same<func_type_const, func_type>::value == bool(false);
+        };
+
+        template<>
+        struct _has_bug<class _stdex_function_ptr_can_be_cv_qualified>
+        { 
+            static const bool value =
+                _has_bug<_stdex_function_ptr_can_be_volatile>::value ||
+                _has_bug<_stdex_function_ptr_can_be_constant>::value;
         };
     } //namespace intern
 
@@ -2000,26 +2019,62 @@ namespace stdex
             public _is_mem_function_ptr_impl<_Tp, is_reference<_Tp>::value, is_fundamental<_Tp>::value>::type
         { };
         
-        template <class _Tp, bool _IsMemberFunctionPtr>
+        template <class, bool _IsMemberFunctionPtr>
         struct _is_function_chooser_impl :
             public false_type
         { };
 
-        template <class _Tp>
-        struct _is_function_chooser_impl<_Tp, false> :
-            public _is_function_ptr_helper<_Tp*>
+        template <class _FuncPtrT>
+        struct _is_function_chooser_impl<_FuncPtrT, false> :
+            public _is_function_ptr_helper<_FuncPtrT>
         { };
 
         template<class _Tp, bool>
         struct _is_function_chooser_helper
         {
             static const bool value = 
-                _is_function_chooser_impl<_Tp, _is_mem_function_ptr_helper<_Tp>::value>::value;
+                _is_function_chooser_impl<_Tp*, _is_mem_function_ptr_helper<_Tp>::value>::value;
+        };
+
+        template<class _Tp>
+        struct _is_function_chooser_helper<const _Tp, true>
+        {
+            static const bool value = 
+                _is_function_chooser_impl<_Tp*, _is_mem_function_ptr_helper<const _Tp>::value>::value;
+        };
+
+        template<class _Tp>
+        struct _is_function_chooser_helper<volatile _Tp, true>
+        {
+            static const bool value = 
+                _is_function_chooser_impl<_Tp*, _is_mem_function_ptr_helper<volatile _Tp>::value>::value;
+        };
+
+        template<class _Tp>
+        struct _is_function_chooser_helper<const volatile _Tp, true>
+        {
+            static const bool value = 
+                _is_function_chooser_impl<_Tp*, _is_mem_function_ptr_helper<const volatile _Tp>::value>::value;
         };
 
         template<class _Tp>
         struct _is_function_chooser_helper<const _Tp, false>:
-            false_type // if there is no compiler bug for treating const function pointer as a thing
+            false_type // if there is no compiler bug for treating cv-qualified function pointer as a thing
+        { };
+
+        template<class _Tp>
+        struct _is_function_chooser_helper<volatile _Tp, false>:
+            false_type // if there is no compiler bug for treating cv-qualified function pointer as a thing
+        { };
+
+        template<class _Tp>
+        struct _is_function_chooser_helper<const volatile _Tp, false>:
+            false_type // if there is no compiler bug for treating cv-qualified function pointer as a thing
+        { };
+
+        template<class _Tp>
+        struct _is_function_chooser_helper<_Tp, false>:
+            is_same<const volatile _Tp, _Tp> // if there is no compiler bug for treating cv-qualified function pointer as a thing
         { };
 
         template<class _Tp, bool _IsRef>
@@ -2031,7 +2086,7 @@ namespace stdex
         struct _is_function_chooser<_Tp, false>
         {
             static const bool value = 
-                _is_function_chooser_helper<_Tp, intern::_has_bug<intern::_stdex_function_ptr_can_be_constant>::value>::value;
+                _is_function_chooser_helper<_Tp, intern::_has_bug<intern::_stdex_function_ptr_can_be_cv_qualified>::value>::value;
         };
     }
 
