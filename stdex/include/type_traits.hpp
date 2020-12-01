@@ -539,6 +539,83 @@ namespace stdex
     template<class _Tp>
     struct is_reference;
 
+    
+    namespace detail
+    {
+        template<class _Tp, class>
+        struct _remove_pointer_helper
+        {
+            typedef _Tp     type;
+        };
+
+        template<class _Tp, class _Up>
+        struct _remove_pointer_helper<_Tp, _Up*>
+        {
+            typedef _Up     type;
+        };
+    }
+
+    // remove_pointer
+    template<class _Tp>
+    struct remove_pointer
+        : public detail::_remove_pointer_helper<_Tp, typename remove_cv<_Tp>::type>
+    { };
+
+    namespace intern
+    {
+        template<class>
+        struct _has_bug;
+
+        template<>
+        struct _has_bug<class _stdex_function_ptr_can_be_constant>
+        { 
+            typedef void(*func_ptr_type)();
+            typedef remove_pointer<void(*)()>::type func_type;
+            typedef const func_type func_type_const;
+            static const bool value = 
+                is_same<func_type, func_type_const>::value == bool(false);
+        };
+    } //namespace intern
+
+    namespace detail
+    {
+        template<class _Tp, bool>
+        struct _is_const_impl_bug_check
+        {
+            typedef bool_constant<is_function<_Tp>::value == bool(false)> type;
+        };
+
+        template<class _Tp>
+        struct _is_const_impl_bug_check<const _Tp, false>
+        {
+            typedef true_type type;
+        };
+
+        template<class _NonConstT, class _ConstT>
+        struct _is_const_impl_fallback:
+            _is_const_impl_bug_check<_ConstT, intern::_has_bug<intern::_stdex_function_ptr_can_be_constant>::value>::type
+        { };
+
+        template<class _Tp>
+        struct _is_const_impl_fallback<_Tp, _Tp>:
+            false_type
+        { };
+
+        template<class _Tp, bool>
+        struct _is_const_impl:
+            false_type // reference can not be const period
+        { };
+
+        template<class _Tp>
+        struct _is_const_impl<_Tp, false>:
+            _is_const_impl_fallback<_Tp, const _Tp>
+        { };
+
+        template<class _Tp>
+        struct _is_const_impl<_Tp*, false>:
+            true_type
+        { };
+    }
     template <class _Tp>
     struct is_const :
         public false_type
@@ -546,7 +623,7 @@ namespace stdex
 
     template <class _Tp>
     struct is_const<const _Tp> :
-        public bool_constant<is_reference<_Tp>::value == bool(false)>
+        public detail::_is_const_impl<_Tp, is_reference<_Tp>::value>
     { };
 
     template <class _Tp>
@@ -835,9 +912,6 @@ namespace stdex
         public detail::_is_pointer_helper<typename remove_cv<_Tp>::type>::type
     { };
 
-    template<class _Tp>
-    struct remove_pointer;
-
     // is_lvalue_reference
     template<class>
     struct is_lvalue_reference :
@@ -849,19 +923,34 @@ namespace stdex
 
     namespace detail
     {
-        template <class _R>
-        struct _is_function_ptr_helper_cdecl
+        template<class _FuncPtrT, bool>
+        struct _is_function_ptr_helper_bug_check
         {
-            typedef typename remove_pointer<_R>::type function_type;
-            static const bool value = 
-                is_const<const function_type>::value == bool(false);
+            typedef false_type type;
         };
-        template <class _R>
-        struct _is_function_ptr_helper_fastcall : _is_function_ptr_helper_cdecl<_R> {};
-        template <class _R>
-        struct _is_function_ptr_helper_stdcall : _is_function_ptr_helper_fastcall<_R> {};
-        template <class _R>
-        struct _is_function_ptr_helper : _is_function_ptr_helper_stdcall<_R> {};
+
+        template<class _FuncPtrT>
+        struct _is_function_ptr_helper_bug_check<_FuncPtrT, false>
+        {
+            typedef typename remove_pointer<_FuncPtrT>::type function_type;
+            typedef bool_constant<is_const<const function_type>::value == bool(false)> type;
+        };
+
+        template<class _FuncPtrT>
+        struct _is_function_ptr_helper_fallback:
+            _is_function_ptr_helper_bug_check<_FuncPtrT, intern::_has_bug<intern::_stdex_function_ptr_can_be_constant>::value>::type
+        { };
+        template <class _FuncPtrT>
+        struct _is_function_ptr_helper_cdecl:
+            _is_function_ptr_helper_fallback<_FuncPtrT>::type
+        {
+        };
+        template <class _FuncPtrT>
+        struct _is_function_ptr_helper_fastcall : _is_function_ptr_helper_cdecl<_FuncPtrT> {};
+        template <class _FuncPtrT>
+        struct _is_function_ptr_helper_stdcall : _is_function_ptr_helper_fastcall<_FuncPtrT> {};
+        template <class _FuncPtrT>
+        struct _is_function_ptr_helper : _is_function_ptr_helper_stdcall<_FuncPtrT> {};
 
         template <class _R >
         struct _is_function_ptr_helper<_R(*)()> : true_type {};
@@ -1917,7 +2006,26 @@ namespace stdex
             public _is_function_ptr_helper<_Tp*>
         { };
 
-        template<class _Tp, bool _IsRef = true>
+        template<class _Tp, bool>
+        struct _is_function_chooser_helper
+        {
+            static const bool value = 
+                _is_function_chooser_impl<_Tp, _is_mem_function_ptr_helper<_Tp>::value>::value;
+        };
+
+        template<class _Tp>
+        struct _is_function_chooser_helper<const _Tp, true>
+        { 
+            static const bool value = 
+                _is_function_chooser_impl<_Tp, _is_mem_function_ptr_helper<const _Tp>::value>::value;
+        };
+
+        template<class _Tp>
+        struct _is_function_chooser_helper<const _Tp, false>:
+            bool_constant<_is_mem_function_ptr_helper<const _Tp>::value == bool(false)>
+        { };
+
+        template<class _Tp, bool _IsRef>
         struct _is_function_chooser :
             public false_type
         { };
@@ -1925,29 +2033,16 @@ namespace stdex
         template <class _Tp>
         struct _is_function_chooser<_Tp, false>
         {
-
-            static const bool value = _is_function_chooser_impl<_Tp, _is_mem_function_ptr_helper<_Tp>::value>::value;
+            static const bool value = 
+                _is_function_chooser_helper<_Tp, intern::_has_bug<intern::_stdex_function_ptr_can_be_constant>::value>::value;
         };
     }
 
     // is_function
     template<class _Tp>
-    struct is_function
+    struct is_function:
+        bool_constant<detail::_is_function_chooser<_Tp, is_reference<_Tp>::value>::value == bool(true)>
     {
-        static const bool value = detail::_is_function_chooser<_Tp, is_reference<_Tp>::value>::value;
-
-        typedef const bool value_type;
-        typedef integral_constant<bool, is_function::value == bool(true)> type;
-
-        operator value_type() const
-        {    // return stored value
-            return (value);
-        }
-
-        value_type operator()() const
-        {    // return stored value
-            return (value);
-        }
     };
 
     namespace detail
@@ -2703,27 +2798,6 @@ namespace stdex
     {
         typedef typename remove_all_extents<_Tp>::type type;
     };*/
-
-    namespace detail
-    {
-        template<class _Tp, class>
-        struct _remove_pointer_helper
-        {
-            typedef _Tp     type;
-        };
-
-        template<class _Tp, class _Up>
-        struct _remove_pointer_helper<_Tp, _Up*>
-        {
-            typedef _Up     type;
-        };
-    }
-
-    // remove_pointer
-    template<class _Tp>
-    struct remove_pointer
-        : public detail::_remove_pointer_helper<_Tp, typename remove_cv<_Tp>::type>
-    { };
 
 
     namespace detail
