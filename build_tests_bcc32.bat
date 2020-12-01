@@ -22,6 +22,7 @@ set has_compile_error=!false!
 set has_compile_warn=!false!
 set current_test_is_ok=!false!
 
+time /T
 
 for /f %%f in ('dir /b ".\tests\*.cpp"') do (
   echo "compiling test Borland C++ %%~nf"
@@ -185,4 +186,6 @@ if !build_ok!==!false! (
   exit /B 1
 )
 
-rem del /Q .\tests\obj\*.obj
+time /T
+
+del /Q .\tests\obj\*.obj
