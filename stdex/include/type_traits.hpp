@@ -540,6 +540,9 @@ namespace stdex
         public true_type//specialization
     { };
 
+    template<class _Tp>
+    struct is_reference;
+
     template <class _Tp>
     struct is_const :
         public false_type
@@ -547,7 +550,7 @@ namespace stdex
 
     template <class _Tp>
     struct is_const<const _Tp> :
-        public true_type
+        public bool_constant<is_reference<_Tp>::value == bool(false)>
     { };
 
     template <class _Tp>
@@ -570,9 +573,6 @@ namespace stdex
     struct is_volatile<const volatile _Tp>
         : public true_type
     { };
-
-    template<class _Tp>
-    struct is_reference;
 
     template<class _Tp>
     struct is_object;
