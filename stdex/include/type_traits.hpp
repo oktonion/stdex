@@ -571,9 +571,10 @@ namespace stdex
         { 
             typedef void(*func_ptr_type)();
             typedef remove_pointer<void(*)()>::type func_type;
-            typedef const func_type func_type_const;
+            typedef remove_pointer<void(*const)()>::type func_type_const;
+
             static const bool value = 
-                is_same<func_type, func_type_const>::value == bool(false);
+                is_same<func_type_const, func_type>::value == bool(false);
         };
     } //namespace intern
 
@@ -911,6 +912,9 @@ namespace stdex
     struct is_pointer :
         public detail::_is_pointer_helper<typename remove_cv<_Tp>::type>::type
     { };
+
+    template<class _Tp>
+    struct is_fundamental;
 
     // is_lvalue_reference
     template<class>
@@ -1977,8 +1981,13 @@ namespace stdex
 #undef _STDEX_IS_MEM_FUN_FASTCALL_PTR
 
 
-        template <class _Tp, bool _IsRef>
-        struct _is_mem_function_ptr_impl
+        template <class _Tp, bool _IsRef, bool _IsFundamental>
+        struct _is_mem_function_ptr_impl:
+            false_type
+        { };
+
+        template <class _Tp>
+        struct _is_mem_function_ptr_impl<_Tp, false, false>
         {
             static _Tp *_ptr;
             static const bool value = (sizeof(_is_mem_function_ptr(_is_mem_function_ptr_impl::_ptr)) == sizeof(_yes_type));
@@ -1987,14 +1996,9 @@ namespace stdex
         };
 
         template <class _Tp>
-        struct _is_mem_function_ptr_impl<_Tp, true>:
-            public false_type
-        {};
-
-        template <class _Tp>
         struct _is_mem_function_ptr_helper:
-            public _is_mem_function_ptr_impl<_Tp, is_reference<_Tp>::value>::type
-        {};
+            public _is_mem_function_ptr_impl<_Tp, is_reference<_Tp>::value, is_fundamental<_Tp>::value>::type
+        { };
         
         template <class _Tp, bool _IsMemberFunctionPtr>
         struct _is_function_chooser_impl :
@@ -2014,15 +2018,8 @@ namespace stdex
         };
 
         template<class _Tp>
-        struct _is_function_chooser_helper<const _Tp, true>
-        { 
-            static const bool value = 
-                _is_function_chooser_impl<_Tp, _is_mem_function_ptr_helper<const _Tp>::value>::value;
-        };
-
-        template<class _Tp>
         struct _is_function_chooser_helper<const _Tp, false>:
-            bool_constant<_is_mem_function_ptr_helper<const _Tp>::value == bool(false)>
+            false_type // if there is no compiler bug for treating const function pointer as a thing
         { };
 
         template<class _Tp, bool _IsRef>
