@@ -1604,6 +1604,12 @@ namespace stdex
             {
                 _dst = &_src;
             }
+
+            static std::size_t call(void* &_dst,
+                typename conditional<is_const<_FuncT>::value, _FuncT&, class _disable&>::type _src)
+            {
+                _dst = &_src;
+            }
         };
 
         template<class func_base, class _FuncT, class args_type>
