@@ -567,33 +567,33 @@ namespace stdex
         struct _has_bug;
 
         template<>
-        struct _has_bug<class _stdex_function_ptr_can_be_constant>
+        struct _has_bug<class _stdex_function_can_be_constant>
         { 
             typedef void(*func_ptr_type)();
-            typedef remove_pointer<void(*)()>::type func_type;
-            typedef const remove_pointer<void(*const)()>::type func_type_const;
+            typedef remove_pointer<func_ptr_type>::type func_type;
+            typedef const remove_pointer<func_ptr_type>::type func_type_qualified;
 
             static const bool value = 
-                is_same<func_type_const, func_type>::value == bool(false);
+                is_same<func_type_qualified, func_type>::value == bool(false);
         };
 
         template<>
-        struct _has_bug<class _stdex_function_ptr_can_be_volatile>
+        struct _has_bug<class _stdex_function_can_be_volatile>
         { 
             typedef void(*func_ptr_type)();
-            typedef remove_pointer<void(*)()>::type func_type;
-            typedef volatile remove_pointer<void(*const)()>::type func_type_const;
+            typedef remove_pointer<func_ptr_type>::type func_type;
+            typedef volatile remove_pointer<func_ptr_type>::type func_type_qualified;
 
             static const bool value = 
-                is_same<func_type_const, func_type>::value == bool(false);
+                is_same<func_type_qualified, func_type>::value == bool(false);
         };
 
         template<>
-        struct _has_bug<class _stdex_function_ptr_can_be_cv_qualified>
+        struct _has_bug<class _stdex_function_can_be_cv_qualified>
         { 
             static const bool value =
-                _has_bug<_stdex_function_ptr_can_be_volatile>::value ||
-                _has_bug<_stdex_function_ptr_can_be_constant>::value;
+                _has_bug<_stdex_function_can_be_volatile>::value ||
+                _has_bug<_stdex_function_can_be_constant>::value;
         };
     } //namespace intern
 
@@ -613,7 +613,7 @@ namespace stdex
 
         template<class _NonConstT, class _ConstT>
         struct _is_const_impl_fallback:
-            _is_const_impl_bug_check<_ConstT, intern::_has_bug<intern::_stdex_function_ptr_can_be_constant>::value>::type
+            _is_const_impl_bug_check<_ConstT, intern::_has_bug<intern::_stdex_function_can_be_constant>::value>::type
         { };
 
         template<class _Tp>
@@ -961,7 +961,7 @@ namespace stdex
 
         template<class _FuncPtrT>
         struct _is_function_ptr_helper_fallback:
-            _is_function_ptr_helper_bug_check<_FuncPtrT, intern::_has_bug<intern::_stdex_function_ptr_can_be_constant>::value>::type
+            _is_function_ptr_helper_bug_check<_FuncPtrT, intern::_has_bug<intern::_stdex_function_can_be_constant>::value>::type
         { };
         template <class _FuncPtrT>
         struct _is_function_ptr_helper_cdecl:
@@ -2086,7 +2086,7 @@ namespace stdex
         struct _is_function_chooser<_Tp, false>
         {
             static const bool value = 
-                _is_function_chooser_helper<_Tp, intern::_has_bug<intern::_stdex_function_ptr_can_be_cv_qualified>::value>::value;
+                _is_function_chooser_helper<_Tp, intern::_has_bug<intern::_stdex_function_can_be_cv_qualified>::value>::value;
         };
     }
 
