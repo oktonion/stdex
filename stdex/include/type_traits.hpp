@@ -598,7 +598,7 @@ namespace stdex
         struct _has_bug;
 
         template<>
-        struct _has_bug<class _stdex_function_can_be_constant>
+        struct _has_bug<class _stdex_function_can_be_const>
         { 
             typedef void(*func_ptr_type)();
             typedef remove_pointer<func_ptr_type>::type func_type;
@@ -624,7 +624,7 @@ namespace stdex
         { 
             static const bool value =
                 _has_bug<_stdex_function_can_be_volatile>::value ||
-                _has_bug<_stdex_function_can_be_constant>::value;
+                _has_bug<_stdex_function_can_be_const>::value;
         };
     } //namespace intern
 
@@ -644,7 +644,7 @@ namespace stdex
 
         template<class _NonConstT, class _ConstT>
         struct _is_const_impl_fallback:
-            _is_const_impl_bug_check<_ConstT, intern::_has_bug<intern::_stdex_function_can_be_constant>::value>::type
+            _is_const_impl_bug_check<_ConstT, intern::_has_bug<intern::_stdex_function_can_be_const>::value>::type
         { };
 
         template<class _Tp>
@@ -666,7 +666,48 @@ namespace stdex
         struct _is_const_impl<_Tp*, false>:
             true_type
         { };
-    }
+    } // namespace detail
+
+    namespace detail
+    {
+        template<class _Tp, bool>
+        struct _is_volatile_impl_bug_check
+        {
+            typedef bool_constant<is_function<_Tp>::value == bool(false)> type;
+        };
+
+        template<class _Tp>
+        struct _is_volatile_impl_bug_check<volatile _Tp, false>
+        {
+            typedef true_type type;
+        };
+
+        template<class _NonVolatileT, class _VolatileT>
+        struct _is_volatile_impl_fallback:
+            _is_volatile_impl_bug_check<_VolatileT, intern::_has_bug<intern::_stdex_function_can_be_volatile>::value>::type
+        { };
+
+        template<class _Tp>
+        struct _is_volatile_impl_fallback<_Tp, _Tp>:
+            false_type
+        { };
+
+        template<class _Tp, bool>
+        struct _is_volatile_impl:
+            false_type // reference can not be volatile period
+        { };
+
+        template<class _Tp>
+        struct _is_volatile_impl<_Tp, false>:
+            _is_volatile_impl_fallback<_Tp, volatile _Tp>
+        { };
+
+        template<class _Tp>
+        struct _is_volatile_impl<_Tp*, false>:
+            true_type
+        { };
+    } // namespace detail
+    
     template <class _Tp>
     struct is_const :
         public false_type
@@ -690,12 +731,12 @@ namespace stdex
 
     template<class _Tp>
     struct is_volatile<volatile _Tp>
-        : public true_type
+        : public detail::_is_volatile_impl<_Tp, is_reference<_Tp>::value>
     { };
 
     template<class _Tp>
     struct is_volatile<const volatile _Tp>
-        : public true_type
+        : public detail::_is_volatile_impl<const _Tp, is_reference<_Tp>::value>
     { };
 
     template<class _Tp>
@@ -992,7 +1033,7 @@ namespace stdex
 
         template<class _FuncPtrT>
         struct _is_function_ptr_helper_fallback:
-            _is_function_ptr_helper_bug_check<_FuncPtrT, intern::_has_bug<intern::_stdex_function_can_be_constant>::value>::type
+            _is_function_ptr_helper_bug_check<_FuncPtrT, intern::_has_bug<intern::_stdex_function_can_be_const>::value>::type
         { };
         template <class _FuncPtrT>
         struct _is_function_ptr_helper_cdecl:
