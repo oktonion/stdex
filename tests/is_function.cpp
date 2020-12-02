@@ -88,6 +88,24 @@ int main(void)
         STATIC_ASSERT(is_function<Test::mfunc_type>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<Test::mfunc_margs_type>::value == (true), should_be_function);
 
+        STATIC_ASSERT(is_function<const foo0_t>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<const foo1_t>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<const foo2_t>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<const foo3_t>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<const foo4_t>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<const foo5_t>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<const Test::mfunc_type>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<const Test::mfunc_margs_type>::value == (true), should_be_function);
+
+        STATIC_ASSERT(is_function<volatile foo0_t>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<volatile foo1_t>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<volatile foo2_t>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<volatile foo3_t>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<volatile foo4_t>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<volatile foo5_t>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<volatile Test::mfunc_type>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<volatile Test::mfunc_margs_type>::value == (true), should_be_function);
+
 #ifdef _STDEX_STDCALL
         STATIC_ASSERT(is_function<stdcall_f::foo0_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<stdcall_f::foo1_t>::value == (true), should_be_function);
