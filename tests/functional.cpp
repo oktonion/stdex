@@ -15,29 +15,29 @@
 #define DYNAMIC_VERIFY_ABORT(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; std::abort();}
 
 // Verify that we can instantiate hash for every required type.
-template struct stdex::hash<bool>;
-template struct stdex::hash<char>;
-template struct stdex::hash<signed char>;
-template struct stdex::hash<unsigned char>;
+STATIC_ASSERT(sizeof(struct stdex::hash<bool>), should_be);
+STATIC_ASSERT(sizeof(struct stdex::hash<char>), should_be);
+STATIC_ASSERT(sizeof(struct stdex::hash<signed char>), should_be);
+STATIC_ASSERT(sizeof(struct stdex::hash<unsigned char>), should_be);
 #ifdef _STDEX_NATIVE_CPP11_TYPES_SUPPORT
 //template struct stdex::hash<stdex_char16_t>;
 //template struct stdex::hash<stdex_char32_t>;
 #endif
-template struct stdex::hash<short>;
-template struct stdex::hash<int>;
-template struct stdex::hash<long>;
-template struct stdex::hash<unsigned short>;
-template struct stdex::hash<unsigned int>;
-template struct stdex::hash<unsigned long>;
-template struct stdex::hash<float>;
-template struct stdex::hash<double>;
-template struct stdex::hash<long double>;
-template struct stdex::hash<void*>;
-template struct stdex::hash<stdex::string>;
-template struct stdex::hash<stdex::error_code>;
-template struct stdex::hash<stdex::error_condition>;
-template struct stdex::hash<wchar_t>;
-template struct stdex::hash<stdex::wstring>;
+STATIC_ASSERT(sizeof(struct stdex::hash<short>), should_be);
+STATIC_ASSERT(sizeof(struct stdex::hash<int>), should_be);
+STATIC_ASSERT(sizeof(struct stdex::hash<long>), should_be);
+STATIC_ASSERT(sizeof(struct stdex::hash<unsigned short>), should_be);
+STATIC_ASSERT(sizeof(struct stdex::hash<unsigned int>), should_be);
+STATIC_ASSERT(sizeof(struct stdex::hash<unsigned long>), should_be);
+STATIC_ASSERT(sizeof(struct stdex::hash<float>), should_be);
+STATIC_ASSERT(sizeof(struct stdex::hash<double>), should_be);
+STATIC_ASSERT(sizeof(struct stdex::hash<long double>), should_be);
+STATIC_ASSERT(sizeof(struct stdex::hash<void*>), should_be);
+STATIC_ASSERT(sizeof(struct stdex::hash<stdex::string>), should_be);
+STATIC_ASSERT(sizeof(struct stdex::hash<stdex::error_code>), should_be);
+STATIC_ASSERT(sizeof(struct stdex::hash<stdex::error_condition>), should_be);
+STATIC_ASSERT(sizeof(struct stdex::hash<wchar_t>), should_be);
+STATIC_ASSERT(sizeof(struct stdex::hash<stdex::wstring>), should_be);
 
 template<typename T>
 int
