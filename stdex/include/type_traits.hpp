@@ -1018,22 +1018,36 @@ namespace stdex
 
     namespace detail
     {
-        template<class _FuncPtrT, bool>
+        template<class _FuncPtrT, bool, bool>
         struct _is_function_ptr_helper_bug_check
         {
             typedef false_type type;
         };
 
         template<class _FuncPtrT>
-        struct _is_function_ptr_helper_bug_check<_FuncPtrT, false>
+        struct _is_function_ptr_helper_bug_check<_FuncPtrT, false, true>
         {
             typedef typename remove_pointer<_FuncPtrT>::type function_type;
-            typedef bool_constant<is_const<const function_type>::value == bool(false)> type;
+            typedef bool_constant<detail::_canonical_is_const<const function_type>::value == bool(false)> type;
         };
 
         template<class _FuncPtrT>
+        struct _is_function_ptr_helper_bug_check<_FuncPtrT, true, false>
+        {
+            typedef typename remove_pointer<_FuncPtrT>::type function_type;
+            typedef bool_constant<detail::_canonical_is_volatile<volatile function_type>::value == bool(false)> type;
+        };
+
+        template<class _FuncPtrT>
+        struct _is_function_ptr_helper_bug_check<_FuncPtrT, false, false>:
+            _is_function_ptr_helper_bug_check<_FuncPtrT, false, true>
+        { };
+
+        template<class _FuncPtrT>
         struct _is_function_ptr_helper_fallback:
-            _is_function_ptr_helper_bug_check<_FuncPtrT, intern::_has_bug<intern::_stdex_function_can_be_const>::value>::type
+            _is_function_ptr_helper_bug_check<_FuncPtrT, 
+                intern::_has_bug<intern::_stdex_function_can_be_const>::value,
+                intern::_has_bug<intern::_stdex_function_can_be_volatile>::value>::type
         { };
         template <class _FuncPtrT>
         struct _is_function_ptr_helper_cdecl:
@@ -2131,22 +2145,22 @@ namespace stdex
 
         template<class _Tp>
         struct _is_function_chooser_helper<const _Tp, false>:
-            false_type // if there is no compiler bug for treating cv-qualified function pointer as a thing
+            detail::_canonical_is_const<const _Tp> // if there is no compiler bug for treating cv-qualified function pointer as a thing
         { };
 
         template<class _Tp>
         struct _is_function_chooser_helper<volatile _Tp, false>:
-            false_type // if there is no compiler bug for treating cv-qualified function pointer as a thing
+            detail::_canonical_is_volatile<volatile _Tp> // if there is no compiler bug for treating cv-qualified function pointer as a thing
         { };
 
         template<class _Tp>
         struct _is_function_chooser_helper<const volatile _Tp, false>:
-            false_type // if there is no compiler bug for treating cv-qualified function pointer as a thing
+            detail::_canonical_is_const<const _Tp> // if there is no compiler bug for treating cv-qualified function pointer as a thing
         { };
 
         template<class _Tp>
         struct _is_function_chooser_helper<_Tp, false>:
-            is_same<const volatile _Tp, _Tp> // if there is no compiler bug for treating cv-qualified function pointer as a thing
+            detail::_canonical_is_const<const _Tp> // if there is no compiler bug for treating cv-qualified function pointer as a thing
         { };
 
         template<class _Tp, bool _IsRef>
