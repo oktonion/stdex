@@ -561,6 +561,37 @@ namespace stdex
         : public detail::_remove_pointer_helper<_Tp, typename remove_cv<_Tp>::type>
     { };
 
+    namespace detail
+    {
+        template<class _Tp>
+        struct _canonical_is_const:
+            false_type
+        { };
+
+        template<class _Tp>
+        struct _canonical_is_const<const _Tp>:
+            true_type
+        { };
+
+        template<class _Tp>
+        struct _canonical_is_volatile:
+            false_type
+        { };
+
+        template<class _Tp>
+        struct _canonical_is_volatile<volatile _Tp>:
+            true_type
+        { };
+
+        template<class _FuncT>
+        struct _canonical_is_function_const:
+            bool_constant<_canonical_is_const<const _FuncT>::value == bool(false)> { };
+        
+        template<class _FuncT>
+        struct _canonical_is_function_volatile:
+            bool_constant<_canonical_is_volatile<volatile _FuncT>::value == bool(false)> { };
+    }
+
     namespace intern
     {
         template<class>
@@ -571,10 +602,10 @@ namespace stdex
         { 
             typedef void(*func_ptr_type)();
             typedef remove_pointer<func_ptr_type>::type func_type;
-            typedef const remove_pointer<func_ptr_type>::type func_type_qualified;
+            //typedef const remove_pointer<func_ptr_type>::type func_type_qualified;
 
             static const bool value = 
-                is_same<func_type_qualified, func_type>::value == bool(false);
+                detail::_canonical_is_function_const<func_type>::value == bool(false);
         };
 
         template<>
@@ -582,10 +613,10 @@ namespace stdex
         { 
             typedef void(*func_ptr_type)();
             typedef remove_pointer<func_ptr_type>::type func_type;
-            typedef volatile remove_pointer<func_ptr_type>::type func_type_qualified;
+            //typedef volatile remove_pointer<func_ptr_type>::type func_type_qualified;
 
             static const bool value = 
-                is_same<func_type_qualified, func_type>::value == bool(false);
+                detail::_canonical_is_function_volatile<func_type>::value == bool(false);
         };
 
         template<>
@@ -648,7 +679,7 @@ namespace stdex
 
     template <class _Tp>
     struct is_const<const volatile _Tp> :
-        public true_type
+        public detail::_is_const_impl<volatile _Tp, is_reference<_Tp>::value>
     { };
 
     /// is_volatile
