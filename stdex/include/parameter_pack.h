@@ -1562,24 +1562,24 @@
     #define STDEX_ARGS_MAX_COUNT 32
 #endif
 
-#define _STDEX_TMPL_ARGS_MAX_IMPL(prefix, postfix, params_type) \
-    _STDEX_TMPL_ARGS31_IMPL (prefix, postfix, params_type)
-#define _STDEX_TYPES_MAX_IMPL(prefix, postfix, params_type) \
-    _STDEX_TYPES31_IMPL (prefix, postfix, params_type)
-#define _STDEX_PARAMS_MAX_IMPL(prefix1, postfix1, prefix2, postfix2, params_type, params_args) \
-    _STDEX_PARAMS31_IMPL (prefix1, postfix1, prefix2, postfix2, params_type, params_args)
-#define _STDEX_ARGS_MAX_IMPL(prefix, postfix, params_args) \
-    _STDEX_ARGS31_IMPL (prefix, postfix, params_args)
+#define _STDEX_TMPL_ARGS_MAX_IMPL \
+    _STDEX_TMPL_ARGS31_IMPL
+#define _STDEX_TYPES_MAX_IMPL \
+    _STDEX_TYPES31_IMPL
+#define _STDEX_PARAMS_MAX_IMPL \
+    _STDEX_PARAMS31_IMPL
+#define _STDEX_ARGS_MAX_IMPL \
+    _STDEX_ARGS31_IMPL
 
-#define _STDEX_REPEAT_TOKEN_MAX(token) _STDEX_REPEAT_TOKEN31(token)
-#define _STDEX_TMPL_ARGS_MAX(prefix, postfix) \
-    _STDEX_TMPL_ARGS31(prefix, postfix)
-#define _STDEX_TYPES_MAX(prefix, postfix) \
-    _STDEX_TYPES31(prefix, postfix)
-#define _STDEX_PARAMS_MAX(prefix1, postfix1, prefix2, postfix2) \
-    _STDEX_PARAMS31(prefix1, postfix1, prefix2, postfix2)
-#define _STDEX_ARGS_MAX(prefix, postfix) \
-    _STDEX_ARGS31(prefix, postfix)
+#define _STDEX_REPEAT_TOKEN_MAX _STDEX_REPEAT_TOKEN31
+#define _STDEX_TMPL_ARGS_MAX \
+    _STDEX_TMPL_ARGS31
+#define _STDEX_TYPES_MAX \
+    _STDEX_TYPES31
+#define _STDEX_PARAMS_MAX \
+    _STDEX_PARAMS31
+#define _STDEX_ARGS_MAX \
+    _STDEX_ARGS31
 
 #endif // _STDEX_PARAMETER_PACK_DEFINE
 
