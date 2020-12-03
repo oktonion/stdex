@@ -600,9 +600,7 @@ namespace stdex
         template<>
         struct _has_bug<class _stdex_function_can_be_const>
         { 
-            typedef void(*func_ptr_type)();
-            typedef remove_pointer<func_ptr_type>::type func_type;
-            //typedef const remove_pointer<func_ptr_type>::type func_type_qualified;
+            typedef void func_type();
 
             static const bool value = 
                 detail::_canonical_is_function_const<func_type>::value == bool(false);
@@ -611,9 +609,7 @@ namespace stdex
         template<>
         struct _has_bug<class _stdex_function_can_be_volatile>
         { 
-            typedef void(*func_ptr_type)();
-            typedef remove_pointer<func_ptr_type>::type func_type;
-            //typedef volatile remove_pointer<func_ptr_type>::type func_type_qualified;
+            typedef void func_type();
 
             static const bool value = 
                 detail::_canonical_is_function_volatile<func_type>::value == bool(false);
@@ -2143,25 +2139,15 @@ namespace stdex
                 _is_function_chooser_impl<_Tp*, _is_mem_function_ptr_helper<const volatile _Tp>::value>::value;
         };
 
-        template<class _Tp>
-        struct _is_function_chooser_helper<const _Tp, false>:
-            bool_constant<detail::_canonical_is_const<const _Tp>::value == bool(false)> // if there is no compiler bug for treating cv-qualified function pointer as a thing
-        { };
 
         template<class _Tp>
-        struct _is_function_chooser_helper<volatile _Tp, false>:
-            bool_constant<detail::_canonical_is_volatile<volatile _Tp>::value == bool(false)> // if there is no compiler bug for treating cv-qualified function pointer as a thing
-        { };
-
-        template<class _Tp>
-        struct _is_function_chooser_helper<const volatile _Tp, false>:
-            bool_constant<detail::_canonical_is_const<const _Tp>::value == bool(false)> // if there is no compiler bug for treating cv-qualified function pointer as a thing
-        { };
-
-        template<class _Tp>
-        struct _is_function_chooser_helper<_Tp, false>:
-            bool_constant<detail::_canonical_is_const<const _Tp>::value == bool(false)> // if there is no compiler bug for treating cv-qualified function pointer as a thing
-        { };
+        struct _is_function_chooser_helper<_Tp, false>
+        // if there is no compiler bug for treating cv-qualified function pointer as a thing
+        { 
+            static const bool value = 
+                detail::_canonical_is_const<const _Tp>::value == bool(false) ||
+                detail::_canonical_is_volatile<volatile _Tp>::value == bool(false);
+        };
 
         template<class _Tp, bool _IsRef>
         struct _is_function_chooser :
