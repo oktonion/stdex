@@ -1674,7 +1674,7 @@ namespace stdex
             {
                 typedef typename add_const<func_type>::type ctype;
                 typedef typename remove_reference<ctype>::type& ctype_ref;
-                return 0;//_functor_pointer_copy<ctype>::call(_dst, const_cast<ctype_ref>(_func));
+                return _functor_pointer_copy<ctype>::call(_dst, const_cast<ctype_ref>(_func));
             }
 
             virtual const std::type_info& _target_type() const _STDEX_NOEXCEPT_FUNCTION
