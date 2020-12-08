@@ -15,7 +15,8 @@
 // POSIX includes
 
 // std includes
-#include <utility> // std::pair
+#include <utility> // std::pair, std::swap
+#include <algorithm> // std::swap
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
@@ -413,6 +414,13 @@ namespace stdex
             args(other.args)
         { }
 
+        void swap(tuple& other)
+        {
+            using std::swap;
+
+            swap(args, other.args);
+        }
+
     private:
         args_type args;
 
@@ -420,8 +428,7 @@ namespace stdex
     };
 
     template<class _Arg0T, class _Arg1T>
-    class tuple<_Arg0T, _Arg1T, 
-        _STDEX_REPEAT_TOKEN29(detail::void_type)>
+    class tuple<_Arg0T, _Arg1T>
     {
         typedef
         typename detail::_make_args::
@@ -454,6 +461,81 @@ namespace stdex
 
         template<_STDEX_REPEAT_TOKEN_MAX(class)> friend class tuple;
     };
+
+    template<class>
+    class reference_wrapper;
+
+    namespace detail
+    {
+        template<class _Tp>
+        struct _unwrap_refwrapper
+        {
+            typedef _Tp type;
+        };
+        
+        template<class _Tp>
+        struct _unwrap_refwrapper<stdex::reference_wrapper<_Tp>/**/>
+        {
+            typedef _Tp& type;
+        };
+
+        template <class _Tp>
+        struct _special_decay :
+            _unwrap_refwrapper<typename stdex::decay<_Tp>::type>
+        { };
+    }
+
+#define _STDEX_MAKE_TUPLE_IMPL(count) \
+    template<_STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+    stdex::tuple<_STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> \
+    make_tuple( _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK) ) \
+    { \
+        return \
+            stdex::tuple<_STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>( \
+                 _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) ); \
+    }
+    
+
+#define _STDEX_MAKE_TUPLE(count) \
+    _STDEX_MAKE_TUPLE_IMPL(count)
+
+#define _STDEX_TYPE_CUSTOM(arg_n) typename detail::_special_decay< _STDEX_TYPE_DEFAULT(arg_n) >::type
+
+    _STDEX_MAKE_TUPLE(0)
+    _STDEX_MAKE_TUPLE(1)
+    _STDEX_MAKE_TUPLE(2)
+    _STDEX_MAKE_TUPLE(3)
+    _STDEX_MAKE_TUPLE(4)
+    _STDEX_MAKE_TUPLE(5)
+    _STDEX_MAKE_TUPLE(6)
+    _STDEX_MAKE_TUPLE(7)
+    _STDEX_MAKE_TUPLE(8)
+    _STDEX_MAKE_TUPLE(9)
+    _STDEX_MAKE_TUPLE(10)
+    _STDEX_MAKE_TUPLE(11)
+    _STDEX_MAKE_TUPLE(12)
+    _STDEX_MAKE_TUPLE(13)
+    _STDEX_MAKE_TUPLE(14)
+    _STDEX_MAKE_TUPLE(15)
+    _STDEX_MAKE_TUPLE(16)
+    _STDEX_MAKE_TUPLE(17)
+    _STDEX_MAKE_TUPLE(18)
+    _STDEX_MAKE_TUPLE(19)
+    _STDEX_MAKE_TUPLE(20)
+    _STDEX_MAKE_TUPLE(21)
+    _STDEX_MAKE_TUPLE(22)
+    _STDEX_MAKE_TUPLE(23)
+    _STDEX_MAKE_TUPLE(24)
+    _STDEX_MAKE_TUPLE(25)
+    _STDEX_MAKE_TUPLE(26)
+    _STDEX_MAKE_TUPLE(27)
+    _STDEX_MAKE_TUPLE(28)
+    _STDEX_MAKE_TUPLE(29)
+    _STDEX_MAKE_TUPLE(30)
+    _STDEX_MAKE_TUPLE(31)
+
+#undef _STDEX_MAKE_TUPLE 
+#undef _STDEX_MAKE_TUPLE_IMPL
 
 } // namespace stdex
 
