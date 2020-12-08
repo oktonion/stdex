@@ -187,7 +187,7 @@ namespace stdex
             bool _Disabled>
         struct _args_ctor_helper_impl
         {
-            typedef typename _get_args_traits<_ArgsT, _N>::arg_type& type;
+            typedef typename _get_args_traits<_ArgsT, _N>::arg_type const& type;
         };
 
         namespace tuple_detail
@@ -196,7 +196,7 @@ namespace stdex
             {
                 template<class _ArgT, int _ArgN>
                 disabled_type(const _arg<_ArgT, _ArgN>&){}
-                disabled_type(void_type){}
+                disabled_type(const void_type&){}
                 disabled_type(const disabled_type&){}
             };
         } // namespace tuple_detail
@@ -213,37 +213,10 @@ namespace stdex
             _args_ctor_helper_impl<_ArgsT, _N, _args_ctor_helper_cond<_N,  _ArgsT>::value>
         { };
 
-        template<class _ArgT, int _N>
-        class _arg_ref
-        {
-        public:
-            explicit _arg_ref(_arg<_ArgT, _N> &ref_) :
-                _ptr(&ref_)
-            { }
-
-            _arg_ref(const _arg_ref &other): 
-                _ptr(other._ptr)
-            { }
-
-            _arg_ref& operator=(const _arg_ref &other)
-            {
-                _ptr = other._ptr;
-                return (*this);
-            }
-
-            _arg<_ArgT, _N>& get() const
-            {
-                return *_ptr;
-            }
-
-        private:
-            _arg<_ArgT, _N> *_ptr;
-        };
-
         template<class _ArgT, int _N, class _AnyT>
-        _arg<_ArgT, _N>& operator,(_arg<_ArgT, _N>& value, const _AnyT&) { return value; }
+        const _arg<_ArgT, _N>& operator,(const _arg<_ArgT, _N>& value, const _AnyT&) { return value; }
         template<class _LArgT, int _LArgN, class _RArgT, int _RArgN>
-        _arg<_RArgT, _RArgN>& operator,(_arg<_LArgT, _LArgN>&, _arg<_RArgT, _RArgN>& value) { return value; }
+        const _arg<_RArgT, _RArgN>& operator,(const _arg<_LArgT, _LArgN>&, const _arg<_RArgT, _RArgN>& value) { return value; }
 
         template<class _ArgsT, class _ArgT, int _N>
         struct _args: _ArgsT, _arg<_ArgT, _N>
@@ -400,7 +373,11 @@ namespace stdex
     class tuple
     {
     public:
-        tuple(_STDEX_PARAMS_MAX(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = ::stdex::detail::void_type())){}
+#define _STDEX_PARAMS_ARG_CUSTOM(arg_n) _STDEX_PARAMS_ARG_DEFAULT(arg_n) = _STDEX_PARAMS_TYPE_DEFAULT(arg_n)()
+        tuple(_STDEX_PARAMS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_PARAMS_TYPE_DEFAULT, _STDEX_PARAMS_ARG_CUSTOM)):
+#undef _STDEX_PARAMS_ARG_CUSTOM
+            args( _STDEX_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK) )
+        { }
     //private:
         typedef
         typename detail::_make_args::
@@ -411,7 +388,7 @@ namespace stdex
 #define _STDEX_DELIM _STDEX_DELIM_DEFAULT
         args args_type;
 
-        //args_type args = args_type( _STDEX_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK) );
+        args_type args;
     };
 
 } // namespace stdex
