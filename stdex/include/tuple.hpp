@@ -413,6 +413,37 @@ namespace stdex
             args(other.args)
         { }
 
+    private:
+        args_type args;
+
+        friend class tuple;
+    };
+
+    template<class _Arg0T, class _Arg1T>
+    class tuple<_Arg0T, _Arg1T, 
+        _STDEX_REPEAT_TOKEN29(detail::void_type)>
+    {
+        typedef
+        typename detail::_make_args::
+#undef _STDEX_DELIM
+#define _STDEX_DELIM ::
+        _STDEX_TYPES1(template add <, >::type)::
+#undef _STDEX_DELIM
+#define _STDEX_DELIM _STDEX_DELIM_DEFAULT
+        args args_type;
+
+    public:
+        tuple(_Arg0T arg0 = _Arg0T(), _Arg1T arg1 = _Arg1T()):
+            args( arg0, arg1 )
+        { }
+
+        template<
+            class _OtherArg0T, class _OtherArg1T
+        >
+        tuple(const tuple<_OtherArg0T, _OtherArg1T> &other):
+            args(other.args)
+        { }
+
         template<class _FirstT, class _SecondT>
         tuple(const std::pair<_FirstT, _SecondT> &other):
             args(other.first, other.second)
@@ -421,7 +452,7 @@ namespace stdex
     private:
         args_type args;
 
-        friend class tuple;
+        template<_STDEX_REPEAT_TOKEN_MAX(class)> friend class tuple;
     };
 
 } // namespace stdex
