@@ -483,7 +483,14 @@ namespace stdex
         struct _special_decay :
             _unwrap_refwrapper<typename stdex::decay<_Tp>::type>
         { };
+        
+        struct _ignore {
+            template <class _Tp>
+            const _ignore& operator=(const _Tp&) const { return *this; }
+        };
     }
+
+    const detail::_ignore ignore;
 
 #define _STDEX_MAKE_TUPLE_IMPL(count) \
     template<_STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
@@ -494,47 +501,60 @@ namespace stdex
             stdex::tuple<_STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>( \
                  _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) ); \
     }
+
+#define _STDEX_TIE_IMPL(count) \
+    template<_STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+    stdex::tuple<_STDEX_TYPES##count(_STDEX_BLANK, &)> \
+    tie( _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, &, _STDEX_BLANK) ) \
+    { \
+        return \
+            stdex::tuple<_STDEX_TYPES##count(_STDEX_BLANK, &)>( \
+                 _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) ); \
+    }
     
 
-#define _STDEX_MAKE_TUPLE(count) \
-    _STDEX_MAKE_TUPLE_IMPL(count)
+#define _STDEX_MAKE_TUPLE_AND_TIE(count) \
+    _STDEX_MAKE_TUPLE_IMPL(count) \
+    _STDEX_TIE_IMPL(count)
 
 #define _STDEX_TYPE_CUSTOM(arg_n) typename detail::_special_decay< _STDEX_TYPE_DEFAULT(arg_n) >::type
 
-    _STDEX_MAKE_TUPLE(0)
-    _STDEX_MAKE_TUPLE(1)
-    _STDEX_MAKE_TUPLE(2)
-    _STDEX_MAKE_TUPLE(3)
-    _STDEX_MAKE_TUPLE(4)
-    _STDEX_MAKE_TUPLE(5)
-    _STDEX_MAKE_TUPLE(6)
-    _STDEX_MAKE_TUPLE(7)
-    _STDEX_MAKE_TUPLE(8)
-    _STDEX_MAKE_TUPLE(9)
-    _STDEX_MAKE_TUPLE(10)
-    _STDEX_MAKE_TUPLE(11)
-    _STDEX_MAKE_TUPLE(12)
-    _STDEX_MAKE_TUPLE(13)
-    _STDEX_MAKE_TUPLE(14)
-    _STDEX_MAKE_TUPLE(15)
-    _STDEX_MAKE_TUPLE(16)
-    _STDEX_MAKE_TUPLE(17)
-    _STDEX_MAKE_TUPLE(18)
-    _STDEX_MAKE_TUPLE(19)
-    _STDEX_MAKE_TUPLE(20)
-    _STDEX_MAKE_TUPLE(21)
-    _STDEX_MAKE_TUPLE(22)
-    _STDEX_MAKE_TUPLE(23)
-    _STDEX_MAKE_TUPLE(24)
-    _STDEX_MAKE_TUPLE(25)
-    _STDEX_MAKE_TUPLE(26)
-    _STDEX_MAKE_TUPLE(27)
-    _STDEX_MAKE_TUPLE(28)
-    _STDEX_MAKE_TUPLE(29)
-    _STDEX_MAKE_TUPLE(30)
-    _STDEX_MAKE_TUPLE(31)
+    _STDEX_MAKE_TUPLE_AND_TIE(0)
+    _STDEX_MAKE_TUPLE_AND_TIE(1)
+    _STDEX_MAKE_TUPLE_AND_TIE(2)
+    _STDEX_MAKE_TUPLE_AND_TIE(3)
+    _STDEX_MAKE_TUPLE_AND_TIE(4)
+    _STDEX_MAKE_TUPLE_AND_TIE(5)
+    _STDEX_MAKE_TUPLE_AND_TIE(6)
+    _STDEX_MAKE_TUPLE_AND_TIE(7)
+    _STDEX_MAKE_TUPLE_AND_TIE(8)
+    _STDEX_MAKE_TUPLE_AND_TIE(9)
+    _STDEX_MAKE_TUPLE_AND_TIE(10)
+    _STDEX_MAKE_TUPLE_AND_TIE(11)
+    _STDEX_MAKE_TUPLE_AND_TIE(12)
+    _STDEX_MAKE_TUPLE_AND_TIE(13)
+    _STDEX_MAKE_TUPLE_AND_TIE(14)
+    _STDEX_MAKE_TUPLE_AND_TIE(15)
+    _STDEX_MAKE_TUPLE_AND_TIE(16)
+    _STDEX_MAKE_TUPLE_AND_TIE(17)
+    _STDEX_MAKE_TUPLE_AND_TIE(18)
+    _STDEX_MAKE_TUPLE_AND_TIE(19)
+    _STDEX_MAKE_TUPLE_AND_TIE(20)
+    _STDEX_MAKE_TUPLE_AND_TIE(21)
+    _STDEX_MAKE_TUPLE_AND_TIE(22)
+    _STDEX_MAKE_TUPLE_AND_TIE(23)
+    _STDEX_MAKE_TUPLE_AND_TIE(24)
+    _STDEX_MAKE_TUPLE_AND_TIE(25)
+    _STDEX_MAKE_TUPLE_AND_TIE(26)
+    _STDEX_MAKE_TUPLE_AND_TIE(27)
+    _STDEX_MAKE_TUPLE_AND_TIE(28)
+    _STDEX_MAKE_TUPLE_AND_TIE(29)
+    _STDEX_MAKE_TUPLE_AND_TIE(30)
+    _STDEX_MAKE_TUPLE_AND_TIE(31)
 
-#undef _STDEX_MAKE_TUPLE 
+#undef _STDEX_TYPE_CUSTOM
+#undef _STDEX_MAKE_TUPLE_AND_TIE 
+#undef _STDEX_TIE_IMPL
 #undef _STDEX_MAKE_TUPLE_IMPL
 
 } // namespace stdex
