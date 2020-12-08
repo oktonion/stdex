@@ -261,15 +261,7 @@ namespace stdex
 #undef _STDEX_ARGS_CTOR_PARAMS
 
             template<class _OtherArgsT, class _OtherArgT>
-            _args(const _args<_OtherArgsT, _OtherArgT, 0> &other):
-                _ArgsT(
-                    static_cast<
-                    typename
-                    _other_args_helper<
-                        _OtherArgsT,
-                        _OtherArgT
-                    >::type >(other)
-                ), 
+            _args(const _args<_OtherArgsT, _OtherArgT, 0> &other): 
                 _arg<_ArgT, 0>(_get_const_arg<0>(other)) 
             { }
         };
@@ -378,7 +370,15 @@ namespace stdex
 #undef _STDEX_PARAMS_ARG_CUSTOM
             args( _STDEX_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK) )
         { }
-    //private:
+
+#define _STDEX_TYPE_CUSTOM(arg_n) _OtherArg##arg_n##T
+    template<
+        _STDEX_TMPL_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)
+    >
+        tuple(const tuple<_STDEX_TYPES_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> &other):
+            args(other.args)
+        { }
+    private:
         typedef
         typename detail::_make_args::
 #undef _STDEX_DELIM
@@ -389,6 +389,8 @@ namespace stdex
         args args_type;
 
         args_type args;
+
+        friend class tuple;
     };
 
 } // namespace stdex
