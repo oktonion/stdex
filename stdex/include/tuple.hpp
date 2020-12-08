@@ -15,6 +15,7 @@
 // POSIX includes
 
 // std includes
+#include <utility> // std::pair
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
@@ -359,26 +360,34 @@ namespace stdex
         };
     } // namespace detail
 
+    namespace detail
+    {
+        template<int _N>
+        struct _tuple_ctor_helper
+        {
+            template<class, class>
+            struct type
+            {
+            };
+        };
+
+        template<>
+        struct _tuple_ctor_helper<2>
+        {
+            template<class _FirstT, class _SecondT>
+            struct type
+            {
+                template<class _OtherFirstT, class _OtherSecondT>
+                type(const std::pair<_OtherFirstT, _OtherSecondT> &pr){}
+            };
+        };
+    } // namespace detail
+
     template<
         _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, = ::stdex::detail::void_type)
     >
     class tuple
     {
-    public:
-#define _STDEX_PARAMS_ARG_CUSTOM(arg_n) _STDEX_PARAMS_ARG_DEFAULT(arg_n) = _STDEX_PARAMS_TYPE_DEFAULT(arg_n)()
-        tuple(_STDEX_PARAMS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_PARAMS_TYPE_DEFAULT, _STDEX_PARAMS_ARG_CUSTOM)):
-#undef _STDEX_PARAMS_ARG_CUSTOM
-            args( _STDEX_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK) )
-        { }
-
-#define _STDEX_TYPE_CUSTOM(arg_n) _OtherArg##arg_n##T
-    template<
-        _STDEX_TMPL_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)
-    >
-        tuple(const tuple<_STDEX_TYPES_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> &other):
-            args(other.args)
-        { }
-    private:
         typedef
         typename detail::_make_args::
 #undef _STDEX_DELIM
@@ -388,6 +397,28 @@ namespace stdex
 #define _STDEX_DELIM _STDEX_DELIM_DEFAULT
         args args_type;
 
+    public:
+#define _STDEX_PARAMS_ARG_CUSTOM(arg_n) _STDEX_PARAMS_ARG_DEFAULT(arg_n) = _STDEX_PARAMS_TYPE_DEFAULT(arg_n)()
+        tuple(_STDEX_PARAMS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_PARAMS_TYPE_DEFAULT, _STDEX_PARAMS_ARG_CUSTOM)):
+#undef _STDEX_PARAMS_ARG_CUSTOM
+            args( _STDEX_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK) )
+        { }
+
+#define _STDEX_TYPE_CUSTOM(arg_n) _OtherArg##arg_n##T
+        template<
+            _STDEX_TMPL_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)
+        >
+        tuple(const tuple<_STDEX_TYPES_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> &other):
+#undef _STDEX_TYPE_CUSTOM
+            args(other.args)
+        { }
+
+        template<class _FirstT, class _SecondT>
+        tuple(const std::pair<_FirstT, _SecondT> &other):
+            args(other.first, other.second)
+        { }
+
+    private:
         args_type args;
 
         friend class tuple;
