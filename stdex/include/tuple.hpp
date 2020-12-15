@@ -588,7 +588,7 @@ namespace stdex
         };
     }
 
-    const detail::_ignore &ignore = detail::_ignore::instance();
+    static const detail::_ignore &ignore = detail::_ignore::instance();
 
 #define _STDEX_MAKE_TUPLE_IMPL(count) \
     template<_STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
