@@ -194,7 +194,7 @@ namespace stdex
 
         namespace tuple_detail
         {
-            struct disabled_type
+            struct disabled_type: void_type
             {
                 template<class _ArgT, int _ArgN>
                 disabled_type(const _arg<_ArgT, _ArgN>&){}
