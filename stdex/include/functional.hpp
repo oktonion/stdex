@@ -972,7 +972,7 @@ namespace stdex
         void _invoke_clear(_FuncT &fx, _callable_args<_ArgsT> &args, _return_arg<_R> &result)
         {
             args.call(fx, result, 
-                functional_detail::_invokable_tag< is_class<_FuncT>::value >());
+                functional_detail::_invokable_tag< is_class<_FuncT>::value == bool(false) >());
         }
 
         template<class _R, class _FuncT, int _N>
