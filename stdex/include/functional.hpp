@@ -937,7 +937,7 @@ namespace stdex
                 const _checked_args<_CheckedArgsT>& checked_args, _return_arg<_R> &result)
             {
                 typedef 
-                typename _get_args<_RawArgsT, _Index>::value_type value_type;
+                typename _get_args_traits<_RawArgsT, _Index>::value_type value_type;
 
                 _check_args_for_null_impl
                 <
@@ -961,6 +961,12 @@ namespace stdex
                 null_checker::call(fx, args, checked_args, result);
             }
         };
+
+        namespace functional_detail
+        {
+            template<bool>
+            struct _invokable_tag{};
+        }
 
         template<class _FuncT, class _ArgsT, class _R>
         void _invoke_clear(_FuncT &fx, _callable_args<_ArgsT> &args, _return_arg<_R> &result)
@@ -1004,12 +1010,6 @@ namespace stdex
         {
             _func_invoker<_R, _FuncT, 0, _callable_args<_ArgsT>::count>::
                 call(fx, args, result);
-        }
-
-        namespace functional_detail
-        {
-            template<bool>
-            struct _invokable_tag{};
         }
 
         template<>
@@ -1216,7 +1216,9 @@ namespace stdex
             {
                 _return_arg<function_return_type> result = 0;
                 //return _func_invoker<function_return_type, func_type, 0, function_args_type::count>::call(_func, args);
-                return _invoke(_func, args, result);
+                _invoke(_func, args, result);
+
+                return result;
             }
             virtual void _delete_this() _STDEX_NOEXCEPT_FUNCTION { delete this; }
 
