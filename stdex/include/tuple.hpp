@@ -583,10 +583,12 @@ namespace stdex
         struct _ignore {
             template <class _Tp>
             const _ignore& operator=(const _Tp&) const { return *this; }
+
+            static _ignore &instance(){static _ignore value; return value;}
         };
     }
 
-    const detail::_ignore ignore;
+    const detail::_ignore &ignore = detail::_ignore::instance();
 
 #define _STDEX_MAKE_TUPLE_IMPL(count) \
     template<_STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
