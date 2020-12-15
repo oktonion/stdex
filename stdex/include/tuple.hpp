@@ -17,6 +17,7 @@
 // std includes
 #include <utility> // std::pair, std::swap
 #include <algorithm> // std::swap
+#include <cstddef> // std::size_t
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
@@ -368,6 +369,9 @@ namespace stdex
         };
     } // namespace detail
 
+    template<std::size_t, class>
+    class tuple_element;
+
     template<
         _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, = ::stdex::detail::void_type)
     >
@@ -394,9 +398,18 @@ namespace stdex
             _STDEX_TMPL_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)
         >
         tuple(const tuple<_STDEX_TYPES_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> &other):
-#undef _STDEX_TYPE_CUSTOM
             args(other.args)
         { }
+
+        template<
+            _STDEX_TMPL_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)
+        >
+        tuple& operator=(const tuple<_STDEX_TYPES_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> &other)
+#undef _STDEX_TYPE_CUSTOM
+        { 
+            args = other.args;
+            return *this;
+        }
 
         void swap(tuple& other)
         {
@@ -409,7 +422,94 @@ namespace stdex
         args_type args;
 
         friend class tuple;
+        template<std::size_t, class> friend class tuple_element;
     };
+
+    template<std::size_t _N, class _TupleT>
+    class tuple_element
+    {
+    public:
+        typedef 
+        typename 
+            detail::_get_args_traits<typename _TupleT::args_type, _N>::value_type type;
+    };
+
+    template<std::size_t _N, _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK)>
+    typename tuple_element<_N, tuple<_STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)>/**/>::type& 
+    get(tuple<_STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)> &value) _STDEX_NOEXCEPT_FUNCTION
+    {
+        return detail::_get_arg<_N>(value.args).value;
+    }
+
+    template<std::size_t _N, _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK)> 
+    typename tuple_element<_N, tuple<_STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)>/**/>::type const& 
+    get(const tuple<_STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)> &value) _STDEX_NOEXCEPT_FUNCTION
+    {
+        return detail::_get_arg<_N>(value.args).value;
+    }
+
+#define _STDEX_TYPE_OTHER(arg_n) _OtherArg##arg_n##T
+#define _STDEX_TMPL_ARGS_MAX_LHS \
+    _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK)
+#define _STDEX_TMPL_ARGS_MAX_RHS \
+    _STDEX_TMPL_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_OTHER)
+#define _STDEX_TYPES_MAX_LHS\
+    _STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)
+#define _STDEX_TYPES_MAX_RHS\
+    _STDEX_TYPES_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_OTHER)
+
+#define _STDEX_ARG_GET_EQ(arg_n) if(!( get<arg_n>(lhs) == get<arg_n>(rhs) )) return false
+#define _STDEX_ARG_GET_NEQ(arg_n) if(get<arg_n>(lhs) != get<arg_n>(rhs)) return true
+#define _STDEX_ARG_GET_CMP_IMPL(arg_n, op) if(get<arg_n>(lhs) op get<arg_n>(rhs)) return true; \
+                                           if(get<arg_n>(rhs) op get<arg_n>(lhs)) return false 
+
+    template<_STDEX_TMPL_ARGS_MAX_LHS, _STDEX_TMPL_ARGS_MAX_RHS>
+    bool operator==(const tuple<_STDEX_TYPES_MAX_LHS> &lhs, const tuple<_STDEX_TYPES_MAX_RHS> &rhs)
+    {
+#undef _STDEX_DELIM
+#define _STDEX_DELIM ;
+        _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_GET_EQ);
+        return true;
+#undef _STDEX_DELIM
+#define _STDEX_DELIM _STDEX_DELIM_DEFAULT
+    }
+
+    template<_STDEX_TMPL_ARGS_MAX_LHS, _STDEX_TMPL_ARGS_MAX_RHS>
+    bool operator!=(const tuple<_STDEX_TYPES_MAX_LHS> &lhs, const tuple<_STDEX_TYPES_MAX_RHS> &rhs)
+    {
+#undef _STDEX_DELIM
+#define _STDEX_DELIM ;
+        _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_GET_NEQ);
+        return true;
+#undef _STDEX_DELIM
+#define _STDEX_DELIM _STDEX_DELIM_DEFAULT
+    }
+
+    template<_STDEX_TMPL_ARGS_MAX_LHS, _STDEX_TMPL_ARGS_MAX_RHS>
+    bool operator<(const tuple<_STDEX_TYPES_MAX_LHS> &lhs, const tuple<_STDEX_TYPES_MAX_RHS> &rhs)
+    {
+#undef _STDEX_DELIM
+#define _STDEX_DELIM ;
+#define _STDEX_ARG_GET_CMP(arg_n) _STDEX_ARG_GET_CMP_IMPL(arg_n, <)
+        _STDEX_ARGS31_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_GET_CMP);
+        return true;
+#undef _STDEX_ARG_GET_CMP
+#undef _STDEX_DELIM
+#define _STDEX_DELIM _STDEX_DELIM_DEFAULT
+    }
+
+    template<_STDEX_TMPL_ARGS_MAX_LHS, _STDEX_TMPL_ARGS_MAX_RHS>
+    bool operator>(const tuple<_STDEX_TYPES_MAX_LHS> &lhs, const tuple<_STDEX_TYPES_MAX_RHS> &rhs)
+    {
+#undef _STDEX_DELIM
+#define _STDEX_DELIM ;
+#define _STDEX_ARG_GET_CMP(arg_n) _STDEX_ARG_GET_CMP_IMPL(arg_n, >)
+        _STDEX_ARGS31_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_GET_CMP);
+        return true;
+#undef _STDEX_ARG_GET_CMP
+#undef _STDEX_DELIM
+#define _STDEX_DELIM _STDEX_DELIM_DEFAULT
+    }
 
     template<class _Arg0T, class _Arg1T>
     class tuple<_Arg0T, _Arg1T>
@@ -436,14 +536,26 @@ namespace stdex
         { }
 
         template<class _FirstT, class _SecondT>
-        tuple(const std::pair<_FirstT, _SecondT> &other):
-            args(other.first, other.second)
+        tuple(std::pair<_FirstT, _SecondT> other):
+            args(detail::_arg<_FirstT, 0>(other.first), detail::_arg<_SecondT, 1>(other.second))
         { }
+
+        template<
+            class _OtherArg0T, class _OtherArg1T
+        >
+        tuple& operator=(const tuple<_OtherArg0T, _OtherArg1T> &other)
+        { 
+            args = other.args;
+            return *this;
+        }
+
 
     private:
         args_type args;
 
         template<_STDEX_REPEAT_TOKEN_MAX(class)> friend class tuple;
+
+        template<std::size_t, class> friend class tuple_element;
     };
 
     template<class>
