@@ -1608,6 +1608,26 @@ namespace stdex
         }
     };
 
+    namespace detail
+    {
+        template<class _Tp, bool, bool>
+        struct _reference_or_pointer_impl
+        { 
+            typedef _Tp type;
+        };
+
+        template<class _Tp>
+        struct _reference_or_pointer_impl<_Tp, false, false>
+        {
+            typedef _Tp& type;
+        };
+
+        template<class _Tp>
+        struct _reference_or_pointer:
+            _reference_or_pointer_impl<_Tp, is_pointer<_Tp>::value, is_reference<_Tp>::value>
+        { };
+    }
+
 #define _STDEX_FUNCTION_IMPL(count) \
     template<class _R,  \
         _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) \
@@ -1616,12 +1636,12 @@ namespace stdex
         _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) \
         )>: \
         detail::_function_impl<_R,  \
-            _STDEX_TYPES##count(typename remove_reference <, >::type&) \
+            _STDEX_TYPES##count(typename detail::_reference_or_pointer <, >::type) \
         > \
     { \
         typedef  \
         detail::_function_impl<_R, \
-            _STDEX_TYPES##count(typename remove_reference <, >::type&) \
+            _STDEX_TYPES##count(typename detail::_reference_or_pointer <, >::type) \
         > base_type; \
  \
         typedef typename stdex::remove_pointer< \
