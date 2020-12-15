@@ -1348,7 +1348,9 @@ namespace stdex
 
                 _args_type args =
                     _args_type_raw( 
-#define _STDEX_ARG_CUSTOM(count) (stdex::detail::functional_std::_forward< _STDEX_PARAMS_TYPE_DEFAULT(count) >::call( _STDEX_PARAMS_ARG_DEFAULT(count) ))
+#define _STDEX_ARG_CUSTOM(arg_n) \
+    _arg<_STDEX_TYPE_DEFAULT(arg_n), arg_n> \
+        (stdex::detail::functional_std::_forward< _STDEX_TYPE_DEFAULT(arg_n) >::call( _STDEX_ARG_DEFAULT(arg_n) ))
                     _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_CUSTOM)
 #undef _STDEX_ARG_CUSTOM
                     );
