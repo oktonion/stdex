@@ -11,6 +11,7 @@
 #include "./type_traits.hpp"
 #include "./string.hpp"
 #include "./memory.hpp"
+#include "./tuple.hpp"
 
 #define _STDEX_PARAMETER_PACK_DEFINE
 #include "./parameter_pack.h"
@@ -81,79 +82,7 @@ namespace stdex
         };
     } // namespace intern
 
-    namespace placeholders
-    {
-
-    }
-
     // Classes
-
-    namespace detail
-    {
-        template<class _Tp, int _N>
-        struct _arg
-        {
-            typedef _Tp type;
-            _Tp value;
-            _arg(_Tp value_): value(value_) {}
-            template<class _OtherTp, int _OtherN>
-            _arg(const _arg<_OtherTp, _OtherN> &other) : value(const_cast<_OtherTp>(other.value)) {}
-        };
-
-        template<class _NullptrT, bool>
-        struct _nullptr_place_holder_impl{
-            static const _NullptrT value = nullptr;
-        };
-
-
-        template<class _NullptrT>
-        struct _nullptr_place_holder_impl<_NullptrT, true>{
-            static _NullptrT value;
-        };
-
-        template<class _NullptrT>
-        _NullptrT _nullptr_place_holder_impl<_NullptrT, true>::value = _NullptrT();
-
-        _yes_type _rt_nullptr_can_be_ptr_checker(class _dummy*);
-        _no_type _rt_nullptr_can_be_ptr_checker(...);
-
-        struct _rt_nullptr_can_be_ptr
-        {
-            static stdex::nullptr_t declnull();
-            static const bool value = 
-                sizeof(_rt_nullptr_can_be_ptr_checker(declnull())) == sizeof(_yes_type);
-        };
-    } // namespace detail
-
-    namespace intern
-    {
-        template<class>
-        struct _has_feature;
-
-        template<>
-        struct _has_feature<class _stdex_has_native_nullptr>:
-            integral_constant<
-                bool,
-                detail::_rt_nullptr_can_be_ptr::value == bool(true) &&
-                is_class<stdex::nullptr_t>::value == bool(false)
-            >
-        { };
-
-        template<class>
-        struct _has_feature;
-
-        template<>
-        struct _has_feature<class _stdex_nullptr_implemented_as_distinct_type>:
-            integral_constant<
-                bool,
-                _has_feature<_stdex_has_native_nullptr>::value == bool(true) ||
-                is_union<stdex::nullptr_t>::value == bool(true) ||
-                (is_arithmetic<stdex::nullptr_t>::value == bool(false) &&
-                 is_arithmetic<remove_pointer<stdex::nullptr_t>::type>::value == bool(false) &&
-                 is_void<remove_pointer<stdex::nullptr_t>::type>::value == bool(false) )
-            >
-        { };
-    } // namespace intern
 
     template<class _FuncSignatureT>
     class function;
@@ -820,180 +749,6 @@ namespace stdex
     using functional_cpp11::mem_fn;
     namespace detail
     {
-        struct _nullptr_place_holder:
-            _nullptr_place_holder_impl<
-                stdex::nullptr_t,
-                intern::_has_feature<intern::_stdex_has_native_nullptr>::value>
-        { };
-
-        template<int _N>
-        struct _arg<_nullptr_place_holder, _N>:
-            _nullptr_place_holder
-        { 
-            typedef stdex::nullptr_t type;
-            _arg(stdex::nullptr_t){}
-            _arg(const _arg&){}
-            template<int _OtherN>
-            _arg(const _arg<stdex::nullptr_t, _OtherN>&){}
-        };
-
-        template<class, int _End>
-        struct _get_args_impl;
-
-        template<class _ArgsT, int _End>
-        struct _get_args;
-
-        template<int _Index, class _ArgsT>
-        typename _get_args<_ArgsT, _Index>::arg&
-        _get_arg(_ArgsT &args);
-
-        template<int _Index, class _ArgsT>
-        const
-        typename _get_args<_ArgsT, _Index>::arg&
-        _get_const_arg(const _ArgsT &args);
-
-        template<class _ArgsT, class _ArgT, int _N>
-        struct _args;
-
-        template<class _OtherArgsT, class _OtherArgT>
-        struct _other_args_helper 
-        {
-            typedef const _OtherArgsT& type;
-        };
-
-        template<class _OtherArgT>
-        struct _other_args_helper<void, _OtherArgT>
-        {
-            typedef const _args<void, _OtherArgT, 0>& type;
-        };
-
-        template<class _ArgT>
-        struct _arg_is_void:
-            bool_constant<
-                is_same<_ArgT, void_type>::value == bool(true) ||
-                is_void<_ArgT>::value == bool(true)
-            >
-        { };
-
-        template<class _ArgT>
-        struct _args_count_incr
-        {
-            static const int value = 
-                _arg_is_void<_ArgT>::value ? 0 : 1;
-        };
-
-        template<class _ArgsT, class _ArgT, int _N>
-        struct _args: _ArgsT, _arg<_ArgT, _N>
-        {
-            typedef _args type;
-            static const int count = _N + _args_count_incr<_ArgT>::value;
-
-            template<class _OtherArgsT, class _OtherArgT>
-            _args(const _args<_OtherArgsT, _OtherArgT, _N - 1> &other, _ArgT arg):
-                _ArgsT(
-                    static_cast<
-                    typename
-                    _other_args_helper<
-                        _OtherArgsT,
-                        _OtherArgT
-                    >::type >(other)
-                ), 
-                _arg<_ArgT, _N>(arg) 
-            { }
-            template<class _OtherArgsT, class _OtherArgT>
-            _args(const _args<_OtherArgsT, _OtherArgT, _N> &other):
-                _ArgsT(
-                    static_cast<
-                    typename
-                    _other_args_helper<
-                        _OtherArgsT,
-                        _OtherArgT
-                    >::type >(other)
-                ), 
-                _arg<_ArgT, _N>(_get_const_arg<_N>(other)) 
-            { }
-
-            template<class _NextArgT>
-            _args<type, _NextArgT, _N + 1> make(_NextArgT arg) const {return _args<type, _NextArgT, _N + 1>(*this, arg);}
-
-            template<class>
-            const type& make(void_type) const { return *this; }
-        };
-
-        template<class _ArgT>
-        struct _args<void, _ArgT, 0> : _arg<_ArgT, 0>
-        {
-            typedef _args type;
-            static const int count = 
-                _args_count_incr<_ArgT>::value;
-
-            _args(_ArgT arg):
-                _arg<_ArgT, 0>(arg) {}
-            template<class _OtherArgT>
-            _args(const _args<void, _OtherArgT, 0> &other):
-                _arg<_ArgT, 0>(_get_const_arg<0>(other)) {}
-
-            template<class _NextArgT>
-            _args<type, _NextArgT, 1> make(_NextArgT arg) const {return _args<type, _NextArgT, 1>(*this, arg);}
-
-            template<class>
-            const type& make(void_type) const { return *this; }
-        };
-
-        template<>
-        struct _args<void, void, 0>
-        {
-            template<class _NextArgT>
-            _args<void, _NextArgT, 0> make(_NextArgT arg) const { return _args<void, _NextArgT, 0>(arg); }
-        };
-
-        namespace functional_detail
-        {
-            template<class _Tp>
-            static
-            typename
-            conditional<
-                is_void<_Tp>::value,
-                void_type,
-                _Tp
-            >::type operator,(_Tp value, void_type&) { return functional_std::_forward<_Tp>::call(value); }
-        }
-
-        template<class _ArgsT, int _End>
-        struct _get_args_impl;
-
-        template<class _ArgsT, int _End>
-        struct _get_args :
-            _get_args_impl<_ArgsT, _End>
-        { };
-
-        template<class _ArgsT, class _ArgT, int _Index, int _End>
-        struct _get_args_impl<_args<_ArgsT, _ArgT, _Index>, _End>:
-            _get_args<_ArgsT, _End>
-        { };
-
-        template<class _ArgsT, class _ArgT, int _End>
-        struct _get_args<_args<_ArgsT, _ArgT, _End>, _End>
-        { 
-            typedef _ArgsT base_args;
-            typedef _args<_ArgsT, _ArgT, _End> args;
-            typedef _arg<_ArgT, _End> arg;
-        };
-
-        template<int _Index, class _ArgsT>
-        typename _get_args<_ArgsT, _Index>::arg&
-        _get_arg(_ArgsT &args)
-        {
-            return args;
-        }
-
-        template<int _Index, class _ArgsT>
-        const
-        typename _get_args<_ArgsT, _Index>::arg&
-        _get_const_arg(const _ArgsT &args)
-        {
-            return args;
-        }
 
         template<class _R, class _FuncT, int _Index, int _Count>
         struct _check_args_for_null;
@@ -1092,15 +847,18 @@ namespace stdex
             //_return_arg(const _return_arg&) _STDEX_DELETED_FUNCTION;
         };
 
+        template<class>
+        struct _callable_args;
+
         template<class _R, class _FuncT, int _Index, int _Count, bool>
         struct _check_args_for_null_impl_helper
         {
             template<class _CheckedArgsT, class _RawArgsT>
-            static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args,
-                const _CheckedArgsT &checked_args)
+            static void call(_FuncT &fx, _callable_args<_RawArgsT> &args,
+                const _CheckedArgsT &checked_args, _return_arg<_R> &result)
             {
                 typedef _func_invoker_impl<_R, _FuncT, _Index + 1, _Count> func_invoker;
-                return func_invoker::call(fx, args, checked_args);
+                func_invoker::call(fx, args, checked_args, result);
             }
         };
 
@@ -1108,26 +866,26 @@ namespace stdex
         struct _check_args_for_null_impl_helper<_R, _FuncT, _Index, _Count, true>
         {
             template<class _CheckedArgsT, class _RawArgsT>
-            static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args,
-                const _checked_args<_CheckedArgsT> &)
+            static void call(_FuncT &fx, _callable_args<_RawArgsT> &args,
+                const _checked_args<_CheckedArgsT> &, _return_arg<_R> &result)
             {
-                    typedef _args<_CheckedArgsT, _nullptr_place_holder, _Index> checked_args_t;
-                    typedef _func_invoker_impl<_R, _FuncT, _Index + 1, _Count> func_invoker;
+                typedef _args<_CheckedArgsT, _nullptr_place_holder, _Index> checked_args_t;
+                typedef _func_invoker_impl<_R, _FuncT, _Index + 1, _Count> func_invoker;
 
-                    return func_invoker::call(fx, args, _checked_args<checked_args_t>());
+                func_invoker::call(fx, args, _checked_args<checked_args_t>(), result);
             }
 
             template<class _RawArgsT>
-            static _return_arg<_R> call(_FuncT& fx, _RawArgsT& args,
-                const _checked_args<_RawArgsT>& )
+            static void call(_FuncT& fx, _callable_args<_RawArgsT>& args,
+                const _checked_args<_RawArgsT>&, _return_arg<_R> &result)
             {
                 typedef 
-                typename _get_args<_RawArgsT, _Index>::base_args args_type;
+                typename _get_args_traits<_RawArgsT, _Index>::base_type args_type;
 
                 typedef _args<args_type, _nullptr_place_holder, _Index> checked_args_t;
                 typedef _func_invoker_impl<_R, _FuncT, _Index + 1, _Count> func_invoker;
 
-                return func_invoker::call(fx, args, _checked_args<checked_args_t>());
+                func_invoker::call(fx, args, _checked_args<checked_args_t>(), result);
             }
         };
 
@@ -1135,13 +893,14 @@ namespace stdex
         struct _check_args_for_null_impl
         {
             template<class _RawArgsT, class _CheckedArgsT>
-            static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>& checked_args)
+            static void call(_FuncT &fx, _callable_args<_RawArgsT> &args, 
+                const _checked_args<_CheckedArgsT>& checked_args, _return_arg<_R> &result)
             {
                 typedef _check_args_for_null_impl_helper<
                     _R, _FuncT, _Index, _Count,
                     intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value == bool(true)
                 > helper;
-                return helper::call(fx, args, checked_args);
+                helper::call(fx, args, checked_args, result);
             }
         };
 
@@ -1151,23 +910,22 @@ namespace stdex
             typedef _func_invoker_impl<_R, _FuncT, _Index + 1, _Count> func_invoker;
             
             template<class _RawArgsT, class _CheckedArgsT>
-            static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>& checked_args)
+            static void call(_FuncT &fx, _callable_args<_RawArgsT> &args, 
+                const _checked_args<_CheckedArgsT>& checked_args, _return_arg<_R> &result)
             {
                 typedef 
-                typename _get_args<_RawArgsT, _Index>::arg arg;
+                typename _get_args_traits<_RawArgsT, _Index>::value_type value_type;
 
-                typedef 
-                typename arg::type arg_type;
+                typedef _args<_CheckedArgsT, value_type, _Index> checked_args_t;
 
-                typedef _args<_CheckedArgsT, arg_type, _Index> checked_args_t;
-
-                return func_invoker::call(fx, args, _checked_args<checked_args_t>());
+                func_invoker::call(fx, args, _checked_args<checked_args_t>(), result);
             }
 
             template<class _RawArgsT>
-            static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_RawArgsT>& checked_args)
+            static void call(_FuncT &fx, _callable_args<_RawArgsT> &args, 
+                const _checked_args<_RawArgsT>& checked_args, _return_arg<_R> &result)
             {
-                return func_invoker::call(fx, args, checked_args);
+                func_invoker::call(fx, args, checked_args, result);
             }
         };
 
@@ -1175,21 +933,18 @@ namespace stdex
         struct _check_args_for_null
         {
             template<class _RawArgsT, class _CheckedArgsT>
-            static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>& checked_args)
+            static  void call(_FuncT &fx, _callable_args<_RawArgsT> &args, 
+                const _checked_args<_CheckedArgsT>& checked_args, _return_arg<_R> &result)
             {
                 typedef 
-                typename _get_args<_RawArgsT, _Index>::arg arg;
+                typename _get_args<_RawArgsT, _Index>::value_type value_type;
 
-                typedef 
-                typename arg::type arg_type;
-
-                return
                 _check_args_for_null_impl
                 <
                     _R, _FuncT, _Index, _Count,
-                    is_null_pointer<typename remove_reference<arg_type>::type>::value == bool(true)
+                    is_null_pointer<typename remove_reference<value_type>::type>::value == bool(true)
                     && intern::_has_feature<intern::_stdex_has_native_nullptr>::value == bool(false)
-                >::call(fx, args, checked_args);
+                >::call(fx, args, checked_args, result);
             }
         };
 
@@ -1200,259 +955,36 @@ namespace stdex
             typedef _check_args_for_null<_R, _FuncT, _Index, _Count> null_checker;
 
             template<class _RawArgsT, class _CheckedArgsT>
-            static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>& checked_args)
+            static void call(_FuncT &fx, _callable_args<_RawArgsT> &args, 
+                const _checked_args<_CheckedArgsT>& checked_args, _return_arg<_R> &result)
             {
-                return null_checker::call(fx, args, checked_args);
+                null_checker::call(fx, args, checked_args, result);
             }
         };
 
-
-
-        template<class _R, class _FuncT>
-        struct _func_invoker_impl<_R, _FuncT, 0, 0>
+        template<class _FuncT, class _ArgsT, class _R>
+        void _invoke_clear(_FuncT &fx, _callable_args<_ArgsT> &args, _return_arg<_R> &result)
         {
-            template<class _RawArgsT>
-            static _return_arg<_R> call(_FuncT &fx, _RawArgsT&, const _checked_args<_RawArgsT>&)
-            {
-                struct _functor
-                {
-                    typedef
-                    typename 
-                    conditional<_arg_is_void<_R>::value, void_type, _R>::type return_type;
-                    typedef return_type(&disable)(...);
-                    typedef
-                    typename 
-                    conditional<_arg_is_void<return_type>::value, disable, _FuncT&>::type func_return_type;
-                    typedef
-                    typename 
-                    conditional<_arg_is_void<return_type>::value, _FuncT&, disable>::type func_noreturn_type;
-
-                    _return_arg<return_type> operator()(func_return_type fx)
-                    {
-                        using ::stdex::detail::_return_arg;
-                        return 
-                        _return_arg<return_type>(
-                            ::stdex::detail::functional_std::_forward<return_type>::call(fx()) );
-                    }
-
-                    _return_arg<return_type> operator()(func_noreturn_type fx)
-                    {
-                        using ::stdex::detail::_return_arg;
-                        fx();
-                        _return_arg<return_type> result = 0;
-                        return  result;
-                    }
-                }; 
-                _functor _f;
-                return _f(fx);
-            }
-        };
-
-
-        namespace func_invoker_calls
-        {
-            template<int>
-            struct _any
-            {
-                template<class _Tp>
-                _any(const _Tp&) {}
-            };
-            template<class _FuncT, class _R, class _Disable1, class _Disable2, class _Disable3, class _Disable4>
-            struct _func_result
-            {
-                typedef
-                typename 
-                conditional<_arg_is_void<_R>::value, _Disable1, _FuncT&>::type non_void_func;
-                typedef
-                typename 
-                conditional<_arg_is_void<_R>::value, _FuncT&, _Disable2>::type void_func;
-                typedef
-                typename 
-                conditional<is_member_function_pointer<_FuncT>::value, _Disable3, non_void_func>::type non_void_plain_func;
-                typedef
-                typename 
-                conditional<is_member_function_pointer<_FuncT>::value, _Disable4, void_func>::type void_plain_func;
-                typedef
-                typename 
-                conditional<is_member_function_pointer<_FuncT>::value, non_void_func, _Disable3>::type non_void_member_func;
-                typedef
-                typename 
-                conditional<is_member_function_pointer<_FuncT>::value, void_func, _Disable4>::type void_member_func;
-            };
-
-            template<class _R, class _FuncT, class _ArgT0, class _ResArgsT>
-            static _return_arg<_R> func(_FuncT &fx, _arg<_ArgT0, 0>&, _ResArgsT &res)
-            {
-                struct _functor: _ResArgsT
-                {
-                    typedef _ResArgsT base_type;
-                    typedef _ArgT0 arg0_type;
-                    typedef
-                    typename 
-                    conditional<_arg_is_void<_R>::value, void_type, _R>::type return_type;
-                    typedef
-                    _func_result<_FuncT, return_type, return_type(&)(_any<1>), return_type(&)(_any<2>), return_type(&)(_any<3>), return_type(&)(_any<4>)> result;
-                    typedef typename result::non_void_plain_func  non_void_plain_func;
-                    typedef typename result::non_void_member_func non_void_member_func;
-                    typedef typename result::void_plain_func      void_plain_func;
-                    typedef typename result::void_member_func     void_member_func;
-
-                    _functor(const base_type &other) : base_type(other) {}
-
-                    _return_arg<return_type> operator()(non_void_plain_func fx)
-                    {
-                        using ::stdex::detail::_arg;
-                        using ::stdex::detail::_return_arg;
-
-                        return 
-                        _return_arg<return_type>(
-                            ::stdex::detail::functional_std::_forward<return_type>::call(
-                                fx(_arg<arg0_type, 0>::value) ) 
-                        );
-                    }
-                    _return_arg<return_type> operator()(non_void_member_func fx)
-                    {
-                        using ::stdex::detail::_arg;
-                        using ::stdex::detail::_return_arg;
-
-                        return 
-                        _return_arg<return_type>(
-                            ::stdex::detail::functional_std::_forward<return_type>::call(
-                                stdex::invoke(fx, _arg<arg0_type, 0>::value) )
-                        );
-                    }
-
-                    _return_arg<return_type> operator()(void_plain_func fx)
-                    {
-                        using ::stdex::detail::_arg;
-                        using ::stdex::detail::_return_arg;
-
-                        fx(_arg<arg0_type, 0>::value);
-                        _return_arg<return_type> _result = 0;
-                        return  _result;
-                    }
-                    _return_arg<return_type> operator()(void_member_func fx)
-                    {
-                        using ::stdex::detail::_arg;
-                        using ::stdex::detail::_return_arg;
-
-                        stdex::invoke(fx, _arg<arg0_type, 0>::value);
-                        _return_arg<return_type> _result = 0;
-                        return  _result;
-                    }
-                };
-                
-                _functor _f = res;
-                return _f(fx);
-            }
-
-            template<class _R, class _FuncT, class _ArgT0, class _ArgT1, class _ResArgsT>
-            static _return_arg<_R> func(_FuncT &fx, _arg<_ArgT0, 0>&, _arg<_ArgT1, 1>&, _ResArgsT &res)
-            {
-                struct _functor: _ResArgsT
-                {
-                    typedef _ResArgsT base_type;
-                    typedef _ArgT0 arg0_type;
-                    typedef _ArgT1 arg1_type;
-                    typedef
-                    typename 
-                    conditional<_arg_is_void<_R>::value, void_type, _R>::type return_type;
-                    typedef
-                    _func_result<_FuncT, return_type, return_type(&)(_any<1>, _any<1>), return_type(&)(_any<2>, _any<2>), return_type(&)(_any<3>, _any<3>), return_type(&)(_any<4>, _any<4>)> result;
-                    typedef typename result::non_void_plain_func  non_void_plain_func;
-                    typedef typename result::non_void_member_func non_void_member_func;
-                    typedef typename result::void_plain_func      void_plain_func;
-                    typedef typename result::void_member_func     void_member_func;
-
-
-                    _functor(const base_type &other) : base_type(other) {}
-                    _return_arg<return_type> operator()(non_void_plain_func fx)
-                    {
-                        using ::stdex::detail::_arg;
-                        using ::stdex::detail::_return_arg;
-
-                        return 
-                        _return_arg<return_type>(
-                            ::stdex::detail::functional_std::_forward<return_type>::call(
-                                fx(_arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value) )
-                        );
-                    }
-
-                    _return_arg<return_type> operator()(non_void_member_func fx)
-                    {
-                        using ::stdex::detail::_arg;
-                        using ::stdex::detail::_return_arg;
-
-                        return 
-                        _return_arg<return_type>(
-                            ::stdex::detail::functional_std::_forward<return_type>::call(
-                                stdex::invoke(fx, _arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value) )
-                        );
-                    }
-
-                    _return_arg<return_type> operator()(void_plain_func fx)
-                    {
-                        using ::stdex::detail::_arg;
-                        using ::stdex::detail::_return_arg;
-
-                        fx(_arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value);
-                        _return_arg<return_type> result = 0;
-                        return  result;
-                    }
-
-                    _return_arg<return_type> operator()(void_member_func fx)
-                    {
-                        using ::stdex::detail::_arg;
-                        using ::stdex::detail::_return_arg;
-
-                        stdex::invoke(fx, _arg<arg0_type, 0>::value, _arg<arg1_type, 1>::value);
-                        _return_arg<return_type> result = 0;
-                        return  result;
-                    }
-
-                };
-                
-                _functor _f = res;
-                return _f(fx);
-            }
+            args.call(fx, result, 
+                functional_detail::_invokable_tag< is_class<_FuncT>::value >());
         }
 
-        template<class _R, class _FuncT>
-        struct _func_invoker_impl<_R, _FuncT, 1, 1>
+        template<class _R, class _FuncT, int _N>
+        struct _func_invoker_impl<_R, _FuncT, _N, _N>
         {
             template<class _RawArgsT, class _CheckedArgsT>
-            static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>&)
+            static void call(_FuncT &fx, _callable_args<_RawArgsT> &args, 
+                const _checked_args<_CheckedArgsT>&, _return_arg<_R> &result)
             {
-                _CheckedArgsT checked_args(functional_std::move(args));
-                return func_invoker_calls::func<_R>(fx, _get_arg<0>(checked_args), checked_args);
+                _callable_args<_CheckedArgsT> checked_args(functional_std::move(args));
+                _invoke_clear(fx, checked_args, result);
             }
 
             template<class _RawArgsT>
-            static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_RawArgsT>&)
+            static void call(_FuncT &fx, _callable_args<_RawArgsT> &args, 
+                const _checked_args<_RawArgsT>&, _return_arg<_R> &result)
             {
-                return func_invoker_calls::func<_R>(fx, _get_arg<0>(args), args);
-            }
-        };
-
-
-        template<class _R, class _FuncT>
-        struct _func_invoker_impl<_R, _FuncT, 2, 2>
-        {
-
-            
-            template<class _RawArgsT, class _CheckedArgsT>
-            static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_CheckedArgsT>&)
-            {
-                _CheckedArgsT checked_args(functional_std::move(args));
-                return 
-                    func_invoker_calls::func<_R>(fx, _get_arg<0>(checked_args), _get_arg<1>(checked_args), checked_args);
-            }
-
-            template<class _RawArgsT>
-            static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args, const _checked_args<_RawArgsT>&)
-            {
-                return 
-                    func_invoker_calls::func<_R>(fx, _get_arg<0>(args), _get_arg<1>(args), args);
+                _invoke_clear(fx, args, result);
             }
         };
 
@@ -1460,28 +992,109 @@ namespace stdex
         struct _func_invoker
         {
             template<class _RawArgsT>
-            static _return_arg<_R> call(_FuncT &fx, _RawArgsT &args)
+            static void call(_FuncT &fx, _callable_args<_RawArgsT> &args, _return_arg<_R> &result)
             {
-                return 
-                    _func_invoker_impl<_R, _FuncT, _Index, _Count>::call(fx, args, _checked_args<_RawArgsT>());
+                _func_invoker_impl<_R, _FuncT, _Index, _Count>::
+                    call(fx, args, _checked_args<_RawArgsT>(), result);
             }
         };
 
-        template<class _R, class _FuncT, class _ArgsT>
-        _return_arg<_R>& _invoke(_FuncT& fx, _ArgsT& args, _return_arg<_R> &result)
+        template<class _FuncT, class _ArgsT, class _R>
+        void _invoke(_FuncT &fx, _callable_args<_ArgsT> &args, _return_arg<_R> &result)
         {
-            typedef _func_invoker<_R, _FuncT, 0, _ArgsT::count> invoker;
-            result = 
-                invoker::call(fx, args).release();
-            return result;
+            _func_invoker<_R, _FuncT, 0, _callable_args<_ArgsT>::count>::
+                call(fx, args, result);
         }
 
-        template<class _FuncT, class _ArgsT>
-        _return_arg<void>& _invoke(_FuncT& fx, _ArgsT& args, _return_arg<void> &result)
+        namespace functional_detail
         {
-            _func_invoker<void, _FuncT, 0, _ArgsT::count>::call(fx, args);
-            return result;
+            template<bool>
+            struct _invokable_tag{};
         }
+
+        template<>
+        struct _callable_args<_empty_args> : _empty_args
+        {
+            typedef _empty_args base_type;
+            
+            _callable_args(const _empty_args &other)
+                : base_type(other) {}
+
+            template<class _R, class _FuncT, class _Invokable>
+            void call(_FuncT &fx, _return_arg<_R> &result, _Invokable)
+            {result = fx();}
+
+            template<class _FuncT, class _Invokable>
+            void call(_FuncT &fx, _return_arg<void> &, _Invokable)
+            {fx();}
+        };
+
+        template<class _ArgsT, class _ArgT>
+        struct _callable_args<_args<_ArgsT, _ArgT, 0>/**/> : _args<_ArgsT, _ArgT, 0>
+        {
+            typedef _args<_ArgsT, _ArgT, 0> base_type;
+            
+            template<class _OtherArgsT, class _OtherArgT>
+            _callable_args(const _args<_OtherArgsT, _OtherArgT, base_type::count - 1> &other)
+                : base_type(other) {}
+                
+            template<class _R, class _FuncT>
+            void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<false>)
+            {result = fx(
+                _get_args_traits<base_type, 0>::arg_type::value);}
+
+            template<class _FuncT>
+            void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<false>)
+            {fx(
+                _get_args_traits<base_type, 0>::arg_type::value);}
+
+            template<class _R, class _FuncT>
+            void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<true>)
+            {result = invoke(fx,
+                _get_args_traits<base_type, 0>::arg_type::value);}
+
+            template<class _FuncT>
+            void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<true>)
+            {invoke(fx,
+                _get_args_traits<base_type, 0>::arg_type::value);}
+        };
+
+        
+
+        template<class _ArgsT, class _ArgT>
+        struct _callable_args<_args<_ArgsT, _ArgT, 1>/**/> : _args<_ArgsT, _ArgT, 1>
+        {
+            typedef _args<_ArgsT, _ArgT, 1> base_type;
+            
+            template<class _OtherArgsT, class _OtherArgT>
+            _callable_args(const _args<_OtherArgsT, _OtherArgT, base_type::count - 1> &other)
+                : base_type(other) {}
+                
+            template<class _R, class _FuncT>
+            void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<false>)
+            {result = fx(
+                _get_args_traits<base_type, 0>::arg_type::value,
+                _get_args_traits<base_type, 1>::arg_type::value);}
+
+            template<class _FuncT>
+            void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<false>)
+            {fx(
+                _get_args_traits<base_type, 0>::arg_type::value,
+                _get_args_traits<base_type, 1>::arg_type::value);}
+
+            template<class _R, class _FuncT>
+            void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<true>)
+            {result = invoke(fx,
+                _get_args_traits<base_type, 0>::arg_type::value,
+                _get_args_traits<base_type, 1>::arg_type::value);}
+
+            template<class _FuncT>
+            void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<true>)
+            {invoke(fx,
+                _get_args_traits<base_type, 0>::arg_type::value,
+                _get_args_traits<base_type, 1>::arg_type::value);}
+        };
+
     } // namespace detail
 
     class bad_function_call : public std::exception { // exception thrown when an empty std::function is called
@@ -1494,62 +1107,8 @@ namespace stdex
         }
     };
 
-    namespace detail{
-
-        template<class _ArgsT, class _ArgT, int _Index, bool>
-        struct _make_args_impl;
-
-        template<class _ArgsT, class _ArgT, class _NextArgT, int _Index>
-        struct _add;
-
-        template<class _ArgsT>
-        struct _make_args_impl1;
-
-        template<class _ArgsT, class _ArgT, int _Index>
-        struct _make_args_impl1<_args<_ArgsT, _ArgT, _Index>/**/>
-        {
-            template<class _NextArgT>
-            struct add
-            {
-                typedef _add<_ArgsT, _ArgT, _NextArgT, _Index> type;
-            };
-        };
-
-        template<class _ArgsT, class _ArgT, int _Index, bool VVV>
-        struct _make_args_impl:
-            _make_args_impl1<_ArgsT>
-        {
-            typedef _make_args_impl<_ArgsT, _ArgT, _Index, VVV> type;
-            typedef _ArgsT args;
-        };
-
-        template<class _ArgsT, class _ArgT>
-        struct _make_args_impl<_ArgsT, _ArgT, 0, true>
-        {
-            typedef _args<void, void_type, 0> args;
-            typedef _make_args_impl1<args> type;
-        };
-
-        template<class _ArgsT, class _ArgT, int _Index>
-        struct _make_args_impl<_ArgsT, _ArgT, _Index, false>:
-            _make_args_impl1<_args<_ArgsT, _ArgT, _Index>/**/>
-        { 
-            typedef _make_args_impl<_ArgsT, _ArgT, _Index, false> type;
-            typedef _args<_ArgsT, _ArgT, _Index> args;
-        };
-
-        template<class _ArgsT, class _ArgT, class _NextArgT, int _Index>
-        struct _add :
-            _make_args_impl<_args<_ArgsT, _ArgT, _Index>, _NextArgT, _Index + 1, _arg_is_void<_NextArgT>::value == bool(true)>
-        { };
-
-        struct _make_args
-        { 
-            template<class _ArgT>
-            struct add :
-                _make_args_impl<void, _ArgT, 0, _arg_is_void<_ArgT>::value> {};
-        };
-
+    namespace detail
+    {
         template<class _FuncT>
         struct _functor_pointer_copy
         {
@@ -1693,7 +1252,7 @@ namespace stdex
 
         template<
             class _R, 
-            _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, = void_type)
+            _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, = ::stdex::detail::void_type)
         >
         class _function_impl
         {
@@ -1704,7 +1263,9 @@ namespace stdex
                 _STDEX_TYPES_MAX(template add <, >::type)::
 #undef _STDEX_DELIM
 #define _STDEX_DELIM _STDEX_DELIM_DEFAULT
-            args _args_type;
+            args _args_type_raw;
+
+            typedef _callable_args<_args_type_raw> _args_type;
 
             struct _func_base {
                 typedef 
@@ -1779,22 +1340,16 @@ namespace stdex
                     ) const
             {
                 if (!_fx)
-                    throw(bad_function_call());
-
-                typedef _args<void, void, 0> args_maker;               
+                    throw(bad_function_call());             
 
                 using stdex::detail::functional_std::move;
 
                 _args_type args =
-                    args_maker().
-#undef _STDEX_DELIM
-#define _STDEX_DELIM . 
-#define _STDEX_PARAMS_ARG_CUSTOM(count) (stdex::detail::functional_std::_forward< _STDEX_PARAMS_TYPE_DEFAULT(count) >::call( _STDEX_PARAMS_ARG_DEFAULT(count) ))
-                    _STDEX_PARAMS_MAX_IMPL(template make <, >, _STDEX_BLANK, _STDEX_BLANK, _STDEX_PARAMS_TYPE_DEFAULT, _STDEX_PARAMS_ARG_CUSTOM)
-#undef _STDEX_DELIM
-#define _STDEX_DELIM _STDEX_DELIM_DEFAULT
-#undef _STDEX_PARAMS_ARG_CUSTOM
-                    ;
+                    _args_type_raw( 
+#define _STDEX_ARG_CUSTOM(count) (stdex::detail::functional_std::_forward< _STDEX_PARAMS_TYPE_DEFAULT(count) >::call( _STDEX_PARAMS_ARG_DEFAULT(count) ))
+                    _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_CUSTOM)
+#undef _STDEX_ARG_CUSTOM
+                    );
 
                 return 
                     _fx->_co_call(move(args));

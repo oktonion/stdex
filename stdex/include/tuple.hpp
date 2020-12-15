@@ -282,6 +282,11 @@ namespace stdex
         { };
 
         template<class _ArgsT, class _ArgT, int _End>
+        struct _get_args_traits_impl<_args<_ArgsT, _ArgT, _End>, _End>:
+            _get_args_traits<_args<_ArgsT, _ArgT, _End>, _End>
+        { };
+
+        template<class _ArgsT, class _ArgT, int _End>
         struct _get_args_traits<_args<_ArgsT, _ArgT, _End>, _End>
         { 
             typedef _ArgsT base_type;
@@ -333,10 +338,12 @@ namespace stdex
             typedef _ArgsT args;
         };
 
+        typedef _args<void, void_type, 0> _empty_args;
+
         template<class _ArgsT, class _ArgT>
         struct _make_args_impl<_ArgsT, _ArgT, 0, true>
         {
-            typedef _args<void, void_type, 0> args;
+            typedef _empty_args args;
             typedef _make_args_impl1<args> type;
         };
 
@@ -358,29 +365,6 @@ namespace stdex
             template<class _ArgT>
             struct add :
                 _make_args_impl<void, _ArgT, 0, tuple_detail::_arg_is_void<_ArgT>::value> {};
-        };
-    } // namespace detail
-
-    namespace detail
-    {
-        template<int _N>
-        struct _tuple_ctor_helper
-        {
-            template<class, class>
-            struct type
-            {
-            };
-        };
-
-        template<>
-        struct _tuple_ctor_helper<2>
-        {
-            template<class _FirstT, class _SecondT>
-            struct type
-            {
-                template<class _OtherFirstT, class _OtherSecondT>
-                type(const std::pair<_OtherFirstT, _OtherSecondT> &pr){}
-            };
         };
     } // namespace detail
 
