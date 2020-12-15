@@ -421,7 +421,7 @@ namespace stdex
     private:
         args_type args;
 
-        friend class tuple;
+        template<_STDEX_REPEAT_TOKEN_MAX(class)> friend class tuple;
         template<std::size_t, class> friend class tuple_element;
     };
 
