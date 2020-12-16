@@ -623,7 +623,10 @@ namespace stdex
             _STDEX_TMPL_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)
         >
         tuple(const tuple<_STDEX_TYPES_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> &other):
-            args(other.args)
+            args(
+                detail::_tuple_intern_access< 
+                    tuple<_STDEX_TYPES_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> 
+                >::args(other))
         { }
 
         template<
@@ -632,7 +635,10 @@ namespace stdex
         tuple& operator=(const tuple<_STDEX_TYPES_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> &other)
 #undef _STDEX_TYPE_CUSTOM
         { 
-            args = other.args;
+            args = 
+                detail::_tuple_intern_access< 
+                    tuple<_STDEX_TYPES_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> 
+                >::args(other);
             return *this;
         }
 
@@ -646,7 +652,7 @@ namespace stdex
     private:
         args_type args;
 
-        template<_STDEX_REPEAT_TOKEN_MAX(class)> friend class tuple;
+        //template<_STDEX_REPEAT_TOKEN_MAX(class)> friend class tuple;
         friend class detail::_tuple_intern_access<tuple<_STDEX_TYPES_MAX(_STDEX_BLANK,_STDEX_BLANK)>/**/>;
     };
 
@@ -761,7 +767,10 @@ namespace stdex
             class _OtherArg0T, class _OtherArg1T
         >
         tuple(const tuple<_OtherArg0T, _OtherArg1T> &other):
-            args(other.args)
+            args(
+                detail::_tuple_intern_access<
+                    tuple<_OtherArg0T, _OtherArg1T>
+                >::args(other))
         { }
 
         template<class _FirstT, class _SecondT>
@@ -774,7 +783,10 @@ namespace stdex
         >
         tuple& operator=(const tuple<_OtherArg0T, _OtherArg1T> &other)
         { 
-            args = other.args;
+            args = 
+                detail::_tuple_intern_access<
+                    tuple<_OtherArg0T, _OtherArg1T>
+                >::args(other);
             return *this;
         }
 
@@ -789,7 +801,7 @@ namespace stdex
     private:
         args_type args;
 
-        template<_STDEX_REPEAT_TOKEN_MAX(class)> friend class tuple;
+        //template<_STDEX_REPEAT_TOKEN_MAX(class)> friend class tuple;
 
         friend class detail::_tuple_intern_access<tuple<_STDEX_TYPES1(_STDEX_BLANK,_STDEX_BLANK)>/**/>;
     };
