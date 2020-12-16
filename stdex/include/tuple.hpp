@@ -42,10 +42,72 @@ namespace stdex
             _Tp value;
             _arg(_Tp value_): value(value_) {}
             template<class _OtherTp, int _OtherN>
-            _arg(const _arg<_OtherTp, _OtherN> &other) : value(const_cast<_OtherTp>(other.value)) {}
+            _arg(const _arg<_OtherTp, _OtherN> &other) : 
+                value(const_cast<typename remove_reference<_OtherTp>::type&>(other.value)) {}
 
-            template<class _NextTp, int _NextN>
-            static _arg<_NextTp, _NextN> &find(_arg<_NextTp, _NextN> &value) {return value;}
+            template<class _OtherTp, int _OtherN>
+            _arg& operator=(const _arg<_OtherTp, _OtherN> &other)
+            {
+                value = (const_cast<typename remove_reference<_OtherTp>::type&>(other.value));
+                return *this;
+            }
+        };
+
+        template<class _Tp, int _N>
+        struct _arg<_Tp&, _N>
+        {
+            typedef _Tp& value_type;
+            _Tp *_ptr;
+            _Tp &value;
+            _arg(_Tp& value_): _ptr(&value_), value(*_ptr) {}
+
+            template<class _OtherTp, int _OtherN>
+            _arg(const _arg<_OtherTp, _OtherN> &other) : 
+                _ptr(&const_cast<typename remove_reference<_OtherTp>::type&>(other.value)),
+                value(*_ptr) {}
+
+            template<class _OtherTp, int _OtherN>
+            _arg& operator=(const _arg<_OtherTp, _OtherN> &other)
+            {
+                _ptr = (&const_cast<typename remove_reference<_OtherTp>::type&>(other.value));
+                return *this;
+            }
+
+            template<class _OtherTp, int _OtherN>
+            bool operator==(const _arg<_OtherTp, _OtherN> &other) const
+            {
+                return value == other.value;
+            }
+
+            template<class _OtherTp, int _OtherN>
+            bool operator!=(const _arg<_OtherTp, _OtherN> &other) const
+            {
+                return value != other.value;
+            }
+
+            template<class _OtherTp, int _OtherN>
+            bool operator<(const _arg<_OtherTp, _OtherN> &other) const
+            {
+                return value < other.value;
+            }
+
+            template<class _OtherTp, int _OtherN>
+            bool operator>(const _arg<_OtherTp, _OtherN> &other) const
+            {
+                return value > other.value;
+            }
+
+            template<class _OtherTp, int _OtherN>
+            bool operator<=(const _arg<_OtherTp, _OtherN> &other) const
+            {
+                return value <= other.value;
+            }
+
+            template<class _OtherTp, int _OtherN>
+            bool operator>=(const _arg<_OtherTp, _OtherN> &other) const
+            {
+                return value >= other.value;
+            }
         };
 
         template<int _N>
@@ -55,7 +117,44 @@ namespace stdex
             void_type value;
             _arg(void_type value_ = void_type()): value(value_) {}
             template<class _OtherTp, int _OtherN>
-            _arg(const _arg<_OtherTp, _OtherN> &other) : value(const_cast<_OtherTp>(other.value)) {}            
+            _arg(const _arg<_OtherTp, _OtherN> &other) : 
+                value(const_cast<typename remove_reference<_OtherTp>::type&>(other.value)) {} 
+
+            template<class _OtherTp, int _OtherN>
+            bool operator==(const _arg<_OtherTp, _OtherN> &other) const
+            {
+                return value == other.value;
+            }
+
+            template<class _OtherTp, int _OtherN>
+            bool operator!=(const _arg<_OtherTp, _OtherN> &other) const
+            {
+                return value != other.value;
+            }
+
+            template<class _OtherTp, int _OtherN>
+            bool operator<(const _arg<_OtherTp, _OtherN> &other) const
+            {
+                return value < other.value;
+            }
+
+            template<class _OtherTp, int _OtherN>
+            bool operator>(const _arg<_OtherTp, _OtherN> &other) const
+            {
+                return value > other.value;
+            }
+
+            template<class _OtherTp, int _OtherN>
+            bool operator<=(const _arg<_OtherTp, _OtherN> &other) const
+            {
+                return value <= other.value;
+            }
+
+            template<class _OtherTp, int _OtherN>
+            bool operator>=(const _arg<_OtherTp, _OtherN> &other) const
+            {
+                return value >= other.value;
+            }         
         };
 
         template<class _NullptrT, bool>
@@ -130,6 +229,42 @@ namespace stdex
             _arg(const _arg&){}
             template<int _OtherN>
             _arg(const _arg<stdex::nullptr_t, _OtherN>&){}
+
+            template<class _OtherTp, int _OtherN>
+            bool operator==(const _arg<_OtherTp, _OtherN> &other) const
+            {
+                return 0 == other.value;
+            }
+
+            template<class _OtherTp, int _OtherN>
+            bool operator!=(const _arg<_OtherTp, _OtherN> &other) const
+            {
+                return 0 != other.value;
+            }
+
+            template<class _OtherTp, int _OtherN>
+            bool operator<(const _arg<_OtherTp, _OtherN> &other) const
+            {
+                return 0 < other.value;
+            }
+
+            template<class _OtherTp, int _OtherN>
+            bool operator>(const _arg<_OtherTp, _OtherN> &other) const
+            {
+                return 0 > other.value;
+            }
+
+            template<class _OtherTp, int _OtherN>
+            bool operator<=(const _arg<_OtherTp, _OtherN> &other) const
+            {
+                return 0 <= other.value;
+            }
+
+            template<class _OtherTp, int _OtherN>
+            bool operator>=(const _arg<_OtherTp, _OtherN> &other) const
+            {
+                return 0 >= other.value;
+            }
         };
 
         template<class, int _End>
@@ -171,6 +306,9 @@ namespace stdex
                 is_void<_ArgT>::value == bool(true)
             >
             {}; 
+
+            template<class _Tp>
+            _Tp _declval(){return _Tp();}
         }
 
         template<class _ArgT>
@@ -248,6 +386,66 @@ namespace stdex
                 ), 
                 _arg<_ArgT, _N>(_get_const_arg<_N>(other)) 
             { }
+
+            template<class _OtherArgsT, class _OtherArgT>
+            _args& operator=(const _args<_OtherArgsT, _OtherArgT, _N>& other)   
+            { 
+                _get_arg<_N>(*this) = _get_const_arg<_N>(other);
+                static_cast<_ArgsT&>(*this) = static_cast<const _OtherArgsT&>(other);
+                return *this;
+            }
+
+            template<class _OtherArgsT, class _OtherArgT>
+            bool operator==(const _args<_OtherArgsT, _OtherArgT, _N> &other) const
+            {
+                if(_get_const_arg<_N>(*this) == _get_const_arg<_N>(other))
+                    return static_cast<const _ArgsT&>(*this) == static_cast<const _OtherArgsT&>(*this);
+                return false;
+            }
+
+            template<class _OtherArgsT, class _OtherArgT>
+            bool operator!=(const _args<_OtherArgsT, _OtherArgT, _N> &other) const
+            {
+                return !(*this == other);
+            }
+
+            template<class _OtherArgsT, class _OtherArgT>
+            bool operator<(const _args<_OtherArgsT, _OtherArgT, _N> &other) const
+            {
+                if(_get_const_arg<_N>(*this) < _get_const_arg<_N>(other))
+                    return true;
+                else if(_get_const_arg<_N>(other) < _get_const_arg<_N>(*this))
+                    return false;
+
+                return static_cast<const _ArgsT&>(*this) < static_cast<const _OtherArgsT&>(*this);
+            }
+
+            template<class _OtherArgsT, class _OtherArgT>
+            bool operator>(const _args<_OtherArgsT, _OtherArgT, _N> &other) const
+            {
+                 if(_get_const_arg<_N>(*this) > _get_const_arg<_N>(other))
+                    return true;
+                else if(_get_const_arg<_N>(other) > _get_const_arg<_N>(*this))
+                    return false;
+
+                return static_cast<const _ArgsT&>(*this) <> static_cast<const _OtherArgsT&>(*this);
+            }
+
+            template<class _OtherArgsT, class _OtherArgT>
+            bool operator<=(const _args<_OtherArgsT, _OtherArgT, _N> &other) const
+            {
+                if(_get_const_arg<_N>(*this) <= _get_const_arg<_N>(other))
+                    return static_cast<const _ArgsT&>(*this) <= static_cast<const _OtherArgsT&>(*this);
+                return false;
+            }
+
+            template<class _OtherArgsT, class _OtherArgT>
+            bool operator>=(const _args<_OtherArgsT, _OtherArgT, _N> &other) const
+            {
+                if(_get_const_arg<_N>(*this) >= _get_const_arg<_N>(other))
+                    return static_cast<const _ArgsT&>(*this) >= static_cast<const _OtherArgsT&>(*this);
+                return false;
+            }
         };
 
         template<class _ArgsT, class _ArgT>
@@ -267,6 +465,13 @@ namespace stdex
             _args(const _args<_OtherArgsT, _OtherArgT, 0> &other): 
                 _arg<_ArgT, 0>(_get_const_arg<0>(other)) 
             { }
+            
+            template<class _OtherArgsT, class _OtherArgT>
+            _args& operator=(const _args<_OtherArgsT, _OtherArgT, 0>& other)   
+            { 
+                _get_arg<0>(*this) = _get_const_arg<0>(other);
+                return *this;
+            }
         };
 
         template<class _ArgsT, int _End>
@@ -367,16 +572,32 @@ namespace stdex
             struct add :
                 _make_args_impl<void, _ArgT, 0, tuple_detail::_arg_is_void<_ArgT>::value> {};
         };
+
+        template<class _TupleT>
+        struct _tuple_intern_access
+        {
+            typedef typename _TupleT::args_type args_type;
+            static args_type &args(_TupleT &value) {return value.args;}
+            static const args_type &args(const _TupleT &value) {return value.args;}
+        };
     } // namespace detail
 
     template<std::size_t, class>
     class tuple_element;
 
+#define _STDEX_TMPL_ARGS_TYPE_CUSTOM(arg_n) _Arg##arg_n##Type
     template<
-        _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, = ::stdex::detail::void_type)
+        _STDEX_TMPL_ARGS_MAX_IMPL(_STDEX_BLANK, = ::stdex::detail::void_type, _STDEX_TMPL_ARGS_TYPE_CUSTOM)
     >
     class tuple
     {
+#undef _STDEX_DELIM
+#define _STDEX_DELIM ;
+#define _STDEX_TYPE_CUSTOM(arg_n) typedef _STDEX_TMPL_ARGS_TYPE_CUSTOM(arg_n) _STDEX_TYPE_DEFAULT(arg_n)
+        _STDEX_TYPES_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM);
+#undef _STDEX_DELIM
+#define _STDEX_DELIM _STDEX_DELIM_DEFAULT
+
         typedef
         typename detail::_make_args::
 #undef _STDEX_DELIM
@@ -386,11 +607,16 @@ namespace stdex
 #define _STDEX_DELIM _STDEX_DELIM_DEFAULT
         args args_type;
 
+#undef _STDEX_TYPE_CUSTOM
+#undef _STDEX_TMPL_ARGS_TYPE_CUSTOM
+
     public:
-#define _STDEX_PARAMS_ARG_CUSTOM(arg_n) _STDEX_PARAMS_ARG_DEFAULT(arg_n) = _STDEX_PARAMS_TYPE_DEFAULT(arg_n)()
-        tuple(_STDEX_PARAMS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_PARAMS_TYPE_DEFAULT, _STDEX_PARAMS_ARG_CUSTOM)):
+#define _STDEX_PARAMS_ARG_CUSTOM(arg_n) _STDEX_PARAMS_ARG_DEFAULT(arg_n) = ::stdex::detail::tuple_detail::_declval< _STDEX_PARAMS_TYPE_DEFAULT(arg_n) >()
+        tuple(
+            _STDEX_PARAMS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_PARAMS_TYPE_DEFAULT, _STDEX_PARAMS_ARG_CUSTOM)
+        )
 #undef _STDEX_PARAMS_ARG_CUSTOM
-            args( _STDEX_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK) )
+            :args( _STDEX_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK) )
         { }
 
 #define _STDEX_TYPE_CUSTOM(arg_n) _OtherArg##arg_n##T
@@ -422,7 +648,7 @@ namespace stdex
         args_type args;
 
         template<_STDEX_REPEAT_TOKEN_MAX(class)> friend class tuple;
-        template<std::size_t, class> friend class tuple_element;
+        friend detail::_tuple_intern_access<tuple<_STDEX_TYPES_MAX(_STDEX_BLANK,_STDEX_BLANK)>/**/>;
     };
 
     template<std::size_t _N, class _TupleT>
@@ -431,21 +657,25 @@ namespace stdex
     public:
         typedef 
         typename 
-            detail::_get_args_traits<typename _TupleT::args_type, _N>::value_type type;
+            detail::_get_args_traits<typename detail::_tuple_intern_access<_TupleT>::args_type, _N>::value_type type;
     };
 
     template<std::size_t _N, _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK)>
     typename tuple_element<_N, tuple<_STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)>/**/>::type& 
     get(tuple<_STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)> &value) _STDEX_NOEXCEPT_FUNCTION
     {
-        return detail::_get_arg<_N>(value.args).value;
+        typedef tuple<_STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)> type;
+        return detail::_get_arg<_N>(
+            detail::_tuple_intern_access<type>::args(value) ).value;
     }
 
     template<std::size_t _N, _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK)> 
     typename tuple_element<_N, tuple<_STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)>/**/>::type const& 
     get(const tuple<_STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)> &value) _STDEX_NOEXCEPT_FUNCTION
     {
-        return detail::_get_arg<_N>(value.args).value;
+        typedef tuple<_STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)> type;
+        return detail::_get_arg<_N>(
+            detail::_tuple_intern_access<type>::args(value) ).value;
     }
 
 #define _STDEX_TYPE_OTHER(arg_n) _OtherArg##arg_n##T
@@ -458,58 +688,58 @@ namespace stdex
 #define _STDEX_TYPES_MAX_RHS\
     _STDEX_TYPES_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_OTHER)
 
-#define _STDEX_ARG_GET_EQ(arg_n) if(!( get<arg_n>(lhs) == get<arg_n>(rhs) )) return false
-#define _STDEX_ARG_GET_NEQ(arg_n) if(get<arg_n>(lhs) != get<arg_n>(rhs)) return true
-#define _STDEX_ARG_GET_CMP_IMPL(arg_n, op) if(get<arg_n>(lhs) op get<arg_n>(rhs)) return true; \
-                                           if(get<arg_n>(rhs) op get<arg_n>(lhs)) return false 
-
     template<_STDEX_TMPL_ARGS_MAX_LHS, _STDEX_TMPL_ARGS_MAX_RHS>
     bool operator==(const tuple<_STDEX_TYPES_MAX_LHS> &lhs, const tuple<_STDEX_TYPES_MAX_RHS> &rhs)
     {
-#undef _STDEX_DELIM
-#define _STDEX_DELIM ;
-        _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_GET_EQ);
-        return true;
-#undef _STDEX_DELIM
-#define _STDEX_DELIM _STDEX_DELIM_DEFAULT
+        typedef tuple<_STDEX_TYPES_MAX_LHS> lhs_type;
+        typedef tuple<_STDEX_TYPES_MAX_RHS> rhs_type;
+        return detail::_tuple_intern_access<lhs_type>::args(lhs) == detail::_tuple_intern_access<rhs_type>::args(rhs);
     }
 
     template<_STDEX_TMPL_ARGS_MAX_LHS, _STDEX_TMPL_ARGS_MAX_RHS>
     bool operator!=(const tuple<_STDEX_TYPES_MAX_LHS> &lhs, const tuple<_STDEX_TYPES_MAX_RHS> &rhs)
     {
-#undef _STDEX_DELIM
-#define _STDEX_DELIM ;
-        _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_GET_NEQ);
-        return true;
-#undef _STDEX_DELIM
-#define _STDEX_DELIM _STDEX_DELIM_DEFAULT
+        return !(lhs == rhs);
     }
 
     template<_STDEX_TMPL_ARGS_MAX_LHS, _STDEX_TMPL_ARGS_MAX_RHS>
     bool operator<(const tuple<_STDEX_TYPES_MAX_LHS> &lhs, const tuple<_STDEX_TYPES_MAX_RHS> &rhs)
     {
-#undef _STDEX_DELIM
-#define _STDEX_DELIM ;
-#define _STDEX_ARG_GET_CMP(arg_n) _STDEX_ARG_GET_CMP_IMPL(arg_n, <)
-        _STDEX_ARGS31_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_GET_CMP);
-        return true;
-#undef _STDEX_ARG_GET_CMP
-#undef _STDEX_DELIM
-#define _STDEX_DELIM _STDEX_DELIM_DEFAULT
+        typedef tuple<_STDEX_TYPES_MAX_LHS> lhs_type;
+        typedef tuple<_STDEX_TYPES_MAX_RHS> rhs_type;
+        return detail::_tuple_intern_access<lhs_type>::args(lhs) < detail::_tuple_intern_access<rhs_type>::args(rhs);
     }
 
     template<_STDEX_TMPL_ARGS_MAX_LHS, _STDEX_TMPL_ARGS_MAX_RHS>
     bool operator>(const tuple<_STDEX_TYPES_MAX_LHS> &lhs, const tuple<_STDEX_TYPES_MAX_RHS> &rhs)
     {
-#undef _STDEX_DELIM
-#define _STDEX_DELIM ;
-#define _STDEX_ARG_GET_CMP(arg_n) _STDEX_ARG_GET_CMP_IMPL(arg_n, >)
-        _STDEX_ARGS31_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_GET_CMP);
-        return true;
-#undef _STDEX_ARG_GET_CMP
-#undef _STDEX_DELIM
-#define _STDEX_DELIM _STDEX_DELIM_DEFAULT
+        typedef tuple<_STDEX_TYPES_MAX_LHS> lhs_type;
+        typedef tuple<_STDEX_TYPES_MAX_RHS> rhs_type;
+        return detail::_tuple_intern_access<lhs_type>::args(lhs) > detail::_tuple_intern_access<rhs_type>::args(rhs);
     }
+
+    template<_STDEX_TMPL_ARGS_MAX_LHS, _STDEX_TMPL_ARGS_MAX_RHS>
+    bool operator<=(const tuple<_STDEX_TYPES_MAX_LHS> &lhs, const tuple<_STDEX_TYPES_MAX_RHS> &rhs)
+    {
+        typedef tuple<_STDEX_TYPES_MAX_LHS> lhs_type;
+        typedef tuple<_STDEX_TYPES_MAX_RHS> rhs_type;
+        return detail::_tuple_intern_access<lhs_type>::args(lhs) <= detail::_tuple_intern_access<rhs_type>::args(rhs);        
+    }
+
+    template<_STDEX_TMPL_ARGS_MAX_LHS, _STDEX_TMPL_ARGS_MAX_RHS>
+    bool operator>=(const tuple<_STDEX_TYPES_MAX_LHS> &lhs, const tuple<_STDEX_TYPES_MAX_RHS> &rhs)
+    {
+        typedef tuple<_STDEX_TYPES_MAX_LHS> lhs_type;
+        typedef tuple<_STDEX_TYPES_MAX_RHS> rhs_type;
+        return detail::_tuple_intern_access<lhs_type>::args(lhs) >= detail::_tuple_intern_access<rhs_type>::args(rhs);
+    }
+
+
+#undef _STDEX_TYPE_OTHER
+#undef _STDEX_TMPL_ARGS_MAX_LHS
+#undef _STDEX_TMPL_ARGS_MAX_RHS
+#undef _STDEX_TYPES_MAX_LHS
+#undef _STDEX_TYPES_MAX_RHS
 
     template<class _Arg0T, class _Arg1T>
     class tuple<_Arg0T, _Arg1T>
@@ -525,7 +755,7 @@ namespace stdex
 
     public:
         tuple(_Arg0T arg0 = _Arg0T(), _Arg1T arg1 = _Arg1T()):
-            args( arg0, arg1 )
+            args( detail::_arg<_Arg0T, 0>(arg0), detail::_arg<_Arg1T, 1>(arg1) )
         { }
 
         template<
@@ -549,13 +779,20 @@ namespace stdex
             return *this;
         }
 
+        template<class _FirstT, class _SecondT>
+        tuple& operator=(const std::pair<_FirstT, _SecondT> &other)
+        { 
+            *this = tuple<_FirstT, _SecondT>(other);
+            return *this;
+        }
+
 
     private:
         args_type args;
 
         template<_STDEX_REPEAT_TOKEN_MAX(class)> friend class tuple;
 
-        template<std::size_t, class> friend class tuple_element;
+        friend detail::_tuple_intern_access<tuple<_STDEX_TYPES1(_STDEX_BLANK,_STDEX_BLANK)>/**/>;
     };
 
     template<class>
