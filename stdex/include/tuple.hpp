@@ -428,7 +428,7 @@ namespace stdex
                 else if(_get_const_arg<_N>(other) > _get_const_arg<_N>(*this))
                     return false;
 
-                return static_cast<const _ArgsT&>(*this) <> static_cast<const _OtherArgsT&>(*this);
+                return static_cast<const _ArgsT&>(*this) > static_cast<const _OtherArgsT&>(*this);
             }
 
             template<class _OtherArgsT, class _OtherArgT>
