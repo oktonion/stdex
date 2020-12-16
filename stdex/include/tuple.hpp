@@ -572,8 +572,9 @@ namespace stdex
         };
 
         template<class _TupleT>
-        struct _tuple_intern_access
+        class _tuple_intern_access
         {
+        public:
             typedef typename _TupleT::args_type args_type;
             static args_type &args(_TupleT &value) {return value.args;}
             static const args_type &args(const _TupleT &value) {return value.args;}
