@@ -790,7 +790,7 @@ namespace stdex
 
         template<_STDEX_REPEAT_TOKEN_MAX(class)> friend class tuple;
 
-        friend detail::_tuple_intern_access<tuple<_STDEX_TYPES1(_STDEX_BLANK,_STDEX_BLANK)>/**/>;
+        friend class detail::_tuple_intern_access<tuple<_STDEX_TYPES1(_STDEX_BLANK,_STDEX_BLANK)>/**/>;
     };
 
     template<class>
