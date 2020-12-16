@@ -318,12 +318,6 @@ namespace stdex
                 tuple_detail::_arg_is_void<_ArgT>::value ? 0 : 1;
         };
 
-        template<int _N, class _ArgsT>
-        struct _args_ctor_helper_cond
-        {
-            static const bool value = _N >= _ArgsT::count;
-        };
-
         template<class _ArgsT, int _N,
             bool _Disabled>
         struct _args_ctor_helper_impl
@@ -350,9 +344,13 @@ namespace stdex
         };
 
         template<class _ArgsT, int _N>
-        struct _args_ctor_helper: 
-            _args_ctor_helper_impl<_ArgsT, _N, _args_ctor_helper_cond<_N,  _ArgsT>::value>
-        { };
+        struct _args_ctor_helper
+        { 
+            typedef 
+            typename
+            _args_ctor_helper_impl<_ArgsT, _N, 
+                (_N >= _ArgsT::count)>::type type;
+        };
 
         template<class _ArgT, int _N, class _AnyT>
         const _arg<_ArgT, _N>& operator,(const _arg<_ArgT, _N>& value, const _AnyT&) { return value; }
