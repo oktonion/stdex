@@ -219,82 +219,6 @@ namespace stdex
 
     } // namespace detail
 
-    namespace detail
-    {
-        namespace functional_detail
-        {
-            struct _any
-            {
-                char* data;
-                void (*deleter)(void*); 
-
-                template<class _Tp>
-                _any(const _Tp &value) : data(reinterpret_cast<char*>(new _Tp(value)))
-                { 
-                    struct lambdas
-                    {
-                        typedef _Tp type;
-                        static void type_deleter(void* ptr_)
-                        {
-                            delete reinterpret_cast<type*>(ptr_);
-                        }
-                    };
-                    deleter = &lambdas::type_deleter;
-                }
-
-                template<class _Tp>
-                _any(_Tp *ptr_) : data(reinterpret_cast<char*>(new _Tp*(ptr_)))
-                { 
-                    struct lambdas
-                    {
-                        typedef _Tp* type;
-                        static void type_deleter(void* ptr_)
-                        {
-                            delete reinterpret_cast<type*>(ptr_);
-                        }
-                    };
-                    deleter = &lambdas::type_deleter;
-                }
-
-                explicit _any(const float &fvalue) : data(reinterpret_cast<char*>(new double(fvalue)))
-                { 
-                    struct lambdas
-                    {
-                        typedef double type;
-                        static void type_deleter(void* ptr_)
-                        {
-                            delete reinterpret_cast<type*>(ptr_);
-                        }
-                    };
-                    deleter = &lambdas::type_deleter;
-                }
-                explicit _any(const int &ivalue) : data(reinterpret_cast<char*>(new int(ivalue)))
-                { 
-                    struct lambdas
-                    {
-                        typedef int type;
-                        static void type_deleter(void* ptr_)
-                        {
-                            delete reinterpret_cast<type*>(ptr_);
-                        }
-                    };
-                    deleter = &lambdas::type_deleter;
-                }
-                
-                _any(void_type) : data(0) {}
-
-                ~_any()
-                {
-                    if(data)
-                        deleter(data);
-                }
-
-                char& get() { static char zero = 0; return data ? *data : zero; }
-                char& operator()() { return get(); }
-            };
-        } // namespace functional_detail
-    } // namespace detail
-
     template<class _R>
     inline
         _R invoke(_R(*_func)())
@@ -844,12 +768,20 @@ namespace stdex
         template<class>
         struct _callable_args;
 
+        namespace functional_detail
+        {
+            struct _any
+            {
+                _any(...){}
+            };
+        } // namespace functional_detail
+
         template<class _R, class _FuncT, int _Index, int _Count, bool>
         struct _check_args_for_null_impl_helper
         {
             template<class _CheckedArgsT, class _RawArgsT>
             static void call(_FuncT &fx, _callable_args<_RawArgsT> &args,
-                const _CheckedArgsT &checked_args, _return_arg<_R> &result)
+                const _CheckedArgsT &checked_args, _return_arg<_R> &result, functional_detail::_any)
             {
                 typedef _func_invoker_impl<_R, _FuncT, _Index + 1, _Count> func_invoker;
                 func_invoker::call(fx, args, checked_args, result);
@@ -861,7 +793,7 @@ namespace stdex
         {
             template<class _CheckedArgsT, class _RawArgsT>
             static void call(_FuncT &fx, _callable_args<_RawArgsT> &args,
-                const _checked_args<_CheckedArgsT> &, _return_arg<_R> &result)
+                const _checked_args<_CheckedArgsT> &, _return_arg<_R> &result, void*)
             {
                 typedef _args<_CheckedArgsT, _nullptr_place_holder, _Index> checked_args_t;
                 typedef _func_invoker_impl<_R, _FuncT, _Index + 1, _Count> func_invoker;
@@ -869,9 +801,17 @@ namespace stdex
                 func_invoker::call(fx, args, _checked_args<checked_args_t>(), result);
             }
 
+            template<class _CheckedArgsT, class _RawArgsT>
+            static void call(_FuncT &fx, _callable_args<_RawArgsT> &args,
+                const _checked_args<_CheckedArgsT> &checked_args, _return_arg<_R> &result, functional_detail::_any)
+            {
+                typedef _func_invoker_impl<_R, _FuncT, _Index + 1, _Count> func_invoker;
+                func_invoker::call(fx, args, checked_args, result);
+            }
+
             template<class _RawArgsT>
             static void call(_FuncT& fx, _callable_args<_RawArgsT>& args,
-                const _checked_args<_RawArgsT>&, _return_arg<_R> &result)
+                const _checked_args<_RawArgsT>&, _return_arg<_R> &result, void*)
             {
                 typedef 
                 typename _get_args_traits<_RawArgsT, _Index>::base_type args_type;
@@ -881,6 +821,35 @@ namespace stdex
 
                 func_invoker::call(fx, args, _checked_args<checked_args_t>(), result);
             }
+
+            template<class _RawArgsT>
+            static void call(_FuncT& fx, _callable_args<_RawArgsT>& args,
+                const _checked_args<_RawArgsT>& checked_args, _return_arg<_R> &result, functional_detail::_any)
+            {
+                typedef _func_invoker_impl<_R, _FuncT, _Index + 1, _Count> func_invoker;
+                func_invoker::call(fx, args, checked_args, result);
+            }
+        };
+
+        template<class _R, class _FuncT, int _Index, int _Count>
+        struct _callable_with_nullptr_tester: _arg<_nullptr_place_holder, 0>
+        {
+            typedef _arg<_nullptr_place_holder, 0> base_type;
+
+            _callable_with_nullptr_tester():
+                base_type(nullptr){}
+
+            template<class _RawArgsT, class _CheckedArgsT>
+            void call(_FuncT &fx, _callable_args<_RawArgsT> &args, 
+                const _checked_args<_CheckedArgsT>& checked_args, _return_arg<_R> &result)
+            {
+                typedef _check_args_for_null_impl_helper<
+                    _R, _FuncT, _Index, _Count,
+                    intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value == bool(true) ||
+                    is_class<_FuncT>::value == bool(false)
+                > helper;
+                helper::call(fx, args, checked_args, result, base_type::value);                        
+            }
         };
 
         template<class _R, class _FuncT, int _Index, int _Count, bool>
@@ -889,12 +858,9 @@ namespace stdex
             template<class _RawArgsT, class _CheckedArgsT>
             static void call(_FuncT &fx, _callable_args<_RawArgsT> &args, 
                 const _checked_args<_CheckedArgsT>& checked_args, _return_arg<_R> &result)
-            {
-                typedef _check_args_for_null_impl_helper<
-                    _R, _FuncT, _Index, _Count,
-                    intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value == bool(true)
-                > helper;
-                helper::call(fx, args, checked_args, result);
+            {                
+                _callable_with_nullptr_tester<_R, _FuncT, _Index, _Count> tt;
+                tt.call(fx, args, checked_args, result);
             }
         };
 
@@ -1044,12 +1010,12 @@ namespace stdex
 
             template<class _R, class _FuncT>
             void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<true>)
-            {result = invoke(fx,
+            {result = stdex::invoke(fx,
                 _get_args_traits<base_type, 0>::arg_type::value);}
 
             template<class _FuncT>
             void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<true>)
-            {invoke(fx,
+            {stdex::invoke(fx,
                 _get_args_traits<base_type, 0>::arg_type::value);}
         };
 
@@ -1078,13 +1044,13 @@ namespace stdex
 
             template<class _R, class _FuncT>
             void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<true>)
-            {result = invoke(fx,
+            {result = stdex::invoke(fx,
                 _get_args_traits<base_type, 0>::arg_type::value,
                 _get_args_traits<base_type, 1>::arg_type::value);}
 
             template<class _FuncT>
             void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<true>)
-            {invoke(fx,
+            {stdex::invoke(fx,
                 _get_args_traits<base_type, 0>::arg_type::value,
                 _get_args_traits<base_type, 1>::arg_type::value);}
         };
@@ -1308,21 +1274,21 @@ namespace stdex
             _function_impl(_FuncT *func, 
                 functional_detail::_priority_tag<0>)
             {
-                _fx = new _functor<_func_base, _FuncT*, _args_type>(stdex::detail::functional_std::move(func));
+                _fx = new _functor<_func_base, _FuncT, _args_type>(stdex::detail::functional_std::move(func));
             }
 
             template<class _FuncT>
             _function_impl(_FuncT &func, 
                 functional_detail::_priority_tag<1>)
             {
-                _fx = new _functor<_func_base, _FuncT&, _args_type>(stdex::detail::functional_std::move(func));
+                _fx = new _functor<_func_base, _FuncT, _args_type>(stdex::detail::functional_std::move(func));
             }
 
             template<class _FuncT>
             _function_impl(reference_wrapper<_FuncT> func,
                 functional_detail::_priority_tag<2>)
             {
-                _fx = new _functor<_func_base, _FuncT&, _args_type>(stdex::detail::functional_std::move(func.get()));
+                _fx = new _functor<_func_base, _FuncT, _args_type>(stdex::detail::functional_std::move(func.get()));
             }
 
             ~_function_impl()
