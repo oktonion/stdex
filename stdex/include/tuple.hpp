@@ -238,6 +238,9 @@ namespace stdex
             _arg(const _arg<stdex::nullptr_t, _OtherN>&){}
 
             template<class _OtherTp, int _OtherN>
+            _arg(const _arg<_OtherTp, _OtherN>&){}
+
+            template<class _OtherTp, int _OtherN>
             bool operator==(const _arg<_OtherTp, _OtherN> &other) const
             {
                 return 0 == other.value;
