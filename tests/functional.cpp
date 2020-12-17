@@ -144,7 +144,7 @@ struct np_tests_impl
 template<>
 struct np_tests_impl<false>
 {
-    static int test01(){return 0;}
+    static int test01(){std::cout << "disabled" <<std::endl; return 0;}
 };
 
 struct np_tests: np_tests_impl<> {};
