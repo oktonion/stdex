@@ -43,12 +43,12 @@ namespace stdex
             _arg(_Tp value_): value(value_) {}
             template<class _OtherTp, int _OtherN>
             _arg(const _arg<_OtherTp, _OtherN> &other) : 
-                value(const_cast<typename remove_reference<_OtherTp>::type&>(other.value)) {}
+                value(other.value) {}
 
             template<class _OtherTp, int _OtherN>
             _arg& operator=(const _arg<_OtherTp, _OtherN> &other)
             {
-                value = (const_cast<typename remove_reference<_OtherTp>::type&>(other.value));
+                value = other.value;
                 return *this;
             }
         };
@@ -62,14 +62,21 @@ namespace stdex
             _arg(_Tp& value_): _ptr(&value_), value(*_ptr) {}
 
             template<class _OtherTp, int _OtherN>
-            _arg(const _arg<_OtherTp, _OtherN> &other) : 
-                _ptr(&const_cast<typename remove_reference<_OtherTp>::type&>(other.value)),
+            _arg(const _arg<_OtherTp&, _OtherN> &other) : 
+                _ptr(other._ptr),
                 value(*_ptr) {}
 
             template<class _OtherTp, int _OtherN>
-            _arg& operator=(const _arg<_OtherTp, _OtherN> &other)
+            _arg& operator=(const _arg<_OtherTp&, _OtherN> &other)
             {
-                _ptr = (&const_cast<typename remove_reference<_OtherTp>::type&>(other.value));
+                _ptr = other._ptr;
+                return *this;
+            }
+
+            template<class _OtherTp, int _OtherN>
+            _arg& operator=(const _arg<_OtherTp, _OtherN>& other)
+            {
+                value = other.value;
                 return *this;
             }
 
@@ -118,7 +125,7 @@ namespace stdex
             _arg(void_type value_ = void_type()): value(value_) {}
             template<class _OtherTp, int _OtherN>
             _arg(const _arg<_OtherTp, _OtherN> &other) : 
-                value(const_cast<typename remove_reference<_OtherTp>::type&>(other.value)) {} 
+                value(other.value) {}
 
             template<class _OtherTp, int _OtherN>
             bool operator==(const _arg<_OtherTp, _OtherN> &other) const
@@ -353,9 +360,13 @@ namespace stdex
         };
 
         template<class _ArgT, int _N, class _AnyT>
-        const _arg<_ArgT, _N>& operator,(const _arg<_ArgT, _N>& value, const _AnyT&) { return value; }
+        const _arg<_ArgT, _N>& operator,(const _arg<_ArgT, _N>& value, const _AnyT&) { 
+            return value; 
+        }
         template<class _LArgT, int _LArgN, class _RArgT, int _RArgN>
-        const _arg<_RArgT, _RArgN>& operator,(const _arg<_LArgT, _LArgN>&, const _arg<_RArgT, _RArgN>& value) { return value; }
+        const _arg<_RArgT, _RArgN>& operator,(const _arg<_LArgT, _LArgN>&, const _arg<_RArgT, _RArgN>& value) { 
+            return value; 
+        }
 
         template<class _ArgsT, class _ArgT, int _N>
         struct _args: _ArgsT, _arg<_ArgT, _N>
@@ -760,7 +771,7 @@ namespace stdex
 
     public:
         tuple(_Arg0T arg0 = _Arg0T(), _Arg1T arg1 = _Arg1T()):
-            args( detail::_arg<_Arg0T, 0>(arg0), detail::_arg<_Arg1T, 1>(arg1) )
+            args( arg0, arg1 )
         { }
 
         template<
