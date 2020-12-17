@@ -633,7 +633,6 @@ namespace stdex
             _STDEX_TMPL_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)
         >
         tuple& operator=(const tuple<_STDEX_TYPES_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> &other)
-#undef _STDEX_TYPE_CUSTOM
         { 
             args = 
                 detail::_tuple_intern_access< 
@@ -641,6 +640,7 @@ namespace stdex
                 >::args(other);
             return *this;
         }
+#undef _STDEX_TYPE_CUSTOM
 
         void swap(tuple& other)
         {
