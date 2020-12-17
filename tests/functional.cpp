@@ -120,12 +120,12 @@ struct np_tests_impl
 {
     static int test01()
     {
-        typedef stdex::function<void(*)(stdex::nullptr_t, float&)> function;
+        typedef stdex::function<void(*)(void*, float&)> function;
 
         struct lambdas{
             static void func(void* ptr, float &val)
             {
-                DYNAMIC_VERIFY_ABORT(ptr == 0);
+                DYNAMIC_VERIFY_ABORT(ptr == 0 || ptr == &val);
                 val = 1.f;
             }
         };
@@ -133,6 +133,11 @@ struct np_tests_impl
         function f(&lambdas::func);
 
         float val = 0.0f;
+
+        void(*target)(void*, float&) =
+            f.target<typename stdex::remove_pointer<void(*)(void*, float&)>::type>();
+
+        stdex::invoke(target, nullptr, val);
         f(nullptr, val);
 
         DYNAMIC_VERIFY(val != 0.0f);
