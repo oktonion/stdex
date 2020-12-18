@@ -105,8 +105,7 @@ namespace stdex
         template<>
         struct _nullptr_ref_arg_helper<stdex::nullptr_t>
         {
-            typedef 
-            typename
+            typedef
             conditional<
                 intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value,
                 const stdex::nullptr_t,
