@@ -146,18 +146,22 @@ int test02()
     return 0;
 }
 
-template<bool Value = 
-    stdex::intern::_has_feature<stdex::intern::_stdex_nullptr_implemented_as_distinct_type>::value>
-struct np_tests_impl
+// hack to check for stdex version of nullptr passed to function 
+struct np_tests_impl:
+    stdex::detail::_arg<stdex::detail::_nullptr_place_holder, 0>
 {
-    static int test01()
+    typedef stdex::detail::_arg<stdex::detail::_nullptr_place_holder, 0> base_type;
+    np_tests_impl() : base_type(nullptr) {}
+
+    template<class T>
+    static int test01_impl(T*)
     {
         typedef stdex::function<void(*)(stdex::nullptr_t, float&)> function;
 
         struct lambdas{
             static void func(void* ptr, float &val)
             {
-                DYNAMIC_VERIFY_ABORT(ptr == 0);
+                DYNAMIC_VERIFY_ABORT(ptr == 0 || ptr == &val);
                 val = 1.f;
             }
         };
@@ -168,21 +172,28 @@ struct np_tests_impl
 
         float val = 0.0f;
 
+        void(*target)(void*, float&) =
+            f.target<typename stdex::remove_pointer<void(*)(void*, float&)>::type>();
+
+        stdex::invoke(target, nullptr, val);
         f(nullptr, val);
 
         DYNAMIC_VERIFY(val != 0.0f);
 
         return 0;
     }
+
+    template<class T>
+    static int test01_impl(stdex::detail::functional_detail::_any){std::cout << "test01 disabled" <<std::endl; return 0;}
+
+    template<class T>
+    int test01()
+    {
+        return test01_impl<T>(base_type::value);
+    }
 };
 
-template<>
-struct np_tests_impl<false>
-{
-    static int test01(){std::cout << "disabled" <<std::endl; return 0;}
-};
-
-struct np_tests: np_tests_impl<> {};
+np_tests_impl np_tests;
 
 std::size_t operations_counter::copy_count = 0;
 std::size_t operations_counter::delete_count = 0;
@@ -439,7 +450,8 @@ int main()
     RUN_TEST(test06);
     RUN_TEST(test07);
     RUN_TEST(test08);
-    RUN_TEST(np_tests::test01);
+    RUN_TEST(np_tests.test01<void>);
+    RUN_TEST(np_tests.test01<int>);
 
     const std::string::size_type big = 
         std::numeric_limits<std::string::size_type>::max();
