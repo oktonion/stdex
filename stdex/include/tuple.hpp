@@ -78,23 +78,6 @@ namespace stdex
 
     namespace detail
     {
-        template<class _Tp, int _N>
-        struct _arg
-        {
-            typedef _Tp value_type;
-            _Tp value;
-            _arg(_Tp value_): value(value_) {}
-            template<class _OtherTp, int _OtherN>
-            _arg(const _arg<_OtherTp, _OtherN> &other) : 
-                value(other.value) {}
-
-            template<class _OtherTp, int _OtherN>
-            _arg& operator=(const _arg<_OtherTp, _OtherN> &other)
-            {
-                value = other.value;
-                return *this;
-            }
-        };
 
         template<class _Tp>
         struct _nullptr_ref_arg_helper
@@ -112,32 +95,77 @@ namespace stdex
                 stdex::nullptr_t>::type type;
         };
 
-        template<class _Tp, int _N>
-        struct _arg<_Tp&, _N>
+        template<class _Tp, bool>
+        struct _arg_impl;
+
+        template<class _Tp>
+        struct _arg_impl<_Tp, true>
         {
-            typedef typename _nullptr_ref_arg_helper<_Tp>::type& value_type;
-            typedef typename _nullptr_ref_arg_helper<_Tp>::type* _ptr_type;
+            typedef typename remove_reference<_Tp>::type clear_type;
+            typedef typename _nullptr_ref_arg_helper<clear_type>::type& value_type;
+            typedef typename _nullptr_ref_arg_helper<clear_type>::type* _ptr_type;
             _ptr_type _ptr;
             value_type value;
-            _arg(value_type value_): _ptr(&value_), value(*_ptr) {}
+            _arg_impl(typename remove_reference<value_type>::type value_): _ptr(&value_), value(*_ptr) {}
 
-
-            template<class _OtherTp, int _OtherN>
-            _arg(const _arg<_OtherTp&, _OtherN> &other) : 
+            template<class _OtherTp>
+            _arg_impl(const _arg_impl<_OtherTp, true> &other) : 
                 _ptr(other._ptr),
                 value(*_ptr) {}
 
-            template<class _OtherTp, int _OtherN>
-            _arg& operator=(const _arg<_OtherTp&, _OtherN> &other)
+            template<class _OtherTp>
+            _arg_impl& operator=(const _arg_impl<_OtherTp, true> &other)
             {
                 _ptr = other._ptr;
                 return *this;
             }
 
-            template<class _OtherTp, int _OtherN>
-            _arg& operator=(const _arg<_OtherTp, _OtherN>& other)
+             template<class _OtherTp>
+            _arg_impl& operator=(const _arg_impl<_OtherTp, false> &other)
             {
                 value = other.value;
+                return *this;
+            }
+        };
+
+        template<class _Tp>
+        struct _arg_impl<_Tp, false>
+        {
+            typedef _Tp value_type;
+            value_type value;
+            _arg_impl(value_type value_): value(value_) {}
+
+            template<class _OtherTp, bool _IsRef>
+            _arg_impl(const _arg_impl<_OtherTp, _IsRef> &other) : 
+                value(other.value) {}
+
+            template<class _OtherTp, bool _IsRef>
+            _arg_impl& operator=(const _arg_impl<_OtherTp, _IsRef> &other)
+            {
+                value = other.value;
+                return *this;
+            }
+        };
+
+        template<class _Tp, int _N>
+        struct _arg : 
+            _arg_impl<_Tp, is_reference<_Tp>::value>
+        {
+            typedef _arg_impl<_Tp, is_reference<_Tp>::value> base_type;
+            typedef typename base_type::value_type value_type;
+
+            _arg(value_type value_): base_type(value_) {}
+            _arg(base_type value_): base_type(value_) {}
+            template<class _OtherTp, int _OtherN>
+            _arg(const _arg<_OtherTp, _OtherN> &other) : 
+                base_type(other) {}
+
+            template<class _OtherTp, int _OtherN>
+            _arg& operator=(const _arg<_OtherTp, _OtherN> &other)
+            {
+                typedef typename _arg<_OtherTp, _OtherN>::base_type const other_base_type;
+                static_cast<base_type&>(*this) = 
+                    static_cast<other_base_type&>(other);
                 return *this;
             }
 
@@ -620,19 +648,11 @@ namespace stdex
     template<std::size_t, class>
     class tuple_element;
 
-#define _STDEX_TMPL_ARGS_TYPE_CUSTOM(arg_n) _Arg##arg_n##Type
     template<
-        _STDEX_TMPL_ARGS_MAX_IMPL(_STDEX_BLANK, = ::stdex::detail::void_type, _STDEX_TMPL_ARGS_TYPE_CUSTOM)
+        _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, = ::stdex::detail::void_type)
     >
     class tuple
     {
-#undef _STDEX_DELIM
-#define _STDEX_DELIM ;
-#define _STDEX_TYPE_CUSTOM(arg_n) typedef _STDEX_TMPL_ARGS_TYPE_CUSTOM(arg_n) _STDEX_TYPE_DEFAULT(arg_n)
-        _STDEX_TYPES_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM);
-#undef _STDEX_DELIM
-#define _STDEX_DELIM _STDEX_DELIM_DEFAULT
-
         typedef
         typename detail::_make_args::
 #undef _STDEX_DELIM
@@ -642,16 +662,15 @@ namespace stdex
 #define _STDEX_DELIM _STDEX_DELIM_DEFAULT
         args args_type;
 
-#undef _STDEX_TYPE_CUSTOM
-#undef _STDEX_TMPL_ARGS_TYPE_CUSTOM
-
     public:
-#define _STDEX_PARAMS_ARG_CUSTOM(arg_n) _STDEX_PARAMS_ARG_DEFAULT(arg_n) = ::stdex::detail::tuple_detail::_declval< _STDEX_PARAMS_TYPE_DEFAULT(arg_n) >()
+#define _STDEX_PARAMS_ARG_CUSTOM(arg_n) _STDEX_PARAMS_ARG_DEFAULT(arg_n) = _STDEX_PARAMS_TYPE_DEFAULT(arg_n)()
         tuple(
             _STDEX_PARAMS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_PARAMS_TYPE_DEFAULT, _STDEX_PARAMS_ARG_CUSTOM)
         )
 #undef _STDEX_PARAMS_ARG_CUSTOM
-            :args( _STDEX_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK) )
+#define _STDEX_ARG_CUSTOM(arg_n) ::stdex::detail::_arg<_STDEX_TYPE_DEFAULT(arg_n), arg_n>( _STDEX_ARG_DEFAULT(arg_n) )
+        : args( _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_CUSTOM) )
+#undef _STDEX_ARG_CUSTOM
         { }
 
 #define _STDEX_TYPE_CUSTOM(arg_n) _OtherArg##arg_n##T
@@ -796,7 +815,7 @@ namespace stdex
 
     public:
         tuple(_Arg0T arg0 = _Arg0T(), _Arg1T arg1 = _Arg1T()):
-            args( arg0, arg1 )
+            args( detail::_arg<_Arg0T, 0>(arg0), detail::_arg<_Arg1T, 1>(arg1) )
         { }
 
         template<
@@ -811,7 +830,7 @@ namespace stdex
 
         template<class _FirstT, class _SecondT>
         tuple(std::pair<_FirstT, _SecondT> other):
-            args(detail::_arg<_FirstT, 0>(other.first), detail::_arg<_SecondT, 1>(other.second))
+            args(detail::_arg<_Arg0T, 0>(other.first), detail::_arg<_Arg1T, 1>(other.second))
         { }
 
         template<
