@@ -53,10 +53,10 @@ int main()
         tuple2 t2_1 = tuple3();
 
         tuple1 t1_3 = stdex::make_tuple(0, 0);
-        tuple2 t2_3 = stdex::make_tuple(0, 1);
+        tuple2 t2_3 = stdex::make_tuple(0, 1.f);
 
         DYNAMIC_VERIFY(stdex::get<0>(t1_3) == 0);
-        DYNAMIC_VERIFY(stdex::get<1>(t1_3) == 1.f);
+        DYNAMIC_VERIFY(stdex::get<1>(t2_3) == 1.f);
     }
 
     {
