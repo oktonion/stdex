@@ -172,37 +172,37 @@ namespace stdex
             template<class _OtherTp, int _OtherN>
             bool operator==(const _arg<_OtherTp, _OtherN> &other) const
             {
-                return value == other.value;
+                return base_type::value == other.value;
             }
 
             template<class _OtherTp, int _OtherN>
             bool operator!=(const _arg<_OtherTp, _OtherN> &other) const
             {
-                return value != other.value;
+                return base_type::value != other.value;
             }
 
             template<class _OtherTp, int _OtherN>
             bool operator<(const _arg<_OtherTp, _OtherN> &other) const
             {
-                return value < other.value;
+                return base_type::value < other.value;
             }
 
             template<class _OtherTp, int _OtherN>
             bool operator>(const _arg<_OtherTp, _OtherN> &other) const
             {
-                return value > other.value;
+                return base_type::value > other.value;
             }
 
             template<class _OtherTp, int _OtherN>
             bool operator<=(const _arg<_OtherTp, _OtherN> &other) const
             {
-                return value <= other.value;
+                return base_type::value <= other.value;
             }
 
             template<class _OtherTp, int _OtherN>
             bool operator>=(const _arg<_OtherTp, _OtherN> &other) const
             {
-                return value >= other.value;
+                return base_type::value >= other.value;
             }
         };
 
