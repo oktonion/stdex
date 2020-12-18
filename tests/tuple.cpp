@@ -1,7 +1,16 @@
 #include "./../stdex/include/tuple.hpp"
 
 #include "./../stdex/include/string.hpp"
+
 #include <set>
+#include <iostream>
+
+#define VERIFY(cond) STATIC_ASSERT((cond), check)
+#define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
+#define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
+#define DYNAMIC_VERIFY_FAIL {std::cout << "check condition " << "failed at line " << __LINE__ << std::endl; return -1;}
+#define DYNAMIC_VERIFY_ABORT(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; std::abort();}
+
 
 struct S {
     int n;
@@ -44,9 +53,10 @@ int main()
         tuple2 t2_1 = tuple3();
 
         tuple1 t1_3 = stdex::make_tuple(0, 0);
-        tuple2 t2_3 = stdex::make_tuple(0, 0);
+        tuple2 t2_3 = stdex::make_tuple(0, 1);
 
-        stdex::get<0>(t1_3) == 0;
+        DYNAMIC_VERIFY(stdex::get<0>(t1_3) == 0);
+        DYNAMIC_VERIFY(stdex::get<1>(t1_3) == 1.f);
     }
 
     {
@@ -54,12 +64,12 @@ int main()
  
         S value = S(42, "Test", 3.14);
         std::set<S>::iterator iter;
-        bool inserted;
+        bool inserted = false;
     
         // unpacks the return value of insert into iter and inserted
         stdex::tie(iter, inserted) = set_of_s.insert(value);
 
-        
+        DYNAMIC_VERIFY(inserted == true);
     }
     return 0;
 }
