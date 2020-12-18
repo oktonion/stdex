@@ -129,6 +129,28 @@ namespace stdex
         };
 
         template<class _Tp>
+        struct _arg_impl<const _Tp&, true>
+        {
+            typedef const _Tp& value_type;
+            typedef const _Tp* _ptr_type;
+            _ptr_type _ptr;
+            value_type value;
+            _arg_impl(const _Tp& value_): _ptr(&value_), value(*_ptr) {}
+
+            template<class _OtherTp>
+            _arg_impl(const _arg_impl<_OtherTp, true> &other) : 
+                _ptr(other._ptr),
+                value(*_ptr) {}
+
+            template<class _OtherTp>
+            _arg_impl& operator=(const _arg_impl<_OtherTp, true> &other)
+            {
+                _ptr = other._ptr;
+                return *this;
+            }
+        };
+
+        template<class _Tp>
         struct _arg_impl<_Tp, false>
         {
             typedef _Tp value_type;
@@ -155,7 +177,7 @@ namespace stdex
             typedef typename base_type::value_type value_type;
 
             _arg(value_type value_): base_type(value_) {}
-            _arg(base_type value_): base_type(value_) {}
+
             template<class _OtherTp, int _OtherN>
             _arg(const _arg<_OtherTp, _OtherN> &other) : 
                 base_type(other) {}
