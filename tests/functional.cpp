@@ -175,7 +175,7 @@ struct np_tests_impl:
         void(*target)(void*, float&) =
             f.target<typename stdex::remove_pointer<void(*)(void*, float&)>::type>();
 
-        stdex::invoke(target, nullptr, val);
+        stdex::invoke(target, 0, val); 
         f(nullptr, val);
 
         DYNAMIC_VERIFY(val != 0.0f);
