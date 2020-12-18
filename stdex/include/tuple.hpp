@@ -485,7 +485,10 @@ namespace stdex
             typedef _args type;
             static const int count = _args_count_incr<_ArgT>::value;
 
-            _args(_STDEX_ARGS_CTOR_PARAMS)
+            _args(typename _args_ctor_helper<type, 0>::type arg0 = void_type(), 
+#define _STDEX_TOKEN tuple_detail::disabled_type = void_type()
+                _STDEX_REPEAT_TOKEN_MAX(_STDEX_TOKEN) )
+#undef _STDEX_TOKEN
                 : _arg<_ArgT, 0>( arg0 )    
             { }
 
