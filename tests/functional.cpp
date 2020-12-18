@@ -146,7 +146,9 @@ int test02()
     return 0;
 }
 
-// hack to check for stdex version of nullptr passed to function 
+// hack to check for stdex version of nullptr passed to function
+template<bool Enabled = 
+    stdex::intern::_has_feature<stdex::intern::_stdex_nullptr_implemented_as_distinct_type>::value> 
 struct np_tests_impl:
     stdex::detail::_arg<stdex::detail::_nullptr_place_holder, 0>
 {
@@ -193,7 +195,17 @@ struct np_tests_impl:
     }
 };
 
-np_tests_impl np_tests;
+template<>
+struct np_tests_impl<false>
+{
+    template<class T>
+    int test01()
+    {
+        std::cout << "test01 disabled" <<std::endl; return 0;
+    }  
+};
+
+np_tests_impl<> np_tests;
 
 std::size_t operations_counter::copy_count = 0;
 std::size_t operations_counter::delete_count = 0;

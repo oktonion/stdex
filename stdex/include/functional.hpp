@@ -845,8 +845,8 @@ namespace stdex
             {
                 typedef _check_args_for_null_impl_helper<
                     _R, _FuncT, _Index, _Count,
-                    intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value == bool(true) ||
-                    is_class<_FuncT>::value == bool(false)
+                    intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value == bool(true)
+                    //|| is_class<_FuncT>::value == bool(false)
                 > helper;
                 helper::call(fx, args, checked_args, result, base_type::value);                        
             }
