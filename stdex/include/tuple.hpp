@@ -35,6 +35,49 @@ namespace stdex
 {
     namespace detail
     {
+        _yes_type _rt_nullptr_can_be_ptr_checker(class _dummy*);
+        _no_type _rt_nullptr_can_be_ptr_checker(...);
+
+        struct _rt_nullptr_can_be_ptr
+        {
+            static stdex::nullptr_t declnull();
+            static const bool value =
+                sizeof(_rt_nullptr_can_be_ptr_checker(declnull())) == sizeof(_yes_type);
+        };
+    } // namespace detail
+
+    namespace intern
+    {
+        template<class>
+        struct _has_feature;
+
+        template<>
+        struct _has_feature<class _stdex_has_native_nullptr> :
+            integral_constant<
+            bool,
+            detail::_rt_nullptr_can_be_ptr::value == bool(true) &&
+            is_class<stdex::nullptr_t>::value == bool(false)
+            >
+        { };
+
+        template<class>
+        struct _has_feature;
+
+        template<>
+        struct _has_feature<class _stdex_nullptr_implemented_as_distinct_type> :
+            integral_constant<
+            bool,
+            _has_feature<_stdex_has_native_nullptr>::value == bool(true) ||
+            is_union<stdex::nullptr_t>::value == bool(true) ||
+            (is_arithmetic<stdex::nullptr_t>::value == bool(false) &&
+                is_arithmetic<remove_pointer<stdex::nullptr_t>::type>::value == bool(false) &&
+                is_void<remove_pointer<stdex::nullptr_t>::type>::value == bool(false))
+            >
+        { };
+    } // namespace intern
+
+    namespace detail
+    {
         template<class _Tp, int _N>
         struct _arg
         {
@@ -53,13 +96,32 @@ namespace stdex
             }
         };
 
+        template<class _Tp>
+        struct _nullptr_ref_arg_helper
+        {
+            typedef _Tp type;
+        };
+
+        template<>
+        struct _nullptr_ref_arg_helper<stdex::nullptr_t>
+        {
+            typedef 
+            typename
+            conditional<
+                intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value,
+                const stdex::nullptr_t,
+                stdex::nullptr_t>::type type;
+        };
+
         template<class _Tp, int _N>
         struct _arg<_Tp&, _N>
         {
-            typedef _Tp& value_type;
-            _Tp *_ptr;
-            _Tp &value;
-            _arg(_Tp& value_): _ptr(&value_), value(*_ptr) {}
+            typedef typename _nullptr_ref_arg_helper<_Tp>::type& value_type;
+            typedef typename _nullptr_ref_arg_helper<_Tp>::type* _ptr_type;
+            _ptr_type _ptr;
+            value_type value;
+            _arg(value_type value_): _ptr(&value_), value(*_ptr) {}
+
 
             template<class _OtherTp, int _OtherN>
             _arg(const _arg<_OtherTp&, _OtherN> &other) : 
@@ -177,47 +239,7 @@ namespace stdex
 
         template<class _NullptrT>
         _NullptrT _nullptr_place_holder_impl<_NullptrT, true>::value = _NullptrT();
-
-        _yes_type _rt_nullptr_can_be_ptr_checker(class _dummy*);
-        _no_type _rt_nullptr_can_be_ptr_checker(...);
-
-        struct _rt_nullptr_can_be_ptr
-        {
-            static stdex::nullptr_t declnull();
-            static const bool value = 
-                sizeof(_rt_nullptr_can_be_ptr_checker(declnull())) == sizeof(_yes_type);
-        };
     } // namespace detail
-
-    namespace intern
-    {
-        template<class>
-        struct _has_feature;
-
-        template<>
-        struct _has_feature<class _stdex_has_native_nullptr>:
-            integral_constant<
-                bool,
-                detail::_rt_nullptr_can_be_ptr::value == bool(true) &&
-                is_class<stdex::nullptr_t>::value == bool(false)
-            >
-        { };
-
-        template<class>
-        struct _has_feature;
-
-        template<>
-        struct _has_feature<class _stdex_nullptr_implemented_as_distinct_type>:
-            integral_constant<
-                bool,
-                _has_feature<_stdex_has_native_nullptr>::value == bool(true) ||
-                is_union<stdex::nullptr_t>::value == bool(true) ||
-                (is_arithmetic<stdex::nullptr_t>::value == bool(false) &&
-                 is_arithmetic<remove_pointer<stdex::nullptr_t>::type>::value == bool(false) &&
-                 is_void<remove_pointer<stdex::nullptr_t>::type>::value == bool(false) )
-            >
-        { };
-    } // namespace intern
 
     namespace detail
     {
@@ -234,8 +256,6 @@ namespace stdex
             typedef stdex::nullptr_t value_type;
             _arg(stdex::nullptr_t){}
             _arg(const _arg&){}
-            template<int _OtherN>
-            _arg(const _arg<stdex::nullptr_t, _OtherN>&){}
 
             template<class _OtherTp, int _OtherN>
             _arg(const _arg<_OtherTp, _OtherN>&){}

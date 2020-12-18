@@ -67,12 +67,40 @@ int test01()
   return 0;
 }
 
+struct operations_counter {
+    static std::size_t copy_count;
+    static std::size_t delete_count;
+    static std::size_t construct_count;
+
+    operations_counter() {
+        construct_count++;
+    }
+    operations_counter(const operations_counter&)
+    {
+        construct_count++;
+        copy_count++;
+    }
+    ~operations_counter() {
+        delete_count++;
+    }
+
+    static void reset() {
+        copy_count = 0; delete_count = 0; construct_count = 0;
+    }
+};
+
 int test02()
 {
     typedef stdex::function<stdex::remove_pointer<void(*)(int&, void*)>::type> function;
+    typedef stdex::function<stdex::remove_pointer<void(*)(operations_counter&, void*)>::type> function_oc;
     //typedef std::function<void(int&, void*)> function;
     struct lambdas
     {
+        static void func0(operations_counter& a, void* ptr) {
+            a.reset();
+            DYNAMIC_VERIFY_ABORT(ptr == nullptr);
+        }
+
         static void func(int& a, void* ptr){
             a++;
             DYNAMIC_VERIFY_ABORT(ptr == nullptr);
@@ -83,6 +111,10 @@ int test02()
             DYNAMIC_VERIFY_ABORT(ptr != nullptr);
         }
     };
+
+    operations_counter oc;
+    function_oc f0(&lambdas::func0);
+    f0(oc, nullptr);
 
     int a = 0;
     function f1(&lambdas::func);
@@ -130,9 +162,12 @@ struct np_tests_impl
             }
         };
 
+        
+
         function f(&lambdas::func);
 
         float val = 0.0f;
+
         f(nullptr, val);
 
         DYNAMIC_VERIFY(val != 0.0f);
@@ -148,28 +183,6 @@ struct np_tests_impl<false>
 };
 
 struct np_tests: np_tests_impl<> {};
-
-struct operations_counter{
-    static std::size_t copy_count;
-    static std::size_t delete_count;
-    static std::size_t construct_count;
-
-    operations_counter() { 
-        construct_count++; 
-    }
-    operations_counter(const operations_counter&)
-    {
-        construct_count++;
-        copy_count++;
-    }
-    ~operations_counter() { 
-        delete_count++; 
-    }
-
-    static void reset() {
-        copy_count = 0; delete_count = 0; construct_count = 0;
-    }
-};
 
 std::size_t operations_counter::copy_count = 0;
 std::size_t operations_counter::delete_count = 0;

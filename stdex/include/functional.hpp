@@ -1311,7 +1311,7 @@ namespace stdex
 #define _STDEX_ARG_CUSTOM(arg_n) \
     _arg<_STDEX_TYPE_DEFAULT(arg_n), arg_n> \
         (stdex::detail::functional_std::_forward< _STDEX_TYPE_DEFAULT(arg_n) >::call( _STDEX_ARG_DEFAULT(arg_n) ))
-                    _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_CUSTOM)
+                    _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_DEFAULT)
 #undef _STDEX_ARG_CUSTOM
                     );
 
