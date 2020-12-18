@@ -449,10 +449,15 @@ namespace stdex
 #define _STDEX_PARAMS_TYPE_CUSTOM(arg_n) typename _args_ctor_helper<type, arg_n>::type
 #define _STDEX_ARGS_CTOR_PARAMS \
     _STDEX_PARAMS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, =void_type(), _STDEX_PARAMS_TYPE_CUSTOM, _STDEX_PARAMS_ARG_DEFAULT) 
+
+            static typename _args_ctor_helper<type, _N>::type get_arg(_STDEX_ARGS_CTOR_PARAMS)
+            {
+                return (_STDEX_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK));
+            }
     
             _args(_STDEX_ARGS_CTOR_PARAMS)
                 : _ArgsT( _STDEX_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK) ), 
-                  _arg<_ArgT, _N>( (_STDEX_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK)) )
+                  _arg<_ArgT, _N>( get_arg(_STDEX_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK)) )
             { }
 
             template<class _OtherArgsT, class _OtherArgT>
@@ -535,11 +540,13 @@ namespace stdex
             typedef _args type;
             static const int count = _args_count_incr<_ArgT>::value;
 
-            _args(typename _args_ctor_helper<type, 0>::type arg0 = void_type(), 
-#define _STDEX_TOKEN tuple_detail::disabled_type = void_type()
-                _STDEX_REPEAT_TOKEN_MAX(_STDEX_TOKEN) )
-#undef _STDEX_TOKEN
-                : _arg<_ArgT, 0>( arg0 )    
+            static const _arg<_ArgT, 0>& get_arg(_STDEX_ARGS_CTOR_PARAMS)
+            {
+                return (_STDEX_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK));
+            }
+
+            _args(_STDEX_ARGS_CTOR_PARAMS)
+                : _arg<_ArgT, 0>( get_arg(_STDEX_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK)) )
             { }
 
 #undef _STDEX_PARAMS_TYPE_CUSTOM
