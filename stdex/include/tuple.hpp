@@ -540,7 +540,7 @@ namespace stdex
             typedef _args type;
             static const int count = _args_count_incr<_ArgT>::value;
 
-            static const _arg<_ArgT, 0>& get_arg(_STDEX_ARGS_CTOR_PARAMS)
+            static typename _args_ctor_helper<type, 0>::type get_arg(_STDEX_ARGS_CTOR_PARAMS)
             {
                 return (_STDEX_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK));
             }
