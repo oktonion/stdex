@@ -106,7 +106,7 @@ namespace stdex
             typedef typename _nullptr_ref_arg_helper<clear_type>::type* _ptr_type;
             _ptr_type _ptr;
             value_type value;
-            _arg_impl(typename remove_reference<value_type>::type value_): _ptr(&value_), value(*_ptr) {}
+            _arg_impl(typename remove_reference<value_type>::type &value_): _ptr(&value_), value(*_ptr) {}
 
             template<class _OtherTp>
             _arg_impl(const _arg_impl<_OtherTp, true> &other) : 
