@@ -989,71 +989,74 @@ namespace stdex
             {fx();}
         };
 
-        template<class _ArgsT, class _ArgT>
-        struct _callable_args<_args<_ArgsT, _ArgT, 0>/**/> : _args<_ArgsT, _ArgT, 0>
-        {
-            typedef _args<_ArgsT, _ArgT, 0> base_type;
-            
-            template<class _OtherArgsT, class _OtherArgT>
-            _callable_args(const _args<_OtherArgsT, _OtherArgT, base_type::count - 1> &other)
-                : base_type(other) {}
-                
-            template<class _R, class _FuncT>
-            void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<false>)
-            {result = fx(
-                _get_args_traits<base_type, 0>::arg_type::value);}
+#define _STDEX_ARG_VALUE(arg_n) _get_args_traits<base_type, arg_n>::arg_type::value
 
-            template<class _FuncT>
-            void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<false>)
-            {fx(
-                _get_args_traits<base_type, 0>::arg_type::value);}
-
-            template<class _R, class _FuncT>
-            void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<true>)
-            {result = stdex::invoke(fx,
-                _get_args_traits<base_type, 0>::arg_type::value);}
-
-            template<class _FuncT>
-            void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<true>)
-            {stdex::invoke(fx,
-                _get_args_traits<base_type, 0>::arg_type::value);}
+#define _STDEX_CALLABLE_ARGS(arg_n) \
+        template<class _ArgsT, class _ArgT> \
+        struct _callable_args<_args<_ArgsT, _ArgT, arg_n>/**/> : _args<_ArgsT, _ArgT, arg_n> \
+        { \
+            typedef _args<_ArgsT, _ArgT, arg_n> base_type; \
+        \
+            template<class _OtherArgsT, class _OtherArgT> \
+            _callable_args(const _args<_OtherArgsT, _OtherArgT, base_type::count - 1> &other) \
+                : base_type(other) {} \
+        \
+            template<class _R, class _FuncT> \
+            void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<false>) \
+            {result = fx( \
+                _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) );} \
+        \
+            template<class _FuncT> \
+            void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<false>) \
+            {fx( \
+                _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) );} \
+        \
+            template<class _R, class _FuncT> \
+            void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<true>) \
+            {result = stdex::invoke(fx, \
+                _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) );} \
+        \
+            template<class _FuncT> \
+            void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<true>) \
+            {stdex::invoke(fx, \
+                _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) );} \
         };
 
-        
+    _STDEX_CALLABLE_ARGS(0)
+    _STDEX_CALLABLE_ARGS(1)
+    _STDEX_CALLABLE_ARGS(2)
+    _STDEX_CALLABLE_ARGS(3)
+    _STDEX_CALLABLE_ARGS(4)
+    _STDEX_CALLABLE_ARGS(5)
+    _STDEX_CALLABLE_ARGS(6)
+    _STDEX_CALLABLE_ARGS(7)
+    _STDEX_CALLABLE_ARGS(8)
+    _STDEX_CALLABLE_ARGS(9)
+    _STDEX_CALLABLE_ARGS(10)
+    _STDEX_CALLABLE_ARGS(11)
+    _STDEX_CALLABLE_ARGS(12)
+    _STDEX_CALLABLE_ARGS(13)
+    _STDEX_CALLABLE_ARGS(14)
+    _STDEX_CALLABLE_ARGS(15)
+    _STDEX_CALLABLE_ARGS(16)
+    _STDEX_CALLABLE_ARGS(17)
+    _STDEX_CALLABLE_ARGS(18)
+    _STDEX_CALLABLE_ARGS(19)
+    _STDEX_CALLABLE_ARGS(20)
+    _STDEX_CALLABLE_ARGS(21)
+    _STDEX_CALLABLE_ARGS(22)
+    _STDEX_CALLABLE_ARGS(23)
+    _STDEX_CALLABLE_ARGS(24)
+    _STDEX_CALLABLE_ARGS(25)
+    _STDEX_CALLABLE_ARGS(26)
+    _STDEX_CALLABLE_ARGS(27)
+    _STDEX_CALLABLE_ARGS(28)
+    _STDEX_CALLABLE_ARGS(29)
+    _STDEX_CALLABLE_ARGS(30)
+    _STDEX_CALLABLE_ARGS(31)
 
-        template<class _ArgsT, class _ArgT>
-        struct _callable_args<_args<_ArgsT, _ArgT, 1>/**/> : _args<_ArgsT, _ArgT, 1>
-        {
-            typedef _args<_ArgsT, _ArgT, 1> base_type;
-            
-            template<class _OtherArgsT, class _OtherArgT>
-            _callable_args(const _args<_OtherArgsT, _OtherArgT, base_type::count - 1> &other)
-                : base_type(other) {}
-                
-            template<class _R, class _FuncT>
-            void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<false>)
-            {result = fx(
-                _get_args_traits<base_type, 0>::arg_type::value,
-                _get_args_traits<base_type, 1>::arg_type::value);}
-
-            template<class _FuncT>
-            void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<false>)
-            {fx(
-                _get_args_traits<base_type, 0>::arg_type::value,
-                _get_args_traits<base_type, 1>::arg_type::value);}
-
-            template<class _R, class _FuncT>
-            void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<true>)
-            {result = stdex::invoke(fx,
-                _get_args_traits<base_type, 0>::arg_type::value,
-                _get_args_traits<base_type, 1>::arg_type::value);}
-
-            template<class _FuncT>
-            void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<true>)
-            {stdex::invoke(fx,
-                _get_args_traits<base_type, 0>::arg_type::value,
-                _get_args_traits<base_type, 1>::arg_type::value);}
-        };
+#undef _STDEX_ARG_VALUE
+#undef _STDEX_CALLABLE_ARGS
 
     } // namespace detail
 
