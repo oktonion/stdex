@@ -9,7 +9,7 @@ int main()
         static void func0(int, float){}
     };
 
-    std::bind(&lambdas::func_none, 0)();
+    stdex::bind(&lambdas::func_none, 0)();
 
     return 0;
 }
