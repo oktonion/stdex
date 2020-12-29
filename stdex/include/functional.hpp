@@ -2028,6 +2028,7 @@ namespace stdex
             , fx( fx_ )
             { }
 
+        public:
             _R operator()(
                 _STDEX_PARAMS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = ::stdex::detail::void_type(), _STDEX_TYPE_DISABLED, _STDEX_ARG_DISABLED)
             )
