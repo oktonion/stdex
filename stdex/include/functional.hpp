@@ -1792,6 +1792,390 @@ namespace stdex
 #undef _STDEX_FUNCTION_IMPL
 #undef _STDEX_MEM_FN
 
+    // Bind
+
+    template<class>
+    struct is_placeholder;
+
+    namespace detail
+    {
+        template<class _ReplArgsT, class, int _PhIndex>
+        struct _replace_ph_args_helper_impl
+        {
+            typedef
+            typename _get_args_traits<_ReplArgsT, _PhIndex - 1>::arg_type type;
+        };
+
+        template<class _ReplArgsT, class _ArgT>
+        struct _replace_ph_args_helper_impl<_ReplArgsT, _ArgT, 0>
+        {
+            typedef _ArgT type;
+        };
+
+        template<class _ArgsT, class _ReplArgsT, int _Index>
+        struct _replace_ph_args_helper
+        {
+            typedef
+            typename _get_args_traits<_ArgsT, _Index>::arg_type _arg_type;
+
+            typedef
+            typename _replace_ph_args_helper_impl<
+                _ReplArgsT, 
+                _arg_type, 
+                is_placeholder<typename _arg_type::value_type>::value
+            >::type _result_arg_type;
+
+            typedef typename _result_arg_type::value_type type;
+        };
+
+        template<class _ArgsT, class _ReplArgsT, int _Index, class _ResultArgsT>
+        struct _replace_ph_args;
+
+        template<class _ArgsT, class _ReplArgsT, int _Index, class _ResultArgsT>
+        struct _replace_ph_args2:
+            _replace_ph_args<_ArgsT, _ReplArgsT, _Index + 1, _ResultArgsT>{};
+
+        template<
+            class _ArgsT, class _ArgT, int _ArgsCount, 
+            class _ReplArgsT, class _ReplArgT, int _ReplArgsCount, 
+            int _Index, class _ResultArgsT>
+        struct _replace_ph_args<
+            _args<_ArgsT, _ArgT, _ArgsCount>, 
+            _args<_ReplArgsT, _ReplArgT, _ReplArgsCount>, 
+            _Index, _ResultArgsT>
+            : _replace_ph_args2<
+                _args<_ArgsT, _ArgT, _ArgsCount>, 
+                _args<_ReplArgsT, _ReplArgT, _ReplArgsCount>, 
+                _Index, 
+                _args<
+                    _ResultArgsT, 
+                    typename 
+                    _replace_ph_args_helper<
+                        _args<_ArgsT, _ArgT, _ArgsCount>,
+                        _args<_ReplArgsT, _ReplArgT, _ReplArgsCount>,
+                        _Index
+                    >::type,
+                    _Index
+                >
+            >
+        {
+        };
+
+        template<class _ArgsT, class _ArgT, int _Index, class _ReplArgsT, class _ResultArgsT>
+        struct _replace_ph_args2<
+            _args<_ArgsT, _ArgT, _Index>, _ReplArgsT, _Index, _ResultArgsT>
+        {
+            typedef
+            _ResultArgsT type;
+        };
+
+        template<class>
+        struct _ph_max_index;
+        
+        template<class _Tp>
+        struct _ph_max_index_impl
+        {
+            template<class _NextTp>
+            struct get
+            {
+                typedef _Tp prev_type;
+                typedef 
+                typename
+                conditional<
+                    (is_placeholder<prev_type>::value < is_placeholder<_NextTp>::value),
+                    _ph_max_index<_NextTp>,
+                    _ph_max_index<prev_type>
+                >::type type;
+            };
+        };
+
+        template<class _Tp>
+        struct _ph_max_index:
+            is_placeholder<_Tp>,
+            _ph_max_index_impl<_Tp>
+        { 
+
+        };
+
+        template<
+            _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, = ::stdex::detail::void_type)
+        >
+        struct _binder_traits
+        {
+            typedef
+            typename detail::_make_args::
+#undef _STDEX_DELIM
+#define _STDEX_DELIM ::
+            _STDEX_TYPES_MAX(template add <, >::type)::
+#undef _STDEX_DELIM
+#define _STDEX_DELIM _STDEX_DELIM_DEFAULT
+            args args_type;
+
+            static const std::size_t ph_max_index = 
+            detail::_ph_max_index<void>::
+#undef _STDEX_DELIM
+#define _STDEX_DELIM ::
+            _STDEX_TYPES_MAX(template get <, >::type)::
+#undef _STDEX_DELIM
+#define _STDEX_DELIM _STDEX_DELIM_DEFAULT
+            value;
+        };
+
+        template<class _ArgsT, class _MissingArgsT, int _N,
+            int _IsPh>
+        struct _get_ph_args_impl
+        {
+            typedef
+            typename 
+            stdex::detail::_get_args_traits<_MissingArgsT, _IsPh - 1>::arg_type arg_type;
+
+            template<class _ArgT>
+            static arg_type &call(const _ArgT &, arg_type &missing_arg)
+            {
+                return missing_arg;
+            }
+        };
+
+        template<class _ArgsT, class _MissingArgsT, int _N>
+        struct _get_ph_args_impl<_ArgsT, _MissingArgsT, _N, 0>
+        {
+            typedef
+            typename 
+            _get_args_traits<_ArgsT, _N>::arg_type arg_type;
+
+            template<class _MissingArgT>
+            static arg_type &call(arg_type &arg, const _MissingArgT &)
+            {
+                return arg;
+            }
+        };
+
+        template<class _ArgsT, class _MissingArgsT, int _N>
+        struct _get_ph_args_impl<_ArgsT, _MissingArgsT, _N, -1>
+        {
+            template<class _MissingArgT>
+            static void_type call(_ArgsT &, const _MissingArgT &)
+            {
+                return void_type();
+            }
+        };
+
+        template<class _ArgsT, int _N, bool>
+        struct _get_ph_args_helper_impl:
+            integral_constant<int, -1>
+        { };
+
+        template<class _ArgsT, int _N>
+        struct _get_ph_args_helper_impl<_ArgsT, _N, true>:
+            is_placeholder<
+                typename _get_args_traits<_ArgsT, _N>::value_type>
+        { };
+
+        template<class _ArgsT, int _N>
+        struct _get_ph_args_helper:
+            _get_ph_args_helper_impl<_ArgsT, _N, (_ArgsT::count > _N)>
+        { };
+
+        template<class _ArgsT, class _MissingArgsT, int _N>
+        struct _get_ph_args:
+            _get_ph_args_impl<_ArgsT, _MissingArgsT, _N,
+                _get_ph_args_helper<
+                    _ArgsT, _N>::value>
+        { };
+
+        template<class _R>
+        _R& _get_return(_return_arg<_R> &arg)
+        {
+            return arg.get();
+        }
+
+        void _get_return(_return_arg<void>&)
+        {
+        }
+
+        template<
+            class _R,
+            class _FuncT,
+            class _TraitsT,
+            std::size_t _PhMaxIndex
+        >
+        class _binder_impl;
+
+#define _STDEX_TYPE_MISSING(arg_n) _MissingArg##arg_n##T
+#define _STDEX_TYPE_DISABLED(arg_n) ::stdex::detail::tuple_detail::disabled_type
+#define _STDEX_ARG_DISABLED(arg_n) disabled_arg##arg_n
+#define _STDEX_MERGE_ARGS(arg_n) detail::_get_ph_args<_ArgsT, missing_args_type, arg_n>::call(args, missing_args)
+
+        template<
+            class _R,
+            class _FuncT,
+            class _TraitsT
+        >
+        class _binder_impl< _R, _FuncT, _TraitsT, 0>
+        {
+            typedef typename _TraitsT::args_type _ArgsT;
+
+        protected:
+            _binder_impl(
+                _FuncT &fx_,
+                _ArgsT &args_
+            )
+            : args( args_ )
+            , fx( fx_ )
+            { }
+
+            _R operator()(
+                _STDEX_PARAMS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = ::stdex::detail::void_type(), _STDEX_TYPE_DISABLED, _STDEX_ARG_DISABLED)
+            )
+            {
+                typedef 
+                typename
+                detail::_binder_traits<
+                    _STDEX_TYPES0_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING)
+                >::args_type missing_args_type; 
+
+                missing_args_type missing_args = missing_args_type(
+                    _STDEX_ARGS0(_STDEX_BLANK, _STDEX_BLANK)
+                    );
+
+                typedef
+                detail::_replace_ph_args<_ArgsT, missing_args_type, 0, void>::type result_args;
+
+                detail::_callable_args<result_args> callable_args = 
+                    result_args(
+                        _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_MERGE_ARGS)
+                    );
+                
+                detail::_return_arg<_R> result = 0;
+
+                detail::_invoke(fx, callable_args, result);
+
+                return detail::_get_return(result);
+            }
+
+        private:
+            _ArgsT &args;
+            _FuncT &fx;
+        };
+
+        template<
+            class _R,
+            class _FuncT,
+            class _TraitsT
+        >
+        class _binder_impl<_R, _FuncT, _TraitsT, 1>
+        {
+            typedef typename _TraitsT::args_type _ArgsT;
+
+        protected:
+            _binder_impl(
+                _FuncT &fx_,
+                _ArgsT &args_
+            )
+            : args( args_ )
+            , fx( fx_ )
+            { }
+
+        public:
+            template<_STDEX_TMPL_ARGS0_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING)>
+            _R operator()(
+                _STDEX_PARAMS0_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING, _STDEX_ARG_DEFAULT),
+                _STDEX_PARAMS30_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = ::stdex::detail::void_type(), _STDEX_TYPE_DISABLED, _STDEX_ARG_DISABLED)
+            )
+            {
+                typedef 
+                typename
+                detail::_binder_traits<
+                    _STDEX_TYPES0_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING)
+                >::args_type missing_args_type; 
+
+                missing_args_type missing_args = missing_args_type(
+                    _STDEX_ARGS0(_STDEX_BLANK, _STDEX_BLANK)
+                    );
+
+                typedef
+                detail::_replace_ph_args<_ArgsT, missing_args_type, 0, void>::type result_args;
+
+                detail::_callable_args<result_args> callable_args = 
+                    result_args(
+                        _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_MERGE_ARGS)
+                    );
+                
+                detail::_return_arg<_R> result = 0;
+
+                detail::_invoke(fx, callable_args, result);
+
+                return detail::_get_return(result);
+            }
+
+        private:
+            _ArgsT &args;
+            _FuncT &fx;
+        };
+
+#undef _STDEX_TYPE_MISSING
+#undef _STDEX_TYPE_DISABLED
+#undef _STDEX_ARG_DISABLED
+
+    } // namespace detail
+
+#define _STDEX_ARG_CUSTOM(arg_n) ::stdex::detail::_arg<_STDEX_TYPE_DEFAULT(arg_n), arg_n>( _STDEX_ARG_DEFAULT(arg_n) )
+    template<
+        class _R,
+        class _FuncT,
+        _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, = ::stdex::detail::void_type)
+    >
+    class binder:
+        public detail::_binder_impl<
+            _R, 
+            _FuncT,
+            ::stdex::detail::_binder_traits<_STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)>,
+            ::stdex::detail::_binder_traits<_STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)>::ph_max_index>
+    { 
+        typedef detail::_binder_traits<_STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)> traits;
+
+        typedef 
+        typename
+        traits::args_type args_type;
+
+        typedef _FuncT func_type;
+
+        typedef 
+        detail::_binder_impl<_R, func_type,
+            traits,
+            traits::ph_max_index> base_type;
+
+    public:
+        binder(
+            func_type fx_,
+            _STDEX_PARAMS_MAX(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = ::stdex::detail::void_type())
+        )
+        : base_type(fx, args) 
+        , args( _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_CUSTOM) )
+        , fx( fx_ )
+        { }
+
+    private:
+        args_type args;
+        func_type fx;
+    };
+
+#undef _STDEX_ARG_CUSTOM
+
+    template<class _FuncT, class _Arg0T>
+    binder<void, _FuncT, _Arg0T>
+    bind(_FuncT fx, _Arg0T arg0)
+    {
+        return binder<void, _FuncT, _Arg0T>(fx, arg0);
+    }
+
+    template<class _FuncT, class _Arg0T, class _Arg1T>
+    binder<void, _FuncT, _Arg0T, _Arg1T> 
+    bind(_FuncT fx, _Arg0T arg0, _Arg1T arg1)
+    {
+        return binder<void, _FuncT, _Arg0T, _Arg1T>(fx, arg0, arg1);
+    }
+
     // Hashing
 
 
