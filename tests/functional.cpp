@@ -438,12 +438,28 @@ int test08()
     return 0;
 }
 
+class replaced{};
+
 int test09()
 {
     dummy_functor func;
     operations_counter counter;
 
-    //std::bind;
+    struct lambdas
+    {
+        static void func_none(){}
+        static void func0(int, float){}
+    };
+    int val;
+    
+    stdex::function<void(*)(double)> functor = 
+        stdex::bind(&lambdas::func0, val, stdex::placeholders::_1);
+    
+    functor(0.0);
+
+    stdex::bind(&lambdas::func0, 0, stdex::placeholders::_1)(val);
+
+    stdex::bind(&lambdas::func_none)(0);
 
     return 0;
 }
