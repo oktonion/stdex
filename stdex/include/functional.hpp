@@ -2079,6 +2079,7 @@ namespace stdex
                     );
 
                 typedef
+                typename
                 detail::_replace_ph_args<_ArgsT, missing_args_type, 0, void>::type result_args;
 
                 detail::_callable_args<result_args> callable_args = 
