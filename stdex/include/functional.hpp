@@ -1986,11 +1986,13 @@ namespace stdex
         { };
 
         template<class _R>
+        inline
         _R& _get_return(_return_arg<_R> &arg)
         {
             return arg.get();
         }
 
+        inline
         void _get_return(_return_arg<void>&)
         {
         }
