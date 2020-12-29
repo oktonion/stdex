@@ -1795,7 +1795,9 @@ namespace stdex
     // Bind
 
     template<class>
-    struct is_placeholder;
+    struct is_placeholder
+        : integral_constant<int, 0>
+    { };
 
     namespace detail
     {
@@ -2566,11 +2568,6 @@ namespace stdex
         static const detail::_ph<31> &_31 = detail::_ph<31>::instance();
         static const detail::_ph<32> &_32 = detail::_ph<32>::instance();
     }
-
-    template<class>
-    struct is_placeholder
-        : integral_constant<int, 0>
-    { };
 
     template<int _N>
     struct is_placeholder<placeholders::detail::_ph<_N>/**/>
