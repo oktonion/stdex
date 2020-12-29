@@ -2005,8 +2005,17 @@ namespace stdex
         >
         class _binder_impl;
 
+        namespace functional_detail
+        {
+            struct _any_type: void_type
+            {
+                template<class _Tp>
+                _any_type(const _Tp&){}
+            };
+        } // namespace tuple_detail
+
 #define _STDEX_TYPE_MISSING(arg_n) _MissingArg##arg_n##T
-#define _STDEX_TYPE_DISABLED(arg_n) ::stdex::detail::tuple_detail::disabled_type
+#define _STDEX_TYPE_DISABLED(arg_n) ::stdex::detail::functional_detail::_any_type
 #define _STDEX_ARG_DISABLED(arg_n) disabled_arg##arg_n
 #define _STDEX_MERGE_ARGS(arg_n) detail::_get_ph_args<_ArgsT, missing_args_type, arg_n>::call(args, missing_args)
 
@@ -2117,7 +2126,7 @@ namespace stdex
     class binder:
         public detail::_binder_impl<
             _R, 
-            _FuncT,
+            typename decay<_FuncT>::type,
             ::stdex::detail::_binder_traits<_STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)>,
             ::stdex::detail::_binder_traits<_STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)>::ph_max_index>
     { 
@@ -2127,7 +2136,7 @@ namespace stdex
         typename
         traits::args_type args_type;
 
-        typedef _FuncT func_type;
+        typedef typename decay<_FuncT>::type func_type;
 
         typedef 
         detail::_binder_impl<_R, func_type,
@@ -2150,6 +2159,13 @@ namespace stdex
     };
 
 #undef _STDEX_ARG_CUSTOM
+
+    template<class _FuncT>
+    binder<void, _FuncT>
+    bind(_FuncT fx)
+    {
+        return binder<void, _FuncT>(fx);
+    }
 
     template<class _FuncT, class _Arg0T>
     binder<void, _FuncT, _Arg0T>
