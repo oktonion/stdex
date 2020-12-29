@@ -2030,33 +2030,16 @@ namespace stdex
                 _STDEX_PARAMS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = ::stdex::detail::void_type(), _STDEX_TYPE_DISABLED, _STDEX_ARG_DISABLED)
             )
             {
-                typedef 
-                typename
-                detail::_binder_traits<
-                    _STDEX_TYPES0_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING)
-                >::args_type missing_args_type; 
-
-                missing_args_type missing_args = missing_args_type(
-                    _STDEX_ARGS0(_STDEX_BLANK, _STDEX_BLANK)
-                    );
-
-                typedef
-                detail::_replace_ph_args<_ArgsT, missing_args_type, 0, void>::type result_args;
-
-                detail::_callable_args<result_args> callable_args = 
-                    result_args(
-                        _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_MERGE_ARGS)
-                    );
                 
                 detail::_return_arg<_R> result = 0;
 
-                detail::_invoke(fx, callable_args, result);
+                detail::_invoke(fx, args, result);
 
                 return detail::_get_return(result);
             }
 
         private:
-            _ArgsT &args;
+            detail::_callable_args<_ArgsT> args;
             _FuncT &fx;
         };
 
