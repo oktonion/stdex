@@ -689,7 +689,6 @@ namespace stdex
             _return_arg(_R* ptr_) :_ptr(ptr_) {}
             void swap(_return_arg& other) { using std::swap; swap(_ptr, other._ptr); }
             ~_return_arg() { delete _ptr; }
-            _return_arg(_return_arg& other): _ptr(0) { swap(other); }
 
             _R* release() { _R* _tmp = _ptr; _ptr = 0; return _tmp; }
             _R& get() { return *_ptr; }
