@@ -450,7 +450,7 @@ int test09()
         static void func_none(){}
         static void func0(int, float){}
     };
-    int val;
+    int val = 1;
     
     stdex::function<void(*)(double)> functor = 
         stdex::bind(&lambdas::func0, val, stdex::placeholders::_1);
