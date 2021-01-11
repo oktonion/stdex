@@ -9,6 +9,8 @@
 // std includes
 #include <exception>
 #include <cstdlib>
+#include <numeric>
+#include <cstring>
 
 void timespec_add(timespec &result, const timespec &in)
 {
@@ -66,6 +68,7 @@ void timespec_add(timespec &result, const timespec &in)
 
 #include <process.h>
 
+typedef LONGLONG duration_long_long;
 struct filetime_ptr
 {
     FILETIME* value;
@@ -353,6 +356,8 @@ using clock_gettime_impl::local_ts_to_system_ts;
 #include <sys/time.h>       /* gettimeofday */
 #include <mach/mach_time.h> /* mach_absolute_time */
 
+typedef ::int64_t duration_long_long;
+
 #define BILLION 1000000000L
 #define MILLION 1000000L
 
@@ -424,6 +429,7 @@ stdex::timespec local_ts_to_system_ts(const stdex::timespec &ts)
 }
 #else
 
+typedef long long duration_long_long;
 
 int clock_gettime(clockid_t, struct timespec*);
 int my_clock_gettime(clockid_t X, stdex::timespec *tv)
@@ -514,6 +520,177 @@ const stdex::timespec& local_ts_to_system_ts(const stdex::timespec &ts)
 
 #endif
 
+namespace stdex {
+    namespace chrono {
+        namespace detail {
+
+            using stdex::detail::_declptr;
+
+            duration_long_long convert(const _big_int &value)
+            {
+                duration_long_long result;
+                std::memcpy(&result, value.least64_value, sizeof(duration_long_long));
+                return result;
+            }
+
+            _big_int convert(const duration_long_long& value)
+            {
+                _big_int result;
+                std::memcpy(result.least64_value, &value, sizeof(duration_long_long));
+                return result;
+            }
+
+            _big_int::_big_int(stdex::intmax_t _value)
+            {
+                STATIC_ASSERT(sizeof(duration_long_long) <= sizeof(_declptr<_big_int>()->least64_value), platform_specific_int64_should_fit_in_8_bytes);
+                duration_long_long value = _value;
+                std::memcpy(least64_value, &value, sizeof(duration_long_long));
+            }
+
+            _big_int::_big_int(const _big_int& other)
+            {
+                std::memcpy(least64_value, other.least64_value, sizeof(least64_value));
+            }
+
+            _big_int& _big_int::operator=(const _big_int& other)
+            {
+                std::memcpy(least64_value, other.least64_value, sizeof(least64_value));
+                return *this;
+            }
+
+            stdex::intmax_t _big_int::to_integer() const
+            {
+                duration_long_long result = convert(*this);
+
+                if (result > (std::numeric_limits<stdex::intmax_t>::max)())
+                    throw(std::out_of_range("overflow in stdex::chrono::duration cast to stdex::intmax_t"));
+
+                return stdex::intmax_t(result);
+            }
+
+            long double     _big_int::to_floating_point() const
+            {
+                long double result = static_cast<long double>(convert(*this));
+
+                if (result > (std::numeric_limits<long double>::max)())
+                    throw(std::out_of_range("overflow in stdex::chrono::duration cast to long double"));
+
+                return (long double)(result);
+            }
+
+            _big_int& _big_int::operator++()
+            {
+                *this = convert(convert(*this) + 1);
+                return *this;
+            }
+
+            _big_int _big_int::operator++(int)
+            {
+                _big_int tmp(*this);
+                operator++();
+                return tmp;
+            }
+
+            _big_int& _big_int::operator--()
+            {
+                *this = convert(convert(*this) - 1);
+                return *this;
+            }
+
+            _big_int _big_int::operator--(int)
+            {
+                _big_int tmp(*this);
+                operator--();
+                return tmp;
+            }
+
+            _big_int& _big_int::operator+=(const _big_int& other)
+            {
+                *this = convert(convert(*this) + convert(other));
+                return *this;
+            }
+
+            _big_int& _big_int::operator-=(const _big_int& other)
+            {
+                *this = convert(convert(*this) - convert(other));
+                return *this;
+            }
+
+            _big_int& _big_int::operator*=(const _big_int& other)
+            {
+                *this = convert(convert(*this) * convert(other));
+                return *this;
+            }
+
+            _big_int& _big_int::operator/=(const _big_int& other)
+            {
+                *this = convert(convert(*this) / convert(other));
+                return *this;
+            }
+
+            _big_int& _big_int::operator%=(const _big_int& other)
+            {
+                *this = convert(convert(*this) % convert(other));
+                return *this;
+            }
+
+            _big_int operator+(_big_int a, const _big_int& b)
+            {
+                return a += b;
+            }
+
+            _big_int operator-(_big_int a, const _big_int& b)
+            {
+                return a -= b;
+            }
+
+            _big_int operator*(_big_int a, const _big_int& b)
+            {
+                return a *= b;
+            }
+
+            _big_int operator/(_big_int a, const _big_int& b)
+            {
+                return a /= b;
+            }
+
+            _big_int operator%(_big_int a, const _big_int& b)
+            {
+                return a %= b;
+            }
+            
+            bool operator< (const _big_int& a, const _big_int& b)
+            {
+                return convert(a) < convert(b);
+            }
+
+            bool operator> (const _big_int& a, const _big_int& b)
+            {
+                return convert(a) > convert(b);
+            }
+
+            bool operator==(const _big_int& a, const _big_int& b)
+            {
+                return convert(a) == convert(b);
+            }
+
+            bool operator!=(const _big_int& a, const _big_int& b)
+            {
+                return convert(a) != convert(b);
+            }
+
+            bool operator>=(const _big_int& a, const _big_int& b)
+            {
+                return convert(a) >= convert(b);
+            }
+
+            bool operator<=(const _big_int& a, const _big_int& b)
+            {
+                return convert(a) <= convert(b);
+            }
+        } // namespace detail
+    } // namespace chrono
+} // namespace stdex
 
 stdex::timespec
     stdex::chrono::system_clock::to_timespec(const time_point &_t) _STDEX_NOEXCEPT_FUNCTION
