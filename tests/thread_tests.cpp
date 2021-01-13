@@ -496,87 +496,9 @@ int test9()
 
 #define CHECK_FOR_THROW_EVENTS 1
 
-int test10()
-{
-    using namespace stdex;
-#if CHECK_FOR_THROW_EVENTS != 0
-        {
-            bool test = false;
 
-            thread t;
-            try
-            {
-                t.join();
-            }
-            catch (const system_error&)
-            {
-                test = true;
-            }
-            catch (const char *)
-            {
-                DYNAMIC_VERIFY_FAIL ;
-            }
 
-            DYNAMIC_VERIFY(test);
-        }
 
-        {
-            bool test = false;
-
-            thread t;
-
-            try
-            {
-                t.detach();
-            }
-            catch (const system_error&)
-            {
-                test = true;
-            }
-            catch (const char *)
-            {
-                DYNAMIC_VERIFY_FAIL ;
-            }
-
-            DYNAMIC_VERIFY(test);
-        }
-#endif
-    return 0;
-}
-
-int test11()
-{
-    using namespace stdex;
-
-    thread_func_nullptr_check_ret = 0;
-
-    {
-        float p;
-        ClassType cl;
-        thread t1(thread_func_nullptr_check, nullptr, &p, nullptr, &cl);
-
-        t1.join();
-    }
-
-    return thread_func_nullptr_check_ret;
-}
-
-int test12()
-{
-    using namespace stdex;
-
-    thread_func_nullptr_check_ret = 0;
-    
-    {
-        float p;
-        ClassType cl;
-        thread t1(functor(), &p, nullptr, nullptr, nullptr, &cl);
-
-        t1.join();
-    }
-
-    return thread_func_nullptr_check_ret;
-}
 
 void dummy_func_0() {}
 void dummy_func_1(void*) {}
@@ -877,10 +799,10 @@ int test13()
 int test14()
 {
     #if defined(_STDEX_NATIVE_CPP11_SUPPORT) || defined(__MACH__)
-    
+
     std::intmax_t std_dur, std_desired_dur;
 
-    {   
+    {
         using namespace std;
         using namespace std::chrono;
         typedef std::intmax_t intmax_type;
@@ -889,7 +811,7 @@ int test14()
 
         stdex::this_thread::sleep_for(stdex::chrono::milliseconds(25000));
 
-        steady_clock::duration dur = 
+        steady_clock::duration dur =
             steady_clock::now() - start;
 
         intmax_type desired_dur = duration_cast<milliseconds>(dur).count();
@@ -969,10 +891,10 @@ int main(void)
         RUN_TEST(test6);
         RUN_TEST(test8);
         RUN_TEST(test9);
-        RUN_TEST(test10);
-        RUN_TEST(test11);
-        RUN_TEST(test12);
-        RUN_TEST(test13);
+        //RUN_TEST(test10);
+        //RUN_TEST(test11);
+        //RUN_TEST(test12);
+        //RUN_TEST(test13);
         
     }
 
