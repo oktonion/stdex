@@ -596,51 +596,13 @@ namespace stdex
     {
         template<class>
         struct _has_bug;
-
-        template<>
-        struct _has_bug<class _stdex_function_can_be_const>
-        { 
-            typedef void func_type();
-
-            static const bool value = 
-                detail::_canonical_is_function_const<func_type>::value == bool(false);
-        };
-
-        template<>
-        struct _has_bug<class _stdex_function_can_be_volatile>
-        { 
-            typedef void func_type();
-
-            static const bool value = 
-                detail::_canonical_is_function_volatile<func_type>::value == bool(false);
-        };
-
-        template<>
-        struct _has_bug<class _stdex_function_can_be_cv_qualified>
-        { 
-            static const bool value =
-                _has_bug<_stdex_function_can_be_volatile>::value ||
-                _has_bug<_stdex_function_can_be_const>::value;
-        };
     } //namespace intern
 
     namespace detail
     {
-        template<class _Tp, bool>
-        struct _is_const_impl_bug_check
-        {
-            typedef bool_constant<is_function<_Tp>::value == bool(false)> type;
-        };
-
-        template<class _Tp>
-        struct _is_const_impl_bug_check<const _Tp, false>
-        {
-            typedef true_type type;
-        };
-
         template<class _NonConstT, class _ConstT>
         struct _is_const_impl_fallback:
-            _is_const_impl_bug_check<_ConstT, intern::_has_bug<intern::_stdex_function_can_be_const>::value>::type
+            bool_constant<is_function<_NonConstT>::value == bool(false)>
         { };
 
         template<class _Tp>
@@ -666,21 +628,9 @@ namespace stdex
 
     namespace detail
     {
-        template<class _Tp, bool>
-        struct _is_volatile_impl_bug_check
-        {
-            typedef bool_constant<is_function<_Tp>::value == bool(false)> type;
-        };
-
-        template<class _Tp>
-        struct _is_volatile_impl_bug_check<volatile _Tp, false>
-        {
-            typedef true_type type;
-        };
-
         template<class _NonVolatileT, class _VolatileT>
         struct _is_volatile_impl_fallback:
-            _is_volatile_impl_bug_check<_VolatileT, intern::_has_bug<intern::_stdex_function_can_be_volatile>::value>::type
+            bool_constant<is_function<_NonVolatileT>::value == bool(false)>
         { };
 
         template<class _Tp>
@@ -907,9 +857,6 @@ namespace stdex
         public alignment_of<detail::_long_double_wrapper>
     {};
 
-    template<class _Tp>
-    struct is_function;
-
     namespace detail
     {
         template<class>
@@ -1014,42 +961,16 @@ namespace stdex
 
     namespace detail
     {
-        template<class _FuncPtrT, bool, bool>
-        struct _is_function_ptr_helper_bug_check
-        {
-            typedef false_type type;
-        };
-
-        template<class _FuncPtrT>
-        struct _is_function_ptr_helper_bug_check<_FuncPtrT, false, true>
-        {
-            typedef typename remove_pointer<_FuncPtrT>::type function_type;
-            typedef bool_constant<detail::_canonical_is_const<const function_type>::value == bool(false)> type;
-        };
-
-        template<class _FuncPtrT>
-        struct _is_function_ptr_helper_bug_check<_FuncPtrT, true, false>
-        {
-            typedef typename remove_pointer<_FuncPtrT>::type function_type;
-            typedef bool_constant<detail::_canonical_is_volatile<volatile function_type>::value == bool(false)> type;
-        };
-
-        template<class _FuncPtrT>
-        struct _is_function_ptr_helper_bug_check<_FuncPtrT, false, false>:
-            _is_function_ptr_helper_bug_check<_FuncPtrT, false, true>
-        { };
-
         template<class _FuncPtrT>
         struct _is_function_ptr_helper_fallback:
-            _is_function_ptr_helper_bug_check<_FuncPtrT, 
-                intern::_has_bug<intern::_stdex_function_can_be_const>::value,
-                intern::_has_bug<intern::_stdex_function_can_be_volatile>::value>::type
+            false_type
         { };
+
         template <class _FuncPtrT>
         struct _is_function_ptr_helper_cdecl:
             _is_function_ptr_helper_fallback<_FuncPtrT>::type
-        {
-        };
+        { };
+
         template <class _FuncPtrT>
         struct _is_function_ptr_helper_fastcall : _is_function_ptr_helper_cdecl<_FuncPtrT> {};
         template <class _FuncPtrT>
@@ -2142,11 +2063,9 @@ namespace stdex
 
         template<class _Tp>
         struct _is_function_chooser_helper<_Tp, false>
+            : true_type
         // if there is no compiler bug for treating cv-qualified function pointer as a thing
         { 
-            static const bool value = 
-                detail::_canonical_is_const<const _Tp>::value == bool(false) ||
-                detail::_canonical_is_volatile<volatile _Tp>::value == bool(false);
         };
 
         template<class _Tp, bool _IsRef>
@@ -2158,7 +2077,9 @@ namespace stdex
         struct _is_function_chooser<_Tp, false>
         {
             static const bool value = 
-                _is_function_chooser_helper<_Tp, intern::_has_bug<intern::_stdex_function_can_be_cv_qualified>::value>::value;
+                _is_function_chooser_helper<_Tp, 
+                    _canonical_is_const<const _Tp>::value == bool(true) ||
+                    _canonical_is_volatile<volatile _Tp>::value == bool(true)>::value;
         };
     }
 
