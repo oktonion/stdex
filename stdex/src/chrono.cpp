@@ -226,7 +226,7 @@ namespace clock_gettime_impl
     }
 
     static const LARGE_INTEGER& get_rel_start_point() {
-        static const LARGE_INTEGER& cached_freq = cache_freq();
+        cache_freq();
 
         struct lambdas {
             static LARGE_INTEGER get_qpc()
