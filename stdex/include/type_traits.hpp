@@ -997,14 +997,10 @@ namespace stdex
 #ifdef _STDEX_STDCALL
         template <class _R >
         struct _is_function_ptr_helper_stdcall<_R(_STDEX_STDCALL*)() > : true_type {};
-        template <class _R >
-        struct _is_function_ptr_helper_stdcall<_R(_STDEX_STDCALL*)(...) > : true_type {};
 
 #define _STDEX_IS_FUNCTION_PTR_HELPER_STDCALL(count) \
         template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
-        struct _is_function_ptr_helper_stdcall<_R(_STDEX_STDCALL *)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK))>: true_type {}; \
-        template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
-        struct _is_function_ptr_helper_stdcall<_R(_STDEX_STDCALL *)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...)>: true_type {};
+        struct _is_function_ptr_helper_stdcall<_R(_STDEX_STDCALL *)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK))>: true_type {};
 #else
 #define _STDEX_IS_FUNCTION_PTR_HELPER_STDCALL(count)
 #endif
@@ -1012,14 +1008,10 @@ namespace stdex
 #ifdef _STDEX_FASTCALL
         template <class _R >
         struct _is_function_ptr_helper_fastcall<_R(_STDEX_FASTCALL*)() > : true_type {};
-        template <class _R >
-        struct _is_function_ptr_helper_fastcall<_R(_STDEX_FASTCALL*)(...) > : true_type {};
 
 #define _STDEX_IS_FUNCTION_PTR_HELPER_FASTCALL(count) \
         template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
-        struct _is_function_ptr_helper_fastcall<_R(_STDEX_FASTCALL *)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK))>: true_type {}; \
-        template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
-        struct _is_function_ptr_helper_fastcall<_R(_STDEX_FASTCALL *)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...)>: true_type {};
+        struct _is_function_ptr_helper_fastcall<_R(_STDEX_FASTCALL *)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK))>: true_type {};
 #else
 #define _STDEX_IS_FUNCTION_PTR_HELPER_FASTCALL(count)
 #endif
@@ -1274,21 +1266,21 @@ namespace stdex
         };
 
         template<class _Tp>
-        struct _is_function_chooser_helper<const _Tp, true>
+        struct _is_function_chooser_helper<const _Tp, false>
         {
             static const bool value = 
                 _is_function_chooser_impl<_Tp*, _is_mem_function_ptr_helper<const _Tp>::value>::value;
         };
 
         template<class _Tp>
-        struct _is_function_chooser_helper<volatile _Tp, true>
+        struct _is_function_chooser_helper<volatile _Tp, false>
         {
             static const bool value = 
                 _is_function_chooser_impl<_Tp*, _is_mem_function_ptr_helper<volatile _Tp>::value>::value;
         };
 
         template<class _Tp>
-        struct _is_function_chooser_helper<const volatile _Tp, true>
+        struct _is_function_chooser_helper<const volatile _Tp, false>
         {
             static const bool value = 
                 _is_function_chooser_impl<_Tp*, _is_mem_function_ptr_helper<const volatile _Tp>::value>::value;
@@ -1296,9 +1288,9 @@ namespace stdex
 
 
         template<class _Tp>
-        struct _is_function_chooser_helper<_Tp, false>
+        struct _is_function_chooser_helper<_Tp, true>
             : true_type
-        // if there is no compiler bug for treating cv-qualified function pointer as a thing
+        // if there is no compiler bug for treating cv-qualified function type as a thing
         { 
         };
 
@@ -1310,10 +1302,12 @@ namespace stdex
         template <class _Tp>
         struct _is_function_chooser<_Tp, false>
         {
+            typedef typename remove_cv<_Tp>::type _stripped_type;
+
             static const bool value = 
                 _is_function_chooser_helper<_Tp, 
-                    _canonical_is_const<const _Tp>::value == bool(true) ||
-                    _canonical_is_volatile<volatile _Tp>::value == bool(true)>::value;
+                    _canonical_is_function_const<_stripped_type>::value == bool(true) ||
+                    _canonical_is_function_volatile<_stripped_type>::value == bool(true)>::value;
         };
     }
 
