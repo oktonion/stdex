@@ -211,7 +211,7 @@ public:
         std::cout << "movable_not_copyable_child(int)" << std::endl;
     }
     movable_not_copyable_child(STDEX_RV_REF(movable_not_copyable_child) other):
-        movable_not_copyable( MY_STD::move(other).operator stdex::rvalue_reference<movable_not_copyable, false> &() )
+        movable_not_copyable( MY_STD::move(static_cast<movable_not_copyable&>(other)) )
     {
         //movable_not_copyable &other = other_;
         std::cout << "movable_not_copyable_child(rv_ref)" << std::endl;
