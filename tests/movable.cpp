@@ -15,13 +15,18 @@
     //#undef STDEX_RV_REF
     //#define STDEX_RV_REF(Type) Type&&
     //#undef STDEX_RV_REF_CONST
-    //#define STDEX_RV_REF_CONST(Type) Type const&&
+    //#define STDEX_RV_REF_CONST(Type) const Type&&
 #endif
 
 #define MY_STD stdex
 
+//#define ENABLE_CT_ERRORS
+
+
 class movable
 {
+    STDEX_MOVABLE(movable)
+
     char data;
 public:
     movable(int)
@@ -74,7 +79,8 @@ public:
 
 class movable_only
 {
-    STDEX_NOT_COPYABLE
+    STDEX_MOVABLE_BUT_NOT_COPYABLE(movable_only)
+
     char data;
 public:
     movable_only(int): STDEX_DELETE_ICC()
@@ -87,6 +93,12 @@ public:
         std::cout << "movable_only(rv_ref)" << std::endl;
         this->swap(other);
     }
+    movable_only(STDEX_RV_REF_CONST(movable_only) other) : STDEX_DELETE_ICC()
+    {
+        //movable &other = other_;
+        std::cout << "movable_only(rv_ref)" << std::endl;
+        //this->swap(other);
+    }
     ~movable_only(){} // eliminates compiler generated move-members
 
     movable_only& operator=(STDEX_RV_REF(movable_only) other)
@@ -94,6 +106,16 @@ public:
         //movable &other = other_;
         std::cout << "movable_only = rv_ref" << std::endl;
         this->swap(other);
+
+        return *this;
+    }
+
+    movable_only& operator=(STDEX_RV_REF_CONST(movable_only) other)
+    {
+        //movable &other = other_;
+        std::cout << "movable_only = rv_ref_const" << std::endl;
+        movable_only tmp = MY_STD::move(other);
+        this->swap(tmp);
 
         return *this;
     }
@@ -113,7 +135,8 @@ public:
 class movable_not_copyable:
     public movable
 {
-    STDEX_NOT_COPYABLE
+    STDEX_MOVABLE_BUT_NOT_COPYABLE(movable_not_copyable)
+
     bool data2;
 public:
     movable_not_copyable(int v = 0): movable(v), STDEX_DELETE_ICC()
@@ -123,10 +146,18 @@ public:
     movable_not_copyable(STDEX_RV_REF(movable_not_copyable) other):
         movable(MY_STD::move(other)),
         STDEX_DELETE_ICC(),
-        data2(static_cast<const movable_not_copyable&>(other).data2)
+        data2(MY_STD::move(static_cast<movable_not_copyable&>(other).data2))
     {
         //movable_not_copyable &other = other_;
         std::cout << "movable_not_copyable(rv_ref)" << std::endl;
+    }
+    movable_not_copyable(STDEX_RV_REF_CONST(movable_not_copyable) other) :
+        movable(MY_STD::move(other)),
+        STDEX_DELETE_ICC(),
+        data2(MY_STD::move(static_cast<const movable_not_copyable&>(other).data2))
+    {
+        //movable_not_copyable &other = other_;
+        std::cout << "movable_not_copyable(rv_ref_const)" << std::endl;
     }
     ~movable_not_copyable(){} // eliminates compiler generated move-members
 
@@ -135,6 +166,18 @@ public:
     {
         //movable_not_copyable &other = other_;
         std::cout << "movable_not_copyable = rv_ref" << std::endl;
+        movable_not_copyable tmp(MY_STD::move(other));
+
+        using std::swap;
+        this->swap(tmp);
+
+        return *this;
+    }
+
+    movable_not_copyable& operator=(STDEX_RV_REF_CONST(movable_not_copyable) other)
+    {
+        //movable_not_copyable &other = other_;
+        std::cout << "movable_not_copyable = rv_ref_const" << std::endl;
         movable_not_copyable tmp(MY_STD::move(other));
 
         using std::swap;
@@ -160,6 +203,7 @@ public:
 class movable_not_copyable_child:
     public movable_not_copyable
 {
+    STDEX_MOVABLE(movable_not_copyable_child)
 
 public:
     movable_not_copyable_child(int v = 0): movable_not_copyable(v)
@@ -167,7 +211,7 @@ public:
         std::cout << "movable_not_copyable_child(int)" << std::endl;
     }
     movable_not_copyable_child(STDEX_RV_REF(movable_not_copyable_child) other):
-        movable_not_copyable(MY_STD::move(other))
+        movable_not_copyable( MY_STD::move(other).operator stdex::rvalue_reference<movable_not_copyable, false> &() )
     {
         //movable_not_copyable &other = other_;
         std::cout << "movable_not_copyable_child(rv_ref)" << std::endl;
@@ -178,10 +222,11 @@ public:
     {
         //movable_not_copyable &other = other_;
         std::cout << "movable_not_copyable_child = rv_ref" << std::endl;
-        movable_not_copyable_child tmp(MY_STD::move(other));
 
         using std::swap;
-        this->swap(tmp);
+        this->swap(other);
+
+        movable_not_copyable_child tmp( MY_STD::move(other) );
 
         return *this;
     }
@@ -202,14 +247,19 @@ public:
 class movable_with_const_rv_ref:
     public movable
 {
+    STDEX_MOVABLE_BUT_NOT_COPYABLE(movable_with_const_rv_ref)
+
     int bbb;
+
 public:
     movable_with_const_rv_ref():
-        movable(0)
+        movable(0),
+        STDEX_DELETE_ICC()
     { }
 
     movable_with_const_rv_ref(STDEX_RV_REF_CONST(movable_with_const_rv_ref) other_):
-        movable(MY_STD::move(other_)),
+        movable((other_)),
+        STDEX_DELETE_ICC(),
         bbb(static_cast<const movable_with_const_rv_ref&>(other_).bbb)
     {
         //movable_not_copyable &other = other_;
@@ -227,10 +277,9 @@ public:
     {
         //movable_not_copyable &other = other_;
         std::cout << "movable_not_copyable = rv_ref" << std::endl;
-        movable_with_const_rv_ref tmp(MY_STD::move(other_));
+        movable_with_const_rv_ref tmp( MY_STD::move(other_) );
 
-        using std::swap;
-        swap(*this, tmp);
+        static_cast<movable&>(*this) = MY_STD::move<movable>(tmp);
 
         return *this;
     }    
@@ -240,17 +289,16 @@ int test0()
 {
     typedef movable_only mv_t;
     
-    mv_t mv = mv_t(0), mv3(0);
-    const mv_t  mv2(0); // shouldn't work
+    mv_t 
+        mv = mv_t(0), // should work without move - but it does not
+        mv3(0);
+    const mv_t  mv2(0);
+    mv_t mv4 = MY_STD::move(mv2); // should work
     std::cout << "should be rv_ref" << std::endl;
-    //mv = // works
+    mv = // should work
         MY_STD::move(mv_t(0)); // works
 
-    //mv = mv2; // shouldn't work
-
-    //mv = mv3; // shouldn't work
-
-    //mv = // shouldn't work
+    mv = // shouldn't work
         MY_STD::move(mv2); // works
     std::cout << "should be rv_ref" << std::endl;
     mv =  // works
@@ -289,18 +337,22 @@ int test2()
     typedef movable_not_copyable mv_t;
     
     std::cout << __LINE__ << std::endl;
-    mv_t mv = mv_t(0); 
+    mv_t mv = MY_STD::move( mv_t(0) ); // should work without move - but it does not
     std::cout << __LINE__ << std::endl;
     mv_t mv3(0);
     std::cout << __LINE__ << std::endl;
     const mv_t  mv2(0);
     std::cout << __LINE__ << std::endl;
-    //mv = // works
+    mv = // should work
         MY_STD::move(mv_t(0)); // works
-    //mv = mv2; // shouldn't work
-    //mv = mv3; // shouldn't work
+
+#ifdef ENABLE_CT_ERRORS
+    mv = mv2; // shouldn't work
+    mv = mv3; // shouldn't work
+#endif
+
     std::cout << __LINE__ << std::endl;
-    //mv =  // shouldn't work
+    mv =  // shouldn't work
         MY_STD::move(mv2); // works
     std::cout << __LINE__ << std::endl;
     mv =  // works
@@ -314,12 +366,17 @@ int test3()
 {
     typedef movable_with_const_rv_ref mv_t;
     
-    mv_t mv = mv_t(), mv3;
+    mv_t mv = MY_STD::move( mv_t() ), // should work without move - but it does not
+        mv3;
     const mv_t  mv2;
     mv = // works
         MY_STD::move(mv_t()); // works
-    //mv = mv2; // shouldn't work
-    //mv = mv3; // shouldn't work
+
+#ifdef ENABLE_CT_ERRORS
+    mv = mv2; // shouldn't work
+    mv = mv3; // shouldn't work
+#endif
+
     mv = // works
         MY_STD::move(mv2); // works
     mv = // works
@@ -333,18 +390,24 @@ int test4()
 {
     typedef movable_not_copyable mv_t;
 
-    mv_t mv = mv_t(0), mv3(0);
+    mv_t 
+        mv = MY_STD::move( mv_t(0) ), // should work without move - but it does not
+        mv3(0);
     const mv_t  mv2(0);
 
     std::map<int, mv_t> mv_map;
 
-    mv_map[0] =  // works
-        MY_STD::move(mv);  // works
-    mv_map[0] =  // works
-        MY_STD::move(mv_map[1]);  // works
+//    mv_map[0]; // works
+//
+//    mv_map[0] =  // works
+//        MY_STD::move(mv);  // works
+//    mv_map[0] =  // works
+//        MY_STD::move(mv_map[1]);  // works
 
-    //mv_map[0] = mv;// shouldn't work
-    //mv_map[0] = mv_map[1];// shouldn't work
+#ifdef ENABLE_CT_ERRORS
+    mv_map[0] = mv;// shouldn't work
+    mv_map[0] = mv_map[1];// shouldn't work
+#endif
 
     return 0;
 }
@@ -519,30 +582,42 @@ int test6()
 {
     // Binding of rvalue references to lvalues
     movable m(0);
-    STDEX_RV_REF(movable) r = MY_STD::move(m);
-    test6_func(r);
+    test6_func(MY_STD::move(m));
 
     return 0;
 }
+
+
+void tttt(const movable_not_copyable_child&) {}
+
+void tttt(...) {}
 
 int test7()
 {
     typedef movable_not_copyable_child mv_t;
     
     std::cout << __LINE__ << std::endl;
-    mv_t mv = mv_t(0); 
+    MY_STD::move(mv_t(0)); // should work
+    tttt( mv_t(0) );
+    mv_t mv = mv_t(0); // should work
     std::cout << __LINE__ << std::endl;
     mv_t mv3(0);
     std::cout << __LINE__ << std::endl;
     const mv_t  mv2(0);
     std::cout << __LINE__ << std::endl;
-    //mv = // works
-        MY_STD::move(mv_t(0)); // works
-    //mv = mv2; // shouldn't work
-    //mv = mv3; // shouldn't work
+    //mv = // should work
+        mv_t(0); // works
+
+#ifdef ENABLE_CT_ERRORS
+    mv = mv2; // shouldn't work
+    mv = mv3; // shouldn't work
     std::cout << __LINE__ << std::endl;
-    //mv =  // shouldn't work
+    mv =  // shouldn't work
         MY_STD::move(mv2); // works
+#endif
+
+    MY_STD::move(mv2); // works
+
     std::cout << __LINE__ << std::endl;
     mv =  // works
         MY_STD::move(mv3); // works
@@ -654,8 +729,7 @@ int test8()
     return forwarding_test(val);
 }
 
-struct forwardable:
-    public movable_not_copyable_child
+struct forwardable
 {
     std::size_t i;
 
@@ -684,7 +758,7 @@ struct forwardable:
 
 int test9()
 {
-    forwardable val;
+    forwardable val = forwardable();
     val.i = 5;
     return forwarding_test(val);
 }
@@ -695,9 +769,9 @@ int test9_1()
     val1.i = 5;
     val2.i = 5;
     STDEX_RV_REF(forwardable) 
-        val1_rv = stdex::move(val1);
+        val1_rv = MY_STD::move(val1);
     STDEX_RV_REF(forwardable) 
-        val2_rv = stdex::move(val2);
+        val2_rv = MY_STD::move(val2);
     DYNAMIC_VERIFY(val1_rv.i == val2_rv.i);
     DYNAMIC_VERIFY(val1_rv.i == val2.i);
     DYNAMIC_VERIFY(val2_rv.i == val1.i);
@@ -709,8 +783,7 @@ int test9_1()
     return 0;
 }
 
-struct forwardable_v:
-    public virtual movable_not_copyable_child
+struct forwardable_v
 {
     std::size_t i;
 

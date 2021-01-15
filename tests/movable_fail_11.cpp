@@ -15,30 +15,44 @@
 #endif
 
 #define MY_STD stdex
-
 class movable_only
 {
-    movable_only(const movable_only&);
-    const movable_only& operator=(const movable_only&);
+    STDEX_NOT_COPYABLE
     char data;
 public:
-    movable_only(int)
+    movable_only(int): STDEX_DELETE_ICC()
     {
         std::cout << "movable_only(int)" << std::endl;
     }
-    movable_only(STDEX_RV_REF(movable_only) other)
+    movable_only(STDEX_RV_REF(movable_only) other): STDEX_DELETE_ICC()
     {
         //movable &other = other_;
         std::cout << "movable_only(rv_ref)" << std::endl;
         this->swap(other);
     }
-
+    movable_only(STDEX_RV_REF_CONST(movable_only) other) : STDEX_DELETE_ICC()
+    {
+        //movable &other = other_;
+        std::cout << "movable_only(rv_ref)" << std::endl;
+        //this->swap(other);
+    }
+    ~movable_only(){} // eliminates compiler generated move-members
 
     movable_only& operator=(STDEX_RV_REF(movable_only) other)
     {
         //movable &other = other_;
         std::cout << "movable_only = rv_ref" << std::endl;
         this->swap(other);
+
+        return *this;
+    }
+
+    movable_only& operator=(STDEX_RV_REF_CONST(movable_only) other)
+    {
+        //movable &other = other_;
+        std::cout << "movable_only = rv_ref_const" << std::endl;
+        movable_only tmp = MY_STD::move(other);
+        this->swap(tmp);
 
         return *this;
     }
@@ -55,24 +69,12 @@ public:
     }
 };
 
-int test1()
+
+int main()
 {
     typedef movable_only mv_t;
-    
-    mv_t mv = mv_t(0);
     const mv_t  mv2(0);
-    std::cout << "should be rv_ref" << std::endl;
+    mv_t mv4 = mv2; // shouldn't work
 
-    mv = // shouldn't work
-        MY_STD::move(mv2); // works
-
-
-    return 0;
-}
-
-int main(void)
-{
-    
-    RUN_TEST(test1);
     return 0;
 }
