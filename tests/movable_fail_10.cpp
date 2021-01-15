@@ -77,7 +77,8 @@ int main()
     // Binding of rvalue references to lvalues
     movable m(0);
     STDEX_RV_REF(movable) r = MY_STD::move(m);
-    test_func(r);  // shouldn't work
+    test_func(r);   shouldn't work, but it works
+
 
     return 0;
 }
