@@ -316,8 +316,8 @@ namespace stdex
 	stdex::detail::delete_implicit_copy_constructor _stdex_icc_deleter;
 
 #define STDEX_MOVABLE(Type) \
-	friend stdex::remove_reference<STDEX_RV_REF( Type )>::type; \
-	friend stdex::remove_reference<stdex::remove_const<STDEX_RV_REF_CONST( Type )>::type>::type;\
+	friend class stdex::rvalue_reference< Type, false >; \
+	friend class stdex::rvalue_reference< const Type, true >;\
 	public: \
 	inline operator STDEX_RV_REF(Type) () \
 	{ \
