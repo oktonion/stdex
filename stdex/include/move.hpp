@@ -326,6 +326,11 @@ namespace stdex
 	} \
 	private:
 
+#ifdef __BORLANDC__
+#undef STDEX_MOVABLE
+#define STDEX_MOVABLE(Nothing)
+#endif
+
 #define STDEX_MOVABLE_BUT_NOT_COPYABLE(Type) \
 	STDEX_NOT_COPYABLE \
 	STDEX_MOVABLE(Type)
