@@ -10,11 +10,11 @@
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
 
 #ifndef __BORLANDC__
-    #undef STDEX_RV_REF
-    #define STDEX_RV_REF(Type) Type&&
+    //#undef STDEX_RV_REF
+    //#define STDEX_RV_REF(Type) Type&&
 #endif
 
-#define MY_STD std
+#define MY_STD stdex
 struct move_only {
 private:
     STDEX_MOVABLE_BUT_NOT_COPYABLE(move_only)
