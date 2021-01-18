@@ -2245,15 +2245,27 @@ namespace stdex
         {
             static const bool value = (sizeof(_is_constructible_from_type_tester<_Tp>(1)) == sizeof(_yes_type));
         };
+    } // namespace detail
 
-        namespace is_enum_detail
-        {
-            enum dummy_enum {};
-            struct _enum_can_have_member_pointer_bug :
-                public integral_constant<bool, _has_member_pointer_impl<dummy_enum>::value>::type
-            { };
-        }
+    namespace is_enum_detail
+    {
+        enum dummy_enum {};
+        struct _enum_can_have_member_pointer_bug :
+            public integral_constant<bool, detail::_has_member_pointer_impl<dummy_enum>::value>::type
+        { };
+    } // namespace is_enum_detail
 
+    namespace intern
+    {
+        
+        template<>
+        struct _has_bug<struct _stdex_enum_can_have_member_pointer_bug>:
+            is_enum_detail::_enum_can_have_member_pointer_bug
+        { };
+    } // namespace intern
+
+    namespace detail
+    {
         template<class _Tp>
         struct _derived_dummy :
             public _Tp
@@ -2284,7 +2296,10 @@ namespace stdex
         struct _enum_can_be_parent
         {
             static const bool value = 
-                sizeof(_enum_can_be_parent_tester<_Tp>(_is_enum_bug_internal<_Tp, is_enum_detail::_enum_can_have_member_pointer_bug::value>::_can_be_parent_tester_helper(0))) == sizeof(_yes_type);
+                sizeof(
+                    _enum_can_be_parent_tester<_Tp>(
+                        _is_enum_bug_internal<_Tp, intern::_has_bug<intern::_stdex_enum_can_have_member_pointer_bug>::value
+                    >::_can_be_parent_tester_helper(0))) == sizeof(_yes_type);
         };
 
         template<class _Tp, bool>
