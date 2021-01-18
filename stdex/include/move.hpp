@@ -104,6 +104,12 @@ namespace stdex
 		};
 	} // namespace move_detail
 
+#define STDEX_RV_REF(Type) stdex::rvalue_reference< Type, false >&
+
+#define STDEX_RV_REF_CONST(Type) const stdex::rvalue_reference< const Type , true >&
+
+#define STDEX_FWD_REF(Type) Type&
+
 	template<class _Tp>
 	class rvalue_reference_moved;
 
@@ -111,7 +117,7 @@ namespace stdex
     class rvalue_reference:
 		public rvalue_reference <const _Tp, true>
     { 
-		typedef typename move_detail::rvalue_reference_base<_Tp>::type base_type;
+		typedef rvalue_reference <const _Tp, true> base_type;
 		typedef _Tp value_type;
 
 		rvalue_reference();
@@ -160,12 +166,6 @@ namespace stdex
 			return reinterpret_cast<rvalue_reference<_ChildT, false>&>(lvalue_ref);
 		}
 	};	
-
-#define STDEX_RV_REF(Type) stdex::rvalue_reference< Type, false >&
-
-#define STDEX_RV_REF_CONST(Type) const stdex::rvalue_reference< const Type , true >&
-
-#define STDEX_FWD_REF(Type) Type&
 
 	namespace move_detail
 	{
@@ -327,8 +327,8 @@ namespace stdex
 	private:
 
 #ifdef __BORLANDC__
-#undef STDEX_MOVABLE
-#define STDEX_MOVABLE(Nothing)
+    #undef STDEX_MOVABLE
+    #define STDEX_MOVABLE(Nothing)
 #endif
 
 #define STDEX_MOVABLE_BUT_NOT_COPYABLE(Type) \
