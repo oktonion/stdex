@@ -310,6 +310,21 @@ namespace stdex
 		>::type type;
 		return const_cast<type&>(value);
 	}
+
+	namespace move_detail
+	{
+		template<class _Tp>
+		struct _peek_conversion_operator
+		{
+			typedef 
+			typename
+			conditional<
+				intern::_has_bug<intern::_stdex_enum_can_have_member_pointer_bug>::value,
+				struct _disabled&,
+				STDEX_RV_REF(_Tp)
+			>::type type;
+		};
+	} // namespace move_detail
 }
 
 #define STDEX_NOT_COPYABLE \
@@ -319,7 +334,7 @@ namespace stdex
 	friend class stdex::rvalue_reference< Type, false >; \
 	friend class stdex::rvalue_reference< const Type, true >;\
 	public: \
-	inline operator STDEX_RV_REF(Type) () \
+	inline operator stdex::move_detail::_peek_conversion_operator< Type >::type () \
 	{ \
 		Type &lvalue_ref = *this; \
 		return reinterpret_cast< STDEX_RV_REF(Type) >(lvalue_ref); \
@@ -327,8 +342,8 @@ namespace stdex
 	private:
 
 #ifdef __BORLANDC__
-    #undef STDEX_MOVABLE
-    #define STDEX_MOVABLE(Nothing)
+    //#undef STDEX_MOVABLE
+    //#define STDEX_MOVABLE(Nothing)
 #endif
 
 #define STDEX_MOVABLE_BUT_NOT_COPYABLE(Type) \
