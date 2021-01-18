@@ -157,13 +157,13 @@ namespace stdex
 		rvalue_reference_moved(rvalue_reference_moved const&);
 		void operator=(rvalue_reference_moved const&);
 
-		typedef rvalue_reference<_Tp> base_type;
+		typedef rvalue_reference<_Tp, stdex::is_const<_Tp>::value> base_type;
 
 	public:
 		template<class _ChildT>
-		operator rvalue_reference<_ChildT, false> & () {
+		operator rvalue_reference<_ChildT, stdex::is_const<_Tp>::value> & () {
 			_ChildT& lvalue_ref = *this;
-			return reinterpret_cast<rvalue_reference<_ChildT, false>&>(lvalue_ref);
+			return reinterpret_cast<rvalue_reference<_ChildT, stdex::is_const<_Tp>::value>&>(lvalue_ref);
 		}
 	};	
 
