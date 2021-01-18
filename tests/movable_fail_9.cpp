@@ -17,7 +17,7 @@
 #define MY_STD stdex
 struct move_only {
 private:
-    STDEX_NOT_COPYABLE
+    STDEX_MOVABLE_BUT_NOT_COPYABLE(move_only)
 
 public:
     move_only() : STDEX_DELETE_ICC() {
