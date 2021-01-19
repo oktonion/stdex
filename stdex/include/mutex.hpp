@@ -39,11 +39,13 @@ namespace stdex
     {
         class _mutex_base
         {
+            STDEX_NOT_COPYABLE
         protected:
 
             pthread_mutex_t  _mutex_handle;
 
-            _mutex_base() _STDEX_NOEXCEPT_FUNCTION
+            _mutex_base() _STDEX_NOEXCEPT_FUNCTION:
+                STDEX_DELETE_ICC()
             {
                 // XXX EAGAIN, ENOMEM, EPERM, EBUSY(may), EINVAL(may)
                 int _err = pthread_mutex_init(&_mutex_handle, NULL);
@@ -57,18 +59,16 @@ namespace stdex
                 if (0 != _err)
                     _throw_system_error(stdex::errc::errc_t(_err));
             }
-
-        private:
-            _mutex_base(const _mutex_base&) _STDEX_DELETED_FUNCTION;
-            _mutex_base& operator=(const _mutex_base&) _STDEX_DELETED_FUNCTION;
         };
 
         class _recursive_mutex_base
         {
+            STDEX_NOT_COPYABLE
         protected:
             pthread_mutex_t  _mutex_handle;
 
-            _recursive_mutex_base()
+            _recursive_mutex_base():
+                STDEX_DELETE_ICC()
             {
                 pthread_mutexattr_t attr;
 
@@ -96,10 +96,6 @@ namespace stdex
                 if (0 != _err)
                     _throw_system_error(stdex::errc::errc_t(_err));
             }
-
-        private:
-            _recursive_mutex_base(const _recursive_mutex_base&) _STDEX_DELETED_FUNCTION;
-            _recursive_mutex_base& operator=(const _recursive_mutex_base&) _STDEX_DELETED_FUNCTION;
         };
     }
 
@@ -146,11 +142,6 @@ namespace stdex
         {
             return &_mutex_handle;
         }
-
-    private:
-
-        mutex(const mutex&) _STDEX_DELETED_FUNCTION;
-        mutex& operator=(const mutex&) _STDEX_DELETED_FUNCTION;
     };
 
     class recursive_mutex :
@@ -196,11 +187,6 @@ namespace stdex
         {
             return &_mutex_handle;
         }
-
-    private:
-
-        recursive_mutex(const recursive_mutex&) _STDEX_DELETED_FUNCTION;
-        recursive_mutex& operator=(const recursive_mutex&) _STDEX_DELETED_FUNCTION;
     };
 
     // LOCK PROPERTIES
@@ -218,17 +204,21 @@ namespace stdex
     extern const try_to_lock_t try_to_lock;
 
     template <class _Lockbl>
-    class lock_guard {
+    class lock_guard 
+    {
+        STDEX_NOT_COPYABLE
     public:
         typedef _Lockbl mutex_type;
 
         explicit lock_guard(mutex_type &_m):
+            STDEX_DELETE_ICC(),
             _device(_m)
         {
             _device.lock();
         }
 
         lock_guard(mutex_type &_m, adopt_lock_t) _STDEX_NOEXCEPT_FUNCTION:
+            STDEX_DELETE_ICC(),
             _device(_m)
         {}
 
@@ -240,23 +230,28 @@ namespace stdex
 
     private:
         mutex_type &_device;
-
-        lock_guard(const lock_guard&) _STDEX_DELETED_FUNCTION;
-        lock_guard& operator=(const lock_guard&) _STDEX_DELETED_FUNCTION;
     };
 
     template<class _Lockbl>
     class unique_lock
     {
+        typedef unique_lock<_Lockbl> self_type;
+        STDEX_MOVABLE_BUT_NOT_COPYABLE(self_type)
+
+        // this nonsense below added to satisfy bugged compilers 
+        // that restrict access to private members of the  s a m e  templated class:
+        template<class> friend class unique_lock; 
     public:
         typedef _Lockbl mutex_type;
 
         unique_lock() _STDEX_NOEXCEPT_FUNCTION : 
+            STDEX_DELETE_ICC(),
             _device(0), 
             _owns(false)
         { }
 
-        explicit unique_lock(mutex_type &_m): 
+        explicit unique_lock(mutex_type &_m):  
+            STDEX_DELETE_ICC(),
             _device(&(_m)),
             _owns(false)
         {
@@ -264,17 +259,20 @@ namespace stdex
             _owns = true;
         }
 
-        unique_lock(mutex_type &_m, defer_lock_t) _STDEX_NOEXCEPT_FUNCTION: 
+        unique_lock(mutex_type &_m, defer_lock_t) _STDEX_NOEXCEPT_FUNCTION:  
+            STDEX_DELETE_ICC(),
             _device(&(_m)), 
             _owns(false)
         { }
 
-        unique_lock(mutex_type &_m, try_to_lock_t): 
+        unique_lock(mutex_type &_m, try_to_lock_t):  
+            STDEX_DELETE_ICC(),
             _device(&(_m)), 
             _owns(_device->try_lock())
         { }
 
-        unique_lock(mutex_type &_m, adopt_lock_t) _STDEX_NOEXCEPT_FUNCTION: 
+        unique_lock(mutex_type &_m, adopt_lock_t) _STDEX_NOEXCEPT_FUNCTION:  
+            STDEX_DELETE_ICC(),
             _device(&(_m)), 
             _owns(true)
         {
@@ -283,12 +281,14 @@ namespace stdex
 
         template<class _Clock, class _Duration>
         unique_lock(mutex_type &_m, const chrono::time_point<_Clock, _Duration> &atime): 
+            STDEX_DELETE_ICC(), 
             _device(&(_m)),
             _owns(_device->try_lock_until(atime))
         { }
 
         template<class _Rep, class _Period>
-        unique_lock(mutex_type &_m, const chrono::duration<_Rep, _Period> &rtime):
+        unique_lock(mutex_type &_m, const chrono::duration<_Rep, _Period> &rtime): 
+            STDEX_DELETE_ICC(),
             _device(&(_m)),
             _owns(_device->try_lock_for(rtime))
         { }
@@ -299,23 +299,24 @@ namespace stdex
                 unlock();
         }
 
-        unique_lock(STDEX_RV_REF(unique_lock<mutex_type>) other) _STDEX_NOEXCEPT_FUNCTION: 
-             _device(static_cast<unique_lock<mutex_type>&>(other)._device), 
-             _owns(static_cast<unique_lock<mutex_type>&>(other)._owns)
+        unique_lock(STDEX_RV_REF(self_type) other) _STDEX_NOEXCEPT_FUNCTION:  
+            STDEX_DELETE_ICC(),
+             _device(other._device), 
+             _owns(other._owns)
          {
-             static_cast<unique_lock<mutex_type>&>(other)._device = 0;
-             static_cast<unique_lock<mutex_type>&>(other)._owns = false;
+             other._device = 0;
+             other._owns = false;
          }
  
-        unique_lock& operator=(STDEX_RV_REF(unique_lock<mutex_type>) other) _STDEX_NOEXCEPT_FUNCTION
+        unique_lock& operator=(STDEX_RV_REF(self_type) other) _STDEX_NOEXCEPT_FUNCTION
          {
              if (_owns)
                  unlock();
  
              unique_lock<mutex_type>(stdex::move(other)).swap(*this);
  
-             static_cast<unique_lock<mutex_type>&>(other)._device = 0;
-             static_cast<unique_lock<mutex_type>&>(other)._owns = false;
+             other._device = 0;
+             other._owns = false;
  
              return *this;
          }
@@ -444,12 +445,9 @@ namespace stdex
     private:
         mutex_type *_device;
         bool _owns; // XXX use atomic_bool
-
-        unique_lock(const unique_lock&) _STDEX_DELETED_FUNCTION;
-        unique_lock& operator=(const unique_lock&) _STDEX_DELETED_FUNCTION;
     };
 
-        class timed_mutex;
+    class timed_mutex;
     class recursive_timed_mutex;
 
     namespace detail
@@ -763,7 +761,7 @@ namespace stdex
         // with pthread_mutex_timedlock support
         template<>
         class _timed_mutex_impl_base<_mutex_base, true> :
-            private _mutex_base
+            private _mutex_base // is STDEX_NOT_COPYABLE
         {
         public:
 
@@ -815,16 +813,11 @@ namespace stdex
 
             _timed_mutex_impl_base() _STDEX_NOEXCEPT_FUNCTION
             {}
-
-        private:
-
-            _timed_mutex_impl_base(const _timed_mutex_impl_base&) _STDEX_DELETED_FUNCTION;
-            _timed_mutex_impl_base& operator=(const _timed_mutex_impl_base&) _STDEX_DELETED_FUNCTION;
         };
 
         template<>
         class _timed_mutex_impl_base<_recursive_mutex_base, true> :
-            private _recursive_mutex_base
+            private _recursive_mutex_base // is STDEX_NOT_COPYABLE
         {
         public:
 
@@ -877,11 +870,6 @@ namespace stdex
 
             _timed_mutex_impl_base()
             {}
-
-        private:
-
-            _timed_mutex_impl_base(const _timed_mutex_impl_base&) _STDEX_DELETED_FUNCTION;
-            _timed_mutex_impl_base& operator=(const _timed_mutex_impl_base&) _STDEX_DELETED_FUNCTION;
         };
 
         template<class>
