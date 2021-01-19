@@ -468,7 +468,7 @@ unsigned X::instances = 0;
         stmt;                                                           \
     }                                                                   \
     unsigned const n = X::copies - old_copies;                          \
-    volatile unsigned const minv(min), maxv(max);                       \
+    volatile unsigned minv(min), maxv(max);                       \
     DYNAMIC_VERIFY(n <= maxv);                                              \
     if (n > maxv)                                                       \
         std::cout << "*** max is too low or compiler is buggy ***\n";   \
