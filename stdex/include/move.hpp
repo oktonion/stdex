@@ -314,27 +314,33 @@ namespace stdex
 	namespace move_detail
 	{
 		template<class _Tp>
+		struct _peek_conversion_operator_helper:
+			intern::_has_bug<intern::_stdex_enum_can_have_member_pointer_bug>
+		{ };
+
+		template<class _Tp>
 		struct _peek_conversion_operator
 		{
 			typedef 
 			typename
 			conditional<
-				intern::_has_bug<intern::_stdex_enum_can_have_member_pointer_bug>::value,
+				_peek_conversion_operator_helper<_Tp>::value,
 				struct _disabled&,
-				STDEX_RV_REF(_Tp)
+				_Tp
 			>::type type;
 		};
 	} // namespace move_detail
 }
 
 #define STDEX_NOT_COPYABLE \
-	stdex::detail::delete_implicit_copy_constructor _stdex_icc_deleter;
+	stdex::detail::delete_implicit_copy_constructor _stdex_implicit_copy_constructor_deleter;
 
 #define STDEX_MOVABLE(Type) \
 	friend class stdex::rvalue_reference< Type, false >; \
 	friend class stdex::rvalue_reference< const Type, true >;\
 	public: \
-	inline operator stdex::move_detail::_peek_conversion_operator< Type >::type () \
+	template<bool _IsConst> \
+	inline operator stdex::rvalue_reference<typename stdex::move_detail::_peek_conversion_operator< Type >::type, _IsConst>& () \
 	{ \
 		Type &lvalue_ref = *this; \
 		return reinterpret_cast< STDEX_RV_REF(Type) >(lvalue_ref); \
@@ -350,7 +356,7 @@ namespace stdex
 	STDEX_NOT_COPYABLE \
 	STDEX_MOVABLE(Type)
 
-#define STDEX_DELETE_ICC() _stdex_icc_deleter(true)
+#define STDEX_DELETE_ICC() _stdex_implicit_copy_constructor_deleter(true)
 
 #undef _STDEX_DELETED_FUNCTION
 #undef _STDEX_NOEXCEPT_FUNCTION
