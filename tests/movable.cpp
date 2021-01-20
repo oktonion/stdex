@@ -299,6 +299,7 @@ int test0()
     MY_STD::move(mv_t(0));
     STDEX_RV_REF_CONST(mv_t) rv_ref = 
         MY_STD::move(mv_t(0));
+    (void)(rv_ref);
     mv = // should work
         MY_STD::move(mv_t(0)); // works
 
