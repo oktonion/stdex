@@ -374,8 +374,7 @@ namespace stdex
 	friend class stdex::rvalue_reference< Type, stdex::move_detail::_ref_non_const >; \
 	friend class stdex::rvalue_reference< const Type, stdex::move_detail::_ref_const >;\
 	public: \
-	template<stdex::move_detail::_rv_ref_type _RefType> \
-	inline operator stdex::rvalue_reference<typename stdex::move_detail::_peek_conversion_operator< Type >::type, _RefType>& () \
+	inline operator stdex::rvalue_reference<typename stdex::move_detail::_peek_conversion_operator< Type >::type, stdex::move_detail::_ref_non_const>& () \
 	{ \
 		typedef \
 		stdex::rvalue_reference< \
