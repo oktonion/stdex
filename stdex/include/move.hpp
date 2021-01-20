@@ -106,8 +106,8 @@ namespace stdex
 		struct _rv
 		{
 			typedef bool type;
-			static const bool _rv::_ref_const = true;
-			static const bool _rv::_ref_non_const = false;
+			static const bool _ref_const = true;
+			static const bool _ref_non_const = false;
 		};
 	} // namespace move_detail
 
