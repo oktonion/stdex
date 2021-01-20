@@ -189,9 +189,9 @@ namespace stdex
 			false_type
 		{ };
 
-		template<class _Tp>
-		struct _do_const_cast<rvalue_reference<_Tp>/**/>:
-			stdex::detail::_not_<stdex::is_const<_Tp>/**/>
+		template<class _Tp, bool _IsConst>
+		struct _do_const_cast<rvalue_reference<_Tp, _IsConst>/**/>:
+			bool_constant<_IsConst == bool(false)>
 		{ };
 
 		template<class _Tp>
