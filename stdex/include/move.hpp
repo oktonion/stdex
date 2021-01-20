@@ -342,8 +342,11 @@ namespace stdex
 	template<bool _IsConst> \
 	inline operator stdex::rvalue_reference<typename stdex::move_detail::_peek_conversion_operator< Type >::type, _IsConst>& () \
 	{ \
+		typedef stdex::rvalue_reference<typename stdex::move_detail::_peek_conversion_operator< Type >::type, false> result_type; \
 		Type &lvalue_ref = *this; \
-		return reinterpret_cast< STDEX_RV_REF(Type) >(lvalue_ref); \
+		return *reinterpret_cast<result_type*>( \
+				&const_cast<char&>( \
+					reinterpret_cast<const volatile char&>(lvalue_ref))); \
 	} \
 	private:
 
