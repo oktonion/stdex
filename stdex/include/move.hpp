@@ -103,31 +103,32 @@ namespace stdex
 			>::type type;
 		};
 
-		enum _rv_ref_type
+		struct _rv
 		{
-			_ref_const,
-			_ref_non_const,
-			_ref_disabled
+			typedef bool type;
+			static const bool _rv::_ref_const = true;
+			static const bool _rv::_ref_non_const = false;
 		};
 	} // namespace move_detail
 
-#define STDEX_RV_REF(Type) stdex::rvalue_reference< Type, stdex::move_detail::_ref_non_const >&
+#define STDEX_RV_REF(Type) stdex::rvalue_reference< Type, stdex::move_detail::_rv::_ref_non_const >&
 
-#define STDEX_RV_REF_CONST(Type) const stdex::rvalue_reference< const Type , stdex::move_detail::_ref_const >&
+#define STDEX_RV_REF_CONST(Type) const stdex::rvalue_reference< const Type , stdex::move_detail::_rv::_ref_const >&
 
 #define STDEX_FWD_REF(Type) Type&
 
 	template<class _Tp>
 	class rvalue_reference_moved;
 
-	template<class _Tp, move_detail::_rv_ref_type>
+	template<class _Tp, move_detail::_rv::type,
+		class _Unused = int>
     class rvalue_reference;
 
     template<class _Tp>
-    class rvalue_reference<_Tp, move_detail::_ref_non_const>:
-		public rvalue_reference <const _Tp, move_detail::_ref_const>
+    class rvalue_reference<_Tp, move_detail::_rv::_ref_non_const>:
+		public rvalue_reference <const _Tp, move_detail::_rv::_ref_const>
     { 
-		typedef rvalue_reference <const _Tp, move_detail::_ref_const> base_type;
+		typedef rvalue_reference <const _Tp, move_detail::_rv::_ref_const> base_type;
 		typedef _Tp value_type;
 
 		rvalue_reference();
@@ -138,7 +139,7 @@ namespace stdex
 
 	namespace move_detail
 	{
-		template<class _Tp, _rv_ref_type _RefType>
+		template<class _Tp, _rv::type _RefType>
 		struct rvalue_reference_base<rvalue_reference<_Tp, _RefType>/**/>
 		{
 			typedef typename rvalue_reference<_Tp, _RefType>::base_type type;
@@ -146,7 +147,7 @@ namespace stdex
 	} // namespace move_detail
 
     template<class _Tp>
-    class rvalue_reference <const _Tp, move_detail::_ref_const>:
+    class rvalue_reference <const _Tp, move_detail::_rv::_ref_const>:
 		public move_detail::rvalue_reference_base<_Tp>::type
     { 
 		typedef typename move_detail::rvalue_reference_base<_Tp>::type base_type;
@@ -160,42 +161,19 @@ namespace stdex
 
 	template<class _Tp>
 	class rvalue_reference_moved:
-		public 
-		conditional<
-			stdex::is_const<_Tp>::value,
-			rvalue_reference<_Tp, move_detail::_ref_const>,
-			rvalue_reference<_Tp, move_detail::_ref_non_const>
-		>::type
+		public rvalue_reference<_Tp, stdex::is_const<_Tp>::value>
 	{
 		rvalue_reference_moved();
 		//~rvalue_reference() throw();
 		rvalue_reference_moved(rvalue_reference_moved const&);
 		void operator=(rvalue_reference_moved const&);
 
-		typedef 
-		typename
-		conditional<
-			stdex::is_const<_Tp>::value,
-			rvalue_reference<_Tp, move_detail::_ref_const>,
-			rvalue_reference<_Tp, move_detail::_ref_non_const>
-		>::type base_type;
+		typedef rvalue_reference<_Tp, stdex::is_const<_Tp>::value> base_type;
 
 	public:
 		template<class _ChildT>
-		operator
-		typename
-		conditional<
-			stdex::is_const<_Tp>::value,
-			rvalue_reference<_ChildT, move_detail::_ref_const>,
-			rvalue_reference<_ChildT, move_detail::_ref_non_const>
-		>::type & () {
-			typedef
-			typename
-			conditional<
-				stdex::is_const<_Tp>::value,
-				rvalue_reference<_ChildT, move_detail::_ref_const>,
-				rvalue_reference<_ChildT, move_detail::_ref_non_const>
-			>::type result_type;
+		operator rvalue_reference<_ChildT, stdex::is_const<_Tp>::value> & () {
+			typedef rvalue_reference<_ChildT, stdex::is_const<_Tp>::value> result_type;
 			
 			_ChildT& lvalue_ref = *this;
 			return reinterpret_cast<result_type&>(lvalue_ref);
@@ -209,7 +187,7 @@ namespace stdex
 			false_type
 		{ };
 
-		template<class _Tp, _rv_ref_type _RefType>
+		template<class _Tp, _rv::type _RefType>
 		struct _is_rvalue_reference<rvalue_reference<_Tp, _RefType>/**/>:
 			true_type
 		{ };
@@ -225,7 +203,7 @@ namespace stdex
 		{ };
 
 		template<class _Tp>
-		struct _do_const_cast<rvalue_reference<_Tp, _ref_non_const>/**/>:
+		struct _do_const_cast<rvalue_reference<_Tp, _rv::_ref_non_const>/**/>:
 			true_type
 		{ };
 
@@ -241,7 +219,7 @@ namespace stdex
 			static type call(const _Tp &value) {return reinterpret_cast<type>(value);}
 		};
 
-		template<class _Tp, _rv_ref_type _RefType>
+		template<class _Tp, _rv::type _RefType>
 		struct _move_const<rvalue_reference<_Tp, _RefType>/**/>
 		{
 			typedef typename stdex::remove_const<_Tp>::type value_type;
@@ -275,9 +253,9 @@ namespace stdex
 	}
 
 	template<class _Tp>
-	rvalue_reference<_Tp, move_detail::_ref_non_const>& move(const rvalue_reference<_Tp, move_detail::_ref_non_const>& value) _STDEX_NOEXCEPT_FUNCTION
+	rvalue_reference<_Tp, move_detail::_rv::_ref_non_const>& move(const rvalue_reference<_Tp, move_detail::_rv::_ref_non_const>& value) _STDEX_NOEXCEPT_FUNCTION
 	{
-		return const_cast<rvalue_reference<_Tp, move_detail::_ref_non_const>&>(value);
+		return const_cast<rvalue_reference<_Tp, move_detail::_rv::_ref_non_const>&>(value);
 	}
 
 	//template<class _Tp>
@@ -293,13 +271,13 @@ namespace stdex
 	//}
 
 	template<class _Tp>
-	rvalue_reference_moved<_Tp>& move(rvalue_reference<_Tp, move_detail::_ref_non_const> &value) _STDEX_NOEXCEPT_FUNCTION
+	rvalue_reference_moved<_Tp>& move(rvalue_reference<_Tp, move_detail::_rv::_ref_non_const> &value) _STDEX_NOEXCEPT_FUNCTION
 	{
 		return reinterpret_cast<rvalue_reference_moved<_Tp>&>(value);
 	}
 
 	template<class _Tp>
-	const rvalue_reference_moved<_Tp>& move(const rvalue_reference<_Tp, move_detail::_ref_const>& value) _STDEX_NOEXCEPT_FUNCTION
+	const rvalue_reference_moved<_Tp>& move(const rvalue_reference<_Tp, move_detail::_rv::_ref_const>& value) _STDEX_NOEXCEPT_FUNCTION
 	{
 		return reinterpret_cast<const rvalue_reference_moved<_Tp>&>(value);
 	}
@@ -371,15 +349,16 @@ namespace stdex
 	stdex::detail::delete_implicit_copy_constructor _stdex_implicit_copy_constructor_deleter;
 
 #define STDEX_MOVABLE(Type) \
-	friend class stdex::rvalue_reference< Type, stdex::move_detail::_ref_non_const >; \
-	friend class stdex::rvalue_reference< const Type, stdex::move_detail::_ref_const >;\
+	friend class stdex::rvalue_reference< Type, stdex::move_detail::_rv::_ref_non_const >; \
+	friend class stdex::rvalue_reference< const Type, stdex::move_detail::_rv::_ref_const >;\
 	public: \
-	inline operator stdex::rvalue_reference<typename stdex::move_detail::_peek_conversion_operator< Type >::type, stdex::move_detail::_ref_non_const>& () \
+	template<class _Unused> \
+	inline operator stdex::rvalue_reference<typename stdex::move_detail::_peek_conversion_operator< Type >::type, stdex::move_detail::_rv::_ref_non_const, _Unused>& () \
 	{ \
 		typedef \
 		stdex::rvalue_reference< \
 			typename stdex::move_detail::_peek_conversion_operator< Type >::type, \
-			stdex::move_detail::_ref_non_const> result_type; \
+			stdex::move_detail::_rv::_ref_non_const> result_type; \
 \
 		Type &lvalue_ref = *this; \
 		return *reinterpret_cast<result_type*>( \
