@@ -298,7 +298,7 @@ int test0()
     STDEX_RV_REF_CONST(mv_t) rv_ref = 
         MY_STD::move(mv_t(0));
     mv = // should work
-        MY_STD::move(mv_t(0)); // works
+        MY_STD::move(rv_ref); // works
 
     mv = // shouldn't work
         MY_STD::move(mv2); // works
