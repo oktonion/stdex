@@ -360,8 +360,9 @@ namespace timed_mutex_tests
             thr.join();
             m.unlock();
         }
-        catch (const stdex::system_error&)
+        catch (const stdex::system_error &e)
         {
+            std::cout << "message: " << e.what() << std::endl;
             DYNAMIC_VERIFY_FAIL;
         }
         catch (...)
