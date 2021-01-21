@@ -331,6 +331,8 @@ namespace stdex
 			intern::_has_bug<intern::_stdex_enum_can_have_member_pointer_bug>
 		{ };
 
+		struct _disabled{};
+
 		template<class _Tp>
 		struct _peek_conversion_operator
 		{
@@ -338,9 +340,19 @@ namespace stdex
 			typename
 			conditional<
 				_peek_conversion_operator_helper<_Tp>::value,
-				struct _disabled&,
-				_Tp
+				_disabled,
+				stdex::rvalue_reference<_Tp, stdex::move_detail::_rv::_ref_non_const>
 			>::type type;
+		};
+
+		template<class _Tp>
+		class _conversion_rvalue_reference:
+			public _peek_conversion_operator<_Tp>::type
+		{ 
+			_conversion_rvalue_reference();
+			//~rvalue_reference() throw();
+			_conversion_rvalue_reference(_conversion_rvalue_reference const&);
+			void operator=(_conversion_rvalue_reference const&);
 		};
 	} // namespace move_detail
 }
@@ -352,13 +364,10 @@ namespace stdex
 	friend class stdex::rvalue_reference< Type, stdex::move_detail::_rv::_ref_non_const >; \
 	friend class stdex::rvalue_reference< const Type, stdex::move_detail::_rv::_ref_const >;\
 	public: \
-	template<class _Unused> \
-	inline operator stdex::rvalue_reference<typename stdex::move_detail::_peek_conversion_operator< Type >::type, stdex::move_detail::_rv::_ref_non_const, _Unused>& () \
+	inline operator stdex::move_detail::_conversion_rvalue_reference<Type>& () \
 	{ \
 		typedef \
-		stdex::rvalue_reference< \
-			typename stdex::move_detail::_peek_conversion_operator< Type >::type, \
-			stdex::move_detail::_rv::_ref_non_const> result_type; \
+		stdex::move_detail::_conversion_rvalue_reference<Type> result_type; \
 \
 		Type &lvalue_ref = *this; \
 		return *reinterpret_cast<result_type*>( \
