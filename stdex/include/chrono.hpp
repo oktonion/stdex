@@ -130,6 +130,9 @@ namespace stdex
                 _big_int(const _big_int&);
                 _big_int& operator=(const _big_int&);
 
+                _big_int operator+() const;
+                _big_int operator-() const;
+
                 _big_int& operator++();
                 _big_int operator++(int);
                 _big_int& operator--();
@@ -765,12 +768,12 @@ namespace stdex
 
             duration operator+() const
             {    // get value
-                return (*this);
+                return duration(*this);
             }
 
             duration operator-() const
             {    // get negated value
-                return (duration<_Rep, _Period>(0 - base_type::_r));
+                return (-base_type::_r);
             }
 
             duration& operator++()

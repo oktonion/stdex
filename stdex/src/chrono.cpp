@@ -568,7 +568,7 @@ namespace stdex {
                 return stdex::intmax_t(result);
             }
 
-            long double     _big_int::to_floating_point() const
+            long double _big_int::to_floating_point() const
             {
                 long double result = static_cast<long double>(convert(*this));
 
@@ -576,6 +576,16 @@ namespace stdex {
                     throw(std::out_of_range("overflow in stdex::chrono::duration cast to long double"));
 
                 return (long double)(result);
+            }
+
+            _big_int _big_int::operator+() const
+            {
+                return (*this);
+            }
+
+            _big_int _big_int::operator-() const
+            {
+                return convert(-convert(*this));
             }
 
             _big_int& _big_int::operator++()
