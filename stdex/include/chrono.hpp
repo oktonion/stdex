@@ -740,6 +740,12 @@ namespace stdex
                 check4; // if you are there means rep type is integer but floating-point type is passed as argument
             }
 
+            
+            duration(const duration& other):
+                base_type(static_cast<const base_type&>(other))
+            {
+            }
+
             template<class _Rep2, class _Period2>
             duration(const duration<_Rep2, _Period2> &other):
                 base_type(detail::duration_count( duration_cast<duration>(other) ))
@@ -768,7 +774,7 @@ namespace stdex
 
             duration operator+() const
             {    // get value
-                return duration(*this);
+                return (*this);
             }
 
             duration operator-() const
@@ -1075,6 +1081,10 @@ namespace stdex
             // construct from a duration
             explicit time_point(const duration &_d_in)
                 : _d(_d_in)
+            {}
+
+            time_point(const time_point &other)
+                : _d(other._d)
             {}
 
             // construct from another duration
