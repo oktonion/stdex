@@ -13,6 +13,7 @@
 #ifdef _MSC_VER
 #pragma warning (push)
 	#pragma warning (disable : 4512) // assignment operator could not be generated
+	#pragma warning (disable : 4521) // multiple copy constructors specified
 #endif
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
