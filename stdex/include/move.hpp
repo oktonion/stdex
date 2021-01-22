@@ -364,8 +364,8 @@ namespace stdex
 				typename 
 				conditional<
 					_peek_conversion_operator_helper<_Tp>::value,
-					class _disabled&,
-					int
+					_Tp,
+					_rv::enabled_type
 				>::type >
 		{ 
 			_conversion_rvalue_reference();
