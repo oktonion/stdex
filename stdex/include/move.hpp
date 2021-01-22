@@ -332,7 +332,7 @@ namespace stdex
 			intern::_has_bug<intern::_stdex_enum_can_have_member_pointer_bug>
 		{ };
 
-		struct _disabled{};
+		/*struct _disabled{};
 
 		template<class _Tp>
 		struct _peek_conversion_operator
@@ -342,16 +342,23 @@ namespace stdex
 			conditional<
 				_peek_conversion_operator_helper<_Tp>::value,
 				_disabled,
-				stdex::rvalue_reference<_Tp, stdex::move_detail::_rv::_ref_non_const>
+				rvalue_reference<_Tp, _rv::_ref_non_const>
 			>::type type;
-		};
+		};*/
 
 		template<class _Tp>
 		class _conversion_rvalue_reference:
-			public _peek_conversion_operator<_Tp>::type
+			public 
+			rvalue_reference<_Tp, _rv::_ref_non_const,
+				typename 
+				conditional<
+					_peek_conversion_operator_helper<_Tp>::value,
+					class _disabled&,
+					int
+				>::type >
 		{ 
 			_conversion_rvalue_reference();
-			//~rvalue_reference() throw();
+			//~_conversion_rvalue_reference() throw();
 			_conversion_rvalue_reference(_conversion_rvalue_reference const&);
 			void operator=(_conversion_rvalue_reference const&);
 		};
