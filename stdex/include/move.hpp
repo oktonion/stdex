@@ -126,9 +126,13 @@ namespace stdex
 		class _Unused = move_detail::_rv::enabled_type>
     class rvalue_reference;
 
-	template<class _Tp, move_detail::_rv::type _IsConst,
+	template<class _Tp,
 		class _Unused>
-	class rvalue_reference<_Tp, _IsConst, _Unused>{};
+	class rvalue_reference<_Tp, move_detail::_rv::_ref_non_const, _Unused>{};
+
+	template<class _Tp,
+		class _Unused>
+	class rvalue_reference<_Tp, move_detail::_rv::_ref_const, _Unused>{};
 
     template<class _Tp>
     class rvalue_reference<_Tp, move_detail::_rv::_ref_non_const, 
