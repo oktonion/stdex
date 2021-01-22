@@ -596,6 +596,28 @@ namespace stdex
     {
         template<class>
         struct _has_bug;
+
+        template<>
+        struct _has_bug<class _stdex_array_can_not_be_const>
+        {
+            static const bool value = 
+                detail::_canonical_is_const<const int[4]>::value == bool(false);
+        };
+
+        template<>
+        struct _has_bug<class _stdex_array_can_not_be_volatile>
+        {
+            static const bool value = 
+                detail::_canonical_is_volatile<volatile int[4]>::value == bool(false);
+        };
+
+        template<>
+        struct _has_bug<class _stdex_array_can_not_be_cv_qualified>
+        {
+            static const bool value = 
+                detail::_canonical_is_const<const volatile int[4]>::value == bool(false) ||
+                detail::_canonical_is_volatile<const volatile int[4]>::value == bool(false);
+        };
     } //namespace intern
 
     namespace detail
@@ -2060,10 +2082,20 @@ namespace stdex
                 _is_function_chooser_impl<_Tp*, _is_mem_function_ptr_helper<const volatile _Tp>::value>::value;
         };
 
+        template<class _Tp, bool>
+        struct _is_function_chooser_helper_array_bug
+            : true_type
+        { };
+
+        template<class _Tp>
+        struct _is_function_chooser_helper_array_bug<_Tp, true>
+            : bool_constant<is_array<_Tp>::value == bool(false)>
+        { };
 
         template<class _Tp>
         struct _is_function_chooser_helper<_Tp, true>
-            : true_type
+            : _is_function_chooser_helper_array_bug<_Tp, 
+                intern::_has_bug<intern::_stdex_array_can_not_be_cv_qualified>::value>
         // if there is no compiler bug for treating cv-qualified function type as a thing
         { 
         };
@@ -2088,7 +2120,11 @@ namespace stdex
     // is_function
     template<class _Tp>
     struct is_function:
-        bool_constant<detail::_is_function_chooser<_Tp, is_reference<_Tp>::value>::value == bool(true)>
+        bool_constant<
+		detail::_is_function_chooser<
+			_Tp, 
+			is_reference<_Tp>::value
+		>::value == bool(true)>
     {
     };
 
