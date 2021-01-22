@@ -160,6 +160,8 @@ int main(void)
         STATIC_ASSERT(is_function<mfunc3>::value == (false), can_not_be_function);
         STATIC_ASSERT(is_function<mfunc4>::value == (false), can_not_be_function);
 
+        STATIC_ASSERT(is_function<int[4]>::value == (false), array_can_not_be_function);
+
         // Sanity check.
         STATIC_ASSERT(is_function<ClassType>::value == (false), can_not_be_function);
     }    
