@@ -109,6 +109,7 @@ namespace stdex
 			typedef bool type;
 			static const bool _ref_const = true;
 			static const bool _ref_non_const = false;
+			typedef int enabled_type;
 		};
 	} // namespace move_detail
 
@@ -122,12 +123,13 @@ namespace stdex
 	class rvalue_reference_moved;
 
 	template<class _Tp, move_detail::_rv::type,
-		class _Unused = int>
-    class rvalue_reference;
+		class _Unused = move_detail::_rv::enabled_type>
+    class rvalue_reference { };
 
     template<class _Tp>
-    class rvalue_reference<_Tp, move_detail::_rv::_ref_non_const>:
-		public rvalue_reference <const _Tp, move_detail::_rv::_ref_const>
+    class rvalue_reference<_Tp, move_detail::_rv::_ref_non_const, 
+		move_detail::_rv::enabled_type>
+		: public rvalue_reference <const _Tp, move_detail::_rv::_ref_const>
     { 
 		typedef rvalue_reference <const _Tp, move_detail::_rv::_ref_const> base_type;
 		typedef _Tp value_type;
@@ -148,8 +150,9 @@ namespace stdex
 	} // namespace move_detail
 
     template<class _Tp>
-    class rvalue_reference <const _Tp, move_detail::_rv::_ref_const>:
-		public move_detail::rvalue_reference_base<_Tp>::type
+    class rvalue_reference <const _Tp, move_detail::_rv::_ref_const, 
+		move_detail::_rv::enabled_type>
+		: public move_detail::rvalue_reference_base<_Tp>::type
     { 
 		typedef typename move_detail::rvalue_reference_base<_Tp>::type base_type;
 		typedef const _Tp value_type;
