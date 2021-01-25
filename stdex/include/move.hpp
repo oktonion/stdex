@@ -9,6 +9,7 @@
 
 // std includes
 #include <cstddef> // std::ptrdiff_t, std::size_t, NULL
+#include <iostream>
 
 #ifdef _MSC_VER
 #pragma warning (push)
@@ -401,7 +402,7 @@ namespace stdex
             Type, \
             stdex::move_detail::_rv::enabled_type \
         >::type > result_type; \
-\
+std::cout << "move debug: templated conversion" << std::endl;\
         Type &lvalue_ref = *this; \
         return *reinterpret_cast<result_type*>( \
                 &const_cast<char&>( \
