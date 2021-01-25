@@ -67,12 +67,14 @@ public:
 
     friend void swap(movable &lhs, movable &rhs)
     {
+        std::cout << "friend void swap(movable &, movable &)" << std::endl;
         lhs.swap(rhs);
     }
 
     void swap(movable &other)
     {
         using std::swap;
+        std::cout << "void swap(movable &)" << std::endl;
         swap(data, other.data);
     }
 };
@@ -122,12 +124,14 @@ public:
 
     friend void swap(movable_only &lhs, movable_only &rhs)
     {
+        std::cout << "friend void swap(movable_only &, movable_only &)" << std::endl;
         lhs.swap(rhs);
     }
 
     void swap(movable_only &other)
     {
         using std::swap;
+        std::cout << "void swap(movable_only &)" << std::endl;
         swap(data, other.data);
     }
 };
