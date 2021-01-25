@@ -9,7 +9,6 @@
 
 // std includes
 #include <cstddef> // std::ptrdiff_t, std::size_t, NULL
-#include <iostream>
 
 #ifdef _MSC_VER
 #pragma warning (push)
@@ -138,7 +137,8 @@ namespace stdex
     template<class _Tp>
     class rvalue_reference<_Tp, move_detail::_rv::_ref_non_const, 
         move_detail::_rv::enabled_type>
-        : public rvalue_reference <const _Tp, move_detail::_rv::_ref_const>
+        : public virtual move_detail::rvalue_reference_base<_Tp>::type,
+        public virtual rvalue_reference <const _Tp, move_detail::_rv::_ref_const>
     { 
         typedef rvalue_reference <const _Tp, move_detail::_rv::_ref_const> base_type;
         typedef _Tp value_type;
@@ -161,7 +161,7 @@ namespace stdex
     template<class _Tp>
     class rvalue_reference <const _Tp, move_detail::_rv::_ref_const, 
         move_detail::_rv::enabled_type>
-        : public move_detail::rvalue_reference_base<_Tp>::type
+        : public virtual move_detail::rvalue_reference_base<_Tp>::type
     { 
         typedef typename move_detail::rvalue_reference_base<_Tp>::type base_type;
         typedef const _Tp value_type;
@@ -384,15 +384,16 @@ namespace stdex
     friend class stdex::rvalue_reference< Type, stdex::move_detail::_rv::_ref_non_const >; \
     friend class stdex::rvalue_reference< const Type, stdex::move_detail::_rv::_ref_const >;\
     public: \
-    template<stdex::move_detail::_rv::type _Dummy> \
+    template<class _Tp> \
     inline operator \
-    stdex::rvalue_reference<Type, _Dummy, \
+    stdex::rvalue_reference<_Tp, stdex::move_detail::_rv::_ref_non_const, \
     typename \
     stdex::conditional< \
-        stdex::move_detail::_peek_conversion_operator_helper<Type>::value, \
+        stdex::move_detail::_peek_conversion_operator_helper<Type>::value == bool(true) || \
+        stdex::is_same<_Tp, Type>::value == bool(false), \
         Type, \
         stdex::move_detail::_rv::enabled_type \
-    >::type >& () \
+    >::type >& () throw() \
     { \
         typedef \
         stdex::rvalue_reference<Type, stdex::move_detail::_rv::_ref_non_const, \
@@ -402,7 +403,7 @@ namespace stdex
             Type, \
             stdex::move_detail::_rv::enabled_type \
         >::type > result_type; \
-std::cout << "move debug: templated conversion" << std::endl;\
+\
         Type &lvalue_ref = *this; \
         return *reinterpret_cast<result_type*>( \
                 &const_cast<char&>( \
