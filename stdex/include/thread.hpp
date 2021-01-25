@@ -1927,7 +1927,7 @@ namespace stdex
         thread& operator=(STDEX_RV_REF(thread) other) _STDEX_NOEXCEPT_FUNCTION
         {
             if (joinable())
-	            std::terminate();
+                std::terminate();
             
             this->swap(other);
 
