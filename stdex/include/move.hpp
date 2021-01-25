@@ -10,6 +10,8 @@
 // std includes
 #include <cstddef> // std::ptrdiff_t, std::size_t, NULL
 
+#include <iostream>
+
 #ifdef _MSC_VER
 #pragma warning (push)
     #pragma warning (disable : 4512) // assignment operator could not be generated
@@ -383,11 +385,35 @@ namespace stdex
     friend class stdex::rvalue_reference< Type, stdex::move_detail::_rv::_ref_non_const >; \
     friend class stdex::rvalue_reference< const Type, stdex::move_detail::_rv::_ref_const >;\
     public: \
+    template<class _Dummy> \
+    inline operator \
+    stdex::rvalue_reference<Type, stdex::move_detail::_rv::_ref_non_const, \
+    typename \
+    stdex::conditional< \
+        stdex::move_detail::_peek_conversion_operator_helper<Type>::value, \
+        Type, \
+        _Dummy \
+    >::type >& () \
+    { \
+        typedef \
+        stdex::rvalue_reference<Type, stdex::move_detail::_rv::_ref_non_const, \
+        typename \
+        stdex::conditional< \
+            stdex::move_detail::_peek_conversion_operator_helper<Type>::value, \
+            Type, \
+            _Dummy \
+        >::type > result_type; \
+std::cout << "move debug: template conversion" << std::endl;\
+        Type &lvalue_ref = *this; \
+        return *reinterpret_cast<result_type*>( \
+                &const_cast<char&>( \
+                    reinterpret_cast<const volatile char&>(lvalue_ref))); \
+    } \
     inline operator stdex::move_detail::_conversion_rvalue_reference<Type>& () \
     { \
         typedef \
         stdex::move_detail::_conversion_rvalue_reference<Type> result_type; \
-\
+std::cout << "move debug: direct conversion" << std::endl;\
         Type &lvalue_ref = *this; \
         return *reinterpret_cast<result_type*>( \
                 &const_cast<char&>( \
