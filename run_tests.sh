@@ -9,10 +9,11 @@ for file in ./tests/bin/*; do
   output=$(($file) 2>&1)
   run_result=$?
   if [ $run_result -eq 0 ]; then
+    echo "$output"
     echo "...ok."
   else
     run_ok=-1
-    echo $output
+    echo "$output"
     echo "...failed with $run_result."
     tests_failed="$tests_failed $filename;"
   fi 
