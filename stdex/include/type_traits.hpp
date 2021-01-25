@@ -2121,10 +2121,10 @@ namespace stdex
     template<class _Tp>
     struct is_function:
         bool_constant<
-		detail::_is_function_chooser<
-			_Tp, 
-			is_reference<_Tp>::value
-		>::value == bool(true)>
+        detail::_is_function_chooser<
+            _Tp, 
+            is_reference<_Tp>::value
+        >::value == bool(true)>
     {
     };
 
