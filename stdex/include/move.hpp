@@ -380,6 +380,8 @@ namespace stdex
 #define STDEX_NOT_COPYABLE \
     stdex::detail::delete_implicit_copy_constructor _stdex_implicit_copy_constructor_deleter;
 
+#ifdef _STDEX_NATIVE_CPP11_SUPPORT
+
 #define STDEX_MOVABLE(Type) \
     friend class stdex::rvalue_reference< Type, stdex::move_detail::_rv::_ref_non_const >; \
     friend class stdex::rvalue_reference< const Type, stdex::move_detail::_rv::_ref_const >;\
@@ -410,6 +412,26 @@ namespace stdex
                     reinterpret_cast<const volatile char&>(lvalue_ref))); \
     } \
     private:
+#else // #ifdef _STDEX_NATIVE_CPP11_SUPPORT
+
+#define STDEX_MOVABLE(Type) \
+    friend class stdex::rvalue_reference< Type, stdex::move_detail::_rv::_ref_non_const >; \
+    friend class stdex::rvalue_reference< const Type, stdex::move_detail::_rv::_ref_const >;\
+    public: \
+    inline operator \
+    stdex::rvalue_reference<Type, stdex::move_detail::_peek_conversion_operator_helper<Type>::value>& () throw() \
+    { \
+        typedef \
+        stdex::rvalue_reference<Type, stdex::move_detail::_peek_conversion_operator_helper<Type>::value> result_type; \
+\
+        Type &lvalue_ref = *this; \
+        return *reinterpret_cast<result_type*>( \
+                &const_cast<char&>( \
+                    reinterpret_cast<const volatile char&>(lvalue_ref))); \
+    } \
+    private:
+
+#endif // _STDEX_NATIVE_CPP11_SUPPORT
 
 #define STDEX_MOVABLE_BUT_NOT_COPYABLE(Type) \
     STDEX_NOT_COPYABLE \
