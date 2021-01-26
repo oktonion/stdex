@@ -7,11 +7,9 @@
 
 // Implemented all basic standard C++11 features. 
 // What can not be implemented or implemented with some limits:
-// is_class - can't detect unions
-// is_enum - ni
+// is_class - can't detect unions (unless there is compiler support)
 // is_rvalue_reference - ni
-// is_union - ni
-// is_scalar - can't detect enums
+// is_union - can't detect class (unless there is compiler support)
 // is_abstract - ni
 // is_empty - ni
 // is_literal_type - ni
