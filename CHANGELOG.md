@@ -4,7 +4,7 @@ All notable changes to stdex library project will be documented in this file.
 
 visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library
 
-## [0.2.8] - 2020-xx-xx
+## [0.2.8] - 2020-01-26
 
 ### Added
 
@@ -19,6 +19,7 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 - **big integer implementation** for `stdex::chrono`:
 - - more precise clocks for compilers without 64 bit integers
 - - more precise sleeps for all time-dependant functions and classes (like `stdex::timed_mutex` and such)
+- - more precise ratio arithmetics for compilers without 64 bit integers
 
 - moar tests to the god of tests
 
