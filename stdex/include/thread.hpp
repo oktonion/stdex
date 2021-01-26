@@ -242,12 +242,12 @@ namespace stdex
             struct _is_able_to_pass_nullptr_with_comma_op
             {
                 static const bool value = 
-                    sizeof(
+                    /*sizeof(
                         _is_able_to_pass_nullptr_with_comma_op_tester1((_dummy_void_f(), nullptr))
                     ) == sizeof(_yes_type) &&
                     sizeof(
                         _is_able_to_pass_nullptr_with_comma_op_tester2((_dummy_void_f(), nullptr))
-                    ) == sizeof(_yes_type);
+                    ) == sizeof(_yes_type)*/false;
             };
         }
     } // namespace detail

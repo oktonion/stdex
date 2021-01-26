@@ -119,7 +119,7 @@ namespace stdex
     {
         namespace detail
         {
-            // this structure is used internaly to represent platform specific big integers
+            // this structure is used internally to represent platform specific big integers
             // and safe number precision checks (throws out_of_range)
             struct _big_int
             {
