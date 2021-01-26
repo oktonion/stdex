@@ -193,6 +193,8 @@
         {
             typedef std::nullptr_t nullptr_t;
         }
+    #else
+        #include "nullptr.h"
     #endif
 
 #else //no C++11 support
