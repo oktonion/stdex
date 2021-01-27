@@ -14,10 +14,9 @@ image:
 - Visual Studio 2019
 init:
 - cmd: >-
-
     setlocal enabledelayedexpansion
 
-    if "%WindowsSdkDir%"=="" (
+    if not defined WindowsSdkDir (
 
       set "WindowsSdkDir=C:\Program Files (x86)\Windows Kits\8.1\"
 
