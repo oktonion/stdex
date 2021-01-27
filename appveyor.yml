@@ -14,7 +14,6 @@ image:
 - Visual Studio 2019
 init:
 - cmd: >-
-    setlocal enabledelayedexpansion
     if "%WindowsSdkDir%"=="" ( set "WindowsSdkDir=C:\Program Files (x86)\Windows Kits\8.1\" )
     if "%APPVEYOR_JOB_NUMBER%"=="1" ( call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\Tools\vsvars32.bat" ) else if "%APPVEYOR_JOB_NUMBER%"=="2" ( call "C:\Program Files (x86)\Microsoft Visual Studio 10.0\Common7\Tools\vsvars32.bat" ) else if "%APPVEYOR_JOB_NUMBER%"=="3" ( call "C:\Program Files (x86)\Microsoft Visual Studio 12.0\Common7\Tools\vsvars32.bat" ) else if "%APPVEYOR_JOB_NUMBER%"=="4" ( call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32.bat" ) else ( call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars32.bat" 10.0.17763.0 )
 install:
