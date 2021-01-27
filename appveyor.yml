@@ -16,10 +16,10 @@ init:
 - cmd: >-
     setlocal enabledelayedexpansion
 
-    if not defined WindowsSdkDir (
-
+    if "%WindowsSdkDir%"=="" (
+      
       set "WindowsSdkDir=C:\Program Files (x86)\Windows Kits\8.1\"
-
+      
     )
 
     if "%APPVEYOR_JOB_NUMBER%"=="1" (
