@@ -16,7 +16,7 @@ init:
 - cmd: >-
     setlocal enabledelayedexpansion
 
-    if "%WindowsSdkDir%"=="" ( set "WindowsSdkDir=C:\Program Files (x86)\Windows Kits\8.1\" set LIB=%LIB%C:\Program Files (x86)\Windows Kits\8.1\Lib\winv6.3\um\x86\ ) 
+    if "%WindowsSdkDir%"=="" ( set "WindowsSdkDir=C:\Program Files (x86)\Windows Kits\8.1\" set "LIB=%LIB%C:\Program Files (x86)\Windows Kits\8.1\Lib\winv6.3\um\x86\" ) 
 install:
 - cmd: >-
     setlocal enabledelayedexpansion
