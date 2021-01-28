@@ -1710,11 +1710,11 @@ namespace stdex
         template<class _FuncT, class _ArgT>
         struct _thread_function_proxy
         {
-            typedef _ArgT arguments_type;
             typedef _FuncT function_type;
+            typedef _ArgT arguments_type;
 
-            arguments_type args;
             function_type fp;
+            arguments_type args;
 
             _thread_function_proxy(function_type fp_, arguments_type args_) :
                 fp(fp_),
