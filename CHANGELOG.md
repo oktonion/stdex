@@ -12,6 +12,8 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 ### Fixed
 
+- static analysis warnings about uninitialized variables and negating unsigned values
+
 
 ## [0.2.8] - 2021-01-26
 
