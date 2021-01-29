@@ -635,20 +635,15 @@ namespace stdex
             // Predicate type that tests whether the current thread can lock a mutex.
             class _Can_lock
             {
-                typedef const _timed_mutex_impl_base<_recursive_mutex_base, false>* _mx_type;
-                _mx_type _mx;
-                thread::id _caller;
-
             public:
-
-                _Can_lock(_mx_type mx_, thread::id caller_) :
-                    _mx(mx_), _caller(caller_) {}
-
                 // Returns true if the mutex is unlocked or is locked by _caller.
                 bool operator()() const _STDEX_NOEXCEPT_FUNCTION
                 {
                     return _mx->_count == 0 || _mx->_owner == _caller;
                 }
+
+                const _timed_mutex_impl_base<_recursive_mutex_base, false>* _mx;
+                thread::id _caller;
             };
 
             friend class _timed_mutex_impl_base<_recursive_mutex_base, false>::_Can_lock;
@@ -663,11 +658,14 @@ namespace stdex
             void lock()
             {
                 thread::id _id = this_thread::get_id();
-                _Can_lock _can_lock = _Can_lock(this, _id);
+                _Can_lock _can_lock;
+
+                _can_lock._mx = this;
+                _can_lock._caller = _id;
 
                 unique_lock<mutex> _lk(_mut);
                 _cv.wait(_lk, _can_lock);
-                if (0u == (_count + 1u))
+                if ((0u - 1u) == _count)
                     throw system_error(
                         stdex::make_error_code(stdex::errc::errc_t(EAGAIN))
                     );// [thread.timedmutex.recursive]/3
@@ -678,12 +676,15 @@ namespace stdex
             bool try_lock()
             {
                 thread::id _id = this_thread::get_id();
-                _Can_lock _can_lock = _Can_lock(this, _id);
+                _Can_lock _can_lock;
+
+                _can_lock._mx = this;
+                _can_lock._caller = _id;
 
                 lock_guard<mutex> _lk(_mut);
                 if (!_can_lock())
                     return false;
-                if (0u == (_count + 1u))
+                if ((0u - 1u) == _count)
                     return false;
                 _owner = _id;
                 ++_count;
@@ -694,12 +695,15 @@ namespace stdex
             bool try_lock_for(const chrono::duration<_Rep, _Period>& _rtime)
             {
                 thread::id _id = this_thread::get_id();
-                _Can_lock _can_lock = _Can_lock(this, _id);
+                _Can_lock _can_lock;
+
+                _can_lock._mx = this;
+                _can_lock._caller = _id;
 
                 unique_lock<mutex> _lk(_mut);
                 if (!_cv.wait_for(_lk, _rtime, _can_lock))
                     return false;
-                if (0u == (_count + 1u))
+                if ((0u - 1u) == _count)
                     return false;
                 _owner = _id;
                 ++_count;
@@ -710,12 +714,15 @@ namespace stdex
             bool try_lock_until(const chrono::time_point<_Clock, _Duration>& _atime)
             {
                 thread::id _id = this_thread::get_id();
-                _Can_lock _can_lock = _Can_lock(this, _id);
+                _Can_lock _can_lock;
+
+                _can_lock._mx = this;
+                _can_lock._caller = _id;
 
                 unique_lock<mutex> _lk(_mut);
                 if (!_cv.wait_until(_lk, _atime, _can_lock))
                     return false;
-                if (0u == (_count + 1u))
+                if ((0u - 1u) == _count)
                     return false;
                 _owner = _id;
                 ++_count;

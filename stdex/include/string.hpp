@@ -1211,8 +1211,7 @@ namespace stdex
 
                 _i = 0; // Left to right
                 while (_str[_i] != '.') {
-                    int _code = (_str[_i] - '0');
-                    fp_integer_part = fp_integer_part * 10.0L + _code;
+                    fp_integer_part = fp_integer_part * 10.0L + (_str[_i] - '0');
                     _i++;
                 }
 
@@ -1223,8 +1222,7 @@ namespace stdex
                     _i--;
 
                 while (_str[_i] != '.') {
-                    int _code = (_str[_i] - '0');
-                    fp_fractional_part = (fp_fractional_part + _code) / 10.0L;
+                    fp_fractional_part = (fp_fractional_part + (_str[_i] - '0')) / 10.0L;
                     _i--;
                 }
 
@@ -1255,8 +1253,7 @@ namespace stdex
 
                     _i = 0; // Left to right
                     while (_str[_i] != L'.') {
-                        int _code = (_str[_i] - L'0');
-                        fp_integer_part = fp_integer_part * 10.0L + _code;
+                        fp_integer_part = fp_integer_part * 10.0L + (_str[_i] - L'0');
                         _i++;
                     }
 
@@ -1267,8 +1264,7 @@ namespace stdex
                         _i--;
 
                     while (_str[_i] != L'.') {
-                        int _code = (_str[_i] - L'0');
-                        fp_fractional_part = (fp_fractional_part + _code) / 10.0L;
+                        fp_fractional_part = (fp_fractional_part + (_str[_i] - L'0')) / 10.0L;
                         _i--;
                     }
 
