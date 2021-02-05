@@ -315,10 +315,12 @@ namespace timed_mutex_tests
                 const milliseconds timeout = milliseconds(100);
                 const typename clock_type::time_point start = clock_type::now();
                 const bool b = m.try_lock_until(start + timeout);
-                const typename clock_type::duration t = clock_type::now() - start;
+                const typename clock_type::time_point tp = clock_type::now();
+                const typename clock_type::duration t = tp - start;
 
                 DYNAMIC_VERIFY( !b );
                 std::cout << stdex::chrono::duration_cast<milliseconds>(t).count() << " >= " << timeout.count() << std::endl;
+                DYNAMIC_VERIFY( tp >= (start + timeout) );
                 DYNAMIC_VERIFY( t >= timeout );
             }
             catch (const stdex::system_error&)
