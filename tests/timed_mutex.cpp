@@ -313,6 +313,7 @@ namespace timed_mutex_tests
                 
                 DYNAMIC_VERIFY( !b );
                 std::cout << stdex::chrono::duration_cast<milliseconds>(t).count() << " >= " << timeout.count() << std::endl;
+                std::cout << t.count() << " >= " << stdex::chrono::duration_cast<typename clock_type::duration>(timeout).count() << std::endl;
                 DYNAMIC_VERIFY( t >= timeout );
             }
             catch (const stdex::system_error&)
