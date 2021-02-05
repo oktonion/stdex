@@ -299,7 +299,7 @@ namespace clock_gettime_impl
             ts.tv_sec =
                 static_cast<stdex::time_t>(delta_sec.QuadPart);
             ts.tv_nsec =
-                static_cast<long>(delta_nsec.QuadPart) + 1;
+                static_cast<long>(delta_nsec.QuadPart);
         }
         else
         {
