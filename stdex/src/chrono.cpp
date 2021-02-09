@@ -69,6 +69,7 @@ void timespec_add(timespec &result, const timespec &in)
 #include <process.h>
 
 typedef LONGLONG duration_long_long;
+typedef ULONGLONG duration_ulong_long;
 struct filetime_ptr
 {
     FILETIME* value;
@@ -357,6 +358,7 @@ using clock_gettime_impl::local_ts_to_system_ts;
 #include <mach/mach_time.h> /* mach_absolute_time */
 
 typedef ::int64_t duration_long_long;
+typedef ::uint64_t duration_ulong_long;
 
 #define BILLION 1000000000L
 #define MILLION 1000000L
@@ -430,6 +432,7 @@ stdex::timespec local_ts_to_system_ts(const stdex::timespec &ts)
 #else
 
 typedef long long duration_long_long;
+typedef unsigned long long duration_ulong_long;
 
 int clock_gettime(clockid_t, struct timespec*);
 int my_clock_gettime(clockid_t X, stdex::timespec *tv)
@@ -526,6 +529,65 @@ namespace stdex {
 
             using stdex::detail::_declptr;
 
+            template<class _LhsT, class _RhsT,
+                bool _BothAreSigned,
+                bool _LhsIsSigned>
+            struct cmp_less_impl;
+
+            template<class _LhsT, class _RhsT>
+            struct cmp_less_impl<_LhsT, _RhsT, 
+                false, false>
+            {
+                bool operator()(_LhsT lhs, _RhsT rhs) const throw()
+                {
+                    typedef typename stdex::make_unsigned<_RhsT>::type type;
+
+                    return rhs < 0 ? false : lhs < type(rhs);
+                }
+            };
+
+            template<class _LhsT, class _RhsT>
+            struct cmp_less_impl<_LhsT, _RhsT, 
+                false, true>
+            {
+                bool operator()(_LhsT lhs, _RhsT rhs) const throw()
+                {
+                    typedef typename stdex::make_unsigned<_LhsT>::type type;
+
+                    return lhs < 0 ? true : type(lhs) < rhs;
+                }
+            };
+
+            template<class _LhsT, class _RhsT, bool _LhsIsSigned>
+            struct cmp_less_impl<_LhsT, _RhsT, 
+                true, _LhsIsSigned>
+            {
+                bool operator()(_LhsT lhs, _RhsT rhs) const throw()
+                {
+                    return lhs < rhs;
+                }
+            };
+
+            template<class _LhsT, class _RhsT>
+            struct cmp_less_functor:
+                cmp_less_impl<_LhsT, _RhsT,
+                    (stdex::is_signed<_LhsT>::value == stdex::is_signed<_RhsT> ::value),
+                    stdex::is_signed<_LhsT>::value>
+            { };
+
+            template<class _LhsT, class _RhsT>
+            static bool cmp_less(_LhsT lhs, _RhsT rhs) throw()
+            {
+                cmp_less_functor<_LhsT, _RhsT> impl;
+                return impl(lhs, rhs);
+            }
+
+            template<class _LhsT, class _RhsT>
+            static bool cmp_greater(_LhsT lhs, _RhsT rhs) throw()
+            {
+                return cmp_less(rhs, lhs);
+            }
+
             duration_long_long convert(const _big_int &value)
             {
                 duration_long_long result;
@@ -562,20 +624,17 @@ namespace stdex {
             {
                 duration_long_long result = convert(*this);
 
-                if (result > (std::numeric_limits<stdex::intmax_t>::max)())
+                if (cmp_greater( result, (std::numeric_limits<stdex::intmax_t>::max)() ))
                     throw(std::out_of_range("overflow in stdex::chrono::duration cast to stdex::intmax_t"));
 
-                return stdex::intmax_t(result);
+                return static_cast<stdex::intmax_t>(result);
             }
 
             long double _big_int::to_floating_point() const
             {
-                long double result = static_cast<long double>(convert(*this));
-
-                if (result > (std::numeric_limits<long double>::max)())
-                    throw(std::out_of_range("overflow in stdex::chrono::duration cast to long double"));
-
-                return (long double)(result);
+                duration_long_long result = convert(*this);
+                // long double range is always wider than long long range 
+                return static_cast<long double>(result);
             }
 
             _big_int _big_int::operator+() const
@@ -710,25 +769,16 @@ stdex::timespec
     chrono::nanoseconds _ns = 
         chrono::duration_cast<chrono::nanoseconds>(_t - _s);
 
-    chrono::time_point<clock_t, chrono::seconds>::rep _s_count = 
-        _s.time_since_epoch().count();
+    stdex::time_t _s_count = 
+        detail::_chrono_convert<stdex::time_t>(
+            detail::duration_count(_s.time_since_epoch()), detail::chrono_detail::_priority_tag<4>() );
 
     stdex::timespec _ts;
 
-    const stdex::time_t _ts_sec_max = 
-        (std::numeric_limits<stdex::time_t>::max)();
-    if (_s_count < _ts_sec_max)
-    {
-        _ts.tv_sec = static_cast<stdex::time_t>(_s_count);
-        _ts.tv_nsec = static_cast<long>(_ns.count());
+    _ts.tv_sec = _s_count;
+    _ts.tv_nsec = static_cast<long>(_ns.count());
 
-        return local_ts_to_system_ts(_ts);
-    }
-    else
-    {
-        _ts.tv_sec = _ts_sec_max;
-        _ts.tv_nsec = 999999999;
-    }
+    return local_ts_to_system_ts(_ts);
 
     return _ts;
 }
