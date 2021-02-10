@@ -143,7 +143,7 @@ namespace clock_gettime_impl
         }
     };
 
-    typedef abs_start_point_impl<sizeof(stdex::intmax_t) * CHAR_BIT >= 64> abs_start_point;
+    typedef abs_start_point_impl<true> abs_start_point;
 
 #define _STDEX_CHRONO_CLOCK_REALTIME 0
 #define _STDEX_CHRONO_CLOCK_MONOTONIC 1
@@ -277,14 +277,14 @@ namespace clock_gettime_impl
 
         const LARGE_INTEGER& cached_freq_sec = cache_freq();
         LARGE_INTEGER sec_to_ns_ratio;
-        sec_to_ns_ratio.QuadPart = 1000 * 1000 * 1000;
+        sec_to_ns_ratio.QuadPart = LONGLONG(1000) * 1000 * 1000;
         LARGE_INTEGER delta;
         delta.QuadPart = (end_point.QuadPart - sp.QuadPart);
 
         LARGE_INTEGER delta_sec, delta_nsec;
 
         delta_sec.QuadPart = delta.QuadPart / cached_freq_sec.QuadPart;
-        delta_nsec.QuadPart = (delta.QuadPart % cached_freq_sec.QuadPart) * sec_to_ns_ratio.QuadPart / cached_freq_sec.QuadPart;
+        delta_nsec.QuadPart = ( (delta.QuadPart % cached_freq_sec.QuadPart) * sec_to_ns_ratio.QuadPart ) / cached_freq_sec.QuadPart;
 
         while (delta_nsec.QuadPart > 999999999)
         {
