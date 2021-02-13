@@ -145,9 +145,9 @@ namespace stdex
         {
             // DR 887 - Sync unknown clock to known clock.
             const typename _Clock::time_point _c_entry = _Clock::now();
-            const clock_t::time_point _s_entry = clock_t::now();
+            //const clock_t::time_point _s_entry = clock_t::now();
 
-            return wait_until_impl(_lock, (_s_entry + (_atime - _c_entry)));
+            return wait_for(_lock, (_atime - _c_entry));
         }
 
         template<class _Clock, class _Duration, class _Predicate>
@@ -179,7 +179,7 @@ namespace stdex
                 if (wait_for_impl(_lock, _rtime) == cv_status::timeout)
                     return _p();
             return true;
-            return wait_until(_lock, clock_t::now() + chrono::duration_cast<clock_t::duration>(_rt), _p);
+            //return wait_until(_lock, clock_t::now() + chrono::duration_cast<clock_t::duration>(_rt), _p);
         }
 
         native_handle_type native_handle()
@@ -241,18 +241,20 @@ namespace stdex
             if (_rtime.count() < 0)
                 return cv_status::timeout;
 
-            clock_t::time_point 
-                _start_time_point = clock_t::now(),
-                _end_time_point = _start_time_point + stdex::chrono::duration_cast<clock_t::duration>(_rtime);
+            typedef chrono::steady_clock steady_clock_t;
+
+            steady_clock_t::time_point 
+                _start_time_point = steady_clock_t::now(),
+                _end_time_point = _start_time_point + stdex::chrono::duration_cast<steady_clock_t::duration>(_rtime);
 
             stdex::timespec _tp_as_ts =
-                clock_t::to_timespec(_end_time_point);
+                clock_t::to_timespec(clock_t::now() + stdex::chrono::duration_cast<clock_t::duration>(_rtime));
 
             ::timespec _ts;
             _ts.tv_sec = _tp_as_ts.tv_sec;
             _ts.tv_nsec = _tp_as_ts.tv_nsec;
 
-            if ((clock_t::now() - _start_time_point) > _rtime)
+            if ((steady_clock_t::now() - _start_time_point) > _rtime)
                 return cv_status::timeout;
 
             int _err = 
@@ -270,7 +272,7 @@ namespace stdex
             }
         #endif
 
-            return (clock_t::now() - _start_time_point < _rtime
+            return (steady_clock_t::now() - _start_time_point < _rtime
                 ? cv_status::no_timeout : cv_status::timeout);
         }
 
