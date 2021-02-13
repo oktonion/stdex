@@ -472,6 +472,12 @@ int main(void)
 
         typedef stdex::timed_mutex test_type;
         typedef test_type::native_handle_type type;
+
+        //#ifdef PTW32_VERSION
+        //STATIC_ASSERT(
+        //    stdex::detail::mutex_type_traits::_has_pthread_mutex_timedlock::value == true, 
+        //    should_have_pthread_mutex_timedlock);
+        //#endif
         
         RUN_TEST(test1);
         RUN_TEST(test2);
