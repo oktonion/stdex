@@ -145,9 +145,9 @@ namespace stdex
         {
             // DR 887 - Sync unknown clock to known clock.
             const typename _Clock::time_point _c_entry = _Clock::now();
-            //const clock_t::time_point _s_entry = clock_t::now();
+            const clock_t::time_point _s_entry = clock_t::now();
 
-            return wait_for(_lock, (_atime - _c_entry));
+            return wait_until_impl(_lock, (_s_entry + (_atime - _c_entry)));
         }
 
         template<class _Clock, class _Duration, class _Predicate>
