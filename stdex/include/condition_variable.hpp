@@ -241,11 +241,11 @@ namespace stdex
             if (_rtime.count() < 0)
                 return cv_status::timeout;
 
-            typedef chrono::steady_clock steady_clock_t;
+            typedef chrono::steady_clock time_measure_clock_t;
 
-            steady_clock_t::time_point 
-                _start_time_point = steady_clock_t::now(),
-                _end_time_point = _start_time_point + stdex::chrono::duration_cast<steady_clock_t::duration>(_rtime);
+            time_measure_clock_t::time_point 
+                _start_time_point = time_measure_clock_t::now(),
+                _end_time_point = _start_time_point + stdex::chrono::duration_cast<time_measure_clock_t::duration>(_rtime);
 
             stdex::timespec _tp_as_ts =
                 clock_t::to_timespec(clock_t::now() + stdex::chrono::duration_cast<clock_t::duration>(_rtime));
@@ -254,7 +254,7 @@ namespace stdex
             _ts.tv_sec = _tp_as_ts.tv_sec;
             _ts.tv_nsec = _tp_as_ts.tv_nsec;
 
-            if ((steady_clock_t::now() - _start_time_point) > _rtime)
+            if ((time_measure_clock_t::now() - _start_time_point) > _rtime)
                 return cv_status::timeout;
 
             int _err = 
@@ -272,7 +272,7 @@ namespace stdex
             }
         #endif
 
-            return (steady_clock_t::now() - _start_time_point < _rtime
+            return (time_measure_clock_t::now() - _start_time_point < _rtime
                 ? cv_status::no_timeout : cv_status::timeout);
         }
 
