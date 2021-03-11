@@ -254,8 +254,8 @@ namespace stdex
             _ts.tv_sec = _tp_as_ts.tv_sec;
             _ts.tv_nsec = _tp_as_ts.tv_nsec;
 
-            if ((time_measure_clock_t::now() - _start_time_point) > _rtime)
-                return cv_status::timeout;
+            //if ((time_measure_clock_t::now() - _start_time_point) > _rtime)
+            //    return cv_status::timeout;
 
             int _err = 
                 pthread_cond_timedwait(&_condition_handle, detail::_lock_mutex_native_handle(_lock), &_ts);
