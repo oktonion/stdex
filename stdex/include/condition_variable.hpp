@@ -241,7 +241,7 @@ namespace stdex
             if (_rtime.count() < 0)
                 return cv_status::timeout;
 
-            typedef chrono::steady_clock time_measure_clock_t;
+            typedef chrono::system_clock time_measure_clock_t;
 
             time_measure_clock_t::time_point 
                 _start_time_point = time_measure_clock_t::now(),
