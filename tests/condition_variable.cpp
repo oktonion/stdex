@@ -22,7 +22,7 @@ namespace cond_var_tests
     stdex::mutex mx;
     stdex::condition_variable cv;
 
-    bool val = false;
+    const bool val = false;
 
     bool func_val() { return cond_var_tests::val; }
 
