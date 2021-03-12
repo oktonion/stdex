@@ -176,7 +176,7 @@ namespace stdex
                 ++_rt;
 
             while (!_p())
-                if (wait_for_impl(_lock, _rtime) == cv_status::timeout)
+                if (wait_for_impl(_lock, _rt) == cv_status::timeout)
                     return _p();
             return true;
             //return wait_until(_lock, clock_t::now() + chrono::duration_cast<clock_t::duration>(_rt), _p);
