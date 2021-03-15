@@ -94,7 +94,9 @@ int test2()
         chrono::system_clock::time_point then = chrono::system_clock::now();
         bool result = c1.wait_for(l, ms, &false_predicate);
         DYNAMIC_VERIFY(result == false);
-        DYNAMIC_VERIFY((chrono::system_clock::now() - then) >= ms);
+        chrono::system_clock::duration wait_for_duration = (chrono::system_clock::now() - then);
+        std::cout << chrono::duration_cast<chrono::microseconds>(wait_for_duration).count() << " >= " << ms.count() << std::endl;
+        DYNAMIC_VERIFY(wait_for_duration >= ms);
         DYNAMIC_VERIFY(l.owns_lock());
     }
     catch (const system_error&)
