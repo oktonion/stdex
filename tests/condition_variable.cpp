@@ -203,7 +203,12 @@ try
 catch(const std::exception& e)
 {
     std::cout << "std::exception " << e.what() << std::endl;
-    throw;
+    return -1;
+}
+catch (...)
+{
+    std::cout << "unknown exception" << std::endl;
+    return -2;
 }
 
     return 0;
