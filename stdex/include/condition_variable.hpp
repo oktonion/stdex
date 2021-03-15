@@ -162,24 +162,20 @@ namespace stdex
         template<class _Rep, class _Period>
         cv_status wait_for(unique_lock<mutex> &_lock, const chrono::duration<_Rep, _Period> &_rtime)
         {
-            chrono::duration<_Rep, _Period> _rt = _rtime;
-            if (ratio_greater<clock_t::period, _Period>::value)
-                ++_rt;
-            return wait_for_impl(_lock, _rt);
+            return wait_for_impl(_lock, _rtime);
         }
 
         template<class _Rep, class _Period, class _Predicate>
         bool wait_for(unique_lock<mutex> &_lock, const chrono::duration<_Rep, _Period> &_rtime, _Predicate _p)
         {
-            chrono::duration<_Rep, _Period> _rt = _rtime;
-            if (ratio_greater<clock_t::period, _Period>::value)
-                ++_rt;
+            chrono::steady_clock::time_point _atime = 
+                chrono::steady_clock::now() + chrono::duration_cast<chrono::steady_clock::duration>(_rtime);
 
+            // exactly the same as wait_until with predicate
             while (!_p())
-                if (wait_for_impl(_lock, _rt) == cv_status::timeout)
+                if (wait_until(_lock, _atime) == cv_status::timeout)
                     return _p();
             return true;
-            //return wait_until(_lock, clock_t::now() + chrono::duration_cast<clock_t::duration>(_rt), _p);
         }
 
         native_handle_type native_handle()
@@ -233,7 +229,7 @@ namespace stdex
         }
 
         template<class _Rep, class _Period>
-        cv_status wait_for_impl(unique_lock<mutex> &_lock, const chrono::duration<_Rep, _Period> &_rtime)
+        cv_status wait_for_impl(unique_lock<mutex> &_lock, chrono::duration<_Rep, _Period> _rtime)
         {
             if (!detail::_lock_owns_lock(_lock))
                 std::terminate();
@@ -242,6 +238,9 @@ namespace stdex
                 return cv_status::timeout;
 
             typedef chrono::system_clock time_measure_clock_t;
+
+            if (ratio_greater<time_measure_clock_t::period, _Period>::value)
+                ++_rtime;
 
             time_measure_clock_t::time_point 
                 _start_time_point = time_measure_clock_t::now(),
