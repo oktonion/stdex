@@ -194,19 +194,19 @@ namespace stdex
             // DR 887 - Sync unknown clock to known clock.
             struct lambdas
             {
-                typedef _Clock _Clock;
-                typedef _Dur _Dur;
-                typedef typename _Clock::time_point _Clock_time_point;
+                typedef _Clock _Clock_local;
+                typedef _Dur _Dur_local;
+                typedef typename _Clock_local::time_point _Clock_time_point;
 
-                static chrono::time_point<wait_until_clock, _Dur> sync_clock_tp(const chrono::time_point<_Clock, _Dur>& _atime, int)
+                static chrono::time_point<wait_until_clock, _Dur_local> sync_clock_tp(const chrono::time_point<_Clock_local, _Dur_local>& _atime, int)
                 {
-                    const _Clock_time_point _c_entry = _Clock::now();
+                    const _Clock_time_point _c_entry = _Clock_local::now();
                     const wait_until_clock::time_point _s_entry = wait_until_clock::now();
 
                     return (_s_entry + (_atime - _c_entry));
                 }
 
-                static const chrono::time_point<wait_until_clock, _Dur>& sync_clock_tp(const chrono::time_point<wait_until_clock, _Dur>& _atime, ...)
+                static const chrono::time_point<wait_until_clock, _Dur_local>& sync_clock_tp(const chrono::time_point<wait_until_clock, _Dur_local>& _atime, ...)
                 {
                     return _atime;
                 }
