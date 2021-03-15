@@ -156,8 +156,8 @@ namespace stdex
         template<class _Rep, class _Period, class _Predicate>
         bool wait_for(unique_lock<mutex> &_lock, const chrono::duration<_Rep, _Period> &_rtime, _Predicate _p)
         {
-            chrono::steady_clock::time_point _atime = 
-                chrono::steady_clock::now() + chrono::duration_cast<chrono::steady_clock::duration>(_rtime);
+            chrono::system_clock::time_point _atime = 
+                chrono::system_clock::now() + chrono::duration_cast<chrono::system_clock::duration>(_rtime);
 
             // exactly the same as wait_until with predicate
             while (!_p())
@@ -212,11 +212,16 @@ namespace stdex
                 }
             };
 
-            chrono::time_point<wait_until_clock, _Dur> _tp = lambdas::sync_clock_tp(_atime, 0);
+            wait_until_clock::time_point _tp = chrono::time_point_cast<wait_until_clock::duration>(
+                    lambdas::sync_clock_tp(_atime, 0)
+                );
+
+            if (_tp < wait_until_clock::now())
+                return cv_status::timeout;
 
             stdex::timespec _tp_as_ts = 
                 wait_until_clock::to_timespec(
-                    chrono::time_point_cast<wait_until_clock::duration>(_tp)
+                    _tp
                 );
             
             ::timespec _ts;

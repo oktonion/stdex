@@ -77,7 +77,7 @@ struct filetime_ptr
         value(input) {}
 };
 
-void GetSystemTimeAsFileTime(filetime_ptr SystemTimeAsFileTimePtr)
+filetime_ptr GetSystemTimeAsFileTime(filetime_ptr SystemTimeAsFileTimePtr)
 { // GetSystemTimeAsFileTime does not exist on WinCE
     SYSTEMTIME st;
 
@@ -86,6 +86,79 @@ void GetSystemTimeAsFileTime(filetime_ptr SystemTimeAsFileTimePtr)
     {
         SystemTimeAsFileTimePtr.value->dwLowDateTime = 0;
         SystemTimeAsFileTimePtr.value->dwHighDateTime = 0;
+    }
+    return SystemTimeAsFileTimePtr;
+}
+
+filetime_ptr GetSystemTimePreciseAsFileTime(filetime_ptr SystemTimeAsFileTimePtr)
+{ // GetSystemTimePreciseAsFileTime does not exist before Win8
+    
+    GetSystemTimeAsFileTime(SystemTimeAsFileTimePtr.value);
+    return SystemTimeAsFileTimePtr;
+}
+
+stdex::detail::_no_type operator,(filetime_ptr, stdex::detail::_yes_type);
+
+namespace WinAPI
+{
+    namespace type_traits
+    {
+        struct _has_GetSystemTimePreciseAsFileTime
+        {
+            static const bool value =
+                sizeof(::GetSystemTimePreciseAsFileTime((FILETIME*)(0)), stdex::detail::_yes_type()) == sizeof(stdex::detail::_yes_type);
+        };
+
+        struct _has_GetSystemTimeAsFileTime
+        {
+            static const bool value =
+                sizeof(::GetSystemTimeAsFileTime((FILETIME*)(0)), stdex::detail::_yes_type()) == sizeof(stdex::detail::_yes_type);
+        };
+    }
+
+#ifndef WINAPI
+    #ifndef NTAPI
+        #define _STDEX_WINAPI __stdcall
+    #else
+        #define _STDEX_WINAPI NTAPI
+    #endif
+#else
+    #define _STDEX_WINAPI WINAPI
+#endif
+
+        extern "C"
+        {
+            typedef 
+            void(_STDEX_WINAPI *GetSystemTimePreciseAsFileTimePtr)(FILETIME*);
+
+            typedef 
+            void(_STDEX_WINAPI *GetSystemTimeAsFileTimePtr)(FILETIME*);
+        }
+
+#undef _STDEX_WINAPI
+
+    void GetSystemTimePreciseAsFileTime(FILETIME* input)
+    {
+        static HINSTANCE hKernel32 = GetModuleHandleW(L"kernel32.dll");
+        if (hKernel32)
+        {
+            // GetSystemTimePreciseAsFileTime
+            {
+                static FARPROC func = GetProcAddress(hKernel32, "GetSystemTimePreciseAsFileTime");
+                if (func)
+                    return reinterpret_cast<GetSystemTimePreciseAsFileTimePtr>(func)(input);
+            }
+
+            // GetSystemTimeAsFileTime
+            {
+                static FARPROC func = GetProcAddress(hKernel32, "GetSystemTimeAsFileTime");
+                if (func)
+                    reinterpret_cast<GetSystemTimeAsFileTimePtr>(func)(input);
+            }
+        }
+
+        filetime_ptr ftp = input;
+        ::GetSystemTimeAsFileTime(ftp);
     }
 }
 
@@ -112,7 +185,7 @@ namespace clock_gettime_impl
                 LARGE_INTEGER current_date;
                 FILETIME ft;
 
-                GetSystemTimeAsFileTime(&ft);
+                WinAPI::GetSystemTimePreciseAsFileTime(&ft);
                 current_date.LowPart = ft.dwLowDateTime;
                 current_date.HighPart = ft.dwHighDateTime;
 
@@ -166,10 +239,11 @@ namespace clock_gettime_impl
             delta_sec.QuadPart++;
         }
 
-        const stdex::time_t _ts_sec_max =
+        LARGE_INTEGER _ts_sec_max;
+        _ts_sec_max.QuadPart =
             (std::numeric_limits<stdex::time_t>::max)();
 
-        if (delta_sec.QuadPart < _ts_sec_max)
+        if (delta_sec.QuadPart < _ts_sec_max.QuadPart)
         {
             ts.tv_sec =
                 static_cast<stdex::time_t>(delta_sec.QuadPart);
@@ -178,7 +252,7 @@ namespace clock_gettime_impl
         }
         else
         {
-            ts.tv_sec = _ts_sec_max;
+            ts.tv_sec = (std::numeric_limits<stdex::time_t>::max)();
             ts.tv_nsec = 999999999;
         }
 
@@ -191,7 +265,9 @@ namespace clock_gettime_impl
         LARGE_INTEGER today;
         const LARGE_INTEGER start_point = abs_start_point::get();;
 
-        GetSystemTimeAsFileTime(&filetime);
+        {
+            WinAPI::GetSystemTimePreciseAsFileTime(&filetime);
+        }
 
         today.LowPart = filetime.dwLowDateTime;
         today.HighPart = filetime.dwHighDateTime;
@@ -200,6 +276,7 @@ namespace clock_gettime_impl
             return -1;
 
         today.QuadPart -= start_point.QuadPart;
+        //today.QuadPart = ((static_cast<long long>(today.HighPart)) << 32) + static_cast<long long>(today.LowPart) - start_point.QuadPart;
 
         ts = system_time_to_timespec(today);
 
