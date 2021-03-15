@@ -126,7 +126,7 @@ int test3()
         const chrono::steady_clock::duration t = now - then;
         DYNAMIC_VERIFY(result == false);
         std::cout << stdex::chrono::duration_cast<chrono::microseconds>(t).count() << " >= " << ms.count() << std::endl;
-        DYNAMIC_VERIFY((chrono::steady_clock::now() - then) >= ms);
+        DYNAMIC_VERIFY(t >= ms);
         DYNAMIC_VERIFY(l.owns_lock());
     }
     catch (const system_error&)
