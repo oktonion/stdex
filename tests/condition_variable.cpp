@@ -86,15 +86,15 @@ int test2()
 
     try
     {
-        chrono::microseconds ms(500);
+        chrono::microseconds ms(1);
         condition_variable c1;
         mutex m;
         unique_lock<mutex> l(m);
 
         chrono::system_clock::time_point then = chrono::system_clock::now();
         bool result = c1.wait_for(l, ms, &false_predicate);
-        DYNAMIC_VERIFY(result == false);
         chrono::system_clock::duration wait_for_duration = (chrono::system_clock::now() - then);
+        DYNAMIC_VERIFY(result == false);
         std::cout << chrono::duration_cast<chrono::microseconds>(wait_for_duration).count() << " >= " << ms.count() << std::endl;
         DYNAMIC_VERIFY(wait_for_duration >= ms);
         DYNAMIC_VERIFY(l.owns_lock());
