@@ -1798,6 +1798,11 @@ namespace stdex
         : integral_constant<int, 0>
     { };
 
+    template<class>
+    struct is_bind_expression
+        : false_type
+    { };
+
     namespace detail
     {
         template<class _ReplArgsT, class, int _PhIndex>
@@ -2013,10 +2018,103 @@ namespace stdex
             };
         } // namespace tuple_detail
 
+        template<class _FuncT, class _ArgsT, class _R>
+        _R _get_bind_expression_impl(_FuncT &fx, _callable_args<_ArgsT> &args,
+            typename
+            conditional<
+                is_bind_expression<_FuncT>::value,
+                functional_detail::_priority_tag<1>, 
+                functional_detail::_priority_tag<0>/**/>::type)
+        {
+            _return_arg<_R> result = 0;
+
+            _invoke(fx, args, result);
+
+            return _get_return(result);
+        }
+
+        template<class _ArgsT, class _R>
+        _R& _get_bind_expression_impl(_R &result, _callable_args<_ArgsT> &,
+            typename
+            conditional<
+                is_bind_expression<_R>::value,
+                functional_detail::_priority_tag<0>, 
+                functional_detail::_priority_tag<1>/**/>::type)
+        {
+            return result;
+        }
+
+        template<class _FuncT, class _ArgsT, class _R>
+        _R _get_bind_expression(_FuncT &fx, _callable_args<_ArgsT> &args)
+        {
+            return _get_bind_expression_impl<_R>(fx, args, functional_detail::_priority_tag<2>());
+        }
+
 #define _STDEX_TYPE_MISSING(arg_n) _MissingArg##arg_n##T
 #define _STDEX_TYPE_DISABLED(arg_n) ::stdex::detail::functional_detail::_any_type
 #define _STDEX_ARG_DISABLED(arg_n) disabled_arg##arg_n
 #define _STDEX_MERGE_ARGS(arg_n) detail::_get_ph_args<_ArgsT, missing_args_type, arg_n>::call(args, missing_args)
+#define _STDEX_MERGE_BIND_EXPR_ARGS(arg_n) \
+            _get_bind_expression< \
+            typename \
+            _get_args_traits<_ArgsT, arg_n>::value_type>( _STDEX_MERGE_ARGS(arg_n), missing_args )
+
+        template<
+            class _R,
+            class _FuncT,
+            class _TraitsT
+        >
+        class _binder_impl<_R, _FuncT, _TraitsT, std::size_t(-1)>
+        {
+            typedef typename _TraitsT::args_type _ArgsT;
+
+        protected:
+            _binder_impl(
+                _FuncT &fx_,
+                _ArgsT &args_
+            )
+            : args( args_ )
+            , fx( fx_ )
+            { }
+
+        public:
+            template<_STDEX_TMPL_ARGS0_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING)>
+            _R operator()(
+                _STDEX_PARAMS0_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING, _STDEX_ARG_DEFAULT)
+            )
+            {
+                typedef 
+                typename
+                detail::_binder_traits<
+                    _STDEX_TYPES0_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING)
+                >::args_type missing_args_type; 
+
+                missing_args_type missing_args = missing_args_type(
+                    _STDEX_ARGS0(_STDEX_BLANK, _STDEX_BLANK)
+                    );
+
+                typedef
+                typename
+                detail::_replace_ph_args<_ArgsT, missing_args_type, 0, void>::type result_args;
+
+                detail::_callable_args<result_args> callable_args = 
+                    result_args(
+                        _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_MERGE_BIND_EXPR_ARGS)
+                    );
+                
+                detail::_return_arg<_R> result = 0;
+
+                detail::_invoke(fx, callable_args, result);
+
+                return detail::_get_return(result);
+            }
+
+        private:
+            _ArgsT &args;
+            _FuncT &fx;
+        };
+
+#undef _STDEX_MERGE_BIND_EXPR_ARGS
 
         template<
             class _R,
@@ -2158,6 +2256,16 @@ namespace stdex
     };
 
 #undef _STDEX_ARG_CUSTOM
+
+    template<
+        class _R,
+        class _FuncT,
+        _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK)
+    >
+    struct is_bind_expression<
+        binder<_R, _FuncT, _STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)>
+    > : true_type
+    { };
 
     template<class _FuncT>
     binder<void, _FuncT>
