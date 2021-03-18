@@ -156,8 +156,10 @@ namespace stdex
         template<class _Rep, class _Period, class _Predicate>
         bool wait_for(unique_lock<mutex> &_lock, const chrono::duration<_Rep, _Period> &_rtime, _Predicate _p)
         {
-            chrono::system_clock::time_point _atime = 
-                chrono::system_clock::now() + chrono::duration_cast<chrono::system_clock::duration>(_rtime);
+            typedef chrono::system_clock sync_clock;
+
+            sync_clock::time_point _atime =
+                sync_clock::now() + chrono::duration_cast<sync_clock::duration>(_rtime);
 
             // exactly the same as wait_until with predicate
             while (!_p())
@@ -198,15 +200,16 @@ namespace stdex
                 typedef _Dur _Dur_local;
                 typedef typename _Clock_local::time_point _Clock_time_point;
 
-                static chrono::time_point<wait_until_clock, _Dur_local> sync_clock_tp(const chrono::time_point<_Clock_local, _Dur_local>& _atime, int)
+                static chrono::time_point<wait_until_clock, _Dur_local> sync_clock_tp(const chrono::time_point<_Clock_local, _Dur_local>& _atime, ...)
                 {
                     const _Clock_time_point _c_entry = _Clock_local::now();
                     const wait_until_clock::time_point _s_entry = wait_until_clock::now();
 
-                    return (_s_entry + (_atime - _c_entry));
+                    _Dur_local _delta = (_atime - _c_entry);
+                    return (_s_entry + chrono::duration_cast<wait_until_clock::duration>(_delta));
                 }
 
-                static const chrono::time_point<wait_until_clock, _Dur_local>& sync_clock_tp(const chrono::time_point<wait_until_clock, _Dur_local>& _atime, ...)
+                static const chrono::time_point<wait_until_clock, _Dur_local>& sync_clock_tp(const chrono::time_point<wait_until_clock, _Dur_local>& _atime, int)
                 {
                     return _atime;
                 }
@@ -217,7 +220,10 @@ namespace stdex
                 );
 
             if (_tp < wait_until_clock::now())
+            {
+                std::cout << "DEBUG: premature timeout" << std::endl;
                 return cv_status::timeout;
+            }
 
             stdex::timespec _tp_as_ts = 
                 wait_until_clock::to_timespec(
