@@ -541,7 +541,7 @@ ULONG AdjustSystemTimerResolutionTo500mcs()
     ULONG minRes;
     ULONG maxRes;
     bool success = WinAPI::NtQueryTimerResolution(&maxRes, &minRes, &sysTimerOrigResolution);
-    if (success)
+    if (!success)
     {
         throw std::runtime_error("Failed query system timer resolution");
     }
@@ -558,7 +558,7 @@ void AdjustSystemTimerResolutionTo(const ULONG &sysTimerOrigResolution)
 {
     ULONG curRes;
     bool success = WinAPI::NtSetTimerResolution(sysTimerOrigResolution, TRUE, &curRes);
-    if (success)
+    if (!success)
     {
         throw std::runtime_error("Failed set system timer resolution");
     }
