@@ -4,7 +4,21 @@ All notable changes to stdex library project will be documented in this file.
 
 visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library
 
-## [0.2.8] - 2020-xx-xx
+## [0.2.9] - 2021-xx-xx
+
+### Added
+
+### Changed
+
+- pthreads-win32 library with fresh fixes (affects Windows only)
+
+### Fixed
+
+- static analysis warnings about uninitialized variables and negating unsigned values
+- `stdex::condition_variable::wait_for`
+
+
+## [0.2.8] - 2021-01-26
 
 ### Added
 
@@ -12,7 +26,15 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 - - `stdex::try_lock`
 - - `stdex::lock`
 
-- `stdex::timespec`
+- `<ctime>` header:
+- - `stdex::timespec`
+- - `STDEX_CLOCKS_PER_SEC` as `CLOCKS_PER_SEC`
+
+- **big integer implementation** for `stdex::chrono`:
+- - more precise clocks for compilers without 64 bit integers
+- - more precise sleeps for all time-dependant functions and classes (like `stdex::timed_mutex` and such)
+- - more precise ratio arithmetics for compilers without 64 bit integers
+
 - moar tests to the god of tests
 
 ### Changed
@@ -20,14 +42,29 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 - trying to be more clear why `std::terminate` has been raised (affects DEBUG mode only)
 - `stdex::condition_variable` correct waitable functions
 - `stdex::chrono::high_resolution_clock` defined in compile-time as most accurate clock from `stdex::chrono::system_clock` and `stdex::chrono::steady_clock`
+- sync sleep clocks with `stdex::chrono` clocks
+- `stdex::is_const` is now correcty detecting functions as non-const for bugged compilers
+- `stdex::is_volatile` is now correcty detecting functions as non-volatile for bugged compilers
+- `stdex::is_function` is now correcty detecting functions
 
 ### Fixed
 
-- `stdex::chrono` clocks in general now are more precise and correct
-- `stdex::chrono::system_clock::is_steady` and `stdex::chrono::steady_clock::is_steady` flags are now correct for Windows
-- `stdex::chrono::system_clock` now converts to and from `time_t` properly
-- `stdex::error_code` and `stdex::error_condition` have now proper comparison operators. That fix restrict compiler from using this comparison operators for user-provided types.
-- `stdex::is_error_code_enum` overload for `stdex::errc` is now correct
+- `<chrono>` header:
+- - `stdex::chrono` clocks in general now are more precise and correct
+- - `stdex::chrono::system_clock::is_steady` and `stdex::chrono::steady_clock::is_steady` flags are now correct for Windows
+- - `stdex::chrono::system_clock` now converts to and from `time_t` properly
+- - `stdex::chrono::duration` incorrect constructor fix
+
+- `<system_error>` header:
+- - `stdex::error_code` and `stdex::error_condition` have now proper comparison operators. That fix restrict compiler from using this comparison operators for user-provided types.
+- - `stdex::is_error_code_enum` overload for `stdex::errc` is now correct
+- - `stdex::is_enum` detection for integral types
+- - `stdex::error_code` construction
+
+- `<ctime>` header:
+- - correct `swprintf` detection - fixing compiler specific implementations of `swprintf`
+
+- qv-qualified array compiler bug
 
 ## [0.2.7] - 2020-07-14
 

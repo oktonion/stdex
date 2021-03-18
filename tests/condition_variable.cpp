@@ -22,7 +22,7 @@ namespace cond_var_tests
     stdex::mutex mx;
     stdex::condition_variable cv;
 
-    bool val = false;
+    const bool val = false;
 
     bool func_val() { return cond_var_tests::val; }
 
@@ -80,6 +80,8 @@ int test1()
     return 0;
 }
 
+extern pthread_cond_t ptw32_cond_list_tail;
+
 int test2()
 {
     using namespace stdex;
@@ -91,11 +93,25 @@ int test2()
         mutex m;
         unique_lock<mutex> l(m);
 
-        chrono::system_clock::time_point then = chrono::system_clock::now();
-        bool result = c1.wait_for(l, ms, &false_predicate);
-        DYNAMIC_VERIFY(result == false);
-        DYNAMIC_VERIFY((chrono::system_clock::now() - then) >= ms);
-        DYNAMIC_VERIFY(l.owns_lock());
+        {
+            chrono::system_clock::time_point then = chrono::system_clock::now();
+            bool result = c1.wait_for(l, ms, &false_predicate);
+            chrono::system_clock::duration wait_for_duration = (chrono::system_clock::now() - then);
+            DYNAMIC_VERIFY(result == false);
+            std::cout << chrono::duration_cast<chrono::microseconds>(wait_for_duration).count() << " >= " << ms.count() << std::endl;
+            DYNAMIC_VERIFY(wait_for_duration >= ms);
+            DYNAMIC_VERIFY(l.owns_lock());
+        }
+
+        {
+            chrono::system_clock::time_point then = chrono::system_clock::now();
+            bool result = c1.wait_for(l, ms, &false_predicate);
+            chrono::system_clock::duration wait_for_duration = (chrono::system_clock::now() - then);
+            DYNAMIC_VERIFY(result == false);
+            std::cout << chrono::duration_cast<chrono::microseconds>(wait_for_duration).count() << " >= " << ms.count() << std::endl;
+            DYNAMIC_VERIFY(wait_for_duration >= ms);
+            DYNAMIC_VERIFY(l.owns_lock());
+        }
     }
     catch (const system_error&)
     {
@@ -126,7 +142,7 @@ int test3()
         const chrono::steady_clock::duration t = now - then;
         DYNAMIC_VERIFY(result == false);
         std::cout << stdex::chrono::duration_cast<chrono::microseconds>(t).count() << " >= " << ms.count() << std::endl;
-        DYNAMIC_VERIFY((chrono::steady_clock::now() - then) >= ms);
+        DYNAMIC_VERIFY(t >= ms);
         DYNAMIC_VERIFY(l.owns_lock());
     }
     catch (const system_error&)
@@ -203,7 +219,12 @@ try
 catch(const std::exception& e)
 {
     std::cout << "std::exception " << e.what() << std::endl;
-    throw;
+    return -1;
+}
+catch (...)
+{
+    std::cout << "unknown exception" << std::endl;
+    return -2;
 }
 
     return 0;

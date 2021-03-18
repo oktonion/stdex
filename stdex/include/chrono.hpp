@@ -119,7 +119,7 @@ namespace stdex
     {
         namespace detail
         {
-            // this structure is used internaly to represent platform specific big integers
+            // this structure is used internally to represent platform specific big integers
             // and safe number precision checks (throws out_of_range)
             struct _big_int
             {
@@ -129,6 +129,9 @@ namespace stdex
 
                 _big_int(const _big_int&);
                 _big_int& operator=(const _big_int&);
+
+                _big_int operator+() const;
+                _big_int operator-() const;
 
                 _big_int& operator++();
                 _big_int operator++(int);
@@ -737,6 +740,12 @@ namespace stdex
                 check4; // if you are there means rep type is integer but floating-point type is passed as argument
             }
 
+            
+            duration(const duration& other):
+                base_type(static_cast<const base_type&>(other))
+            {
+            }
+
             template<class _Rep2, class _Period2>
             duration(const duration<_Rep2, _Period2> &other):
                 base_type(detail::duration_count( duration_cast<duration>(other) ))
@@ -770,7 +779,7 @@ namespace stdex
 
             duration operator-() const
             {    // get negated value
-                return (duration<_Rep, _Period>(0 - base_type::_r));
+                return (-base_type::_r);
             }
 
             duration& operator++()
@@ -1074,6 +1083,10 @@ namespace stdex
                 : _d(_d_in)
             {}
 
+            time_point(const time_point &other)
+                : _d(other._d)
+            {}
+
             // construct from another duration
             template<class _Duration2>
             time_point(const time_point<_Clock, _Duration2> &_tp)
@@ -1246,7 +1259,8 @@ namespace stdex
         {
             typedef 
             stdex::conditional<
-                (sizeof(stdex::intmax_t) * CHAR_BIT >= 64), 
+                (sizeof(chrono::nanoseconds::rep) * CHAR_BIT >= 64) ||
+                (detail::_use_big_int<chrono::nanoseconds::rep, chrono::nanoseconds::period>::value == bool(true)), 
                 chrono::nanoseconds, 
                 chrono::microseconds
             >::type duration;
@@ -1300,7 +1314,8 @@ namespace stdex
         {
             typedef 
             stdex::conditional<
-                (sizeof(stdex::intmax_t)* CHAR_BIT >= 64),
+                (sizeof(chrono::nanoseconds::rep) * CHAR_BIT >= 64) ||
+                (detail::_use_big_int<chrono::nanoseconds::rep, chrono::nanoseconds::period>::value == bool(true)), 
                 chrono::nanoseconds, 
                 chrono::microseconds
             >::type duration;

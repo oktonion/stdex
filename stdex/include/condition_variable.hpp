@@ -84,8 +84,6 @@ namespace stdex
 
     class condition_variable 
     {
-        typedef chrono::system_clock clock_t;
-
     public:
         typedef pthread_cond_t* native_handle_type;
 
@@ -134,20 +132,10 @@ namespace stdex
                 wait(_lock);
         }
 
-        template<class _Duration>
-        cv_status wait_until(unique_lock<mutex> &_lock, const chrono::time_point<clock_t, _Duration> &_atime)
-        {
-            return wait_until_impl(_lock, _atime);
-        }
-
         template<class _Clock, class _Duration>
         cv_status wait_until(unique_lock<mutex> &_lock, const chrono::time_point<_Clock, _Duration> &_atime)
         {
-            // DR 887 - Sync unknown clock to known clock.
-            const typename _Clock::time_point _c_entry = _Clock::now();
-            const clock_t::time_point _s_entry = clock_t::now();
-
-            return wait_until_impl(_lock, (_s_entry + (_atime - _c_entry)));
+            return wait_until_impl(_lock, _atime);
         }
 
         template<class _Clock, class _Duration, class _Predicate>
@@ -162,24 +150,22 @@ namespace stdex
         template<class _Rep, class _Period>
         cv_status wait_for(unique_lock<mutex> &_lock, const chrono::duration<_Rep, _Period> &_rtime)
         {
-            chrono::duration<_Rep, _Period> _rt = _rtime;
-            if (ratio_greater<clock_t::period, _Period>::value)
-                ++_rt;
-            return wait_for_impl(_lock, _rt);
+            return wait_for_impl(_lock, _rtime);
         }
 
         template<class _Rep, class _Period, class _Predicate>
         bool wait_for(unique_lock<mutex> &_lock, const chrono::duration<_Rep, _Period> &_rtime, _Predicate _p)
         {
-            chrono::duration<_Rep, _Period> _rt = _rtime;
-            if (ratio_greater<clock_t::period, _Period>::value)
-                ++_rt;
+            typedef chrono::system_clock sync_clock;
 
+            sync_clock::time_point _atime =
+                sync_clock::now() + chrono::duration_cast<sync_clock::duration>(_rtime);
+
+            // exactly the same as wait_until with predicate
             while (!_p())
-                if (wait_for_impl(_lock, _rtime) == cv_status::timeout)
+                if (wait_until(_lock, _atime) == cv_status::timeout)
                     return _p();
             return true;
-            return wait_until(_lock, clock_t::now() + chrono::duration_cast<clock_t::duration>(_rt), _p);
         }
 
         native_handle_type native_handle()
@@ -199,14 +185,47 @@ namespace stdex
 
     private:
 
-        template<class _Dur>
-        cv_status wait_until_impl(unique_lock<mutex> &_lock, const chrono::time_point<clock_t, _Dur> &_atime)
+        template<class _Clock, class _Dur>
+        cv_status wait_until_impl(unique_lock<mutex> &_lock, const chrono::time_point<_Clock, _Dur> &_atime)
         {
             if (!detail::_lock_owns_lock(_lock))
                 std::terminate();
 
+            typedef chrono::system_clock wait_until_clock;
+
+            // DR 887 - Sync unknown clock to known clock.
+            struct lambdas
+            {
+                typedef _Clock _Clock_local;
+                typedef _Dur _Dur_local;
+                typedef typename _Clock_local::time_point _Clock_time_point;
+
+                static chrono::time_point<wait_until_clock, _Dur_local> sync_clock_tp(const chrono::time_point<_Clock_local, _Dur_local>& _atime, ...)
+                {
+                    const _Clock_time_point _c_entry = _Clock_local::now();
+                    const wait_until_clock::time_point _s_entry = wait_until_clock::now();
+
+                    _Dur_local _delta = (_atime - _c_entry);
+                    return (_s_entry + stdex::chrono::duration_cast<wait_until_clock::duration>(_delta));
+                }
+
+                static const chrono::time_point<wait_until_clock, _Dur_local>& sync_clock_tp(const chrono::time_point<wait_until_clock, _Dur_local>& _atime, int)
+                {
+                    return _atime;
+                }
+            };
+
+            wait_until_clock::time_point _tp = chrono::time_point_cast<wait_until_clock::duration>(
+                    lambdas::sync_clock_tp(_atime, 0)
+                );
+
+            if (_tp < wait_until_clock::now())
+                return cv_status::timeout;
+
             stdex::timespec _tp_as_ts = 
-                clock_t::to_timespec(chrono::time_point_cast<clock_t::duration>(_atime));
+                wait_until_clock::to_timespec(
+                    _tp
+                );
             
             ::timespec _ts;
 
@@ -228,12 +247,12 @@ namespace stdex
             }
         #endif
 
-            return (clock_t::now() < _atime
+            return (wait_until_clock::now() < _tp
                 ? cv_status::no_timeout : cv_status::timeout);
         }
 
         template<class _Rep, class _Period>
-        cv_status wait_for_impl(unique_lock<mutex> &_lock, const chrono::duration<_Rep, _Period> &_rtime)
+        cv_status wait_for_impl(unique_lock<mutex> &_lock, chrono::duration<_Rep, _Period> _rtime)
         {
             if (!detail::_lock_owns_lock(_lock))
                 std::terminate();
@@ -241,18 +260,24 @@ namespace stdex
             if (_rtime.count() < 0)
                 return cv_status::timeout;
 
-            clock_t::time_point 
-                _start_time_point = clock_t::now(),
-                _end_time_point = _start_time_point + stdex::chrono::duration_cast<clock_t::duration>(_rtime);
+            typedef chrono::system_clock time_measurment_clock;
+            typedef chrono::system_clock wait_for_clock;
+
+            if (ratio_greater<time_measurment_clock::period, _Period>::value)
+                ++_rtime;
+
+            time_measurment_clock::time_point 
+                _start_time_point = time_measurment_clock::now(),
+                _end_time_point = _start_time_point + stdex::chrono::duration_cast<time_measurment_clock::duration>(_rtime);
 
             stdex::timespec _tp_as_ts =
-                clock_t::to_timespec(_end_time_point);
+                wait_for_clock::to_timespec(wait_for_clock::now() + stdex::chrono::duration_cast<wait_for_clock::duration>(_rtime));
 
             ::timespec _ts;
             _ts.tv_sec = _tp_as_ts.tv_sec;
             _ts.tv_nsec = _tp_as_ts.tv_nsec;
 
-            if ((clock_t::now() - _start_time_point) > _rtime)
+            if ((time_measurment_clock::now() - _start_time_point) > _rtime)
                 return cv_status::timeout;
 
             int _err = 
@@ -270,7 +295,7 @@ namespace stdex
             }
         #endif
 
-            return (clock_t::now() - _start_time_point < _rtime
+            return (time_measurment_clock::now() - _start_time_point < _rtime
                 ? cv_status::no_timeout : cv_status::timeout);
         }
 

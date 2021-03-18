@@ -7,11 +7,9 @@
 
 // Implemented all basic standard C++11 features. 
 // What can not be implemented or implemented with some limits:
-// is_class - can't detect unions
-// is_enum - ni
+// is_class - can't detect unions (unless there is compiler support)
 // is_rvalue_reference - ni
-// is_union - ni
-// is_scalar - can't detect enums
+// is_union - can't detect class (unless there is compiler support)
 // is_abstract - ni
 // is_empty - ni
 // is_literal_type - ni
@@ -600,6 +598,28 @@ namespace stdex
     {
         template<class>
         struct _has_bug;
+
+        template<>
+        struct _has_bug<class _stdex_array_can_not_be_const>
+        {
+            static const bool value = 
+                detail::_canonical_is_const<const int[4]>::value == bool(false);
+        };
+
+        template<>
+        struct _has_bug<class _stdex_array_can_not_be_volatile>
+        {
+            static const bool value = 
+                detail::_canonical_is_volatile<volatile int[4]>::value == bool(false);
+        };
+
+        template<>
+        struct _has_bug<class _stdex_array_can_not_be_cv_qualified>
+        {
+            static const bool value = 
+                detail::_canonical_is_const<const volatile int[4]>::value == bool(false) ||
+                detail::_canonical_is_volatile<const volatile int[4]>::value == bool(false);
+        };
     } //namespace intern
 
     namespace detail
@@ -1286,10 +1306,20 @@ namespace stdex
                 _is_function_chooser_impl<_Tp*, _is_mem_function_ptr_helper<const volatile _Tp>::value>::value;
         };
 
+        template<class _Tp, bool>
+        struct _is_function_chooser_helper_array_bug
+            : true_type
+        { };
+
+        template<class _Tp>
+        struct _is_function_chooser_helper_array_bug<_Tp, true>
+            : bool_constant<is_array<_Tp>::value == bool(false)>
+        { };
 
         template<class _Tp>
         struct _is_function_chooser_helper<_Tp, true>
-            : true_type
+            : _is_function_chooser_helper_array_bug<_Tp, 
+                intern::_has_bug<intern::_stdex_array_can_not_be_cv_qualified>::value>
         // if there is no compiler bug for treating cv-qualified function type as a thing
         { 
         };
@@ -1314,7 +1344,11 @@ namespace stdex
     // is_function
     template<class _Tp>
     struct is_function:
-        bool_constant<detail::_is_function_chooser<_Tp, is_reference<_Tp>::value>::value == bool(true)>
+        bool_constant<
+        detail::_is_function_chooser<
+            _Tp, 
+            is_reference<_Tp>::value
+        >::value == bool(true)>
     {
     };
 
@@ -1471,15 +1505,27 @@ namespace stdex
         {
             static const bool value = (sizeof(_is_constructible_from_type_tester<_Tp>(1)) == sizeof(_yes_type));
         };
+    } // namespace detail
 
-        namespace is_enum_detail
-        {
-            enum dummy_enum {};
-            struct _enum_can_have_member_pointer_bug :
-                public integral_constant<bool, _has_member_pointer_impl<dummy_enum>::value>::type
-            { };
-        }
+    namespace is_enum_detail
+    {
+        enum dummy_enum {};
+        struct _enum_can_have_member_pointer_bug :
+            public integral_constant<bool, detail::_has_member_pointer_impl<dummy_enum>::value>::type
+        { };
+    } // namespace is_enum_detail
 
+    namespace intern
+    {
+        
+        template<>
+        struct _has_bug<struct _stdex_enum_can_have_member_pointer_bug>:
+            is_enum_detail::_enum_can_have_member_pointer_bug
+        { };
+    } // namespace intern
+
+    namespace detail
+    {
         template<class _Tp>
         struct _derived_dummy :
             public _Tp
@@ -1510,7 +1556,10 @@ namespace stdex
         struct _enum_can_be_parent
         {
             static const bool value = 
-                sizeof(_enum_can_be_parent_tester<_Tp>(_is_enum_bug_internal<_Tp, is_enum_detail::_enum_can_have_member_pointer_bug::value>::_can_be_parent_tester_helper(0))) == sizeof(_yes_type);
+                sizeof(
+                    _enum_can_be_parent_tester<_Tp>(
+                        _is_enum_bug_internal<_Tp, intern::_has_bug<intern::_stdex_enum_can_have_member_pointer_bug>::value
+                    >::_can_be_parent_tester_helper(0))) == sizeof(_yes_type);
         };
 
         template<class _Tp, bool>

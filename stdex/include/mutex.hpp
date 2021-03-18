@@ -450,15 +450,23 @@ namespace stdex
         unique_lock& operator=(const unique_lock&) _STDEX_DELETED_FUNCTION;
     };
 
-        class timed_mutex;
+    class timed_mutex;
     class recursive_timed_mutex;
 
     namespace detail
     {
-        void* pthread_mutex_timedlock(...); // dummy
-
+      
         namespace mutex_type_traits
         {
+            namespace _adl
+            {
+                extern "C" {
+                    float* pthread_mutex_timedlock(...); // dummy
+                }   
+            }
+
+            using namespace _adl;
+
             template<class _Tp>
             _Tp declval();
 
@@ -471,7 +479,7 @@ namespace stdex
                     sizeof( 
                         _pthread_func_tester(
                             pthread_mutex_timedlock(
-                                declval<pthread_mutex_t*>(), 
+                                declval< ::pthread_mutex_t*>(), 
                                 declval< ::timespec* >()
                         )
                     ) 

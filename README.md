@@ -9,9 +9,13 @@ master   | [![Build Status](https://travis-ci.org/oktonion/stdex.svg?branch=mast
 
 # stdex
 
+![logo](https://github.com/oktonion/stdex/blob/master/stdex-no-bg-small.png)
+
 [![language](https://img.shields.io/badge/C%2B%2B98-C%2B%2B11-green.svg)](https://github.com/oktonion/stdex/wiki)
 
 C++ 11 standard library implementation with extra features using C++98 only and POSIX threads. Minimum ugly preprocessor macro and no configuration files. The library itself is built on top of C++ standard library distributed with your compiler and just extends it with C++11 features.
+
+[Usage examples on Wiki](https://github.com/oktonion/stdex/wiki/Architecture-overview#what-to-expect)
 
 ## Supported platforms
 

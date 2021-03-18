@@ -69,6 +69,7 @@ void timespec_add(timespec &result, const timespec &in)
 #include <process.h>
 
 typedef LONGLONG duration_long_long;
+typedef ULONGLONG duration_ulong_long;
 struct filetime_ptr
 {
     FILETIME* value;
@@ -76,7 +77,7 @@ struct filetime_ptr
         value(input) {}
 };
 
-void GetSystemTimeAsFileTime(filetime_ptr SystemTimeAsFileTimePtr)
+filetime_ptr GetSystemTimeAsFileTime(filetime_ptr SystemTimeAsFileTimePtr)
 { // GetSystemTimeAsFileTime does not exist on WinCE
     SYSTEMTIME st;
 
@@ -85,6 +86,79 @@ void GetSystemTimeAsFileTime(filetime_ptr SystemTimeAsFileTimePtr)
     {
         SystemTimeAsFileTimePtr.value->dwLowDateTime = 0;
         SystemTimeAsFileTimePtr.value->dwHighDateTime = 0;
+    }
+    return SystemTimeAsFileTimePtr;
+}
+
+filetime_ptr GetSystemTimePreciseAsFileTime(filetime_ptr SystemTimeAsFileTimePtr)
+{ // GetSystemTimePreciseAsFileTime does not exist before Win8
+    
+    GetSystemTimeAsFileTime(SystemTimeAsFileTimePtr.value);
+    return SystemTimeAsFileTimePtr;
+}
+
+stdex::detail::_no_type operator,(filetime_ptr, stdex::detail::_yes_type);
+
+namespace WinAPI
+{
+    namespace type_traits
+    {
+        struct _has_GetSystemTimePreciseAsFileTime
+        {
+            static const bool value =
+                sizeof(::GetSystemTimePreciseAsFileTime((FILETIME*)(0)), stdex::detail::_yes_type()) == sizeof(stdex::detail::_yes_type);
+        };
+
+        struct _has_GetSystemTimeAsFileTime
+        {
+            static const bool value =
+                sizeof(::GetSystemTimeAsFileTime((FILETIME*)(0)), stdex::detail::_yes_type()) == sizeof(stdex::detail::_yes_type);
+        };
+    }
+
+#ifndef WINAPI
+    #ifndef NTAPI
+        #define _STDEX_WINAPI __stdcall
+    #else
+        #define _STDEX_WINAPI NTAPI
+    #endif
+#else
+    #define _STDEX_WINAPI WINAPI
+#endif
+
+        extern "C"
+        {
+            typedef 
+            void(_STDEX_WINAPI *GetSystemTimePreciseAsFileTimePtr)(FILETIME*);
+
+            typedef 
+            void(_STDEX_WINAPI *GetSystemTimeAsFileTimePtr)(FILETIME*);
+        }
+
+#undef _STDEX_WINAPI
+
+    void GetSystemTimePreciseAsFileTime(FILETIME* input)
+    {
+        static HINSTANCE hKernel32 = GetModuleHandleW(L"kernel32.dll");
+        if (hKernel32)
+        {
+            // GetSystemTimePreciseAsFileTime
+            {
+                static FARPROC func = GetProcAddress(hKernel32, "GetSystemTimePreciseAsFileTime");
+                if (func)
+                    return reinterpret_cast<GetSystemTimePreciseAsFileTimePtr>(func)(input);
+            }
+
+            // GetSystemTimeAsFileTime
+            {
+                static FARPROC func = GetProcAddress(hKernel32, "GetSystemTimeAsFileTime");
+                if (func)
+                    reinterpret_cast<GetSystemTimeAsFileTimePtr>(func)(input);
+            }
+        }
+
+        filetime_ptr ftp = input;
+        ::GetSystemTimeAsFileTime(ftp);
     }
 }
 
@@ -111,7 +185,7 @@ namespace clock_gettime_impl
                 LARGE_INTEGER current_date;
                 FILETIME ft;
 
-                GetSystemTimeAsFileTime(&ft);
+                WinAPI::GetSystemTimePreciseAsFileTime(&ft);
                 current_date.LowPart = ft.dwLowDateTime;
                 current_date.HighPart = ft.dwHighDateTime;
 
@@ -165,10 +239,11 @@ namespace clock_gettime_impl
             delta_sec.QuadPart++;
         }
 
-        const stdex::time_t _ts_sec_max =
+        LARGE_INTEGER _ts_sec_max;
+        _ts_sec_max.QuadPart =
             (std::numeric_limits<stdex::time_t>::max)();
 
-        if (delta_sec.QuadPart < _ts_sec_max)
+        if (delta_sec.QuadPart < _ts_sec_max.QuadPart)
         {
             ts.tv_sec =
                 static_cast<stdex::time_t>(delta_sec.QuadPart);
@@ -177,7 +252,7 @@ namespace clock_gettime_impl
         }
         else
         {
-            ts.tv_sec = _ts_sec_max;
+            ts.tv_sec = (std::numeric_limits<stdex::time_t>::max)();
             ts.tv_nsec = 999999999;
         }
 
@@ -190,7 +265,9 @@ namespace clock_gettime_impl
         LARGE_INTEGER today;
         const LARGE_INTEGER start_point = abs_start_point::get();;
 
-        GetSystemTimeAsFileTime(&filetime);
+        {
+            WinAPI::GetSystemTimePreciseAsFileTime(&filetime);
+        }
 
         today.LowPart = filetime.dwLowDateTime;
         today.HighPart = filetime.dwHighDateTime;
@@ -199,6 +276,7 @@ namespace clock_gettime_impl
             return -1;
 
         today.QuadPart -= start_point.QuadPart;
+        //today.QuadPart = ((static_cast<long long>(today.HighPart)) << 32) + static_cast<long long>(today.LowPart) - start_point.QuadPart;
 
         ts = system_time_to_timespec(today);
 
@@ -276,14 +354,14 @@ namespace clock_gettime_impl
 
         const LARGE_INTEGER& cached_freq_sec = cache_freq();
         LARGE_INTEGER sec_to_ns_ratio;
-        sec_to_ns_ratio.QuadPart = 1000 * 1000 * 1000;
+        sec_to_ns_ratio.QuadPart = LONGLONG(1000) * 1000 * 1000;
         LARGE_INTEGER delta;
         delta.QuadPart = (end_point.QuadPart - sp.QuadPart);
 
         LARGE_INTEGER delta_sec, delta_nsec;
 
         delta_sec.QuadPart = delta.QuadPart / cached_freq_sec.QuadPart;
-        delta_nsec.QuadPart = (delta.QuadPart % cached_freq_sec.QuadPart) * sec_to_ns_ratio.QuadPart / cached_freq_sec.QuadPart;
+        delta_nsec.QuadPart = ( (delta.QuadPart % cached_freq_sec.QuadPart) * sec_to_ns_ratio.QuadPart ) / cached_freq_sec.QuadPart;
 
         while (delta_nsec.QuadPart > 999999999)
         {
@@ -299,7 +377,7 @@ namespace clock_gettime_impl
             ts.tv_sec =
                 static_cast<stdex::time_t>(delta_sec.QuadPart);
             ts.tv_nsec =
-                static_cast<long>(delta_nsec.QuadPart) + 1;
+                static_cast<long>(delta_nsec.QuadPart);
         }
         else
         {
@@ -357,6 +435,7 @@ using clock_gettime_impl::local_ts_to_system_ts;
 #include <mach/mach_time.h> /* mach_absolute_time */
 
 typedef ::int64_t duration_long_long;
+typedef ::uint64_t duration_ulong_long;
 
 #define BILLION 1000000000L
 #define MILLION 1000000L
@@ -430,6 +509,7 @@ stdex::timespec local_ts_to_system_ts(const stdex::timespec &ts)
 #else
 
 typedef long long duration_long_long;
+typedef unsigned long long duration_ulong_long;
 
 int clock_gettime(clockid_t, struct timespec*);
 int my_clock_gettime(clockid_t X, stdex::timespec *tv)
@@ -526,6 +606,65 @@ namespace stdex {
 
             using stdex::detail::_declptr;
 
+            template<class _LhsT, class _RhsT,
+                bool _BothAreSigned,
+                bool _LhsIsSigned>
+            struct cmp_less_impl;
+
+            template<class _LhsT, class _RhsT>
+            struct cmp_less_impl<_LhsT, _RhsT, 
+                false, false>
+            {
+                bool operator()(_LhsT lhs, _RhsT rhs) const throw()
+                {
+                    typedef typename stdex::make_unsigned<_RhsT>::type type;
+
+                    return rhs < 0 ? false : lhs < type(rhs);
+                }
+            };
+
+            template<class _LhsT, class _RhsT>
+            struct cmp_less_impl<_LhsT, _RhsT, 
+                false, true>
+            {
+                bool operator()(_LhsT lhs, _RhsT rhs) const throw()
+                {
+                    typedef typename stdex::make_unsigned<_LhsT>::type type;
+
+                    return lhs < 0 ? true : type(lhs) < rhs;
+                }
+            };
+
+            template<class _LhsT, class _RhsT, bool _LhsIsSigned>
+            struct cmp_less_impl<_LhsT, _RhsT, 
+                true, _LhsIsSigned>
+            {
+                bool operator()(_LhsT lhs, _RhsT rhs) const throw()
+                {
+                    return lhs < rhs;
+                }
+            };
+
+            template<class _LhsT, class _RhsT>
+            struct cmp_less_functor:
+                cmp_less_impl<_LhsT, _RhsT,
+                    (stdex::is_signed<_LhsT>::value == stdex::is_signed<_RhsT> ::value),
+                    stdex::is_signed<_LhsT>::value>
+            { };
+
+            template<class _LhsT, class _RhsT>
+            static bool cmp_less(_LhsT lhs, _RhsT rhs) throw()
+            {
+                cmp_less_functor<_LhsT, _RhsT> impl;
+                return impl(lhs, rhs);
+            }
+
+            template<class _LhsT, class _RhsT>
+            static bool cmp_greater(_LhsT lhs, _RhsT rhs) throw()
+            {
+                return cmp_less(rhs, lhs);
+            }
+
             duration_long_long convert(const _big_int &value)
             {
                 duration_long_long result;
@@ -562,20 +701,27 @@ namespace stdex {
             {
                 duration_long_long result = convert(*this);
 
-                if (result > (std::numeric_limits<stdex::intmax_t>::max)())
+                if (cmp_greater( result, (std::numeric_limits<stdex::intmax_t>::max)() ))
                     throw(std::out_of_range("overflow in stdex::chrono::duration cast to stdex::intmax_t"));
 
-                return stdex::intmax_t(result);
+                return static_cast<stdex::intmax_t>(result);
             }
 
-            long double     _big_int::to_floating_point() const
+            long double _big_int::to_floating_point() const
             {
-                long double result = static_cast<long double>(convert(*this));
+                duration_long_long result = convert(*this);
+                // long double range is always wider than long long range 
+                return static_cast<long double>(result);
+            }
 
-                if (result > (std::numeric_limits<long double>::max)())
-                    throw(std::out_of_range("overflow in stdex::chrono::duration cast to long double"));
+            _big_int _big_int::operator+() const
+            {
+                return (*this);
+            }
 
-                return (long double)(result);
+            _big_int _big_int::operator-() const
+            {
+                return convert(-convert(*this));
             }
 
             _big_int& _big_int::operator++()
@@ -700,25 +846,16 @@ stdex::timespec
     chrono::nanoseconds _ns = 
         chrono::duration_cast<chrono::nanoseconds>(_t - _s);
 
-    chrono::time_point<clock_t, chrono::seconds>::rep _s_count = 
-        _s.time_since_epoch().count();
+    stdex::time_t _s_count = 
+        detail::_chrono_convert<stdex::time_t>(
+            detail::duration_count(_s.time_since_epoch()), detail::chrono_detail::_priority_tag<4>() );
 
     stdex::timespec _ts;
 
-    const stdex::time_t _ts_sec_max = 
-        (std::numeric_limits<stdex::time_t>::max)();
-    if (_s_count < _ts_sec_max)
-    {
-        _ts.tv_sec = static_cast<stdex::time_t>(_s_count);
-        _ts.tv_nsec = static_cast<long>(_ns.count());
+    _ts.tv_sec = _s_count;
+    _ts.tv_nsec = static_cast<long>(_ns.count());
 
-        return local_ts_to_system_ts(_ts);
-    }
-    else
-    {
-        _ts.tv_sec = _ts_sec_max;
-        _ts.tv_nsec = 999999999;
-    }
+    return local_ts_to_system_ts(_ts);
 
     return _ts;
 }
