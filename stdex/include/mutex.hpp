@@ -455,10 +455,11 @@ namespace stdex
 
     namespace detail
     {
-        float* pthread_mutex_timedlock(...); // dummy
-        
+      
         namespace mutex_type_traits
         {
+            float* pthread_mutex_timedlock(...); // dummy
+
             template<class _Tp>
             _Tp declval();
 
