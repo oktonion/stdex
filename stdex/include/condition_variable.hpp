@@ -206,7 +206,7 @@ namespace stdex
                     const wait_until_clock::time_point _s_entry = wait_until_clock::now();
 
                     _Dur_local _delta = (_atime - _c_entry);
-                    return (_s_entry + chrono::duration_cast<wait_until_clock::duration>(_delta));
+                    return (_s_entry + stdex::chrono::duration_cast<wait_until_clock::duration>(_delta));
                 }
 
                 static const chrono::time_point<wait_until_clock, _Dur_local>& sync_clock_tp(const chrono::time_point<wait_until_clock, _Dur_local>& _atime, int)
@@ -220,10 +220,7 @@ namespace stdex
                 );
 
             if (_tp < wait_until_clock::now())
-            {
-                std::cout << "DEBUG: premature timeout" << std::endl;
                 return cv_status::timeout;
-            }
 
             stdex::timespec _tp_as_ts = 
                 wait_until_clock::to_timespec(
