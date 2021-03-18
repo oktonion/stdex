@@ -10,9 +10,12 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 ### Changed
 
+- pthreads-win32 library with fresh fixes (affects Windows only)
+
 ### Fixed
 
 - static analysis warnings about uninitialized variables and negating unsigned values
+- `stdex::condition_variable::wait_for`
 
 
 ## [0.2.8] - 2021-01-26
