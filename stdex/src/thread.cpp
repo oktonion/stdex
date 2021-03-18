@@ -497,6 +497,7 @@ namespace WinAPI
         BOOLEAN              SetResolution,
         PULONG               CurrentResolution)
     {
+        if(hNtdll())
         {
             static FARPROC func = GetProcAddress(hNtdll(), "NtSetTimerResolution");
             if (func)
@@ -506,8 +507,8 @@ namespace WinAPI
                 if (NT_ERROR(ntRes))
                     return false;
             }
-            return true;
         }
+        return true;
     }
 
     bool
@@ -516,6 +517,7 @@ namespace WinAPI
         PULONG              MinimumResolution,
         PULONG              CurrentResolution)
     {
+        if (hNtdll())
         {
             static FARPROC func = GetProcAddress(hNtdll(), "NtQueryTimerResolution");
             if (func)
@@ -525,8 +527,8 @@ namespace WinAPI
                 if (NT_ERROR(ntRes))
                     return false;
             }
-            return true;
         }
+        return true;
     }
 }
 
