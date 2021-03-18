@@ -458,7 +458,15 @@ namespace stdex
       
         namespace mutex_type_traits
         {
-            float* pthread_mutex_timedlock(...); // dummy
+            namespace _adl
+            {
+                extern "C" {
+                    float* pthread_mutex_timedlock(...); // dummy
+                }
+                
+            };
+
+            using namespace _adl;
 
             template<class _Tp>
             _Tp declval();
