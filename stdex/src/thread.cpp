@@ -464,27 +464,71 @@ typedef long NTSTATUS;
 #define _Out_
 #endif
 
-extern "C"
+
+
+namespace WinAPI
 {
-
-    NTSYSAPI
+    extern "C"
+    {
+        typedef
         NTSTATUS
-        NTAPI
-        NtSetTimerResolution(
-            _In_ ULONG                DesiredResolution,
-            _In_ BOOLEAN              SetResolution,
-            _Out_ PULONG              CurrentResolution);
+        (NTAPI *NtSetTimerResolutionPtr)(
+            _In_ ULONG,
+            _In_ BOOLEAN,
+            _Out_ PULONG);
 
-    NTSYSAPI
+        typedef
         NTSTATUS
-        NTAPI
-        NtQueryTimerResolution(
-            _Out_ PULONG              MaximumResolution,
-            _Out_ PULONG              MinimumResolution,
-            _Out_ PULONG              CurrentResolution);
+        (NTAPI *NtQueryTimerResolutionPtr)(
+            _Out_ PULONG,
+            _Out_ PULONG,
+            _Out_ PULONG);
+    }
 
+    static HINSTANCE hNtdll()
+    {
+        static HINSTANCE instance = GetModuleHandleW(L"ntdll.dll");
+        return instance;
+    }
+
+    bool
+    static NtSetTimerResolution(
+        ULONG                DesiredResolution,
+        BOOLEAN              SetResolution,
+        PULONG               CurrentResolution)
+    {
+        {
+            static FARPROC func = GetProcAddress(hNtdll(), "NtSetTimerResolution");
+            if (func)
+            {
+                NTSTATUS ntRes =
+                    reinterpret_cast<NtSetTimerResolutionPtr>(func)(DesiredResolution, SetResolution, CurrentResolution);
+                if (NT_ERROR(ntRes))
+                    return false;
+            }
+            return true;
+        }
+    }
+
+    bool
+    static NtQueryTimerResolution(
+        PULONG              MaximumResolution,
+        PULONG              MinimumResolution,
+        PULONG              CurrentResolution)
+    {
+        {
+            static FARPROC func = GetProcAddress(hNtdll(), "NtQueryTimerResolution");
+            if (func)
+            {
+                NTSTATUS ntRes = 
+                    reinterpret_cast<NtQueryTimerResolutionPtr>(func)(MaximumResolution, MinimumResolution, CurrentResolution);
+                if (NT_ERROR(ntRes))
+                    return false;
+            }
+            return true;
+        }
+    }
 }
-//#pragma comment (lib, "ntdll.lib") // uncomment to add lib explicitly
 
 ULONG AdjustSystemTimerResolutionTo500mcs()
 {
@@ -494,8 +538,8 @@ ULONG AdjustSystemTimerResolutionTo500mcs()
 
     ULONG minRes;
     ULONG maxRes;
-    NTSTATUS ntRes = NtQueryTimerResolution(&maxRes, &minRes, &sysTimerOrigResolution);
-    if (NT_ERROR(ntRes))
+    bool success = WinAPI::NtQueryTimerResolution(&maxRes, &minRes, &sysTimerOrigResolution);
+    if (success)
     {
         throw std::runtime_error("Failed query system timer resolution");
     }
@@ -503,11 +547,7 @@ ULONG AdjustSystemTimerResolutionTo500mcs()
     resolution = minRes < resolution ? minRes : resolution;
 
     ULONG curRes;
-    ntRes = NtSetTimerResolution(resolution, TRUE, &curRes);
-    if (NT_ERROR(ntRes))
-    {
-        // throw std::runtime_error("Failed set system timer resolution" ); // does not matter actually
-    }
+    WinAPI::NtSetTimerResolution(resolution, TRUE, &curRes);
 
     return sysTimerOrigResolution;
 }
@@ -515,8 +555,8 @@ ULONG AdjustSystemTimerResolutionTo500mcs()
 void AdjustSystemTimerResolutionTo(const ULONG &sysTimerOrigResolution)
 {
     ULONG curRes;
-    NTSTATUS ntRes = NtSetTimerResolution(sysTimerOrigResolution, TRUE, &curRes);
-    if (NT_ERROR(ntRes))
+    bool success = WinAPI::NtSetTimerResolution(sysTimerOrigResolution, TRUE, &curRes);
+    if (success)
     {
         throw std::runtime_error("Failed set system timer resolution");
     }
