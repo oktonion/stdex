@@ -461,7 +461,7 @@ namespace stdex
             namespace _adl
             {
                 extern "C" {
-                    float* pthread_mutex_timedlock(...); // dummy
+                    float* pthread_mutex_timedlock(void*, ...); // dummy
                 }   
             }
 
