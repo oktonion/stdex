@@ -766,8 +766,8 @@ namespace stdex
         };
 
         // with pthread_mutex_timedlock support
-        template<>
-        class _timed_mutex_impl_base<_mutex_base, true> :
+        template<bool _Dummy>
+        class _timed_mutex_impl_base<_mutex_base, _Dummy> :
             private _mutex_base
         {
         public:
@@ -827,8 +827,8 @@ namespace stdex
             _timed_mutex_impl_base& operator=(const _timed_mutex_impl_base&) _STDEX_DELETED_FUNCTION;
         };
 
-        template<>
-        class _timed_mutex_impl_base<_recursive_mutex_base, true> :
+        template<bool _Dummy>
+        class _timed_mutex_impl_base<_recursive_mutex_base, _Dummy> :
             private _recursive_mutex_base
         {
         public:
@@ -895,8 +895,8 @@ namespace stdex
         template<>
         class _timed_mutex_impl<timed_mutex> :
             public _timed_mutex_impl_base<
-            _mutex_base,
-            mutex_type_traits::_has_pthread_mutex_timedlock::value
+                _mutex_base,
+                mutex_type_traits::_has_pthread_mutex_timedlock::value
             >
         { 
         protected:
