@@ -11,6 +11,7 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 ### Changed
 
 - pthreads-win32 library with fresh fixes (affects Windows only)
+- dynamic load of 'ntdll.dll' (no more need for 'ntdll.lib' linkage)
 
 ### Fixed
 
