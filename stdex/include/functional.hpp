@@ -745,8 +745,8 @@ namespace stdex
             _return_arg(void_type) {}
             _return_arg(const _return_arg<void_type>&) {}
 
-            void_type release() { void_type dummy;  return dummy; }
-            void_type get() { return release(); }
+            void_type &release() { static void_type dummy;  return dummy; }
+            void_type &get() { return release(); }
 
         private:
             //_return_arg(const _return_arg&) _STDEX_DELETED_FUNCTION;
@@ -760,8 +760,8 @@ namespace stdex
             _return_arg(void_type) {}
             _return_arg(const _return_arg<void>&) {}
 
-            void_type release() { void_type dummy;  return dummy; }
-            void_type get() { return release(); }
+            void_type &release() { static void_type dummy;  return dummy; }
+            void_type &get() { return release(); }
 
         private:
             //_return_arg(const _return_arg&) _STDEX_DELETED_FUNCTION;
