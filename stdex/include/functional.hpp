@@ -1179,7 +1179,7 @@ namespace stdex
             virtual function_func_base* _move() _STDEX_NOEXCEPT_FUNCTION { return (new type(stdex::detail::functional_std::move(_func))); }
             virtual _return_arg<function_return_type> _co_call(function_args_type& args)
             {
-                _return_arg<function_return_type> result = 0;
+                _return_arg<function_return_type> result;
                 //return _func_invoker<function_return_type, func_type, 0, function_args_type::count>::call(_func, args);
                 _invoke(_func, args, result);
 
