@@ -686,7 +686,7 @@ namespace stdex
             mutable _R* _ptr;
 
             _return_arg(const _R& ref_) :_ptr( new _R(ref_)) {}
-            _return_arg(_R* ptr_) :_ptr(ptr_) {}
+            _return_arg() :_ptr(0) {}
             void swap(_return_arg& other) { using std::swap; swap(_ptr, other._ptr); }
             ~_return_arg() { delete _ptr; }
 
@@ -713,7 +713,7 @@ namespace stdex
         {
             _R* _ptr;
 
-            _return_arg(_R* ptr_) :_ptr(ptr_) {}
+            _return_arg(_R* ptr_ = 0) :_ptr(ptr_) {}
 
             _R* release() { return _ptr; }
             _R* get() { return release(); }
@@ -728,6 +728,7 @@ namespace stdex
             _R* _ptr;
 
             _return_arg(_R& ref_) :_ptr(&ref_) {}
+            _return_arg() :_ptr(0) {}
 
             _R& release() { return *_ptr; }
             _R& get() { return release(); }
@@ -739,6 +740,7 @@ namespace stdex
         template<>
         struct _return_arg<void>
         {
+            _return_arg() {}
             _return_arg(void*) {}
             _return_arg(void_type) {}
             _return_arg(const _return_arg<void_type>&) {}
@@ -753,6 +755,7 @@ namespace stdex
         template<>
         struct _return_arg<void_type>
         {
+            _return_arg() {}
             _return_arg(void*) {}
             _return_arg(void_type) {}
             _return_arg(const _return_arg<void>&) {}
@@ -2102,7 +2105,7 @@ namespace stdex
                         _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_MERGE_BIND_EXPR_ARGS)
                     );
                 
-                detail::_return_arg<_R> result = 0;
+                detail::_return_arg<_R> result;
 
                 detail::_invoke(fx, callable_args, result);
 
@@ -2140,7 +2143,7 @@ namespace stdex
             )
             {
                 
-                detail::_return_arg<_R> result = 0;
+                detail::_return_arg<_R> result;
 
                 detail::_invoke(fx, args, result);
 
@@ -2196,7 +2199,7 @@ namespace stdex
                         _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_MERGE_ARGS)
                     );
                 
-                detail::_return_arg<_R> result = 0;
+                detail::_return_arg<_R> result;
 
                 detail::_invoke(fx, callable_args, result);
 
@@ -2267,25 +2270,69 @@ namespace stdex
     > : true_type
     { };
 
+    namespace detail
+    {
+        template<class _FuncT, bool>
+        struct _function_return_impl
+        {
+            typedef typename function<_FuncT>::return_type type;
+        };
+
+        template<class _FuncT>
+        struct _function_return_impl<_FuncT, false>
+        {
+            typedef void type;
+        };
+        template<class _FuncT>
+        struct _function_return:
+            _function_return_impl<
+                _FuncT,
+                is_function<typename remove_pointer<_FuncT>::type>::value
+            >
+        { };
+
+    } // namespace detail
+
     template<class _FuncT>
-    binder<void, _FuncT>
+    binder<typename detail::_function_return<_FuncT>::type, _FuncT>
     bind(_FuncT fx)
     {
-        return binder<void, _FuncT>(fx);
+        return binder<typename detail::_function_return<_FuncT>::type, _FuncT>(fx);
+    }
+
+    template<class _R, class _FuncT>
+    binder<_R, _FuncT>
+    bind(_FuncT fx)
+    {
+        return binder<_R, _FuncT>(fx);
     }
 
     template<class _FuncT, class _Arg0T>
-    binder<void, _FuncT, _Arg0T>
+    binder<typename detail::_function_return<_FuncT>::type, _FuncT, _Arg0T>
     bind(_FuncT fx, _Arg0T arg0)
     {
-        return binder<void, _FuncT, _Arg0T>(fx, arg0);
+        return binder<typename detail::_function_return<_FuncT>::type, _FuncT, _Arg0T>(fx, arg0);
+    }
+
+    template<class _R, class _FuncT, class _Arg0T>
+    binder<_R, _FuncT, _Arg0T>
+    bind(_FuncT fx, _Arg0T arg0)
+    {
+        return binder<_R, _FuncT, _Arg0T>(fx, arg0);
     }
 
     template<class _FuncT, class _Arg0T, class _Arg1T>
-    binder<void, _FuncT, _Arg0T, _Arg1T> 
+    binder<typename detail::_function_return<_FuncT>::type, _FuncT, _Arg0T, _Arg1T>
     bind(_FuncT fx, _Arg0T arg0, _Arg1T arg1)
     {
-        return binder<void, _FuncT, _Arg0T, _Arg1T>(fx, arg0, arg1);
+        return binder<typename detail::_function_return<_FuncT>::type, _FuncT, _Arg0T, _Arg1T>(fx, arg0, arg1);
+    }
+
+    template<class _R, class _FuncT, class _Arg0T, class _Arg1T>
+    binder<_R, _FuncT, _Arg0T, _Arg1T> 
+    bind(_FuncT fx, _Arg0T arg0, _Arg1T arg1)
+    {
+        return binder<_R, _FuncT, _Arg0T, _Arg1T>(fx, arg0, arg1);
     }
 
     // Hashing
