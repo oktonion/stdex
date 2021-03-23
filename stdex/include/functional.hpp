@@ -727,7 +727,7 @@ namespace stdex
         };
 
         template<class _R>
-        struct _return_arg<_R&, _R*>
+        struct _return_arg<_R&, _R&>
         {
             _R* _ptr;
 
