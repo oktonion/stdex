@@ -680,8 +680,12 @@ namespace stdex
             typedef _CheckedArgsT type;
         };
 
+        template<class _R, 
+            class _IsVoid = _R> // 2nd param just for bugged compilers to shut up
+        struct _return_arg;
+
         template<class _R>
-        struct _return_arg
+        struct _return_arg<_R, _R>
         {
             mutable _R* _ptr;
 
@@ -709,7 +713,7 @@ namespace stdex
         };
 
         template<class _R>
-        struct _return_arg<_R*>
+        struct _return_arg<_R*, _R*>
         {
             _R* _ptr;
 
@@ -723,7 +727,7 @@ namespace stdex
         };
 
         template<class _R>
-        struct _return_arg<_R&>
+        struct _return_arg<_R&, _R*>
         {
             _R* _ptr;
 
@@ -738,7 +742,7 @@ namespace stdex
         };
 
         template<>
-        struct _return_arg<void>
+        struct _return_arg<void, void>
         {
             _return_arg() {}
             _return_arg(void*) {}
@@ -753,7 +757,7 @@ namespace stdex
         };
 
         template<>
-        struct _return_arg<void_type>
+        struct _return_arg<void_type, void>
         {
             _return_arg() {}
             _return_arg(void*) {}
