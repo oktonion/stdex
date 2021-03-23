@@ -1563,6 +1563,7 @@ namespace stdex
         };
 
         template<class _ArgT>
+        inline
         void _swprintf4_std_impl(wchar_t* ws, cstddef::size_t len, const wchar_t* format, _ArgT arg)
         {
             _swprintf_impl<_has_4arg_swprintf::value>::call(ws, len, format, arg);
