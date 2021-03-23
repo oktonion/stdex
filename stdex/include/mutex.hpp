@@ -500,8 +500,8 @@ namespace stdex
                 return try_lock_until1(_mutex_handle, _clock::now() + _rt);
             }
 
-            template<class _Duration>
-            static bool try_lock_until1(pthread_mutex_t& _mutex_handle,
+            template<class _Duration, class _MtxHandle>
+            static bool try_lock_until1(_MtxHandle& _mutex_handle,
                 const chrono::time_point<chrono::system_clock, _Duration>& _atime)
             {
                 stdex::timespec _tp_as_ts = 
