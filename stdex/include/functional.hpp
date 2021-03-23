@@ -2036,7 +2036,7 @@ namespace stdex
                 functional_detail::_priority_tag<1>, 
                 functional_detail::_priority_tag<0>/**/>::type)
         {
-            _return_arg<_R> result = 0;
+            _return_arg<_R> result;
 
             _invoke(fx, args, result);
 
@@ -2134,6 +2134,7 @@ namespace stdex
         class _binder_impl< _R, _FuncT, _TraitsT, 0>
         {
             typedef typename _TraitsT::args_type _ArgsT;
+            typedef _R return_type;
 
         protected:
             _binder_impl(
@@ -2145,12 +2146,12 @@ namespace stdex
             { }
 
         public:
-            _R operator()(
+            return_type operator()(
                 _STDEX_PARAMS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = ::stdex::detail::void_type(), _STDEX_TYPE_DISABLED, _STDEX_ARG_DISABLED)
             )
             {
                 
-                detail::_return_arg<_R> result;
+                detail::_return_arg<return_type> result;
 
                 detail::_invoke(fx, args, result);
 
@@ -2170,6 +2171,7 @@ namespace stdex
         class _binder_impl<_R, _FuncT, _TraitsT, 1>
         {
             typedef typename _TraitsT::args_type _ArgsT;
+            typedef _R return_type;
 
         protected:
             _binder_impl(
@@ -2182,7 +2184,7 @@ namespace stdex
 
         public:
             template<_STDEX_TMPL_ARGS0_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING)>
-            _R operator()(
+            return_type operator()(
                 _STDEX_PARAMS0_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING, _STDEX_ARG_DEFAULT),
                 _STDEX_PARAMS30_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = ::stdex::detail::void_type(), _STDEX_TYPE_DISABLED, _STDEX_ARG_DISABLED)
             )
@@ -2206,7 +2208,7 @@ namespace stdex
                         _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_MERGE_ARGS)
                     );
                 
-                detail::_return_arg<_R> result;
+                detail::_return_arg<return_type> result;
 
                 detail::_invoke(fx, callable_args, result);
 
