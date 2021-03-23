@@ -538,12 +538,12 @@ namespace stdex
             }
         };
 
-        template<class, class>
+        template<class, bool>
         class _timed_mutex_impl_base;
 
         // without pthread_mutex_timedlock support
         template<>
-        class _timed_mutex_impl_base<_mutex_base, void>
+        class _timed_mutex_impl_base<_mutex_base, false>
         { 
             struct _Pred
             {
@@ -635,7 +635,7 @@ namespace stdex
         };
 
         template<>
-        class _timed_mutex_impl_base<_recursive_mutex_base, void>
+        class _timed_mutex_impl_base<_recursive_mutex_base, false>
         {
             // Predicate type that tests whether the current thread can lock a mutex.
             class _Can_lock
@@ -647,11 +647,11 @@ namespace stdex
                     return _mx->_count == 0 || _mx->_owner == _caller;
                 }
 
-                const _timed_mutex_impl_base<_recursive_mutex_base, void>* _mx;
+                const _timed_mutex_impl_base<_recursive_mutex_base, false>* _mx;
                 thread::id _caller;
             };
 
-            friend class _timed_mutex_impl_base<_recursive_mutex_base, void>::_Can_lock;
+            friend class _timed_mutex_impl_base<_recursive_mutex_base, false>::_Can_lock;
 
         public:
 
@@ -767,8 +767,8 @@ namespace stdex
         };
 
         // with pthread_mutex_timedlock support
-        template<class _timed_mutex_with_timedlock_impl>
-        class _timed_mutex_impl_base<_mutex_base, _timed_mutex_with_timedlock_impl> :
+        template<>
+        class _timed_mutex_impl_base<_mutex_base, true> :
             private _mutex_base
         {
         public:
@@ -828,8 +828,8 @@ namespace stdex
             _timed_mutex_impl_base& operator=(const _timed_mutex_impl_base&) _STDEX_DELETED_FUNCTION;
         };
 
-        template<class _timed_mutex_with_timedlock_impl>
-        class _timed_mutex_impl_base<_recursive_mutex_base, _timed_mutex_with_timedlock_impl> :
+        template<>
+        class _timed_mutex_impl_base<_recursive_mutex_base, true> :
             private _recursive_mutex_base
         {
         public:
@@ -897,11 +897,7 @@ namespace stdex
         class _timed_mutex_impl<timed_mutex> :
             public _timed_mutex_impl_base<
                 _mutex_base,
-                conditional<
-                    mutex_type_traits::_has_pthread_mutex_timedlock::value,
-                    _timed_mutex_with_timedlock,
-                    void
-                >::type
+                mutex_type_traits::_has_pthread_mutex_timedlock::value
             >
         { 
         protected:
@@ -913,11 +909,7 @@ namespace stdex
         class _timed_mutex_impl<recursive_timed_mutex> :
             public _timed_mutex_impl_base<
                 _recursive_mutex_base,
-                conditional<
-                    mutex_type_traits::_has_pthread_mutex_timedlock::value,
-                    _timed_mutex_with_timedlock,
-                    void
-                >::type
+                mutex_type_traits::_has_pthread_mutex_timedlock::value
             >
         { 
         protected:
