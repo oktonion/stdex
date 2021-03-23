@@ -767,14 +767,14 @@ namespace stdex
         };
 
         // with pthread_mutex_timedlock support
-        template<bool _Dummy>
-        class _timed_mutex_impl_base<_mutex_base, _Dummy> :
+        template<>
+        class _timed_mutex_impl_base<_mutex_base, true> :
             private _mutex_base
         {
             typedef
             typename
             stdex::enable_if<
-                _Dummy,
+                mutex_type_traits::_has_pthread_mutex_timedlock::value,
                 _timed_mutex_with_timedlock
             >::type _timed_mutex_with_timedlock_impl;
         public:
@@ -834,14 +834,14 @@ namespace stdex
             _timed_mutex_impl_base& operator=(const _timed_mutex_impl_base&) _STDEX_DELETED_FUNCTION;
         };
 
-        template<bool _Dummy>
-        class _timed_mutex_impl_base<_recursive_mutex_base, _Dummy> :
+        template<>
+        class _timed_mutex_impl_base<_recursive_mutex_base, true> :
             private _recursive_mutex_base
         {
             typedef
             typename
             stdex::enable_if<
-                _Dummy,
+                mutex_type_traits::_has_pthread_mutex_timedlock::value,
                 _timed_mutex_with_timedlock
             >::type _timed_mutex_with_timedlock_impl;
         public:
