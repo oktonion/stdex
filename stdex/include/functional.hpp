@@ -1005,8 +1005,8 @@ namespace stdex
         \
             template<class _R, class _FuncT> \
             void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<false>) \
-            {result = fx( \
-                _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) );} \
+            {result = _return_arg<_R>(fx( \
+                _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) ));} \
         \
             template<class _FuncT> \
             void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<false>) \
@@ -1015,8 +1015,8 @@ namespace stdex
         \
             template<class _R, class _FuncT> \
             void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<true>) \
-            {result = stdex::invoke(fx, \
-                _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) );} \
+            {result = _return_arg<_R>(stdex::invoke(fx, \
+                _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) ));} \
         \
             template<class _FuncT> \
             void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<true>) \

@@ -76,8 +76,17 @@ return_line run_test(int line)
 
 #define RUN_TEST_PARAM(test) RUN_TEST(run_test(test))
 
+template<class R, class FuncT>
+void verify_function_return(FuncT)
+{
+    VERIFY((stdex::is_same<typename stdex::detail::_function_return<FuncT>::type, R>::value));
+}
+
 int main()
 {    
+    verify_function_return<int>(&return_value);
+    verify_function_return<int&>(&return_lvalue);
+
     stdex::bind<int>(&return_const_lvalue, stdex::placeholders::_1)(2);
 
     RUN_TEST_PARAM(do_test<int>(&return_value));
