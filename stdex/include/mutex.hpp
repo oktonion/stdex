@@ -647,11 +647,11 @@ namespace stdex
                     return _mx->_count == 0 || _mx->_owner == _caller;
                 }
 
-                const _timed_mutex_impl_base<_recursive_mutex_base, false>* _mx;
+                const _timed_mutex_impl_base<_recursive_mutex_base, void>* _mx;
                 thread::id _caller;
             };
 
-            friend class _timed_mutex_impl_base<_recursive_mutex_base, false>::_Can_lock;
+            friend class _timed_mutex_impl_base<_recursive_mutex_base, void>::_Can_lock;
 
         public:
 
@@ -913,7 +913,11 @@ namespace stdex
         class _timed_mutex_impl<recursive_timed_mutex> :
             public _timed_mutex_impl_base<
                 _recursive_mutex_base,
-                mutex_type_traits::_has_pthread_mutex_timedlock::value
+                conditional<
+                    mutex_type_traits::_has_pthread_mutex_timedlock::value,
+                    _timed_mutex_with_timedlock,
+                    void
+                >::type
             >
         { 
         protected:
