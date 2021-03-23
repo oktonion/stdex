@@ -459,7 +459,7 @@ namespace stdex
         namespace mutex_type_traits
         {
 #ifndef PTW32_VERSION
-            float* pthread_mutex_timedlock(...); // dummy   
+            static float* pthread_mutex_timedlock(...); // dummy   
 #endif
 
             template<class _Tp>
