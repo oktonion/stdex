@@ -512,8 +512,6 @@ namespace stdex
                 _ts.tv_nsec = _tp_as_ts.tv_nsec;
                 _ts.tv_sec = _tp_as_ts.tv_sec;
 
-                STATIC_ASSERT(mutex_type_traits::_has_pthread_mutex_timedlock::value, should_have_pthread_mutex_timedlock);
-
                 bool success = 
                     (pthread_mutex_timedlock(&_mutex_handle, &_ts) == 0);
 
