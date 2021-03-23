@@ -482,7 +482,6 @@ namespace stdex
             };
         }
         
-        template<bool>
         struct _timed_mutex_with_timedlock
         {
 
@@ -772,6 +771,12 @@ namespace stdex
         class _timed_mutex_impl_base<_mutex_base, _Dummy> :
             private _mutex_base
         {
+            typedef
+            typename
+            stdex::enable_if<
+                _Dummy,
+                _timed_mutex_with_timedlock
+            >::type _timed_mutex_with_timedlock_impl;
         public:
 
             typedef mutex::native_handle_type native_handle_type;
@@ -799,13 +804,13 @@ namespace stdex
             template <class _Rep, class _Period>
             bool try_lock_for(const chrono::duration<_Rep, _Period>& _rtime)
             {
-                return _timed_mutex_with_timedlock<_Dummy>::try_lock_for(_mutex_handle, _rtime);
+                return _timed_mutex_with_timedlock_impl::try_lock_for(_mutex_handle, _rtime);
             }
 
             template <class _Clock, class _Duration>
             bool try_lock_until(const chrono::time_point<_Clock, _Duration>& _atime)
             {
-                return _timed_mutex_with_timedlock<_Dummy>::try_lock_until(_mutex_handle, _atime);
+                return _timed_mutex_with_timedlock_impl::try_lock_until(_mutex_handle, _atime);
             }
 
             inline void unlock()
@@ -833,6 +838,12 @@ namespace stdex
         class _timed_mutex_impl_base<_recursive_mutex_base, _Dummy> :
             private _recursive_mutex_base
         {
+            typedef
+            typename
+            stdex::enable_if<
+                _Dummy,
+                _timed_mutex_with_timedlock
+            >::type _timed_mutex_with_timedlock_impl;
         public:
 
             typedef mutex::native_handle_type native_handle_type;
@@ -860,13 +871,13 @@ namespace stdex
             template <class _Rep, class _Period>
             bool try_lock_for(const chrono::duration<_Rep, _Period>& _rtime)
             {
-                return _timed_mutex_with_timedlock<_Period>::try_lock_for(_mutex_handle, _rtime);
+                return _timed_mutex_with_timedlock_impl::try_lock_for(_mutex_handle, _rtime);
             }
 
             template <class _Clock, class _Duration>
             bool try_lock_until(const chrono::time_point<_Clock, _Duration>& _atime)
             {
-                return _timed_mutex_with_timedlock<_Duration>::try_lock_until(_mutex_handle, _atime);
+                return _timed_mutex_with_timedlock_impl::try_lock_until(_mutex_handle, _atime);
             }
 
             inline void unlock()
