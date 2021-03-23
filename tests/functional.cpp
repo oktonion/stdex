@@ -478,6 +478,7 @@ int main()
     RUN_TEST(test06);
     RUN_TEST(test07);
     RUN_TEST(test08);
+    RUN_TEST(test09);
     RUN_TEST(np_tests.test01<void>);
     RUN_TEST(np_tests.test01<int>);
 
