@@ -1091,7 +1091,7 @@ namespace stdex
             if (errno == ERANGE)
 #endif
                 num_s_end = 0;
-            else if (_value > static_cast<double>(std::numeric_limits<_Tp>::max()) || _value < static_cast<double>(-std::numeric_limits<_Tp>::max()))
+            else if (_value > static_cast<double>((std::numeric_limits<_Tp>::max)()) || _value < static_cast<double>(-(std::numeric_limits<_Tp>::max)()))
             {
                 _value = (std::numeric_limits<_Tp>::max)();
                 num_s_end = 0;
@@ -1563,6 +1563,7 @@ namespace stdex
         };
 
         template<class _ArgT>
+        inline
         void _swprintf4_std_impl(wchar_t* ws, cstddef::size_t len, const wchar_t* format, _ArgT arg)
         {
             _swprintf_impl<_has_4arg_swprintf::value>::call(ws, len, format, arg);

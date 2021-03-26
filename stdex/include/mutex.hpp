@@ -452,10 +452,13 @@ namespace stdex
 
     namespace detail
     {
-        void* pthread_mutex_timedlock(...); // dummy
-
+      
         namespace mutex_type_traits
         {
+#ifndef PTW32_VERSION
+            static float* pthread_mutex_timedlock(...); // dummy   
+#endif
+
             template<class _Tp>
             _Tp declval();
 
@@ -468,7 +471,7 @@ namespace stdex
                     sizeof( 
                         _pthread_func_tester(
                             pthread_mutex_timedlock(
-                                declval<pthread_mutex_t*>(), 
+                                declval< ::pthread_mutex_t*>(), 
                                 declval< ::timespec* >()
                         )
                     ) 
@@ -494,8 +497,8 @@ namespace stdex
                 return try_lock_until1(_mutex_handle, _clock::now() + _rt);
             }
 
-            template<class _Duration>
-            static bool try_lock_until1(pthread_mutex_t& _mutex_handle,
+            template<class _Duration, class _MtxHandle>
+            static bool try_lock_until1(_MtxHandle& _mutex_handle,
                 const chrono::time_point<chrono::system_clock, _Duration>& _atime)
             {
                 stdex::timespec _tp_as_ts = 
@@ -878,8 +881,8 @@ namespace stdex
         template<>
         class _timed_mutex_impl<timed_mutex> :
             public _timed_mutex_impl_base<
-            _mutex_base,
-            mutex_type_traits::_has_pthread_mutex_timedlock::value
+                _mutex_base,
+                mutex_type_traits::_has_pthread_mutex_timedlock::value
             >
         { 
         protected:
@@ -890,8 +893,8 @@ namespace stdex
         template<>
         class _timed_mutex_impl<recursive_timed_mutex> :
             public _timed_mutex_impl_base<
-            _recursive_mutex_base,
-            mutex_type_traits::_has_pthread_mutex_timedlock::value
+                _recursive_mutex_base,
+                mutex_type_traits::_has_pthread_mutex_timedlock::value
             >
         { 
         protected:

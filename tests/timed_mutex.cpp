@@ -313,6 +313,7 @@ namespace timed_mutex_tests
                 
                 DYNAMIC_VERIFY( !b );
                 std::cout << stdex::chrono::duration_cast<milliseconds>(t).count() << " >= " << timeout.count() << std::endl;
+                std::cout << t.count() << " >= " << stdex::chrono::duration_cast<typename clock_type::duration>(timeout).count() << std::endl;
                 DYNAMIC_VERIFY( t >= timeout );
             }
             catch (const stdex::system_error&)
@@ -471,6 +472,12 @@ int main(void)
 
         typedef stdex::timed_mutex test_type;
         typedef test_type::native_handle_type type;
+
+        #ifdef PTW32_VERSION
+        STATIC_ASSERT(
+            stdex::detail::mutex_type_traits::_has_pthread_mutex_timedlock::value == true, 
+            should_have_pthread_mutex_timedlock);
+        #endif
         
         RUN_TEST(test1);
         RUN_TEST(test2);
