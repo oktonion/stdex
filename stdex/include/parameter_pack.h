@@ -1559,7 +1559,7 @@
 
 
 #if !defined(STDEX_FUNCTION_MAX_ARG_N) || (STDEX_FUNCTION_MAX_ARG_N > 31)
-    #define STDEX_FUNCTION_MAX_ARG_N 16
+    #define STDEX_FUNCTION_MAX_ARG_N 15
 #endif
 
 #define _STDEX_MACRO_CONCAT1(prefix, value,  postfix) prefix##value##postfix
