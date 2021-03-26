@@ -578,38 +578,102 @@ namespace stdex
         //_STDEX_INVOKE_ELIPSIS(30)
         //_STDEX_INVOKE_ELIPSIS(31)
 
+#if (STDEX_FUNCTION_MAX_ARG_N >= 1)
         _STDEX_INVOKE_AND_MEM_FN(0 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 1)
         _STDEX_INVOKE_AND_MEM_FN(1 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 2)
         _STDEX_INVOKE_AND_MEM_FN(2 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 3)
         _STDEX_INVOKE_AND_MEM_FN(3 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 4)
         _STDEX_INVOKE_AND_MEM_FN(4 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 5)
         _STDEX_INVOKE_AND_MEM_FN(5 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 6)
         _STDEX_INVOKE_AND_MEM_FN(6 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 7)
         _STDEX_INVOKE_AND_MEM_FN(7 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 8)
         _STDEX_INVOKE_AND_MEM_FN(8 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 9)
         _STDEX_INVOKE_AND_MEM_FN(9 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 10)
         _STDEX_INVOKE_AND_MEM_FN(10)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 11)
         _STDEX_INVOKE_AND_MEM_FN(11)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 12)
         _STDEX_INVOKE_AND_MEM_FN(12)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 13)
         _STDEX_INVOKE_AND_MEM_FN(13)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 14)
         _STDEX_INVOKE_AND_MEM_FN(14)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 15)
         _STDEX_INVOKE_AND_MEM_FN(15)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 16)
         _STDEX_INVOKE_AND_MEM_FN(16)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 17)
         _STDEX_INVOKE_AND_MEM_FN(17)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 18)
         _STDEX_INVOKE_AND_MEM_FN(18)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 19)
         _STDEX_INVOKE_AND_MEM_FN(19)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 20)
         _STDEX_INVOKE_AND_MEM_FN(20)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 21)
         _STDEX_INVOKE_AND_MEM_FN(21)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 22)
         _STDEX_INVOKE_AND_MEM_FN(22)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 23)
         _STDEX_INVOKE_AND_MEM_FN(23)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 24)
         _STDEX_INVOKE_AND_MEM_FN(24)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 25)
         _STDEX_INVOKE_AND_MEM_FN(25)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 26)
         _STDEX_INVOKE_AND_MEM_FN(26)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 27)
         _STDEX_INVOKE_AND_MEM_FN(27)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 28)
         _STDEX_INVOKE_AND_MEM_FN(28)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 29)
         _STDEX_INVOKE_AND_MEM_FN(29)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 30)
         _STDEX_INVOKE_AND_MEM_FN(30)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 31)
         _STDEX_INVOKE_AND_MEM_FN(31)
+#endif
 
 #undef _STDEX_INVOKE_ELIPSIS_IMPL
 #undef _STDEX_INVOKE_ELIPSIS_IMPL0
@@ -1030,38 +1094,102 @@ namespace stdex
                 _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) );} \
         };
 
+#if (STDEX_FUNCTION_MAX_ARG_N >= 0)
     _STDEX_CALLABLE_ARGS(0)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 1)
     _STDEX_CALLABLE_ARGS(1)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 2)
     _STDEX_CALLABLE_ARGS(2)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 3)
     _STDEX_CALLABLE_ARGS(3)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 4)
     _STDEX_CALLABLE_ARGS(4)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 5)
     _STDEX_CALLABLE_ARGS(5)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 6)
     _STDEX_CALLABLE_ARGS(6)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 7)
     _STDEX_CALLABLE_ARGS(7)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 8)
     _STDEX_CALLABLE_ARGS(8)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 9)
     _STDEX_CALLABLE_ARGS(9)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 10)
     _STDEX_CALLABLE_ARGS(10)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 11)
     _STDEX_CALLABLE_ARGS(11)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 12)
     _STDEX_CALLABLE_ARGS(12)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 13)
     _STDEX_CALLABLE_ARGS(13)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 14)
     _STDEX_CALLABLE_ARGS(14)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 15)
     _STDEX_CALLABLE_ARGS(15)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 16)
     _STDEX_CALLABLE_ARGS(16)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 17)
     _STDEX_CALLABLE_ARGS(17)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 18)
     _STDEX_CALLABLE_ARGS(18)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 19)
     _STDEX_CALLABLE_ARGS(19)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 20)
     _STDEX_CALLABLE_ARGS(20)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 21)
     _STDEX_CALLABLE_ARGS(21)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 22)
     _STDEX_CALLABLE_ARGS(22)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 23)
     _STDEX_CALLABLE_ARGS(23)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 24)
     _STDEX_CALLABLE_ARGS(24)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 25)
     _STDEX_CALLABLE_ARGS(25)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 26)
     _STDEX_CALLABLE_ARGS(26)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 27)
     _STDEX_CALLABLE_ARGS(27)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 28)
     _STDEX_CALLABLE_ARGS(28)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 29)
     _STDEX_CALLABLE_ARGS(29)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 30)
     _STDEX_CALLABLE_ARGS(30)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 31)
     _STDEX_CALLABLE_ARGS(31)
+#endif
 
 #undef _STDEX_ARG_VALUE
 #undef _STDEX_CALLABLE_ARGS
@@ -1763,38 +1891,102 @@ namespace stdex
     _STDEX_FUNCTION_IMPL(count)\
     _STDEX_MEM_FN(count)
 
+#if (STDEX_FUNCTION_MAX_ARG_N >= 0)
     _STDEX_FUNCTION(0)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 1)
     _STDEX_FUNCTION(1)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 2)
     _STDEX_FUNCTION(2)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 3)
     _STDEX_FUNCTION(3)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 4)
     _STDEX_FUNCTION(4)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 5)
     _STDEX_FUNCTION(5)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 6)
     _STDEX_FUNCTION(6)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 7)
     _STDEX_FUNCTION(7)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 8)
     _STDEX_FUNCTION(8)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 9)
     _STDEX_FUNCTION(9)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 10)
     _STDEX_FUNCTION(10)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 11)
     _STDEX_FUNCTION(11)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 12)
     _STDEX_FUNCTION(12)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 13)
     _STDEX_FUNCTION(13)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 14)
     _STDEX_FUNCTION(14)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 15)
     _STDEX_FUNCTION(15)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 16)
     _STDEX_FUNCTION(16)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 17)
     _STDEX_FUNCTION(17)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 18)
     _STDEX_FUNCTION(18)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 19)
     _STDEX_FUNCTION(19)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 20)
     _STDEX_FUNCTION(20)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 21)
     _STDEX_FUNCTION(21)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 22)
     _STDEX_FUNCTION(22)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 23)
     _STDEX_FUNCTION(23)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 24)
     _STDEX_FUNCTION(24)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 25)
     _STDEX_FUNCTION(25)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 26)
     _STDEX_FUNCTION(26)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 27)
     _STDEX_FUNCTION(27)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 28)
     _STDEX_FUNCTION(28)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 29)
     _STDEX_FUNCTION(29)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 30)
     _STDEX_FUNCTION(30)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 31)
     _STDEX_FUNCTION(31)
+#endif
 
 #undef _STDEX_FUNCTION 
 #undef _STDEX_FUNCTION_IMPL
@@ -2157,7 +2349,7 @@ namespace stdex
                 _STDEX_PARAMS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = ::stdex::detail::void_type(), _STDEX_TYPE_DISABLED, _STDEX_ARG_DISABLED)
             )
             {
-                                detail::_return_arg<return_type> result;
+                detail::_return_arg<return_type> result;
 
                 _callable_args<_ArgsT> callable(args);
                 detail::_invoke(fx, callable, result);
@@ -2703,38 +2895,102 @@ namespace stdex
             };
         }
 
+#if (STDEX_FUNCTION_MAX_ARG_N >= 0)
         static const detail::_ph<1>  &_1  = detail::_ph<1 >::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 1)
         static const detail::_ph<2>  &_2  = detail::_ph<2 >::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 2)
         static const detail::_ph<3>  &_3  = detail::_ph<3 >::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 3)
         static const detail::_ph<4>  &_4  = detail::_ph<4 >::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 4)
         static const detail::_ph<5>  &_5  = detail::_ph<5 >::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 5)
         static const detail::_ph<6>  &_6  = detail::_ph<6 >::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 6)
         static const detail::_ph<7>  &_7  = detail::_ph<7 >::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 7)
         static const detail::_ph<8>  &_8  = detail::_ph<8 >::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 8)
         static const detail::_ph<9>  &_9  = detail::_ph<9 >::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 9)
         static const detail::_ph<10> &_10 = detail::_ph<10>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 10)
         static const detail::_ph<11> &_11 = detail::_ph<11>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 11)
         static const detail::_ph<12> &_12 = detail::_ph<12>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 12)
         static const detail::_ph<13> &_13 = detail::_ph<13>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 13)
         static const detail::_ph<14> &_14 = detail::_ph<14>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 14)
         static const detail::_ph<15> &_15 = detail::_ph<15>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 15)
         static const detail::_ph<16> &_16 = detail::_ph<16>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 16)
         static const detail::_ph<17> &_17 = detail::_ph<17>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 17)
         static const detail::_ph<18> &_18 = detail::_ph<18>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 18)
         static const detail::_ph<19> &_19 = detail::_ph<19>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 19)
         static const detail::_ph<20> &_20 = detail::_ph<20>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 20)
         static const detail::_ph<21> &_21 = detail::_ph<21>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 21)
         static const detail::_ph<22> &_22 = detail::_ph<22>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 22)
         static const detail::_ph<23> &_23 = detail::_ph<23>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 23)
         static const detail::_ph<24> &_24 = detail::_ph<24>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 24)
         static const detail::_ph<25> &_25 = detail::_ph<25>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 25)
         static const detail::_ph<26> &_26 = detail::_ph<26>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 26)
         static const detail::_ph<27> &_27 = detail::_ph<27>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 27)
         static const detail::_ph<28> &_28 = detail::_ph<28>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 28)
         static const detail::_ph<29> &_29 = detail::_ph<29>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 29)
         static const detail::_ph<30> &_30 = detail::_ph<30>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 30)
         static const detail::_ph<31> &_31 = detail::_ph<31>::instance();
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 31)
         static const detail::_ph<32> &_32 = detail::_ph<32>::instance();
+#endif
     }
 
     template<int _N>
