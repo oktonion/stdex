@@ -12,6 +12,7 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 - pthreads-win32 library with fresh fixes (affects Windows only)
 - dynamic load of 'ntdll.dll' (no more need for 'ntdll.lib' linkage)
+- when using `big_int` as internal implementation for `stdex::chrono::system_clock` and `stdex::chrono::steady_clock` duration counter define duration as `stdex::chrono::nanoseconds`
 
 ### Fixed
 
