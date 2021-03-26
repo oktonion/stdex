@@ -535,7 +535,7 @@ void ff(const float&, ...) {}
 int main()
 {
     float a = 0;
-    stdex::invoke<void>(ff, a, 0, 0, 0, 0, 0, 0, 0);
+    stdex::invoke(ff, a, 0, 0, 0, 0, 0, 0, 0);
     RUN_TEST(test01);
     RUN_TEST(test02);
     RUN_TEST(test03);
