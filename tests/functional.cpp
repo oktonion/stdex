@@ -447,19 +447,85 @@ int test09()
 
     struct lambdas
     {
-        static void func_none(){}
-        static void func0(int, float){}
+        static void func_none(){
+            throw(1);
+        }
+        static void func0(int, float){
+            throw(2);
+        }
     };
     int val = 1;
     
+    bool functor_ok = false;
+
+    {
+        stdex::binder<void, void(*)()> functor =
+            stdex::bind(&lambdas::func_none);
+
+        functor_ok = false;
+        try
+        {
+            functor();
+        }
+        catch (int e)
+        {
+            functor_ok = (e == 1);
+        }
+
+        DYNAMIC_VERIFY(functor_ok);
+    }
+    
     stdex::function<void(*)(double)> functor = 
         stdex::bind(&lambdas::func0, val, stdex::placeholders::_1);
+
+    functor_ok = false;
+    try
+    {
+        stdex::bind(&lambdas::func0, val, stdex::placeholders::_1)(0.0);
+    }
+    catch (int e)
+    {
+        functor_ok = (e == 2);
+    }
+
+    DYNAMIC_VERIFY(functor_ok);
     
-    functor(0.0);
+    functor_ok = false;
+    try
+    {
+        functor(0.0);
+    }
+    catch (int e)
+    {
+        functor_ok = (e == 2);
+    }
 
-    stdex::bind(&lambdas::func0, 0, stdex::placeholders::_1)(val);
+    DYNAMIC_VERIFY(functor_ok);
 
-    stdex::bind(&lambdas::func_none)(0);
+    try
+    {
+        stdex::bind(&lambdas::func0, 0, stdex::placeholders::_1)(val);
+    }
+    catch (int e)
+    {
+        functor_ok = (e == 2);
+    }
+
+    DYNAMIC_VERIFY(functor_ok);
+
+    {
+        functor_ok = false;
+        try
+        {
+            stdex::bind(&lambdas::func_none)(0);
+        }
+        catch (int e)
+        {
+            functor_ok = (e == 1);
+        }
+
+        DYNAMIC_VERIFY(functor_ok);
+    }
 
     return 0;
 }
