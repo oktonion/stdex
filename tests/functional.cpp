@@ -456,7 +456,7 @@ int test09()
     };
     int val = 1;
     
-    bool functor_ok = false;
+    bool functor_ok;
 
     {
         stdex::binder<void, void(*)()> functor =

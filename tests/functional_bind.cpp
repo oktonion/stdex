@@ -37,7 +37,7 @@ int do_test(Fn* func) {
     DYNAMIC_VERIFY(exp_r == 42);
     DYNAMIC_VERIFY(exp_r2 == 42);
 
-    if ((stdex::is_reference<Expect>::value)) {
+    if ((stdex::is_reference<Expect>::value && func)) {
         DYNAMIC_VERIFY(&exp == &dummy);
         DYNAMIC_VERIFY(&exp2 == &dummy);
         DYNAMIC_VERIFY(&exp_r == &dummy);
