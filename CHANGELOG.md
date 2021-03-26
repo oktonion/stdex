@@ -4,7 +4,21 @@ All notable changes to stdex library project will be documented in this file.
 
 visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library
 
-## [0.2.9] - 2021-xx-xx
+## [0.2.10] - 2021-XX-XX
+
+### Added
+
+- something
+
+### Changed
+
+- something
+
+### Fixed
+
+- something
+
+## [0.2.9] - 2021-03-26
 
 ### Added
 
@@ -12,6 +26,7 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 - pthreads-win32 library with fresh fixes (affects Windows only)
 - dynamic load of 'ntdll.dll' (no more need for 'ntdll.lib' linkage)
+- when using `big_int` as internal implementation for `stdex::chrono::system_clock` and `stdex::chrono::steady_clock` duration counter define duration as `stdex::chrono::nanoseconds`
 
 ### Fixed
 
