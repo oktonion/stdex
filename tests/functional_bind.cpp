@@ -122,6 +122,7 @@ int copy_test()
     typedef stdex::function<float(*)(float, float)> stdex_function_type;
     typedef stdex::binder<float, stdex_function_type, float, float> stdex_binder_type;
     stdex_function_type fnc = mult;
+    DYNAMIC_VERIFY(fnc(2.f, 4.f) == 8);
     stdex_binder_type task = stdex::bind(fnc, 2.f, 4.f);
     stdex_binder_type task2(task);
     DYNAMIC_VERIFY(task() == 8);
