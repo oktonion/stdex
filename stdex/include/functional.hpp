@@ -578,7 +578,7 @@ namespace stdex
         //_STDEX_INVOKE_ELIPSIS(30)
         //_STDEX_INVOKE_ELIPSIS(31)
 
-#if (STDEX_FUNCTION_MAX_ARG_N >= 1)
+#if (STDEX_FUNCTION_MAX_ARG_N >= 0)
         _STDEX_INVOKE_AND_MEM_FN(0 )
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 1)
@@ -2515,6 +2515,7 @@ namespace stdex
     _STDEX_BINDER_IMPL(30, 0)
 #endif
 
+#undef _STDEX_BINDER_IMPL
 #undef _STDEX_TYPE_MISSING
 #undef _STDEX_TYPE_DISABLED
 #undef _STDEX_ARG_DISABLED
@@ -2595,43 +2596,147 @@ namespace stdex
     binder<typename detail::_function_return<_FuncT>::type, _FuncT>
     bind(_FuncT fx)
     {
-                return binder<typename detail::_function_return<_FuncT>::type, _FuncT>(fx);
+        return binder<typename detail::_function_return<_FuncT>::type, _FuncT>(fx);
     }
 
     template<class _R, class _FuncT>
     binder<_R, _FuncT>
     bind(_FuncT fx)
     {
-                return binder<_R, _FuncT>(fx);
+        return binder<_R, _FuncT>(fx);
     }
 
-    template<class _FuncT, class _Arg0T>
-    binder<typename detail::_function_return<_FuncT>::type, _FuncT, _Arg0T>
-    bind(_FuncT fx, _Arg0T arg0)
-    {
-                return binder<typename detail::_function_return<_FuncT>::type, _FuncT, _Arg0T>(fx, arg0);
+#define _STDEX_BIND(count) \
+    template<class _FuncT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+    binder< \
+        typename detail::_function_return<_FuncT>::type, \
+        _FuncT, \
+        _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) \
+    > \
+    bind(_FuncT fx, _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK)) \
+    { \
+        return \
+        binder< \
+            typename detail::_function_return<_FuncT>::type, \
+            _FuncT, \
+            _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) \
+        >(fx, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)); \
+    } \
+\
+    template<class _R, class _FuncT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+    binder< \
+        _R, \
+        _FuncT, \
+        _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) \
+    > \
+    bind(_FuncT fx, _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK)) \
+    { \
+        return \
+        binder< \
+            _R, \
+            _FuncT, \
+            _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) \
+        >(fx, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)); \
     }
 
-    template<class _R, class _FuncT, class _Arg0T>
-    binder<_R, _FuncT, _Arg0T>
-    bind(_FuncT fx, _Arg0T arg0)
-    {
-                return binder<_R, _FuncT, _Arg0T>(fx, arg0);
-    }
+#if (STDEX_FUNCTION_MAX_ARG_N >= 0)
+        _STDEX_BIND(0 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 1)
+        _STDEX_BIND(1 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 2)
+        _STDEX_BIND(2 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 3)
+        _STDEX_BIND(3 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 4)
+        _STDEX_BIND(4 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 5)
+        _STDEX_BIND(5 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 6)
+        _STDEX_BIND(6 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 7)
+        _STDEX_BIND(7 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 8)
+        _STDEX_BIND(8 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 9)
+        _STDEX_BIND(9 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 10)
+        _STDEX_BIND(10)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 11)
+        _STDEX_BIND(11)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 12)
+        _STDEX_BIND(12)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 13)
+        _STDEX_BIND(13)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 14)
+        _STDEX_BIND(14)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 15)
+        _STDEX_BIND(15)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 16)
+        _STDEX_BIND(16)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 17)
+        _STDEX_BIND(17)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 18)
+        _STDEX_BIND(18)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 19)
+        _STDEX_BIND(19)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 20)
+        _STDEX_BIND(20)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 21)
+        _STDEX_BIND(21)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 22)
+        _STDEX_BIND(22)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 23)
+        _STDEX_BIND(23)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 24)
+        _STDEX_BIND(24)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 25)
+        _STDEX_BIND(25)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 26)
+        _STDEX_BIND(26)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 27)
+        _STDEX_BIND(27)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 28)
+        _STDEX_BIND(28)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 29)
+        _STDEX_BIND(29)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 30)
+        _STDEX_BIND(30)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 31)
+        _STDEX_BIND(31)
+#endif
 
-    template<class _FuncT, class _Arg0T, class _Arg1T>
-    binder<typename detail::_function_return<_FuncT>::type, _FuncT, _Arg0T, _Arg1T>
-    bind(_FuncT fx, _Arg0T arg0, _Arg1T arg1)
-    {
-                return binder<typename detail::_function_return<_FuncT>::type, _FuncT, _Arg0T, _Arg1T>(fx, arg0, arg1);
-    }
-
-    template<class _R, class _FuncT, class _Arg0T, class _Arg1T>
-    binder<_R, _FuncT, _Arg0T, _Arg1T> 
-    bind(_FuncT fx, _Arg0T arg0, _Arg1T arg1)
-    {
-                return binder<_R, _FuncT, _Arg0T, _Arg1T>(fx, arg0, arg1);
-    }
+#undef _STDEX_BIND
 
     // Hashing
 
