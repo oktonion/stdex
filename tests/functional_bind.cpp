@@ -131,9 +131,42 @@ int copy_test()
     return 0;
 }
 
+struct DummyUnaryFunction
+{
+    template <typename S>
+    int operator()(S const&) const { return 0; }
+};
+
+struct BadUnaryFunction
+{
+    template <typename S>
+    int operator()(S const&) const
+    {
+        // Trigger a compile error if this function is instantiated.
+        // The constexpr is needed so that it is instantiated while checking
+        // __invoke_of<BadUnaryFunction &, ...>.
+        STATIC_ASSERT((stdex::is_same<S, S>::value == bool(false)), should_not_be);
+        return 0;
+    }
+};
+
+int invoke_function_object()
+{
+    stdex::binder<int, DummyUnaryFunction, BadUnaryFunction> b =
+        stdex::bind<int>(DummyUnaryFunction(), BadUnaryFunction());
+    DYNAMIC_VERIFY(b(0) == 0);
+    stdex::binder<long, DummyUnaryFunction, BadUnaryFunction> b2 =
+        stdex::bind<long>(DummyUnaryFunction(), BadUnaryFunction());
+    DYNAMIC_VERIFY(b2(0) == 0);
+
+    return 0;
+}
+
 int main()
 {
     RUN_TEST(bind_return);
     RUN_TEST(copy_test);
+    RUN_TEST(invoke_function_object);
+
     return 0;
 }
