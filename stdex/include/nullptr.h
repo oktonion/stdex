@@ -169,13 +169,38 @@ namespace stdex
             typedef _nullptr_as_ptrdiff_type<_ptrdiff_is_signed::value == _pointer_is_signed::value>::type _nullptr_t_as_integral;
             
             template<bool>
-            struct _nullptr_t_as_enum_chooser
+            struct _nullptr_t_as_enum_chooser;
+
+            template<class _EnumType, bool>
+            struct _nullptr_t_as_enum_chooser_helper
+            {
+                typedef _EnumType type;
+            };
+
+            template<class _EnumType>
+            struct _nullptr_t_as_enum_chooser_helper<_EnumType, false>
             {
                 enum type
+                {
+                    _nullptr_val = _EnumType::_nullptr_val,
+                    _max_nullptr = _EnumType::_max_nullptr + 1
+                };
+            };
+
+            template<>
+            struct _nullptr_t_as_enum_chooser<true>
+            {
+                enum _type
                 {
                     _nullptr_val = _nullptr_t_as_integral(STDEX_NULL),
                     _max_nullptr = _nullptr_t_as_integral((_nullptr_t_as_uint(1) << (CHAR_BIT * sizeof(void*) - 1)) / 2)
                 };
+
+                typedef 
+                _nullptr_t_as_enum_chooser_helper<
+                    _type,
+                    sizeof(_type) == sizeof(void*)
+                >::type type;
             };
 
             template<>
