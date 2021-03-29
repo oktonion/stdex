@@ -82,8 +82,8 @@ void verify_function_return(FuncT)
     VERIFY((stdex::is_same<typename stdex::detail::_function_return<FuncT>::type, R>::value));
 }
 
-int main()
-{    
+int bind_return()
+{
     verify_function_return<int>(&return_value);
     verify_function_return<int&>(&return_lvalue);
 
@@ -109,6 +109,30 @@ int main()
     RUN_TEST_PARAM(do_test_r<long>(&return_const_rvalue));
 #endif
 
+    return 0;
+}
 
-  return 0;
+float mult(float a, float b)
+{
+    return a * b;
+}
+
+int copy_test()
+{
+    typedef stdex::function<float(*)(float, float)> stdex_function_type;
+    typedef stdex::binder<float, stdex_function_type, float, float> stdex_binder_type;
+    stdex_function_type fnc = mult;
+    stdex_binder_type task = stdex::bind(fnc, 2.f, 4.f);
+    stdex_binder_type task2(task);
+    DYNAMIC_VERIFY(task() == 8);
+    DYNAMIC_VERIFY(task2() == 8);
+
+    return 0;
+}
+
+int main()
+{
+    RUN_TEST(bind_return);
+    RUN_TEST(copy_test);
+    return 0;
 }
