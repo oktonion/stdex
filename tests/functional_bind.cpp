@@ -162,11 +162,47 @@ int invoke_function_object()
     return 0;
 }
 
+template <class R, class F>
+void
+test(F f, R expected)
+{
+    DYNAMIC_VERIFY_ABORT(f() == expected);
+}
+
+template <class R, class F>
+void
+test_const(const F& f, R expected)
+{
+    DYNAMIC_VERIFY_ABORT(f() == expected);
+}
+
+int f() { return 1; }
+
+struct A_int_0
+{
+    int operator()() { return 4; }
+    int operator()() const { return 5; }
+};
+
+int invoke_int_0()
+{
+    test(stdex::bind(f), 1);
+    test(stdex::bind(&f), 1);
+
+    test(stdex::bind<int>(f), 1);
+    test(stdex::bind<int>(&f), 1);
+    test(stdex::bind<int>(A_int_0()), 4);
+    test_const(stdex::bind<int>(A_int_0()), 5);
+
+    return 0;
+}
+
 int main()
 {
     RUN_TEST(bind_return);
     RUN_TEST(copy_test);
     RUN_TEST(invoke_function_object);
+    RUN_TEST(invoke_int_0);
 
     return 0;
 }
