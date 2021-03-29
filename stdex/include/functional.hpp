@@ -1003,8 +1003,16 @@ namespace stdex
         template<class _FuncT, class _ArgsT, class _R>
         void _invoke_clear(_FuncT &fx, _callable_args<_ArgsT> &args, _return_arg<_R> &result)
         {
+            typedef typename remove_reference< typename remove_pointer<_FuncT>::type >::type func_type;
+
+            STATIC_ASSERT(is_compound<func_type>::value, callable_should_be_compound);
+
             args.call(fx, result, 
-                functional_detail::_invokable_tag< is_compound<_FuncT>::value == bool(false) >());
+                functional_detail::_invokable_tag< 
+                    is_function<func_type>::value == bool(true) ||
+                    is_member_function_pointer<_FuncT>::value == bool(true)
+                >()
+            );
         }
 
         template<class _R, class _FuncT, int _N>
@@ -1079,22 +1087,26 @@ namespace stdex
         \
             template<class _R, class _FuncT> \
             void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<false>) \
-            {             result = _return_arg<_R>(fx( \
+            { \
+                result = _return_arg<_R>(fx( \
                 _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) ));} \
         \
             template<class _FuncT> \
             void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<false>) \
-            {             fx( \
+            { \
+                fx( \
                 _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) );} \
         \
             template<class _R, class _FuncT> \
             void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<true>) \
-            {             result = _return_arg<_R>(stdex::invoke(fx, \
+            { \
+                result = _return_arg<_R>(stdex::invoke(fx, \
                 _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) ));} \
         \
             template<class _FuncT> \
             void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<true>) \
-            {             stdex::invoke(fx, \
+            { \
+                stdex::invoke(fx, \
                 _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) );} \
         };
 
