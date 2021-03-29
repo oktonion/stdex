@@ -1030,7 +1030,7 @@ namespace stdex
             template<class _RawArgsT>
             static void call(_FuncT &fx, _callable_args<_RawArgsT> &args, _return_arg<_R> &result)
             {
-                                _func_invoker_impl<_R, _FuncT, _Index, _Count>::
+                _func_invoker_impl<_R, _FuncT, _Index, _Count>::
                     call(fx, args, _checked_args<_RawArgsT>(), result);
             }
         };
@@ -1038,7 +1038,7 @@ namespace stdex
         template<class _FuncT, class _ArgsT, class _R>
         void _invoke(_FuncT &fx, _callable_args<_ArgsT> &args, _return_arg<_R> &result)
         {
-                        _func_invoker<_R, _FuncT, 0, _callable_args<_ArgsT>::count>::
+            _func_invoker<_R, _FuncT, 0, _callable_args<_ArgsT>::count>::
                 call(fx, args, result);
         }
 
