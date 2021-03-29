@@ -2396,7 +2396,7 @@ namespace stdex
                 >::args_type missing_args_type; \
 \
                 missing_args_type missing_args = missing_args_type( \
-                    _STDEX_ARGS##count##(_STDEX_BLANK, _STDEX_BLANK) \
+                    _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) \
                     ); \
 \
                 typedef \
