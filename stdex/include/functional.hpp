@@ -1778,7 +1778,7 @@ namespace stdex
  \
         operator bool() const _STDEX_NOEXCEPT_FUNCTION \
         { \
-            return static_cast<const base_type&>(*this); \
+            return base_type::operator bool(); \
         } \
  \
         const std::type_info& target_type() const _STDEX_NOEXCEPT_FUNCTION \
@@ -2589,6 +2589,22 @@ namespace stdex
                 is_function<typename remove_pointer<_FuncT>::type>::value
             >
         { };
+
+        template<class _FuncT>
+        struct _function_return<
+            stdex::function<_FuncT>
+        >
+        {
+            typedef typename stdex::function<_FuncT>::return_type type;
+        };
+
+        template<class _ObjT, class _FuncT>
+        struct _function_return<
+            stdex::member_function<_ObjT, _FuncT>
+        >
+        {
+            typedef typename stdex::member_function<_ObjT, _FuncT>::return_type type;
+        };
 
     } // namespace detail
 
