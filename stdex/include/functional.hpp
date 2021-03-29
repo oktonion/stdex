@@ -41,6 +41,8 @@
 
 namespace stdex
 {
+    class bad_function_call;
+
     namespace functional_cpp11
     {
     #ifndef STDEX_DO_NOT_ADD_CPP11_STD // define to exclude std implementations
@@ -759,7 +761,7 @@ namespace stdex
             ~_return_arg() { delete _ptr; }
 
             _R* release() { _R* _tmp = _ptr; _ptr = 0; return _tmp; }
-            _R& get() { return *_ptr; }
+            _R& get() { if(!_ptr) throw(stdex::bad_function_call()); return *_ptr; }
 
             _return_arg(const _return_arg& other):
                 _ptr(0)
@@ -1002,7 +1004,7 @@ namespace stdex
         void _invoke_clear(_FuncT &fx, _callable_args<_ArgsT> &args, _return_arg<_R> &result)
         {
             args.call(fx, result, 
-                functional_detail::_invokable_tag< is_class<_FuncT>::value == bool(false) >());
+                functional_detail::_invokable_tag< is_compound<_FuncT>::value == bool(false) >());
         }
 
         template<class _R, class _FuncT, int _N>
@@ -1053,12 +1055,14 @@ namespace stdex
             template<class _R, class _FuncT, class _Invokable>
             void call(_FuncT &fx, _return_arg<_R> &result, _Invokable)
             {
-                                result = fx();}
+                result = fx();
+            }
 
             template<class _FuncT, class _Invokable>
             void call(_FuncT &fx, _return_arg<void> &, _Invokable)
             {
-                                fx();}
+                fx();
+            }
         };
 
 #define _STDEX_ARG_VALUE(arg_n) _get_args_traits<base_type, arg_n>::arg_type::value
@@ -1315,6 +1319,7 @@ namespace stdex
             {
                 _return_arg<function_return_type> result;
                 //return _func_invoker<function_return_type, func_type, 0, function_args_type::count>::call(_func, args);
+                
                 _invoke(_func, args, result);
 
                 return result;
@@ -1413,14 +1418,14 @@ namespace stdex
             _function_impl(_FuncT *func, 
                 functional_detail::_priority_tag<0>)
             {
-                _fx = new _functor<_func_base, _FuncT, _args_type>(stdex::detail::functional_std::move(func));
+                _fx = new _functor<_func_base, _FuncT, _args_type>(func);
             }
 
             template<class _FuncT>
             _function_impl(_FuncT &func, 
                 functional_detail::_priority_tag<1>)
             {
-                _fx = new _functor<_func_base, _FuncT, _args_type>(stdex::detail::functional_std::move(func));
+                _fx = new _functor<_func_base, _FuncT, _args_type>(func);
             }
 
             template<class _FuncT>
@@ -1591,7 +1596,7 @@ namespace stdex
 
         operator bool() const _STDEX_NOEXCEPT_FUNCTION
         {
-            return static_cast<const base_type&>(*this);
+            return base_type::operator bool();
         }
 
         const std::type_info& target_type() const _STDEX_NOEXCEPT_FUNCTION
@@ -1636,7 +1641,7 @@ namespace stdex
 
         operator bool() const _STDEX_NOEXCEPT_FUNCTION
         {
-            return static_cast<const base_type&>(*this);
+            return base_type::operator bool();
         }
 
         const std::type_info& target_type() const _STDEX_NOEXCEPT_FUNCTION
@@ -1688,7 +1693,7 @@ namespace stdex
 
         operator bool() const _STDEX_NOEXCEPT_FUNCTION
         {
-            return static_cast<const base_type&>(*this);
+            return base_type::operator bool();
         }
 
         const std::type_info& target_type() const _STDEX_NOEXCEPT_FUNCTION
@@ -2352,6 +2357,7 @@ namespace stdex
                 detail::_return_arg<return_type> result;
 
                 _callable_args<_ArgsT> callable(args);
+                
                 detail::_invoke(fx, callable, result);
 
                 return detail::_get_return(result);
