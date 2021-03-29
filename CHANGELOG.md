@@ -18,6 +18,7 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 - some warnings for GCC
 - comparison detection for int type nullptr emulation
+- nullptr as enum implementation with valid sizeof(enum) == sizeof(void*)
 
 ## [0.2.9] - 2021-03-26
 
