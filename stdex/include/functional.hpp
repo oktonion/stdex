@@ -1001,7 +1001,7 @@ namespace stdex
         template<class _FuncT, class _ArgsT, class _R>
         void _invoke_clear(_FuncT &fx, _callable_args<_ArgsT> &args, _return_arg<_R> &result)
         {
-                        args.call(fx, result, 
+            args.call(fx, result, 
                 functional_detail::_invokable_tag< is_class<_FuncT>::value == bool(false) >());
         }
 
@@ -1013,14 +1013,14 @@ namespace stdex
                 const _checked_args<_CheckedArgsT>&, _return_arg<_R> &result)
             {
                 _callable_args<_CheckedArgsT> checked_args(functional_std::move(args));
-                                _invoke_clear(fx, checked_args, result);
+                _invoke_clear(fx, checked_args, result);
             }
 
             template<class _RawArgsT>
             static void call(_FuncT &fx, _callable_args<_RawArgsT> &args, 
                 const _checked_args<_RawArgsT>&, _return_arg<_R> &result)
             {
-                                _invoke_clear(fx, args, result);
+                _invoke_clear(fx, args, result);
             }
         };
 
