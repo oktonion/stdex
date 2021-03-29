@@ -1,6 +1,6 @@
-#include "../stdex/include/nullptr.h"
-
 #include <iostream>
+
+#include "../stdex/include/nullptr.h"
 
 int main()
 {
