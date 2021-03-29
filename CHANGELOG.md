@@ -16,7 +16,8 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 ### Fixed
 
-- something
+- some warnings for GCC
+- comparison detection for int type nullptr emulation
 
 ## [0.2.9] - 2021-03-26
 
