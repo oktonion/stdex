@@ -2362,63 +2362,158 @@ namespace stdex
             _FuncT fx;
         };
 
-        template<
-            class _R,
-            class _FuncT,
-            class _TraitsT
-        >
-        class _binder_impl<_R, _FuncT, _TraitsT, 1>
-        {
-            typedef typename _TraitsT::args_type _ArgsT;
-            typedef _R return_type;
-
-        protected:
-            _binder_impl(
-                _FuncT fx_,
-                const _ArgsT &args_
-            )
-            : args( args_ )
-            , fx( fx_ )
-            { }
-
-        public:
-            template<_STDEX_TMPL_ARGS0_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING)>
-            return_type operator()(
-                _STDEX_PARAMS0_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING, _STDEX_ARG_DEFAULT),
-                _STDEX_PARAMS30_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = ::stdex::detail::void_type(), _STDEX_TYPE_DISABLED, _STDEX_ARG_DISABLED)
-            )
-            {
-                typedef 
-                typename
-                detail::_binder_traits<
-                    _STDEX_TYPES0_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING)
-                >::args_type missing_args_type; 
-
-                missing_args_type missing_args = missing_args_type(
-                    _STDEX_ARGS0(_STDEX_BLANK, _STDEX_BLANK)
-                    );
-
-                typedef
-                typename
-                detail::_replace_ph_args<_ArgsT, missing_args_type, 0, void>::type result_args;
-
-                detail::_callable_args<result_args> callable_args = 
-                    result_args(
-                        _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_MERGE_ARGS)
-                    );
-                
-                
-                detail::_return_arg<return_type> result;
-
-                detail::_invoke(fx, callable_args, result);
-
-                return detail::_get_return(result);
-            }
-
-        private:
-            _ArgsT args;
-            _FuncT fx;
+#define _STDEX_BINDER_IMPL(count, left) \
+        template< \
+            class _R, \
+            class _FuncT, \
+            class _TraitsT \
+        > \
+        class _binder_impl<_R, _FuncT, _TraitsT, count + 1> \
+        { \
+            typedef typename _TraitsT::args_type _ArgsT; \
+            typedef _R return_type; \
+\
+        protected: \
+            _binder_impl( \
+                _FuncT fx_, \
+                const _ArgsT &args_ \
+            ) \
+            : args( args_ ) \
+            , fx( fx_ ) \
+            { } \
+\
+        public: \
+            template<_STDEX_TMPL_ARGS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING)> \
+            return_type operator()( \
+                _STDEX_PARAMS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING, _STDEX_ARG_DEFAULT), \
+                _STDEX_PARAMS##left##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = ::stdex::detail::void_type(), _STDEX_TYPE_DISABLED, _STDEX_ARG_DISABLED) \
+            ) \
+            { \
+                typedef \
+                typename \
+                detail::_binder_traits< \
+                    _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING) \
+                >::args_type missing_args_type; \
+\
+                missing_args_type missing_args = missing_args_type( \
+                    _STDEX_ARGS##count##(_STDEX_BLANK, _STDEX_BLANK) \
+                    ); \
+\
+                typedef \
+                typename \
+                detail::_replace_ph_args<_ArgsT, missing_args_type, 0, void>::type result_args; \
+\
+                detail::_callable_args<result_args> callable_args = \
+                    result_args( \
+                        _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_MERGE_ARGS) \
+                    ); \
+\
+\
+                detail::_return_arg<return_type> result; \
+\
+                detail::_invoke(fx, callable_args, result); \
+\
+                return detail::_get_return(result); \
+            } \
+\
+        private: \
+            _ArgsT args; \
+            _FuncT fx; \
         };
+
+#if (STDEX_FUNCTION_MAX_ARG_N >= 0)
+    _STDEX_BINDER_IMPL(0, 30)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 1)
+    _STDEX_BINDER_IMPL(1, 29)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 2)
+    _STDEX_BINDER_IMPL(2, 28)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 3)
+    _STDEX_BINDER_IMPL(3, 27)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 4)
+    _STDEX_BINDER_IMPL(4, 26)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 5)
+    _STDEX_BINDER_IMPL(5, 25)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 6)
+    _STDEX_BINDER_IMPL(6, 24)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 7)
+    _STDEX_BINDER_IMPL(7, 23)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 8)
+    _STDEX_BINDER_IMPL(8, 22)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 9)
+    _STDEX_BINDER_IMPL(9, 21)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 10)
+    _STDEX_BINDER_IMPL(10, 20)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 11)
+    _STDEX_BINDER_IMPL(11, 19)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 12)
+    _STDEX_BINDER_IMPL(12, 18)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 13)
+    _STDEX_BINDER_IMPL(13, 17)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 14)
+    _STDEX_BINDER_IMPL(14, 16)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 15)
+    _STDEX_BINDER_IMPL(15, 15)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 16)
+    _STDEX_BINDER_IMPL(16, 14)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 17)
+    _STDEX_BINDER_IMPL(17, 13)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 18)
+    _STDEX_BINDER_IMPL(18, 12)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 19)
+    _STDEX_BINDER_IMPL(19, 11)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 20)
+    _STDEX_BINDER_IMPL(20, 10)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 21)
+    _STDEX_BINDER_IMPL(21, 9)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 22)
+    _STDEX_BINDER_IMPL(22, 8)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 23)
+    _STDEX_BINDER_IMPL(23, 7)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 24)
+    _STDEX_BINDER_IMPL(24, 6)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 25)
+    _STDEX_BINDER_IMPL(25, 5)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 26)
+    _STDEX_BINDER_IMPL(26, 4)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 27)
+    _STDEX_BINDER_IMPL(27, 3)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 28)
+    _STDEX_BINDER_IMPL(28, 2)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 29)
+    _STDEX_BINDER_IMPL(29, 1)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 30)
+    _STDEX_BINDER_IMPL(30, 0)
+#endif
 
 #undef _STDEX_TYPE_MISSING
 #undef _STDEX_TYPE_DISABLED
