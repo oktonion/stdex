@@ -2375,8 +2375,21 @@ namespace stdex
                 return detail::_get_return(result);
             }
 
+            return_type operator()(
+                _STDEX_PARAMS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = ::stdex::detail::void_type(), _STDEX_TYPE_DISABLED, _STDEX_ARG_DISABLED)
+            )
+            {
+                detail::_return_arg<return_type> result;
+
+                _callable_args<_ArgsT> callable(args);
+                
+                detail::_invoke(fx, callable, result);
+
+                return detail::_get_return(result);
+            }
+
         private:
-            mutable _ArgsT args;
+            _ArgsT args;
             _FuncT fx;
         };
 
@@ -2401,6 +2414,38 @@ namespace stdex
             { } \
 \
         public: \
+            template<_STDEX_TMPL_ARGS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING)> \
+            return_type operator()( \
+                _STDEX_PARAMS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING, _STDEX_ARG_DEFAULT), \
+                _STDEX_PARAMS##left##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = ::stdex::detail::void_type(), _STDEX_TYPE_DISABLED, _STDEX_ARG_DISABLED) \
+            ) \
+            { \
+                typedef \
+                typename \
+                detail::_binder_traits< \
+                    _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING) \
+                >::args_type missing_args_type; \
+\
+                missing_args_type missing_args = missing_args_type( \
+                    _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) \
+                    ); \
+\
+                typedef \
+                typename \
+                detail::_replace_ph_args<_ArgsT, missing_args_type, 0, void>::type result_args; \
+\
+                detail::_callable_args<result_args> callable_args = \
+                    result_args( \
+                        _STDEX_ARGS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_MERGE_ARGS) \
+                    ); \
+\
+\
+                detail::_return_arg<return_type> result; \
+\
+                detail::_invoke(fx, callable_args, result); \
+\
+                return detail::_get_return(result); \
+            } \
             template<_STDEX_TMPL_ARGS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING)> \
             return_type operator()( \
                 _STDEX_PARAMS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING, _STDEX_ARG_DEFAULT), \
@@ -2435,7 +2480,7 @@ namespace stdex
             } \
 \
         private: \
-            mutable _ArgsT args; \
+            _ArgsT args; \
             _FuncT fx; \
         };
 
