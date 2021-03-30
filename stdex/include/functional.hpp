@@ -231,114 +231,114 @@ namespace stdex
 
     template<class _R>
     inline
-        _R invoke(_R(*_func)())
+    _R invoke(_R(*_func)())
     {
-                return
-            detail::functional_std::_forward<_R>::call(
-                _func());
+        return
+        detail::functional_std::_forward<_R>::call(
+            _func());
     }
 
     template<class _R, class _ObjectT>
     inline
-        _R invoke(_R(_ObjectT::* _func)(), _ObjectT& _obj)
+    _R invoke(_R(_ObjectT::* _func)(), _ObjectT& _obj)
     {
-                return
-            detail::functional_std::_forward<_R>::call(
-                (_obj.*_func)());
+        return
+        detail::functional_std::_forward<_R>::call(
+            (_obj.*_func)());
     }
 
     template<class _ObjectT>
     inline
-        void invoke(void(_ObjectT::* _func)(), _ObjectT& _obj)
+    void invoke(void(_ObjectT::* _func)(), _ObjectT& _obj)
     {
-                (_obj.*_func)();
+        (_obj.*_func)();
     }
 
     template<class _R, class _ObjectT>
     inline
-        _R invoke(_R(_ObjectT::* _func)() const, const _ObjectT& _obj)
+    _R invoke(_R(_ObjectT::* _func)() const, const _ObjectT& _obj)
     {
-                return
-            detail::functional_std::_forward<_R>::call(
-                (_obj.*_func)());
+        return
+        detail::functional_std::_forward<_R>::call(
+            (_obj.*_func)());
     }
 
     template<class _ObjectT>
     inline
-        void invoke(void(_ObjectT::* _func)() const, const _ObjectT& _obj)
+    void invoke(void(_ObjectT::* _func)() const, const _ObjectT& _obj)
     {
-                (_obj.*_func)();
+        (_obj.*_func)();
     }
 
     template<class _R, class _ObjectT>
     inline
-        _R invoke(_R(_ObjectT::* _func)(), _ObjectT* _obj)
+    _R invoke(_R(_ObjectT::* _func)(), _ObjectT* _obj)
     {
-                return
-            detail::functional_std::_forward<_R>::call(
-                ((*_obj).*_func)());
+        return
+        detail::functional_std::_forward<_R>::call(
+            ((*_obj).*_func)());
     }
 
     template<class _ObjectT>
     inline
-        void invoke(void(_ObjectT::* _func)(), _ObjectT* _obj)
+    void invoke(void(_ObjectT::* _func)(), _ObjectT* _obj)
     {
-                ((*_obj).*_func)();
+        ((*_obj).*_func)();
     }
 
     template<class _R, class _ObjectT>
     inline
-        _R invoke(_R(_ObjectT::* _func)() const, const _ObjectT* _obj)
+    _R invoke(_R(_ObjectT::* _func)() const, const _ObjectT* _obj)
     {
-                return
-            detail::functional_std::_forward<_R>::call(
-                ((*_obj).*_func)());
+        return
+        detail::functional_std::_forward<_R>::call(
+            ((*_obj).*_func)());
     }
 
     template<class _ObjectT>
     inline
-        void invoke(void(_ObjectT::* _func)() const, const _ObjectT* _obj)
+    void invoke(void(_ObjectT::* _func)() const, const _ObjectT* _obj)
     {
-                ((*_obj).*_func)();
+        ((*_obj).*_func)();
     }
 
     template<class _R, class _ObjectT>
     inline
-        _R invoke(_R(_ObjectT::* _func)(), const reference_wrapper<_ObjectT>& _ref)
+    _R invoke(_R(_ObjectT::* _func)(), const reference_wrapper<_ObjectT>& _ref)
     {
-                return
-            detail::functional_std::_forward<_R>::call(
-                (_ref.get().*_func)());
+        return
+        detail::functional_std::_forward<_R>::call(
+            (_ref.get().*_func)());
     }
 
 
     template<class _ObjectT>
     inline
-        void invoke(void(_ObjectT::* _func)(), const reference_wrapper<_ObjectT>& _ref)
+    void invoke(void(_ObjectT::* _func)(), const reference_wrapper<_ObjectT>& _ref)
     {
-                (_ref.get().*_func)();
+        (_ref.get().*_func)();
     }
 
     template<class _R, class _ObjectT>
     inline
-        _R invoke(_R(_ObjectT::* _func)() const, const reference_wrapper<const _ObjectT>& _ref)
+    _R invoke(_R(_ObjectT::* _func)() const, const reference_wrapper<const _ObjectT>& _ref)
     {
-                return
-            detail::functional_std::_forward<_R>::call(
-                (_ref.get().*_func)());
+        return
+        detail::functional_std::_forward<_R>::call(
+            (_ref.get().*_func)());
     }
 
     template<class _ObjectT>
     inline
-        void invoke(void(_ObjectT::* _func)() const, const reference_wrapper<const _ObjectT>& _ref)
+    void invoke(void(_ObjectT::* _func)() const, const reference_wrapper<const _ObjectT>& _ref)
     {
-                (_ref.get().*_func)();
+        (_ref.get().*_func)();
     }
 
     template<class _R>
     _R invoke(typename stdex::detail::_function_trait<_R(*)(), is_void<_R>::value == bool(false)>::type  _func)
     {
-                return
+        return
         detail::functional_std::_forward<_R>::call(
             _func() );
     }
@@ -346,7 +346,28 @@ namespace stdex
     template<class _R>
     _R invoke(typename stdex::detail::_function_trait<_R(*)(), is_void<_R>::value == bool(true)>::type _func)
     {
-                _func();
+        _func();
+    }
+
+    template<class _Tp, class _ObjectT>
+    inline
+    _Tp& invoke(_Tp _ObjectT::* _data_member, _ObjectT& _obj)
+    {
+        return _obj.*_data_member;
+    }
+
+    template<class _Tp, class _ObjectT>
+    inline
+    _Tp& invoke(_Tp _ObjectT::* _data_member, const reference_wrapper<_ObjectT>& _ref)
+    {
+        _ref.get().*_data_member;
+    }
+
+    template<class _Tp, class _ObjectT>
+    inline
+    _Tp& invoke(_Tp _ObjectT::* _data_member, _ObjectT* _obj)
+    {
+        return (*_obj).*_data_member;
     }
 
 #define _STDEX_INVOKE_IMPL(count, vargs, elipsis_tmpl_args, elipsis_params, elipsis_args) \
@@ -461,7 +482,7 @@ namespace stdex
     _R invoke(typename stdex::detail::_function_trait<_R(*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) vargs ), is_void<_R>::value == bool(true)>::type  _func, _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK))\
     {\
         _func(_STDEX_ARGS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_CUSTOM));\
-    }
+    }\
 
 #define _STDEX_MEM_FN(count) \
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)>\
@@ -1018,7 +1039,8 @@ namespace stdex
             args.call(fx, result, 
                 functional_detail::_invokable_tag< 
                     is_function<func_type>::value == bool(true) ||
-                    is_member_function_pointer<_FuncT>::value == bool(true)
+                    is_member_function_pointer<_FuncT>::value == bool(true) ||
+                    is_member_pointer<_FuncT>::value == bool(true)
                 >()
             );
         }
@@ -1118,8 +1140,45 @@ namespace stdex
                 _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) );} \
         };
 
+        template<class _ArgsT, class _ArgT> 
+        struct _callable_args<_args<_ArgsT, _ArgT, 0> > : 
+            _args<_ArgsT, _ArgT, 0> 
+        { 
+            typedef _args<_ArgsT, _ArgT, 0> base_type; 
+            template<class _OtherArgsT, class _OtherArgT> 
+            _callable_args(const _args<_OtherArgsT, _OtherArgT, base_type::count - 1>& other) : 
+                base_type(other) {} 
+
+            template<class _R, class _FuncT> 
+            void call(_FuncT& fx, _return_arg<_R>& result, functional_detail::_invokable_tag<false>) 
+            { 
+                result = 
+                    _return_arg<_R>(
+                        fx(_get_args_traits<base_type, 0>::arg_type::value)
+                    ); 
+            } 
+            
+            template<class _FuncT> 
+            void call(_FuncT& fx, _return_arg<void>&, functional_detail::_invokable_tag<false>) 
+            { 
+                fx(_get_args_traits<base_type, 0>::arg_type::value); 
+            } 
+            
+            template<class _R, class _FuncT> 
+            void call(_FuncT& fx, _return_arg<_R>& result, functional_detail::_invokable_tag<true>) 
+            { 
+                result = _return_arg<_R>(stdex::invoke(fx, _get_args_traits<base_type, 0>::arg_type::value)); 
+            } 
+            
+            template<class _FuncT> 
+            void call(_FuncT& fx, _return_arg<void>&, functional_detail::_invokable_tag<true>) 
+            { 
+                stdex::invoke(fx, _get_args_traits<base_type, 0>::arg_type::value); 
+            } 
+        };
+
 #if (STDEX_FUNCTION_MAX_ARG_N >= 0)
-    _STDEX_CALLABLE_ARGS(0)
+    //_STDEX_CALLABLE_ARGS(0)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 1)
     _STDEX_CALLABLE_ARGS(1)
@@ -2176,7 +2235,7 @@ namespace stdex
         struct _get_ph_args_impl<_ArgsT, _MissingArgsT, _N, -1>
         {
             template<class _MissingArgT>
-            static void_type call(_ArgsT &, const _MissingArgT &)
+            static void_type call(const _ArgsT &, const _MissingArgT &)
             {
                 return void_type();
             }
@@ -2478,12 +2537,67 @@ namespace stdex
             } \
 \
         private: \
-            _ArgsT args; \
+            mutable _ArgsT args; \
             _FuncT fx; \
         };
 
+template< class _R, class _FuncT, class _TraitsT > 
+class _binder_impl<_R, _FuncT, _TraitsT, 0 + 1> { 
+    typedef typename _TraitsT::args_type _ArgsT; 
+    typedef _R return_type; 
+protected: 
+        _binder_impl(_FuncT fx_, const _ArgsT& args_) : args(args_), fx(fx_) { } 
+public: 
+    template<class _MissingArg0T > 
+    return_type operator()(_MissingArg0T arg0, 
+        ::stdex::detail::functional_detail::_any_type disabled_arg0 = ::stdex::detail::void_type(), 
+        ::stdex::detail::functional_detail::_any_type disabled_arg1 = ::stdex::detail::void_type(), 
+        ::stdex::detail::functional_detail::_any_type disabled_arg2 = ::stdex::detail::void_type(), 
+        ::stdex::detail::functional_detail::_any_type disabled_arg3 = ::stdex::detail::void_type()) 
+    { 
+        typedef typename detail::_binder_traits< _MissingArg0T >::args_type missing_args_type; 
+        missing_args_type missing_args = missing_args_type(arg0); 
+        typedef typename detail::_replace_ph_args<_ArgsT, missing_args_type, 0, void>::type result_args; 
+        detail::_callable_args<result_args> callable_args = 
+            result_args(
+                detail::_get_ph_args<_ArgsT, missing_args_type, 0>::call(args, missing_args), 
+                detail::_get_ph_args<_ArgsT, missing_args_type, 1>::call(args, missing_args), 
+                detail::_get_ph_args<_ArgsT, missing_args_type, 2>::call(args, missing_args), 
+                detail::_get_ph_args<_ArgsT, missing_args_type, 3>::call(args, missing_args)
+            ); 
+        detail::_return_arg<return_type> result; 
+        detail::_invoke(fx, callable_args, result); 
+        return detail::_get_return(result); 
+    }     
+
+    template<class _MissingArg0T >
+    return_type operator()(_MissingArg0T arg0,
+        ::stdex::detail::functional_detail::_any_type disabled_arg0 = ::stdex::detail::void_type(),
+        ::stdex::detail::functional_detail::_any_type disabled_arg1 = ::stdex::detail::void_type(),
+        ::stdex::detail::functional_detail::_any_type disabled_arg2 = ::stdex::detail::void_type(),
+        ::stdex::detail::functional_detail::_any_type disabled_arg3 = ::stdex::detail::void_type()) const
+    {
+        typedef typename detail::_binder_traits< _MissingArg0T >::args_type missing_args_type;
+        missing_args_type missing_args = missing_args_type(arg0);
+        typedef typename detail::_replace_ph_args<_ArgsT, missing_args_type, 0, void>::type result_args;
+        detail::_callable_args<result_args> callable_args =
+            result_args(
+                detail::_get_ph_args<_ArgsT, missing_args_type, 0>::call(args, missing_args),
+                detail::_get_ph_args<_ArgsT, missing_args_type, 1>::call(args, missing_args),
+                detail::_get_ph_args<_ArgsT, missing_args_type, 2>::call(args, missing_args),
+                detail::_get_ph_args<_ArgsT, missing_args_type, 3>::call(args, missing_args)
+            );
+        detail::_return_arg<return_type> result;
+        detail::_invoke(fx, callable_args, result);
+        return detail::_get_return(result);
+    } 
+private: 
+    mutable _ArgsT args; 
+    _FuncT fx; 
+};
+
 #if (STDEX_FUNCTION_MAX_ARG_N >= 0)
-    _STDEX_BINDER_IMPL(0, 30)
+    //_STDEX_BINDER_IMPL(0, 30)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 1)
     _STDEX_BINDER_IMPL(1, 29)
@@ -2638,11 +2752,33 @@ namespace stdex
             typedef typename function<_FuncT>::return_type type;
         };
 
-        template<class _FuncT>
-        struct _function_return_impl<_FuncT, false>
+        template<class _FuncT, bool>
+        struct _function_return_impl_helper
         {
-            typedef void type;
+            typedef typename _member_function_traits<_FuncT>::return_type type;
         };
+
+        template<class _FuncT>
+        struct _function_return_impl_helper<_FuncT, false>
+        {
+            typedef typename _remove_member_pointer<_FuncT>::type _type;
+
+            typedef
+            typename
+            conditional<
+                is_member_pointer<_FuncT>::value,
+                _type&,
+                void
+            >::type type;
+        };
+
+        template<class _FuncT>
+        struct _function_return_impl<_FuncT, false>:
+            _function_return_impl_helper<_FuncT, is_member_function_pointer<_FuncT>::value>
+        {
+
+        };
+
         template<class _FuncT>
         struct _function_return:
             _function_return_impl<
