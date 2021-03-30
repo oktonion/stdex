@@ -2364,7 +2364,7 @@ namespace stdex
         public:
             return_type operator()(
                 _STDEX_PARAMS_MAX_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = ::stdex::detail::void_type(), _STDEX_TYPE_DISABLED, _STDEX_ARG_DISABLED)
-            )
+            ) const
             {
                 detail::_return_arg<return_type> result;
 
@@ -2376,7 +2376,7 @@ namespace stdex
             }
 
         private:
-            _ArgsT args;
+            mutable _ArgsT args;
             _FuncT fx;
         };
 
@@ -2405,7 +2405,7 @@ namespace stdex
             return_type operator()( \
                 _STDEX_PARAMS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_MISSING, _STDEX_ARG_DEFAULT), \
                 _STDEX_PARAMS##left##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, = ::stdex::detail::void_type(), _STDEX_TYPE_DISABLED, _STDEX_ARG_DISABLED) \
-            ) \
+            ) const \
             { \
                 typedef \
                 typename \
@@ -2435,7 +2435,7 @@ namespace stdex
             } \
 \
         private: \
-            _ArgsT args; \
+            mutable _ArgsT args; \
             _FuncT fx; \
         };
 
