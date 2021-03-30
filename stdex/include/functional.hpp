@@ -3173,100 +3173,132 @@ namespace stdex
         }
 
 #if (STDEX_FUNCTION_MAX_ARG_N >= 0)
-        static const detail::_ph<1>  &_1  = detail::_ph<1 >::instance();
+        typedef detail::_ph<1> ph_1;
+        static const ph_1 &_1  = ph_1::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 1)
-        static const detail::_ph<2>  &_2  = detail::_ph<2 >::instance();
+        typedef detail::_ph<2> ph_2;
+        static const ph_2& _2 = ph_2::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 2)
-        static const detail::_ph<3>  &_3  = detail::_ph<3 >::instance();
+        typedef detail::_ph<3> ph_3;
+        static const ph_3& _3 = ph_3::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 3)
-        static const detail::_ph<4>  &_4  = detail::_ph<4 >::instance();
+        typedef detail::_ph<4> ph_4;
+        static const ph_4& _4 = ph_4::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 4)
-        static const detail::_ph<5>  &_5  = detail::_ph<5 >::instance();
+        typedef detail::_ph<5> ph_5;
+        static const ph_5& _5 = ph_5::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 5)
-        static const detail::_ph<6>  &_6  = detail::_ph<6 >::instance();
+        typedef detail::_ph<6> ph_6;
+        static const ph_6& _6 = ph_6::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 6)
-        static const detail::_ph<7>  &_7  = detail::_ph<7 >::instance();
+        typedef detail::_ph<7> ph_7;
+        static const ph_7& _7 = ph_7::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 7)
-        static const detail::_ph<8>  &_8  = detail::_ph<8 >::instance();
+        typedef detail::_ph<8> ph_8;
+        static const ph_8& _8 = ph_8::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 8)
-        static const detail::_ph<9>  &_9  = detail::_ph<9 >::instance();
+        typedef detail::_ph<9> ph_9;
+        static const ph_9& _9 = ph_9::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 9)
-        static const detail::_ph<10> &_10 = detail::_ph<10>::instance();
+        typedef detail::_ph<10> ph_10;
+        static const ph_10& _10 = ph_10::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 10)
-        static const detail::_ph<11> &_11 = detail::_ph<11>::instance();
+        typedef detail::_ph<11> ph_11;
+        static const ph_11& _11 = ph_11::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 11)
-        static const detail::_ph<12> &_12 = detail::_ph<12>::instance();
+        typedef detail::_ph<12> ph_12;
+        static const ph_12& _12 = ph_12::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 12)
-        static const detail::_ph<13> &_13 = detail::_ph<13>::instance();
+        typedef detail::_ph<13> ph_13;
+        static const ph_13& _13 = ph_13::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 13)
-        static const detail::_ph<14> &_14 = detail::_ph<14>::instance();
+        typedef detail::_ph<14> ph_14;
+        static const ph_14& _14 = ph_14::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 14)
-        static const detail::_ph<15> &_15 = detail::_ph<15>::instance();
+        typedef detail::_ph<15> ph_15;
+        static const ph_15& _15 = ph_15::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 15)
-        static const detail::_ph<16> &_16 = detail::_ph<16>::instance();
+        typedef detail::_ph<16> ph_16;
+        static const ph_16& _16 = ph_16::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 16)
-        static const detail::_ph<17> &_17 = detail::_ph<17>::instance();
+        typedef detail::_ph<17> ph_17;
+        static const ph_17& _17 = ph_17::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 17)
-        static const detail::_ph<18> &_18 = detail::_ph<18>::instance();
+        typedef detail::_ph<18> ph_18;
+        static const ph_18& _18 = ph_18::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 18)
-        static const detail::_ph<19> &_19 = detail::_ph<19>::instance();
+        typedef detail::_ph<19> ph_19;
+        static const ph_19& _19 = ph_19::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 19)
-        static const detail::_ph<20> &_20 = detail::_ph<20>::instance();
+        typedef detail::_ph<20> ph_20;
+        static const ph_20& _20 = ph_20::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 20)
-        static const detail::_ph<21> &_21 = detail::_ph<21>::instance();
+        typedef detail::_ph<21> ph_21;
+        static const ph_21& _21 = ph_21::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 21)
-        static const detail::_ph<22> &_22 = detail::_ph<22>::instance();
+        typedef detail::_ph<22> ph_22;
+        static const ph_22& _22 = ph_22::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 22)
-        static const detail::_ph<23> &_23 = detail::_ph<23>::instance();
+        typedef detail::_ph<23> ph_23;
+        static const ph_23& _23 = ph_23::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 23)
-        static const detail::_ph<24> &_24 = detail::_ph<24>::instance();
+        typedef detail::_ph<24> ph_24;
+        static const ph_24& _24 = ph_24::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 24)
-        static const detail::_ph<25> &_25 = detail::_ph<25>::instance();
+        typedef detail::_ph<25> ph_25;
+        static const ph_25& _25 = ph_25::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 25)
-        static const detail::_ph<26> &_26 = detail::_ph<26>::instance();
+        typedef detail::_ph<26> ph_26;
+        static const ph_26& _26 = ph_26::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 26)
-        static const detail::_ph<27> &_27 = detail::_ph<27>::instance();
+        typedef detail::_ph<27> ph_27;
+        static const ph_27& _27 = ph_27::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 27)
-        static const detail::_ph<28> &_28 = detail::_ph<28>::instance();
+        typedef detail::_ph<28> ph_28;
+        static const ph_28& _28 = ph_28::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 28)
-        static const detail::_ph<29> &_29 = detail::_ph<29>::instance();
+        typedef detail::_ph<29> ph_29;
+        static const ph_29& _29 = ph_29::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 29)
-        static const detail::_ph<30> &_30 = detail::_ph<30>::instance();
+        typedef detail::_ph<30> ph_30;
+        static const ph_30& _30 = ph_30::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 30)
-        static const detail::_ph<31> &_31 = detail::_ph<31>::instance();
+        typedef detail::_ph<31> ph_31;
+        static const ph_31& _31 = ph_31::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 31)
-        static const detail::_ph<32> &_32 = detail::_ph<32>::instance();
+        typedef detail::_ph<32> ph_32;
+        static const ph_32& _32 = ph_32::instance();
 #endif
     }
 
