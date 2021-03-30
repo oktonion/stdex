@@ -197,12 +197,294 @@ int invoke_int_0()
     return 0;
 }
 
+namespace invoke_lvalue
+{
+    int count = 0;
+
+    // 1 arg, return void
+
+    void f_void_1(int i)
+    {
+        count += i;
+    }
+
+    struct A_void_1
+    {
+        void operator()(int i)
+        {
+            count += i;
+        }
+
+        void mem1() { ++count; }
+        void mem2() const { count += 2; }
+    };
+
+    int test_void_1()
+    {
+        using namespace stdex::placeholders;
+        int save_count = count;
+        // function
+        {
+            int i = 2;
+            stdex::bind(f_void_1, _1)(i);
+            DYNAMIC_VERIFY(count == save_count + 2);
+            save_count = count;
+        }
+        {
+            int i = 2;
+            stdex::bind(f_void_1, i)();
+            DYNAMIC_VERIFY(count == save_count + 2);
+            save_count = count;
+        }
+        // function pointer
+        {
+            void (*fp)(int) = f_void_1;
+            int i = 3;
+            stdex::bind(fp, _1)(i);
+            DYNAMIC_VERIFY(count == save_count + 3);
+            save_count = count;
+        }
+        {
+            void (*fp)(int) = f_void_1;
+            int i = 3;
+            stdex::bind(fp, i)();
+            DYNAMIC_VERIFY(count == save_count + 3);
+            save_count = count;
+        }
+        // functor
+        {
+            A_void_1 a0;
+            int i = 4;
+            stdex::bind(a0, _1)(i);
+            DYNAMIC_VERIFY(count == save_count + 4);
+            save_count = count;
+        }
+        {
+            A_void_1 a0;
+            int i = 4;
+            stdex::bind(a0, i)();
+            DYNAMIC_VERIFY(count == save_count + 4);
+            save_count = count;
+        }
+        // member function pointer
+        {
+            void (A_void_1:: * fp)() = &A_void_1::mem1;
+            A_void_1 a;
+            stdex::bind(fp, _1)(a);
+            DYNAMIC_VERIFY(count == save_count + 1);
+            save_count = count;
+            A_void_1* ap = &a;
+            stdex::bind(fp, _1)(ap);
+            DYNAMIC_VERIFY(count == save_count + 1);
+            save_count = count;
+        }
+        {
+            void (A_void_1:: * fp)() = &A_void_1::mem1;
+            A_void_1 a;
+            stdex::bind(fp, a)();
+            DYNAMIC_VERIFY(count == save_count + 1);
+            save_count = count;
+            A_void_1* ap = &a;
+            stdex::bind(fp, ap)();
+            DYNAMIC_VERIFY(count == save_count + 1);
+            save_count = count;
+        }
+        // const member function pointer
+        {
+            void (A_void_1:: * fp)() const = &A_void_1::mem2;
+            A_void_1 a;
+            stdex::bind(fp, _1)(a);
+            DYNAMIC_VERIFY(count == save_count + 2);
+            save_count = count;
+            A_void_1* ap = &a;
+            stdex::bind(fp, _1)(ap);
+            DYNAMIC_VERIFY(count == save_count + 2);
+            save_count = count;
+        }
+        {
+            void (A_void_1:: * fp)() const = &A_void_1::mem2;
+            A_void_1 a;
+            stdex::bind(fp, a)();
+            DYNAMIC_VERIFY(count == save_count + 2);
+            save_count = count;
+            A_void_1* ap = &a;
+            stdex::bind(fp, ap)();
+            DYNAMIC_VERIFY(count == save_count + 2);
+            save_count = count;
+        }
+
+        return 0;
+    }
+
+    // 1 arg, return int
+
+    int f_int_1(int i)
+    {
+        return i + 1;
+    }
+
+    struct A_int_1
+    {
+        A_int_1() : data_(5) {}
+        int operator()(int i)
+        {
+            return i - 1;
+        }
+
+        int mem1() { return 3; }
+        int mem2() const { return 4; }
+        int data_;
+    };
+
+    int test_int_1()
+    {
+        using namespace stdex::placeholders;
+        // function
+        {
+            int i = 2;
+            DYNAMIC_VERIFY(stdex::bind(f_int_1, _1)(i) == 3);
+            DYNAMIC_VERIFY(stdex::bind(f_int_1, i)() == 3);
+        }
+        // function pointer
+        {
+            int (*fp)(int) = f_int_1;
+            int i = 3;
+            DYNAMIC_VERIFY(stdex::bind(fp, _1)(i) == 4);
+            DYNAMIC_VERIFY(stdex::bind(fp, i)() == 4);
+        }
+        // functor
+        {
+            int i = 4;
+            DYNAMIC_VERIFY(stdex::bind<int>(A_int_1(), _1)(i) == 3);
+            DYNAMIC_VERIFY(stdex::bind<int>(A_int_1(), i)() == 3);
+        }
+        // member function pointer
+        {
+            A_int_1 a;
+            DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::mem1, _1)(a) == 3);
+            DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::mem1, a)() == 3);
+            A_int_1* ap = &a;
+            DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::mem1, _1)(ap) == 3);
+            DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::mem1, ap)() == 3);
+        }
+        // const member function pointer
+        {
+            A_int_1 a;
+            DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::mem2, _1)(A_int_1()) == 4);
+            DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::mem2, A_int_1())() == 4);
+            A_int_1* ap = &a;
+            DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::mem2, _1)(ap) == 4);
+            DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::mem2, ap)() == 4);
+        }
+        // member data pointer
+        {
+            A_int_1 a;
+            //DYNAMIC_VERIFY(stdex::bind<int&>(&A_int_1::data_, _1)(a) == 5);
+            //DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::data_, a)() == 5);
+            A_int_1* ap = &a;
+            //DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::data_, _1)(a) == 5);
+            //stdex::bind<int&>(&A_int_1::data_, _1)(a) = 6;
+            //DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::data_, _1)(a) == 6);
+            //DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::data_, _1)(ap) == 6);
+            //stdex::bind<int&>(&A_int_1::data_, _1)(ap) = 7;
+            //DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::data_, _1)(ap) == 7);
+        }
+
+        return 0;
+    }
+
+    // 2 arg, return void
+
+    void f_void_2(int i, int j)
+    {
+        count += i + j;
+    }
+
+    struct A_void_2
+    {
+        void operator()(int i, int j)
+        {
+            count += i + j;
+        }
+
+        void mem1(int i) { count += i; }
+        void mem2(int i) const { count += i; }
+    };
+
+    int test_void_2()
+    {
+        using namespace stdex::placeholders;
+        int save_count = count;
+        // function
+        {
+            int i = 2;
+            int j = 3;
+            stdex::bind(f_void_2, _1, _2)(i, j);
+            DYNAMIC_VERIFY(count == save_count + 5);
+            save_count = count;
+            stdex::bind(f_void_2, i, _1)(j);
+            DYNAMIC_VERIFY(count == save_count + 5);
+            save_count = count;
+            stdex::bind(f_void_2, i, j)();
+            DYNAMIC_VERIFY(count == save_count + 5);
+            save_count = count;
+        }
+        // member function pointer
+        {
+            int j = 3;
+            stdex::bind(&A_void_2::mem1, _1, _2)(A_void_2(), j);
+            DYNAMIC_VERIFY(count == save_count + 3);
+            save_count = count;
+            stdex::bind(&A_void_2::mem1, _2, _1)(j, A_void_2());
+            DYNAMIC_VERIFY(count == save_count + 3);
+            save_count = count;
+        }
+
+        return 0;
+    }
+
+    struct TFENode
+    {
+        bool foo(unsigned long) const
+        {
+            return true;
+        }
+    };
+
+    int test3()
+    {
+        using namespace stdex;
+        using namespace stdex::placeholders;
+        typedef bool(TFENode::*member_type)(unsigned long) const;
+        typedef binder<bool, member_type, placeholders::ph_1, unsigned long> binder_type;
+        const binder_type f =
+            bind<bool, member_type, placeholders::ph_1>(&TFENode::foo, _1, 0UL);
+        const TFENode n = TFENode();
+        //bool b = f(n);
+        //DYNAMIC_VERIFY(b);
+
+        return 0;
+    }
+
+
+    int run()
+    {
+        RUN_TEST(test_void_1);
+        RUN_TEST(test_int_1);
+        RUN_TEST(test_void_2);
+        RUN_TEST(test3);
+
+        return 0;
+    }
+}
+
 int main()
 {
     RUN_TEST(bind_return);
     RUN_TEST(copy_test);
     RUN_TEST(invoke_function_object);
     RUN_TEST(invoke_int_0);
+    RUN_TEST(invoke_lvalue::run);
 
     return 0;
 }
