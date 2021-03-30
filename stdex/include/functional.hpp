@@ -41,7 +41,15 @@
 
 namespace stdex
 {
-    class bad_function_call;
+    class bad_function_call : public std::exception { // exception thrown when an empty std::function is called
+    public:
+        bad_function_call() _STDEX_NOEXCEPT_FUNCTION {}
+
+        virtual const char* what() const _STDEX_NOEXCEPT_FUNCTION {
+            // return pointer to message string
+            return "bad function call";
+        }
+    };
 
     namespace functional_cpp11
     {
@@ -1211,16 +1219,6 @@ namespace stdex
 #undef _STDEX_CALLABLE_ARGS
 
     } // namespace detail
-
-    class bad_function_call : public std::exception { // exception thrown when an empty std::function is called
-    public:
-        bad_function_call() _STDEX_NOEXCEPT_FUNCTION {}
-
-        virtual const char* what() const _STDEX_NOEXCEPT_FUNCTION {
-            // return pointer to message string
-            return "bad function call";
-        }
-    };
 
     namespace detail
     {
