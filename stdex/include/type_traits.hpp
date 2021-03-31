@@ -555,23 +555,6 @@ namespace stdex
         {
             typedef _Up     type;
         };
-
-        template<class _Tp, class>
-        struct _remove_member_pointer_helper
-        {
-            typedef _Tp type;
-        };
-
-        template<class _Tp, class _Up, class _ObjT>
-        struct _remove_member_pointer_helper<_Tp, _Up _ObjT::*>
-        {
-            typedef _Up type;
-        };
-
-        template<class _Tp>
-        struct _remove_member_pointer
-            : public _remove_member_pointer_helper<_Tp, typename remove_cv<_Tp>::type>
-        {};
     }
 
     // remove_pointer
@@ -1173,79 +1156,40 @@ namespace stdex
 
 #undef _STDEX_IS_FUNCTION_PTR_HELPER
 
-        template<class _FuncPtrT>
-        struct _member_function_traits
-        {
-            typedef void object_type;
-            typedef void return_type;
-        };
-
         template <class _R, class _ObjectT> 
         _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)()); 
-        template <class _R, class _ObjectT>
-        struct _member_function_traits< _R ( _ObjectT::*const volatile*)()> { typedef _ObjectT object_type; typedef _R return_type; };
         template <class _R, class _ObjectT> 
         _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(...)); 
-        template <class _R, class _ObjectT>
-        struct _member_function_traits< _R ( _ObjectT::*const volatile*)(...)> { typedef _ObjectT object_type; typedef _R return_type; };
         template <class _R, class _ObjectT> 
-        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)() const);
-        template <class _R, class _ObjectT>
-        struct _member_function_traits< _R ( _ObjectT::*const volatile*)() const> { typedef _ObjectT object_type; typedef _R return_type; }; 
+        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)() const); 
         template <class _R, class _ObjectT> 
         _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)() volatile); 
-        template <class _R, class _ObjectT>
-        struct _member_function_traits< _R ( _ObjectT::*const volatile*)() volatile> { typedef _ObjectT object_type; typedef _R return_type; };
         template <class _R, class _ObjectT> 
         _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)() const volatile); 
-        template <class _R, class _ObjectT>
-        struct _member_function_traits< _R ( _ObjectT::*const volatile*)() const volatile> { typedef _ObjectT object_type; typedef _R return_type; };
         template <class _R, class _ObjectT> 
         _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(...) const); 
-        template <class _R, class _ObjectT>
-        struct _member_function_traits< _R ( _ObjectT::*const volatile*)(...) const> { typedef _ObjectT object_type; typedef _R return_type; };
         template <class _R, class _ObjectT> 
         _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(...) volatile); 
-        template <class _R, class _ObjectT>
-        struct _member_function_traits< _R ( _ObjectT::*const volatile*)(...) volatile> { typedef _ObjectT object_type; typedef _R return_type; };
         template <class _R, class _ObjectT> 
         _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(...) const volatile);
-        template <class _R, class _ObjectT>
-        struct _member_function_traits< _R ( _ObjectT::*const volatile*)(...) const volatile> { typedef _ObjectT object_type; typedef _R return_type; };
 
 #define _STDEX_IS_MEM_FUN_PTR_CLR(count) \
         template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
         _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK))); \
         template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
-        struct _member_function_traits< _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK))> { typedef _ObjectT object_type; typedef _R return_type; }; \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
         _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...)); \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
-        struct _member_function_traits< _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...)> { typedef _ObjectT object_type; typedef _R return_type; }; \
         template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
         _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) const); \
         template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
-        struct _member_function_traits< _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) const> { typedef _ObjectT object_type; typedef _R return_type; }; \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
         _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) volatile); \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
-        struct _member_function_traits< _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) volatile> { typedef _ObjectT object_type; typedef _R return_type; }; \
         template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
         _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) const volatile); \
         template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
-        struct _member_function_traits< _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)) const volatile> { typedef _ObjectT object_type; typedef _R return_type; }; \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
         _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...) const); \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
-        struct _member_function_traits< _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...) const> { typedef _ObjectT object_type; typedef _R return_type; }; \
         template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
         _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...) volatile); \
         template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
-        struct _member_function_traits< _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...) volatile> { typedef _ObjectT object_type; typedef _R return_type; }; \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
-        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...) const volatile); \
-        template <class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK) > \
-        struct _member_function_traits< _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...) const volatile> { typedef _ObjectT object_type; typedef _R return_type; }; \
+        _yes_type _is_mem_function_ptr( _R ( _ObjectT::*const volatile*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)...) const volatile);
 
 #ifdef _STDEX_CDECL
     _no_type _STDEX_CDECL _is_mem_function_ptr(...);
