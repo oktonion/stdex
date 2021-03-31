@@ -555,6 +555,21 @@ namespace stdex
         {
             typedef _Up     type;
         };
+
+        template<class _Tp, class>
+        struct _remove_member_pointer_helper
+        {
+            typedef _Tp type;
+        };
+        template<class _Tp, class _Up, class _ObjT>
+        struct _remove_member_pointer_helper<_Tp, _Up _ObjT::*>
+        {
+            typedef _Up type;
+        };
+        template<class _Tp>
+        struct _remove_member_pointer
+            : public _remove_member_pointer_helper<_Tp, typename remove_cv<_Tp>::type>
+        {};
     }
 
     // remove_pointer
