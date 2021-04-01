@@ -358,9 +358,16 @@ namespace stdex
 
     template<class _Tp, class _ObjectT>
     inline
+    const _Tp& invoke(const _Tp _ObjectT::* _data_member, const _ObjectT& _obj)
+    {
+        return _obj.*_data_member;
+    }
+
+    template<class _Tp, class _ObjectT>
+    inline
     _Tp& invoke(_Tp _ObjectT::* _data_member, const reference_wrapper<_ObjectT>& _ref)
     {
-        _ref.get().*_data_member;
+        return _ref.get().*_data_member;
     }
 
     template<class _Tp, class _ObjectT>
@@ -1877,9 +1884,10 @@ namespace stdex
     class member_function:
         public member_function<_ObjectT, _FuncT*>
     {
-        typedef typename member_function<_ObjectT, _FuncT*>::pointer_type pointer_type;
         typedef member_function<_ObjectT, _FuncT*> base_type;
     public:
+        typedef typename member_function<_ObjectT, _FuncT*>::pointer_type pointer_type;
+
         explicit member_function(pointer_type mem_ptr) _STDEX_NOEXCEPT_FUNCTION:
             base_type(mem_ptr) {}      
     };
@@ -1888,8 +1896,9 @@ namespace stdex
     template<class _ObjectT, class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
     class member_function<_ObjectT, _R(*)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK))> \
     { \
-    protected: \
+    public: \
         typedef _R(_ObjectT::*pointer_type)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK)); \
+    protected: \
         typedef _R return_type; \
 \
         pointer_type _mem_ptr; \
@@ -2753,31 +2762,34 @@ private:
         };
 
         template<class _FuncT, bool>
-        struct _function_return_impl_helper
+        struct _function_return_impl_helper1
         {
-            typedef typename _member_function_traits<_FuncT>::return_type type;
+            typedef void type;
         };
 
         template<class _FuncT>
-        struct _function_return_impl_helper<_FuncT, false>
+        struct _function_return_impl_helper1<_FuncT, true>
         {
-            typedef typename _remove_member_pointer<_FuncT>::type _type;
-
             typedef
-            typename
-            conditional<
-                is_member_pointer<_FuncT>::value,
-                _type&,
-                void
-            >::type type;
+            typename remove_reference<typename _remove_member_pointer<_FuncT>::type>::type& type;
+        };
+
+        template<class _FuncT, bool>
+        struct _function_return_impl_helper
+        {
+            typedef void type;
+        };
+
+        template<class _FuncT>
+        struct _function_return_impl_helper<_FuncT, false>:
+            _function_return_impl_helper1<_FuncT, is_member_pointer<_FuncT>::value>
+        {
         };
 
         template<class _FuncT>
         struct _function_return_impl<_FuncT, false>:
             _function_return_impl_helper<_FuncT, is_member_function_pointer<_FuncT>::value>
-        {
-
-        };
+        { };
 
         template<class _FuncT>
         struct _function_return:
@@ -2803,7 +2815,37 @@ private:
             typedef typename stdex::member_function<_ObjT, _FuncT>::return_type type;
         };
 
+        template<class _FuncT>
+        struct _member_function_ptr
+        {
+
+        };
+
+        template<class _R, class _ObjectT, int _N,
+            _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, =void_type)>
+        struct _member_function_ptr_helper;
+
+        template<class _R, class _ObjectT, _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK)>
+        struct _member_function_ptr_helper<_R, _ObjectT, 0, _STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)>
+        {
+            typedef _R(_ObjectT::*type)();
+            typedef _R(_ObjectT::*type_const)() const;
+            typedef _R(_ObjectT::*type_varg)(...);
+            typedef _R(_ObjectT::*type_const_varg)(...) const;
+        };
+
     } // namespace detail
+
+#define _STDEX_MEMBER_FUNCTION_PTR(count) \
+    namespace detail { \
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK)> \
+    struct _member_function_ptr_helper<_R, _ObjectT, count + 1, _STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)> \
+    { \
+        typedef _R(_ObjectT::*type)( _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) ); \
+        typedef _R(_ObjectT::*type_const)( _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) ) const; \
+        typedef _R(_ObjectT::*type_varg)( _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK), ...); \
+        typedef _R(_ObjectT::*type_const_varg)(_STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK), ...) const; \
+    }; }
 
     template<class _FuncT>
     binder<typename detail::_function_return<_FuncT>::type, _FuncT>
@@ -2819,7 +2861,52 @@ private:
         return binder<_R, _FuncT>(fx);
     }
 
+    template<class _ObjectT, class _ArgObjectT, class _R>
+    binder<_R, 
+        typename detail::_member_function_ptr_helper<_R, _ObjectT, 0>::type,
+        _ArgObjectT>
+    bind(_R(_ObjectT::*fx)(), _ArgObjectT obj)
+    {
+        return binder<_R, 
+            typename detail::_member_function_ptr_helper<_R, _ObjectT, 0>::type,
+            _ArgObjectT>(fx, obj);
+    }
+
+    template<class _ObjectT, class _ArgObjectT, class _R>
+    binder<_R,
+        typename detail::_member_function_ptr_helper<_R, _ObjectT, 0>::type_const,
+        _ArgObjectT>
+    bind(_R(_ObjectT::*fx)() const, _ArgObjectT obj)
+    {
+        return binder<_R, 
+            typename detail::_member_function_ptr_helper<_R, _ObjectT, 0>::type_const,
+            _ArgObjectT>(fx, obj);
+    }
+
+    template<class _ObjectT, class _ArgObjectT, class _R>
+    binder<_R, 
+        typename detail::_member_function_ptr_helper<_R, _ObjectT, 0>::type_varg,
+        _ArgObjectT>
+    bind(_R(_ObjectT::*fx)(...), _ArgObjectT obj)
+    {
+        return binder<_R, 
+            typename detail::_member_function_ptr_helper<_R, _ObjectT, 0>::type_varg,
+            _ArgObjectT>(fx, obj);
+    }
+
+    template<class _ObjectT, class _ArgObjectT, class _R>
+    binder<_R,
+        typename detail::_member_function_ptr_helper<_R, _ObjectT, 0>::type_const_varg,
+        _ArgObjectT>
+    bind(_R(_ObjectT::*fx)(...) const, _ArgObjectT obj)
+    {
+        return binder<_R, 
+            typename detail::_member_function_ptr_helper<_R, _ObjectT, 0>::type_const_varg,
+            _ArgObjectT>(fx, obj);
+    }
+
 #define _STDEX_BIND(count) \
+    _STDEX_MEMBER_FUNCTION_PTR(count) \
     template<class _FuncT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
     binder< \
         typename detail::_function_return<_FuncT>::type, \
@@ -2850,7 +2937,42 @@ private:
             _FuncT, \
             _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) \
         >(fx, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)); \
+    } \
+\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK), \
+        _STDEX_TMPL_ARGS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> \
+    binder< \
+        _R, \
+        typename detail::_member_function_ptr_helper<_R, _ObjectT, count + 1, _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>::type, \
+        _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) \
+    > \
+    bind(_R(_ObjectT::*fx)( _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM) ), \
+        _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK) ) \
+    { \
+        typedef \
+        typename \
+        detail::_member_function_ptr_helper<_R, _ObjectT, count + 1, _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>::type func_type; \
+        return binder<_R, func_type>(fx, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)); \
+    } \
+\
+    template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK), \
+        _STDEX_TMPL_ARGS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> \
+    binder< \
+        _R, \
+        typename detail::_member_function_ptr_helper<_R, _ObjectT, count + 1, _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>::type_const, \
+        _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) \
+    > \
+    bind(_R(_ObjectT::*fx)( _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM) ), \
+        _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK) ) \
+    { \
+        typedef \
+        typename \
+        detail::_member_function_ptr_helper<_R, _ObjectT, count + 1, _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>::type_const func_type; \
+        return binder<_R, func_type>(fx, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)); \
     }
+
+#define _STDEX_TYPE_CUSTOM(count) _MemberArg##count##T
+#define _STDEX_ARG_CUSTOM(count) member_arg##count
 
 #if (STDEX_FUNCTION_MAX_ARG_N >= 0)
         _STDEX_BIND(0 )
@@ -2950,6 +3072,8 @@ private:
 #endif
 
 #undef _STDEX_BIND
+#undef _STDEX_TYPE_CUSTOM
+#undef _STDEX_ARG_CUSTOM
 
     // Hashing
 
@@ -3304,137 +3428,137 @@ private:
             template<int _N>
             struct _ph
             {	// placeholder
-                static const _ph<_N> &instance(){static _ph<_N> inst; return inst;}
+                static _ph<_N> &instance(){static _ph<_N> inst; return inst;}
             };
         }
 
 #if (STDEX_FUNCTION_MAX_ARG_N >= 0)
         typedef detail::_ph<1> ph_1;
-        static const ph_1 &_1  = ph_1::instance();
+        static ph_1 &_1  = ph_1::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 1)
         typedef detail::_ph<2> ph_2;
-        static const ph_2& _2 = ph_2::instance();
+        static ph_2& _2 = ph_2::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 2)
         typedef detail::_ph<3> ph_3;
-        static const ph_3& _3 = ph_3::instance();
+        static ph_3& _3 = ph_3::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 3)
         typedef detail::_ph<4> ph_4;
-        static const ph_4& _4 = ph_4::instance();
+        static ph_4& _4 = ph_4::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 4)
         typedef detail::_ph<5> ph_5;
-        static const ph_5& _5 = ph_5::instance();
+        static ph_5& _5 = ph_5::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 5)
         typedef detail::_ph<6> ph_6;
-        static const ph_6& _6 = ph_6::instance();
+        static ph_6& _6 = ph_6::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 6)
         typedef detail::_ph<7> ph_7;
-        static const ph_7& _7 = ph_7::instance();
+        static ph_7& _7 = ph_7::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 7)
         typedef detail::_ph<8> ph_8;
-        static const ph_8& _8 = ph_8::instance();
+        static ph_8& _8 = ph_8::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 8)
         typedef detail::_ph<9> ph_9;
-        static const ph_9& _9 = ph_9::instance();
+        static ph_9& _9 = ph_9::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 9)
         typedef detail::_ph<10> ph_10;
-        static const ph_10& _10 = ph_10::instance();
+        static ph_10& _10 = ph_10::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 10)
         typedef detail::_ph<11> ph_11;
-        static const ph_11& _11 = ph_11::instance();
+        static ph_11& _11 = ph_11::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 11)
         typedef detail::_ph<12> ph_12;
-        static const ph_12& _12 = ph_12::instance();
+        static ph_12& _12 = ph_12::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 12)
         typedef detail::_ph<13> ph_13;
-        static const ph_13& _13 = ph_13::instance();
+        static ph_13& _13 = ph_13::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 13)
         typedef detail::_ph<14> ph_14;
-        static const ph_14& _14 = ph_14::instance();
+        static ph_14& _14 = ph_14::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 14)
         typedef detail::_ph<15> ph_15;
-        static const ph_15& _15 = ph_15::instance();
+        static ph_15& _15 = ph_15::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 15)
         typedef detail::_ph<16> ph_16;
-        static const ph_16& _16 = ph_16::instance();
+        static ph_16& _16 = ph_16::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 16)
         typedef detail::_ph<17> ph_17;
-        static const ph_17& _17 = ph_17::instance();
+        static ph_17& _17 = ph_17::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 17)
         typedef detail::_ph<18> ph_18;
-        static const ph_18& _18 = ph_18::instance();
+        static ph_18& _18 = ph_18::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 18)
         typedef detail::_ph<19> ph_19;
-        static const ph_19& _19 = ph_19::instance();
+        static ph_19& _19 = ph_19::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 19)
         typedef detail::_ph<20> ph_20;
-        static const ph_20& _20 = ph_20::instance();
+        static ph_20& _20 = ph_20::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 20)
         typedef detail::_ph<21> ph_21;
-        static const ph_21& _21 = ph_21::instance();
+        static ph_21& _21 = ph_21::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 21)
         typedef detail::_ph<22> ph_22;
-        static const ph_22& _22 = ph_22::instance();
+        static ph_22& _22 = ph_22::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 22)
         typedef detail::_ph<23> ph_23;
-        static const ph_23& _23 = ph_23::instance();
+        static ph_23& _23 = ph_23::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 23)
         typedef detail::_ph<24> ph_24;
-        static const ph_24& _24 = ph_24::instance();
+        static ph_24& _24 = ph_24::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 24)
         typedef detail::_ph<25> ph_25;
-        static const ph_25& _25 = ph_25::instance();
+        static ph_25& _25 = ph_25::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 25)
         typedef detail::_ph<26> ph_26;
-        static const ph_26& _26 = ph_26::instance();
+        static ph_26& _26 = ph_26::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 26)
         typedef detail::_ph<27> ph_27;
-        static const ph_27& _27 = ph_27::instance();
+        static ph_27& _27 = ph_27::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 27)
         typedef detail::_ph<28> ph_28;
-        static const ph_28& _28 = ph_28::instance();
+        static ph_28& _28 = ph_28::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 28)
         typedef detail::_ph<29> ph_29;
-        static const ph_29& _29 = ph_29::instance();
+        static ph_29& _29 = ph_29::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 29)
         typedef detail::_ph<30> ph_30;
-        static const ph_30& _30 = ph_30::instance();
+        static ph_30& _30 = ph_30::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 30)
         typedef detail::_ph<31> ph_31;
-        static const ph_31& _31 = ph_31::instance();
+        static ph_31& _31 = ph_31::instance();
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 31)
         typedef detail::_ph<32> ph_32;
-        static const ph_32& _32 = ph_32::instance();
+        static ph_32& _32 = ph_32::instance();
 #endif
     }
 
