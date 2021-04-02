@@ -2815,15 +2815,9 @@ private:
             typedef typename stdex::member_function<_ObjT, _FuncT>::return_type type;
         };
 
-        template<class _FuncT>
-        struct _member_function_ptr
-        {
-
-        };
-
         template<class _R, class _ObjectT, int _N,
             _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, =void_type)>
-        struct _member_function_ptr_helper;
+        struct _member_function_ptr_helper{};
 
         template<class _R, class _ObjectT, _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK)>
         struct _member_function_ptr_helper<_R, _ObjectT, 0, _STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)>
@@ -2832,6 +2826,29 @@ private:
             typedef _R(_ObjectT::*type_const)() const;
             typedef _R(_ObjectT::*type_varg)(...);
             typedef _R(_ObjectT::*type_const_varg)(...) const;
+        };
+
+        template<int _N, bool>
+        struct _member_function_arg_count_helper:
+            integral_constant<int, _N>
+        { };
+
+        template<int _N>
+        struct _member_function_arg_count_helper<_N, false> :
+            integral_constant<int, -1>
+        { };
+
+        template<class _R, class _ObjectT, int _N,
+            _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, =void_type)>
+        struct _member_function_ptr:
+            _member_function_ptr_helper<
+                _R, 
+                _ObjectT, 
+                _member_function_arg_count_helper<_N,
+                    is_class<_ObjectT>::value == bool(true) ||
+                    is_union<_ObjectT>::value == bool(true)>::value, 
+            _STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)>
+        {
         };
 
     } // namespace detail
@@ -2863,45 +2880,45 @@ private:
 
     template<class _ObjectT, class _ArgObjectT, class _R>
     binder<_R, 
-        typename detail::_member_function_ptr_helper<_R, _ObjectT, 0>::type,
+        typename detail::_member_function_ptr<_R, _ObjectT, 0>::type,
         _ArgObjectT>
     bind(_R(_ObjectT::*fx)(), _ArgObjectT obj)
     {
         return binder<_R, 
-            typename detail::_member_function_ptr_helper<_R, _ObjectT, 0>::type,
+            typename detail::_member_function_ptr<_R, _ObjectT, 0>::type,
             _ArgObjectT>(fx, obj);
     }
 
     template<class _ObjectT, class _ArgObjectT, class _R>
     binder<_R,
-        typename detail::_member_function_ptr_helper<_R, _ObjectT, 0>::type_const,
+        typename detail::_member_function_ptr<_R, _ObjectT, 0>::type_const,
         _ArgObjectT>
     bind(_R(_ObjectT::*fx)() const, _ArgObjectT obj)
     {
         return binder<_R, 
-            typename detail::_member_function_ptr_helper<_R, _ObjectT, 0>::type_const,
+            typename detail::_member_function_ptr<_R, _ObjectT, 0>::type_const,
             _ArgObjectT>(fx, obj);
     }
 
     template<class _ObjectT, class _ArgObjectT, class _R>
     binder<_R, 
-        typename detail::_member_function_ptr_helper<_R, _ObjectT, 0>::type_varg,
+        typename detail::_member_function_ptr<_R, _ObjectT, 0>::type_varg,
         _ArgObjectT>
     bind(_R(_ObjectT::*fx)(...), _ArgObjectT obj)
     {
         return binder<_R, 
-            typename detail::_member_function_ptr_helper<_R, _ObjectT, 0>::type_varg,
+            typename detail::_member_function_ptr<_R, _ObjectT, 0>::type_varg,
             _ArgObjectT>(fx, obj);
     }
 
     template<class _ObjectT, class _ArgObjectT, class _R>
     binder<_R,
-        typename detail::_member_function_ptr_helper<_R, _ObjectT, 0>::type_const_varg,
+        typename detail::_member_function_ptr<_R, _ObjectT, 0>::type_const_varg,
         _ArgObjectT>
     bind(_R(_ObjectT::*fx)(...) const, _ArgObjectT obj)
     {
         return binder<_R, 
-            typename detail::_member_function_ptr_helper<_R, _ObjectT, 0>::type_const_varg,
+            typename detail::_member_function_ptr<_R, _ObjectT, 0>::type_const_varg,
             _ArgObjectT>(fx, obj);
     }
 
@@ -2943,7 +2960,7 @@ private:
         _STDEX_TMPL_ARGS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> \
     binder< \
         _R, \
-        typename detail::_member_function_ptr_helper<_R, _ObjectT, count + 1, _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>::type, \
+        typename detail::_member_function_ptr<_R, _ObjectT, count + 1, _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>::type, \
         _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) \
     > \
     bind(_R(_ObjectT::*fx)( _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM) ), \
@@ -2951,7 +2968,7 @@ private:
     { \
         typedef \
         typename \
-        detail::_member_function_ptr_helper<_R, _ObjectT, count + 1, _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>::type func_type; \
+        detail::_member_function_ptr<_R, _ObjectT, count + 1, _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>::type func_type; \
         return binder<_R, func_type>(fx, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)); \
     } \
 \
@@ -2959,7 +2976,7 @@ private:
         _STDEX_TMPL_ARGS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> \
     binder< \
         _R, \
-        typename detail::_member_function_ptr_helper<_R, _ObjectT, count + 1, _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>::type_const, \
+        typename detail::_member_function_ptr<_R, _ObjectT, count + 1, _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>::type_const, \
         _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) \
     > \
     bind(_R(_ObjectT::*fx)( _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM) ), \
@@ -2967,7 +2984,7 @@ private:
     { \
         typedef \
         typename \
-        detail::_member_function_ptr_helper<_R, _ObjectT, count + 1, _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>::type_const func_type; \
+        detail::_member_function_ptr<_R, _ObjectT, count + 1, _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>::type_const func_type; \
         return binder<_R, func_type>(fx, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)); \
     }
 
