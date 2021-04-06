@@ -1283,7 +1283,7 @@ namespace stdex
             {
                 return 
                 stdex::time_t(
-                    static_cast<chrono::seconds>(_t.time_since_epoch()).count()
+                    duration_cast<chrono::seconds>(_t.time_since_epoch()).count()
                 );
             }
 
