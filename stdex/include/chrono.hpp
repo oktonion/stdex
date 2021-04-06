@@ -1281,19 +1281,14 @@ namespace stdex
             static stdex::time_t
                 to_time_t(const time_point &_t) _STDEX_NOEXCEPT_FUNCTION
             {
-                stdex::timespec _ts = to_timespec(_t);
-
-                return stdex::time_t(_ts.tv_sec);
+                return 
+                stdex::time_t(
+                    static_cast<chrono::seconds>(_t.time_since_epoch()).count()
+                );
             }
 
             static time_point
-                from_time_t(stdex::time_t _t) _STDEX_NOEXCEPT_FUNCTION
-            {
-                typedef chrono::time_point<system_clock, seconds>    _from;
-
-                return time_point_cast<system_clock::duration>
-                    (_from(chrono::seconds(_t)));
-            }
+                from_time_t(stdex::time_t _t) _STDEX_NOEXCEPT_FUNCTION;
 
         private:
             typedef intern::chrono_asserts check;
