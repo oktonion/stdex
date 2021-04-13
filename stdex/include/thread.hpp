@@ -1713,8 +1713,8 @@ namespace stdex
             typedef _ArgT arguments_type;
             typedef _FuncT function_type;
 
-            arguments_type args;
             function_type fp;
+            arguments_type args;
 
             _thread_function_proxy(function_type fp_, arguments_type args_) :
                 fp(fp_),
