@@ -721,6 +721,9 @@ namespace stdex
                 period_must_be_positive_assert_failed
             check3; // if you are there means 2nd template param _Period in duration class is ratio of negative
 
+            template<class _Clock, class _Duration>
+            duration(const time_point<_Clock, _Duration>&) _STDEX_DELETED_FUNCTION;
+
         public:
             typedef _Rep rep;
             typedef _Period period;
@@ -729,6 +732,9 @@ namespace stdex
             explicit duration():
                 base_type(0)
             {};
+
+            duration(const rep &_r_in) : 
+                base_type(_r_in) { }
 
             //! Construct a duration object with the given duration.
             template <class _Rep2>
@@ -743,8 +749,7 @@ namespace stdex
             
             duration(const duration& other):
                 base_type(static_cast<const base_type&>(other))
-            {
-            }
+            { }
 
             template<class _Rep2, class _Period2>
             duration(const duration<_Rep2, _Period2> &other):
