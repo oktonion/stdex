@@ -82,9 +82,9 @@ static void _pthread_t_ID(const eThreadIDOperation operation, stdex::uintmax_t *
 {
     typedef std::map<stdex::thread::native_handle_type, stdex::uintmax_t, _pthread_t_less> id_map_type;
 
-    static stdex::mutex idLock;
-    static id_map_type idCollection_shared;
-    static stdex::uintmax_t idCount_shared = 1;
+    static stdex::mutex& idLock = *(new stdex::mutex());
+    static id_map_type& idCollection_shared = *(new id_map_type());
+    static stdex::uintmax_t& idCount_shared = *(new stdex::uintmax_t());
 
     stdex::thread::native_handle_type aHandle = pthread_self();
 
@@ -213,8 +213,8 @@ struct thread_notification_data {
     static void _this_thread_notification_data(eThreadDataOperation operation, thread_notification_data *data = NULL, condition_variable *cond = NULL, unique_lock<mutex> *lk = NULL)
     {
         typedef std::map<thread::id, thread_notification_data*> data_map_type;
-        static mutex dataMapLock;
-        static data_map_type dataMap;
+        static mutex &dataMapLock = *(new mutex());
+        static data_map_type &dataMap = *(new data_map_type());
 
         unique_lock<mutex> lock(dataMapLock);
 
