@@ -42,7 +42,19 @@ namespace stdex
         {
             struct _nil_type {}; // empty struct, for unused argument types
             template<class _Tp>
-            struct _rv_reference {};
+            struct _rv_reference : _Tp {};
+
+            template<class _Tp>
+            _rv_reference<_Tp>& move(_Tp &other)
+            {
+                return reinterpret_cast<_rv_reference<_Tp>&>(other);
+            }
+
+            template<class _Tp>
+            _rv_reference<_Tp>& move(_Tp *other)
+            {
+                return move(*other);
+            }
 
             template <class _Tp>
             inline _Tp* addressof(_Tp& v)
@@ -296,6 +308,7 @@ namespace stdex
 
     class atomic_uintmax_t
     {
+
     public:
         typedef unsigned long value_type;
 
@@ -313,7 +326,7 @@ namespace stdex
 
         value_type operator=(value_type _desired) volatile _STDEX_NOEXCEPT_FUNCTION
         {
-            stdex::unique_lock<volatile stdex::mutex> lock(_sync);
+            stdex::unique_lock<stdex::mutex> lock(const_cast<stdex::mutex&>(_sync));
             _value = _desired;
             return _value;
         }
@@ -326,7 +339,7 @@ namespace stdex
 
         void store(value_type _desired) volatile _STDEX_NOEXCEPT_FUNCTION
         {
-            stdex::unique_lock<volatile stdex::mutex> lock(_sync);
+            stdex::unique_lock<stdex::mutex> lock(const_cast<stdex::mutex&>(_sync));
             _value = _desired;
         }
 
@@ -338,7 +351,7 @@ namespace stdex
 
         value_type load() const volatile _STDEX_NOEXCEPT_FUNCTION
         {
-            stdex::unique_lock<volatile stdex::mutex> lock(_sync);
+            stdex::unique_lock<stdex::mutex> lock(const_cast<stdex::mutex&>(_sync));
             return _value;
         }
 
@@ -352,7 +365,7 @@ namespace stdex
         value_type exchange(value_type _desired) volatile _STDEX_NOEXCEPT_FUNCTION
         {
             volatile value_type _desired_vol = _desired;
-            stdex::unique_lock<volatile stdex::mutex> lock(_sync);
+            stdex::unique_lock<stdex::mutex> lock(const_cast<stdex::mutex&>(_sync));
             std::swap(_desired_vol, _value);
             return _desired_vol;
         }
@@ -367,7 +380,7 @@ namespace stdex
 
         value_type operator++() volatile _STDEX_NOEXCEPT_FUNCTION
         {
-            stdex::unique_lock<volatile stdex::mutex> lock(_sync);
+            stdex::unique_lock<stdex::mutex> lock(const_cast<stdex::mutex&>(_sync));
             ++_value;
             return _value;
         }
@@ -382,7 +395,7 @@ namespace stdex
         
         value_type operator++(int) volatile _STDEX_NOEXCEPT_FUNCTION
         {
-            stdex::unique_lock<volatile stdex::mutex> lock(_sync);
+            stdex::unique_lock<stdex::mutex> lock(const_cast<stdex::mutex&>(_sync));
             _value++;
             return _value;
         }
@@ -397,7 +410,7 @@ namespace stdex
 
         value_type operator--() volatile _STDEX_NOEXCEPT_FUNCTION
         {
-            stdex::unique_lock<volatile stdex::mutex> lock(_sync);
+            stdex::unique_lock<stdex::mutex> lock(const_cast<stdex::mutex&>(_sync));
             --_value;
             return _value;
         }
@@ -412,7 +425,7 @@ namespace stdex
         
         value_type operator--(int) volatile _STDEX_NOEXCEPT_FUNCTION
         {
-            stdex::unique_lock<volatile stdex::mutex> lock(_sync);
+            stdex::unique_lock<stdex::mutex> lock(const_cast<stdex::mutex&>(_sync));
             _value--;
             return _value;
         }
@@ -442,7 +455,7 @@ namespace stdex
         {
             if (_has_stored_result && !_ready) 
             { // registered for release at thread exit
-                void remove_from_this_thread_notification_data(condition_variable*, unique_lock<mutex>*);
+                void remove_from_this_thread_notification_data(condition_variable*, mutex*);
                 remove_from_this_thread_notification_data(&_condition, &_sync);
             }
         }
@@ -1225,7 +1238,7 @@ namespace stdex
                 detail::future_detail::_nil_type()
             );
 
-            return reinterpret_cast<detail::future_detail::_rv_reference<future<_Tp>/**/>&>(result);
+            return detail::future_detail::move(result);
         }
 
         void set_value(const _Tp& _value) 
@@ -1298,7 +1311,7 @@ namespace stdex
                 detail::future_detail::_nil_type()
             );
 
-            return reinterpret_cast<detail::future_detail::_rv_reference<future<_Tp&>/**/>&>(result);
+            return detail::future_detail::move(result);
         }
 
         void set_value(_Tp& _value) {
@@ -1359,7 +1372,7 @@ namespace stdex
                 detail::future_detail::_nil_type()
             );
 
-            return reinterpret_cast<detail::future_detail::_rv_reference<future<void>/**/>&>(result);
+            return detail::future_detail::move(result);
         }
 
         void set_value() {
