@@ -245,7 +245,7 @@ struct thread_notification_data {
         SetThreadData
     };
 
-    static void _this_thread_notification_data(eThreadDataOperation operation, thread_notification_data *data = NULL, condition_variable *cond = NULL, unique_lock<mutex> *lk = NULL)
+    static void _this_thread_notification_data(eThreadDataOperation operation, thread_notification_data *data = NULL, condition_variable *cond = NULL, unique_lock<mutex> *lk = NULL, mutex *sync = NULL)
     {
         typedef std::map<thread::id, thread_notification_data*> data_map_type;
         static mutex &dataMapLock = *(new mutex());
@@ -270,7 +270,7 @@ struct thread_notification_data {
             if(result)
             {
                 lock.unlock();
-                std::pair<condition_variable*, mutex*> key(cond, lk->mutex());
+                std::pair<condition_variable*, mutex*> key(cond, sync);
                 for(std::size_t i = 0; i < result->notify.size(); ++i)
                 {
                     if(result->notify[i] == key)
@@ -308,9 +308,9 @@ struct thread_notification_data {
     }
 };
 
-void remove_from_this_thread_notification_data(condition_variable *cond, unique_lock<mutex> *lk)
+void remove_from_this_thread_notification_data(condition_variable *cond, mutex *sync)
 {
-    thread_notification_data::_this_thread_notification_data(thread_notification_data::RemoveFromThreadData, NULL, cond, lk);
+    thread_notification_data::_this_thread_notification_data(thread_notification_data::RemoveFromThreadData, NULL, cond, NULL, sync);
 }
 
 
