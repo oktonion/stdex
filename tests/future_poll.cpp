@@ -104,6 +104,9 @@ int main()
   double wait_until_steady_epoch 
     = print("wait_until(steady_clock epoch", stop - start);
 
+  (void)wait_until_steady_epoch;
+  (void)wait_until_sys_epoch;
+
   p.set_value(1);
 
   start = chrono::high_resolution_clock::now();
