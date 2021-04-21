@@ -316,10 +316,31 @@ namespace stdex
 
     typedef errc generic_errno;
 
-    // ENUM io_errc
+    struct io_errc
+    {
+        enum io_errc_t
+        {
+            stream = 1
+        };
 
-    enum io_errc {    // error codes for ios_base::failure
-        stream = 1
+        io_errc(io_errc_t code):
+            _code(code)
+        {
+
+        }
+
+        operator io_errc_t&()
+        {
+            return _code;
+        }
+
+        operator const io_errc_t&() const
+        {
+            return _code;
+        }
+
+        private:
+            io_errc_t _code;
     };
 
     // TEMPLATE CLASS is_error_code_enum
@@ -331,6 +352,12 @@ namespace stdex
 
     template<>
     struct is_error_code_enum<io_errc>
+    {    // tests for error_code enumeration
+        static const bool value = true;
+    };
+
+    template<>
+    struct is_error_code_enum<io_errc::io_errc_t>
     {    // tests for error_code enumeration
         static const bool value = true;
     };
@@ -1177,7 +1204,7 @@ namespace stdex
 
             virtual std::string message(int _Errcode) const
             {    // convert to name of error
-                if (_Errcode == (int) stream)
+                if (_Errcode == (int) io_errc::stream)
                     return ("iostream stream error");
                 else
                     return (_generic_error_category::message(_Errcode));
@@ -1221,17 +1248,17 @@ namespace stdex
 
             static _generic_error_category &_generic_object()
             {
-                static _generic_error_category _obj;
+                static _generic_error_category &_obj = *(new _generic_error_category());
                 return _obj;
             }
             static _io_stream_error_category &_io_stream_object()
             {
-                static _io_stream_error_category _obj;
+                static _io_stream_error_category &_obj = *(new _io_stream_error_category());
                 return _obj;
             }
             static _system_error_category &_system_object()
             {
-                static _system_error_category _obj;
+                static _system_error_category &_obj = *(new _system_error_category());
                 return _obj;
             }
         };
