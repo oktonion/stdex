@@ -88,10 +88,10 @@ struct thread_id_access :
     static id create_id(const id_type& uid)
     {
         struct thread_id :
-            public id
+            public thread_id_access::id
         {
-            thread_id(const id_type& uid) :
-                id(uid) {}
+            thread_id(const thread_id_access::id_type& uid) :
+                thread_id_access::id(uid) {}
         };
 
         return thread_id(uid);

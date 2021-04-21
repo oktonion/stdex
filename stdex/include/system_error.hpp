@@ -1067,23 +1067,23 @@ namespace stdex
     }
 
     // FUNCTION make_error_code
-    inline error_code make_error_code(errc::errc_t _Errno) _STDEX_NOEXCEPT_FUNCTION
+    inline error_code make_error_code(errc::type _Errno) _STDEX_NOEXCEPT_FUNCTION
     {    // make an error_code
         return (error_code((int) _Errno, generic_category()));
     }
 
-    inline error_code make_error_code(io_errc _Errno) _STDEX_NOEXCEPT_FUNCTION
+    inline error_code make_error_code(io_errc::type _Errno) _STDEX_NOEXCEPT_FUNCTION
     {    // make an error_code
         return (error_code((int) _Errno, iostream_category()));
     }
 
     // FUNCTION make_error_condition
-    inline error_condition make_error_condition(errc::errc_t _Errno) _STDEX_NOEXCEPT_FUNCTION
+    inline error_condition make_error_condition(errc::type _Errno) _STDEX_NOEXCEPT_FUNCTION
     {    // make an error_condition
         return (error_condition((int) _Errno, generic_category()));
     }
 
-    inline error_condition make_error_condition(io_errc _Errno) _STDEX_NOEXCEPT_FUNCTION
+    inline error_condition make_error_condition(io_errc::type _Errno) _STDEX_NOEXCEPT_FUNCTION
     {    // make an error_condition
         return (error_condition((int) _Errno, iostream_category()));
     }
