@@ -1,5 +1,5 @@
-#ifndef _STDEX_CSTDINT_H
-#define _STDEX_CSTDINT_H
+#ifndef _STDEX_FUTURE_H
+#define _STDEX_FUTURE_H
 
 #if _MSC_VER > 1000
 #pragma once
@@ -1359,4 +1359,4 @@ namespace stdex
 #undef _STDEX_DELETED_FUNCTION
 #undef _STDEX_NOEXCEPT_FUNCTION
 
-#endif // _STDEX_CSTDINT_H
+#endif // _STDEX_FUTURE_H
