@@ -19,7 +19,7 @@ template<typename Duration>
 double
 print(const char* desc, Duration dur)
 {
-  chrono::nanoseconds ns = chrono::duration_cast<chrono::nanoseconds>(dur).count();
+  chrono::nanoseconds::rep ns = chrono::duration_cast<chrono::nanoseconds>(dur).count();
   double d = double(ns) / iterations;
   std::cout << desc << ": " << ns << "ns for " << iterations
     << " calls, avg " << d << "ns per call\n";
@@ -29,7 +29,8 @@ print(const char* desc, Duration dur)
 int main()
 {
   promise<int> p;
-  future<int> f = p.get_future();
+  future<int> f = 
+      detail::future_detail::move(&p.get_future());
 
  start_over:
   chrono::high_resolution_clock::time_point start = chrono::high_resolution_clock::now();
@@ -42,33 +43,34 @@ int main()
   if (start == stop)
     {
       /* After set_value, wait_for is faster, so use that for the
-	 calibration to avoid zero at low clock resultions.  */
+     calibration to avoid zero at low clock resultions.  */
       promise<int> pc;
-      future<int> fc = pc.get_future();
+      future<int> fc = 
+          detail::future_detail::move(&pc.get_future());
       pc.set_value(1);
 
       /* Loop until the clock advances, so that start is right after a
-	 time increment.  */
+     time increment.  */
       do
-	start = chrono::high_resolution_clock::now();
+    start = chrono::high_resolution_clock::now();
       while (start == stop);
       int i = 0;
       /* Now until the clock advances again, so that stop is right
-	 after another time increment.  */
+     after another time increment.  */
       do
-	{
-	  fc.wait_for(chrono::seconds(0));
-	  stop = chrono::high_resolution_clock::now();
-	  i++;
-	}
+    {
+      fc.wait_for(chrono::seconds(0));
+      stop = chrono::high_resolution_clock::now();
+      i++;
+    }
       while (start == stop);
       /* Go for some 10 cycles, but if we're already past that and
-	 still get into the calibration loop, double the iteration
-	 count and try again.  */
+     still get into the calibration loop, double the iteration
+     count and try again.  */
       if (iterations < i * 10)
-	iterations = i * 10;
+    iterations = i * 10;
       else
-	iterations *= 2;
+    iterations *= 2;
       goto start_over;
     }
 
@@ -118,8 +120,6 @@ int main()
   DYNAMIC_VERIFY( wait_until_sys_min < (ready * 100) );
   DYNAMIC_VERIFY( wait_until_steady_min < (ready * 100) );
 
-  // The following two tests fail with GCC 11, see
-  // https://gcc.gnu.org/pipermail/libstdc++/2020-November/051422.html
 #if 0
   // Polling before ready using wait_until(epoch) should not be terribly slow.
   DYNAMIC_VERIFY( wait_until_sys_epoch < (ready * 100) );
