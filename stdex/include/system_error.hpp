@@ -37,6 +37,7 @@ namespace stdex
 {
     struct errc
     {
+        typedef
         enum errc_t {    // names for generic error codes
 #ifdef EAFNOSUPPORT
             address_family_not_supported = EAFNOSUPPORT,
@@ -292,55 +293,56 @@ namespace stdex
 #else
             wrong_protocol_type = 136
 #endif
-        };
+        } type;
 
-        errc(errc_t code):
+        errc(type code):
             _code(code)
         {
 
         }
 
-        operator errc_t&()
+        operator type&()
         {
             return _code;
         }
 
-        operator const errc_t&() const
+        operator const type&() const
         {
             return _code;
         }
 
         private:
-            errc_t _code;
+            type _code;
     };
 
     typedef errc generic_errno;
 
     struct io_errc
     {
+        typedef
         enum io_errc_t
         {
             stream = 1
-        };
+        } type;
 
-        io_errc(io_errc_t code):
+        io_errc(type code):
             _code(code)
         {
 
         }
 
-        operator io_errc_t&()
+        operator type&()
         {
             return _code;
         }
 
-        operator const io_errc_t&() const
+        operator const type&() const
         {
             return _code;
         }
 
         private:
-            io_errc_t _code;
+            type _code;
     };
 
     // TEMPLATE CLASS is_error_code_enum
@@ -357,7 +359,7 @@ namespace stdex
     };
 
     template<>
-    struct is_error_code_enum<io_errc::io_errc_t>
+    struct is_error_code_enum<io_errc::type>
     {    // tests for error_code enumeration
         static const bool value = true;
     };
@@ -370,7 +372,7 @@ namespace stdex
     };
 
     template<>
-    struct is_error_condition_enum<errc::errc_t>
+    struct is_error_condition_enum<errc::type>
     {
         static const bool value = true;
     };
@@ -1242,23 +1244,9 @@ namespace stdex
         template<class _Cat>
         struct _error_objects
         {    // wraps category objects
-            _error_objects()
-            {    // default constructor
-            }
-
-            static _generic_error_category &_generic_object()
+            static _Cat &_object()
             {
-                static _generic_error_category &_obj = *(new _generic_error_category());
-                return _obj;
-            }
-            static _io_stream_error_category &_io_stream_object()
-            {
-                static _io_stream_error_category &_obj = *(new _io_stream_error_category());
-                return _obj;
-            }
-            static _system_error_category &_system_object()
-            {
-                static _system_error_category &_obj = *(new _system_error_category());
+                static _Cat &_obj = *(new _Cat());
                 return _obj;
             }
         };
@@ -1266,17 +1254,17 @@ namespace stdex
 
     inline const error_category& generic_category() _STDEX_NOEXCEPT_FUNCTION
     {    // get generic_category
-        return (detail::_error_objects<int>::_generic_object());
+        return (detail::_error_objects<detail::_generic_error_category>::_object());
     }
 
     inline const error_category& iostream_category() _STDEX_NOEXCEPT_FUNCTION
     {    // get iostream_category
-        return (detail::_error_objects<int>::_io_stream_object());
+        return (detail::_error_objects<detail::_io_stream_error_category>::_object());
     }
 
     inline const error_category& system_category() _STDEX_NOEXCEPT_FUNCTION
     {    // get system_category
-        return (detail::_error_objects<int>::_system_object());
+        return (detail::_error_objects<detail::_system_error_category>::_object());
     }
 
 } // namespace stdex
