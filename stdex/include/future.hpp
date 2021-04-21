@@ -126,9 +126,9 @@ namespace stdex
     inline launch::type operator^(launch::type _lhs, launch::type _rhs) { return ((launch::type)((int)_lhs ^ (int)_rhs)); } 
     inline launch::type operator~(launch::type _lhs) { return ((launch::type)~(int)_lhs); }
 
-    inline launch& operator&=(launch& _lhs, launch _rhs) { launch::type &_lhs_ref = _lhs, _rhs_val = _rhs; operator&=(_lhs_ref, _rhs_val); return (_lhs);} 
-    inline launch& operator|=(launch& _lhs, launch _rhs) { launch::type &_lhs_ref = _lhs, _rhs_val = _rhs; operator|=(_lhs_ref, _rhs_val); return (_lhs);} 
-    inline launch& operator^=(launch& _lhs, launch _rhs) { launch::type &_lhs_ref = _lhs, _rhs_val = _rhs; operator^=(_lhs_ref, _rhs_val); return (_lhs);} 
+    inline launch& operator&=(launch& _lhs, launch _rhs) { launch::type &_lhs_ref = _lhs, &_rhs_ref = _rhs; operator&=(_lhs_ref, _rhs_ref); return (_lhs);} 
+    inline launch& operator|=(launch& _lhs, launch _rhs) { launch::type &_lhs_ref = _lhs, &_rhs_ref = _rhs; operator|=(_lhs_ref, _rhs_ref); return (_lhs);} 
+    inline launch& operator^=(launch& _lhs, launch _rhs) { launch::type &_lhs_ref = _lhs, &_rhs_ref = _rhs; operator^=(_lhs_ref, _rhs_ref); return (_lhs);} 
     inline launch operator&(launch _lhs, launch _rhs) { const launch::type &_lhs_ref = _lhs, &_rhs_ref = _rhs; return operator&(_lhs_ref, _rhs_ref); } 
     inline launch operator|(launch _lhs, launch _rhs) { const launch::type &_lhs_ref = _lhs, &_rhs_ref = _rhs; return operator|(_lhs_ref, _rhs_ref); } 
     inline launch operator^(launch _lhs, launch _rhs) { const launch::type &_lhs_ref = _lhs, &_rhs_ref = _rhs; return operator^(_lhs_ref, _rhs_ref); } 
@@ -207,14 +207,17 @@ namespace stdex
     template <>
     struct is_error_code_enum<future_errc> : true_type {};
 
+    template <>
+    struct is_error_code_enum<future_errc::type> : true_type {};
+
     const error_category& future_category() _STDEX_NOEXCEPT_FUNCTION;
 
-    inline error_code make_error_code(future_errc _Errno) _STDEX_NOEXCEPT_FUNCTION 
+    inline error_code make_error_code(future_errc::type _Errno) _STDEX_NOEXCEPT_FUNCTION 
     {
         return error_code(static_cast<int>(_Errno), ::stdex::future_category());
     }
 
-    inline error_condition make_error_condition(future_errc _Errno) _STDEX_NOEXCEPT_FUNCTION 
+    inline error_condition make_error_condition(future_errc::type _Errno) _STDEX_NOEXCEPT_FUNCTION 
     {
         return error_condition(static_cast<int>(_Errno), ::stdex::future_category());
     }
@@ -245,7 +248,7 @@ namespace stdex
         explicit future_error(error_code _Errcode) // internal, TRANSITION, will be removed
             : std::logic_error(""), _code(_Errcode) {}
 
-        explicit future_error(future_errc _Errno) : std::logic_error(""), _code(::stdex::make_error_code(_Errno)) {}
+        explicit future_error(future_errc::type _Errno) : std::logic_error(""), _code(::stdex::make_error_code(_Errno)) {}
 
         const error_code& code() const _STDEX_NOEXCEPT_FUNCTION {
             return _code;
@@ -358,7 +361,17 @@ namespace stdex
         value_type exchange(value_type _desired) _STDEX_NOEXCEPT_FUNCTION
         {
             stdex::unique_lock<stdex::mutex> lock(_sync);
-            std::swap(_desired, _value);
+            
+            struct lambdas
+            {
+                static void swap(atomic_uintmax_t::value_type &lhs, atomic_uintmax_t::value_type &rhs)
+                {
+                    stdex::atomic_uintmax_t::value_type tmp = lhs;
+                    lhs = rhs;
+                    rhs = tmp;
+                }
+            };
+            lambdas::swap(_desired, _value);
             return _desired;
         }
 
@@ -366,7 +379,16 @@ namespace stdex
         {
             volatile value_type _desired_vol = _desired;
             stdex::unique_lock<stdex::mutex> lock(const_cast<stdex::mutex&>(_sync));
-            std::swap(_desired_vol, _value);
+            struct lambdas
+            {
+                static void swap(volatile atomic_uintmax_t::value_type &lhs, volatile atomic_uintmax_t::value_type &rhs)
+                {
+                    volatile stdex::atomic_uintmax_t::value_type tmp = lhs;
+                    lhs = rhs;
+                    rhs = tmp;
+                }
+            };
+            lambdas::swap(_desired_vol, _value);
             return _desired_vol;
         }
 
@@ -716,7 +738,8 @@ namespace stdex
     }
 
     template <class _Tp>
-    class _state_manager {
+    class _state_manager 
+    {
         // class for managing possibly non-existent associated asynchronous state object
     public:
         _state_manager() : _assoc_state(nullptr) 
@@ -741,7 +764,7 @@ namespace stdex
         //    _move_from(other);
         //    _get_only_once = _Get_once;
         //}
-        _state_manager(detail::future_detail::_rv_reference<_state_manager>& other, bool _Get_once = false)
+        _state_manager(detail::future_detail::_rv_reference<_state_manager<_Tp>/**/>& other, bool _Get_once = false)
             : _assoc_state(nullptr)
         {
             _move_from(reinterpret_cast<_state_manager&>(other));
@@ -911,7 +934,7 @@ namespace stdex
         future() _STDEX_NOEXCEPT_FUNCTION {}
 
         //future(future&& other) _STDEX_NOEXCEPT_FUNCTION : base_type(::stdex::move(other), true) {}
-        future(detail::future_detail::_rv_reference <future>& other) _STDEX_NOEXCEPT_FUNCTION :
+        future(detail::future_detail::_rv_reference <future<_Tp>/**/>& other) _STDEX_NOEXCEPT_FUNCTION :
             base_type(reinterpret_cast<detail::future_detail::_rv_reference<base_type>&>(other), true) {}
 
         //future& operator=(future&& other) _STDEX_NOEXCEPT_FUNCTION {
@@ -950,7 +973,7 @@ namespace stdex
         future() _STDEX_NOEXCEPT_FUNCTION {}
 
         //future(future&& other) _STDEX_NOEXCEPT_FUNCTION : base_type(::stdex::move(other), true) {}
-        future(detail::future_detail::_rv_reference<future>& other) _STDEX_NOEXCEPT_FUNCTION :
+        future(detail::future_detail::_rv_reference<future<_Tp&>/**/>& other) _STDEX_NOEXCEPT_FUNCTION :
             base_type(reinterpret_cast<detail::future_detail::_rv_reference<base_type>&>(other), true) {}
 
         //future& operator=(future&& other) _STDEX_NOEXCEPT_FUNCTION 
@@ -990,7 +1013,7 @@ namespace stdex
         future() _STDEX_NOEXCEPT_FUNCTION {}
 
         //future(future&& other) _STDEX_NOEXCEPT_FUNCTION : _base(::stdex::move(other), true) {}
-        future(detail::future_detail::_rv_reference<future>& other) _STDEX_NOEXCEPT_FUNCTION :
+        future(detail::future_detail::_rv_reference<future<void>/**/>& other) _STDEX_NOEXCEPT_FUNCTION :
             base_type(reinterpret_cast<detail::future_detail::_rv_reference<base_type>&>(other), true) {}
 
         //future& operator=(future&& other) _STDEX_NOEXCEPT_FUNCTION {
