@@ -890,6 +890,18 @@ int test11()
     return forwarding_test(val);
 }
 
+movable_only movable_only_return()
+{
+    movable_only mv;
+    return stdex::move(mv);
+}
+
+int test_move_return()
+{
+    movable_only_return();
+    return 0;
+}
+
 int main(void)
 {
     using namespace stdex;
@@ -908,6 +920,7 @@ int main(void)
     RUN_TEST(test9_1);
     RUN_TEST(test10);
     RUN_TEST(test11);
+    RUN_TEST(test_move_return);
     // Double parens prevent "most vexing parse"
     CHECK_COPIES( X a(( lvalue() )), 1U, 1U, "Direct initialization from lvalue");
     CHECK_COPIES( X a(( rvalue(0) )), 0U, 1U, "Direct initialization from rvalue");
