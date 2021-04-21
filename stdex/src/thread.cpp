@@ -218,6 +218,7 @@ struct thread_notification_data {
     > notify_list_t;
 
     notify_list_t notify;
+    mutex sync;
 
     void notify_all_at_thread_exit(condition_variable* cv, mutex* m)
     {
@@ -229,8 +230,10 @@ struct thread_notification_data {
         for (notify_list_t::iterator i = notify.begin(), e = notify.end();
             i != e; ++i)
         {
-            i->second->unlock();
-            i->first->notify_all();
+            if(i->second)
+                i->second->unlock();
+            if(i->first)
+                i->first->notify_all();
         }
     }
 
@@ -238,6 +241,7 @@ struct thread_notification_data {
     {
         RemoveThreadData,
         AddToThreadData,
+        RemoveFromThreadData,
         SetThreadData
     };
 
@@ -258,6 +262,25 @@ struct thread_notification_data {
                 lock.unlock();
                 result->notify_all_at_thread_exit(cond, lk->release());
             }
+        }
+        else if(operation == RemoveFromThreadData)
+        {
+            thread_notification_data *result = dataMap[this_thread::get_id()];
+
+            if(result)
+            {
+                lock.unlock();
+                std::pair<condition_variable*, mutex*> key(cond, lk->mutex());
+                for(std::size_t i = 0; i < result->notify.size(); ++i)
+                {
+                    if(result->notify[i] == key)
+                    {
+                        result->notify[i].first = nullptr;
+                        result->notify[i].second = nullptr;
+                        break;
+                    }
+                }
+            }          
         }
         else if (operation == SetThreadData)
         {
@@ -284,6 +307,11 @@ struct thread_notification_data {
         _this_thread_notification_data(RemoveThreadData);
     }
 };
+
+void remove_from_this_thread_notification_data(condition_variable *cond, unique_lock<mutex> *lk)
+{
+    thread_notification_data::_this_thread_notification_data(thread_notification_data::RemoveFromThreadData, NULL, cond, lk);
+}
 
 
 
