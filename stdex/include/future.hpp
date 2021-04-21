@@ -36,6 +36,22 @@
 
 namespace stdex
 {
+    namespace detail
+    {
+        namespace future_detail
+        {
+            struct _nil_type {}; // empty struct, for unused argument types
+            template<class _Tp>
+            struct _rv_reference {};
+
+            template <class _Tp>
+            inline _Tp* addressof(_Tp& v)
+            {
+                return reinterpret_cast<_Tp*>(
+                    &const_cast<char&>(reinterpret_cast<const volatile char&>(v)));
+            }
+        } // namespace future_detail
+    } // namespace detail
     struct future_errc
     {
         typedef
@@ -518,10 +534,10 @@ namespace stdex
             return _result;
         }
 
-        void _set_value(const _Tp& _value, bool _At_thread_exit) 
+        void _set_value(const _Tp& _value, bool _at_thread_exit) 
         { // store a result
             unique_lock<mutex> lock(_sync);
-            _set_value_raw(_value, &lock, _At_thread_exit);
+            _set_value_raw(_value, &lock, _at_thread_exit);
         }
 
         void _set_value_raw(const _Tp& _value, unique_lock<mutex>* lock,
@@ -535,43 +551,43 @@ namespace stdex
             _do_notify(lock, _At_thread_exit);
         }
 
-        void _set_value(_Tp&& _value, bool _At_thread_exit) 
-        { // store a result
-            unique_lock<mutex> lock(_sync);
-            _set_value_raw(::stdex::forward<_Tp>(_value), &lock, _At_thread_exit);
-        }
+        //void _set_value(_Tp&& _value, bool _At_thread_exit) 
+        //{ // store a result
+        //    unique_lock<mutex> lock(_sync);
+        //    _set_value_raw(::stdex::forward<_Tp>(_value), &lock, _At_thread_exit);
+        //}
 
-        void _set_value_raw(_Tp&& _value, unique_lock<mutex>* lock,
-            bool _At_thread_exit) 
-        { // store a result while inside a locked block
-            if (_has_stored_result) {
-                throw future_error(make_error_code(future_errc::promise_already_satisfied));
-            }
+        //void _set_value_raw(_Tp&& _value, unique_lock<mutex>* lock,
+        //    bool _At_thread_exit) 
+        //{ // store a result while inside a locked block
+        //    if (_has_stored_result) {
+        //        throw future_error(make_error_code(future_errc::promise_already_satisfied));
+        //    }
+        //
+        //    _result = ::stdex::forward<_Tp>(_value);
+        //    _do_notify(lock, _At_thread_exit);
+        //}
 
-            _result = ::stdex::forward<_Tp>(_value);
-            _do_notify(lock, _At_thread_exit);
-        }
-
-        void _set_value(bool _At_thread_exit) 
+        void _set_value(bool _at_thread_exit) 
         { // store a (void) result
             unique_lock<mutex> lock(_sync);
-            _set_value_raw(&lock, _At_thread_exit);
+            _set_value_raw(&lock, _at_thread_exit);
         }
 
         void _set_value_raw(
-            unique_lock<mutex>* lock, bool _At_thread_exit) 
+            unique_lock<mutex>* lock, bool _at_thread_exit) 
         { // store a (void) result while inside a locked block
             if (_has_stored_result) {
                 throw future_error(make_error_code(future_errc::promise_already_satisfied));
             }
 
-            _do_notify(lock, _At_thread_exit);
+            _do_notify(lock, _at_thread_exit);
         }
 
-        void _set_exception(_nullable_exception _excpt, bool _At_thread_exit) 
+        void _set_exception(_nullable_exception _excpt, bool _at_thread_exit) 
         { // store a result
             unique_lock<mutex> lock(_sync);
-            _set_exception_raw(_excpt, &lock, _At_thread_exit);
+            _set_exception_raw(_excpt, &lock, _at_thread_exit);
         }
 
         void _set_exception_raw(_nullable_exception _excpt, unique_lock<mutex>* lock,
@@ -681,16 +697,7 @@ namespace stdex
     void _state_deleter<_Tp, _Derived, _Alloc>::_delete(
         _associated_state<_Tp>* _state) 
     { // delete _state and this using stored allocator
-        using _state_allocator = _Rebind_alloc_t<_Alloc, _Derived>;
-        _state_allocator _st_alloc(_alloc);
-
-        using _deleter_allocator = _Rebind_alloc_t<_Alloc, _state_deleter>;
-        _deleter_allocator _Del_alloc(_alloc);
-
-        _Derived* _ptr = static_cast<_Derived*>(_state);
-
-        _delete_plain_internal(_St_alloc, _ptr);
-        _delete_plain_internal(_Del_alloc, this);
+        delete _state;
     }
 
     template <class _Tp>
@@ -719,6 +726,12 @@ namespace stdex
         //    _move_from(other);
         //    _get_only_once = _Get_once;
         //}
+        _state_manager(detail::future_detail::_rv_reference<_state_manager>& other, bool _Get_once = false)
+            : _assoc_state(nullptr)
+        {
+            _move_from(reinterpret_cast<_state_manager&>(other));
+            _get_only_once = _Get_once;
+        }
 
         ~_state_manager() _STDEX_NOEXCEPT_FUNCTION 
         {
@@ -825,7 +838,7 @@ namespace stdex
 
         void _copy_from(const _state_manager& other) 
         { // copy stored associated asynchronous state object from other
-            if (this != ::stdex::addressof(other)) {
+            if (this != ::stdex::detail::future_detail::addressof(other)) {
                 if (_assoc_state) {
                     _assoc_state->_release();
                 }
@@ -842,10 +855,10 @@ namespace stdex
 
         void _move_from(_state_manager& other) 
         { // move stored associated asynchronous state object from other
-            if (this != ::stdex::addressof(other)) {
-                if (_assoc_state) {
+            if (this != ::stdex::detail::future_detail::addressof(other)) 
+            {
+                if (_assoc_state) 
                     _assoc_state->_release();
-                }
 
                 _assoc_state        = other._assoc_state;
                 other._assoc_state = nullptr;
@@ -883,20 +896,22 @@ namespace stdex
         future() _STDEX_NOEXCEPT_FUNCTION {}
 
         //future(future&& other) _STDEX_NOEXCEPT_FUNCTION : base_type(::stdex::move(other), true) {}
+        future(detail::future_detail::_rv_reference <future>& other) _STDEX_NOEXCEPT_FUNCTION :
+            base_type(reinterpret_cast<detail::future_detail::_rv_reference<base_type>&>(other), true) {}
 
         //future& operator=(future&& other) _STDEX_NOEXCEPT_FUNCTION {
         //    base_type::operator=(::stdex::move(other));
         //    return *this;
         //}
 
-        future(const base_type& _state, _nil_type) : base_type(_state, true) {}
+        future(const base_type& _state, stdex::detail::future_detail::_nil_type) : base_type(_state, true) {}
 
         ~future() _STDEX_NOEXCEPT_FUNCTION {}
 
         _Tp get() 
         {
             // block until ready then return the stored result or throw the stored exception
-            return this->_get_value());
+            return this->_get_value();
         }
 
         shared_future<_Tp> share() _STDEX_NOEXCEPT_FUNCTION 
@@ -920,6 +935,8 @@ namespace stdex
         future() _STDEX_NOEXCEPT_FUNCTION {}
 
         //future(future&& other) _STDEX_NOEXCEPT_FUNCTION : base_type(::stdex::move(other), true) {}
+        future(detail::future_detail::_rv_reference<future>& other) _STDEX_NOEXCEPT_FUNCTION :
+            base_type(reinterpret_cast<detail::future_detail::_rv_reference<base_type>&>(other), true) {}
 
         //future& operator=(future&& other) _STDEX_NOEXCEPT_FUNCTION 
         //{
@@ -927,7 +944,7 @@ namespace stdex
         //    return *this;
         //}
 
-        future(const base_type& _state, _nil_type) : base_type(_state, true) {}
+        future(const base_type& _state, detail::future_detail::_nil_type) : base_type(_state, true) {}
 
         ~future() _STDEX_NOEXCEPT_FUNCTION {}
 
@@ -947,10 +964,9 @@ namespace stdex
         future& operator=(const future&) _STDEX_DELETED_FUNCTION;
     };
 
-    struct _nil_type {}; // empty struct, for unused argument types
-
     template <>
-    class future<void> : public _state_manager<int> 
+    class future<void> : 
+        public _state_manager<int> 
     {
         // class that defines a non-copyable asynchronous return object that does not hold a value
         typedef _state_manager<int> base_type;
@@ -959,13 +975,15 @@ namespace stdex
         future() _STDEX_NOEXCEPT_FUNCTION {}
 
         //future(future&& other) _STDEX_NOEXCEPT_FUNCTION : _base(::stdex::move(other), true) {}
+        future(detail::future_detail::_rv_reference<future>& other) _STDEX_NOEXCEPT_FUNCTION :
+            base_type(reinterpret_cast<detail::future_detail::_rv_reference<base_type>&>(other), true) {}
 
         //future& operator=(future&& other) _STDEX_NOEXCEPT_FUNCTION {
         //    _base::operator=(::stdex::move(other));
         //    return *this;
         //}
 
-        future(const base_type& _state, _nil_type) : base_type(_state, true) {}
+        future(const base_type& _state, detail::future_detail::_nil_type) : base_type(_state, true) {}
 
         ~future() _STDEX_NOEXCEPT_FUNCTION {}
 
@@ -1032,7 +1050,7 @@ namespace stdex
 
         shared_future& operator=(const shared_future& other) _STDEX_NOEXCEPT_FUNCTION 
         {
-            _base::operator=(other);
+            base_type::operator=(other);
             return *this;
         }
 
@@ -1200,7 +1218,12 @@ namespace stdex
 
         future<_Tp> get_future() 
         {
-            return future<_Tp>(_promise_impl._get_state_for_future(), _nil_type());
+            future<_Tp> result(
+                _promise_impl._get_state_for_future(),
+                detail::future_detail::_nil_type()
+            );
+
+            return reinterpret_cast<detail::future_detail::_rv_reference<future<_Tp>/**/>&>(result)
         }
 
         void set_value(const _Tp& _value) 
@@ -1213,15 +1236,15 @@ namespace stdex
             _promise_impl._get_state_for_set()._set_value(_value, true);
         }
 
-        void set_value(_Tp&& _value) 
-        {
-            _promise_impl._get_state_for_set()._set_value(::stdex::forward<_Tp>(_value), false);
-        }
+        //void set_value(_Tp&& _value) 
+        //{
+        //    _promise_impl._get_state_for_set()._set_value(::stdex::forward<_Tp>(_value), false);
+        //}
 
-        void set_value_at_thread_exit(_Tp&& _value) 
-        {
-            _promise_impl._get_state_for_set()._set_value(::stdex::forward<_Tp>(_value), true);
-        }
+        //void set_value_at_thread_exit(_Tp&& _value) 
+        //{
+        //    _promise_impl._get_state_for_set()._set_value(::stdex::forward<_Tp>(_value), true);
+        //}
 
         void set_exception(_nullable_exception _excpt) 
         {
@@ -1268,15 +1291,20 @@ namespace stdex
         }
 
         future<_Tp&> get_future() {
-            return future<_Tp&>(_promise_impl._get_state_for_future(), _nil_type());
+            future<_Tp&> result(
+                _promise_impl._get_state_for_future(),
+                detail::future_detail::_nil_type()
+            );
+
+            return reinterpret_cast<detail::future_detail::_rv_reference<future<_Tp&>/**/>&>(result)
         }
 
         void set_value(_Tp& _value) {
-            _promise_impl._get_state_for_set()._set_value(::stdex::addressof(_value), false);
+            _promise_impl._get_state_for_set()._set_value(::stdex::detail::future_detail::addressof(_value), false);
         }
 
         void set_value_at_thread_exit(_Tp& _value) {
-            _promise_impl._get_state_for_set()._set_value(::stdex::addressof(_value), true);
+            _promise_impl._get_state_for_set()._set_value(::stdex::detail::future_detail::addressof(_value), true);
         }
 
         void set_exception(_nullable_exception _excpt) {
@@ -1323,7 +1351,13 @@ namespace stdex
         }
 
         future<void> get_future() {
-            return future<void>(_promise_impl._get_state_for_future(), _nil_type());
+            // moving
+            future<void> result(
+                _promise_impl._get_state_for_future(),
+                detail::future_detail::_nil_type()
+            );
+
+            return reinterpret_cast<detail::future_detail::_rv_reference<future<void>/**/>&>(result)
         }
 
         void set_value() {
