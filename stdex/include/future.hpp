@@ -440,8 +440,10 @@ namespace stdex
 
         virtual ~_associated_state() _STDEX_NOEXCEPT_FUNCTION 
         {
-            if (_has_stored_result && !_ready) { // registered for release at thread exit
-                _condition._Unregister(_sync);
+            if (_has_stored_result && !_ready) 
+            { // registered for release at thread exit
+                void remove_from_this_thread_notification_data(condition_variable*, unique_lock<mutex>*);
+                remove_from_this_thread_notification_data(&_condition, &_sync);
             }
         }
 
