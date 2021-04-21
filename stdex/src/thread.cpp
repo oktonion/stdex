@@ -78,17 +78,40 @@ struct _pthread_t_less
     }
 };
 
-static void _pthread_t_ID(const eThreadIDOperation operation, stdex::uintmax_t *id_out = NULL)
+struct thread_id_access :
+    public stdex::thread::id
 {
+    typedef stdex::thread::id id;
+    using id::id_type;
+    using id::invalid_id;
+
+    static id create_id(const id_type& uid)
+    {
+        struct thread_id :
+            public id
+        {
+            thread_id(const id_type& uid) :
+                id(uid) {}
+        };
+
+        return thread_id(uid);
+    }
+};
+
+static void _pthread_t_ID(const eThreadIDOperation operation, thread_id_access::id_type *id_out = NULL)
+{
+
     typedef std::map<stdex::thread::native_handle_type, stdex::uintmax_t, _pthread_t_less> id_map_type;
 
     static stdex::mutex& idLock = *(new stdex::mutex());
     static id_map_type& idCollection_shared = *(new id_map_type());
-    static stdex::uintmax_t& idCount_shared = *(new stdex::uintmax_t());
+    static thread_id_access::id_type& idCount_shared = *(new thread_id_access::id_type());
 
     stdex::thread::native_handle_type aHandle = pthread_self();
 
     stdex::unique_lock<stdex::mutex> guard(idLock); // shared section begin
+
+
 
     if (operation == GetThreadID)
     {
@@ -109,6 +132,9 @@ static void _pthread_t_ID(const eThreadIDOperation operation, stdex::uintmax_t *
             out = idCount_shared;
 
             idCount_shared++;
+
+            if(idCount_shared == thread_id_access::invalid_id)
+                idCount_shared++;
 
             guard.unlock(); // shared section end
         }
@@ -132,6 +158,8 @@ static void _pthread_t_ID(const eThreadIDOperation operation, stdex::uintmax_t *
         if (result.second) // new element
         {
             idCount_shared++;
+            if (idCount_shared == thread_id_access::invalid_id)
+                idCount_shared++;
         }
         else
         {
@@ -161,6 +189,9 @@ static void _pthread_t_ID(const eThreadIDOperation operation, stdex::uintmax_t *
                 idCount_shared = 1;
             else if(idCollection_shared.size() == 1)
                 idCount_shared = idCollection_shared.rbegin()->second + 1;
+
+            if (idCount_shared == thread_id_access::invalid_id)
+                idCount_shared++;
         }
     }
 
@@ -442,11 +473,11 @@ void thread::swap(thread & other) _STDEX_NOEXCEPT_FUNCTION
 
 thread::id this_thread::get_id() _STDEX_NOEXCEPT_FUNCTION
 {
-    stdex::uintmax_t uid;
+    thread_id_access::id_type uid;
 
     _pthread_t_ID(GetThreadID, &uid);
 
-    return thread::id(uid);
+    return thread_id_access::create_id(uid);
 }
 
 #ifdef _STDEX_THREAD_WIN // windows platform

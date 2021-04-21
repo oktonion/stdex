@@ -1763,20 +1763,11 @@ namespace stdex
     public:
         typedef pthread_t native_handle_type;
 
-        //! Thread ID.
-        //! The thread ID is a unique identifier for each thread.
-        //! @see thread::get_id()
         class id {
         public:
-            //! Default constructor.
-            //! The default constructed ID is that of thread without a thread of
-            //! execution.
+            
             id() _STDEX_NOEXCEPT_FUNCTION :
-                _uid()
-            { }
-
-            explicit id(const stdex::uintmax_t &uid) :
-                _uid(uid)
+                _uid(invalid_id)
             { }
 
             id(const id &aId) :
@@ -1823,14 +1814,23 @@ namespace stdex
             ::std::ostream& print(::std::ostream &out) const
             {
                 if (*this == id())
-                    return out << "thread::id of a non-executing thread";
+                    return out << "stdex::thread::id of a non-executing thread";
                 else
                     return out << _uid;
             }
 
+        protected:
+            typedef stdex::uintmax_t id_type;
+            static const id_type invalid_id =
+                id_type(-1);
+
+            explicit id(const id_type& uid) :
+                _uid(uid)
+            { }
+
         private:
             friend class thread;
-            stdex::uintmax_t _uid;
+            id_type _uid;
         };
 
         //! Default constructor.
