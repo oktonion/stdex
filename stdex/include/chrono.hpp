@@ -1121,7 +1121,8 @@ namespace stdex
             static const time_point min()
         #endif
             {    // get minimum time point
-                return (time_point((duration::min)()));
+                typedef time_point<_Clock, _Duration> that_type;
+                return (that_type((that_type::duration::min)()));
             }
 
         #ifdef max
@@ -1130,7 +1131,8 @@ namespace stdex
             static const time_point max()
         #endif
             {    // get maximum time point
-                return (time_point((duration::max)()));
+                typedef time_point<_Clock, _Duration> that_type;
+                return (that_type((that_type::duration::max)()));
             }
 
         private:
