@@ -1223,7 +1223,7 @@ namespace stdex
                 detail::future_detail::_nil_type()
             );
 
-            return reinterpret_cast<detail::future_detail::_rv_reference<future<_Tp>/**/>&>(result)
+            return reinterpret_cast<detail::future_detail::_rv_reference<future<_Tp>/**/>&>(result);
         }
 
         void set_value(const _Tp& _value) 
@@ -1296,7 +1296,7 @@ namespace stdex
                 detail::future_detail::_nil_type()
             );
 
-            return reinterpret_cast<detail::future_detail::_rv_reference<future<_Tp&>/**/>&>(result)
+            return reinterpret_cast<detail::future_detail::_rv_reference<future<_Tp&>/**/>&>(result);
         }
 
         void set_value(_Tp& _value) {
@@ -1357,7 +1357,7 @@ namespace stdex
                 detail::future_detail::_nil_type()
             );
 
-            return reinterpret_cast<detail::future_detail::_rv_reference<future<void>/**/>&>(result)
+            return reinterpret_cast<detail::future_detail::_rv_reference<future<void>/**/>&>(result);
         }
 
         void set_value() {
