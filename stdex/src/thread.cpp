@@ -78,17 +78,40 @@ struct _pthread_t_less
     }
 };
 
-static void _pthread_t_ID(const eThreadIDOperation operation, stdex::uintmax_t *id_out = NULL)
+struct thread_id_access :
+    public stdex::thread::id
 {
+    typedef stdex::thread::id id;
+    using id::id_type;
+    using id::invalid_id;
+
+    static id create_id(const id_type& uid)
+    {
+        struct thread_id :
+            public thread_id_access::id
+        {
+            thread_id(const thread_id_access::id_type& uid) :
+                thread_id_access::id(uid) {}
+        };
+
+        return thread_id(uid);
+    }
+};
+
+static void _pthread_t_ID(const eThreadIDOperation operation, thread_id_access::id_type *id_out = NULL)
+{
+
     typedef std::map<stdex::thread::native_handle_type, stdex::uintmax_t, _pthread_t_less> id_map_type;
 
-    static stdex::mutex idLock;
-    static id_map_type idCollection_shared;
-    static stdex::uintmax_t idCount_shared = 1;
+    static stdex::mutex& idLock = *(new stdex::mutex());
+    static id_map_type& idCollection_shared = *(new id_map_type());
+    static thread_id_access::id_type& idCount_shared = *(new thread_id_access::id_type());
 
     stdex::thread::native_handle_type aHandle = pthread_self();
 
     stdex::unique_lock<stdex::mutex> guard(idLock); // shared section begin
+
+
 
     if (operation == GetThreadID)
     {
@@ -109,6 +132,9 @@ static void _pthread_t_ID(const eThreadIDOperation operation, stdex::uintmax_t *
             out = idCount_shared;
 
             idCount_shared++;
+
+            if(idCount_shared == thread_id_access::invalid_id)
+                idCount_shared++;
 
             guard.unlock(); // shared section end
         }
@@ -132,6 +158,8 @@ static void _pthread_t_ID(const eThreadIDOperation operation, stdex::uintmax_t *
         if (result.second) // new element
         {
             idCount_shared++;
+            if (idCount_shared == thread_id_access::invalid_id)
+                idCount_shared++;
         }
         else
         {
@@ -161,6 +189,9 @@ static void _pthread_t_ID(const eThreadIDOperation operation, stdex::uintmax_t *
                 idCount_shared = 1;
             else if(idCollection_shared.size() == 1)
                 idCount_shared = idCollection_shared.rbegin()->second + 1;
+
+            if (idCount_shared == thread_id_access::invalid_id)
+                idCount_shared++;
         }
     }
 
@@ -187,6 +218,7 @@ struct thread_notification_data {
     > notify_list_t;
 
     notify_list_t notify;
+    mutex sync;
 
     void notify_all_at_thread_exit(condition_variable* cv, mutex* m)
     {
@@ -198,8 +230,10 @@ struct thread_notification_data {
         for (notify_list_t::iterator i = notify.begin(), e = notify.end();
             i != e; ++i)
         {
-            i->second->unlock();
-            i->first->notify_all();
+            if(i->second)
+                i->second->unlock();
+            if(i->first)
+                i->first->notify_all();
         }
     }
 
@@ -207,14 +241,15 @@ struct thread_notification_data {
     {
         RemoveThreadData,
         AddToThreadData,
+        RemoveFromThreadData,
         SetThreadData
     };
 
-    static void _this_thread_notification_data(eThreadDataOperation operation, thread_notification_data *data = NULL, condition_variable *cond = NULL, unique_lock<mutex> *lk = NULL)
+    static void _this_thread_notification_data(eThreadDataOperation operation, thread_notification_data *data = NULL, condition_variable *cond = NULL, unique_lock<mutex> *lk = NULL, mutex *sync = NULL)
     {
         typedef std::map<thread::id, thread_notification_data*> data_map_type;
-        static mutex dataMapLock;
-        static data_map_type dataMap;
+        static mutex &dataMapLock = *(new mutex());
+        static data_map_type &dataMap = *(new data_map_type());
 
         unique_lock<mutex> lock(dataMapLock);
 
@@ -227,6 +262,25 @@ struct thread_notification_data {
                 lock.unlock();
                 result->notify_all_at_thread_exit(cond, lk->release());
             }
+        }
+        else if(operation == RemoveFromThreadData)
+        {
+            thread_notification_data *result = dataMap[this_thread::get_id()];
+
+            if(result)
+            {
+                lock.unlock();
+                std::pair<condition_variable*, mutex*> key(cond, sync);
+                for(std::size_t i = 0; i < result->notify.size(); ++i)
+                {
+                    if(result->notify[i] == key)
+                    {
+                        result->notify[i].first = nullptr;
+                        result->notify[i].second = nullptr;
+                        break;
+                    }
+                }
+            }          
         }
         else if (operation == SetThreadData)
         {
@@ -253,6 +307,19 @@ struct thread_notification_data {
         _this_thread_notification_data(RemoveThreadData);
     }
 };
+
+namespace stdex
+{
+    void remove_from_this_thread_notification_data(condition_variable *cond, mutex *sync)
+    {
+        thread_notification_data::_this_thread_notification_data(thread_notification_data::RemoveFromThreadData, NULL, cond, NULL, sync);
+    }
+}
+
+void remove_from_this_thread_notification_data(condition_variable *cond, mutex *sync)
+{
+    stdex::remove_from_this_thread_notification_data(cond, sync);
+}
 
 
 
@@ -442,11 +509,11 @@ void thread::swap(thread & other) _STDEX_NOEXCEPT_FUNCTION
 
 thread::id this_thread::get_id() _STDEX_NOEXCEPT_FUNCTION
 {
-    stdex::uintmax_t uid;
+    thread_id_access::id_type uid;
 
     _pthread_t_ID(GetThreadID, &uid);
 
-    return thread::id(uid);
+    return thread_id_access::create_id(uid);
 }
 
 #ifdef _STDEX_THREAD_WIN // windows platform

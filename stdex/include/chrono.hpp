@@ -721,6 +721,9 @@ namespace stdex
                 period_must_be_positive_assert_failed
             check3; // if you are there means 2nd template param _Period in duration class is ratio of negative
 
+            template<class _Clock, class _Duration>
+            duration(const time_point<_Clock, _Duration>&) _STDEX_DELETED_FUNCTION;
+
         public:
             typedef _Rep rep;
             typedef _Period period;
@@ -729,6 +732,9 @@ namespace stdex
             explicit duration():
                 base_type(0)
             {};
+
+            duration(const rep &_r_in) : 
+                base_type(_r_in) { }
 
             //! Construct a duration object with the given duration.
             template <class _Rep2>
@@ -743,8 +749,7 @@ namespace stdex
             
             duration(const duration& other):
                 base_type(static_cast<const base_type&>(other))
-            {
-            }
+            { }
 
             template<class _Rep2, class _Period2>
             duration(const duration<_Rep2, _Period2> &other):
@@ -1116,7 +1121,8 @@ namespace stdex
             static const time_point min()
         #endif
             {    // get minimum time point
-                return (time_point((duration::min)()));
+                typedef time_point<_Clock, _Duration> that_type;
+                return (that_type((that_type::duration::min)()));
             }
 
         #ifdef max
@@ -1125,7 +1131,8 @@ namespace stdex
             static const time_point max()
         #endif
             {    // get maximum time point
-                return (time_point((duration::max)()));
+                typedef time_point<_Clock, _Duration> that_type;
+                return (that_type((that_type::duration::max)()));
             }
 
         private:
@@ -1281,19 +1288,14 @@ namespace stdex
             static stdex::time_t
                 to_time_t(const time_point &_t) _STDEX_NOEXCEPT_FUNCTION
             {
-                stdex::timespec _ts = to_timespec(_t);
-
-                return stdex::time_t(_ts.tv_sec);
+                return 
+                stdex::time_t(
+                    duration_cast<chrono::seconds>(_t.time_since_epoch()).count()
+                );
             }
 
             static time_point
-                from_time_t(stdex::time_t _t) _STDEX_NOEXCEPT_FUNCTION
-            {
-                typedef chrono::time_point<system_clock, seconds>    _from;
-
-                return time_point_cast<system_clock::duration>
-                    (_from(chrono::seconds(_t)));
-            }
+                from_time_t(stdex::time_t _t) _STDEX_NOEXCEPT_FUNCTION;
 
         private:
             typedef intern::chrono_asserts check;

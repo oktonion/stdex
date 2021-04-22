@@ -860,6 +860,20 @@ stdex::timespec
     return _ts;
 }
 
+stdex::chrono::system_clock::time_point
+    stdex::chrono::system_clock::from_time_t(stdex::time_t _t) _STDEX_NOEXCEPT_FUNCTION
+{
+    typedef chrono::time_point<system_clock, seconds>    _from;
+      
+    stdex::chrono::detail::_big_int result = 
+        stdex::chrono::detail::convert(
+            static_cast<duration_long_long>(duration_long_long(0) + _t)
+        );
+
+    return time_point_cast<system_clock::duration>
+        (_from(chrono::seconds(result)));
+}
+
 stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDEX_NOEXCEPT_FUNCTION
 {    // get current time
     {
