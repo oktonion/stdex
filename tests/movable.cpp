@@ -892,7 +892,7 @@ int test11()
 
 movable_only movable_only_return()
 {
-    movable_only mv;
+    movable_only mv(0);
     return stdex::move(mv);
 }
 
