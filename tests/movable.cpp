@@ -896,9 +896,33 @@ movable_only movable_only_return()
     return stdex::move(mv);
 }
 
+struct movable_only_with_deleted_icc:
+    stdex::detail::delete_implicit_copy_constructor
+{
+    movable_only_with_deleted_icc():
+        delete_implicit_copy_constructor(true)
+    { }
+
+    movable_only_with_deleted_icc(STDEX_RV_REF(movable_only_with_deleted_icc) other)
+        : delete_implicit_copy_constructor(true)
+    { }
+    int test(){ return 0;}
+};
+
+struct movable_only_with_deleted_icc_return_test
+{
+    movable_only_with_deleted_icc movable_only_with_deleted_icc_return()
+    {
+        movable_only_with_deleted_icc mv;
+        return stdex::move(mv);
+    }
+};
+
 int test_move_return()
 {
     movable_only_return();
+    movable_only_with_deleted_icc_return_test test;
+    test.movable_only_with_deleted_icc_return();
     return 0;
 }
 
