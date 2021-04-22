@@ -978,9 +978,7 @@ namespace stdex
 
         void inline swap(future& other)
         {
-            future tmp = detail::future_detail::move(&other);
-            other = detail::future_detail::move(this);
-            *this = detail::future_detail::move(&tmp);
+            base_type::_swap(other);
         }
 
     private:
@@ -1034,9 +1032,7 @@ namespace stdex
 
         void inline swap(future& other)
         {
-            future tmp = detail::future_detail::move(&other);
-            other = detail::future_detail::move(this);
-            *this = detail::future_detail::move(&tmp);
+            base_type::_swap(other);
         }
 
     private:
@@ -1087,9 +1083,7 @@ namespace stdex
 
         void inline swap(future& other)
         {
-            future tmp = detail::future_detail::move(&other);
-            other = detail::future_detail::move(this);
-            *this = detail::future_detail::move(&tmp);
+            base_type::_swap(other);
         }
 
     private:
