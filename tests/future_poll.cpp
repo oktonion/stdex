@@ -29,8 +29,8 @@ print(const char* desc, Duration dur)
 int main()
 {
   promise<int> p;
-  future<int> f = 
-      detail::future_detail::move(&p.get_future());
+  future<int> f;
+  p.get_future().swap(f);
 
  start_over:
   chrono::high_resolution_clock::time_point start = chrono::high_resolution_clock::now();
@@ -45,8 +45,8 @@ int main()
       /* After set_value, wait_for is faster, so use that for the
      calibration to avoid zero at low clock resultions.  */
       promise<int> pc;
-      future<int> fc = 
-          detail::future_detail::move(&pc.get_future());
+      future<int> fc;
+      pc.get_future().swap(fc);
       pc.set_value(1);
 
       /* Loop until the clock advances, so that start is right after a
@@ -123,7 +123,7 @@ int main()
   DYNAMIC_VERIFY( wait_until_sys_min < (ready * 100) );
   DYNAMIC_VERIFY( wait_until_steady_min < (ready * 100) );
 
-#if 0
+#if 1
   // Polling before ready using wait_until(epoch) should not be terribly slow.
   DYNAMIC_VERIFY( wait_until_sys_epoch < (ready * 100) );
   DYNAMIC_VERIFY( wait_until_steady_epoch < (ready * 100) );

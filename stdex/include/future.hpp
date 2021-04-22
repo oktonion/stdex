@@ -976,6 +976,13 @@ namespace stdex
             return shared_future<_Tp>(detail::future_detail::move(this));
         }
 
+        void inline swap(future& other)
+        {
+            future tmp = detail::future_detail::move(&other);
+            other = detail::future_detail::move(this);
+            *this = detail::future_detail::move(&tmp);
+        }
+
     private:
         //future(const future&) _STDEX_DELETED_FUNCTION;
         //future& operator=(const future&) _STDEX_DELETED_FUNCTION;
@@ -1025,6 +1032,13 @@ namespace stdex
             return shared_future<_Tp&>(*this);
         }
 
+        void inline swap(future& other)
+        {
+            future tmp = detail::future_detail::move(&other);
+            other = detail::future_detail::move(this);
+            *this = detail::future_detail::move(&tmp);
+        }
+
     private:
         //future(const future&) _STDEX_DELETED_FUNCTION;
         //future& operator=(const future&) _STDEX_DELETED_FUNCTION;
@@ -1071,10 +1085,19 @@ namespace stdex
 
         shared_future<void> share() _STDEX_NOEXCEPT_FUNCTION;
 
+        void inline swap(future& other)
+        {
+            future tmp = detail::future_detail::move(&other);
+            other = detail::future_detail::move(this);
+            *this = detail::future_detail::move(&tmp);
+        }
+
     private:
         //future(const future&) _STDEX_DELETED_FUNCTION;
         //future& operator=(const future&) _STDEX_DELETED_FUNCTION;
     };
+
+
 
     // CLASS TEMPLATE shared_future
     template <class _Tp>
