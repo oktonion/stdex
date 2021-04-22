@@ -459,6 +459,9 @@ namespace stdex
 
         mutable stdex::mutex _sync;
         value_type _value; 
+
+        atomic_uintmax_t(const atomic_uintmax_t&) _STDEX_DELETED_FUNCTION;
+        atomic_uintmax_t& operator=(const atomic_uintmax_t&) _STDEX_DELETED_FUNCTION;
     };
 
     template <class _Tp>
@@ -770,7 +773,7 @@ namespace stdex
         _state_manager(detail::future_detail::_rv_reference<_state_manager<_Tp>/**/>* other, bool _Get_once = false)
             : _assoc_state(nullptr)
         {
-            _move_from(reinterpret_cast<_state_manager&>(other));
+            _move_from(reinterpret_cast<_state_manager&>(*other));
             _get_only_once = _Get_once;
         }
 
