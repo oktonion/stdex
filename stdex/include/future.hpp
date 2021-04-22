@@ -880,7 +880,9 @@ namespace stdex
 
         void _swap(_state_manager& other) 
         { // exchange with other
-            ::stdex::swap(_assoc_state, other._assoc_state);
+            _associated_state<_Tp> *tmp = _assoc_state;
+            _assoc_state = other._assoc_state;
+            other._assoc_state = tmp;
         }
 
         _associated_state<_Tp>* _ptr() const 
