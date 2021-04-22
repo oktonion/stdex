@@ -44,11 +44,15 @@ namespace stdex
             template<class _Tp>
             struct _rv_reference : public _Tp {};
 
+#define _STDEX_FUTURE_RV_REF(type) detail::future_detail::_rv_reference< type >&
+
             template<class _Tp>
-            _rv_reference<_Tp>* move(_Tp *other)
+            _STDEX_FUTURE_RV_REF(_Tp) move(_Tp &other)
             {
-                return reinterpret_cast<_rv_reference<_Tp>*>(other);
+                return reinterpret_cast<_STDEX_FUTURE_RV_REF(_Tp)>(other);
             }
+
+            
 
             template <class _Tp>
             inline _Tp* addressof(_Tp& v)
@@ -770,10 +774,10 @@ namespace stdex
         //    _move_from(other);
         //    _get_only_once = _Get_once;
         //}
-        _state_manager(detail::future_detail::_rv_reference<_state_manager<_Tp>/**/>* other, bool _Get_once = false)
+        _state_manager(_STDEX_FUTURE_RV_REF(_state_manager<_Tp>) other, bool _Get_once = false)
             : _assoc_state(nullptr)
         {
-            _move_from(reinterpret_cast<_state_manager&>(*other));
+            _move_from(reinterpret_cast<_state_manager&>(other));
             _get_only_once = _Get_once;
         }
 
@@ -793,8 +797,8 @@ namespace stdex
         //    _move_from(other);
         //    return *this;
         //}
-        _state_manager& operator=(detail::future_detail::_rv_reference<_state_manager<_Tp>/**/>* other) {
-            _move_from(*other);
+        _state_manager& operator=(_STDEX_FUTURE_RV_REF(_state_manager<_Tp>) other) {
+            _move_from(other);
             return *this;
         }
 
@@ -946,16 +950,16 @@ namespace stdex
         future() _STDEX_NOEXCEPT_FUNCTION : icc_deleter(true) {}
 
         //future(future&& other) _STDEX_NOEXCEPT_FUNCTION : base_type(::stdex::move(other), true) {}
-        future(detail::future_detail::_rv_reference <future<_Tp>/**/>* other) _STDEX_NOEXCEPT_FUNCTION :
-            base_type(reinterpret_cast<detail::future_detail::_rv_reference<base_type>*>(other), true),
+        future(_STDEX_FUTURE_RV_REF(future<_Tp>) other) _STDEX_NOEXCEPT_FUNCTION :
+            base_type(reinterpret_cast<_STDEX_FUTURE_RV_REF(base_type)>(other), true),
             icc_deleter(true) {}
 
         //future& operator=(future&& other) _STDEX_NOEXCEPT_FUNCTION {
         //    base_type::operator=(::stdex::move(other));
         //    return *this;
         //}
-        future& operator=(detail::future_detail::_rv_reference <future<_Tp>/**/>* other) _STDEX_NOEXCEPT_FUNCTION {
-            base_type::operator=(reinterpret_cast<detail::future_detail::_rv_reference<base_type>*>(other));
+        future& operator=(_STDEX_FUTURE_RV_REF(future<_Tp>) other) _STDEX_NOEXCEPT_FUNCTION {
+            base_type::operator=(reinterpret_cast<_STDEX_FUTURE_RV_REF(base_type)>(other));
             return *this;
         }
 
@@ -999,8 +1003,8 @@ namespace stdex
         future() _STDEX_NOEXCEPT_FUNCTION : icc_deleter(true) {}
 
         //future(future&& other) _STDEX_NOEXCEPT_FUNCTION : base_type(::stdex::move(other), true) {}
-        future(detail::future_detail::_rv_reference<future<_Tp&>/**/>* other) _STDEX_NOEXCEPT_FUNCTION :
-            base_type(reinterpret_cast<detail::future_detail::_rv_reference<base_type>&>(*other), true),
+        future(_STDEX_FUTURE_RV_REF(future<_Tp&>) other) _STDEX_NOEXCEPT_FUNCTION :
+            base_type(reinterpret_cast<_STDEX_FUTURE_RV_REF(base_type)>(other), true),
             icc_deleter(true) {}
 
         //future& operator=(future&& other) _STDEX_NOEXCEPT_FUNCTION 
@@ -1008,8 +1012,8 @@ namespace stdex
         //    base_type::operator=(::stdex::move(other));
         //    return *this;
         //}
-        future& operator=(detail::future_detail::_rv_reference <future<_Tp&>/**/>* other) _STDEX_NOEXCEPT_FUNCTION {
-            base_type::operator=(reinterpret_cast<detail::future_detail::_rv_reference<base_type>*>(other));
+        future& operator=(_STDEX_FUTURE_RV_REF(future<_Tp&>) other) _STDEX_NOEXCEPT_FUNCTION {
+            base_type::operator=(reinterpret_cast<_STDEX_FUTURE_RV_REF(base_type)>(other));
             return *this;
         }
 
@@ -1053,16 +1057,16 @@ namespace stdex
         future() _STDEX_NOEXCEPT_FUNCTION : icc_deleter(true) {}
 
         //future(future&& other) _STDEX_NOEXCEPT_FUNCTION : _base(::stdex::move(other), true) {}
-        future(detail::future_detail::_rv_reference<future<void>/**/>* other) _STDEX_NOEXCEPT_FUNCTION :
-            base_type(reinterpret_cast<detail::future_detail::_rv_reference<base_type>*>(other), true),
+        future(_STDEX_FUTURE_RV_REF(future<void>) other) _STDEX_NOEXCEPT_FUNCTION :
+            base_type(reinterpret_cast<_STDEX_FUTURE_RV_REF(base_type)>(other), true),
             icc_deleter(true) {}
 
         //future& operator=(future&& other) _STDEX_NOEXCEPT_FUNCTION {
         //    _base::operator=(::stdex::move(other));
         //    return *this;
         //}
-        future& operator=(detail::future_detail::_rv_reference<future<void>/**/>* other) _STDEX_NOEXCEPT_FUNCTION {
-            base_type::operator=(reinterpret_cast<detail::future_detail::_rv_reference<base_type>*>(other));
+        future& operator=(_STDEX_FUTURE_RV_REF(future<void>) other) _STDEX_NOEXCEPT_FUNCTION {
+            base_type::operator=(reinterpret_cast<_STDEX_FUTURE_RV_REF(base_type)>(other));
             return *this;
         }
 
@@ -1113,7 +1117,7 @@ namespace stdex
         }
 
         //shared_future(future<_Tp>&& other) _STDEX_NOEXCEPT_FUNCTION : base_type(::stdex::forward<base_type>(other)) {}
-        shared_future(detail::future_detail::_rv_reference<future<_Tp>/**/> *other) _STDEX_NOEXCEPT_FUNCTION : base_type(*other) {}
+        shared_future(_STDEX_FUTURE_RV_REF(future<_Tp>) other) _STDEX_NOEXCEPT_FUNCTION : base_type(other) {}
 
         //shared_future(shared_future&& other) _STDEX_NOEXCEPT_FUNCTION : base_type(::stdex::move(other)) {}
 
@@ -1317,7 +1321,7 @@ namespace stdex
                 detail::future_detail::_nil_type()
             );
 
-            return detail::future_detail::move(&result);
+            return detail::future_detail::move(result);
         }
 
         void set_value(const _Tp& _value) 
@@ -1390,7 +1394,7 @@ namespace stdex
                 detail::future_detail::_nil_type()
             );
 
-            return detail::future_detail::move(&result);
+            return detail::future_detail::move(result);
         }
 
         void set_value(_Tp& _value) {
@@ -1451,7 +1455,7 @@ namespace stdex
                 detail::future_detail::_nil_type()
             );
 
-            return detail::future_detail::move(&result);
+            return detail::future_detail::move(result);
         }
 
         void set_value() {
@@ -1483,6 +1487,8 @@ namespace stdex
     }
 
 } // namespace stdex
+
+#undef _STDEX_FUTURE_RV_REF
 
 #undef _STDEX_DELETED_FUNCTION
 #undef _STDEX_NOEXCEPT_FUNCTION
