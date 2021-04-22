@@ -308,9 +308,17 @@ struct thread_notification_data {
     }
 };
 
+namespace stdex
+{
+    void remove_from_this_thread_notification_data(condition_variable *cond, mutex *sync)
+    {
+        thread_notification_data::_this_thread_notification_data(thread_notification_data::RemoveFromThreadData, NULL, cond, NULL, sync);
+    }
+}
+
 void remove_from_this_thread_notification_data(condition_variable *cond, mutex *sync)
 {
-    thread_notification_data::_this_thread_notification_data(thread_notification_data::RemoveFromThreadData, NULL, cond, NULL, sync);
+    stdex::remove_from_this_thread_notification_data(cond, sync);
 }
 
 
