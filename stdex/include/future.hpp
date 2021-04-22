@@ -791,7 +791,7 @@ namespace stdex
         //    return *this;
         //}
         _state_manager& operator=(detail::future_detail::_rv_reference<_state_manager<_Tp>/**/>* other) {
-            _move_from(other);
+            _move_from(*other);
             return *this;
         }
 
@@ -970,7 +970,7 @@ namespace stdex
 
         shared_future<_Tp> share() _STDEX_NOEXCEPT_FUNCTION 
         {
-            return shared_future<_Tp>(*this);
+            return shared_future<_Tp>(detail::future_detail::move(this));
         }
 
     private:
@@ -1093,6 +1093,7 @@ namespace stdex
         }
 
         //shared_future(future<_Tp>&& other) _STDEX_NOEXCEPT_FUNCTION : base_type(::stdex::forward<base_type>(other)) {}
+        shared_future(detail::future_detail::_rv_reference<future<_Tp>/**/> *other) _STDEX_NOEXCEPT_FUNCTION : base_type(*other) {}
 
         //shared_future(shared_future&& other) _STDEX_NOEXCEPT_FUNCTION : base_type(::stdex::move(other)) {}
 
