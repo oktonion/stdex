@@ -32,9 +32,30 @@ int test01()
   return 0;
 }
 
+int test02()
+{
+  stdex::promise<int> p1;
+  stdex::future<int> f1;
+
+  p1.get_future().swap(f1);
+
+  stdex::chrono::milliseconds delay(100);
+
+  DYNAMIC_VERIFY( f1.wait_for(delay) == stdex::future_status::timeout );
+
+  p1.set_value(1);
+
+  stdex::chrono::system_clock::time_point before = stdex::chrono::system_clock::now();
+  DYNAMIC_VERIFY( f1.wait_for(delay) == stdex::future_status::ready );
+  DYNAMIC_VERIFY( stdex::chrono::system_clock::now() < (before + delay) );
+
+  return 0;
+}
+
 int main()
 {
   RUN_TEST(test01);
+  RUN_TEST(test02);
   
   return 0;
 }
