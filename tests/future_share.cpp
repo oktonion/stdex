@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <string>
+#include <future>
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
@@ -17,7 +18,12 @@ int test01()
 {
   stdex::promise<int> p1;
   stdex::future<int> f1;
+
+  DYNAMIC_VERIFY(f1.valid() == false);
   p1.get_future().swap(f1);
+
+  DYNAMIC_VERIFY(f1.valid() == true);
+
   stdex::shared_future<int> f2 = f1.share();
 
   p1.set_value(value);
@@ -30,7 +36,12 @@ int test02()
 {
   stdex::promise<int&> p1;
   stdex::future<int&> f1;
+
+  DYNAMIC_VERIFY(f1.valid() == false);
   p1.get_future().swap(f1);
+
+  DYNAMIC_VERIFY(f1.valid() == true);
+
   stdex::shared_future<int&> f2 = f1.share();
 
   p1.set_value(value);
@@ -45,7 +56,12 @@ int test03()
   
   stdex::promise<void> p1;
   stdex::future<void> f1;
+
+  DYNAMIC_VERIFY(f1.valid() == false);
   p1.get_future().swap(f1);
+
+  DYNAMIC_VERIFY(f1.valid() == true);
+
   stdex::shared_future<void> f2 = f1.share();
 
   p1.set_value();
