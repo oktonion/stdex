@@ -17,7 +17,9 @@ int test01()
   DYNAMIC_VERIFY( !f0.valid() );
 
   stdex::promise<int> p1;
-  stdex::future<int> f1(p1.get_future());
+  stdex::future<int> f1;
+
+  p1.get_future().swap(f1);
 
   DYNAMIC_VERIFY( f1.valid() );
 
@@ -25,7 +27,7 @@ int test01()
 
   DYNAMIC_VERIFY( f1.valid() );
 
-  f1.swap(f0);
+  f1 = stdex::detail::future_detail::move(f0);
 
   DYNAMIC_VERIFY( !f1.valid() );
   DYNAMIC_VERIFY( !f0.valid() );
