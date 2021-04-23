@@ -60,7 +60,7 @@ struct my_exception:
 {
     int value() const { return ::value; }
 
-    virtual char const* what() const
+    char const* what() const stdex_noexcept
     {
         return "Unknown exception";
     }
