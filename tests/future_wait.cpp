@@ -52,10 +52,36 @@ int test02()
   return 0;
 }
 
+stdex::chrono::system_clock::time_point make_time(int i)
+{
+  return stdex::chrono::system_clock::now() + stdex::chrono::milliseconds(i);
+}
+
+int test03()
+{
+  stdex::promise<int> p1;
+  stdex::future<int> f1;
+
+  p1.get_future().swap(f1);
+
+  stdex::chrono::system_clock::time_point when = make_time(10);
+  DYNAMIC_VERIFY( f1.wait_until(when) == stdex::future_status::timeout );
+  DYNAMIC_VERIFY( stdex::chrono::system_clock::now() >= when );
+
+  p1.set_value(1);
+
+  when = make_time(100);
+  DYNAMIC_VERIFY( f1.wait_until(when) == stdex::future_status::ready );
+  DYNAMIC_VERIFY( stdex::chrono::system_clock::now() < when );
+
+  return 0;
+}
+
 int main()
 {
   RUN_TEST(test01);
   RUN_TEST(test02);
+  RUN_TEST(test03);
   
   return 0;
 }
