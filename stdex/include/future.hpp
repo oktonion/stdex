@@ -170,45 +170,119 @@ namespace stdex
 
     class _nullable_exception
     {
+        template<class _Tp>
+        static std::exception* copier_impl(const std::exception* value)
+        {
+            return new _Tp( static_cast<const _Tp&>(*value) );
+        }
+
+        template<class _Tp>
+        static void deleter_impl(std::exception* value)
+        {
+            delete static_cast<_Tp*>(value);
+        }
+
+        template<class _Tp>
+        static void try_throw_impl(std::exception* value)
+        {
+            throw static_cast<_Tp&>(*value);
+        }
+
     public:
         _nullable_exception() _STDEX_NOEXCEPT_FUNCTION
-            : valid(false)
+            : value(nullptr)
+            , copier(nullptr)
+            , deleter(nullptr)
+            , thrower(nullptr)
         { }
 
         _nullable_exception(nullptr_t) _STDEX_NOEXCEPT_FUNCTION
-            : valid(false)
+            : value(nullptr)
+            , copier(nullptr)
+            , deleter(nullptr)
+            , thrower(nullptr)
         { }
 
-        _nullable_exception(const std::exception &exp) _STDEX_NOEXCEPT_FUNCTION
-            : value(exp)
-            , valid(true)
+        template<class _Tp>
+        _nullable_exception(const _Tp &exp) _STDEX_NOEXCEPT_FUNCTION
+            : value( copier_impl<_Tp>(&exp) )
+            , copier(&copier_impl<_Tp>)
+            , deleter(&deleter_impl<_Tp>)
+            , thrower(&try_throw_impl<_Tp>)
         { }
+
+        _nullable_exception(const _nullable_exception& other)
+        {
+            value = nullptr;
+            copier = other.copier;
+            deleter = other.deleter;
+            thrower = other.thrower;
+
+            if (other.value)
+                value = other.copier(other.value);
+        }
+
+        ~_nullable_exception()
+        {
+            if(value)
+                deleter(value);
+        }
+
+        _nullable_exception& operator=(const _nullable_exception& other)
+        {
+            if (&other != this && value != other.value)
+            {
+                if (value)
+                    deleter(value);
+
+                value = nullptr;
+                copier = other.copier;
+                deleter = other.deleter;
+                thrower = other.thrower;
+
+                if (other.value)
+                    value = other.copier(other.value);
+            }
+
+            return *this;
+        }
 
         _nullable_exception& operator=(nullptr_t) _STDEX_NOEXCEPT_FUNCTION
         { 
+            if (value)
+                deleter(value);
+
+            value = nullptr;
+            copier = nullptr;
+            deleter = nullptr;
+            thrower = nullptr;
+
             return *this;
         }
 
         operator bool() const _STDEX_NOEXCEPT_FUNCTION
         {
-            return valid;
+            return !!value;
         }
 
-        const std::exception &operator*() const _STDEX_NOEXCEPT_FUNCTION
+        void _try_throw() const
         {
-            return value;
+            if(value)
+                thrower(value);
         }
 
         bool operator==(const _nullable_exception& other) const _STDEX_NOEXCEPT_FUNCTION
         {
-            if(!other.valid && !valid)
+            if(!other.value && !value)
                 return true;
-            return value.what() == other.value.what();
+            return value == other.value;
         }
 
     private:
-        std::exception value;
-        bool valid;
+        std::exception *value;
+        std::exception* (*copier)(const std::exception*);
+        void (*deleter)(std::exception*);
+        void (*thrower)(std::exception*);
     };
 
     template <>
@@ -565,7 +639,7 @@ namespace stdex
             }
 
             if (_exception) {
-                throw (*_exception);
+                _exception._try_throw();
             }
 
             _retrieved = true;
@@ -575,7 +649,7 @@ namespace stdex
             }
 
             if (_exception) {
-                throw (*_exception);
+                _exception._try_throw();
             }
 
             return _result;
@@ -974,7 +1048,8 @@ namespace stdex
         _Tp get() 
         {
             // block until ready then return the stored result or throw the stored exception
-            return this->_get_value();
+            future _local = detail::future_detail::move(*this);
+            return _local._get_value();
         }
 
         shared_future<_Tp> share() _STDEX_NOEXCEPT_FUNCTION 
@@ -1028,7 +1103,8 @@ namespace stdex
         _Tp& get() 
         {
             // block until ready then return the stored result or throw the stored exception
-            return *(this->_get_value());
+            future _local = detail::future_detail::move(*this);
+            return *_local._get_value();
         }
 
         shared_future<_Tp&> share() _STDEX_NOEXCEPT_FUNCTION 
@@ -1082,7 +1158,8 @@ namespace stdex
         void get() 
         {
             // block until ready then return or throw the stored exception
-            this->_get_value();
+            future _local = detail::future_detail::move(*this);
+            _local._get_value();
         }
 
         shared_future<void> share() _STDEX_NOEXCEPT_FUNCTION;
@@ -1488,6 +1565,12 @@ namespace stdex
     template <class _Tp>
     void swap(promise<_Tp>& _lhs, promise<_Tp>& _rhs) _STDEX_NOEXCEPT_FUNCTION {
         _lhs.swap(_rhs);
+    }
+
+    template<class _Tp>
+    stdex::_nullable_exception make_exception_ptr(const _Tp &exp)
+    {
+        return stdex::_nullable_exception(exp);
     }
 
 } // namespace stdex
