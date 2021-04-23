@@ -979,7 +979,7 @@ namespace stdex
 
         shared_future<_Tp> share() _STDEX_NOEXCEPT_FUNCTION 
         {
-            return shared_future<_Tp>(detail::future_detail::move(this));
+            return shared_future<_Tp>( detail::future_detail::move(*this) );
         }
 
         void inline swap(future& other)
@@ -1155,6 +1155,7 @@ namespace stdex
         }
 
         //shared_future(future<_Tp&>&& other) _STDEX_NOEXCEPT_FUNCTION : base_type(::stdex::forward<base_type>(other)) {}
+        shared_future(_STDEX_FUTURE_RV_REF(future<_Tp&>) other) _STDEX_NOEXCEPT_FUNCTION : base_type(other) {}
 
         //shared_future(shared_future&& other) _STDEX_NOEXCEPT_FUNCTION : base_type(::stdex::move(other)) {}
 
@@ -1191,6 +1192,7 @@ namespace stdex
         }
 
         //shared_future(shared_future&& other) _STDEX_NOEXCEPT_FUNCTION : base_type(::stdex::move(other)) {}
+        shared_future(_STDEX_FUTURE_RV_REF(future<void>) other) _STDEX_NOEXCEPT_FUNCTION : base_type(other) {}
 
         //shared_future(future<void>&& other) _STDEX_NOEXCEPT_FUNCTION : base_type(::stdex::forward<base_type>(other)) {}
 
@@ -1207,9 +1209,9 @@ namespace stdex
         }
     };
 
-    //inline shared_future<void> future<void>::share() _STDEX_NOEXCEPT_FUNCTION {
-    //    return shared_future<void>(::stdex::move(*this));
-    //}
+    inline shared_future<void> future<void>::share() _STDEX_NOEXCEPT_FUNCTION {
+        return shared_future<void>( detail::future_detail::move(*this) );
+    }
 
     template <class _Tp>
     class _promise_base
