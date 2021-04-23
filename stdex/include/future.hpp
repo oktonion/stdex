@@ -183,10 +183,21 @@ namespace stdex
         }
 
         template<class _Tp>
-        static void try_throw_impl(std::exception* value)
+        static void thrower_impl(std::exception* value)
         {
             throw static_cast<_Tp&>(*value);
         }
+
+        typedef std::exception* (*copier_type)(const std::exception*);
+        typedef void (*deleter_type)(std::exception*);
+        typedef void (*thrower_type)(std::exception*);
+
+        template<class _Tp>
+        copier_type _get_copier() const { return &copier_impl<_Tp>; }
+        template<class _Tp>
+        deleter_type _get_deleter() const { return &deleter_impl<_Tp>; }
+        template<class _Tp>
+        thrower_type _get_thrower() const { return &thrower_impl<_Tp>; }
 
     public:
         _nullable_exception() _STDEX_NOEXCEPT_FUNCTION
@@ -205,10 +216,10 @@ namespace stdex
 
         template<class _Tp>
         _nullable_exception(const _Tp &exp) _STDEX_NOEXCEPT_FUNCTION
-            : value( copier_impl<_Tp>(&exp) )
-            , copier(&copier_impl<_Tp>)
-            , deleter(&deleter_impl<_Tp>)
-            , thrower(&try_throw_impl<_Tp>)
+            : value( _get_copier<_Tp>()(&exp) )
+            , copier(_get_copier<_Tp>())
+            , deleter(_get_deleter<_Tp>())
+            , thrower(_get_thrower<_Tp>())
         { }
 
         _nullable_exception(const _nullable_exception& other)
@@ -280,9 +291,10 @@ namespace stdex
 
     private:
         std::exception *value;
-        std::exception* (*copier)(const std::exception*);
-        void (*deleter)(std::exception*);
-        void (*thrower)(std::exception*);
+
+        copier_type copier;
+        deleter_type deleter;
+        thrower_type thrower;
     };
 
     template <>
@@ -602,7 +614,7 @@ namespace stdex
         };
 
         template <class _Rep, class _Per>
-        future_status _wait_for(const chrono::duration<_Rep, _Per>& _rel_time) 
+        future_status::type _wait_for(const chrono::duration<_Rep, _Per>& _rel_time) 
         { // wait for duration
             unique_lock<mutex> lock(_sync);
             if (_has_deferred_function()) {
@@ -617,7 +629,7 @@ namespace stdex
         }
 
         template <class _Clock, class _Dur>
-        future_status _wait_until(const chrono::time_point<_Clock, _Dur>& _abs_time) 
+        future_status::type _wait_until(const chrono::time_point<_Clock, _Dur>& _abs_time) 
         { // wait until time point
             unique_lock<mutex> lock(_sync);
             if (_has_deferred_function()) {
@@ -891,7 +903,7 @@ namespace stdex
         }
 
         template <class _Rep, class _Per>
-        future_status wait_for(const chrono::duration<_Rep, _Per>& _rel_time) const 
+        future_status::type wait_for(const chrono::duration<_Rep, _Per>& _rel_time) const 
         { // wait for duration
             if (!valid()) {
                 throw future_error(make_error_code(future_errc::no_state));
@@ -901,7 +913,7 @@ namespace stdex
         }
 
         template <class _Clock, class _Dur>
-        future_status wait_until(const chrono::time_point<_Clock, _Dur>& _abs_time) const 
+        future_status::type wait_until(const chrono::time_point<_Clock, _Dur>& _abs_time) const 
         { // wait until time point
             if (!valid()) {
                 throw future_error(make_error_code(future_errc::no_state));
