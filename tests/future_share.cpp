@@ -15,10 +15,9 @@ int value = 99;
 
 int test01()
 {
-  using stdex::detail::future_detail::move;
-
   stdex::promise<int> p1;
-  stdex::future<int> f1( move(p1.get_future()) );
+  stdex::future<int> f1;
+  p1.get_future().swap(f1);
   stdex::shared_future<int> f2 = f1.share();
 
   p1.set_value(value);
@@ -29,10 +28,9 @@ int test01()
 
 int test02()
 {
-  using stdex::detail::future_detail::move;
-
   stdex::promise<int&> p1;
-  stdex::future<int&> f1( move(p1.get_future()) );
+  stdex::future<int&> f1;
+  p1.get_future().swap(f1);
   stdex::shared_future<int&> f2 = f1.share();
 
   p1.set_value(value);
@@ -46,7 +44,8 @@ int test03()
   using stdex::detail::future_detail::move;
   
   stdex::promise<void> p1;
-  stdex::future<void> f1( move(p1.get_future()) );
+  stdex::future<void> f1;
+  p1.get_future().swap(f1);
   stdex::shared_future<void> f2 = f1.share();
 
   p1.set_value();
