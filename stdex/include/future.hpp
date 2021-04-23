@@ -1033,7 +1033,7 @@ namespace stdex
 
         shared_future<_Tp&> share() _STDEX_NOEXCEPT_FUNCTION 
         {
-            return shared_future<_Tp&>(*this);
+            return shared_future<_Tp&>( detail::future_detail::move(*this) );
         }
 
         void inline swap(future& other)
