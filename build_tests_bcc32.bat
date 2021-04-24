@@ -55,8 +55,8 @@ for /f  %%f in ('dir /b ".\tests\*.cpp"') do (
     if not "!origin_str!"=="!replaced_str!" (
       set has_compile_warn=!true!
     )
-    set /A line_n=!line_n!+1
     set "ouput_line!line_n!=%%i"
+    set /A line_n=!line_n!+1
   )
   
   set current_test_is_ok=!true!
@@ -67,7 +67,7 @@ for /f  %%f in ('dir /b ".\tests\*.cpp"') do (
     if "!origin_str!"=="!replaced_str!" (
       set build_ok=!false!
       set current_test_is_ok=!false!
-      for /l %%i in (1, 1, !line_n!) do (
+      for /l %%i in (0, 1, !line_n!) do (
         if defined ouput_line%%i echo !ouput_line%%i!
       )
       set "tests_failed=!tests_failed! !origin_str!"
@@ -81,18 +81,20 @@ for /f  %%f in ('dir /b ".\tests\*.cpp"') do (
       set build_ok=!false!
       set current_test_is_ok=!false!
       echo "not failed as expected"
-      for /l %%i in (1, 1, !line_n!) do (
+      for /l %%i in (0, 1, !line_n!) do (
         if defined !ouput_line%%i! echo !ouput_line%%i!
       )
       set "tests_failed=!tests_failed! !origin_str!"
     ) else (
       if !has_compile_warn!==!true! (
-        for /l %%i in (1, 1, !line_n!) do (
+        for /l %%i in (0, 1, !line_n!) do (
           if defined ouput_line%%i echo !ouput_line%%i!
         )
       )
     )
   )
+
+  set line_n=0
   
   if !current_test_is_ok!==!true! if !has_compile_error!==!false! (
     set /A line_n=0
@@ -123,8 +125,8 @@ for /f  %%f in ('dir /b ".\tests\*.cpp"') do (
       if not "!origin_str!"=="!replaced_str!" (
         set has_compile_warn=!true!
       )
-      set /A line_n=!line_n!+1
       set "ouput_line!line_n!=%%i"
+      set /A line_n=!line_n!+1
     )
     
     if !has_compile_error!==!true! (
@@ -132,7 +134,7 @@ for /f  %%f in ('dir /b ".\tests\*.cpp"') do (
       set "replaced_str=!origin_str:fail=!"
       if "!origin_str!"=="!replaced_str!" (
         set build_ok=!false!
-        for /l %%i in (1, 1, !line_n!) do (
+        for /l %%i in (0, 1, !line_n!) do (
           if defined ouput_line%%i echo !ouput_line%%i!
         )
         set "tests_failed=!tests_failed! !origin_str!"
@@ -145,13 +147,13 @@ for /f  %%f in ('dir /b ".\tests\*.cpp"') do (
       if not "!origin_str!"=="!replaced_str!" (
         set build_ok=!false!
         echo "not failed as expected"
-        for /l %%i in (1, 1, !line_n!) do (
+        for /l %%i in (0, 1, !line_n!) do (
           if defined ouput_line%%i echo !ouput_line%%i!
         )
         set "tests_failed=!tests_failed! !origin_str!"
       ) else (
         if !has_compile_warn!==!true! (
-          for /l %%i in (1, 1, !line_n!) do (
+          for /l %%i in (0, 1, !line_n!) do (
             if defined ouput_line%%i echo !ouput_line%%i!
           )
         )
