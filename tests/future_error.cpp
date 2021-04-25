@@ -65,6 +65,40 @@ int make_error_condition_test()
   return 0;
 }
 
+int future_error_test()
+{
+    {
+        stdex::error_code ec = stdex::make_error_code(stdex::future_errc::broken_promise);
+        stdex::future_error f(ec);
+        DYNAMIC_VERIFY(f.code() == ec);
+    }
+    {
+        stdex::error_code ec = stdex::make_error_code(stdex::future_errc::future_already_retrieved);
+        stdex::future_error f(ec);
+        DYNAMIC_VERIFY(f.code() == ec);
+    }
+    {
+        stdex::error_code ec = stdex::make_error_code(stdex::future_errc::promise_already_satisfied);
+        stdex::future_error f(ec);
+        DYNAMIC_VERIFY(f.code() == ec);
+    }
+    {
+        stdex::error_code ec = stdex::make_error_code(stdex::future_errc::no_state);
+        stdex::future_error f(ec);
+        DYNAMIC_VERIFY(f.code() == ec);
+    }
+    {
+        stdex::future_error f(stdex::future_errc::broken_promise);
+        DYNAMIC_VERIFY(f.code() == stdex::make_error_code(stdex::future_errc::broken_promise));
+    }
+    {
+        stdex::future_error f(stdex::future_errc::no_state);
+        DYNAMIC_VERIFY(f.code() == stdex::make_error_code(stdex::future_errc::no_state));
+    }
+  return 0;
+}
+
+
 int main()
 {
   try
@@ -75,6 +109,7 @@ int main()
     RUN_TEST(future_category_test);
     RUN_TEST(make_error_code_test);
     RUN_TEST(make_error_condition_test);
+    RUN_TEST(future_error_test);
   }
   catch (const std::exception& e)
   {
