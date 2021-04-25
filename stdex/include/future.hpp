@@ -320,16 +320,19 @@ namespace stdex
         switch (static_cast<future_errc::type>(_Errcode)) 
         { // switch on error code value
         case future_errc::broken_promise:
-            return "broken promise";
+            return "The associated promise has been destructed prior "
+                      "to the associated state becoming ready.";
 
         case future_errc::future_already_retrieved:
-            return "future already retrieved";
+            return "The future has already been retrieved from "
+                      "the promise or packaged_task.";
 
         case future_errc::promise_already_satisfied:
-            return "promise already satisfied";
+            return "The state of the promise has already been set.";
 
         case future_errc::no_state:
-            return "no state";
+            return "Operation not permitted on an object without "
+                      "an associated state.";
 
         default:
             return nullptr;
