@@ -31,6 +31,7 @@ int main(void)
             t1 = std::time(0),
             t2 = system_clock::to_time_t(system_clock::now());
 
+            std::cout << "delta: " << (t2 - t1) << std::endl;
             DYNAMIC_VERIFY((t2 - t1 == 0 || t2 - t1 == 1)); // we could afford 1 sec shift in time measurement
         }
     }
