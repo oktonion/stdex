@@ -803,7 +803,7 @@ namespace stdex
         return stdex::operator<(_lhs, error_condition(_rhs));
     }
 
-    inline
+    /*inline
     bool operator<(const stdex::error_condition& _lhs, const stdex::error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
         if (_lhs.category() < _rhs.category())
@@ -811,7 +811,7 @@ namespace stdex
         if (_lhs.value() < _rhs.value())
             return true;
         return false;
-    }
+    }*/
 
     // OPERATOR== FOR error_code/error_condition
     template<class _LhsT>
@@ -952,11 +952,11 @@ namespace stdex
         return stdex::operator==(_lhs, error_condition(_rhs));
     }
 
-    inline
-    bool operator==(const stdex::error_condition& _lhs, const stdex::error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
-    {
-        return _lhs.category() == _rhs.category() && _lhs.value() == _rhs.value();
-    }
+    //inline
+    //bool operator==(const stdex::error_condition& _lhs, const stdex::error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
+    //{
+    //    return _lhs.category() == _rhs.category() && _lhs.value() == _rhs.value();
+    //}
 
     // OPERATOR!= FOR error_code/error_condition
     template<class _LhsT>
@@ -1055,11 +1055,11 @@ namespace stdex
         return !(_lhs == _rhs);
     }
 
-    inline
-    bool operator!=(const stdex::error_condition& _lhs, const stdex::error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
-    {
-        return !(_lhs == _rhs);
-    }
+    //inline
+    //bool operator!=(const stdex::error_condition& _lhs, const stdex::error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
+    //{
+    //    return !(_lhs == _rhs);
+    //}
 
     
     // VIRTUALS FOR error_category
