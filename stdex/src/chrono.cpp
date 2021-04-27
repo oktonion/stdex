@@ -216,7 +216,7 @@ namespace clock_gettime_impl
         }
     };
 
-    typedef abs_start_point_impl<sizeof(stdex::intmax_t) * CHAR_BIT >= 64> abs_start_point;
+    typedef abs_start_point_impl<sizeof(duration_long_long) * CHAR_BIT >= 64> abs_start_point;
 
 #define _STDEX_CHRONO_CLOCK_REALTIME 0
 #define _STDEX_CHRONO_CLOCK_MONOTONIC 1
