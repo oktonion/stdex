@@ -19,6 +19,8 @@ int main(void)
         stdex::time_t t2 = system_clock::to_time_t(t1);
         system_clock::time_point t3 = system_clock::from_time_t(t2);
         t3 = t3; // suppress unused warning
+        stdex::time_t t4 = system_clock::to_time_t(t3);
+        DYNAMIC_VERIFY(t4 == t2);
 
         microseconds mcs = duration_cast<microseconds>(t3 - t1);
         mcs = mcs; // suppress unused warning
