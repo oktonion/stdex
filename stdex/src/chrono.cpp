@@ -70,6 +70,16 @@ void timespec_add(timespec &result, const timespec &in)
 
 typedef LONGLONG duration_long_long;
 typedef ULONGLONG duration_ulong_long;
+
+namespace WinAPI
+{
+    namespace kernel32_dll
+    {
+        static bool GetSystemTimePreciseAsFileTime(FILETIME* input);
+        static bool GetSystemTimeAsFileTime(FILETIME* input);
+    }
+}
+
 struct filetime_ptr
 {
     FILETIME* value;
@@ -79,13 +89,17 @@ struct filetime_ptr
 
 filetime_ptr GetSystemTimeAsFileTime(filetime_ptr SystemTimeAsFileTimePtr)
 { // GetSystemTimeAsFileTime does not exist on WinCE
-    SYSTEMTIME st;
-
-    GetSystemTime(&st);
-    if (0 == SystemTimeToFileTime(&st, SystemTimeAsFileTimePtr.value))
+    
+    if(!WinAPI::kernel32_dll::GetSystemTimeAsFileTime(SystemTimeAsFileTimePtr.value))
     {
-        SystemTimeAsFileTimePtr.value->dwLowDateTime = 0;
-        SystemTimeAsFileTimePtr.value->dwHighDateTime = 0;
+        SYSTEMTIME st;
+
+        GetSystemTime(&st);
+        if (0 == SystemTimeToFileTime(&st, SystemTimeAsFileTimePtr.value))
+        {
+            SystemTimeAsFileTimePtr.value->dwLowDateTime = 0;
+            SystemTimeAsFileTimePtr.value->dwHighDateTime = 0;
+        }
     }
     return SystemTimeAsFileTimePtr;
 }
@@ -93,7 +107,8 @@ filetime_ptr GetSystemTimeAsFileTime(filetime_ptr SystemTimeAsFileTimePtr)
 filetime_ptr GetSystemTimePreciseAsFileTime(filetime_ptr SystemTimeAsFileTimePtr)
 { // GetSystemTimePreciseAsFileTime does not exist before Win8
     
-    GetSystemTimeAsFileTime(SystemTimeAsFileTimePtr.value);
+    if(!WinAPI::kernel32_dll::GetSystemTimePreciseAsFileTime(SystemTimeAsFileTimePtr.value))
+        GetSystemTimeAsFileTime(SystemTimeAsFileTimePtr.value);
     return SystemTimeAsFileTimePtr;
 }
 
@@ -137,28 +152,48 @@ namespace WinAPI
 
 #undef _STDEX_WINAPI
 
-    void GetSystemTimePreciseAsFileTime(FILETIME* input)
+    namespace kernel32_dll
     {
-        static HINSTANCE hKernel32 = GetModuleHandleW(L"kernel32.dll");
-        if (hKernel32)
+        bool GetSystemTimePreciseAsFileTime(FILETIME* input)
         {
-            // GetSystemTimePreciseAsFileTime
+            static HINSTANCE hKernel32 = GetModuleHandleW(L"kernel32.dll");
+            if (hKernel32)
             {
-                static FARPROC func = GetProcAddress(hKernel32, "GetSystemTimePreciseAsFileTime");
-                if (func)
-                    return reinterpret_cast<GetSystemTimePreciseAsFileTimePtr>(func)(input);
+                // GetSystemTimePreciseAsFileTime
+                {
+                    static FARPROC func = GetProcAddress(hKernel32, "GetSystemTimePreciseAsFileTime");
+                    if (func)
+                    {
+                        reinterpret_cast<GetSystemTimePreciseAsFileTimePtr>(func)(input);
+                        return true;
+                    }
+                }
             }
-
-            // GetSystemTimeAsFileTime
-            {
-                static FARPROC func = GetProcAddress(hKernel32, "GetSystemTimeAsFileTime");
-                if (func)
-                    reinterpret_cast<GetSystemTimeAsFileTimePtr>(func)(input);
-            }
+            return false;
         }
 
-        filetime_ptr ftp = input;
-        ::GetSystemTimeAsFileTime(ftp);
+        bool GetSystemTimeAsFileTime(FILETIME* input)
+        {
+            static HINSTANCE hKernel32 = GetModuleHandleW(L"kernel32.dll");
+            if (hKernel32)
+            {
+                // GetSystemTimeAsFileTime
+                {
+                    static FARPROC func = GetProcAddress(hKernel32, "GetSystemTimeAsFileTime");
+                    if (func)
+                    {
+                        reinterpret_cast<GetSystemTimeAsFileTimePtr>(func)(input);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+    
+    void GetSystemTimePreciseAsFileTime(FILETIME* input)
+    {
+        ::GetSystemTimePreciseAsFileTime(input);
     }
 }
 
