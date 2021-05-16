@@ -550,13 +550,14 @@ namespace stdex
                     _big_int den;
                 };
 
-                static
-                _big_int naive_gcd (_big_int n1, _big_int n2) {
-                    _big_int tmp;
+                static inline
+                _big_int naive_gcd(_big_int n1, _big_int n2) 
+                {
+                    _big_int _tmp;
                     while (n2 != 0) {
-                        tmp = n1;
+                        _tmp = n1;
                         n1 = n2;
-                        n2 = tmp % n2;
+                        n2 = _tmp % n2;
                     }
                     return n1;
                 }
@@ -587,7 +588,7 @@ namespace stdex
 
                     return ratio_multiply<_R1, _R2_inv>();
                 }
-            }
+            } // namespace runtime_ratio
 
             template<class _FromDur, class _ToDur>
             struct _duration_cast_impl<_FromDur, _ToDur, true> // rt-cast

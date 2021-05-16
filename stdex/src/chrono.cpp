@@ -977,7 +977,6 @@ make_utc_tm(stdex::chrono::system_clock::time_point tp)
     // t is time duration since 1970-01-01
     stdex::chrono::system_clock::duration t = tp.time_since_epoch();
     // d is days since 1970-01-01
-    stdex::chrono::duration_cast<days>(t);
     days d = round_down<days>(t);
     // t is now time duration since midnight of day d
     t -= d;
@@ -993,9 +992,9 @@ make_utc_tm(stdex::chrono::system_clock::time_point tp)
     tm.tm_yday = d.count() - days_from_civil(civ_date.year, 1, 1);
     // Fill in the time
     tm.tm_hour = duration_cast<hours>(t).count();
-    //t -= hours(tm.tm_hour);
+    t -= hours(tm.tm_hour);
     tm.tm_min = duration_cast<minutes>(t).count();
-    //t -= minutes(tm.tm_min);
+    t -= minutes(tm.tm_min);
     tm.tm_sec = duration_cast<seconds>(t).count();
     return tm;
 }
