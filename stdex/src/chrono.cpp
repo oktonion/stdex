@@ -1,5 +1,6 @@
 // stdex includes
 #include "../include/chrono.hpp"
+#include "../include/ctime.hpp"
 
 // POSIX includes
 //#include <time.h> // for clock_gettime
@@ -204,7 +205,7 @@ namespace clock_gettime_impl
         LARGE_INTEGER jan_1_1970;
 
         // January 1, 1970 (start of Unix epoch) in "ticks"
-        // 116444736000000000 in ULARGE_INTEGER
+        // 116444736000000000 in ULARGE_INTEGER (UTC)
         jan_1_1970.LowPart  = 0xD53E8000;
         jan_1_1970.HighPart = 0x019DB1DE;
 
@@ -895,14 +896,134 @@ stdex::timespec
     return _ts;
 }
 
+
+static
+duration_long_long
+days_from_civil(duration_long_long y, duration_ulong_long m, duration_ulong_long d) _STDEX_NOEXCEPT_FUNCTION
+{
+    y -= m <= 2;
+    const duration_long_long era = (y >= 0 ? y : y-399) / 400;
+    const duration_ulong_long yoe = static_cast<duration_ulong_long>(y - era * 400);      // [0, 399]
+    const duration_ulong_long doy = (153*(m + (m > 2 ? -3 : 9)) + 2)/5 + d-1;  // [0, 365]
+    const duration_ulong_long doe = yoe * 365 + yoe/4 - yoe/100 + doy;         // [0, 146096]
+    return era * 146097 + static_cast<duration_long_long>(doe) - 719468;
+}
+
+struct civil_date
+{
+    duration_long_long year;
+    duration_ulong_long month;
+    duration_ulong_long day;
+};
+
+static
+civil_date
+civil_from_days(duration_long_long z) _STDEX_NOEXCEPT_FUNCTION
+{
+    z += 719468;
+    const duration_long_long era = (z >= 0 ? z : z - 146096) / 146097;
+    const duration_ulong_long doe = static_cast<duration_ulong_long>(z - era * 146097);          // [0, 146096]
+    const duration_ulong_long yoe = (doe - doe/1460 + doe/36524 - doe/146096) / 365;  // [0, 399]
+    const duration_long_long y = static_cast<duration_long_long>(yoe) + era * 400;
+    const duration_ulong_long doy = doe - (365*yoe + yoe/4 - yoe/100);                // [0, 365]
+    const duration_ulong_long mp = (5*doy + 2)/153;                                   // [0, 11]
+    const duration_ulong_long d = doy - (153*mp+2)/5 + 1;                             // [1, 31]
+    const duration_ulong_long m = mp + (mp < 10 ? 3 : -9);                            // [1, 12]
+
+    civil_date result;
+    result.year = y + (m <= 2);
+    result.month = m;
+    result.day = d;
+
+    return result;
+}
+
+static
+duration_ulong_long
+weekday_from_days(duration_long_long z) _STDEX_NOEXCEPT_FUNCTION
+{
+    return static_cast<duration_ulong_long>(z >= -4 ? (z+4) % 7 : (z+5) % 7 + 6);
+}
+
+template <class To, class Rep, class Period>
+To
+round_down(const stdex::chrono::duration<Rep, Period>& d)
+{
+    To t = stdex::chrono::duration_cast<To>(d);
+    if (t > d)
+        --t;
+    return t;
+}
+
+static
+stdex::tm
+make_utc_tm(stdex::chrono::system_clock::time_point tp)
+{
+    using namespace stdex::chrono;
+
+
+    typedef         
+    stdex::ratio_multiply<
+        hours::period,
+        stdex::ratio<24>
+    >::type days_period;
+
+    typedef 
+    stdex::chrono::duration<
+        stdex::chrono::system_clock::rep,
+        days_period
+    > days;
+
+    // t is time duration since 1970-01-01
+    stdex::chrono::system_clock::duration t = tp.time_since_epoch();
+    // d is days since 1970-01-01
+    stdex::chrono::duration_cast<days>(t);
+    days d = round_down<days>(t);
+    // t is now time duration since midnight of day d
+    t -= d;
+    // break d down into year/month/day
+    civil_date civ_date = civil_from_days(d.count());
+    // start filling in the tm with calendar info
+    std::tm tm;
+    tm.tm_isdst = 0;
+    tm.tm_year = civ_date.year - 1900;
+    tm.tm_mon = civ_date.month - 1;
+    tm.tm_mday = civ_date.day;
+    tm.tm_wday = weekday_from_days(d.count());
+    tm.tm_yday = d.count() - days_from_civil(civ_date.year, 1, 1);
+    // Fill in the time
+    tm.tm_hour = duration_cast<hours>(t).count();
+    //t -= hours(tm.tm_hour);
+    tm.tm_min = duration_cast<minutes>(t).count();
+    //t -= minutes(tm.tm_min);
+    tm.tm_sec = duration_cast<seconds>(t).count();
+    return tm;
+}
+
+stdex::time_t
+    stdex::chrono::system_clock::to_time_t(const time_point &_t) _STDEX_NOEXCEPT_FUNCTION
+{
+    stdex::tm result = make_utc_tm(_t);
+    return 
+        stdex::mktime(&result);
+}
+
+
 stdex::chrono::system_clock::time_point
     stdex::chrono::system_clock::from_time_t(stdex::time_t _t) _STDEX_NOEXCEPT_FUNCTION
 {
     typedef chrono::time_point<system_clock, seconds>    _from;
+
+    stdex::tm stdex_sys_clock_epoch = make_utc_tm(time_point(0));
+    stdex_sys_clock_epoch.tm_mon++;
+    stdex::time_t stdex_sys_clock_epoch_tt = mktime(&stdex_sys_clock_epoch);
+
+    double seconds_from_epoch = 
+        stdex::difftime(_t, stdex_sys_clock_epoch_tt);
       
     stdex::chrono::detail::_big_int result = 
         stdex::chrono::detail::convert(
-            static_cast<duration_long_long>(duration_long_long(0) + _t)
+            static_cast<duration_long_long>(duration_long_long(0) + duration_long_long(seconds_from_epoch) + duration_long_long(31 * 24 * 60 * 60))
         );
 
     return time_point_cast<system_clock::duration>
