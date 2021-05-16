@@ -1002,9 +1002,13 @@ make_utc_tm(stdex::chrono::system_clock::time_point tp)
 stdex::time_t
     stdex::chrono::system_clock::to_time_t(const time_point &_t) _STDEX_NOEXCEPT_FUNCTION
 {
-    stdex::tm result = make_utc_tm(_t);
+    stdex::tm stdex_sys_clock_epoch = make_utc_tm(time_point(0));
+    stdex::time_t tt_epoch = 0;
+
+
+    stdex::tm UTC_result = make_utc_tm(_t + (from_time_t(0) - time_point(0)));
     return 
-        stdex::mktime(&result);
+        stdex::mktime(&UTC_result);
 }
 
 
@@ -1015,14 +1019,16 @@ stdex::chrono::system_clock::time_point
 
     stdex::tm stdex_sys_clock_epoch = make_utc_tm(time_point(0));
     stdex_sys_clock_epoch.tm_mon++;
-    stdex::time_t stdex_sys_clock_epoch_tt = mktime(&stdex_sys_clock_epoch);
+    stdex_sys_clock_epoch.tm_yday = 31;
+    stdex::time_t stdex_sys_clock_epoch_tt = stdex::mktime(&stdex_sys_clock_epoch);
 
     double seconds_from_epoch = 
         stdex::difftime(_t, stdex_sys_clock_epoch_tt);
+    const duration_long_long sec_in_jan = (31 * 24 * 60 * 60);
       
     stdex::chrono::detail::_big_int result = 
         stdex::chrono::detail::convert(
-            static_cast<duration_long_long>(duration_long_long(0) + duration_long_long(seconds_from_epoch) + duration_long_long(31 * 24 * 60 * 60))
+            static_cast<duration_long_long>(duration_long_long(0) + duration_long_long(seconds_from_epoch) + sec_in_jan)
         );
 
     return time_point_cast<system_clock::duration>
