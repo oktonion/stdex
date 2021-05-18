@@ -999,14 +999,70 @@ make_utc_tm(stdex::chrono::system_clock::time_point tp)
     return tm;
 }
 
+static
+stdex::tm get_time_t_epoch()
+{
+    const stdex::chrono::system_clock::time_point stdex_sys_clock_tp_epoch = 
+        stdex::chrono::system_clock::time_point(0);
+    stdex::tm stdex_tm_time_point = 
+        make_utc_tm(stdex_sys_clock_tp_epoch);
+    const stdex::time_t time_t_epoch(0);
+    const stdex::time_t invalid_time_t(-1);
+    stdex::time_t time_t_time_point = invalid_time_t;
+    do{   
+        stdex_tm_time_point.tm_year++;
+        time_t_time_point = stdex::mktime(&stdex_tm_time_point);
+    }
+    while(invalid_time_t == time_t_time_point);
+
+    const double secs_since_time_t_epoch = 
+        stdex::difftime(time_t_time_point, time_t_epoch);
+    
+    stdex::chrono::seconds
+        secs_since_tm_epoch = // since 1 jan 1900
+            stdex::chrono::hours(stdex_tm_time_point.tm_yday * 24 * stdex_tm_time_point.tm_year) +
+            stdex::chrono::hours(stdex_tm_time_point.tm_hour) +
+            stdex::chrono::minutes(stdex_tm_time_point.tm_min) +
+            stdex::chrono::seconds(stdex_tm_time_point.tm_sec);
+    stdex::chrono::seconds secs_since_tm_epoch_to_tt_epoch =
+        secs_since_tm_epoch -
+        stdex::chrono::seconds(stdex::chrono::seconds::rep(secs_since_time_t_epoch));
+
+    stdex_tm_time_point =
+        make_utc_tm(stdex_sys_clock_tp_epoch + secs_since_tm_epoch);
+
+    
+    return stdex_tm_time_point;
+}
+
+static
+int get_UTC_shift()
+{
+    static stdex::tm time_t_epoch = get_time_t_epoch();
+
+    stdex::tm stdex_tm_time_point = time_t_epoch;
+    stdex::time_t time_t_time_point = stdex::mktime(&time_t_epoch);
+    const stdex::time_t invalid_time_t(-1);
+
+    int UTC_shift = 0;
+
+    while (invalid_time_t == time_t_time_point)
+    {
+        stdex_tm_time_point.tm_hour++;
+        UTC_shift++;
+        time_t_time_point = stdex::mktime(&stdex_tm_time_point);
+    }
+
+    return UTC_shift;
+}
+
 stdex::time_t
     stdex::chrono::system_clock::to_time_t(const time_point &_t) _STDEX_NOEXCEPT_FUNCTION
 {
+    int UTC_shift = get_UTC_shift();
     stdex::tm stdex_sys_clock_epoch = make_utc_tm(time_point(0));
-    stdex::time_t tt_epoch = 0;
 
-
-    stdex::tm UTC_result = make_utc_tm(_t + (from_time_t(0) - time_point(0)));
+    stdex::tm UTC_result = make_utc_tm(_t + hours(UTC_shift));
     return 
         stdex::mktime(&UTC_result);
 }
@@ -1017,7 +1073,8 @@ stdex::chrono::system_clock::time_point
 {
     typedef chrono::time_point<system_clock, seconds>    _from;
 
-    stdex::tm stdex_sys_clock_epoch = make_utc_tm(time_point(0));
+    int UTC_shift = get_UTC_shift();
+    stdex::tm stdex_sys_clock_epoch = make_utc_tm(time_point(0) + hours(UTC_shift));
     stdex_sys_clock_epoch.tm_mon++;
     stdex_sys_clock_epoch.tm_yday = 31;
     stdex::time_t stdex_sys_clock_epoch_tt = stdex::mktime(&stdex_sys_clock_epoch);
