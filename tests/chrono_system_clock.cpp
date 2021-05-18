@@ -37,8 +37,20 @@ int main(void)
 
         {
             stdex::time_t 
-            t1 = std::time(0),
-            t2 = system_clock::to_time_t(system_clock::now());
+                t1 = std::time(0),
+                t2 = system_clock::to_time_t(system_clock::now());
+
+            double sec_diff = stdex::difftime(t2, t1);
+            int diff = int(sec_diff);
+
+            std::cout << "delta: " << diff << std::endl;
+            DYNAMIC_VERIFY((diff == 0 || diff == 1)); // we could afford 1 sec shift in time measurement
+        }
+
+        {
+            stdex::time_t
+                t1 = 0,
+                t2 = system_clock::to_time_t(system_clock::time_point(0));
 
             double sec_diff = stdex::difftime(t2, t1);
             int diff = int(sec_diff);
