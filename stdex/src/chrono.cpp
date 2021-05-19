@@ -91,16 +91,16 @@ namespace WinAPI
 {
     namespace type_traits
     {
-        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_NT4) > is_windows_NT_or_later;
-        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_WIN2K) > is_windows_2000_or_later;
-        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_WINXP) > is_windows_XP_or_later;
-        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_WS03) > is_windows_server_2003_or_later;
-        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_VISTA) > is_windows_vista_or_later;
-        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_WS08) > is_windows_server_2008_or_later;
-        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_WIN7) > is_windows_7_or_later;
-        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_WIN8) > is_windows_8_or_later;
-        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_WINBLUE) > is_windows_8_1_or_later;
-        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_WIN10) > is_windows_10_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_NT4) > target_is_windows_NT_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_WIN2K) > target_is_windows_2000_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_WINXP) > target_is_windows_XP_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_WS03) > target_is_windows_server_2003_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_VISTA) > target_is_windows_vista_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_WS08) > target_is_windows_server_2008_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_WIN7) > target_is_windows_7_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_WIN8) > target_is_windows_8_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_WINBLUE) > target_is_windows_8_1_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_WIN10) > target_is_windows_10_or_later;
     }
 
 } // namespace WinAPI
@@ -253,7 +253,8 @@ namespace WinAPI
         {
             // Windows8.1 or grater
             // NOTE: attempt to dynamically load GetSystemTimePreciseAsFileTime from kernel32.dll would be done anyway
-            static void call(FILETIME* input) 
+            template<class _FileTime>
+            static void call(_FileTime input)
             {
                 ::GetSystemTimePreciseAsFileTime(input);
             }
@@ -273,7 +274,8 @@ namespace WinAPI
         {
             // Windows2000 or grater
             // NOTE: attempt to dynamically load GetSystemTimeAsFileTime from kernel32.dll would be done anyway
-            static void call(FILETIME* input)
+            template<class _FileTime>
+            static void call(_FileTime input)
             {
                 ::GetSystemTimeAsFileTime(input);
             }
@@ -291,12 +293,12 @@ namespace WinAPI
     
     void GetSystemTimePreciseAsFileTime(FILETIME* input)
     {
-        detail::GetSystemTimePreciseAsFileTime_impl<type_traits::is_windows_8_1_or_later::value>::call(input);
+        detail::GetSystemTimePreciseAsFileTime_impl<type_traits::target_is_windows_10_or_later::value>::call(input);
     }
 
     void GetSystemTimeAsFileTime(FILETIME* input)
     {
-        detail::GetSystemTimeAsFileTime_impl<type_traits::is_windows_2000_or_later::value>::call(input);
+        detail::GetSystemTimeAsFileTime_impl<type_traits::target_is_windows_2000_or_later::value>::call(input);
     }
 }
 
