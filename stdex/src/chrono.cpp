@@ -13,7 +13,7 @@
 #include <numeric>
 #include <cstring>
 
-void timespec_add(timespec &result, const timespec &in)
+void timespec_add(stdex::timespec &result, const stdex::timespec &in)
 {
     enum {BILLION = 1000000000};
 
@@ -28,7 +28,7 @@ void timespec_add(timespec &result, const timespec &in)
         return;
     }
 
-    timespec t2 = in;
+    stdex::timespec t2 = in;
     if (result.tv_nsec >= BILLION) {
         result.tv_nsec -= BILLION;
         result.tv_sec++;
@@ -69,6 +69,55 @@ void timespec_add(timespec &result, const timespec &in)
 
 #include <process.h>
 
+//from <sdkddkver.h> SDK Win10:
+#define _STDEX_WIN32_WINNT_NT4                    0x0400 // Windows NT 4.0
+#define _STDEX_WIN32_WINNT_WIN2K                  0x0500 // Windows 2000
+#define _STDEX_WIN32_WINNT_WINXP                  0x0501 // Windows XP
+#define _STDEX_WIN32_WINNT_WS03                   0x0502 // Windows Server 2003
+#define _STDEX_WIN32_WINNT_VISTA                  0x0600 // Windows Vista
+#define _STDEX_WIN32_WINNT_WS08                   0x0600 // Windows Server 2008
+#define _STDEX_WIN32_WINNT_WIN7                   0x0601 // Windows 7
+#define _STDEX_WIN32_WINNT_WIN8                   0x0602 // Windows 8
+#define _STDEX_WIN32_WINNT_WINBLUE                0x0603 // Windows 8.1
+#define _STDEX_WIN32_WINNT_WIN10                  0x0A00 // Windows 10
+
+#ifdef WINVER
+#define _STDEX_WINVER WINVER
+#else
+#define _STDEX_WINVER 0x0
+#endif
+
+namespace WinAPI
+{
+    namespace type_traits
+    {
+        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_NT4) > is_windows_NT_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_WIN2K) > is_windows_2000_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_WINXP) > is_windows_XP_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_WS03) > is_windows_server_2003_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_VISTA) > is_windows_vista_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_WS08) > is_windows_server_2008_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_WIN7) > is_windows_7_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_WIN8) > is_windows_8_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_WINBLUE) > is_windows_8_1_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER > _STDEX_WIN32_WINNT_WIN10) > is_windows_10_or_later;
+    }
+
+} // namespace WinAPI
+
+#undef _STDEX_WIN32_WINNT_NT4         
+#undef _STDEX_WIN32_WINNT_WIN2K       
+#undef _STDEX_WIN32_WINNT_WINXP       
+#undef _STDEX_WIN32_WINNT_WS03               
+#undef _STDEX_WIN32_WINNT_VISTA       
+#undef _STDEX_WIN32_WINNT_WS08         
+#undef _STDEX_WIN32_WINNT_WIN7        
+#undef _STDEX_WIN32_WINNT_WIN8        
+#undef _STDEX_WIN32_WINNT_WINBLUE     
+#undef _STDEX_WIN32_WINNT_WIN10   
+
+#undef _STDEX_WINVER
+
 typedef LONGLONG duration_long_long;
 typedef ULONGLONG duration_ulong_long;
 
@@ -79,6 +128,9 @@ namespace WinAPI
         static bool GetSystemTimePreciseAsFileTime(FILETIME* input);
         static bool GetSystemTimeAsFileTime(FILETIME* input);
     }
+
+    void GetSystemTimePreciseAsFileTime(FILETIME* input);
+    void GetSystemTimeAsFileTime(FILETIME* input);
 }
 
 struct filetime_ptr
@@ -108,8 +160,10 @@ filetime_ptr GetSystemTimeAsFileTime(filetime_ptr SystemTimeAsFileTimePtr)
 filetime_ptr GetSystemTimePreciseAsFileTime(filetime_ptr SystemTimeAsFileTimePtr)
 { // GetSystemTimePreciseAsFileTime does not exist before Win8
     
-    if(!WinAPI::kernel32_dll::GetSystemTimePreciseAsFileTime(SystemTimeAsFileTimePtr.value))
-        GetSystemTimeAsFileTime(SystemTimeAsFileTimePtr.value);
+    if (!WinAPI::kernel32_dll::GetSystemTimePreciseAsFileTime(SystemTimeAsFileTimePtr.value))
+    {
+        WinAPI::GetSystemTimeAsFileTime(SystemTimeAsFileTimePtr.value);
+    }
     return SystemTimeAsFileTimePtr;
 }
 
@@ -117,7 +171,7 @@ stdex::detail::_no_type operator,(filetime_ptr, stdex::detail::_yes_type);
 
 namespace WinAPI
 {
-    namespace type_traits
+    /*namespace type_traits
     {
         struct _has_GetSystemTimePreciseAsFileTime
         {
@@ -130,7 +184,7 @@ namespace WinAPI
             static const bool value =
                 sizeof(::GetSystemTimeAsFileTime((FILETIME*)(0)), stdex::detail::_yes_type()) == sizeof(stdex::detail::_yes_type);
         };
-    }
+    }*/
 
 #ifndef WINAPI
     #ifndef NTAPI
@@ -191,10 +245,58 @@ namespace WinAPI
             return false;
         }
     }
+
+    namespace detail
+    {
+        template<bool>
+        struct GetSystemTimePreciseAsFileTime_impl
+        {
+            // Windows8.1 or grater
+            // NOTE: attempt to dynamically load GetSystemTimePreciseAsFileTime from kernel32.dll would be done anyway
+            static void call(FILETIME* input) 
+            {
+                ::GetSystemTimePreciseAsFileTime(input);
+            }
+        };
+
+        template<>
+        struct GetSystemTimePreciseAsFileTime_impl<false>
+        {
+            static void call(filetime_ptr input) // Windows 7 or less
+            {
+                ::GetSystemTimePreciseAsFileTime(input);
+            }
+        };
+
+        template<bool>
+        struct GetSystemTimeAsFileTime_impl
+        {
+            // Windows2000 or grater
+            // NOTE: attempt to dynamically load GetSystemTimeAsFileTime from kernel32.dll would be done anyway
+            static void call(FILETIME* input)
+            {
+                ::GetSystemTimeAsFileTime(input);
+            }
+        };
+
+        template<>
+        struct GetSystemTimeAsFileTime_impl<false>
+        {
+            static void call(filetime_ptr input) // Windows CE or less
+            {
+                ::GetSystemTimeAsFileTime(input);
+            }
+        };
+    }
     
     void GetSystemTimePreciseAsFileTime(FILETIME* input)
     {
-        ::GetSystemTimePreciseAsFileTime(input);
+        detail::GetSystemTimePreciseAsFileTime_impl<type_traits::is_windows_8_1_or_later::value>::call(input);
+    }
+
+    void GetSystemTimeAsFileTime(FILETIME* input)
+    {
+        detail::GetSystemTimeAsFileTime_impl<type_traits::is_windows_2000_or_later::value>::call(input);
     }
 }
 
@@ -257,9 +359,9 @@ namespace clock_gettime_impl
 #define _STDEX_CHRONO_CLOCK_REALTIME 0
 #define _STDEX_CHRONO_CLOCK_MONOTONIC 1
 
-    ::timespec system_time_to_timespec(const LARGE_INTEGER &stime)
+    stdex::timespec system_time_to_timespec(const LARGE_INTEGER &stime)
     {
-        timespec ts;
+        stdex::timespec ts;
 
         LARGE_INTEGER ticks_per_sec_in_filetime;
         ticks_per_sec_in_filetime.QuadPart = 10000000; // a tick is 100ns
@@ -295,7 +397,7 @@ namespace clock_gettime_impl
         return ts;
     }
 
-    int clock_gettime_realtime(timespec& ts) // unix time since January 1, 1970
+    int clock_gettime_realtime(stdex::timespec& ts) // unix time since January 1, 1970
     {
         FILETIME    filetime;
         LARGE_INTEGER today;
@@ -377,7 +479,7 @@ namespace clock_gettime_impl
         }
     } init_inittime;
 
-    int clock_gettime_monotonic(timespec& ts) // relative time since program start
+    int clock_gettime_monotonic(stdex::timespec& ts) // relative time since program start
     {
         const LARGE_INTEGER& sp = rel_start_point::get();
 
@@ -425,7 +527,7 @@ namespace clock_gettime_impl
 }
 
     int clock_gettime(int clk_id, stdex::timespec* _ts) {
-        ::timespec ts;
+        stdex::timespec ts;
         ts.tv_sec = _ts->tv_sec;
         ts.tv_nsec = _ts->tv_nsec;
         int err = -1;
@@ -441,7 +543,7 @@ namespace clock_gettime_impl
 
     stdex::timespec local_ts_to_system_ts(const stdex::timespec &_ts)
     {
-        ::timespec ts;
+        stdex::timespec ts;
         ts.tv_nsec = _ts.tv_nsec;
         ts.tv_sec = _ts.tv_sec;
 
@@ -449,7 +551,7 @@ namespace clock_gettime_impl
         local_delta.QuadPart = 
             abs_start_point::get().QuadPart - get_abs_start_point_system().QuadPart;
 
-        ::timespec result = 
+        stdex::timespec result =
             system_time_to_timespec(local_delta);
 
         timespec_add(result, ts);
@@ -893,7 +995,7 @@ stdex::timespec
 
     return local_ts_to_system_ts(_ts);
 
-    return _ts;
+    //return _ts;
 }
 
 
