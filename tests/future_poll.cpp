@@ -113,7 +113,7 @@ int main()
   for(int i = 0; i < iterations; i++)
     f.wait_for(chrono::seconds(0));
   stop = chrono::high_resolution_clock::now();
-  double ready = print("wait_for when ready", stop - start);
+  double ready = print("wait_for when ready", stop - start) + 1.0;
 
   // Polling before ready with wait_for(0s) should be almost as fast as
   // after the result is ready.
