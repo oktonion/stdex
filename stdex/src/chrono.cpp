@@ -1045,6 +1045,7 @@ int get_UTC_shift()
     const stdex::time_t invalid_time_t(-1);
 
     int UTC_shift = 0;
+    stdex_tm_time_point.tm_sec++;
 
     while (invalid_time_t == time_t_time_point)
     {
@@ -1063,8 +1064,19 @@ stdex::time_t
     stdex::tm stdex_sys_clock_epoch = make_utc_tm(time_point(0));
 
     stdex::tm UTC_result = make_utc_tm(_t + hours(UTC_shift));
-    return 
+    stdex::time_t result =
         stdex::mktime(&UTC_result);
+    const stdex::time_t invalid_time_t(-1);
+    if(invalid_time_t == result)
+    {
+        UTC_result.tm_sec++;
+        stdex::time_t tmp =
+          stdex::mktime(&UTC_result),
+          time_t_epoch(0);
+        if(int(stdex::difftime(tmp, time_t_epoch)) == 1)
+            result = time_t_epoch;
+    }
+    return result;
 }
 
 
