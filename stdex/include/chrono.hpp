@@ -162,6 +162,7 @@ namespace stdex
             bool operator<=(const _big_int&, const _big_int&);
             
             template<class _Tp>
+            inline
             _big_int operator+(const _Tp& _lhs,
                 typename
                 conditional<is_integral<_Tp>::value, const _big_int&, class _disabled>::type _rhs)
@@ -170,6 +171,7 @@ namespace stdex
             }
 
             template<class _Tp>
+            inline
             _big_int operator-(const _Tp& _lhs,
                 typename
                 conditional<is_integral<_Tp>::value, const _big_int&, class _disabled>::type _rhs)
@@ -178,6 +180,7 @@ namespace stdex
             }
 
             template<class _Tp>
+            inline
             _big_int operator*(const _Tp& _lhs,
                 typename
                 conditional<is_integral<_Tp>::value, const _big_int&, class _disabled>::type _rhs)
@@ -186,6 +189,7 @@ namespace stdex
             }
 
             template<class _Tp>
+            inline
             _big_int operator/(const _Tp& _lhs,
                 typename
                 conditional<is_integral<_Tp>::value, const _big_int&, class _disabled>::type _rhs)
@@ -194,6 +198,7 @@ namespace stdex
             }
 
             template<class _Tp>
+            inline
             _big_int operator%(const _Tp& _lhs,
                 typename
                 conditional<is_integral<_Tp>::value, const _big_int&, class _disabled>::type _rhs)
@@ -201,7 +206,8 @@ namespace stdex
                 return _big_int(_lhs) % _rhs;
             }
 
-        template<class _To, class _From>
+            template<class _To, class _From>
+            inline
             _To _chrono_convert(_From _from,
                 typename
                 conditional<
@@ -215,6 +221,7 @@ namespace stdex
             }
 
             template<class _To, class _From>
+            inline
             _To _chrono_convert(_From _from,
                 typename
                 conditional<
@@ -228,6 +235,7 @@ namespace stdex
             }
 
             template<class _To, class _From>
+            inline
             _To _chrono_convert(const _From& _from,
                 typename
                 conditional<
@@ -242,6 +250,7 @@ namespace stdex
             }
 
              template<class _To, class _From>
+             inline
              _To _chrono_convert(const _From& _from,
                  typename
                  conditional <
@@ -256,6 +265,7 @@ namespace stdex
             }
 
             template<class _To, class _From>
+            inline
             _To _chrono_convert(const _From& _from,
                 typename
                 conditional<
