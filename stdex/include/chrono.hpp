@@ -417,7 +417,7 @@ namespace stdex
             struct _duration_cast_ct_impl<_ToDur, _CR, true, true>
             {
                 template<class _Rep, class _Period, class _CF>
-                static _ToDur _cast(const duration<_Rep, _Period>& _d, const _CF &_cf)
+                static _ToDur _cast(const duration<_Rep, _Period>& _d, const _CF&)
                 {
                     typedef typename _ToDur::rep _to_dur_rep;
                     typedef 
