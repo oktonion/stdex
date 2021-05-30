@@ -322,6 +322,42 @@ namespace stdex
             static const stdex::intmax_t num = type::num;
             static const stdex::intmax_t den = type::den;
         };
+
+        template<class _R1, class _R2>
+        struct _ratio_multiply_den
+        {
+        private:
+            static const stdex::intmax_t _gcd1 =
+                _gcd<_R1::num, _R2::den>::value;
+            static const stdex::intmax_t _gcd2 =
+                _gcd<_R2::num, _R1::den>::value;
+
+        public:
+
+            static const stdex::intmax_t value = 
+                _safe_multiply<
+                    (_R1::den / _ratio_multiply_den::_gcd2),
+                    (_R2::den / _ratio_multiply_den::_gcd1)
+                >::value;
+        };
+
+        template<class _R1, class _R2>
+        struct _ratio_multiply_num
+        {
+        private:
+            static const stdex::intmax_t _gcd1 =
+                _gcd<_R1::num, _R2::den>::value;
+            static const stdex::intmax_t _gcd2 =
+                _gcd<_R2::num, _R1::den>::value;
+
+        public:
+
+            static const stdex::intmax_t value = 
+                _safe_multiply<
+                    (_R1::num / _ratio_multiply_num::_gcd1),
+                    (_R2::num / _ratio_multiply_num::_gcd2)
+                >::value;
+        };
     }
 
     template<class _R1, class _R2>
@@ -342,6 +378,38 @@ namespace stdex
             static const stdex::intmax_t num = type::num;
             static const stdex::intmax_t den = type::den;
 
+        private:
+            typedef intern::ratio_asserts check;
+
+            typedef typename check::out_of_range< (_R2::num != 0) >::
+                out_of_range_failed
+            check1;// if you are there means that divider is zero
+        };
+
+        template<class _R1, class _R2>
+        struct _ratio_divide_den
+        {
+            typedef _ratio_multiply_den<
+                _R1,
+                ratio<_R2::den, _R2::num> > type;
+
+            static const stdex::intmax_t value = type::value;
+        private:
+            typedef intern::ratio_asserts check;
+
+            typedef typename check::out_of_range< (_R2::num != 0) >::
+                out_of_range_failed
+            check1;// if you are there means that divider is zero
+        };
+
+        template<class _R1, class _R2>
+        struct _ratio_divide_num
+        {
+            typedef _ratio_multiply_num<
+                _R1,
+                ratio<_R2::den, _R2::num> > type;
+
+            static const stdex::intmax_t value = type::value;
         private:
             typedef intern::ratio_asserts check;
 
