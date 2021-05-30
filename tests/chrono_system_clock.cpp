@@ -6,7 +6,7 @@
 #include <iostream>
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
 
-int main(void)
+int test1(void)
 {
     using namespace stdex;
     using namespace stdex::chrono;
@@ -60,4 +60,13 @@ int main(void)
         }
     }
     return 0;
+}
+
+static int res = test1();
+
+int main(void)
+{
+    if(0 == res)
+        return test1();
+    return res;
 }

@@ -1113,28 +1113,43 @@ stdex::tm get_time_t_epoch()
     const stdex::time_t time_t_epoch(0);
     const stdex::time_t invalid_time_t(-1);
     stdex::time_t time_t_time_point = invalid_time_t;
-    do{   
+    do{ 
+        if(stdex_tm_time_point.tm_year > 1900 + 1000) 
+            break; 
         stdex_tm_time_point.tm_year++;
+        stdex_tm_time_point.tm_isdst = 0;
         time_t_time_point = stdex::mktime(&stdex_tm_time_point);
+        if(invalid_time_t == time_t_time_point)
+        {
+            stdex_tm_time_point.tm_isdst = 1;
+            time_t_time_point = stdex::mktime(&stdex_tm_time_point);
+        }
     }
     while(invalid_time_t == time_t_time_point);
 
-    const double secs_since_time_t_epoch = 
-        stdex::difftime(time_t_time_point, time_t_epoch);
-    
-    stdex::chrono::seconds
-        secs_since_tm_epoch = // since 1 jan 1900
-            stdex::chrono::hours(stdex_tm_time_point.tm_yday * 24 * stdex_tm_time_point.tm_year) +
-            stdex::chrono::hours(stdex_tm_time_point.tm_hour) +
-            stdex::chrono::minutes(stdex_tm_time_point.tm_min) +
-            stdex::chrono::seconds(stdex_tm_time_point.tm_sec);
-    stdex::chrono::seconds secs_since_tm_epoch_to_tt_epoch =
-        secs_since_tm_epoch -
-        stdex::chrono::seconds(stdex::chrono::seconds::rep(secs_since_time_t_epoch));
+    if(invalid_time_t != time_t_time_point)
+    {
+        const double secs_since_time_t_epoch = 
+            stdex::difftime(time_t_time_point, time_t_epoch) - ( (1 == stdex_tm_time_point.tm_isdst) ? (1.0 * 60.0 * 60.0) : 0.0 );
+        
+        stdex::chrono::seconds
+            secs_since_tm_epoch = // since 1 jan 1900
+                stdex::chrono::hours(stdex_tm_time_point.tm_yday * 24 * stdex_tm_time_point.tm_year) +
+                stdex::chrono::hours(stdex_tm_time_point.tm_hour) +
+                stdex::chrono::minutes(stdex_tm_time_point.tm_min) +
+                stdex::chrono::seconds(stdex_tm_time_point.tm_sec);
+        stdex::chrono::seconds secs_since_tm_epoch_to_tt_epoch =
+            secs_since_tm_epoch -
+            stdex::chrono::seconds(stdex::chrono::seconds::rep(secs_since_time_t_epoch));
 
-    stdex_tm_time_point =
-        make_utc_tm(stdex_sys_clock_tp_epoch + secs_since_tm_epoch);
+        stdex_tm_time_point =
+            make_utc_tm(stdex_sys_clock_tp_epoch + secs_since_tm_epoch);
 
+    }
+    else
+    {
+        stdex_tm_time_point.tm_year = -987654321;
+    }
     
     return stdex_tm_time_point;
 }
@@ -1143,6 +1158,13 @@ static
 int get_UTC_shift()
 {
     static stdex::tm time_t_epoch = get_time_t_epoch();
+
+    if(time_t_epoch.tm_year == -987654321)
+    {
+        stdex::tm time_t_epoch = get_time_t_epoch();
+        if(time_t_epoch.tm_year == -987654321)
+            return -1;
+    }
 
     stdex::tm stdex_tm_time_point = time_t_epoch;
     stdex::time_t time_t_time_point = stdex::mktime(&time_t_epoch);
@@ -1156,6 +1178,12 @@ int get_UTC_shift()
         stdex_tm_time_point.tm_hour++;
         UTC_shift++;
         time_t_time_point = stdex::mktime(&stdex_tm_time_point);
+
+        if(stdex_tm_time_point.tm_hour > 23)
+        {
+            UTC_shift = -1;
+            break;
+        }
     }
 
     return UTC_shift;
@@ -1165,8 +1193,12 @@ stdex::time_t
     stdex::chrono::system_clock::to_time_t(const time_point &_t) _STDEX_NOEXCEPT_FUNCTION
 {
     int UTC_shift = get_UTC_shift();
-    stdex::tm stdex_sys_clock_epoch = make_utc_tm(time_point(0));
 
+    if(-1 == UTC_shift)
+        return -1;
+
+    stdex::tm stdex_sys_clock_epoch = make_utc_tm(time_point(0));
+    
     stdex::tm UTC_result = make_utc_tm(_t + hours(UTC_shift));
     stdex::time_t result =
         stdex::mktime(&UTC_result);
