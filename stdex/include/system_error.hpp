@@ -803,32 +803,15 @@ namespace stdex
         return stdex::operator<(_lhs, error_condition(_rhs));
     }
 
-    // VIRTUALS FOR error_category
-    inline error_condition
-        error_category::default_error_condition(int _Errval) const _STDEX_NOEXCEPT_FUNCTION
-    {    // make error_condition for error code
-        return (error_condition(_Errval, *this));
-    }
-
-    inline bool
-        error_category::equivalent(int _Errval,
-            const error_condition& _Cond) const _STDEX_NOEXCEPT_FUNCTION
-    {    // test if error code same condition
-        return (default_error_condition(_Errval) == _Cond);
-    }
-
-    inline bool
-        error_category::equivalent(const error_code& _Code,
-            int _Errval) const _STDEX_NOEXCEPT_FUNCTION
-    {    // test if conditions same for this category
-        return (*this == _Code.category() && _Code.value() == _Errval);
-    }
-
-    // MEMBER FUNCTIONS for error_code
-    inline error_condition error_code::default_error_condition() const _STDEX_NOEXCEPT_FUNCTION
-    {    // make error_condition for error code
-        return (category().default_error_condition(value()));
-    }
+    /*inline
+    bool operator<(const stdex::error_condition& _lhs, const stdex::error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
+    {
+        if (_lhs.category() < _rhs.category())
+            return true;
+        if (_lhs.value() < _rhs.value())
+            return true;
+        return false;
+    }*/
 
     // OPERATOR== FOR error_code/error_condition
     template<class _LhsT>
@@ -969,6 +952,12 @@ namespace stdex
         return stdex::operator==(_lhs, error_condition(_rhs));
     }
 
+    //inline
+    //bool operator==(const stdex::error_condition& _lhs, const stdex::error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
+    //{
+    //    return _lhs.category() == _rhs.category() && _lhs.value() == _rhs.value();
+    //}
+
     // OPERATOR!= FOR error_code/error_condition
     template<class _LhsT>
     inline
@@ -1064,6 +1053,40 @@ namespace stdex
         const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
     {
         return !(_lhs == _rhs);
+    }
+
+    //inline
+    //bool operator!=(const stdex::error_condition& _lhs, const stdex::error_condition& _rhs) _STDEX_NOEXCEPT_FUNCTION
+    //{
+    //    return !(_lhs == _rhs);
+    //}
+
+    
+    // VIRTUALS FOR error_category
+    inline error_condition
+        error_category::default_error_condition(int _Errval) const _STDEX_NOEXCEPT_FUNCTION
+    {    // make error_condition for error code
+        return (error_condition(_Errval, *this));
+    }
+
+    inline bool
+        error_category::equivalent(int _Errval,
+            const error_condition& _Cond) const _STDEX_NOEXCEPT_FUNCTION
+    {    // test if error code same condition
+        return (default_error_condition(_Errval) == _Cond);
+    }
+
+    inline bool
+        error_category::equivalent(const error_code& _Code,
+            int _Errval) const _STDEX_NOEXCEPT_FUNCTION
+    {    // test if conditions same for this category
+        return (*this == _Code.category() && _Code.value() == _Errval);
+    }
+
+    // MEMBER FUNCTIONS for error_code
+    inline error_condition error_code::default_error_condition() const _STDEX_NOEXCEPT_FUNCTION
+    {    // make error_condition for error code
+        return (category().default_error_condition(value()));
     }
 
     // FUNCTION make_error_code

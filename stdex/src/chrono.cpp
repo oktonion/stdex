@@ -1,5 +1,6 @@
 // stdex includes
 #include "../include/chrono.hpp"
+#include "../include/ctime.hpp"
 
 // POSIX includes
 //#include <time.h> // for clock_gettime
@@ -12,7 +13,7 @@
 #include <numeric>
 #include <cstring>
 
-void timespec_add(timespec &result, const timespec &in)
+void timespec_add(stdex::timespec &result, const stdex::timespec &in)
 {
     enum {BILLION = 1000000000};
 
@@ -27,7 +28,7 @@ void timespec_add(timespec &result, const timespec &in)
         return;
     }
 
-    timespec t2 = in;
+    stdex::timespec t2 = in;
     if (result.tv_nsec >= BILLION) {
         result.tv_nsec -= BILLION;
         result.tv_sec++;
@@ -68,8 +69,70 @@ void timespec_add(timespec &result, const timespec &in)
 
 #include <process.h>
 
+//from <sdkddkver.h> SDK Win10:
+#define _STDEX_WIN32_WINNT_NT4                    0x0400 // Windows NT 4.0
+#define _STDEX_WIN32_WINNT_WIN2K                  0x0500 // Windows 2000
+#define _STDEX_WIN32_WINNT_WINXP                  0x0501 // Windows XP
+#define _STDEX_WIN32_WINNT_WS03                   0x0502 // Windows Server 2003
+#define _STDEX_WIN32_WINNT_VISTA                  0x0600 // Windows Vista
+#define _STDEX_WIN32_WINNT_WS08                   0x0600 // Windows Server 2008
+#define _STDEX_WIN32_WINNT_WIN7                   0x0601 // Windows 7
+#define _STDEX_WIN32_WINNT_WIN8                   0x0602 // Windows 8
+#define _STDEX_WIN32_WINNT_WINBLUE                0x0603 // Windows 8.1
+#define _STDEX_WIN32_WINNT_WIN10                  0x0A00 // Windows 10
+
+#ifdef WINVER
+#define _STDEX_WINVER WINVER
+#else
+#define _STDEX_WINVER 0x0
+#endif
+
+namespace WinAPI
+{
+    namespace type_traits
+    {
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_NT4) > target_is_windows_NT_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_WIN2K) > target_is_windows_2000_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_WINXP) > target_is_windows_XP_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_WS03) > target_is_windows_server_2003_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_VISTA) > target_is_windows_vista_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_WS08) > target_is_windows_server_2008_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_WIN7) > target_is_windows_7_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_WIN8) > target_is_windows_8_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_WINBLUE) > target_is_windows_8_1_or_later;
+        typedef stdex::bool_constant< (_STDEX_WINVER >= _STDEX_WIN32_WINNT_WIN10) > target_is_windows_10_or_later;
+    }
+
+} // namespace WinAPI
+
+#undef _STDEX_WIN32_WINNT_NT4         
+#undef _STDEX_WIN32_WINNT_WIN2K       
+#undef _STDEX_WIN32_WINNT_WINXP       
+#undef _STDEX_WIN32_WINNT_WS03               
+#undef _STDEX_WIN32_WINNT_VISTA       
+#undef _STDEX_WIN32_WINNT_WS08         
+#undef _STDEX_WIN32_WINNT_WIN7        
+#undef _STDEX_WIN32_WINNT_WIN8        
+#undef _STDEX_WIN32_WINNT_WINBLUE     
+#undef _STDEX_WIN32_WINNT_WIN10   
+
+#undef _STDEX_WINVER
+
 typedef LONGLONG duration_long_long;
 typedef ULONGLONG duration_ulong_long;
+
+namespace WinAPI
+{
+    namespace kernel32_dll
+    {
+        static bool GetSystemTimePreciseAsFileTime(FILETIME* input);
+        static bool GetSystemTimeAsFileTime(FILETIME* input);
+    }
+
+    void GetSystemTimePreciseAsFileTime(FILETIME* input);
+    void GetSystemTimeAsFileTime(FILETIME* input);
+}
+
 struct filetime_ptr
 {
     FILETIME* value;
@@ -79,13 +142,17 @@ struct filetime_ptr
 
 filetime_ptr GetSystemTimeAsFileTime(filetime_ptr SystemTimeAsFileTimePtr)
 { // GetSystemTimeAsFileTime does not exist on WinCE
-    SYSTEMTIME st;
-
-    GetSystemTime(&st);
-    if (0 == SystemTimeToFileTime(&st, SystemTimeAsFileTimePtr.value))
+    
+    if(!WinAPI::kernel32_dll::GetSystemTimeAsFileTime(SystemTimeAsFileTimePtr.value))
     {
-        SystemTimeAsFileTimePtr.value->dwLowDateTime = 0;
-        SystemTimeAsFileTimePtr.value->dwHighDateTime = 0;
+        SYSTEMTIME st;
+
+        GetSystemTime(&st);
+        if (0 == SystemTimeToFileTime(&st, SystemTimeAsFileTimePtr.value))
+        {
+            SystemTimeAsFileTimePtr.value->dwLowDateTime = 0;
+            SystemTimeAsFileTimePtr.value->dwHighDateTime = 0;
+        }
     }
     return SystemTimeAsFileTimePtr;
 }
@@ -93,7 +160,10 @@ filetime_ptr GetSystemTimeAsFileTime(filetime_ptr SystemTimeAsFileTimePtr)
 filetime_ptr GetSystemTimePreciseAsFileTime(filetime_ptr SystemTimeAsFileTimePtr)
 { // GetSystemTimePreciseAsFileTime does not exist before Win8
     
-    GetSystemTimeAsFileTime(SystemTimeAsFileTimePtr.value);
+    if (!WinAPI::kernel32_dll::GetSystemTimePreciseAsFileTime(SystemTimeAsFileTimePtr.value))
+    {
+        WinAPI::GetSystemTimeAsFileTime(SystemTimeAsFileTimePtr.value);
+    }
     return SystemTimeAsFileTimePtr;
 }
 
@@ -101,7 +171,7 @@ stdex::detail::_no_type operator,(filetime_ptr, stdex::detail::_yes_type);
 
 namespace WinAPI
 {
-    namespace type_traits
+    /*namespace type_traits
     {
         struct _has_GetSystemTimePreciseAsFileTime
         {
@@ -114,7 +184,7 @@ namespace WinAPI
             static const bool value =
                 sizeof(::GetSystemTimeAsFileTime((FILETIME*)(0)), stdex::detail::_yes_type()) == sizeof(stdex::detail::_yes_type);
         };
-    }
+    }*/
 
 #ifndef WINAPI
     #ifndef NTAPI
@@ -137,28 +207,98 @@ namespace WinAPI
 
 #undef _STDEX_WINAPI
 
-    void GetSystemTimePreciseAsFileTime(FILETIME* input)
+    namespace kernel32_dll
     {
-        static HINSTANCE hKernel32 = GetModuleHandleW(L"kernel32.dll");
-        if (hKernel32)
+        bool GetSystemTimePreciseAsFileTime(FILETIME* input)
         {
-            // GetSystemTimePreciseAsFileTime
+            static HINSTANCE hKernel32 = GetModuleHandleW(L"kernel32.dll");
+            if (hKernel32)
             {
-                static FARPROC func = GetProcAddress(hKernel32, "GetSystemTimePreciseAsFileTime");
-                if (func)
-                    return reinterpret_cast<GetSystemTimePreciseAsFileTimePtr>(func)(input);
+                // GetSystemTimePreciseAsFileTime
+                {
+                    static FARPROC func = GetProcAddress(hKernel32, "GetSystemTimePreciseAsFileTime");
+                    if (func)
+                    {
+                        reinterpret_cast<GetSystemTimePreciseAsFileTimePtr>(func)(input);
+                        return true;
+                    }
+                }
             }
-
-            // GetSystemTimeAsFileTime
-            {
-                static FARPROC func = GetProcAddress(hKernel32, "GetSystemTimeAsFileTime");
-                if (func)
-                    reinterpret_cast<GetSystemTimeAsFileTimePtr>(func)(input);
-            }
+            return false;
         }
 
-        filetime_ptr ftp = input;
-        ::GetSystemTimeAsFileTime(ftp);
+        bool GetSystemTimeAsFileTime(FILETIME* input)
+        {
+            static HINSTANCE hKernel32 = GetModuleHandleW(L"kernel32.dll");
+            if (hKernel32)
+            {
+                // GetSystemTimeAsFileTime
+                {
+                    static FARPROC func = GetProcAddress(hKernel32, "GetSystemTimeAsFileTime");
+                    if (func)
+                    {
+                        reinterpret_cast<GetSystemTimeAsFileTimePtr>(func)(input);
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+    }
+
+    namespace detail
+    {
+        template<bool>
+        struct GetSystemTimePreciseAsFileTime_impl
+        {
+            // Windows8.1 or grater
+            // NOTE: attempt to dynamically load GetSystemTimePreciseAsFileTime from kernel32.dll would be done anyway
+            template<class _FileTime>
+            static void call(_FileTime input)
+            {
+                ::GetSystemTimePreciseAsFileTime(input);
+            }
+        };
+
+        template<>
+        struct GetSystemTimePreciseAsFileTime_impl<false>
+        {
+            static void call(filetime_ptr input) // Windows 7 or less
+            {
+                ::GetSystemTimePreciseAsFileTime(input);
+            }
+        };
+
+        template<bool>
+        struct GetSystemTimeAsFileTime_impl
+        {
+            // Windows2000 or grater
+            // NOTE: attempt to dynamically load GetSystemTimeAsFileTime from kernel32.dll would be done anyway
+            template<class _FileTime>
+            static void call(_FileTime input)
+            {
+                ::GetSystemTimeAsFileTime(input);
+            }
+        };
+
+        template<>
+        struct GetSystemTimeAsFileTime_impl<false>
+        {
+            static void call(filetime_ptr input) // Windows CE or less
+            {
+                ::GetSystemTimeAsFileTime(input);
+            }
+        };
+    }
+    
+    void GetSystemTimePreciseAsFileTime(FILETIME* input)
+    {
+        detail::GetSystemTimePreciseAsFileTime_impl<type_traits::target_is_windows_10_or_later::value>::call(input);
+    }
+
+    void GetSystemTimeAsFileTime(FILETIME* input)
+    {
+        detail::GetSystemTimeAsFileTime_impl<type_traits::target_is_windows_2000_or_later::value>::call(input);
     }
 }
 
@@ -169,7 +309,7 @@ namespace clock_gettime_impl
         LARGE_INTEGER jan_1_1970;
 
         // January 1, 1970 (start of Unix epoch) in "ticks"
-        // 116444736000000000 in ULARGE_INTEGER
+        // 116444736000000000 in ULARGE_INTEGER (UTC)
         jan_1_1970.LowPart  = 0xD53E8000;
         jan_1_1970.HighPart = 0x019DB1DE;
 
@@ -216,14 +356,14 @@ namespace clock_gettime_impl
         }
     };
 
-    typedef abs_start_point_impl<sizeof(stdex::intmax_t) * CHAR_BIT >= 64> abs_start_point;
+    typedef abs_start_point_impl<sizeof(duration_long_long) * CHAR_BIT >= 64> abs_start_point;
 
 #define _STDEX_CHRONO_CLOCK_REALTIME 0
 #define _STDEX_CHRONO_CLOCK_MONOTONIC 1
 
-    ::timespec system_time_to_timespec(const LARGE_INTEGER &stime)
+    stdex::timespec system_time_to_timespec(const LARGE_INTEGER &stime)
     {
-        timespec ts;
+        stdex::timespec ts;
 
         LARGE_INTEGER ticks_per_sec_in_filetime;
         ticks_per_sec_in_filetime.QuadPart = 10000000; // a tick is 100ns
@@ -259,7 +399,7 @@ namespace clock_gettime_impl
         return ts;
     }
 
-    int clock_gettime_realtime(timespec& ts) // unix time since January 1, 1970
+    int clock_gettime_realtime(stdex::timespec& ts) // unix time since January 1, 1970
     {
         FILETIME    filetime;
         LARGE_INTEGER today;
@@ -341,7 +481,7 @@ namespace clock_gettime_impl
         }
     } init_inittime;
 
-    int clock_gettime_monotonic(timespec& ts) // relative time since program start
+    int clock_gettime_monotonic(stdex::timespec& ts) // relative time since program start
     {
         const LARGE_INTEGER& sp = rel_start_point::get();
 
@@ -389,7 +529,7 @@ namespace clock_gettime_impl
 }
 
     int clock_gettime(int clk_id, stdex::timespec* _ts) {
-        ::timespec ts;
+        stdex::timespec ts;
         ts.tv_sec = _ts->tv_sec;
         ts.tv_nsec = _ts->tv_nsec;
         int err = -1;
@@ -405,7 +545,7 @@ namespace clock_gettime_impl
 
     stdex::timespec local_ts_to_system_ts(const stdex::timespec &_ts)
     {
-        ::timespec ts;
+        stdex::timespec ts;
         ts.tv_nsec = _ts.tv_nsec;
         ts.tv_sec = _ts.tv_sec;
 
@@ -413,7 +553,7 @@ namespace clock_gettime_impl
         local_delta.QuadPart = 
             abs_start_point::get().QuadPart - get_abs_start_point_system().QuadPart;
 
-        ::timespec result = 
+        stdex::timespec result =
             system_time_to_timespec(local_delta);
 
         timespec_add(result, ts);
@@ -857,17 +997,243 @@ stdex::timespec
 
     return local_ts_to_system_ts(_ts);
 
-    return _ts;
+    //return _ts;
 }
+
+
+static
+duration_long_long
+days_from_civil(duration_long_long y, duration_ulong_long m, duration_ulong_long d) _STDEX_NOEXCEPT_FUNCTION
+{
+    y -= m <= 2;
+    const duration_long_long era = (y >= 0 ? y : y-399) / 400;
+    const duration_ulong_long yoe = static_cast<duration_ulong_long>(y - era * 400);      // [0, 399]
+    const duration_ulong_long doy = (153*(m + (m > 2 ? -3 : 9)) + 2)/5 + d-1;  // [0, 365]
+    const duration_ulong_long doe = yoe * 365 + yoe/4 - yoe/100 + doy;         // [0, 146096]
+    return era * 146097 + static_cast<duration_long_long>(doe) - 719468;
+}
+
+struct civil_date
+{
+    duration_long_long year;
+    duration_ulong_long month;
+    duration_ulong_long day;
+};
+
+static
+civil_date
+civil_from_days(duration_long_long z) _STDEX_NOEXCEPT_FUNCTION
+{
+    z += 719468;
+    const duration_long_long era = (z >= 0 ? z : z - 146096) / 146097;
+    const duration_ulong_long doe = static_cast<duration_ulong_long>(z - era * 146097);          // [0, 146096]
+    const duration_ulong_long yoe = (doe - doe/1460 + doe/36524 - doe/146096) / 365;  // [0, 399]
+    const duration_long_long y = static_cast<duration_long_long>(yoe) + era * 400;
+    const duration_ulong_long doy = doe - (365*yoe + yoe/4 - yoe/100);                // [0, 365]
+    const duration_ulong_long mp = (5*doy + 2)/153;                                   // [0, 11]
+    const duration_ulong_long d = doy - (153*mp+2)/5 + 1;                             // [1, 31]
+    const duration_ulong_long m = mp + (mp < 10 ? 3 : -9);                            // [1, 12]
+
+    civil_date result;
+    result.year = y + (m <= 2);
+    result.month = m;
+    result.day = d;
+
+    return result;
+}
+
+static
+duration_ulong_long
+weekday_from_days(duration_long_long z) _STDEX_NOEXCEPT_FUNCTION
+{
+    return static_cast<duration_ulong_long>(z >= -4 ? (z+4) % 7 : (z+5) % 7 + 6);
+}
+
+template <class To, class Rep, class Period>
+To
+round_down(const stdex::chrono::duration<Rep, Period>& d)
+{
+    To t = stdex::chrono::duration_cast<To>(d);
+    if (t > d)
+        --t;
+    return t;
+}
+
+static
+stdex::tm
+make_utc_tm(stdex::chrono::system_clock::time_point tp)
+{
+    using namespace stdex::chrono;
+
+
+    typedef         
+    stdex::ratio_multiply<
+        hours::period,
+        stdex::ratio<24>
+    >::type days_period;
+
+    typedef 
+    stdex::chrono::duration<
+        stdex::chrono::system_clock::rep,
+        days_period
+    > days;
+
+    // t is time duration since 1970-01-01
+    stdex::chrono::system_clock::duration t = tp.time_since_epoch();
+    // d is days since 1970-01-01
+    days d = round_down<days>(t);
+    // t is now time duration since midnight of day d
+    t -= d;
+    // break d down into year/month/day
+    civil_date civ_date = civil_from_days(d.count());
+    // start filling in the tm with calendar info
+    std::tm tm;
+    tm.tm_isdst = 0;
+    tm.tm_year = civ_date.year - 1900;
+    tm.tm_mon = civ_date.month - 1;
+    tm.tm_mday = civ_date.day;
+    tm.tm_wday = weekday_from_days(d.count());
+    tm.tm_yday = d.count() - days_from_civil(civ_date.year, 1, 1);
+    // Fill in the time
+    tm.tm_hour = duration_cast<hours>(t).count();
+    t -= hours(tm.tm_hour);
+    tm.tm_min = duration_cast<minutes>(t).count();
+    t -= minutes(tm.tm_min);
+    tm.tm_sec = duration_cast<seconds>(t).count();
+    return tm;
+}
+
+static
+stdex::tm get_time_t_epoch()
+{
+    const stdex::chrono::system_clock::time_point stdex_sys_clock_tp_epoch = 
+        stdex::chrono::system_clock::time_point(0);
+    stdex::tm stdex_tm_time_point = 
+        make_utc_tm(stdex_sys_clock_tp_epoch);
+    const stdex::time_t time_t_epoch(0);
+    const stdex::time_t invalid_time_t(-1);
+    stdex::time_t time_t_time_point = invalid_time_t;
+    do{ 
+        if(stdex_tm_time_point.tm_year > 1900 + 1000) 
+            break; 
+        stdex_tm_time_point.tm_year++;
+        stdex_tm_time_point.tm_isdst = 0;
+        time_t_time_point = stdex::mktime(&stdex_tm_time_point);
+        if(invalid_time_t == time_t_time_point)
+        {
+            stdex_tm_time_point.tm_isdst = 1;
+            time_t_time_point = stdex::mktime(&stdex_tm_time_point);
+        }
+    }
+    while(invalid_time_t == time_t_time_point);
+
+    if(invalid_time_t != time_t_time_point)
+    {
+        const double secs_since_time_t_epoch = 
+            stdex::difftime(time_t_time_point, time_t_epoch) - ( (1 == stdex_tm_time_point.tm_isdst) ? (1.0 * 60.0 * 60.0) : 0.0 );
+        
+        stdex::chrono::seconds
+            secs_since_tm_epoch = // since 1 jan 1900
+                stdex::chrono::hours(stdex_tm_time_point.tm_yday * 24 * stdex_tm_time_point.tm_year) +
+                stdex::chrono::hours(stdex_tm_time_point.tm_hour) +
+                stdex::chrono::minutes(stdex_tm_time_point.tm_min) +
+                stdex::chrono::seconds(stdex_tm_time_point.tm_sec);
+        stdex::chrono::seconds secs_since_tm_epoch_to_tt_epoch =
+            secs_since_tm_epoch -
+            stdex::chrono::seconds(stdex::chrono::seconds::rep(secs_since_time_t_epoch));
+
+        stdex_tm_time_point =
+            make_utc_tm(stdex_sys_clock_tp_epoch + secs_since_tm_epoch);
+
+    }
+    else
+    {
+        stdex_tm_time_point.tm_year = -987654321;
+    }
+    
+    return stdex_tm_time_point;
+}
+
+static
+int get_UTC_shift()
+{
+    static stdex::tm time_t_epoch = get_time_t_epoch();
+
+    if(time_t_epoch.tm_year == -987654321)
+    {
+        stdex::tm time_t_epoch = get_time_t_epoch();
+        if(time_t_epoch.tm_year == -987654321)
+            return -1;
+    }
+
+    stdex::tm stdex_tm_time_point = time_t_epoch;
+    stdex::time_t time_t_time_point = stdex::mktime(&time_t_epoch);
+    const stdex::time_t invalid_time_t(-1);
+
+    int UTC_shift = 0;
+    stdex_tm_time_point.tm_sec++;
+
+    while (invalid_time_t == time_t_time_point)
+    {
+        stdex_tm_time_point.tm_hour++;
+        UTC_shift++;
+        time_t_time_point = stdex::mktime(&stdex_tm_time_point);
+
+        if(stdex_tm_time_point.tm_hour > 23)
+        {
+            UTC_shift = -1;
+            break;
+        }
+    }
+
+    return UTC_shift;
+}
+
+stdex::time_t
+    stdex::chrono::system_clock::to_time_t(const time_point &_t) _STDEX_NOEXCEPT_FUNCTION
+{
+    int UTC_shift = get_UTC_shift();
+
+    if(-1 == UTC_shift)
+        return -1;
+
+    stdex::tm stdex_sys_clock_epoch = make_utc_tm(time_point(0));
+    
+    stdex::tm UTC_result = make_utc_tm(_t + hours(UTC_shift));
+    stdex::time_t result =
+        stdex::mktime(&UTC_result);
+    const stdex::time_t invalid_time_t(-1);
+    if(invalid_time_t == result)
+    {
+        UTC_result.tm_sec++;
+        stdex::time_t tmp =
+          stdex::mktime(&UTC_result),
+          time_t_epoch(0);
+        if(int(stdex::difftime(tmp, time_t_epoch)) == 1)
+            result = time_t_epoch;
+    }
+    return result;
+}
+
 
 stdex::chrono::system_clock::time_point
     stdex::chrono::system_clock::from_time_t(stdex::time_t _t) _STDEX_NOEXCEPT_FUNCTION
 {
     typedef chrono::time_point<system_clock, seconds>    _from;
+
+    int UTC_shift = get_UTC_shift();
+    stdex::tm stdex_sys_clock_epoch = make_utc_tm(time_point(0) + hours(UTC_shift));
+    stdex_sys_clock_epoch.tm_mon++;
+    stdex_sys_clock_epoch.tm_yday = 31;
+    stdex::time_t stdex_sys_clock_epoch_tt = stdex::mktime(&stdex_sys_clock_epoch);
+
+    double seconds_from_epoch = 
+        stdex::difftime(_t, stdex_sys_clock_epoch_tt);
+    const duration_long_long sec_in_jan = (31 * 24 * 60 * 60);
       
     stdex::chrono::detail::_big_int result = 
         stdex::chrono::detail::convert(
-            static_cast<duration_long_long>(duration_long_long(0) + _t)
+            static_cast<duration_long_long>(duration_long_long(0) + duration_long_long(seconds_from_epoch) + sec_in_jan)
         );
 
     return time_point_cast<system_clock::duration>
