@@ -1268,7 +1268,7 @@ stdex::time_t
     if(-1 == UTC_shift)
         return -1;
 
-    stdex::tm stdex_sys_clock_epoch = make_utc_tm(time_point(0));
+    stdex::tm stdex_sys_clock_epoch = make_utc_tm(time_point());
     
     stdex::tm UTC_result = make_utc_tm(_t + hours(UTC_shift));
     stdex::time_t result =
@@ -1295,9 +1295,9 @@ stdex::chrono::system_clock::time_point
     int UTC_shift = get_UTC_shift();
 
     if(-1 == UTC_shift || -1 == _t)
-        return time_point(0);
+        return time_point();
 
-    stdex::tm stdex_sys_clock_epoch = make_utc_tm(time_point(0) + hours(UTC_shift));
+    stdex::tm stdex_sys_clock_epoch = make_utc_tm(time_point() + hours(UTC_shift));
     stdex_sys_clock_epoch.tm_mon++;
     stdex_sys_clock_epoch.tm_yday = 31;
     stdex::time_t stdex_sys_clock_epoch_tt = stdex::mktime(&stdex_sys_clock_epoch);
