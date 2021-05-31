@@ -1043,6 +1043,18 @@ civil_from_days(duration_long_long z) _STDEX_NOEXCEPT_FUNCTION
 }
 
 static
+duration_long_long
+days_from_julian(duration_long_long y, duration_ulong_long m, duration_ulong_long d) _STDEX_NOEXCEPT_FUNCTION
+{
+    y -= m <= 2;
+    const duration_long_long era = (y >= 0 ? y : y-3) / 4;
+    const duration_ulong_long yoe = static_cast<duration_ulong_long>(y - era * 4);        // [0, 3]
+    const duration_ulong_long doy = (153*(m + (m > 2 ? -3 : 9)) + 2)/5 + d-1;  // [0, 365]
+    const duration_ulong_long doe = yoe * 365 + doy;                           // [0, 1460]
+    return era * 1461 + static_cast<duration_long_long>(doe) - 719470;
+}
+
+static
 duration_ulong_long
 weekday_from_days(duration_long_long z) _STDEX_NOEXCEPT_FUNCTION
 {
@@ -1059,27 +1071,26 @@ round_down(const stdex::chrono::duration<Rep, Period>& d)
     return t;
 }
 
+typedef         
+stdex::ratio_multiply<
+    stdex::chrono::hours::period,
+    stdex::ratio<24>
+>::type days_period;
+
+typedef 
+stdex::chrono::duration<
+    stdex::chrono::system_clock::rep,
+    days_period
+> days;
+
 static
 stdex::tm
 make_utc_tm(stdex::chrono::system_clock::time_point tp)
 {
     using namespace stdex::chrono;
 
-
-    typedef         
-    stdex::ratio_multiply<
-        hours::period,
-        stdex::ratio<24>
-    >::type days_period;
-
-    typedef 
-    stdex::chrono::duration<
-        stdex::chrono::system_clock::rep,
-        days_period
-    > days;
-
     // t is time duration since 1970-01-01
-    stdex::chrono::system_clock::duration t = tp.time_since_epoch();
+    system_clock::duration t = tp.time_since_epoch();
     // d is days since 1970-01-01
     days d = round_down<days>(t);
     // t is now time duration since midnight of day d
@@ -1087,36 +1098,80 @@ make_utc_tm(stdex::chrono::system_clock::time_point tp)
     // break d down into year/month/day
     civil_date civ_date = civil_from_days(d.count());
     // start filling in the tm with calendar info
-    std::tm tm;
-    tm.tm_isdst = 0;
-    tm.tm_year = civ_date.year - 1900;
-    tm.tm_mon = civ_date.month - 1;
-    tm.tm_mday = civ_date.day;
-    tm.tm_wday = weekday_from_days(d.count());
-    tm.tm_yday = d.count() - days_from_civil(civ_date.year, 1, 1);
+    stdex::tm result;
+    result.tm_isdst = 0;
+    result.tm_year = civ_date.year - 1900;
+    result.tm_mon = civ_date.month - 1;
+    result.tm_mday = civ_date.day;
+    result.tm_wday = weekday_from_days(d.count());
+    result.tm_yday = d.count() - days_from_civil(civ_date.year, 1, 1);
     // Fill in the time
-    tm.tm_hour = duration_cast<hours>(t).count();
-    t -= hours(tm.tm_hour);
-    tm.tm_min = duration_cast<minutes>(t).count();
-    t -= minutes(tm.tm_min);
-    tm.tm_sec = duration_cast<seconds>(t).count();
-    return tm;
+    result.tm_hour = duration_cast<hours>(t).count();
+    t -= hours(result.tm_hour);
+    result.tm_min = duration_cast<minutes>(t).count();
+    t -= minutes(result.tm_min);
+    result.tm_sec = duration_cast<seconds>(t).count();
+    return result;
+}
+
+static
+stdex::tm
+make_tm_from_civil_secs(stdex::chrono::seconds secs)
+{
+    using namespace stdex::chrono;
+
+    // secs is time duration since 1900-01-01
+    // d is days since 1900-01-01
+    days d = round_down<days>(secs);
+    // t is now time duration since midnight of day d
+    secs -= d;
+    // break d down into year/month/day
+    civil_date civ_date = civil_from_days(d.count());
+    // start filling in the tm with calendar info
+    stdex::tm result;
+    result.tm_isdst = 0;
+    result.tm_year = civ_date.year - 1900;
+    result.tm_mon = civ_date.month - 1;
+    result.tm_mday = civ_date.day;
+    result.tm_wday = weekday_from_days(d.count());
+    result.tm_yday = d.count() - days_from_civil(civ_date.year, 1, 1);
+    // Fill in the time
+    result.tm_hour = duration_cast<hours>(secs).count();
+    secs -= hours(result.tm_hour);
+    result.tm_min = duration_cast<minutes>(secs).count();
+    secs -= minutes(result.tm_min);
+    result.tm_sec = duration_cast<seconds>(secs).count();
+    return result;
 }
 
 static
 stdex::tm get_time_t_epoch()
 {
-    const stdex::chrono::system_clock::time_point stdex_sys_clock_tp_epoch = 
-        stdex::chrono::system_clock::time_point(0);
+    const stdex::chrono::system_clock::time_point stdex_sys_clock_tp_epoch; // should be 1970-1-1
     stdex::tm stdex_tm_time_point = 
         make_utc_tm(stdex_sys_clock_tp_epoch);
+    
+    if(
+        stdex_tm_time_point.tm_year != 70 ||
+        stdex_tm_time_point.tm_mon != 0 ||
+        stdex_tm_time_point.tm_mday != 1 ||
+        stdex_tm_time_point.tm_hour != 0 ||
+        stdex_tm_time_point.tm_hour != 0 ||
+        stdex_tm_time_point.tm_hour != 0
+      )
+    {
+        stdex_tm_time_point.tm_year = -987654321;
+        return stdex_tm_time_point;
+    }
+
     const stdex::time_t time_t_epoch(0);
     const stdex::time_t invalid_time_t(-1);
     stdex::time_t time_t_time_point = invalid_time_t;
+    unsigned short d_shift = 0;
     do{ 
         if(stdex_tm_time_point.tm_year > 1900 + 1000) 
             break; 
-        stdex_tm_time_point.tm_year++;
+        stdex_tm_time_point = make_utc_tm(stdex_sys_clock_tp_epoch + days(d_shift * 30));
         stdex_tm_time_point.tm_isdst = 0;
         time_t_time_point = stdex::mktime(&stdex_tm_time_point);
         if(invalid_time_t == time_t_time_point)
@@ -1132,18 +1187,34 @@ stdex::tm get_time_t_epoch()
         const double secs_since_time_t_epoch = 
             stdex::difftime(time_t_time_point, time_t_epoch) - ( (1 == stdex_tm_time_point.tm_isdst) ? (1.0 * 60.0 * 60.0) : 0.0 );
         
+        // stdex_tm_time_point - time count from 1900-1-1
+        // time_t epoch is (stdex_tm_time_point - secs_since_time_t_epoch)
+        
+        // days since 1900-1-1 up to stdex_tm_time_point:
+        duration_long_long days_count_up_to_stdex_tm_time_point = 
+            days_from_civil(
+                        1900 + stdex_tm_time_point.tm_year, 
+                        1 + stdex_tm_time_point.tm_mon, 
+                        stdex_tm_time_point.tm_mday);
+
+        // secs count since 1900-1-1 up to stdex_tm_time_point:
         stdex::chrono::seconds
-            secs_since_tm_epoch = // since 1 jan 1900
-                stdex::chrono::hours(stdex_tm_time_point.tm_yday * 24 * stdex_tm_time_point.tm_year) +
+            secs_since_tm_epoch_up_to_stdex_tm_time_point = // since 1 jan 1900
+                stdex::chrono::hours(
+                    days_count_up_to_stdex_tm_time_point * 24
+                ) +
                 stdex::chrono::hours(stdex_tm_time_point.tm_hour) +
                 stdex::chrono::minutes(stdex_tm_time_point.tm_min) +
                 stdex::chrono::seconds(stdex_tm_time_point.tm_sec);
+
+        // secs count since 1900-1-1 up to time_t epoch:
         stdex::chrono::seconds secs_since_tm_epoch_to_tt_epoch =
-            secs_since_tm_epoch -
-            stdex::chrono::seconds(stdex::chrono::seconds::rep(secs_since_time_t_epoch));
+            secs_since_tm_epoch_up_to_stdex_tm_time_point -
+            stdex::chrono::seconds(duration_long_long(secs_since_time_t_epoch));
+            
 
         stdex_tm_time_point =
-            make_utc_tm(stdex_sys_clock_tp_epoch + secs_since_tm_epoch);
+            make_tm_from_civil_secs(secs_since_tm_epoch_to_tt_epoch);
 
     }
     else
@@ -1209,7 +1280,7 @@ stdex::time_t
         stdex::time_t tmp =
           stdex::mktime(&UTC_result),
           time_t_epoch(0);
-        if(int(stdex::difftime(tmp, time_t_epoch)) == 1)
+        if(invalid_time_t != tmp && int(stdex::difftime(tmp, time_t_epoch)) == 1)
             result = time_t_epoch;
     }
     return result;
@@ -1222,6 +1293,10 @@ stdex::chrono::system_clock::time_point
     typedef chrono::time_point<system_clock, seconds>    _from;
 
     int UTC_shift = get_UTC_shift();
+
+    if(-1 == UTC_shift || -1 == _t)
+        return time_point(0);
+
     stdex::tm stdex_sys_clock_epoch = make_utc_tm(time_point(0) + hours(UTC_shift));
     stdex_sys_clock_epoch.tm_mon++;
     stdex_sys_clock_epoch.tm_yday = 31;
