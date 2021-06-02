@@ -9,18 +9,14 @@ mkdir ./obj
 
 build_ok=1
 
-if [[ $COMPILER = *"clang"* ]]; then
-  exclude_warn="-Wno-c++11-long-long -Wno-non-literal-null-conversion"
-else
-  exclude_warn="-Wno-long-long"
-fi
-
 
 for file in ./src/*.cpp; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
   echo "compiling $filename"
-  if ! $COMPILER -pedantic $exclude_warn -lstdlib -c "$file" -o "./obj/$filename.o"; then
+  if $COMPILER -pedantic $exclude_warn -lstdlib -c "$file" -o "./obj/$filename.o"; then
+    echo ""
+  then
     build_ok=0
   fi
 done
