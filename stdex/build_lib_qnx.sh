@@ -16,7 +16,7 @@ for file in ./src/*.cpp; do
   echo "compiling $filename"
   if $COMPILER -pedantic $exclude_warn -lstdlib -c "$file" -o "./obj/$filename.o"; then
     echo ""
-  then
+  else
     build_ok=0
   fi
 done
