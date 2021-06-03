@@ -43,7 +43,7 @@ namespace stdex
     namespace intern
     {
         // since we have no static_assert in pre-C++11 we just compile-time assert this way:
-        struct type_traits_asserts
+        namespace type_traits_asserts
         {
             template<bool>
             struct make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert;
@@ -56,7 +56,7 @@ namespace stdex
 
             template<bool>
             struct alignment_of_type_can_not_be_zero_assert;
-        };
+        }
 
         template<>
         struct type_traits_asserts::make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert<true>
@@ -829,14 +829,19 @@ namespace stdex
             >::type type;
 
         private:
-            typedef intern::type_traits_asserts check;
-            typedef typename check::alignment_of_type_can_not_be_zero_assert<( _alignment_of_impl::value != 0 )>::
+            
+            typedef intern::type_traits_asserts::alignment_of_type_can_not_be_zero_assert<( _alignment_of_impl::value != 0 )>::
                 alignment_of_type_can_not_be_zero_assert_failed
             check1; // if you are there means alignment of type passed can not be calculated or compiler can not handle this situation (sorry, nothing can be done there)
         };
 
         // Borland compilers seem to be unable to handle long double correctly, so this will do the trick:
         struct _long_double_wrapper{ long double value; };
+
+        template<>
+        struct _alignment_of_impl<long double>
+            : _alignment_of_impl<_long_double_wrapper>
+        { };
     }
 
     template <class _Tp> 
@@ -847,11 +852,6 @@ namespace stdex
     template <class _Tp> 
     struct alignment_of<_Tp&>: 
         public alignment_of<_Tp*>
-    {};
-
-    template<> 
-    struct alignment_of<long double>: 
-        public alignment_of<detail::_long_double_wrapper>
     {};
 
     namespace detail
@@ -2639,9 +2639,9 @@ namespace stdex
         class _make_unsigned_selector
         {
         private:
-            typedef intern::type_traits_asserts check;
+            
 
-            typedef typename check::make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert< is_integral<_Tp>::value >::
+            typedef intern::type_traits_asserts::make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert< is_integral<_Tp>::value >::
                 make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed
             check1; // if you are there means _Tp is not an integral type
 
@@ -2750,9 +2750,9 @@ namespace stdex
         class _make_signed_selector
         {
         private:
-            typedef intern::type_traits_asserts check;
+            
 
-            typedef typename check::make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert< is_integral<_Tp>::value >::
+            typedef intern::type_traits_asserts::make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert< is_integral<_Tp>::value >::
                 make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed
             check1; // if you are there means _Tp is not an integral type
 
@@ -2956,8 +2956,8 @@ namespace stdex
         {
             typedef void type;
         private:
-            typedef intern::type_traits_asserts check;
-            typedef typename check::not_allowed_arithmetic_type_assert< _I != 0 >::
+            
+            typedef intern::type_traits_asserts::not_allowed_arithmetic_type_assert< _I != 0 >::
                 not_allowed_arithmetic_type_assert_failed
             check1; // if you are there means you passed to common_type not known arithmetic type
         };
