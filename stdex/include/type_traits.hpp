@@ -3156,7 +3156,18 @@ namespace stdex
         template<class _Tp, class _U> 
         struct _common_arithmetic_type
         { 
-            typedef typename _arithmetic_type<_common_arithmetic_type_cpp11<_Tp, _U, _common_arithmetic_type_base<_Tp, _U>::value != int(0)>::value>::type type;
+            typedef 
+            typename 
+            _arithmetic_type<
+                _common_arithmetic_type_cpp11<
+                    _Tp, 
+                    _U, bool(
+                    _common_arithmetic_type_base<
+                        _Tp, 
+                        _U
+                    >::value != int(0) )
+                >::value
+            >::type type;
         };
 
         template<class _Tp, class _U>
