@@ -741,44 +741,35 @@ namespace stdex
         typedef _Tp& type;
     };
 
+    namespace detail
+    {
+        template<class _Tp>
+        struct is_signed_impl
+        {
+            typedef _sign_unsign_chooser<is_integral<_Tp>::value>::template _signed<_Tp> _impl;
+            
+            typedef typename conditional< _impl::value, true_type, false_type >::type type;
+        };
+
+        template<class _Tp>
+        struct is_unsigned_impl
+        {
+            typedef detail::_sign_unsign_chooser<is_integral<_Tp>::value>::template _unsigned<_Tp> _impl;
+            
+            typedef typename conditional< _impl::value, true_type, false_type >::type type;
+        };
+    }
+
     template<class _Tp>
-    struct is_signed
+    struct is_signed:
+        detail::is_signed_impl<_Tp>::type
     {    // determine whether _Tp is a signed type
-
-        static const bool value = detail::_sign_unsign_chooser<is_integral<_Tp>::value>::template _signed<_Tp>::value;
-
-        typedef const bool value_type;
-        typedef integral_constant< bool, (is_signed::value == bool(true)) > type;
-
-        operator value_type() const
-        {    // return stored value
-            return (value);
-        }
-
-        value_type operator()() const
-        {    // return stored value
-            return (value);
-        }
     };
 
     template<class _Tp>
-    struct is_unsigned
+    struct is_unsigned:
+        detail::is_unsigned_impl<_Tp>::type
     {    // determine whether _Tp is an unsigned type
-
-        static const bool value = detail::_sign_unsign_chooser<is_integral<_Tp>::value>::template _unsigned<_Tp>::value;
-
-        typedef const bool value_type;
-        typedef integral_constant<bool, (is_unsigned::value == bool(true)) > type;
-
-        operator value_type() const
-        {    // return stored value
-            return (value);
-        }
-
-        value_type operator()() const
-        {    // return stored value
-            return (value);
-        }
     };
 
     namespace detail
