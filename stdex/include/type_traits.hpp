@@ -2270,9 +2270,8 @@ namespace stdex
         namespace is_enum_detail
         {
             enum dummy_enum {};
-            struct _enum_can_have_member_pointer_bug :
-                public bool_constant<bool( _has_member_pointer_impl<dummy_enum>::value == bool(true) )>::type
-            { };
+
+            typedef bool_constant<bool( _has_member_pointer_impl<dummy_enum>::value == bool(true) )>::type _enum_can_have_member_pointer_bug;
         } // namespace is_enum_detail
 
     } // namespace detail
