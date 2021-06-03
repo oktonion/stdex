@@ -112,11 +112,11 @@ namespace stdex
             template<bool>
             struct _pointer_as_short_type { typedef const short type; };
             template<>
-            struct _pointer_as_short_type<false> { typedef _pointer_as_long_type<sizeof(long) == sizeof(void*)>::type type; };
+            struct _pointer_as_short_type<false> { static const bool flag = sizeof(long) == sizeof(void*); typedef _pointer_as_long_type<_pointer_as_short_type::flag>::type type; };
             template<bool>
             struct _pointer_as_int_type { typedef const int type; };
             template<>
-            struct _pointer_as_int_type<false> { typedef _pointer_as_short_type<sizeof(short) == sizeof(void*)>::type type; };
+            struct _pointer_as_int_type<false> { static const bool flag = sizeof(short) == sizeof(void*); typedef _pointer_as_short_type<_pointer_as_int_type::flag>::type type; };
 
             template<bool>
             struct _pointer_as_ulong_type { typedef const unsigned long type; };
@@ -125,16 +125,16 @@ namespace stdex
             template<bool>
             struct _pointer_as_ushort_type { typedef const unsigned short type; };
             template<>
-            struct _pointer_as_ushort_type<false> { typedef _pointer_as_long_type<sizeof(unsigned long) == sizeof(void*)>::type type; };
+            struct _pointer_as_ushort_type<false> { static const bool flag = sizeof(unsigned long) == sizeof(void*); typedef _pointer_as_long_type<_pointer_as_ushort_type::flag>::type type; };
             template<bool>
             struct _pointer_as_uint_type { typedef const unsigned int type; };
             template<>
-            struct _pointer_as_uint_type<false> { typedef _pointer_as_short_type<sizeof(unsigned short) == sizeof(void*)>::type type; };
+            struct _pointer_as_uint_type<false> { static const bool flag = sizeof(unsigned short) == sizeof(void*); typedef _pointer_as_short_type<_pointer_as_uint_type::flag>::type type; };
 
             template<bool>
-            struct _pointer_as_integral_type_impl { typedef _pointer_as_int_type<sizeof(int) == sizeof(void*)>::type type; };
+            struct _pointer_as_integral_type_impl { static const bool flag = sizeof(int) == sizeof(void*); typedef _pointer_as_int_type<_pointer_as_integral_type_impl::flag>::type type; };
             template<>
-            struct _pointer_as_integral_type_impl<false> { typedef _pointer_as_uint_type<sizeof(int) == sizeof(void*)>::type type; };
+            struct _pointer_as_integral_type_impl<false> { static const bool flag = sizeof(int) == sizeof(void*); typedef _pointer_as_uint_type<_pointer_as_integral_type_impl::flag>::type type; };
 
             struct _ptrdiff_is_signed
             {
@@ -363,7 +363,10 @@ namespace stdex
                 static const bool _can_be_compared_to_ptr = _nullptr_t_can_be_compared_to_ptr<_nullptr_t_as_integral>::value;
             };
 
-            typedef _nullptr_choose_as_int<_as_int::_is_convertable_to_ptr == bool(true) && _as_int::_equal_void_ptr == bool(true) && _as_int::_can_be_compared_to_ptr == bool(true)>::type type;
+            static const bool flag =
+                _as_int::_is_convertable_to_ptr == bool(true) && _as_int::_equal_void_ptr == bool(true) && _as_int::_can_be_compared_to_ptr == bool(true);
+
+            typedef _nullptr_choose_as_int<_nullptr_choose_as_enum::flag>::type type;
         };
 
         template<>
