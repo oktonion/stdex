@@ -258,7 +258,7 @@ namespace stdex
 
             template<int _Rank> 
             struct _sized_integer_map:
-                _sized_integer_map_helper<_Rank, cstdint_detail::_is_integral_constant<typename _sized_integer_map_impl<_Rank>::signed_type>::value == true>
+                _sized_integer_map_helper<_Rank, cstdint_detail::_is_integral_constant<typename _sized_integer_map_impl<_Rank>::signed_type>::value>
             { };
 
             template<>
