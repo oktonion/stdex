@@ -550,7 +550,7 @@ namespace stdex
             _ratio_add<
                 _R1,
                 ratio<
-                    (-_R2::num), 
+                    stdex::intmax_t(-_R2::num), 
                     _R2::den
                 > 
             >::type type;
