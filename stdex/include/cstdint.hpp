@@ -91,17 +91,26 @@ namespace stdex
                 char _padding[8];
             };
 
-            class _is_integral_constant_std_impl_helper
+            namespace _is_integral_constant_std_impl_ns
             {
-                class _type;
-            public:
-                static cstdint_detail::_yes_type check(_type*);
-                static cstdint_detail::_no_type check(_constructible_from_any);
-            };
+                class _is_integral_constant_std_impl_helper_type;
 
-            class _is_integral_constant_hack_impl_helper
+                static cstdint_detail::_yes_type check(_is_integral_constant_std_impl_helper_type*);
+                static cstdint_detail::_no_type check(_constructible_from_any);
+
+                template<class _Tp>
+                struct _is_integral_constant_std_impl
+                {
+                    static const bool value =
+                        sizeof(check(_Tp(NULL))) == sizeof(cstdint_detail::_yes_type) &&
+                        sizeof(check(_Tp(1))) == sizeof(cstdint_detail::_no_type);
+                };
+            }
+
+            using _is_integral_constant_std_impl_ns::_is_integral_constant_std_impl;
+
+            namespace _is_integral_constant_hack_impl_ns
             {
-            public:
                 static cstdint_detail::_yes_type check1(int);
                 static cstdint_detail::_no_type check1(_constructible_from_any);
 
@@ -114,24 +123,19 @@ namespace stdex
                 static cstdint_detail::_no_type check3(const float*);
                 static cstdint_detail::_no_type check3(const double*);
                 static cstdint_detail::_no_type check3(const long double*);
-            };
 
-            template<class _Tp>
-            struct _is_integral_constant_std_impl
-            {
-                static const bool value =
-                    sizeof(_is_integral_constant_std_impl_helper::check(_Tp(NULL))) == sizeof(cstdint_detail::_yes_type) &&
-                    sizeof(_is_integral_constant_std_impl_helper::check(_Tp(1))) == sizeof(cstdint_detail::_no_type);
-            };
+                template<class _Tp>
+                struct _is_integral_constant_hack_impl
+                {
+                    static const bool value =
+                        sizeof(check1(_Tp(NULL))) == sizeof(cstdint_detail::_yes_type) &&
+                        sizeof(check2<_Tp>(NULL)) == sizeof(cstdint_detail::_yes_type) &&
+                        sizeof(check3(static_cast<_Tp*>(NULL))) == sizeof(cstdint_detail::_yes_type);
+                };
+            }
+            
+            using _is_integral_constant_hack_impl_ns::_is_integral_constant_hack_impl;
 
-            template<class _Tp>
-            struct _is_integral_constant_hack_impl
-            {
-                static const bool value =
-                    sizeof(_is_integral_constant_hack_impl_helper::check1(_Tp(NULL))) == sizeof(cstdint_detail::_yes_type) &&
-                    sizeof(_is_integral_constant_hack_impl_helper::check2<_Tp>(NULL)) == sizeof(cstdint_detail::_yes_type) &&
-                    sizeof(_is_integral_constant_hack_impl_helper::check3(static_cast<_Tp*>(NULL))) == sizeof(cstdint_detail::_yes_type);
-            };
 
             template<class _Tp, bool /*does integral implementation conform standard?*/>
             struct _is_integral_constant_impl :
