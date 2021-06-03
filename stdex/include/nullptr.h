@@ -244,25 +244,32 @@ namespace stdex
             static const bool value = false;// (sizeof(nullptr_detail::_nullptr_can_be_ct_constant<T>(0)) == sizeof(nullptr_detail::_yes_type));
         };
 
-        template<class _Tp>
-        struct _is_convertable_to_void_ptr_impl
+        namespace nullptr_detail
         {
-            static const bool value = (sizeof(nullptr_detail::_is_convertable_to_void_ptr_tester((_Tp) (STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-        };
+            template<class _Tp>
+            struct _is_convertable_to_void_ptr_impl
+            {
+                static const bool value = (sizeof(_is_convertable_to_void_ptr_tester((_Tp) (STDEX_NULL))) == sizeof(_yes_type));
+            };
 
-        template<class _Tp>
-        struct _is_convertable_to_member_function_ptr_impl
-        {
-            static const bool value = 
-                (sizeof(nullptr_detail::_is_convertable_to_member_function_ptr_tester((_Tp) (STDEX_NULL))) == sizeof(nullptr_detail::_yes_type)) &&
-                (sizeof(nullptr_detail::_is_convertable_to_const_member_function_ptr_tester((_Tp) (STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-        };
+            template<class _Tp>
+            struct _is_convertable_to_member_function_ptr_impl
+            {
+                static const bool value = 
+                    (sizeof(_is_convertable_to_member_function_ptr_tester((_Tp) (STDEX_NULL))) == sizeof(_yes_type)) &&
+                    (sizeof(_is_convertable_to_const_member_function_ptr_tester((_Tp) (STDEX_NULL))) == sizeof(_yes_type));
+            };
 
-        template<class NullPtrType, class _Tp>
-        struct _is_convertable_to_any_ptr_impl_helper
-        {
-            static const bool value = (sizeof(nullptr_detail::_is_convertable_to_ptr_tester<_Tp>((NullPtrType) (STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-        };
+            template<class NullPtrType, class _Tp>
+            struct _is_convertable_to_any_ptr_impl_helper
+            {
+                static const bool value = (sizeof(_is_convertable_to_ptr_tester<_Tp>((NullPtrType) (STDEX_NULL))) == sizeof(_yes_type));
+            };
+        }
+
+        using nullptr_detail::_is_convertable_to_void_ptr_impl;
+        using nullptr_detail::_is_convertable_to_member_function_ptr_impl;
+        using nullptr_detail::_is_convertable_to_any_ptr_impl_helper;
 
         template<class _Tp>
         struct _is_convertable_to_any_ptr_impl
