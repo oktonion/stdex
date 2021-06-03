@@ -204,7 +204,7 @@ namespace stdex
             static const bool value = !bool(_Pp::value);
 
             typedef const bool value_type;
-            typedef integral_constant<bool, ( _not_::value == bool(true) )> type;
+            typedef integral_constant<bool, ( _Pp::value == bool(false) ) > type;
 
             operator value_type() const
             {    // return stored value
