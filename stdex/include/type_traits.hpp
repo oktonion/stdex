@@ -898,7 +898,22 @@ namespace stdex
             false_type
         { };
 
-        template<class _Tp, bool ImplCh = _is_incomplete_type<_Tp[]>::value>
+        template<class _Tp>
+        struct _arr_is_incomplete_type:
+            _is_incomplete_type<_Tp[]>
+        { };
+
+        template<class _Tp>
+        struct _arr_is_incomplete_type<_Tp&>:
+            _is_incomplete_type<_Tp[]>
+        { };
+
+        template<>
+        struct _arr_is_incomplete_type<void>:
+            _is_incomplete_type<void>
+        { };
+
+        template<class _Tp, bool ImplCh = _arr_is_incomplete_type<_Tp>::value>
         struct _is_array_impl:
             _and_<_is_incomplete_type<_Tp>, _not_<is_function<_Tp> > >::type
         { };
