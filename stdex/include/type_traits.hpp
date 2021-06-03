@@ -43,7 +43,7 @@ namespace stdex
     namespace intern
     {
         // since we have no static_assert in pre-C++11 we just compile-time assert this way:
-        struct type_traits_asserts
+        namespace type_traits_asserts
         {
             template<bool>
             struct make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert;
@@ -56,7 +56,7 @@ namespace stdex
 
             template<bool>
             struct alignment_of_type_can_not_be_zero_assert;
-        };
+        }
 
         template<>
         struct type_traits_asserts::make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert<true>
@@ -199,23 +199,9 @@ namespace stdex
         { };
 
         template<class _Pp>
-        struct _not_
-        {
-            static const bool value = !bool(_Pp::value);
-
-            typedef const bool value_type;
-            typedef integral_constant<bool, _not_::value == bool(true)> type;
-
-            operator value_type() const
-            {    // return stored value
-                return (value);
-            }
-
-            value_type operator()() const
-            {    // return stored value
-                return (value);
-            }
-        };
+        struct _not_:
+            conditional<_Pp::value, false_type, true_type>::type
+        { };
     }
 
     namespace detail
@@ -583,11 +569,11 @@ namespace stdex
 
         template<class _FuncT>
         struct _canonical_is_function_const:
-            bool_constant<_canonical_is_const<const _FuncT>::value == bool(false)> { };
+            bool_constant<( _canonical_is_const<const _FuncT>::value == bool(false) )> { };
         
         template<class _FuncT>
         struct _canonical_is_function_volatile:
-            bool_constant<_canonical_is_volatile<volatile _FuncT>::value == bool(false)> { };
+            bool_constant<( _canonical_is_volatile<volatile _FuncT>::value == bool(false) )> { };
     }
 
     namespace intern
@@ -622,7 +608,7 @@ namespace stdex
     {
         template<class _NonConstT, class _ConstT>
         struct _is_const_impl_fallback:
-            bool_constant<is_function<_NonConstT>::value == bool(false)>
+            bool_constant<( is_function<_NonConstT>::value == bool(false) )>
         { };
 
         template<class _Tp>
@@ -650,7 +636,7 @@ namespace stdex
     {
         template<class _NonVolatileT, class _VolatileT>
         struct _is_volatile_impl_fallback:
-            bool_constant<is_function<_NonVolatileT>::value == bool(false)>
+            bool_constant<( is_function<_NonVolatileT>::value == bool(false) )>
         { };
 
         template<class _Tp>
@@ -755,44 +741,35 @@ namespace stdex
         typedef _Tp& type;
     };
 
+    namespace detail
+    {
+        template<class _Tp>
+        struct is_signed_impl
+        {
+            static const bool value = _sign_unsign_chooser<is_integral<_Tp>::value>::template _signed<_Tp>::value;
+            
+            typedef typename conditional<is_signed_impl::value, true_type, false_type >::type type;
+        };
+
+        template<class _Tp>
+        struct is_unsigned_impl
+        {
+            static const bool value = detail::_sign_unsign_chooser<is_integral<_Tp>::value>::template _unsigned<_Tp>::value;
+            
+            typedef typename conditional<is_unsigned_impl::value, true_type, false_type >::type type;
+        };
+    }
+
     template<class _Tp>
-    struct is_signed
+    struct is_signed:
+        detail::is_signed_impl<_Tp>::type
     {    // determine whether _Tp is a signed type
-
-        static const bool value = detail::_sign_unsign_chooser<is_integral<_Tp>::value>::template _signed<_Tp>::value;
-
-        typedef const bool value_type;
-        typedef integral_constant<bool, is_signed::value == bool(true)> type;
-
-        operator value_type() const
-        {    // return stored value
-            return (value);
-        }
-
-        value_type operator()() const
-        {    // return stored value
-            return (value);
-        }
     };
 
     template<class _Tp>
-    struct is_unsigned
+    struct is_unsigned:
+        detail::is_unsigned_impl<_Tp>::type
     {    // determine whether _Tp is an unsigned type
-
-        static const bool value = detail::_sign_unsign_chooser<is_integral<_Tp>::value>::template _unsigned<_Tp>::value;
-
-        typedef const bool value_type;
-        typedef integral_constant<bool, is_unsigned::value == bool(true)> type;
-
-        operator value_type() const
-        {    // return stored value
-            return (value);
-        }
-
-        value_type operator()() const
-        {    // return stored value
-            return (value);
-        }
     };
 
     namespace detail
@@ -808,7 +785,7 @@ namespace stdex
         template <unsigned _A, unsigned _S>
         struct _alignment_logic_helper
         {
-            static const std::size_t value = _A < _S ? _A : _S;
+            static const std::size_t value = (_A < _S ? _A : _S);
         };
 
         template <unsigned _A>
@@ -823,8 +800,8 @@ namespace stdex
             static const std::size_t value = _S;
         };
 
-        template< class _Tp >
-        struct _alignment_of_impl
+        template<class _Tp>
+        struct _alignment_of_impl_logic
         {
         #if _MSC_VER > 1400
             //
@@ -834,32 +811,46 @@ namespace stdex
             //
             static const std::size_t value =
                 (_alignment_logic_helper<
-                    sizeof(_alignment_of_trick<_Tp>) - sizeof(_Tp),
+                    ( sizeof(_alignment_of_trick<_Tp>) - sizeof(_Tp) ),
                     __alignof(_Tp)
                 >::value);
         #else
             static const std::size_t value =
                 (_alignment_logic_helper<
-                    sizeof(_alignment_of_trick<_Tp>) - sizeof(_Tp),
+                    ( sizeof(_alignment_of_trick<_Tp>) - sizeof(_Tp) ),
                     sizeof(_Tp)
                 >::value);
         #endif
+
+        };
+
+        using intern::type_traits_asserts::alignment_of_type_can_not_be_zero_assert;
+
+        template< class _Tp >
+        struct _alignment_of_impl
+        {
             typedef 
             typename
             integral_constant<
                 std::size_t, 
-                (const std::size_t)(_alignment_of_impl::value)
+                std::size_t(_alignment_of_impl_logic<_Tp>::value)
             >::type type;
 
         private:
-            typedef intern::type_traits_asserts check;
-            typedef typename check::alignment_of_type_can_not_be_zero_assert< _alignment_of_impl::value != 0 >::
+            
+            typedef typename alignment_of_type_can_not_be_zero_assert<bool( type::value > 0 )>::
                 alignment_of_type_can_not_be_zero_assert_failed
             check1; // if you are there means alignment of type passed can not be calculated or compiler can not handle this situation (sorry, nothing can be done there)
         };
 
         // Borland compilers seem to be unable to handle long double correctly, so this will do the trick:
         struct _long_double_wrapper{ long double value; };
+
+        template<>
+        struct _alignment_of_impl<long double>
+        { 
+            typedef _alignment_of_impl<_long_double_wrapper>::type type;
+        };
     }
 
     template <class _Tp> 
@@ -870,11 +861,6 @@ namespace stdex
     template <class _Tp> 
     struct alignment_of<_Tp&>: 
         public alignment_of<_Tp*>
-    {};
-
-    template<> 
-    struct alignment_of<long double>: 
-        public alignment_of<detail::_long_double_wrapper>
     {};
 
     namespace detail
@@ -906,7 +892,7 @@ namespace stdex
         struct _is_incomplete_type
         { 
             static const bool value = _is_incomplete_type_helper<_Tp>::value;
-            typedef integral_constant<bool, _is_incomplete_type_helper<_Tp>::value == bool(true)> type;
+            typedef bool_constant<bool( _is_incomplete_type_helper<_Tp>::value == bool(true) )> type;
         };
 
         template<>
@@ -914,7 +900,7 @@ namespace stdex
             false_type
         { };
 
-        template<class _Tp, bool ImplCh = _is_incomplete_type<char[]>::value>
+        template<class _Tp, bool ImplCh = _is_incomplete_type<_Tp[]>::value>
         struct _is_array_impl:
             _and_<_is_incomplete_type<_Tp>, _not_<is_function<_Tp> > >::type
         { };
@@ -2034,7 +2020,7 @@ namespace stdex
             static _Tp *_ptr;
             static const bool value = (sizeof(_is_mem_function_ptr(_is_mem_function_ptr_impl::_ptr)) == sizeof(_yes_type));
 
-            typedef typename integral_constant<bool, _is_mem_function_ptr_impl::value == bool(true)>::type type;
+            typedef typename bool_constant<bool( _is_mem_function_ptr_impl::value == bool(true) )>::type type;
         };
 
         template <class _Tp>
@@ -2087,7 +2073,7 @@ namespace stdex
 
         template<class _Tp>
         struct _is_function_chooser_helper_array_bug<_Tp, true>
-            : bool_constant<is_array<_Tp>::value == bool(false)>
+            : bool_constant<( is_array<_Tp>::value == bool(false) )>
         { };
 
         template<class _Tp>
@@ -2109,9 +2095,10 @@ namespace stdex
             typedef typename remove_cv<_Tp>::type _stripped_type;
 
             static const bool value = 
-                _is_function_chooser_helper<_Tp, 
-                    _canonical_is_function_const<_stripped_type>::value == bool(true) ||
-                    _canonical_is_function_volatile<_stripped_type>::value == bool(true)>::value;
+                _is_function_chooser_helper<_Tp, bool(
+                    (_canonical_is_function_const<_stripped_type>::value == bool(true)) ||
+                    (_canonical_is_function_volatile<_stripped_type>::value == bool(true))
+                )>::value;
         };
     }
 
@@ -2122,7 +2109,7 @@ namespace stdex
         detail::_is_function_chooser<
             _Tp, 
             is_reference<_Tp>::value
-        >::value == bool(true)>
+        >::value>
     {
     };
 
@@ -2238,7 +2225,7 @@ namespace stdex
         struct _has_member_pointer_impl
         {
             static const bool value = sizeof(_has_member_pointer_tester<_Tp>(0)) == sizeof(_yes_type) && sizeof(_has_member_pointer_tester_helper<_Tp>(0)) != sizeof(char);
-            typedef integral_constant<bool, _has_member_pointer_impl::value == bool(true)> type;
+            typedef bool_constant<bool( _has_member_pointer_impl::value == bool(true) )> type;
         };
 
 
@@ -2279,22 +2266,22 @@ namespace stdex
         {
             static const bool value = (sizeof(_is_constructible_from_type_tester<_Tp>(1)) == sizeof(_yes_type));
         };
-    } // namespace detail
 
-    namespace is_enum_detail
-    {
-        enum dummy_enum {};
-        struct _enum_can_have_member_pointer_bug :
-            public integral_constant<bool, detail::_has_member_pointer_impl<dummy_enum>::value>::type
-        { };
-    } // namespace is_enum_detail
+        namespace is_enum_detail
+        {
+            enum dummy_enum {};
+
+            typedef bool_constant<bool( _has_member_pointer_impl<dummy_enum>::value == bool(true) )>::type _enum_can_have_member_pointer_bug;
+        } // namespace is_enum_detail
+
+    } // namespace detail
 
     namespace intern
     {
         
         template<>
         struct _has_bug<struct _stdex_enum_can_have_member_pointer_bug>:
-            is_enum_detail::_enum_can_have_member_pointer_bug
+            detail::is_enum_detail::_enum_can_have_member_pointer_bug
         { };
     } // namespace intern
 
@@ -2359,15 +2346,21 @@ namespace stdex
         struct _is_enum_helper<_Tp, true>
         { // with enum bug
             static const bool value =
-                _is_enum_helper1<_Tp, (_is_convertable_to_int<_Tp>::value == bool(true) && _is_constructible_from_int<_Tp>::value == bool(false))>::value;
+                _is_enum_helper1<_Tp, bool(_is_convertable_to_int<_Tp>::value == bool(true) && _is_constructible_from_int<_Tp>::value == bool(false))>::value;
         };
 
         template<class _Tp, bool>
         struct _is_enum_impl
         {
             static const bool value =
-                _is_enum_helper<_Tp, is_enum_detail::_enum_can_have_member_pointer_bug::value == bool(true)>::value;
-            typedef integral_constant<bool, _is_enum_helper<_Tp, is_enum_detail::_enum_can_have_member_pointer_bug::value>::value == bool(true)> type;
+                _is_enum_helper<_Tp, bool(is_enum_detail::_enum_can_have_member_pointer_bug::value == bool(true))>::value;
+            typedef 
+            bool_constant<bool(
+                _is_enum_helper<
+                    _Tp, 
+                    bool( is_enum_detail::_enum_can_have_member_pointer_bug::value == bool(true) )
+                >::value == bool(true)
+            )> type;
         };
 
         template<class _Tp>
@@ -2397,7 +2390,7 @@ namespace stdex
     {
         template<class _Tp>
         struct _is_member_pointer_helper:
-            public integral_constant<bool, is_member_function_pointer<_Tp>::value == bool(true)>::type
+            public bool_constant<bool( is_member_function_pointer<_Tp>::value == bool(true) )>::type
         { 
         };
 
@@ -2427,17 +2420,18 @@ namespace stdex
         template <class _Tp, bool _IsReference>
         struct _is_class_or_union_helper
         {
-            typedef integral_constant<bool, false> type;
+            typedef false_type type;
         };
 
         template <class _Tp>
         struct _is_class_or_union_helper<_Tp, false>
         {
-            typedef integral_constant<bool,
+            typedef bool_constant<bool(
                 (is_scalar<_Tp>::value == bool(false))
                 && (is_array<_Tp>::value == bool(false))
                 && (is_void<_Tp>::value == bool(false))
-                && (is_function<_Tp>::value == bool(false))> type;
+                && (is_function<_Tp>::value == bool(false))
+            )> type;
         };
     }
 
@@ -2463,17 +2457,17 @@ namespace stdex
         template <class _Tp, bool>
         struct _is_union_helper
         {
-            typedef integral_constant<bool, false> type;
+            typedef false_type type;
         };
 
         template <class _Tp>
         struct _is_union_helper<_Tp, false>
         {
             typedef typename _is_class_or_union_helper<_Tp, false>::type is_class_or_union;
-            typedef integral_constant<bool,
+            typedef bool_constant<bool(
                 (is_class_or_union::value == bool(true))
                 && (_is_union_intrinsic<_Tp>::value == bool(true))
-            > type;
+            )> type;
         };
     }
 
@@ -2488,17 +2482,17 @@ namespace stdex
         template <class _Tp, bool _IsReference>
         struct _is_class_helper
         {
-            typedef integral_constant<bool, false> type;
+            typedef false_type type;
         };
 
         template <class _Tp>
         struct _is_class_helper<_Tp, false>
         {
             typedef typename _is_class_or_union_helper<_Tp, false>::type is_class_or_union;
-            typedef integral_constant<bool,
+            typedef bool_constant<bool(
                 (is_class_or_union::value == bool(true))
                 && (_is_union_intrinsic<_Tp>::value == bool(false))
-            > type;
+            )> type;
         };
     }
 
@@ -2539,7 +2533,7 @@ namespace stdex
         static const std::size_t value = 1 + rank<_Tp>::value;
 
         typedef const bool value_type;
-        typedef integral_constant<std::size_t, (const std::size_t)(rank::value)> type;
+        typedef integral_constant<std::size_t, std::size_t(rank::value)> type;
 
         operator value_type() const
         {    // return stored value
@@ -2563,7 +2557,7 @@ namespace stdex
 
     template<class _Tp, unsigned _Uint, std::size_t _Size>
     struct extent<_Tp[_Size], _Uint> :
-        public integral_constant<std::size_t, _Uint == 0 ? _Size : extent<_Tp, _Uint - 1>::value>
+        public integral_constant<std::size_t, std::size_t(_Uint == 0 ? _Size : extent<_Tp, _Uint - 1>::value)>
     { };
 
     /*template<class _Tp, unsigned _Uint>
@@ -2662,9 +2656,9 @@ namespace stdex
         class _make_unsigned_selector
         {
         private:
-            typedef intern::type_traits_asserts check;
+            
 
-            typedef typename check::make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert< is_integral<_Tp>::value >::
+            typedef typename intern::type_traits_asserts::make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert< is_integral<_Tp>::value >::
                 make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed
             check1; // if you are there means _Tp is not an integral type
 
@@ -2773,9 +2767,9 @@ namespace stdex
         class _make_signed_selector
         {
         private:
-            typedef intern::type_traits_asserts check;
+            
 
-            typedef typename check::make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert< is_integral<_Tp>::value >::
+            typedef typename intern::type_traits_asserts::make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert< is_integral<_Tp>::value >::
                 make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed
             check1; // if you are there means _Tp is not an integral type
 
@@ -2979,8 +2973,8 @@ namespace stdex
         {
             typedef void type;
         private:
-            typedef intern::type_traits_asserts check;
-            typedef typename check::not_allowed_arithmetic_type_assert< _I != 0 >::
+            
+            typedef typename intern::type_traits_asserts::not_allowed_arithmetic_type_assert< bool(_I != 0) >::
                 not_allowed_arithmetic_type_assert_failed
             check1; // if you are there means you passed to common_type not known arithmetic type
         };
@@ -3162,7 +3156,18 @@ namespace stdex
         template<class _Tp, class _U> 
         struct _common_arithmetic_type
         { 
-            typedef typename _arithmetic_type<_common_arithmetic_type_cpp11<_Tp, _U, _common_arithmetic_type_base<_Tp, _U>::value != int(0)>::value>::type type;
+            typedef 
+            typename 
+            _arithmetic_type<
+                _common_arithmetic_type_cpp11<
+                    _Tp, 
+                    _U, bool(
+                    _common_arithmetic_type_base<
+                        _Tp, 
+                        _U
+                    >::value != int(0) )
+                >::value
+            >::type type;
         };
 
         template<class _Tp, class _U>
@@ -3194,7 +3199,7 @@ namespace stdex
 
         template<class _Tp, class _U> 
         struct _common_type_impl:
-            public _common_type_impl1<_Tp, _U, (is_arithmetic<_Tp>::value == bool(true)) && (is_arithmetic<_U>::value == bool(true))>
+            public _common_type_impl1<_Tp, _U, ( (is_arithmetic<_Tp>::value == bool(true)) && (is_arithmetic<_U>::value == bool(true)) )>
         { };
 
         template<class _Tp> 

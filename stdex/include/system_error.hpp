@@ -501,7 +501,7 @@ namespace stdex
         template<class _ErrorCondEnum>
         error_condition(const _ErrorCondEnum& val) _STDEX_NOEXCEPT_FUNCTION
         {
-            STATIC_ASSERT(is_error_condition_enum<_ErrorCondEnum>::value == true, value_should_be_error_condition_enum);
+            STATIC_ASSERT(bool(is_error_condition_enum<_ErrorCondEnum>::value == true), value_should_be_error_condition_enum);
             *this = val;
         }
 
@@ -580,7 +580,7 @@ namespace stdex
         template<class _ErrorCodeEnum>
         error_code(const _ErrorCodeEnum &val) _STDEX_NOEXCEPT_FUNCTION
         {
-            STATIC_ASSERT(is_error_code_enum<_ErrorCodeEnum>::value == true, value_should_be_error_code_enum);
+            STATIC_ASSERT(bool(is_error_code_enum<_ErrorCodeEnum>::value == true), value_should_be_error_code_enum);
             *this = val;
         }
 
@@ -738,7 +738,7 @@ namespace stdex
     bool operator<(
         const _LhsT& _lhs,
         typename conditional<
-            detail::_is_error_code_enum_or_class<_LhsT>::value,
+            bool( detail::_is_error_code_enum_or_class<_LhsT>::value == bool(true) ),
             const detail::_error_code_compare&,
             class _disabled1>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
@@ -760,7 +760,7 @@ namespace stdex
     inline // overload for enum values at right
     bool operator<(
         typename conditional<
-            detail::_is_error_code_enum_not_class<_RhsT>::value,
+            bool( detail::_is_error_code_enum_not_class<_RhsT>::value == bool(true) ),
             const detail::_error_code_compare&,
             class _disabled2>::type _lhs,
         const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
@@ -773,7 +773,7 @@ namespace stdex
     bool operator<(
         const _LhsT& _lhs,
         typename conditional<
-            detail::_is_error_condition_enum_or_class<_LhsT>::value,
+            bool( detail::_is_error_condition_enum_or_class<_LhsT>::value == bool(true) ),
             const detail::_error_condition_compare&,
             class _disabled3>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
@@ -795,7 +795,7 @@ namespace stdex
     inline // overload for enum values at right
     bool operator<(
         typename conditional<
-            detail::_is_error_condition_enum_not_class<_RhsT>::value,
+            bool( detail::_is_error_condition_enum_not_class<_RhsT>::value == bool(true) ),
             const detail::_error_condition_compare&,
             class _disabled4>::type _lhs,
         const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
@@ -819,7 +819,7 @@ namespace stdex
     bool operator==(
         const _LhsT& _lhs,
         typename conditional<
-            detail::_is_error_code_enum_or_class<_LhsT>::value,
+            bool( detail::_is_error_code_enum_or_class<_LhsT>::value == bool(true) ),
             const detail::_error_code_compare&,
             class _disabled1>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
@@ -840,7 +840,7 @@ namespace stdex
     inline
     bool operator==(
         typename conditional<
-            detail::_is_error_code_enum_not_class<_RhsT>::value,
+            bool( detail::_is_error_code_enum_not_class<_RhsT>::value == bool(true) ),
             const detail::_error_code_compare&,
             class _disabled2>::type _lhs,
         const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
@@ -853,7 +853,7 @@ namespace stdex
     bool operator==(
         const _LhsT& _lhs,
         typename conditional<
-            detail::_is_error_code_enum_or_class<_LhsT>::value,
+            bool( detail::_is_error_code_enum_or_class<_LhsT>::value == bool(true) ),
             const detail::_error_condition_compare&,
             class _disabled3>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {    // test errors for equality
@@ -874,7 +874,7 @@ namespace stdex
     inline
     bool operator==(
         typename conditional<
-            detail::_is_error_condition_enum_not_class<_RhsT>::value,
+            bool( detail::_is_error_condition_enum_not_class<_RhsT>::value == bool(true) ),
             const detail::_error_code_compare&,
             class _disabled4>::type _lhs,
         const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
@@ -887,7 +887,7 @@ namespace stdex
     bool operator==(
         const _LhsT& _lhs,
         typename conditional<
-            detail::_is_error_condition_enum_or_class<_LhsT>::value,
+            bool( detail::_is_error_condition_enum_or_class<_LhsT>::value == bool(true) ),
             const detail::_error_code_compare&,
             class _disabled5>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {    // test errors for equality
@@ -908,7 +908,7 @@ namespace stdex
     inline
     bool operator==(
         typename conditional<
-            detail::_is_error_code_enum_not_class<_RhsT>::value,
+            bool( detail::_is_error_code_enum_not_class<_RhsT>::value == bool(true) ),
             const detail::_error_condition_compare&,
             class _disabled6>::type _lhs,
         const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
@@ -923,7 +923,7 @@ namespace stdex
     bool operator==(
         const _LhsT& _lhs,
         typename conditional<
-            detail::_is_error_condition_enum_or_class<_LhsT>::value,
+            bool( detail::_is_error_condition_enum_or_class<_LhsT>::value == bool(true) ),
             const detail::_error_condition_compare&,
             class _disabled7>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
@@ -944,7 +944,7 @@ namespace stdex
     inline
     bool operator==(
         typename conditional<
-            detail::_is_error_condition_enum_not_class<_RhsT>::value,
+            bool( detail::_is_error_condition_enum_not_class<_RhsT>::value == bool(true) ),
             const detail::_error_condition_compare&,
             class _disabled8>::type _lhs,
         const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
@@ -964,7 +964,7 @@ namespace stdex
     bool operator!=(
         const _LhsT& _lhs,
         typename conditional<
-            detail::_is_error_code_enum_or_class<_LhsT>::value,
+            bool( detail::_is_error_code_enum_or_class<_LhsT>::value == bool(true) ),
             const detail::_error_code_compare&,
             class _disabled1>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
@@ -975,7 +975,7 @@ namespace stdex
     inline
     bool operator!=(
         typename conditional<
-            detail::_is_error_code_enum_not_class<_RhsT>::value,
+            bool( detail::_is_error_code_enum_not_class<_RhsT>::value == bool(true) ),
             const detail::_error_code_compare&,
             class _disabled2>::type _lhs,
         const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
@@ -988,7 +988,7 @@ namespace stdex
     bool operator!=(
         const _LhsT& _lhs,
         typename conditional<
-            detail::_is_error_code_enum_or_class<_LhsT>::value,
+            bool( detail::_is_error_code_enum_or_class<_LhsT>::value == bool(true) ),
             const detail::_error_condition_compare&,
             class _disabled3>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
@@ -999,7 +999,7 @@ namespace stdex
     inline
     bool operator!=(
         typename conditional<
-            detail::_is_error_condition_enum_not_class<_RhsT>::value,
+            bool( detail::_is_error_condition_enum_not_class<_RhsT>::value == bool(true) ),
             const detail::_error_code_compare&,
             class _disabled4>::type _lhs,
         const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
@@ -1012,7 +1012,7 @@ namespace stdex
     bool operator!=(
         const _LhsT& _lhs,
         typename conditional<
-            detail::_is_error_condition_enum_or_class<_LhsT>::value,
+            bool( detail::_is_error_condition_enum_or_class<_LhsT>::value == bool(true) ),
             const detail::_error_code_compare&,
             class _disabled5>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
@@ -1023,7 +1023,7 @@ namespace stdex
     inline
     bool operator!=(
         typename conditional<
-            detail::_is_error_code_enum_not_class<_RhsT>::value,
+            bool( detail::_is_error_code_enum_not_class<_RhsT>::value == bool(true) ),
             const detail::_error_condition_compare&,
             class _disabled6>::type _lhs,
         const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION
@@ -1036,7 +1036,7 @@ namespace stdex
     bool operator!=(
         const _LhsT& _lhs,
         typename conditional<
-            detail::_is_error_condition_enum_or_class<_LhsT>::value,
+            bool( detail::_is_error_condition_enum_or_class<_LhsT>::value == bool(true) ),
             const detail::_error_condition_compare&,
             class _disabled7>::type _rhs) _STDEX_NOEXCEPT_FUNCTION
     {
@@ -1047,7 +1047,7 @@ namespace stdex
     inline
     bool operator!=(
         typename conditional<
-            detail::_is_error_condition_enum_not_class<_RhsT>::value,
+            bool( detail::_is_error_condition_enum_not_class<_RhsT>::value == bool(true) ),
             const detail::_error_condition_compare&,
             class _disabled8>::type _lhs,
         const _RhsT &_rhs) _STDEX_NOEXCEPT_FUNCTION

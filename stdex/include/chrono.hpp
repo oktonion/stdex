@@ -97,7 +97,7 @@ namespace stdex
         typedef detail::_gcd<_Period1::den, _Period2::den>     _gcd_den;
         typedef typename common_type<_Rep1, _Rep2>::type        _cr;
         typedef ratio<_gcd_num::value,
-            (_Period1::den / _gcd_den::value) * _Period2::den> _r;
+            stdex::intmax_t( (_Period1::den / _gcd_den::value) * _Period2::den )> _r;
 
     public:
         typedef chrono::duration<_cr, _r>             type;
@@ -210,9 +210,9 @@ namespace stdex
             inline
             _To _chrono_convert(_From _from,
                 typename
-                conditional<
+                conditional<bool(
                     is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(false) &&
-                    is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(false),
+                    is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(false) ),
                     const chrono_detail::_priority_tag<0>&,
                     class _disabled0
                 >::type)
@@ -224,9 +224,9 @@ namespace stdex
             inline
             _To _chrono_convert(_From _from,
                 typename
-                conditional<
+                conditional<bool(
                     is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(false) &&
-                    is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(true),
+                    is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(true) ),
                     const chrono_detail::_priority_tag<1>&,
                     class _disabled1
                 >::type)
@@ -238,10 +238,10 @@ namespace stdex
             inline
             _To _chrono_convert(const _From& _from,
                 typename
-                conditional<
+                conditional<bool(
                     is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(true) &&
                     is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(false) &&
-                    is_floating_point<_To>::value == bool(true),
+                    is_floating_point<_To>::value == bool(true) ),
                     const chrono_detail::_priority_tag<2>&,
                     class _disabled2
                 >::type)
@@ -253,10 +253,10 @@ namespace stdex
              inline
              _To _chrono_convert(const _From& _from,
                  typename
-                 conditional <
+                 conditional<bool(
                  is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(true) &&
                  is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(false) &&
-                    is_floating_point<_To>::value == bool(false),
+                    is_floating_point<_To>::value == bool(false) ),
                     const chrono_detail::_priority_tag<3>&,
                     class _disabled3
                 >::type)
@@ -268,9 +268,9 @@ namespace stdex
             inline
             _To _chrono_convert(const _From& _from,
                 typename
-                conditional<
+                conditional<bool(
                     is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(true) &&
-                    is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(true),
+                    is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(true) ),
                     const chrono_detail::_priority_tag<4>&,
                     class _disabled4
                 >::type)
@@ -517,18 +517,18 @@ namespace stdex
 
             template <class _Tp>
             struct _enable_if_is_duration:
-                _enable_if_is_duration_impl<_is_duration<_Tp>::value == bool(true), _Tp>
+                _enable_if_is_duration_impl<bool( _is_duration<_Tp>::value == bool(true) ), _Tp>
             {};
 
             template <class _Tp>
             struct _disable_if_is_duration :
-                _enable_if_is_duration_impl<_is_duration<_Tp>::value == bool(false), _Tp>
+                _enable_if_is_duration_impl<bool( _is_duration<_Tp>::value == bool(false) ), _Tp>
             {};
 
             template<class _FromDur, class _ToDur,
-                bool _RunTimeCast = 
+                bool _RunTimeCast = bool(
                     _use_big_int<typename _ToDur::rep, typename _ToDur::period>::value == bool(true) ||
-                    _use_big_int<typename _FromDur::rep, typename _FromDur::period>::value == bool(true)>
+                    _use_big_int<typename _FromDur::rep, typename _FromDur::period>::value == bool(true) )>
             struct _duration_cast_impl;
 
             template<class _FromDur, class _ToDur>
@@ -542,7 +542,7 @@ namespace stdex
                 typedef typename detail::_duration_common_type<_to_rep, _from_rep, _from_period>::type
                     _cr;
                 typedef  detail::_duration_cast_ct_impl<_ToDur, _cr,
-                    _cf::num == 1, _cf::den == 1> type;
+                    bool(_cf::num == 1), bool(_cf::den == 1)> type;
 
                 template<class _Rep, class _Period>
                 static _ToDur _cast(const duration<_Rep, _Period>& _d)
@@ -623,9 +623,9 @@ namespace stdex
 
             template<class _FromDur, class _ToDur>
             struct _duration_cast
-                : _duration_cast_impl<_FromDur, _ToDur,
+                : _duration_cast_impl<_FromDur, _ToDur, bool(
                     _use_big_int<typename _ToDur::rep, typename _ToDur::period>::value == bool(true) ||
-                    _use_big_int<typename _FromDur::rep, typename _FromDur::period>::value == bool(true)>
+                    _use_big_int<typename _FromDur::rep, typename _FromDur::period>::value == bool(true) )>
             { };
 
         } // namespace detail
@@ -753,7 +753,7 @@ namespace stdex
         namespace intern
         {
             // since we have no static_assert in pre-C++11 we just compile-time assert this way:
-            struct chrono_asserts
+            namespace chrono_asserts
             {
                 template<bool>
                 struct rep_cannot_be_a_duration_assert; // if you are there means 1st template param _Rep in duration class is duration type
@@ -832,7 +832,7 @@ namespace stdex
             typedef detail::duration_base<_Rep, _Period, 
                 detail::_use_big_int<_Rep, _Period>::value> base_type;
 
-            typedef intern::chrono_asserts check;
+            
             struct _disabled1;
             struct _disabled2;
             
@@ -841,13 +841,13 @@ namespace stdex
             void _modulus(const _disabled1 &) { }
             void _modulus(const _disabled2 &) { }
 
-            typedef typename check::rep_cannot_be_a_duration_assert< (detail::_is_duration<_Rep>::value == bool(false)) >::
+            typedef typename intern::chrono_asserts::rep_cannot_be_a_duration_assert< (detail::_is_duration<_Rep>::value == bool(false)) >::
                 rep_cannot_be_a_duration_assert_failed
             check1; // if you are there means 1st template param _Rep is duration type
-            typedef typename check::period_must_be_a_specialization_of_ratio_assert< (detail::_is_ratio<typename _Period::type>::value) >::
+            typedef typename intern::chrono_asserts::period_must_be_a_specialization_of_ratio_assert< (detail::_is_ratio<typename _Period::type>::value) >::
                 period_must_be_a_specialization_of_ratio_assert_failed
             check2; // if you are there means 2nd template param _Period is not a specialization of ratio class
-            typedef typename check::period_must_be_positive_assert< (_Period::num > 0) >::
+            typedef typename intern::chrono_asserts::period_must_be_positive_assert< (_Period::num > 0) >::
                 period_must_be_positive_assert_failed
             check3; // if you are there means 2nd template param _Period in duration class is ratio of negative
 
@@ -871,7 +871,7 @@ namespace stdex
             duration(const _Rep2 &_r_in) : 
                 base_type(_r_in)
             {
-                typedef typename check::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert<(treat_as_floating_point<_Rep>::value == bool(true)) || (treat_as_floating_point<_Rep2>::value == bool(false))>::
+                typedef typename intern::chrono_asserts::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert<bool( (treat_as_floating_point<_Rep>::value == bool(true)) || (treat_as_floating_point<_Rep2>::value == bool(false)) )>::
                     a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert_failed
                 check4; // if you are there means rep type is integer but floating-point type is passed as argument
             }
@@ -887,14 +887,14 @@ namespace stdex
             {    // construct from a duration
                 typedef stdex::detail::_ratio_divide_den<_Period2, _Period> _Checked_type;
 
-                typedef typename check::duration_does_not_use_floating_point_ticks_or_other_duration_period_is_not_exactly_divisible_by_current_period<
+                typedef typename intern::chrono_asserts::duration_does_not_use_floating_point_ticks_or_other_duration_period_is_not_exactly_divisible_by_current_period<
                     (treat_as_floating_point<_Rep>::value == bool(true)) || 
                     ( (_Checked_type::value == 1 && treat_as_floating_point<_Rep2>::value == bool(false)) )
                     >::duration_does_not_use_floating_point_ticks_or_other_duration_period_is_not_exactly_divisible_by_current_period_assert_failed
                 check5;
 
 
-                typedef typename check::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert<(treat_as_floating_point<_Rep>::value == bool(true)) || (treat_as_floating_point<_Rep2>::value == bool(false))>::
+                typedef typename intern::chrono_asserts::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert<bool( (treat_as_floating_point<_Rep>::value == bool(true)) || (treat_as_floating_point<_Rep2>::value == bool(false)) )>::
                     a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert_failed
                 check6; // if you are there means rep type is integer but floating-point duration type is passed as argument
             }
@@ -966,7 +966,7 @@ namespace stdex
             duration& operator%=(
             typename
             conditional<
-                treat_as_floating_point<_Rep>::value == bool(false),
+                bool( treat_as_floating_point<_Rep>::value == bool(false) ),
                 const _Rep &,
                 _disabled1&
             >::type _r_in
@@ -979,7 +979,7 @@ namespace stdex
             duration& operator%=(
             typename
             conditional<
-                treat_as_floating_point<_Rep>::value == bool(false),
+                bool( treat_as_floating_point<_Rep>::value == bool(false) ),
                 const duration &,
                 _disabled2&
             >::type other
@@ -1395,9 +1395,9 @@ namespace stdex
         struct system_clock
         {
             typedef 
-            stdex::conditional<
-                (sizeof(chrono::nanoseconds::rep) * CHAR_BIT >= 64) ||
-                (detail::_use_big_int<chrono::nanoseconds::rep, chrono::nanoseconds::period>::value == bool(true)), 
+            stdex::conditional<bool(
+                bool(sizeof(chrono::nanoseconds::rep) * CHAR_BIT >= 64) ||
+                (detail::_use_big_int<chrono::nanoseconds::rep, chrono::nanoseconds::period>::value == bool(true)) ), 
                 chrono::nanoseconds, 
                 chrono::microseconds
             >::type duration;
@@ -1422,11 +1422,11 @@ namespace stdex
                 from_time_t(stdex::time_t _t) _STDEX_NOEXCEPT_FUNCTION;
 
         private:
-            typedef intern::chrono_asserts check;
+            
 
             typedef duration_values<rep>::template_constants duration_constants;
     
-            typedef check::a_clocks_minimum_duration_cannot_be_less_than_its_epoch_assert< (duration_constants::min < duration_constants::zero) >::
+            typedef intern::chrono_asserts::a_clocks_minimum_duration_cannot_be_less_than_its_epoch_assert< (duration_constants::min < duration_constants::zero) >::
                 a_clocks_minimum_duration_cannot_be_less_than_its_epoch_assert_failed    
             check1; // if you are there means that what it says
         };
@@ -1439,9 +1439,9 @@ namespace stdex
         struct steady_clock
         {
             typedef 
-            stdex::conditional<
-                (sizeof(chrono::nanoseconds::rep) * CHAR_BIT >= 64) ||
-                (detail::_use_big_int<chrono::nanoseconds::rep, chrono::nanoseconds::period>::value == bool(true)), 
+            stdex::conditional<bool(
+                bool(sizeof(chrono::nanoseconds::rep) * CHAR_BIT >= 64) ||
+                (detail::_use_big_int<chrono::nanoseconds::rep, chrono::nanoseconds::period>::value == bool(true)) ), 
                 chrono::nanoseconds, 
                 chrono::microseconds
             >::type duration;
