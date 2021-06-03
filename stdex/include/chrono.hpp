@@ -775,50 +775,50 @@ namespace stdex
 
                 template<bool>
                 struct a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert; // if you are there means that what it says
-            };
 
-            template<>
-            struct chrono_asserts::rep_cannot_be_a_duration_assert<true>
-            {
-                typedef bool rep_cannot_be_a_duration_assert_failed;
-            };
+                template<>
+                struct rep_cannot_be_a_duration_assert<true>
+                {
+                    typedef bool rep_cannot_be_a_duration_assert_failed;
+                };
 
-            template<>
-            struct chrono_asserts::period_must_be_a_specialization_of_ratio_assert<true>
-            {
-                typedef bool period_must_be_a_specialization_of_ratio_assert_failed;
-            };
+                template<>
+                struct period_must_be_a_specialization_of_ratio_assert<true>
+                {
+                    typedef bool period_must_be_a_specialization_of_ratio_assert_failed;
+                };
 
-            template<>
-            struct chrono_asserts::period_must_be_positive_assert<true>
-            {
-                typedef bool period_must_be_positive_assert_failed;
-            };
+                template<>
+                struct period_must_be_positive_assert<true>
+                {
+                    typedef bool period_must_be_positive_assert_failed;
+                };
 
-            template<>
-            struct chrono_asserts::a_clocks_minimum_duration_cannot_be_less_than_its_epoch_assert<true>
-            {
-                typedef bool a_clocks_minimum_duration_cannot_be_less_than_its_epoch_assert_failed;
-            };
+                template<>
+                struct a_clocks_minimum_duration_cannot_be_less_than_its_epoch_assert<true>
+                {
+                    typedef bool a_clocks_minimum_duration_cannot_be_less_than_its_epoch_assert_failed;
+                };
 
-            template<>
-            struct chrono_asserts::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert<true>
-            {
-                typedef bool a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert_failed;
-            };
+                template<>
+                struct a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert<true>
+                {
+                    typedef bool a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert_failed;
+                };
 
-            template<>
-            struct chrono_asserts::duration_does_not_use_floating_point_ticks_or_other_duration_period_is_not_exactly_divisible_by_current_period<true>
-            {
-                typedef bool duration_does_not_use_floating_point_ticks_or_other_duration_period_is_not_exactly_divisible_by_current_period_assert_failed;
-            };
+                template<>
+                struct duration_does_not_use_floating_point_ticks_or_other_duration_period_is_not_exactly_divisible_by_current_period<true>
+                {
+                    typedef bool duration_does_not_use_floating_point_ticks_or_other_duration_period_is_not_exactly_divisible_by_current_period_assert_failed;
+                };
 
-            template<>
-            struct chrono_asserts::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert<true>
-            {
-                typedef bool a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert_failed;
-            };
-        }
+                template<>
+                struct a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert<true>
+                {
+                    typedef bool a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert_failed;
+                };
+            } // namespace chrono_asserts
+        } // namespace intern
 
         //! Duration template class. This class provides enough functionality to
         //! implement @c this_thread::sleep_for().
