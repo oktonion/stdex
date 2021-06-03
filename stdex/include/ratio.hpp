@@ -316,10 +316,10 @@ namespace stdex
 
         public:
             typedef ratio<
-                _safe_multiply<(_R1::num / _ratio_multiply::_gcd1),
-                (_R2::num / _ratio_multiply::_gcd2)>::value,
-                _safe_multiply<(_R1::den / _ratio_multiply::_gcd2),
-                (_R2::den / _ratio_multiply::_gcd1)>::value> type;
+                _safe_multiply<stdex::intmax_t(_R1::num / _ratio_multiply::_gcd1),
+                stdex::intmax_t(_R2::num / _ratio_multiply::_gcd2)>::value,
+                _safe_multiply<stdex::intmax_t(_R1::den / _ratio_multiply::_gcd2),
+                stdex::intmax_t(_R2::den / _ratio_multiply::_gcd1)>::value> type;
 
             static const stdex::intmax_t num = type::num;
             static const stdex::intmax_t den = type::den;
@@ -338,8 +338,8 @@ namespace stdex
 
             static const stdex::intmax_t value = 
                 _safe_multiply<
-                    (_R1::den / _ratio_multiply_den::_gcd2),
-                    (_R2::den / _ratio_multiply_den::_gcd1)
+                    stdex::intmax_t(_R1::den / _ratio_multiply_den::_gcd2),
+                    stdex::intmax_t(_R2::den / _ratio_multiply_den::_gcd1)
                 >::value;
         };
 
@@ -356,8 +356,8 @@ namespace stdex
 
             static const stdex::intmax_t value = 
                 _safe_multiply<
-                    (_R1::num / _ratio_multiply_num::_gcd1),
-                    (_R2::num / _ratio_multiply_num::_gcd2)
+                    stdex::intmax_t(_R1::num / _ratio_multiply_num::_gcd1),
+                    stdex::intmax_t(_R2::num / _ratio_multiply_num::_gcd2)
                 >::value;
         };
     }
@@ -515,8 +515,8 @@ namespace stdex
             static const stdex::intmax_t _gx = _gcd<_d1, _d2>::value;
 
             static const stdex::intmax_t _n = _safe_add<
-                _safe_multiply<_R1::num, (_R2::den / _ratio_add::_gx)>::value,
-                _safe_multiply<_R2::num, (_R1::den / _ratio_add::_gx)>::value>::value;
+                _safe_multiply<_R1::num, stdex::intmax_t(_R2::den / _ratio_add::_gx)>::value,
+                _safe_multiply<_R2::num, stdex::intmax_t(_R1::den / _ratio_add::_gx)>::value>::value;
 
             // The new numerator may have common factors with the denominator,
             // but they have to also be factors of __gcd.
@@ -524,8 +524,14 @@ namespace stdex
 
         public:
             // typename ratio<>::type is necessary here
-            typedef typename ratio<_ratio_add::_n / _ratio_add::_gx2,
-                _safe_multiply<_R1::den / _ratio_add::_gx2, _R2::den / _ratio_add::_gx>::value>::type type;
+            typedef 
+            typename 
+            ratio<
+                stdex::intmax_t(_ratio_add::_n / _ratio_add::_gx2),
+                _safe_multiply<
+                    stdex::intmax_t(_R1::den / _ratio_add::_gx2), stdex::intmax_t(_R2::den / _ratio_add::_gx)
+                >::value
+            >::type type;
         };
     }
 
