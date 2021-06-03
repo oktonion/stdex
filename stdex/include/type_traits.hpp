@@ -2095,9 +2095,10 @@ namespace stdex
             typedef typename remove_cv<_Tp>::type _stripped_type;
 
             static const bool value = 
-                _is_function_chooser_helper<_Tp, 
-                    _canonical_is_function_const<_stripped_type>::value == bool(true) ||
-                    _canonical_is_function_volatile<_stripped_type>::value == bool(true)>::value;
+                _is_function_chooser_helper<_Tp, bool(
+                    (_canonical_is_function_const<_stripped_type>::value == bool(true)) ||
+                    (_canonical_is_function_volatile<_stripped_type>::value == bool(true))
+                )>::value;
         };
     }
 
