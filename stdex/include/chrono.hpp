@@ -517,12 +517,12 @@ namespace stdex
 
             template <class _Tp>
             struct _enable_if_is_duration:
-                _enable_if_is_duration_impl<_is_duration<_Tp>::value == bool(true), _Tp>
+                _enable_if_is_duration_impl<bool( _is_duration<_Tp>::value == bool(true) ), _Tp>
             {};
 
             template <class _Tp>
             struct _disable_if_is_duration :
-                _enable_if_is_duration_impl<_is_duration<_Tp>::value == bool(false), _Tp>
+                _enable_if_is_duration_impl<bool( _is_duration<_Tp>::value == bool(false) ), _Tp>
             {};
 
             template<class _FromDur, class _ToDur,
@@ -542,7 +542,7 @@ namespace stdex
                 typedef typename detail::_duration_common_type<_to_rep, _from_rep, _from_period>::type
                     _cr;
                 typedef  detail::_duration_cast_ct_impl<_ToDur, _cr,
-                    _cf::num == 1, _cf::den == 1> type;
+                    bool(_cf::num == 1), bool(_cf::den == 1)> type;
 
                 template<class _Rep, class _Period>
                 static _ToDur _cast(const duration<_Rep, _Period>& _d)
@@ -871,7 +871,7 @@ namespace stdex
             duration(const _Rep2 &_r_in) : 
                 base_type(_r_in)
             {
-                typedef typename intern::chrono_asserts::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert<(treat_as_floating_point<_Rep>::value == bool(true)) || (treat_as_floating_point<_Rep2>::value == bool(false))>::
+                typedef typename intern::chrono_asserts::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert<bool( (treat_as_floating_point<_Rep>::value == bool(true)) || (treat_as_floating_point<_Rep2>::value == bool(false)) )>::
                     a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_floating_point_value_assert_failed
                 check4; // if you are there means rep type is integer but floating-point type is passed as argument
             }
@@ -894,7 +894,7 @@ namespace stdex
                 check5;
 
 
-                typedef typename intern::chrono_asserts::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert<(treat_as_floating_point<_Rep>::value == bool(true)) || (treat_as_floating_point<_Rep2>::value == bool(false))>::
+                typedef typename intern::chrono_asserts::a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert<bool( (treat_as_floating_point<_Rep>::value == bool(true)) || (treat_as_floating_point<_Rep2>::value == bool(false)) )>::
                     a_duration_with_an_integer_tick_count_cannot_be_constructed_from_a_duration_with_floating_point_tick_assert_failed
                 check6; // if you are there means rep type is integer but floating-point duration type is passed as argument
             }
@@ -966,7 +966,7 @@ namespace stdex
             duration& operator%=(
             typename
             conditional<
-                treat_as_floating_point<_Rep>::value == bool(false),
+                bool( treat_as_floating_point<_Rep>::value == bool(false) ),
                 const _Rep &,
                 _disabled1&
             >::type _r_in
@@ -979,7 +979,7 @@ namespace stdex
             duration& operator%=(
             typename
             conditional<
-                treat_as_floating_point<_Rep>::value == bool(false),
+                bool( treat_as_floating_point<_Rep>::value == bool(false) ),
                 const duration &,
                 _disabled2&
             >::type other
@@ -1395,9 +1395,9 @@ namespace stdex
         struct system_clock
         {
             typedef 
-            stdex::conditional<
-                (sizeof(chrono::nanoseconds::rep) * CHAR_BIT >= 64) ||
-                (detail::_use_big_int<chrono::nanoseconds::rep, chrono::nanoseconds::period>::value == bool(true)), 
+            stdex::conditional<bool(
+                bool(sizeof(chrono::nanoseconds::rep) * CHAR_BIT >= 64) ||
+                (detail::_use_big_int<chrono::nanoseconds::rep, chrono::nanoseconds::period>::value == bool(true)) ), 
                 chrono::nanoseconds, 
                 chrono::microseconds
             >::type duration;
@@ -1439,9 +1439,9 @@ namespace stdex
         struct steady_clock
         {
             typedef 
-            stdex::conditional<
-                (sizeof(chrono::nanoseconds::rep) * CHAR_BIT >= 64) ||
-                (detail::_use_big_int<chrono::nanoseconds::rep, chrono::nanoseconds::period>::value == bool(true)), 
+            stdex::conditional<bool(
+                bool(sizeof(chrono::nanoseconds::rep) * CHAR_BIT >= 64) ||
+                (detail::_use_big_int<chrono::nanoseconds::rep, chrono::nanoseconds::period>::value == bool(true)) ), 
                 chrono::nanoseconds, 
                 chrono::microseconds
             >::type duration;
