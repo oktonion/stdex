@@ -824,6 +824,8 @@ namespace stdex
 
         };
 
+        using intern::type_traits_asserts::alignment_of_type_can_not_be_zero_assert;
+
         template< class _Tp >
         struct _alignment_of_impl
         {
@@ -836,7 +838,7 @@ namespace stdex
 
         private:
             
-            typedef typename intern::type_traits_asserts::alignment_of_type_can_not_be_zero_assert<( type::value != 0 )>::
+            typedef typename alignment_of_type_can_not_be_zero_assert<bool( type::value > 0 )>::
                 alignment_of_type_can_not_be_zero_assert_failed
             check1; // if you are there means alignment of type passed can not be calculated or compiler can not handle this situation (sorry, nothing can be done there)
         };
@@ -890,7 +892,7 @@ namespace stdex
         struct _is_incomplete_type
         { 
             static const bool value = _is_incomplete_type_helper<_Tp>::value;
-            typedef integral_constant<bool, ( _is_incomplete_type_helper<_Tp>::value == bool(true) )> type;
+            typedef bool_constant<bool( _is_incomplete_type_helper<_Tp>::value == bool(true) )> type;
         };
 
         template<>
@@ -2018,7 +2020,7 @@ namespace stdex
             static _Tp *_ptr;
             static const bool value = (sizeof(_is_mem_function_ptr(_is_mem_function_ptr_impl::_ptr)) == sizeof(_yes_type));
 
-            typedef typename integral_constant<bool, _is_mem_function_ptr_impl::value == bool(true)>::type type;
+            typedef typename bool_constant<bool( _is_mem_function_ptr_impl::value == bool(true) )>::type type;
         };
 
         template <class _Tp>
@@ -2222,7 +2224,7 @@ namespace stdex
         struct _has_member_pointer_impl
         {
             static const bool value = sizeof(_has_member_pointer_tester<_Tp>(0)) == sizeof(_yes_type) && sizeof(_has_member_pointer_tester_helper<_Tp>(0)) != sizeof(char);
-            typedef integral_constant<bool, ( _has_member_pointer_impl::value == bool(true) )> type;
+            typedef bool_constant<bool( _has_member_pointer_impl::value == bool(true) )> type;
         };
 
 
@@ -2269,7 +2271,7 @@ namespace stdex
     {
         enum dummy_enum {};
         struct _enum_can_have_member_pointer_bug :
-            public integral_constant<bool, detail::_has_member_pointer_impl<dummy_enum>::value>::type
+            public bool_constant<bool( detail::_has_member_pointer_impl<dummy_enum>::value == bool(true) )>::type
         { };
     } // namespace is_enum_detail
 
@@ -2343,7 +2345,7 @@ namespace stdex
         struct _is_enum_helper<_Tp, true>
         { // with enum bug
             static const bool value =
-                _is_enum_helper1<_Tp, (_is_convertable_to_int<_Tp>::value == bool(true) && _is_constructible_from_int<_Tp>::value == bool(false))>::value;
+                _is_enum_helper1<_Tp, bool(_is_convertable_to_int<_Tp>::value == bool(true) && _is_constructible_from_int<_Tp>::value == bool(false))>::value;
         };
 
         template<class _Tp, bool>
@@ -2352,11 +2354,10 @@ namespace stdex
             static const bool value =
                 _is_enum_helper<_Tp, (is_enum_detail::_enum_can_have_member_pointer_bug::value == bool(true))>::value;
             typedef 
-            integral_constant<
-                bool, (
+            bool_constant<bool(
                 _is_enum_helper<
                     _Tp, 
-                    is_enum_detail::_enum_can_have_member_pointer_bug::value == bool(true)
+                    bool( is_enum_detail::_enum_can_have_member_pointer_bug::value == bool(true) )
                 >::value == bool(true)
             )> type;
         };
@@ -2388,7 +2389,7 @@ namespace stdex
     {
         template<class _Tp>
         struct _is_member_pointer_helper:
-            public integral_constant<bool, ( is_member_function_pointer<_Tp>::value == bool(true) )>::type
+            public bool_constant<bool( is_member_function_pointer<_Tp>::value == bool(true) )>::type
         { 
         };
 
@@ -2418,13 +2419,13 @@ namespace stdex
         template <class _Tp, bool _IsReference>
         struct _is_class_or_union_helper
         {
-            typedef integral_constant<bool, false> type;
+            typedef false_type type;
         };
 
         template <class _Tp>
         struct _is_class_or_union_helper<_Tp, false>
         {
-            typedef integral_constant<bool,(
+            typedef bool_constant<bool(
                 (is_scalar<_Tp>::value == bool(false))
                 && (is_array<_Tp>::value == bool(false))
                 && (is_void<_Tp>::value == bool(false))
@@ -2455,14 +2456,14 @@ namespace stdex
         template <class _Tp, bool>
         struct _is_union_helper
         {
-            typedef integral_constant<bool, false> type;
+            typedef false_type type;
         };
 
         template <class _Tp>
         struct _is_union_helper<_Tp, false>
         {
             typedef typename _is_class_or_union_helper<_Tp, false>::type is_class_or_union;
-            typedef integral_constant<bool, (
+            typedef bool_constant<bool(
                 (is_class_or_union::value == bool(true))
                 && (_is_union_intrinsic<_Tp>::value == bool(true))
             )> type;
@@ -2480,14 +2481,14 @@ namespace stdex
         template <class _Tp, bool _IsReference>
         struct _is_class_helper
         {
-            typedef integral_constant<bool, false> type;
+            typedef false_type type;
         };
 
         template <class _Tp>
         struct _is_class_helper<_Tp, false>
         {
             typedef typename _is_class_or_union_helper<_Tp, false>::type is_class_or_union;
-            typedef integral_constant<bool, (
+            typedef bool_constant<bool(
                 (is_class_or_union::value == bool(true))
                 && (_is_union_intrinsic<_Tp>::value == bool(false))
             )> type;
@@ -2531,7 +2532,7 @@ namespace stdex
         static const std::size_t value = 1 + rank<_Tp>::value;
 
         typedef const bool value_type;
-        typedef integral_constant<std::size_t, (const std::size_t)(rank::value)> type;
+        typedef integral_constant<std::size_t, std::size_t(rank::value)> type;
 
         operator value_type() const
         {    // return stored value
@@ -2555,7 +2556,7 @@ namespace stdex
 
     template<class _Tp, unsigned _Uint, std::size_t _Size>
     struct extent<_Tp[_Size], _Uint> :
-        public integral_constant<std::size_t, (_Uint == 0 ? _Size : extent<_Tp, _Uint - 1>::value)>
+        public integral_constant<std::size_t, std::size_t(_Uint == 0 ? _Size : extent<_Tp, _Uint - 1>::value)>
     { };
 
     /*template<class _Tp, unsigned _Uint>
