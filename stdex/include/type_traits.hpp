@@ -746,17 +746,17 @@ namespace stdex
         template<class _Tp>
         struct is_signed_impl
         {
-            typedef _sign_unsign_chooser<is_integral<_Tp>::value>::template _signed<_Tp> _impl;
+            static const bool value = _sign_unsign_chooser<is_integral<_Tp>::value>::template _signed<_Tp>::value;
             
-            typedef typename conditional< _impl::value, true_type, false_type >::type type;
+            typedef typename conditional<is_signed_impl::value, true_type, false_type >::type type;
         };
 
         template<class _Tp>
         struct is_unsigned_impl
         {
-            typedef detail::_sign_unsign_chooser<is_integral<_Tp>::value>::template _unsigned<_Tp> _impl;
+            static const bool value = detail::_sign_unsign_chooser<is_integral<_Tp>::value>::template _unsigned<_Tp>::value;
             
-            typedef typename conditional< _impl::value, true_type, false_type >::type type;
+            typedef typename conditional<is_unsigned_impl::value, true_type, false_type >::type type;
         };
     }
 
