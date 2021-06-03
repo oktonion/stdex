@@ -2266,22 +2266,23 @@ namespace stdex
         {
             static const bool value = (sizeof(_is_constructible_from_type_tester<_Tp>(1)) == sizeof(_yes_type));
         };
-    } // namespace detail
 
-    namespace is_enum_detail
-    {
-        enum dummy_enum {};
-        struct _enum_can_have_member_pointer_bug :
-            public bool_constant<bool( detail::_has_member_pointer_impl<dummy_enum>::value == bool(true) )>::type
-        { };
-    } // namespace is_enum_detail
+        namespace is_enum_detail
+        {
+            enum dummy_enum {};
+            struct _enum_can_have_member_pointer_bug :
+                public bool_constant<bool( _has_member_pointer_impl<dummy_enum>::value == bool(true) )>::type
+            { };
+        } // namespace is_enum_detail
+
+    } // namespace detail
 
     namespace intern
     {
         
         template<>
         struct _has_bug<struct _stdex_enum_can_have_member_pointer_bug>:
-            is_enum_detail::_enum_can_have_member_pointer_bug
+            detail::is_enum_detail::_enum_can_have_member_pointer_bug
         { };
     } // namespace intern
 
@@ -2353,7 +2354,7 @@ namespace stdex
         struct _is_enum_impl
         {
             static const bool value =
-                _is_enum_helper<_Tp, (is_enum_detail::_enum_can_have_member_pointer_bug::value == bool(true))>::value;
+                _is_enum_helper<_Tp, bool(is_enum_detail::_enum_can_have_member_pointer_bug::value == bool(true))>::value;
             typedef 
             bool_constant<bool(
                 _is_enum_helper<
