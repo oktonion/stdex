@@ -204,7 +204,7 @@ namespace stdex
             static const bool value = !bool(_Pp::value);
 
             typedef const bool value_type;
-            typedef integral_constant<bool, _not_::value == bool(true)> type;
+            typedef integral_constant<bool, ( _not_::value == bool(true) )> type;
 
             operator value_type() const
             {    // return stored value
@@ -583,11 +583,11 @@ namespace stdex
 
         template<class _FuncT>
         struct _canonical_is_function_const:
-            bool_constant<_canonical_is_const<const _FuncT>::value == bool(false)> { };
+            bool_constant<( _canonical_is_const<const _FuncT>::value == bool(false) )> { };
         
         template<class _FuncT>
         struct _canonical_is_function_volatile:
-            bool_constant<_canonical_is_volatile<volatile _FuncT>::value == bool(false)> { };
+            bool_constant<( _canonical_is_volatile<volatile _FuncT>::value == bool(false) )> { };
     }
 
     namespace intern
@@ -622,7 +622,7 @@ namespace stdex
     {
         template<class _NonConstT, class _ConstT>
         struct _is_const_impl_fallback:
-            bool_constant<is_function<_NonConstT>::value == bool(false)>
+            bool_constant<( is_function<_NonConstT>::value == bool(false) )>
         { };
 
         template<class _Tp>
@@ -650,7 +650,7 @@ namespace stdex
     {
         template<class _NonVolatileT, class _VolatileT>
         struct _is_volatile_impl_fallback:
-            bool_constant<is_function<_NonVolatileT>::value == bool(false)>
+            bool_constant<( is_function<_NonVolatileT>::value == bool(false) )>
         { };
 
         template<class _Tp>
@@ -762,7 +762,7 @@ namespace stdex
         static const bool value = detail::_sign_unsign_chooser<is_integral<_Tp>::value>::template _signed<_Tp>::value;
 
         typedef const bool value_type;
-        typedef integral_constant<bool, is_signed::value == bool(true)> type;
+        typedef integral_constant< bool, (is_signed::value == bool(true)) > type;
 
         operator value_type() const
         {    // return stored value
@@ -782,7 +782,7 @@ namespace stdex
         static const bool value = detail::_sign_unsign_chooser<is_integral<_Tp>::value>::template _unsigned<_Tp>::value;
 
         typedef const bool value_type;
-        typedef integral_constant<bool, is_unsigned::value == bool(true)> type;
+        typedef integral_constant<bool, (is_unsigned::value == bool(true)) > type;
 
         operator value_type() const
         {    // return stored value
@@ -834,13 +834,13 @@ namespace stdex
             //
             static const std::size_t value =
                 (_alignment_logic_helper<
-                    sizeof(_alignment_of_trick<_Tp>) - sizeof(_Tp),
+                    ( sizeof(_alignment_of_trick<_Tp>) - sizeof(_Tp) ),
                     __alignof(_Tp)
                 >::value);
         #else
             static const std::size_t value =
                 (_alignment_logic_helper<
-                    sizeof(_alignment_of_trick<_Tp>) - sizeof(_Tp),
+                    ( sizeof(_alignment_of_trick<_Tp>) - sizeof(_Tp) ),
                     sizeof(_Tp)
                 >::value);
         #endif
@@ -853,7 +853,7 @@ namespace stdex
 
         private:
             typedef intern::type_traits_asserts check;
-            typedef typename check::alignment_of_type_can_not_be_zero_assert< _alignment_of_impl::value != 0 >::
+            typedef typename check::alignment_of_type_can_not_be_zero_assert<( _alignment_of_impl::value != 0 )>::
                 alignment_of_type_can_not_be_zero_assert_failed
             check1; // if you are there means alignment of type passed can not be calculated or compiler can not handle this situation (sorry, nothing can be done there)
         };
