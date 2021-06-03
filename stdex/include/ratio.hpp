@@ -61,7 +61,7 @@ namespace stdex
     namespace intern
     {
         // since we have no static_assert in pre-C++11 we just compile-time assert this way:
-        struct ratio_asserts
+        namespace ratio_asserts
         {
             template<bool> 
             struct overflow_in_multiplication_assert; // if you are there means overflow in safe template multiplication occurred
@@ -80,7 +80,7 @@ namespace stdex
 
             template<bool>
             struct overflow_in_addition_assert; // if you are there means overflow in safe template addition occurred
-        };
+        }
 
         template<>
         struct ratio_asserts::overflow_in_multiplication_assert<true>
@@ -146,9 +146,9 @@ namespace stdex
             static const stdex::intmax_t value = _Pn + _Qn;
 
         private:
-            typedef intern::ratio_asserts check;
+            
 
-            typedef typename check::overflow_in_addition_assert<(_add_overflow_check<_Pn, _Qn>::value != 0)>::
+            typedef typename intern::ratio_asserts::overflow_in_addition_assert<bool(_add_overflow_check<_Pn, _Qn>::value != 0)>::
                 overflow_in_addition_assert_failed
             check1; // if you are there means overflow in safe template addition occurred
         };
@@ -158,8 +158,8 @@ namespace stdex
             static const stdex::uintmax_t value = (CHAR_BIT / 2);
 
         private:
-            typedef intern::ratio_asserts check;
-            typedef check::internal_library_error_assert< ( (CHAR_BIT % 2) == 0 ) >::
+            
+            typedef intern::ratio_asserts::internal_library_error_assert< ( (CHAR_BIT % 2) == 0 ) >::
                 internal_library_error_assert_failed
             check1; // if you are there means internal library error occurred (number of bits in char is not even on your platform)
         };
@@ -183,20 +183,20 @@ namespace stdex
             static const stdex::uintmax_t _b0 = _abs<_Qn>::value % _c;
             static const stdex::uintmax_t _b1 = _abs<_Qn>::value / _c;
 
-            typedef intern::ratio_asserts check;
+            
 
             static const stdex::uintmax_t _intmax_max = STDEX_UINTMAX_C(STDEX_INTMAX_MAX);
 
-            typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_a1 == 0 || _safe_multiply::_b1 == 0) >::
+            typedef typename intern::ratio_asserts::overflow_in_multiplication_assert< bool(_safe_multiply::_a1 == 0 || _safe_multiply::_b1 == 0) >::
                 overflow_in_multiplication_assert_failed
             check1; // if you are there means overflow in safe template multiplication occurred
-            typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1 < (_safe_multiply::_c / stdex::uintmax_t(2))) >::
+            typedef typename intern::ratio_asserts::overflow_in_multiplication_assert< bool(_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1 < (_safe_multiply::_c / stdex::uintmax_t(2))) >::
                 overflow_in_multiplication_assert_failed
             check2; // if you are there means overflow in safe template multiplication occurred
-            typedef typename check::overflow_in_multiplication_assert< ( _safe_multiply::_b0 * _safe_multiply::_a0 <= _safe_multiply::_intmax_max ) >::
+            typedef typename intern::ratio_asserts::overflow_in_multiplication_assert< bool( _safe_multiply::_b0 * _safe_multiply::_a0 <= _safe_multiply::_intmax_max ) >::
                 overflow_in_multiplication_assert_failed
             check3; // if you are there means overflow in safe template multiplication occurred
-            typedef typename check::overflow_in_multiplication_assert< ((_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1) * _safe_multiply::_c <= _safe_multiply::_intmax_max - _safe_multiply::_b0 * _safe_multiply::_a0) >::
+            typedef typename intern::ratio_asserts::overflow_in_multiplication_assert< bool((_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1) * _safe_multiply::_c <= _safe_multiply::_intmax_max - _safe_multiply::_b0 * _safe_multiply::_a0) >::
                 overflow_in_multiplication_assert_failed
             check4; // if you are there means overflow in safe template multiplication occurred
 
@@ -233,8 +233,8 @@ namespace stdex
                 (_lo1 < _lo2)); // carry
 
         private:
-            typedef intern::ratio_asserts check;
-            typedef typename check::internal_library_error_assert< (!(_big_less<_hi1, _lo1, _hi2, _lo2>::value != 0)) >::
+            
+            typedef typename intern::ratio_asserts::internal_library_error_assert< bool(!(_big_less<_hi1, _lo1, _hi2, _lo2>::value != 0)) >::
                 internal_library_error_assert_failed
             check1; // if you are there means internal library error occurred
         };
@@ -293,12 +293,12 @@ namespace stdex
         typedef ratio<ratio::num, ratio::den> type;
 
     private:
-        typedef intern::ratio_asserts check;
+        
 
-        typedef typename check::denominator_cant_be_zero_assert< (_Den != 0) >::
+        typedef typename intern::ratio_asserts::denominator_cant_be_zero_assert< (_Den != 0) >::
             denominator_cant_be_zero_assert_failed
         check1; // if you are there means you put the denominator to zero
-        typedef typename check::out_of_range<( (_Num >= -STDEX_INTMAX_MAX) && (_Den >= -STDEX_INTMAX_MAX) )>::
+        typedef typename intern::ratio_asserts::out_of_range<bool( (_Num >= -STDEX_INTMAX_MAX) && (_Den >= -STDEX_INTMAX_MAX) )>::
             out_of_range_failed
         check2; // if you are there means that value is out of range
     };
@@ -381,9 +381,9 @@ namespace stdex
             static const stdex::intmax_t den = type::den;
 
         private:
-            typedef intern::ratio_asserts check;
+            
 
-            typedef typename check::out_of_range< (_R2::num != 0) >::
+            typedef typename intern::ratio_asserts::out_of_range< bool(_R2::num != 0) >::
                 out_of_range_failed
             check1;// if you are there means that divider is zero
         };
@@ -397,9 +397,9 @@ namespace stdex
 
             static const stdex::intmax_t value = type::value;
         private:
-            typedef intern::ratio_asserts check;
+            
 
-            typedef typename check::out_of_range< (_R2::num != 0) >::
+            typedef typename intern::ratio_asserts::out_of_range< bool(_R2::num != 0) >::
                 out_of_range_failed
             check1;// if you are there means that divider is zero
         };
@@ -413,9 +413,9 @@ namespace stdex
 
             static const stdex::intmax_t value = type::value;
         private:
-            typedef intern::ratio_asserts check;
+            
 
-            typedef typename check::out_of_range< (_R2::num != 0) >::
+            typedef typename intern::ratio_asserts::out_of_range< bool(_R2::num != 0) >::
                 out_of_range_failed
             check1;// if you are there means that divider is zero
         };
