@@ -836,7 +836,7 @@ namespace stdex
 
         private:
             
-            typedef intern::type_traits_asserts::alignment_of_type_can_not_be_zero_assert<( type::value != 0 )>::
+            typedef typename intern::type_traits_asserts::alignment_of_type_can_not_be_zero_assert<( type::value != 0 )>::
                 alignment_of_type_can_not_be_zero_assert_failed
             check1; // if you are there means alignment of type passed can not be calculated or compiler can not handle this situation (sorry, nothing can be done there)
         };
@@ -2656,7 +2656,7 @@ namespace stdex
         private:
             
 
-            typedef intern::type_traits_asserts::make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert< is_integral<_Tp>::value >::
+            typedef typename intern::type_traits_asserts::make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert< is_integral<_Tp>::value >::
                 make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed
             check1; // if you are there means _Tp is not an integral type
 
@@ -2767,7 +2767,7 @@ namespace stdex
         private:
             
 
-            typedef intern::type_traits_asserts::make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert< is_integral<_Tp>::value >::
+            typedef typename intern::type_traits_asserts::make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert< is_integral<_Tp>::value >::
                 make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed
             check1; // if you are there means _Tp is not an integral type
 
@@ -2972,7 +2972,7 @@ namespace stdex
             typedef void type;
         private:
             
-            typedef intern::type_traits_asserts::not_allowed_arithmetic_type_assert< _I != 0 >::
+            typedef typename intern::type_traits_asserts::not_allowed_arithmetic_type_assert< _I != 0 >::
                 not_allowed_arithmetic_type_assert_failed
             check1; // if you are there means you passed to common_type not known arithmetic type
         };
