@@ -849,6 +849,21 @@ namespace stdex
         { 
             typedef _alignment_of_impl<_long_double_wrapper>::type type;
         };
+
+        template<>
+        struct _alignment_of_impl<const long double>:
+            _alignment_of_impl<long double>
+        { };
+
+        template<>
+        struct _alignment_of_impl<volatile long double>:
+            _alignment_of_impl<long double>
+        { };
+
+        template<>
+        struct _alignment_of_impl<const volatile long double>:
+            _alignment_of_impl<long double>
+        { };
     }
 
     template <class _Tp> 
