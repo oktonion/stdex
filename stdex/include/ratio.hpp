@@ -148,7 +148,7 @@ namespace stdex
         private:
             typedef intern::ratio_asserts check;
 
-            typedef typename check::overflow_in_addition_assert<_add_overflow_check<_Pn, _Qn>::value != 0>::
+            typedef typename check::overflow_in_addition_assert<(_add_overflow_check<_Pn, _Qn>::value != 0)>::
                 overflow_in_addition_assert_failed
             check1; // if you are there means overflow in safe template addition occurred
         };
@@ -159,7 +159,7 @@ namespace stdex
 
         private:
             typedef intern::ratio_asserts check;
-            typedef check::internal_library_error_assert< (CHAR_BIT % 2) == 0 >::
+            typedef check::internal_library_error_assert< ( (CHAR_BIT % 2) == 0 ) >::
                 internal_library_error_assert_failed
             check1; // if you are there means internal library error occurred (number of bits in char is not even on your platform)
         };
