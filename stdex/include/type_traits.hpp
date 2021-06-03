@@ -785,7 +785,7 @@ namespace stdex
         template <unsigned _A, unsigned _S>
         struct _alignment_logic_helper
         {
-            static const std::size_t value = _A < _S ? _A : _S;
+            static const std::size_t value = (_A < _S ? _A : _S);
         };
 
         template <unsigned _A>
