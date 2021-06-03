@@ -105,6 +105,12 @@ namespace stdex
                 using std::ptrdiff_t;
             }
 
+            template<class _T1, class _T2>
+            struct _sizeof_cmp
+            {
+                static const bool value = sizeof(_T1) == sizeof(_T2);
+            };
+
             template<bool>
             struct _pointer_as_long_type { typedef const long type; };
             template<>
@@ -112,11 +118,11 @@ namespace stdex
             template<bool>
             struct _pointer_as_short_type { typedef const short type; };
             template<>
-            struct _pointer_as_short_type<false> { static const bool flag = sizeof(long) == sizeof(void*); typedef _pointer_as_long_type<_pointer_as_short_type::flag>::type type; };
+            struct _pointer_as_short_type<false> { typedef _pointer_as_long_type<_sizeof_cmp<long, void*>::value>::type type; };
             template<bool>
             struct _pointer_as_int_type { typedef const int type; };
             template<>
-            struct _pointer_as_int_type<false> { static const bool flag = sizeof(short) == sizeof(void*); typedef _pointer_as_short_type<_pointer_as_int_type::flag>::type type; };
+            struct _pointer_as_int_type<false> { typedef _pointer_as_short_type<_sizeof_cmp<short, void*>::value>::type type; };
 
             template<bool>
             struct _pointer_as_ulong_type { typedef const unsigned long type; };
@@ -125,16 +131,16 @@ namespace stdex
             template<bool>
             struct _pointer_as_ushort_type { typedef const unsigned short type; };
             template<>
-            struct _pointer_as_ushort_type<false> { static const bool flag = sizeof(unsigned long) == sizeof(void*); typedef _pointer_as_long_type<_pointer_as_ushort_type::flag>::type type; };
+            struct _pointer_as_ushort_type<false> { typedef _pointer_as_long_type<_sizeof_cmp<unsigned long, void*>::value>::type type; };
             template<bool>
             struct _pointer_as_uint_type { typedef const unsigned int type; };
             template<>
-            struct _pointer_as_uint_type<false> { static const bool flag = sizeof(unsigned short) == sizeof(void*); typedef _pointer_as_short_type<_pointer_as_uint_type::flag>::type type; };
+            struct _pointer_as_uint_type<false> { typedef _pointer_as_short_type<_sizeof_cmp<unsigned short, void*>::value>::type type; };
 
             template<bool>
-            struct _pointer_as_integral_type_impl { static const bool flag = sizeof(int) == sizeof(void*); typedef _pointer_as_int_type<_pointer_as_integral_type_impl::flag>::type type; };
+            struct _pointer_as_integral_type_impl { typedef _pointer_as_int_type<_sizeof_cmp<int, void*>::value>::type type; };
             template<>
-            struct _pointer_as_integral_type_impl<false> { static const bool flag = sizeof(int) == sizeof(void*); typedef _pointer_as_uint_type<_pointer_as_integral_type_impl::flag>::type type; };
+            struct _pointer_as_integral_type_impl<false> { typedef _pointer_as_uint_type<_sizeof_cmp<int, void*>::value>::type type; };
 
             struct _ptrdiff_is_signed
             {
