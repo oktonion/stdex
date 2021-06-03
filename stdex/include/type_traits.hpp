@@ -56,32 +56,32 @@ namespace stdex
 
             template<bool>
             struct alignment_of_type_can_not_be_zero_assert;
-        }
 
-        template<>
-        struct type_traits_asserts::make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert<true>
-        {
-            typedef bool make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed;
-        };
+            template<>
+            struct make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert<true>
+            {
+                typedef bool make_signed_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed;
+            };
 
-        template<>
-        struct type_traits_asserts::make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert<true>
-        {
-            typedef bool make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed;
-        };
+            template<>
+            struct make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert<true>
+            {
+                typedef bool make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed;
+            };
 
-        template<>
-        struct type_traits_asserts::not_allowed_arithmetic_type_assert<true>
-        {
-            typedef bool not_allowed_arithmetic_type_assert_failed;
-        };
+            template<>
+            struct not_allowed_arithmetic_type_assert<true>
+            {
+                typedef bool not_allowed_arithmetic_type_assert_failed;
+            };
 
-        template<>
-        struct type_traits_asserts::alignment_of_type_can_not_be_zero_assert<true>
-        {
-            typedef bool alignment_of_type_can_not_be_zero_assert_failed;
-        };
-    }
+            template<>
+            struct alignment_of_type_can_not_be_zero_assert<true>
+            {
+                typedef bool alignment_of_type_can_not_be_zero_assert_failed;
+            };
+        } // namespace type_traits_asserts
+    } // namespace intern
 
     template<class _Tp, _Tp Val>
     struct integral_constant
@@ -824,8 +824,6 @@ namespace stdex
 
         };
 
-        using intern::type_traits_asserts::alignment_of_type_can_not_be_zero_assert;
-
         template< class _Tp >
         struct _alignment_of_impl
         {
@@ -838,7 +836,7 @@ namespace stdex
 
         private:
             
-            typedef typename alignment_of_type_can_not_be_zero_assert<bool( type::value > 0 )>::
+            typedef typename intern::type_traits_asserts::alignment_of_type_can_not_be_zero_assert<bool( type::value > 0 )>::
                 alignment_of_type_can_not_be_zero_assert_failed
             check1; // if you are there means alignment of type passed can not be calculated or compiler can not handle this situation (sorry, nothing can be done there)
         };

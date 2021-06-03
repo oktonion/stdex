@@ -80,44 +80,44 @@ namespace stdex
 
             template<bool>
             struct overflow_in_addition_assert; // if you are there means overflow in safe template addition occurred
-        }
 
-        template<>
-        struct ratio_asserts::overflow_in_multiplication_assert<true>
-        {
-            typedef bool overflow_in_multiplication_assert_failed;
-        };
+            template<>
+            struct overflow_in_multiplication_assert<true>
+            {
+                typedef bool overflow_in_multiplication_assert_failed;
+            };
 
-        template<>
-        struct ratio_asserts::internal_library_error_assert<true>
-        {
-            typedef bool internal_library_error_assert_failed;
-        };
+            template<>
+            struct internal_library_error_assert<true>
+            {
+                typedef bool internal_library_error_assert_failed;
+            };
 
-        template<>
-        struct ratio_asserts::denominator_cant_be_zero_assert<true>
-        {
-            typedef bool denominator_cant_be_zero_assert_failed;
-        };
+            template<>
+            struct denominator_cant_be_zero_assert<true>
+            {
+                typedef bool denominator_cant_be_zero_assert_failed;
+            };
 
-        template<>
-        struct ratio_asserts::out_of_range<true>
-        {
-            typedef bool out_of_range_failed;
-        };
+            template<>
+            struct out_of_range<true>
+            {
+                typedef bool out_of_range_failed;
+            };
 
-        template<>
-        struct ratio_asserts::division_by_zero<true>
-        {
-            typedef bool division_by_zero_failed;
-        };
+            template<>
+            struct division_by_zero<true>
+            {
+                typedef bool division_by_zero_failed;
+            };
 
-        template<>
-        struct ratio_asserts::overflow_in_addition_assert<true>
-        {
-            typedef bool overflow_in_addition_assert_failed;
-        };
-    }
+            template<>
+            struct overflow_in_addition_assert<true>
+            {
+                typedef bool overflow_in_addition_assert_failed;
+            };
+        } // namespace ratio_asserts
+    } // namespace intern
 
     namespace detail
     {
