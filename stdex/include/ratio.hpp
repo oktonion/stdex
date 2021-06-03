@@ -545,9 +545,15 @@ namespace stdex
         template<class _R1, class _R2>
         struct _ratio_subtract
         {
-            typedef typename _ratio_add<
+            typedef 
+            typename 
+            _ratio_add<
                 _R1,
-                ratio<-_R2::num, _R2::den> >::type type;
+                ratio<
+                    (-_R2::num), 
+                    _R2::den
+                > 
+            >::type type;
 
             static const stdex::intmax_t num = type::num;
             static const stdex::intmax_t den = type::den;
