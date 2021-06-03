@@ -162,7 +162,7 @@ namespace stdex
 
             template<bool>
             struct _nullptr_as_ptrdiff_type:
-                _pointer_as_ptrdiff_type<sizeof(ptrdiff_detail::ptrdiff_t) == sizeof(void*)>
+                _pointer_as_ptrdiff_type<_sizeof_cmp<ptrdiff_detail::ptrdiff_t, void*>::value>
             { };
 
             template<>
@@ -172,7 +172,7 @@ namespace stdex
 
             typedef _pointer_as_integral_type_impl<false>::type _nullptr_t_as_uint;
             typedef _pointer_as_integral_type_impl<true>::type _nullptr_t_as_int;
-            typedef _nullptr_as_ptrdiff_type<_ptrdiff_is_signed::value == _pointer_is_signed::value>::type _nullptr_t_as_integral;
+            typedef _nullptr_as_ptrdiff_type<(_ptrdiff_is_signed::value == _pointer_is_signed::value)>::type _nullptr_t_as_integral;
             
             template<bool>
             struct _nullptr_t_as_enum_chooser;
