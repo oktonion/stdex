@@ -2974,7 +2974,7 @@ namespace stdex
             typedef void type;
         private:
             
-            typedef typename intern::type_traits_asserts::not_allowed_arithmetic_type_assert< _I != 0 >::
+            typedef typename intern::type_traits_asserts::not_allowed_arithmetic_type_assert< bool(_I != 0) >::
                 not_allowed_arithmetic_type_assert_failed
             check1; // if you are there means you passed to common_type not known arithmetic type
         };
