@@ -836,7 +836,7 @@ namespace stdex
 
         private:
             
-            typedef typename intern::type_traits_asserts::alignment_of_type_can_not_be_zero_assert<bool( type::value > 0 )>::
+            typedef typename intern::type_traits_asserts::alignment_of_type_can_not_be_zero_assert<bool( type::value != 0 )>::
                 alignment_of_type_can_not_be_zero_assert_failed
             check1; // if you are there means alignment of type passed can not be calculated or compiler can not handle this situation (sorry, nothing can be done there)
         };
