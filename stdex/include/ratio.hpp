@@ -185,7 +185,7 @@ namespace stdex
 
             typedef intern::ratio_asserts check;
 
-            static const stdex::intmax_t _intmax_max = STDEX_UINTMAX_C(STDEX_INTMAX_MAX);
+            static const stdex::uintmax_t _intmax_max = STDEX_UINTMAX_C(STDEX_INTMAX_MAX);
 
             typedef typename check::overflow_in_multiplication_assert< (_safe_multiply::_a1 == 0 || _safe_multiply::_b1 == 0) >::
                 overflow_in_multiplication_assert_failed
