@@ -199,23 +199,9 @@ namespace stdex
         { };
 
         template<class _Pp>
-        struct _not_
-        {
-            static const bool value = !bool(_Pp::value);
-
-            typedef const bool value_type;
-            typedef integral_constant<bool, ( _Pp::value == bool(false) ) > type;
-
-            operator value_type() const
-            {    // return stored value
-                return (value);
-            }
-
-            value_type operator()() const
-            {    // return stored value
-                return (value);
-            }
-        };
+        struct _not_:
+            conditional<_Pp::value, false_type, true_type>::type
+        { };
     }
 
     namespace detail
