@@ -800,8 +800,8 @@ namespace stdex
             static const std::size_t value = _S;
         };
 
-        template< class _Tp >
-        struct _alignment_of_impl
+        template<class _Tp>
+        struct _alignment_of_impl_logic
         {
         #if _MSC_VER > 1400
             //
@@ -821,16 +821,22 @@ namespace stdex
                     sizeof(_Tp)
                 >::value);
         #endif
+
+        };
+
+        template< class _Tp >
+        struct _alignment_of_impl
+        {
             typedef 
             typename
             integral_constant<
                 std::size_t, 
-                (const std::size_t)(_alignment_of_impl::value)
+                std::size_t(_alignment_of_impl_logic<_Tp>::value)
             >::type type;
 
         private:
             
-            typedef intern::type_traits_asserts::alignment_of_type_can_not_be_zero_assert<( _alignment_of_impl::value != 0 )>::
+            typedef intern::type_traits_asserts::alignment_of_type_can_not_be_zero_assert<( type::value != 0 )>::
                 alignment_of_type_can_not_be_zero_assert_failed
             check1; // if you are there means alignment of type passed can not be calculated or compiler can not handle this situation (sorry, nothing can be done there)
         };
@@ -840,8 +846,9 @@ namespace stdex
 
         template<>
         struct _alignment_of_impl<long double>
-            : _alignment_of_impl<_long_double_wrapper>
-        { };
+        { 
+            typedef _alignment_of_impl<_long_double_wrapper>::type type;
+        };
     }
 
     template <class _Tp> 
