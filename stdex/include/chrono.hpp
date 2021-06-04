@@ -161,11 +161,13 @@ namespace stdex
             bool operator>=(const _big_int&, const _big_int&);
             bool operator<=(const _big_int&, const _big_int&);
             
+            class _disabled_big_int_operator;
+
             template<class _Tp>
             inline
             _big_int operator+(const _Tp& _lhs,
                 typename
-                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled>::type _rhs)
+                conditional<is_integral<_Tp>::value, const _big_int&, _disabled_big_int_operator>::type _rhs)
             {
                 return _big_int(_lhs) + _rhs;
             }
@@ -174,7 +176,7 @@ namespace stdex
             inline
             _big_int operator-(const _Tp& _lhs,
                 typename
-                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled>::type _rhs)
+                conditional<is_integral<_Tp>::value, const _big_int&, _disabled_big_int_operator>::type _rhs)
             {
                 return _big_int(_lhs) - _rhs;
             }
@@ -183,7 +185,7 @@ namespace stdex
             inline
             _big_int operator*(const _Tp& _lhs,
                 typename
-                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled>::type _rhs)
+                conditional<is_integral<_Tp>::value, const _big_int&, _disabled_big_int_operator>::type _rhs)
             {
                 return _big_int(_lhs) * _rhs;
             }
@@ -192,7 +194,7 @@ namespace stdex
             inline
             _big_int operator/(const _Tp& _lhs,
                 typename
-                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled>::type _rhs)
+                conditional<is_integral<_Tp>::value, const _big_int&, _disabled_big_int_operator>::type _rhs)
             {
                 return _big_int(_lhs) / _rhs;
             }
@@ -201,10 +203,13 @@ namespace stdex
             inline
             _big_int operator%(const _Tp& _lhs,
                 typename
-                conditional<is_integral<_Tp>::value, const _big_int&, class _disabled>::type _rhs)
+                conditional<is_integral<_Tp>::value, const _big_int&, _disabled_big_int_operator>::type _rhs)
             {
                 return _big_int(_lhs) % _rhs;
             }
+            
+            template<int>
+            class _disabled_chrono_convert;
 
             template<class _To, class _From>
             inline
@@ -214,7 +219,7 @@ namespace stdex
                     is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(false) &&
                     is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(false) ),
                     const chrono_detail::_priority_tag<0>&,
-                    class _disabled0
+                    _disabled_chrono_convert<__LINE__>/**/
                 >::type)
             {
                 return static_cast<_To>(_from);
@@ -228,7 +233,7 @@ namespace stdex
                     is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(false) &&
                     is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(true) ),
                     const chrono_detail::_priority_tag<1>&,
-                    class _disabled1
+                    _disabled_chrono_convert<__LINE__>/**/
                 >::type)
             {
                 return intmax_t(_from);
@@ -243,7 +248,7 @@ namespace stdex
                     is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(false) &&
                     is_floating_point<_To>::value == bool(true) ),
                     const chrono_detail::_priority_tag<2>&,
-                    class _disabled2
+                    _disabled_chrono_convert<__LINE__>/**/
                 >::type)
             {
                 return _To(_from.to_floating_point());
@@ -258,7 +263,7 @@ namespace stdex
                  is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(false) &&
                     is_floating_point<_To>::value == bool(false) ),
                     const chrono_detail::_priority_tag<3>&,
-                    class _disabled3
+                    _disabled_chrono_convert<__LINE__>/**/
                 >::type)
             {
                 return _To(_from.to_integer());
@@ -272,7 +277,7 @@ namespace stdex
                     is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(true) &&
                     is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(true) ),
                     const chrono_detail::_priority_tag<4>&,
-                    class _disabled4
+                    _disabled_chrono_convert<__LINE__>/**/
                 >::type)
             {
                 return _from;
