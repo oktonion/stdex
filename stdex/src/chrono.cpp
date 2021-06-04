@@ -920,29 +920,29 @@ namespace stdex {
                 return *this;
             }
 
-            _big_int operator+(_big_int a, const _big_int& b)
+            _big_int operator+(const _big_int& a, const _big_int& b)
             {
-                return a += b;
+                return _big_int(a) += b;
             }
 
-            _big_int operator-(_big_int a, const _big_int& b)
+            _big_int operator-(const _big_int& a, const _big_int& b)
             {
-                return a -= b;
+                return _big_int(a) -= b;
             }
 
-            _big_int operator*(_big_int a, const _big_int& b)
+            _big_int operator*(const _big_int& a, const _big_int& b)
             {
-                return a *= b;
+                return _big_int(a) *= b;
             }
 
-            _big_int operator/(_big_int a, const _big_int& b)
+            _big_int operator/(const _big_int& a, const _big_int& b)
             {
-                return a /= b;
+                return _big_int(a) /= b;
             }
 
-            _big_int operator%(_big_int a, const _big_int& b)
+            _big_int operator%(const _big_int& a, const _big_int& b)
             {
-                return a %= b;
+                return _big_int(a) %= b;
             }
             
             bool operator< (const _big_int& a, const _big_int& b)

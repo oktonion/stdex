@@ -148,11 +148,11 @@ namespace stdex
                 long double     to_floating_point() const;
             };
 
-            _big_int operator+(_big_int, const _big_int&);
-            _big_int operator-(_big_int, const _big_int&);
-            _big_int operator*(_big_int, const _big_int&);
-            _big_int operator/(_big_int, const _big_int&);
-            _big_int operator%(_big_int, const _big_int&);
+            _big_int operator+(const _big_int&, const _big_int&);
+            _big_int operator-(const _big_int&, const _big_int&);
+            _big_int operator*(const _big_int&, const _big_int&);
+            _big_int operator/(const _big_int&, const _big_int&);
+            _big_int operator%(const _big_int&, const _big_int&);
 
             bool operator< (const _big_int&, const _big_int&);
             bool operator> (const _big_int&, const _big_int&);
@@ -844,7 +844,7 @@ namespace stdex
             typedef typename intern::chrono_asserts::rep_cannot_be_a_duration_assert< bool(detail::_is_duration<_Rep>::value == bool(false)) >::
                 rep_cannot_be_a_duration_assert_failed
             check1; // if you are there means 1st template param _Rep is duration type
-            typedef typename intern::chrono_asserts::period_must_be_a_specialization_of_ratio_assert< bool(detail::_is_ratio<typename _Period::type>::value) >::
+            typedef typename intern::chrono_asserts::period_must_be_a_specialization_of_ratio_assert< bool(detail::_is_ratio<typename _Period::type>::value == bool(true)) >::
                 period_must_be_a_specialization_of_ratio_assert_failed
             check2; // if you are there means 2nd template param _Period is not a specialization of ratio class
             typedef typename intern::chrono_asserts::period_must_be_positive_assert< bool(_Period::num > 0) >::
