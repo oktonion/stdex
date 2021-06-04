@@ -841,13 +841,13 @@ namespace stdex
             void _modulus(const _disabled1 &) { }
             void _modulus(const _disabled2 &) { }
 
-            typedef typename intern::chrono_asserts::rep_cannot_be_a_duration_assert< (detail::_is_duration<_Rep>::value == bool(false)) >::
+            typedef typename intern::chrono_asserts::rep_cannot_be_a_duration_assert< bool(detail::_is_duration<_Rep>::value == bool(false)) >::
                 rep_cannot_be_a_duration_assert_failed
             check1; // if you are there means 1st template param _Rep is duration type
-            typedef typename intern::chrono_asserts::period_must_be_a_specialization_of_ratio_assert< (detail::_is_ratio<typename _Period::type>::value) >::
+            typedef typename intern::chrono_asserts::period_must_be_a_specialization_of_ratio_assert< bool(detail::_is_ratio<typename _Period::type>::value) >::
                 period_must_be_a_specialization_of_ratio_assert_failed
             check2; // if you are there means 2nd template param _Period is not a specialization of ratio class
-            typedef typename intern::chrono_asserts::period_must_be_positive_assert< (_Period::num > 0) >::
+            typedef typename intern::chrono_asserts::period_must_be_positive_assert< bool(_Period::num > 0) >::
                 period_must_be_positive_assert_failed
             check3; // if you are there means 2nd template param _Period in duration class is ratio of negative
 
@@ -887,10 +887,10 @@ namespace stdex
             {    // construct from a duration
                 typedef stdex::detail::_ratio_divide_den<_Period2, _Period> _Checked_type;
 
-                typedef typename intern::chrono_asserts::duration_does_not_use_floating_point_ticks_or_other_duration_period_is_not_exactly_divisible_by_current_period<
+                typedef typename intern::chrono_asserts::duration_does_not_use_floating_point_ticks_or_other_duration_period_is_not_exactly_divisible_by_current_period<bool(
                     (treat_as_floating_point<_Rep>::value == bool(true)) || 
                     ( (_Checked_type::value == 1 && treat_as_floating_point<_Rep2>::value == bool(false)) )
-                    >::duration_does_not_use_floating_point_ticks_or_other_duration_period_is_not_exactly_divisible_by_current_period_assert_failed
+                )>::duration_does_not_use_floating_point_ticks_or_other_duration_period_is_not_exactly_divisible_by_current_period_assert_failed
                 check5;
 
 
