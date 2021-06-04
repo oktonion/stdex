@@ -978,22 +978,65 @@ namespace stdex {
     } // namespace chrono
 } // namespace stdex
 
+namespace stdex 
+{
+    namespace chrono
+    {
+        template<class _Dur>
+        static
+        stdex::intmax_t _get_duration_count(
+            typename conditional<
+                detail::_is_duration<_Dur>::value,
+                const _Dur&,
+                seconds&
+            >::type dur)
+        {
+            return dur.count();
+        }
+
+        template<class _Dur>
+        static
+        stdex::intmax_t _get_duration_count(
+            typename conditional<
+                detail::_is_duration<_Dur>::value,
+                int,
+                const _Dur&
+            >::type)
+        {
+            return 0;
+        }
+
+        static void _get_ns(const nanoseconds &ns, stdex::timespec &out)
+        {
+            out.tv_nsec = static_cast<long>(_get_duration_count<nanoseconds>(ns));
+        }
+
+        static void _get_ns(const microseconds &mcs, stdex::timespec &out)
+        {
+            out.tv_nsec = static_cast<long>(_get_duration_count<microseconds>(mcs) * 1000);
+        }
+
+        static void _get_ns(const milliseconds &ms, stdex::timespec &out)
+        {
+            out.tv_nsec = static_cast<long>(_get_duration_count<milliseconds>(ms) * 1000 * 1000);
+        }
+    }
+}
+
 stdex::timespec
     stdex::chrono::system_clock::to_timespec(const time_point &_t) _STDEX_NOEXCEPT_FUNCTION
 {
     chrono::time_point<system_clock, chrono::seconds> _s = 
         chrono::time_point_cast<chrono::seconds>(_t);
-    chrono::nanoseconds _ns = 
-        chrono::duration_cast<chrono::nanoseconds>(_t - _s);
 
-    stdex::time_t _s_count = 
+    stdex::timespec _ts;
+    _ts.tv_nsec = 0;
+
+    _ts.tv_sec = 
         detail::_chrono_convert<stdex::time_t>(
             detail::duration_count(_s.time_since_epoch()), detail::chrono_detail::_priority_tag<4>() );
 
-    stdex::timespec _ts;
-
-    _ts.tv_sec = _s_count;
-    _ts.tv_nsec = static_cast<long>(_ns.count());
+    _get_ns(_t - _s, _ts);
 
     return local_ts_to_system_ts(_ts);
 
@@ -1301,6 +1344,50 @@ stdex::chrono::system_clock::time_point
     return time_point() + time_from_time_t_epoch;
 }
 
+namespace stdex 
+{
+    namespace chrono
+    {
+        template<class _Dur>
+        static
+        void _add_duration(
+            typename conditional<
+                detail::_is_duration<_Dur>::value,
+                long,
+                void*
+            >::type delta, _Dur & dur)
+        {
+            dur += delta;
+        }
+
+        template<class _Dur>
+        static
+        void _add_duration(
+            typename conditional<
+                detail::_is_duration<_Dur>::value,
+                void*,
+                long
+            >::type, _Dur &)
+        {
+        }
+
+        static void _convert_to_duration(long ts_nsec, nanoseconds &out)
+        {
+            _add_duration(ts_nsec, out);
+        }
+
+        static void _convert_to_duration(long ts_nsec, microseconds &out)
+        {
+            _add_duration(ts_nsec/1000, out);
+        }
+
+        static void _convert_to_duration(long ts_nsec, milliseconds &out)
+        {
+            _add_duration(ts_nsec/1000000, out);
+        }
+    }
+}
+
 stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDEX_NOEXCEPT_FUNCTION
 {    // get current time
     {
@@ -1313,9 +1400,13 @@ stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDE
             std::terminate();
         }
         
+        duration tv_nsec = 0;
+
+        _convert_to_duration(ts.tv_nsec, tv_nsec);
+
         return
         time_point( 
-            seconds(ts.tv_sec) + duration_cast<duration>(nanoseconds(ts.tv_nsec)) );
+            seconds(ts.tv_sec) + tv_nsec);
     }
 }
 
@@ -1331,8 +1422,12 @@ stdex::chrono::steady_clock::time_point stdex::chrono::steady_clock::now() _STDE
             std::terminate();
         }
 
+        duration tv_nsec = 0;
+
+        _convert_to_duration(ts.tv_nsec, tv_nsec);
+
         return
-        time_point(
-            seconds(ts.tv_sec) + duration_cast<duration>(nanoseconds(ts.tv_nsec)));
+        time_point( 
+            seconds(ts.tv_sec) + tv_nsec);
     }
 }

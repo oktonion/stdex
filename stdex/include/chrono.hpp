@@ -1463,6 +1463,25 @@ namespace stdex
             return !(lhs < rhs);
         }
 
+        namespace detail
+        {
+            template<class _Dur, bool>
+            struct _duration_is_using_big_int_impl
+            { 
+                typedef false_type type;
+            };
+
+            template<class _Dur>
+            struct _duration_is_using_big_int_impl<_Dur, true>
+            { 
+                typedef _use_big_int<typename _Dur::rep, typename _Dur::period> type;
+            };
+
+            template<class _Dur>
+            struct _duration_is_using_big_int:
+                _duration_is_using_big_int_impl<_Dur, _is_duration<_Dur>::value>::type
+            { };
+        }
         
 
         /**
@@ -1472,10 +1491,17 @@ namespace stdex
      */
         struct system_clock
         {
+        private:
+
+            typedef bool_constant<bool(detail::_sizeof_duration_rep<chrono::nanoseconds>::value * CHAR_BIT >= 64)> _nanoseconds_can_be_used;
+            typedef bool_constant<detail::_duration_is_using_big_int<chrono::nanoseconds>::value> _big_int_is_used_for_nanoseconds;
+
+        public:
+
             typedef 
             stdex::conditional<bool(
-                bool(detail::_sizeof_duration_rep<chrono::nanoseconds>::value * CHAR_BIT >= 64) ||
-                (detail::_use_big_int<chrono::nanoseconds::rep, chrono::nanoseconds::period>::value == bool(true)) ), 
+                bool(_nanoseconds_can_be_used::value == bool(true)) ||
+                bool(_big_int_is_used_for_nanoseconds::value == bool(true)) ), 
                 chrono::nanoseconds, 
                 chrono::microseconds
             >::type duration;
@@ -1516,10 +1542,17 @@ namespace stdex
      */
         struct steady_clock
         {
+        private:
+
+            typedef bool_constant<bool(detail::_sizeof_duration_rep<chrono::nanoseconds>::value * CHAR_BIT >= 64)> _nanoseconds_can_be_used;
+            typedef bool_constant<detail::_duration_is_using_big_int<chrono::nanoseconds>::value> _big_int_is_used_for_nanoseconds;
+
+        public:
+
             typedef 
             stdex::conditional<bool(
-                bool(detail::_sizeof_duration_rep<chrono::nanoseconds>::value * CHAR_BIT >= 64) ||
-                (detail::_use_big_int<chrono::nanoseconds::rep, chrono::nanoseconds::period>::value == bool(true)) ), 
+                bool(_nanoseconds_can_be_used::value == bool(true)) ||
+                bool(_big_int_is_used_for_nanoseconds::value == bool(true)) ), 
                 chrono::nanoseconds, 
                 chrono::microseconds
             >::type duration;
