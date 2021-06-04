@@ -45,6 +45,7 @@ namespace stdex
                 template<unsigned _Rank> struct _priority_tag : _priority_tag < _Rank - 1 > {};
                 template<> struct _priority_tag<0> {};
             }
+
             template<class _Tp>
             struct _is_ratio
             {
@@ -52,10 +53,36 @@ namespace stdex
             };
 
             template<stdex::intmax_t _Num, stdex::intmax_t _Den>
-            struct _is_ratio< ratio<_Num, _Den> >
+            struct _is_ratio<ratio<_Num, _Den>/**/>
             {
                 static const bool value = true;
             };
+
+            template<class _Tp, bool>
+            struct _sizeof_ratio_members_helper
+            {
+                enum
+                { 
+                    num = sizeof(_Tp::num), 
+                    den = sizeof(_Tp::den)
+                };
+            };
+
+            template<class _Tp>
+            struct _sizeof_ratio_members_helper<_Tp, false>
+            {
+                enum
+                { 
+                    num = 0, 
+                    den = 0
+                };
+            };
+
+            template<class _Tp>
+            struct _sizeof_ratio_members
+                : _sizeof_ratio_members_helper<_Tp, _is_ratio<_Tp>::value>
+            { };
+
 
             template<class _Rep, class _Period, bool>
             struct _use_big_int_impl
@@ -77,7 +104,7 @@ namespace stdex
             { };
         }
 
-        template <class _Rep, class _Period = ratio<1> >
+        template <class _Rep, class _Period = ratio<1>/**/>
         class duration;
 
         template<class _Clock, class _Dur = typename _Clock::duration>
@@ -505,9 +532,22 @@ namespace stdex
             };
 
             template<class _Rep, class _Period>
-            struct _is_duration<duration<_Rep, _Period> >
+            struct _is_duration<duration<_Rep, _Period>/**/>
             { 
                 static const bool value = true;
+            };
+
+            template<class _Tp>
+            struct _sizeof_duration_rep
+            {
+                static const std::size_t value = 0;
+            };
+
+            template<class _Rep, class _Period>
+            struct _sizeof_duration_rep<duration<_Rep, _Period>/**/>
+            {
+                static const std::size_t value = 
+                    sizeof(_Rep);
             };
 
             template <bool, class _Tp>
@@ -1198,12 +1238,12 @@ namespace stdex
         }
 
         // Standard duration types.
-        typedef duration<stdex::intmax_t, ratio<1, 1000000000> > nanoseconds; //!< Duration with the unit nanoseconds.
-        typedef duration<stdex::intmax_t, ratio<1, 1000000> > microseconds;   //!< Duration with the unit microseconds.
-        typedef duration<stdex::intmax_t, ratio<1, 1000> > milliseconds;      //!< Duration with the unit milliseconds.
-        typedef duration<stdex::intmax_t> seconds;                            //!< Duration with the unit seconds.
-        typedef duration<stdex::intmax_t, ratio<60> > minutes;                //!< Duration with the unit minutes.
-        typedef duration<stdex::intmax_t, ratio<3600> > hours;                //!< Duration with the unit hours.
+        typedef duration<stdex::intmax_t, nano> nanoseconds;        //!< Duration with the unit nanoseconds.
+        typedef duration<stdex::intmax_t, micro> microseconds;      //!< Duration with the unit microseconds.
+        typedef duration<stdex::intmax_t, milli> milliseconds;      //!< Duration with the unit milliseconds.
+        typedef duration<stdex::intmax_t> seconds;                  //!< Duration with the unit seconds.
+        typedef duration<stdex::intmax_t, ratio<60>/**/> minutes;   //!< Duration with the unit minutes.
+        typedef duration<stdex::intmax_t, ratio<3600>/**/> hours;   //!< Duration with the unit hours.
 
         template<class _Clock, class _Duration>
         class time_point
@@ -1401,7 +1441,7 @@ namespace stdex
         {
             typedef 
             stdex::conditional<bool(
-                bool(sizeof(chrono::nanoseconds::rep) * CHAR_BIT >= 64) ||
+                bool(std::size_t(detail::_sizeof_duration_rep<chrono::nanoseconds>::value) * CHAR_BIT >= 64) ||
                 (detail::_use_big_int<chrono::nanoseconds::rep, chrono::nanoseconds::period>::value == bool(true)) ), 
                 chrono::nanoseconds, 
                 chrono::microseconds
@@ -1445,7 +1485,7 @@ namespace stdex
         {
             typedef 
             stdex::conditional<bool(
-                bool(sizeof(chrono::nanoseconds::rep) * CHAR_BIT >= 64) ||
+                bool(std::size_t(detail::_sizeof_duration_rep<chrono::nanoseconds>::value) * CHAR_BIT >= 64) ||
                 (detail::_use_big_int<chrono::nanoseconds::rep, chrono::nanoseconds::period>::value == bool(true)) ), 
                 chrono::nanoseconds, 
                 chrono::microseconds
