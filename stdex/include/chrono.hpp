@@ -1237,13 +1237,46 @@ namespace stdex
             return !(lhs < rhs);
         }
 
+        namespace detail
+        {
+            struct _duration_predefined
+            {
+                struct duration_cannot_be_implemented;
+
+                typedef 
+                conditional<
+                    _is_ratio<nano>::value, 
+                    duration<stdex::intmax_t, nano>, 
+                    duration_cannot_be_implemented
+                >::type nanoseconds;
+
+                typedef 
+                conditional<
+                    _is_ratio<micro>::value, 
+                    duration<stdex::intmax_t, micro>, 
+                    duration_cannot_be_implemented
+                >::type microseconds;
+
+                typedef 
+                conditional<
+                    _is_ratio<milli>::value, 
+                    duration<stdex::intmax_t, milli>, 
+                    duration_cannot_be_implemented
+                >::type milliseconds;
+
+                typedef duration<stdex::intmax_t> seconds;                
+                typedef duration<stdex::intmax_t, ratio<60>/**/> minutes; 
+                typedef duration<stdex::intmax_t, ratio<3600>/**/> hours; 
+            };
+        }
+
         // Standard duration types.
-        typedef duration<stdex::intmax_t, nano> nanoseconds;        //!< Duration with the unit nanoseconds.
-        typedef duration<stdex::intmax_t, micro> microseconds;      //!< Duration with the unit microseconds.
-        typedef duration<stdex::intmax_t, milli> milliseconds;      //!< Duration with the unit milliseconds.
-        typedef duration<stdex::intmax_t> seconds;                  //!< Duration with the unit seconds.
-        typedef duration<stdex::intmax_t, ratio<60>/**/> minutes;   //!< Duration with the unit minutes.
-        typedef duration<stdex::intmax_t, ratio<3600>/**/> hours;   //!< Duration with the unit hours.
+        typedef detail::_duration_predefined::nanoseconds  nanoseconds;  //!< Duration with the unit nanoseconds.
+        typedef detail::_duration_predefined::microseconds microseconds; //!< Duration with the unit microseconds.
+        typedef detail::_duration_predefined::milliseconds milliseconds; //!< Duration with the unit milliseconds.
+        typedef detail::_duration_predefined::seconds      seconds;      //!< Duration with the unit seconds.
+        typedef detail::_duration_predefined::minutes      minutes;      //!< Duration with the unit minutes.
+        typedef detail::_duration_predefined::hours        hours;        //!< Duration with the unit hours.
 
         template<class _Clock, class _Duration>
         class time_point
