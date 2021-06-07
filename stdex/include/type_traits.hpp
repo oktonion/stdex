@@ -2686,7 +2686,7 @@ namespace stdex
 #endif
 
         template<class _Tp>
-        class _make_unsigned_selector_helper
+        struct _make_unsigned_selector_helper
         {
             typedef unsigned char _smallest;
             static const bool _b0 = sizeof(_Tp) <= sizeof(_smallest);
