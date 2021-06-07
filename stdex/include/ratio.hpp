@@ -265,37 +265,40 @@ namespace stdex
             static const stdex::uintmax_t _lo = _Res::_lo;
         };
     }
+    
+    namespace detail
+    {
+        template<stdex::intmax_t _Num, stdex::intmax_t _Den = 1>
+        struct _ratio
+        {
+            static const stdex::intmax_t num =
+                _Num * _sign_of<_Den>::value / _gcd<_Num, _Den>::value;
 
-    /**
- *  @brief Provides compile-time rational arithmetic.
- *
- *  This class template represents any finite rational number with a
- *  numerator and denominator representable by compile-time constants of
- *  type intmax_t. The ratio is simplified when instantiated.
- *
- *  For example:
- *  @code
- *    stdex::ratio<7,-21>::num == -1;
- *    stdex::ratio<7,-21>::den == 3;
- *  @endcode
- *
- */
+            static const stdex::intmax_t den =
+                _abs<_Den>::value / _gcd<_Num, _Den>::value;
+        };
+
+    } // namespace detail
+
     template<stdex::intmax_t _Num, stdex::intmax_t _Den = 1>
     struct ratio
     {
         // Note: sign(N) * abs(N) == N
         static const stdex::intmax_t num =
-            _Num * detail::_sign_of<_Den>::value / detail::_gcd<_Num, _Den>::value;
+            detail::_ratio<_Num, _Den>::num;
 
         static const stdex::intmax_t den =
-            detail::_abs<_Den>::value / detail::_gcd<_Num, _Den>::value;
+            detail::_ratio<_Num, _Den>::den;
 
-        typedef ratio<ratio::num, ratio::den> type;
+        typedef 
+        ratio<
+            detail::_ratio<_Num, _Den>::num, 
+            detail::_ratio<_Num, _Den>::den
+        > type;
 
     private:
-        
 
-        typedef typename intern::ratio_asserts::denominator_cant_be_zero_assert< (_Den != 0) >::
+        typedef typename intern::ratio_asserts::denominator_cant_be_zero_assert< bool(_Den != 0) >::
             denominator_cant_be_zero_assert_failed
         check1; // if you are there means you put the denominator to zero
         typedef typename intern::ratio_asserts::out_of_range<bool( (_Num >= -STDEX_INTMAX_MAX) && (_Den >= -STDEX_INTMAX_MAX) )>::
