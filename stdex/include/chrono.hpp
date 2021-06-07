@@ -1587,7 +1587,7 @@ namespace stdex
      */
         typedef
         stdex::conditional<
-            bool(steady_clock::period::den > system_clock::period::den),
+            detail::_greater<steady_clock::period::den, system_clock::period::den>::value,
             steady_clock,
             system_clock
         >::type high_resolution_clock;
