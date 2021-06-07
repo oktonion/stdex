@@ -18,7 +18,11 @@ void timespec_add(stdex::timespec &result, const stdex::timespec &in)
     enum {BILLION = 1000000000};
 
     const stdex::time_t _ts_sec_max = 
+    #ifdef max
         (std::numeric_limits<stdex::time_t>::max)();
+    #else
+        std::numeric_limits<stdex::time_t>::max();
+    #endif
     
     if(result.tv_sec == _ts_sec_max || result.tv_sec < 0 ||
         in.tv_sec == _ts_sec_max)
@@ -381,7 +385,11 @@ namespace clock_gettime_impl
 
         LARGE_INTEGER _ts_sec_max;
         _ts_sec_max.QuadPart =
+        #ifdef max
             (std::numeric_limits<stdex::time_t>::max)();
+        #else
+            std::numeric_limits<stdex::time_t>::max();
+        #endif
 
         if (delta_sec.QuadPart < _ts_sec_max.QuadPart)
         {
@@ -392,7 +400,12 @@ namespace clock_gettime_impl
         }
         else
         {
-            ts.tv_sec = (std::numeric_limits<stdex::time_t>::max)();
+            ts.tv_sec = 
+            #ifdef max
+                (std::numeric_limits<stdex::time_t>::max)();
+            #else
+                std::numeric_limits<stdex::time_t>::max();
+            #endif
             ts.tv_nsec = 999999999;
         }
 
@@ -510,7 +523,11 @@ namespace clock_gettime_impl
         }
 
         const stdex::time_t _ts_sec_max =
+        #ifdef max
             (std::numeric_limits<stdex::time_t>::max)();
+        #else
+            std::numeric_limits<stdex::time_t>::max();
+        #endif
 
         if (delta_sec.QuadPart < _ts_sec_max)
         {
@@ -840,8 +857,14 @@ namespace stdex {
             stdex::intmax_t _big_int::to_integer() const
             {
                 duration_long_long result = convert(*this);
+                const stdex::intmax_t intmax_max =
+                #ifdef max
+                    (std::numeric_limits<stdex::intmax_t>::max)();
+                #else
+                    std::numeric_limits<stdex::intmax_t>::max();
+                #endif
 
-                if (cmp_greater( result, (std::numeric_limits<stdex::intmax_t>::max)() ))
+                if (cmp_greater( result,  intmax_max))
                     throw(std::out_of_range("overflow in stdex::chrono::duration cast to stdex::intmax_t"));
 
                 return static_cast<stdex::intmax_t>(result);
