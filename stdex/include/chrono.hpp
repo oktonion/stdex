@@ -53,7 +53,7 @@ namespace stdex
             };
 
             template<stdex::intmax_t _Num, stdex::intmax_t _Den>
-            struct _is_ratio<ratio<_Num, _Den>/**/>
+            struct _is_ratio<stdex::ratio<_Num, _Den>/**/>
             {
                 static const bool value = true;
             };
@@ -571,9 +571,7 @@ namespace stdex
             {};
 
             template<class _FromDur, class _ToDur,
-                bool _RunTimeCast = bool(
-                    _use_big_int<typename _ToDur::rep, typename _ToDur::period>::value == bool(true) ||
-                    _use_big_int<typename _FromDur::rep, typename _FromDur::period>::value == bool(true) )>
+                bool _RunTimeCast>
             struct _duration_cast_impl;
 
             template<class _FromDur, class _ToDur>
@@ -667,10 +665,18 @@ namespace stdex
             };
 
             template<class _FromDur, class _ToDur>
-            struct _duration_cast
-                : _duration_cast_impl<_FromDur, _ToDur, bool(
+            struct _duration_cast_impl_chooser
+            {
+                typedef
+                _duration_cast_impl<_FromDur, _ToDur, bool(
                     _use_big_int<typename _ToDur::rep, typename _ToDur::period>::value == bool(true) ||
                     _use_big_int<typename _FromDur::rep, typename _FromDur::period>::value == bool(true) )>
+                type;
+            };
+
+            template<class _FromDur, class _ToDur>
+            struct _duration_cast
+                : _duration_cast_impl_chooser<_FromDur, _ToDur>::type
             { };
 
         } // namespace detail
@@ -699,22 +705,16 @@ namespace stdex
             }
 
         #ifdef max
-            static _Rep(max)()
+            static _Rep(max)() { return (std::numeric_limits<_Rep>::max)(); }
         #else
-            static _Rep max()
+            static _Rep max() { return std::numeric_limits<_Rep>::max(); }
         #endif
-            {
-                return (std::numeric_limits<_Rep>::max)();
-            }
 
         #ifdef min
-            static _Rep(min)()
+            static _Rep(min)() { return (std::numeric_limits<_Rep>::min)(); }
         #else
-            static _Rep min()
+            static _Rep min() { return std::numeric_limits<_Rep>::min(); }
         #endif
-            {
-                return (std::numeric_limits<_Rep>::min)();
-            }
 
             // since we have no constexpr use this in template params
             struct template_constants
@@ -1040,22 +1040,16 @@ namespace stdex
             }
 
         #ifdef max
-            static const duration(max)()
+            static const duration(max)() { return (duration_values<_Rep>::max)(); }
         #else
-            static const duration max()
+            static const duration max() { return duration_values<_Rep>::max(); }
         #endif
-            {
-                return (duration_values<_Rep>::max)();
-            }
 
         #ifdef min
-            static const duration(min)()
+            static const duration(min)() { return (duration_values<_Rep>::min)(); }
         #else
-            static const duration min()
+            static const duration min() { return duration_values<_Rep>::min(); }
         #endif
-            {
-                return (duration_values<_Rep>::min)();
-            }
         };
 
         template<class _Rep1, class _Period1,
@@ -1237,13 +1231,46 @@ namespace stdex
             return !(lhs < rhs);
         }
 
+        namespace detail
+        {
+            struct _duration_predefined
+            {
+                struct duration_cannot_be_implemented;
+
+                typedef 
+                conditional<
+                    _is_ratio<nano>::value, 
+                    duration<stdex::intmax_t, nano>, 
+                    duration_cannot_be_implemented
+                >::type nanoseconds;
+
+                typedef 
+                conditional<
+                    _is_ratio<micro>::value, 
+                    duration<stdex::intmax_t, micro>, 
+                    duration_cannot_be_implemented
+                >::type microseconds;
+
+                typedef 
+                conditional<
+                    _is_ratio<milli>::value, 
+                    duration<stdex::intmax_t, milli>, 
+                    duration_cannot_be_implemented
+                >::type milliseconds;
+
+                typedef duration<stdex::intmax_t> seconds;                
+                typedef duration<stdex::intmax_t, ratio<60>/**/> minutes; 
+                typedef duration<stdex::intmax_t, ratio<3600>/**/> hours; 
+            };
+        }
+
         // Standard duration types.
-        typedef duration<stdex::intmax_t, nano> nanoseconds;        //!< Duration with the unit nanoseconds.
-        typedef duration<stdex::intmax_t, micro> microseconds;      //!< Duration with the unit microseconds.
-        typedef duration<stdex::intmax_t, milli> milliseconds;      //!< Duration with the unit milliseconds.
-        typedef duration<stdex::intmax_t> seconds;                  //!< Duration with the unit seconds.
-        typedef duration<stdex::intmax_t, ratio<60>/**/> minutes;   //!< Duration with the unit minutes.
-        typedef duration<stdex::intmax_t, ratio<3600>/**/> hours;   //!< Duration with the unit hours.
+        typedef detail::_duration_predefined::nanoseconds  nanoseconds;  //!< Duration with the unit nanoseconds.
+        typedef detail::_duration_predefined::microseconds microseconds; //!< Duration with the unit microseconds.
+        typedef detail::_duration_predefined::milliseconds milliseconds; //!< Duration with the unit milliseconds.
+        typedef detail::_duration_predefined::seconds      seconds;      //!< Duration with the unit seconds.
+        typedef detail::_duration_predefined::minutes      minutes;      //!< Duration with the unit minutes.
+        typedef detail::_duration_predefined::hours        hours;        //!< Duration with the unit hours.
 
         template<class _Clock, class _Duration>
         class time_point
@@ -1292,23 +1319,31 @@ namespace stdex
 
         #ifdef min
             static const time_point(min)()
-        #else
-            static const time_point min()
-        #endif
             {    // get minimum time point
                 typedef time_point<_Clock, _Duration> that_type;
                 return (that_type((that_type::duration::min)()));
             }
+        #else
+            static const time_point min()
+            {    // get minimum time point
+                typedef time_point<_Clock, _Duration> that_type;
+                return (that_type(that_type::duration::min()));
+            }
+        #endif
 
         #ifdef max
             static const time_point(max)()
-        #else
-            static const time_point max()
-        #endif
             {    // get maximum time point
                 typedef time_point<_Clock, _Duration> that_type;
                 return (that_type((that_type::duration::max)()));
             }
+        #else
+            static const time_point max()
+            {    // get maximum time point
+                typedef time_point<_Clock, _Duration> that_type;
+                return (that_type(that_type::duration::max()));
+            }
+        #endif
 
         private:
             duration _d;    // duration since the epoch
@@ -1430,6 +1465,25 @@ namespace stdex
             return !(lhs < rhs);
         }
 
+        namespace detail
+        {
+            template<class _Dur, bool>
+            struct _duration_is_using_big_int_impl
+            { 
+                typedef false_type type;
+            };
+
+            template<class _Dur>
+            struct _duration_is_using_big_int_impl<_Dur, true>
+            { 
+                typedef _use_big_int<typename _Dur::rep, typename _Dur::period> type;
+            };
+
+            template<class _Dur>
+            struct _duration_is_using_big_int:
+                _duration_is_using_big_int_impl<_Dur, _is_duration<_Dur>::value>::type
+            { };
+        }
         
 
         /**
@@ -1439,10 +1493,17 @@ namespace stdex
      */
         struct system_clock
         {
+        private:
+
+            typedef bool_constant<bool(detail::_sizeof_duration_rep<chrono::nanoseconds>::value * CHAR_BIT >= 64)> _nanoseconds_can_be_used;
+            typedef bool_constant<detail::_duration_is_using_big_int<chrono::nanoseconds>::value> _big_int_is_used_for_nanoseconds;
+
+        public:
+
             typedef 
             stdex::conditional<bool(
-                bool(std::size_t(detail::_sizeof_duration_rep<chrono::nanoseconds>::value) * CHAR_BIT >= 64) ||
-                (detail::_use_big_int<chrono::nanoseconds::rep, chrono::nanoseconds::period>::value == bool(true)) ), 
+                bool(_nanoseconds_can_be_used::value == bool(true)) ||
+                bool(_big_int_is_used_for_nanoseconds::value == bool(true)) ), 
                 chrono::nanoseconds, 
                 chrono::microseconds
             >::type duration;
@@ -1483,10 +1544,17 @@ namespace stdex
      */
         struct steady_clock
         {
+        private:
+
+            typedef bool_constant<bool(detail::_sizeof_duration_rep<chrono::nanoseconds>::value * CHAR_BIT >= 64)> _nanoseconds_can_be_used;
+            typedef bool_constant<detail::_duration_is_using_big_int<chrono::nanoseconds>::value> _big_int_is_used_for_nanoseconds;
+
+        public:
+
             typedef 
             stdex::conditional<bool(
-                bool(std::size_t(detail::_sizeof_duration_rep<chrono::nanoseconds>::value) * CHAR_BIT >= 64) ||
-                (detail::_use_big_int<chrono::nanoseconds::rep, chrono::nanoseconds::period>::value == bool(true)) ), 
+                bool(_nanoseconds_can_be_used::value == bool(true)) ||
+                bool(_big_int_is_used_for_nanoseconds::value == bool(true)) ), 
                 chrono::nanoseconds, 
                 chrono::microseconds
             >::type duration;
@@ -1510,7 +1578,7 @@ namespace stdex
      */
         typedef
         stdex::conditional<
-            (steady_clock::period::den > system_clock::period::den),
+            bool(steady_clock::period::den > system_clock::period::den),
             steady_clock,
             system_clock
         >::type high_resolution_clock;

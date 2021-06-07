@@ -173,9 +173,8 @@ namespace stdex
         // Multiplication is safe if each term and the sum of the terms
         // is representable by intmax_t.
         template<stdex::intmax_t _Pn, stdex::intmax_t _Qn>
-        struct _safe_multiply
+        struct _safe_multiply_helper
         {
-        private:
             static const stdex::uintmax_t _c = stdex::uintmax_t(1) << (sizeof(stdex::intmax_t) * _half_char_bit::value);
 
             static const stdex::uintmax_t _a0 = _abs<_Pn>::value % _c;
@@ -183,20 +182,25 @@ namespace stdex
             static const stdex::uintmax_t _b0 = _abs<_Qn>::value % _c;
             static const stdex::uintmax_t _b1 = _abs<_Qn>::value / _c;
 
-            
-
             static const stdex::uintmax_t _intmax_max = STDEX_UINTMAX_C(STDEX_INTMAX_MAX);
+        };
 
-            typedef typename intern::ratio_asserts::overflow_in_multiplication_assert< bool(_safe_multiply::_a1 == 0 || _safe_multiply::_b1 == 0) >::
+        template<stdex::intmax_t _Pn, stdex::intmax_t _Qn>
+        struct _safe_multiply
+        {
+        private:
+            typedef _safe_multiply_helper<_Pn, _Qn> _helper_type;
+
+            typedef typename intern::ratio_asserts::overflow_in_multiplication_assert< bool(_helper_type::_a1 == 0 || _helper_type::_b1 == 0) >::
                 overflow_in_multiplication_assert_failed
             check1; // if you are there means overflow in safe template multiplication occurred
-            typedef typename intern::ratio_asserts::overflow_in_multiplication_assert< bool(_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1 < (_safe_multiply::_c / stdex::uintmax_t(2))) >::
+            typedef typename intern::ratio_asserts::overflow_in_multiplication_assert< bool(_helper_type::_a0 * _helper_type::_b1 + _helper_type::_b0 * _helper_type::_a1 < (_helper_type::_c / stdex::uintmax_t(2))) >::
                 overflow_in_multiplication_assert_failed
             check2; // if you are there means overflow in safe template multiplication occurred
-            typedef typename intern::ratio_asserts::overflow_in_multiplication_assert< bool( _safe_multiply::_b0 * _safe_multiply::_a0 <= _safe_multiply::_intmax_max ) >::
+            typedef typename intern::ratio_asserts::overflow_in_multiplication_assert< bool( _helper_type::_b0 * _helper_type::_a0 <= _helper_type::_intmax_max ) >::
                 overflow_in_multiplication_assert_failed
             check3; // if you are there means overflow in safe template multiplication occurred
-            typedef typename intern::ratio_asserts::overflow_in_multiplication_assert< bool((_safe_multiply::_a0 * _safe_multiply::_b1 + _safe_multiply::_b0 * _safe_multiply::_a1) * _safe_multiply::_c <= _safe_multiply::_intmax_max - _safe_multiply::_b0 * _safe_multiply::_a0) >::
+            typedef typename intern::ratio_asserts::overflow_in_multiplication_assert< bool((_helper_type::_a0 * _helper_type::_b1 + _helper_type::_b0 * _helper_type::_a1) * _helper_type::_c <= _helper_type::_intmax_max - _helper_type::_b0 * _helper_type::_a0) >::
                 overflow_in_multiplication_assert_failed
             check4; // if you are there means overflow in safe template multiplication occurred
 
@@ -214,23 +218,37 @@ namespace stdex
             static const bool value = (_hi1 < _hi2 || (_hi1 == _hi2 && _lo1 < _lo2));
         };
 
+        template<stdex::uintmax_t _lo1, stdex::uintmax_t _lo2>
+        struct _big_add_lo
+        {
+            static const stdex::uintmax_t value = (_lo1 + _lo2);
+        };
+
         template<stdex::uintmax_t _hi1, stdex::uintmax_t _lo1, stdex::uintmax_t _hi2, stdex::uintmax_t _lo2>
         struct _big_add
         {
-            static const stdex::uintmax_t _lo = static_cast<const stdex::uintmax_t>(_lo1 + _lo2); // overflow is ok
+            typedef _big_add_lo<_lo1, _lo2> _lo_type;// overflow is ok
+            static const stdex::uintmax_t _lo = _lo_type::value;
             static const stdex::uintmax_t _hi = (_hi1 + _hi2 +
-                stdex::uintmax_t(_big_add::_lo < _lo1) ); // carry
+                stdex::uintmax_t(_lo_type::value < _lo1) ); // carry
         };
 
         // [Subtract template]
+
+        template<stdex::uintmax_t _hi1, stdex::uintmax_t _lo1, stdex::uintmax_t _hi2, stdex::uintmax_t _lo2>
+        struct _big_sub_helper
+        {
+            static const stdex::uintmax_t _lo = _lo1 - _lo2;
+            static const stdex::uintmax_t _hi = (_hi1 - _hi2 - (_lo1 < _lo2));
+        };
 
         // Subtract a number from a bigger one.
         template<stdex::uintmax_t _hi1, stdex::uintmax_t _lo1, stdex::uintmax_t _hi2, stdex::uintmax_t _lo2>
         struct _big_sub
         {
-            static const stdex::uintmax_t _lo = _lo1 - _lo2;
-            static const stdex::uintmax_t _hi = (_hi1 - _hi2 -
-                (_lo1 < _lo2)); // carry
+            typedef _big_sub_helper<_hi1, _lo1, _hi2, _lo2> _helper_type;
+            static const stdex::uintmax_t _lo = _helper_type::_lo;
+            static const stdex::uintmax_t _hi = _helper_type::_hi;
 
         private:
             
@@ -240,62 +258,93 @@ namespace stdex
         };
 
         // [Safe multiply for bigger numbers template]
+        template<stdex::uintmax_t _x, stdex::uintmax_t _y>
+        struct _big_multiply_helper1
+        {
+            static const stdex::uintmax_t _c = stdex::uintmax_t(1) << (sizeof(stdex::intmax_t) * _half_char_bit::value);
+            static const stdex::uintmax_t _x0 = _x % _c;
+            static const stdex::uintmax_t _x1 = _x / _c;
+            static const stdex::uintmax_t _y0 = _y % _c;
+            static const stdex::uintmax_t _y1 = _y / _c;
+        };
+
+        template<stdex::uintmax_t _x, stdex::uintmax_t _y>
+        struct _big_multiply_helper2
+        {
+            typedef _big_multiply_helper1<_x, _y> _helper_type;
+
+            static const stdex::uintmax_t _x0y0 = _helper_type::_x0 * _helper_type::_y0;
+            static const stdex::uintmax_t _x0y1 = _helper_type::_x0 * _helper_type::_y1;
+            static const stdex::uintmax_t _x1y0 = _helper_type::_x1 * _helper_type::_y0;
+            static const stdex::uintmax_t _x1y1 = _helper_type::_x1 * _helper_type::_y1;
+        };
+
+        template<stdex::uintmax_t _x, stdex::uintmax_t _y>
+        struct _big_multiply_helper3
+        {
+            typedef _big_multiply_helper2<_x, _y> _helper_type;
+
+            static const stdex::uintmax_t _mix = _helper_type::_x0y1 + _helper_type::_x1y0; // possible carry...
+        };
+
+        template<stdex::uintmax_t _x, stdex::uintmax_t _y>
+        struct _big_multiply_helper
+        {
+            typedef _big_multiply_helper1<_x, _y> _helper_type1;
+            typedef _big_multiply_helper2<_x, _y> _helper_type2;
+            typedef _big_multiply_helper3<_x, _y> _helper_type3;
+
+            static const stdex::uintmax_t _mix_lo = static_cast<const stdex::uintmax_t>(_helper_type3::_mix) * _helper_type1::_c;  // overflow is ok
+            static const stdex::uintmax_t _mix_hi
+                = _helper_type3::_mix / _helper_type1::_c + ((_helper_type3::_mix < _helper_type2::_x0y1) ? _helper_type1::_c : 0); // ... added here
+        };
 
         // Same principle as _safe_multiply.
         template<stdex::uintmax_t _x, stdex::uintmax_t _y>
         struct _big_multiply
         {
         private:
-            static const stdex::uintmax_t _c = stdex::uintmax_t(1) << (sizeof(stdex::intmax_t) * _half_char_bit::value);
-            static const stdex::uintmax_t _x0 = _x % _c;
-            static const stdex::uintmax_t _x1 = _x / _c;
-            static const stdex::uintmax_t _y0 = _y % _c;
-            static const stdex::uintmax_t _y1 = _y / _c;
-            static const stdex::uintmax_t _x0y0 = _x0 * _y0;
-            static const stdex::uintmax_t _x0y1 = _x0 * _y1;
-            static const stdex::uintmax_t _x1y0 = _x1 * _y0;
-            static const stdex::uintmax_t _x1y1 = _x1 * _y1;
-            static const stdex::uintmax_t _mix = _x0y1 + _x1y0; // possible carry...
-            static const stdex::uintmax_t _mix_lo = static_cast<const stdex::uintmax_t>(_mix) * _c;  // overflow is ok
-            static const stdex::uintmax_t _mix_hi
-                = _mix / _c + ((_big_multiply::_mix < _x0y1) ? _c : 0); // ... added here
-            typedef _big_add<_big_multiply::_mix_hi, _big_multiply::_mix_lo, _big_multiply::_x1y1, _big_multiply::_x0y0> _Res;
+            typedef _big_multiply_helper<_x, _y> _helper_type;
+            typedef _big_add<_helper_type::_mix_hi, _helper_type::_mix_lo, _helper_type::_x1y1, _helper_type::_x0y0> _Res;
         public:
             static const stdex::uintmax_t _hi = _Res::_hi;
             static const stdex::uintmax_t _lo = _Res::_lo;
         };
     }
+    
+    namespace detail
+    {
+        template<stdex::intmax_t _Num, stdex::intmax_t _Den = 1>
+        struct _ratio
+        {
+            static const stdex::intmax_t num =
+                _Num * _sign_of<_Den>::value / _gcd<_Num, _Den>::value;
 
-    /**
- *  @brief Provides compile-time rational arithmetic.
- *
- *  This class template represents any finite rational number with a
- *  numerator and denominator representable by compile-time constants of
- *  type intmax_t. The ratio is simplified when instantiated.
- *
- *  For example:
- *  @code
- *    stdex::ratio<7,-21>::num == -1;
- *    stdex::ratio<7,-21>::den == 3;
- *  @endcode
- *
- */
+            static const stdex::intmax_t den =
+                _abs<_Den>::value / _gcd<_Num, _Den>::value;
+        };
+
+    } // namespace detail
+
     template<stdex::intmax_t _Num, stdex::intmax_t _Den = 1>
     struct ratio
     {
         // Note: sign(N) * abs(N) == N
         static const stdex::intmax_t num =
-            _Num * detail::_sign_of<_Den>::value / detail::_gcd<_Num, _Den>::value;
+            detail::_ratio<_Num, _Den>::num;
 
         static const stdex::intmax_t den =
-            detail::_abs<_Den>::value / detail::_gcd<_Num, _Den>::value;
+            detail::_ratio<_Num, _Den>::den;
 
-        typedef ratio<ratio::num, ratio::den> type;
+        typedef 
+        ratio<
+            detail::_ratio<_Num, _Den>::num, 
+            detail::_ratio<_Num, _Den>::den
+        > type;
 
     private:
-        
 
-        typedef typename intern::ratio_asserts::denominator_cant_be_zero_assert< (_Den != 0) >::
+        typedef typename intern::ratio_asserts::denominator_cant_be_zero_assert< bool(_Den != 0) >::
             denominator_cant_be_zero_assert_failed
         check1; // if you are there means you put the denominator to zero
         typedef typename intern::ratio_asserts::out_of_range<bool( (_Num >= -STDEX_INTMAX_MAX) && (_Den >= -STDEX_INTMAX_MAX) )>::
@@ -306,20 +355,26 @@ namespace stdex
     namespace detail
     {
         template<class _R1, class _R2>
-        struct _ratio_multiply
+        struct _ratio_multiply_gcd
         {
-        private:
             static const stdex::intmax_t _gcd1 =
                 _gcd<_R1::num, _R2::den>::value;
             static const stdex::intmax_t _gcd2 =
                 _gcd<_R2::num, _R1::den>::value;
+        };
+
+        template<class _R1, class _R2>
+        struct _ratio_multiply
+        {
+        private:
+            typedef _ratio_multiply_gcd<_R1, _R2> _gcd_type;
 
         public:
             typedef ratio<
-                _safe_multiply<stdex::intmax_t(_R1::num / _ratio_multiply::_gcd1),
-                stdex::intmax_t(_R2::num / _ratio_multiply::_gcd2)>::value,
-                _safe_multiply<stdex::intmax_t(_R1::den / _ratio_multiply::_gcd2),
-                stdex::intmax_t(_R2::den / _ratio_multiply::_gcd1)>::value> type;
+                _safe_multiply<stdex::intmax_t(_R1::num / _gcd_type::_gcd1),
+                stdex::intmax_t(_R2::num / _gcd_type::_gcd2)>::value,
+                _safe_multiply<stdex::intmax_t(_R1::den / _gcd_type::_gcd2),
+                stdex::intmax_t(_R2::den / _gcd_type::_gcd1)>::value> type;
 
             static const stdex::intmax_t num = type::num;
             static const stdex::intmax_t den = type::den;
@@ -329,17 +384,14 @@ namespace stdex
         struct _ratio_multiply_den
         {
         private:
-            static const stdex::intmax_t _gcd1 =
-                _gcd<_R1::num, _R2::den>::value;
-            static const stdex::intmax_t _gcd2 =
-                _gcd<_R2::num, _R1::den>::value;
+            typedef _ratio_multiply_gcd<_R1, _R2> _gcd_type;
 
         public:
 
             static const stdex::intmax_t value = 
                 _safe_multiply<
-                    stdex::intmax_t(_R1::den / _ratio_multiply_den::_gcd2),
-                    stdex::intmax_t(_R2::den / _ratio_multiply_den::_gcd1)
+                    stdex::intmax_t(_R1::den / _gcd_type::_gcd2),
+                    stdex::intmax_t(_R2::den / _gcd_type::_gcd1)
                 >::value;
         };
 
@@ -347,17 +399,14 @@ namespace stdex
         struct _ratio_multiply_num
         {
         private:
-            static const stdex::intmax_t _gcd1 =
-                _gcd<_R1::num, _R2::den>::value;
-            static const stdex::intmax_t _gcd2 =
-                _gcd<_R2::num, _R1::den>::value;
+            typedef _ratio_multiply_gcd<_R1, _R2> _gcd_type;
 
         public:
 
             static const stdex::intmax_t value = 
                 _safe_multiply<
-                    stdex::intmax_t(_R1::num / _ratio_multiply_num::_gcd1),
-                    stdex::intmax_t(_R2::num / _ratio_multiply_num::_gcd2)
+                    stdex::intmax_t(_R1::num / _gcd_type::_gcd1),
+                    stdex::intmax_t(_R2::num / _gcd_type::_gcd2)
                 >::value;
         };
     }
