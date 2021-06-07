@@ -2685,34 +2685,39 @@ namespace stdex
         };
 #endif
 
-
         template<class _Tp>
-        class _make_unsigned_selector
+        class _make_unsigned_selector_helper
         {
-        private:
-            
-
-            typedef typename intern::type_traits_asserts::make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert< is_integral<_Tp>::value >::
-                make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed
-            check1; // if you are there means _Tp is not an integral type
-
             typedef unsigned char _smallest;
             static const bool _b0 = sizeof(_Tp) <= sizeof(_smallest);
             static const bool _b1 = sizeof(_Tp) <= sizeof(unsigned short);
             static const bool _b2 = sizeof(_Tp) <= sizeof(unsigned int);
             static const bool _b3 = sizeof(_Tp) <= sizeof(unsigned long);
+        };
+
+        template<class _Tp>
+        class _make_unsigned_selector
+        {
+        private:
+            typedef _make_unsigned_selector_helper<_Tp> _helper;
+
+            typedef typename intern::type_traits_asserts::make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert< is_integral<_Tp>::value >::
+                make_unsigned_template_require_that_type_shall_be_a_possibly_cv_qualified_but_integral_type_assert_failed
+            check1; // if you are there means _Tp is not an integral type
+
+
 #if defined(ULLONG_MAX)
-            typedef conditional<_make_unsigned_selector<_Tp>::_b3, unsigned long, unsigned long long> _cond3;
+            typedef conditional<_helper::_b3, unsigned long, unsigned long long> _cond3;
 #else
-            typedef conditional<_make_unsigned_selector<_Tp>::_b3, unsigned long, unsigned long> _cond3;
+            typedef conditional<_helper::_b3, unsigned long, unsigned long> _cond3;
 #endif
             typedef typename _cond3::type _cond3_type;
-            typedef conditional<_make_unsigned_selector<_Tp>::_b2, unsigned int, _cond3_type> _cond2;
+            typedef conditional<_helper::_b2, unsigned int, _cond3_type> _cond2;
             typedef typename _cond2::type _cond2_type;
-            typedef conditional<_make_unsigned_selector<_Tp>::_b1, unsigned short, _cond2_type> _cond1;
+            typedef conditional<_helper::_b1, unsigned short, _cond2_type> _cond1;
             typedef typename _cond1::type _cond1_type;
 
-            typedef typename conditional<_make_unsigned_selector<_Tp>::_b0, _smallest, _cond1_type>::type
+            typedef typename conditional<_helper::_b0, _smallest, _cond1_type>::type
                 _unsigned_type;
             typedef _match_cv_qualifiers<_Tp, _unsigned_type> _cv_unsigned;
 
