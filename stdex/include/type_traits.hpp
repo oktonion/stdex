@@ -2717,7 +2717,7 @@ namespace stdex
             typedef conditional<_helper::_b1, unsigned short, _cond2_type> _cond1;
             typedef typename _cond1::type _cond1_type;
 
-            typedef typename conditional<_helper::_b0, _smallest, _cond1_type>::type
+            typedef typename conditional<_helper::_b0, typename _helper::_smallest, _cond1_type>::type
                 _unsigned_type;
             typedef _match_cv_qualifiers<_Tp, _unsigned_type> _cv_unsigned;
 
