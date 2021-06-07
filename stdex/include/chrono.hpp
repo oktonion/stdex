@@ -53,7 +53,7 @@ namespace stdex
             };
 
             template<stdex::intmax_t _Num, stdex::intmax_t _Den>
-            struct _is_ratio<ratio<_Num, _Den>/**/>
+            struct _is_ratio<stdex::ratio<_Num, _Den>/**/>
             {
                 static const bool value = true;
             };
@@ -1576,7 +1576,7 @@ namespace stdex
      */
         typedef
         stdex::conditional<
-            (steady_clock::period::den > system_clock::period::den),
+            bool(steady_clock::period::den > system_clock::period::den),
             steady_clock,
             system_clock
         >::type high_resolution_clock;
