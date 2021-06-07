@@ -1020,6 +1020,11 @@ namespace stdex
         {
             out.tv_nsec = static_cast<long>(_get_duration_count<milliseconds>(ms) * 1000 * 1000);
         }
+
+        static void _get_ns(const seconds &sec, stdex::timespec &out)
+        {
+            out.tv_nsec = static_cast<long>(_get_duration_count<seconds>(sec) * 1000 * 1000 * 1000);
+        }
     }
 }
 
@@ -1383,7 +1388,15 @@ namespace stdex
 
         static void _convert_to_duration(long ts_nsec, milliseconds &out)
         {
-            _add_duration(ts_nsec/1000000, out);
+            ts_nsec /= 1000;
+            _add_duration(ts_nsec/1000, out);
+        }
+
+        static void _convert_to_duration(long ts_nsec, seconds &out)
+        {
+            ts_nsec /= 1000;
+            ts_nsec /= 1000;
+            _add_duration(ts_nsec/1000, out);
         }
     }
 }
