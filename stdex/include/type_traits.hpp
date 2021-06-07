@@ -452,7 +452,7 @@ namespace stdex
 
     namespace detail
     {
-        template<bool>
+        template<class _Tp, bool>
         struct _sign_unsign_chooser;
 
         template<class _Tp>
@@ -467,32 +467,28 @@ namespace stdex
             static const bool value = _Tp(0) < _Tp(-1);
         };
 
-        template<>
-        struct _sign_unsign_chooser<true>//integral
+        template<class _Tp>
+        struct _sign_unsign_chooser<_Tp, true>//integral
         {
-            template<class _Tp>
             struct _signed :
                 public _cat_base<_signed_comparer<typename remove_cv<_Tp>::type>::value>
             {
             };
 
-            template<class _Tp>
             struct _unsigned :
                 public _cat_base<_unsigned_comparer<typename remove_cv<_Tp>::type>::value>
             {
             };
         };
 
-        template<>
-        struct _sign_unsign_chooser<false>//floating point
+        template<class _Tp>
+        struct _sign_unsign_chooser<_Tp, false>//floating point
         {
-            template<class _Tp>
             struct _signed :
                 public is_floating_point<_Tp>
             {
             };
 
-            template<class _Tp>
             struct _unsigned :
                 public false_type
             {
@@ -746,7 +742,9 @@ namespace stdex
         template<class _Tp>
         struct is_signed_impl
         {
-            static const bool value = _sign_unsign_chooser<is_integral<_Tp>::value>::template _signed<_Tp>::value;
+            typedef typename _sign_unsign_chooser<_Tp, is_integral<_Tp>::value>::_signed _chooser;
+
+            static const bool value = _chooser::value;
             
             typedef typename conditional<is_signed_impl::value, true_type, false_type >::type type;
         };
@@ -754,7 +752,9 @@ namespace stdex
         template<class _Tp>
         struct is_unsigned_impl
         {
-            static const bool value = detail::_sign_unsign_chooser<is_integral<_Tp>::value>::template _unsigned<_Tp>::value;
+            typedef typename _sign_unsign_chooser<_Tp, is_integral<_Tp>::value>::_unsigned _chooser;
+
+            static const bool value = _chooser::value;
             
             typedef typename conditional<is_unsigned_impl::value, true_type, false_type >::type type;
         };
