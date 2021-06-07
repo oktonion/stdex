@@ -571,9 +571,7 @@ namespace stdex
             {};
 
             template<class _FromDur, class _ToDur,
-                bool _RunTimeCast = bool(
-                    _use_big_int<typename _ToDur::rep, typename _ToDur::period>::value == bool(true) ||
-                    _use_big_int<typename _FromDur::rep, typename _FromDur::period>::value == bool(true) )>
+                bool _RunTimeCast>
             struct _duration_cast_impl;
 
             template<class _FromDur, class _ToDur>
@@ -667,10 +665,18 @@ namespace stdex
             };
 
             template<class _FromDur, class _ToDur>
-            struct _duration_cast
-                : _duration_cast_impl<_FromDur, _ToDur, bool(
+            struct _duration_cast_impl_chooser
+            {
+                typedef
+                _duration_cast_impl<_FromDur, _ToDur, bool(
                     _use_big_int<typename _ToDur::rep, typename _ToDur::period>::value == bool(true) ||
                     _use_big_int<typename _FromDur::rep, typename _FromDur::period>::value == bool(true) )>
+                type;
+            };
+
+            template<class _FromDur, class _ToDur>
+            struct _duration_cast
+                : _duration_cast_impl_chooser<_FromDur, _ToDur>::type
             { };
 
         } // namespace detail
