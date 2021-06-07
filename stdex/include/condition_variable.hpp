@@ -82,6 +82,31 @@ namespace stdex
             cv_status_t _cvstat;
     };
 
+    namespace detail
+    {
+        template<class _Clock, class _Dur, class _WaitUntilClock>
+        struct _sync_unknown_clock
+        {
+            typedef _Clock _Clock_local;
+            typedef _Dur _Dur_local;
+            typedef typename _Clock_local::time_point _Clock_time_point;
+
+            static chrono::time_point<_WaitUntilClock, _Dur_local> sync_clock_tp(const chrono::time_point<_Clock_local, _Dur_local>& _atime, ...)
+            {
+                const _Clock_time_point _c_entry = _Clock_local::now();
+                const typename _WaitUntilClock::time_point _s_entry = _WaitUntilClock::now();
+
+                _Dur_local _delta = (_atime - _c_entry);
+                return (_s_entry + stdex::chrono::duration_cast<typename _WaitUntilClock::duration>(_delta));
+            }
+
+            static const chrono::time_point<_WaitUntilClock, _Dur_local>& sync_clock_tp(const chrono::time_point<_WaitUntilClock, _Dur_local>& _atime, int)
+            {
+                return _atime;
+            }
+        };
+    }
+
     class condition_variable 
     {
     public:
@@ -194,29 +219,10 @@ namespace stdex
             typedef chrono::system_clock wait_until_clock;
 
             // DR 887 - Sync unknown clock to known clock.
-            struct lambdas
-            {
-                typedef _Clock _Clock_local;
-                typedef _Dur _Dur_local;
-                typedef typename _Clock_local::time_point _Clock_time_point;
 
-                static chrono::time_point<wait_until_clock, _Dur_local> sync_clock_tp(const chrono::time_point<_Clock_local, _Dur_local>& _atime, ...)
-                {
-                    const _Clock_time_point _c_entry = _Clock_local::now();
-                    const wait_until_clock::time_point _s_entry = wait_until_clock::now();
-
-                    _Dur_local _delta = (_atime - _c_entry);
-                    return (_s_entry + stdex::chrono::duration_cast<wait_until_clock::duration>(_delta));
-                }
-
-                static const chrono::time_point<wait_until_clock, _Dur_local>& sync_clock_tp(const chrono::time_point<wait_until_clock, _Dur_local>& _atime, int)
-                {
-                    return _atime;
-                }
-            };
 
             wait_until_clock::time_point _tp = chrono::time_point_cast<wait_until_clock::duration>(
-                    lambdas::sync_clock_tp(_atime, 0)
+                    _sync_unknown_clock<_Clock, _Dur, wait_until_clock>::sync_clock_tp(_atime, 0)
                 );
 
             if (_tp < wait_until_clock::now())
