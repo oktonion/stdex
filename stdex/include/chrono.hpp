@@ -689,7 +689,7 @@ namespace stdex
         {
             typedef duration<_Rep, _Period> _from_dur;
             typedef _ToDur _to_dur;
-            typedef typename detail::_duration_cast<_from_dur, _ToDur> _dc;
+            typedef detail::_duration_cast<_from_dur, _ToDur> _dc;
                 
             return _dc::_cast(_d);
         }
