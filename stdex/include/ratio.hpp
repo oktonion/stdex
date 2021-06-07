@@ -305,7 +305,8 @@ namespace stdex
         {
         private:
             typedef _big_multiply_helper<_x, _y> _helper_type;
-            typedef _big_add<_helper_type::_mix_hi, _helper_type::_mix_lo, _helper_type::_x1y1, _helper_type::_x0y0> _Res;
+            typedef _big_multiply_helper2<_x, _y> _helper_type2;
+            typedef _big_add<_helper_type::_mix_hi, _helper_type::_mix_lo, _helper_type2::_x1y1, _helper_type2::_x0y0> _Res;
         public:
             static const stdex::uintmax_t _hi = _Res::_hi;
             static const stdex::uintmax_t _lo = _Res::_lo;
