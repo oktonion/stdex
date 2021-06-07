@@ -222,7 +222,7 @@ namespace stdex
 
 
             wait_until_clock::time_point _tp = chrono::time_point_cast<wait_until_clock::duration>(
-                    _sync_unknown_clock<_Clock, _Dur, wait_until_clock>::sync_clock_tp(_atime, 0)
+                    detail::_sync_unknown_clock<_Clock, _Dur, wait_until_clock>::sync_clock_tp(_atime, 0)
                 );
 
             if (_tp < wait_until_clock::now())
