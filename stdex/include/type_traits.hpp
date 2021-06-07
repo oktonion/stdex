@@ -746,7 +746,7 @@ namespace stdex
 
             static const bool value = _chooser::value;
             
-            typedef typename conditional<is_signed_impl::value, true_type, false_type >::type type;
+            typedef typename conditional<_chooser::value, true_type, false_type >::type type;
         };
 
         template<class _Tp>
@@ -756,7 +756,7 @@ namespace stdex
 
             static const bool value = _chooser::value;
             
-            typedef typename conditional<is_unsigned_impl::value, true_type, false_type >::type type;
+            typedef typename conditional<_chooser::value, true_type, false_type >::type type;
         };
     }
 
