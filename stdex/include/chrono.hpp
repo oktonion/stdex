@@ -865,6 +865,15 @@ namespace stdex
             } // namespace chrono_asserts
         } // namespace intern
 
+        namespace detail
+        {
+            template<stdex::intmax_t _Lhs, stdex::intmax_t _Rhs>
+            struct _greater
+            {
+                static const bool value = (_Lhs > _Rhs);
+            };
+        }
+
         //! Duration template class. This class provides enough functionality to
         //! implement @c this_thread::sleep_for().
         template <class _Rep, class _Period>
@@ -892,7 +901,7 @@ namespace stdex
             typedef typename intern::chrono_asserts::period_must_be_a_specialization_of_ratio_assert< bool(detail::_is_ratio<typename _Period::type>::value == bool(true)) >::
                 period_must_be_a_specialization_of_ratio_assert_failed
             check2; // if you are there means 2nd template param _Period is not a specialization of ratio class
-            typedef typename intern::chrono_asserts::period_must_be_positive_assert< bool(_Period::num > 0) >::
+            typedef typename intern::chrono_asserts::period_must_be_positive_assert< detail::_greater<_Period::num, 0>::value >::
                 period_must_be_positive_assert_failed
             check3; // if you are there means 2nd template param _Period in duration class is ratio of negative
 
