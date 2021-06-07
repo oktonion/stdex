@@ -699,22 +699,16 @@ namespace stdex
             }
 
         #ifdef max
-            static _Rep(max)()
+            static _Rep(max)() { return (std::numeric_limits<_Rep>::max)(); }
         #else
-            static _Rep max()
+            static _Rep max() { return std::numeric_limits<_Rep>::max(); }
         #endif
-            {
-                return (std::numeric_limits<_Rep>::max)();
-            }
 
         #ifdef min
-            static _Rep(min)()
+            static _Rep(min)() { return (std::numeric_limits<_Rep>::min)(); }
         #else
-            static _Rep min()
+            static _Rep min() { return std::numeric_limits<_Rep>::min(); }
         #endif
-            {
-                return (std::numeric_limits<_Rep>::min)();
-            }
 
             // since we have no constexpr use this in template params
             struct template_constants
@@ -1040,22 +1034,16 @@ namespace stdex
             }
 
         #ifdef max
-            static const duration(max)()
+            static const duration(max)() { return (duration_values<_Rep>::max)(); }
         #else
-            static const duration max()
+            static const duration max() { return duration_values<_Rep>::max(); }
         #endif
-            {
-                return (duration_values<_Rep>::max)();
-            }
 
         #ifdef min
-            static const duration(min)()
+            static const duration(min)() { return (duration_values<_Rep>::min)(); }
         #else
-            static const duration min()
+            static const duration min() { return duration_values<_Rep>::min(); }
         #endif
-            {
-                return (duration_values<_Rep>::min)();
-            }
         };
 
         template<class _Rep1, class _Period1,
@@ -1325,23 +1313,31 @@ namespace stdex
 
         #ifdef min
             static const time_point(min)()
-        #else
-            static const time_point min()
-        #endif
             {    // get minimum time point
                 typedef time_point<_Clock, _Duration> that_type;
                 return (that_type((that_type::duration::min)()));
             }
+        #else
+            static const time_point min()
+            {    // get minimum time point
+                typedef time_point<_Clock, _Duration> that_type;
+                return (that_type(that_type::duration::min()));
+            }
+        #endif
 
         #ifdef max
             static const time_point(max)()
-        #else
-            static const time_point max()
-        #endif
             {    // get maximum time point
                 typedef time_point<_Clock, _Duration> that_type;
                 return (that_type((that_type::duration::max)()));
             }
+        #else
+            static const time_point max()
+            {    // get maximum time point
+                typedef time_point<_Clock, _Duration> that_type;
+                return (that_type(that_type::duration::max()));
+            }
+        #endif
 
         private:
             duration _d;    // duration since the epoch
