@@ -2250,10 +2250,16 @@ namespace stdex
         char _has_member_pointer_tester_helper(...);
 
         template<class _Tp>
-        struct _has_member_pointer_impl
+        struct _has_member_pointer_impl_helper
         {
             static const bool value = sizeof(_has_member_pointer_tester<_Tp>(0)) == sizeof(_yes_type) && sizeof(_has_member_pointer_tester_helper<_Tp>(0)) != sizeof(char);
-            typedef bool_constant<bool( _has_member_pointer_impl::value == bool(true) )> type;
+        };
+
+        template<class _Tp>
+        struct _has_member_pointer_impl
+        {
+            static const bool value = _has_member_pointer_impl_helper<_Tp>::value;
+            typedef bool_constant<_has_member_pointer_impl_helper<_Tp>::value> type;
         };
 
 
