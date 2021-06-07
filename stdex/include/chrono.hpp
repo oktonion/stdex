@@ -582,13 +582,12 @@ namespace stdex
                 typedef typename _FromDur::period _from_period;
                 typedef typename _FromDur::rep _from_rep;
                 typedef ratio_divide<_from_period, _to_period> _cf;
-                typedef typename detail::_duration_common_type<_to_rep, _from_rep, _from_period>::type
+                typedef typename _duration_common_type<_to_rep, _from_rep, _from_period>::type
                     _cr;
-                typedef  detail::_duration_cast_ct_impl<_ToDur, _cr,
+                typedef  _duration_cast_ct_impl<_ToDur, _cr,
                     bool(_cf::num == 1), bool(_cf::den == 1)> type;
 
-                template<class _Rep, class _Period>
-                static _ToDur _cast(const duration<_Rep, _Period>& _d)
+                static _ToDur _cast(const _FromDur& _d)
                 {
                     _cf _cf_value;
                     return type::_cast(_d, _cf_value);
@@ -643,6 +642,15 @@ namespace stdex
                 }
             } // namespace runtime_ratio
 
+            template<class _R1, class _R2>
+            struct _runtime_ratio_ratio_divide
+            {
+                static runtime_ratio::ratio call()
+                {
+                    return runtime_ratio::ratio_divide<_R1, _R2>();
+                }
+            };
+
             template<class _FromDur, class _ToDur>
             struct _duration_cast_impl<_FromDur, _ToDur, true> // rt-cast
             {
@@ -650,15 +658,14 @@ namespace stdex
                 typedef typename _ToDur::rep _to_rep;
                 typedef typename _FromDur::period _from_period;
                 typedef typename _FromDur::rep _from_rep;
-                typedef typename detail::_duration_common_type<_to_rep, _from_rep, _from_period>::type
+                typedef typename _duration_common_type<_to_rep, _from_rep, _from_period>::type
                     _cr;
-                typedef  detail::_duration_cast_rt_impl<_ToDur, _cr> type;
+                typedef  _duration_cast_rt_impl<_ToDur, _cr> type;
 
-                template<class _Rep, class _Period>
-                static _ToDur _cast(const duration<_Rep, _Period>& _d)
-                {
+                static _ToDur _cast(const _FromDur& _d)
+                { 
                     runtime_ratio::ratio _cf_value = 
-                        runtime_ratio::ratio_divide<_from_period, _to_period>();
+                        _runtime_ratio_ratio_divide<_from_period, _to_period>::call();
 
                     return type::_cast(_d, _cf_value);
                 }
@@ -676,8 +683,13 @@ namespace stdex
 
             template<class _FromDur, class _ToDur>
             struct _duration_cast
-                : _duration_cast_impl_chooser<_FromDur, _ToDur>::type
-            { };
+            { 
+                typedef typename _duration_cast_impl_chooser<_FromDur, _ToDur>::type impl;
+                static _ToDur call(const _FromDur &_from)
+                {
+                    return impl::_cast(_from);
+                }
+            };
 
         } // namespace detail
 
@@ -687,11 +699,12 @@ namespace stdex
         typename detail::_enable_if_is_duration<_ToDur>::type 
         duration_cast(const duration<_Rep, _Period> &_d)
         {
+            using stdex::chrono::detail::_duration_cast;
             typedef duration<_Rep, _Period> _from_dur;
             typedef _ToDur _to_dur;
-            typedef detail::_duration_cast<_from_dur, _ToDur> _dc;
+            typedef _duration_cast<_from_dur, _to_dur> _dc;
                 
-            return _dc::_cast(_d);
+            return _dc::call(_d);
         }
         
 
