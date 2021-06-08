@@ -235,7 +235,7 @@
     #define STATIC_ASSERT(expression, message)\
       struct CONCATENATE(__static_assertion_at_line_, __LINE__)\
       {\
-        stdex::detail::StaticAssertion<static_cast<const bool>((expression))> CONCATENATE(CONCATENATE(CONCATENATE(STATIC_ASSERTION_FAILED_AT_LINE_, __LINE__), _WITH__), message);\
+        stdex::detail::StaticAssertion<bool((expression))> CONCATENATE(CONCATENATE(CONCATENATE(STATIC_ASSERTION_FAILED_AT_LINE_, __LINE__), _WITH__), message);\
       };\
       typedef stdex::detail::StaticAssertionTest<sizeof(CONCATENATE(__static_assertion_at_line_, __LINE__))> CONCATENATE(__static_assertion_test_at_line_, __LINE__)
 

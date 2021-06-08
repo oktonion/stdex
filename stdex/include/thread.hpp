@@ -181,13 +181,18 @@ namespace stdex
         };
 
         template<class _Tp, class _ArgT>
-        struct _type_is_nullptr_base_chooser
+        struct _type_is_nullptr_base_chooser_helper
         {
             static const bool _is_nullptr =
-                _is_nullptr_t<_Tp>::value == (true) && 
-                (is_pointer<_ArgT>::value == (true) || is_member_function_pointer<_ArgT>::value == (true));
+                _is_nullptr_t<_Tp>::value == bool(true) && 
+                (is_pointer<_ArgT>::value == bool(true) || is_member_function_pointer<_ArgT>::value == bool(true));
+        };
 
-            typedef _type_is_nullptr_helper<_type_is_nullptr_base_chooser::_is_nullptr == (true)> type;
+        template<class _Tp, class _ArgT>
+        struct _type_is_nullptr_base_chooser
+        {
+            typedef _type_is_nullptr_base_chooser_helper<_Tp, _ArgT> _helper;
+            typedef _type_is_nullptr_helper<bool(_helper::_is_nullptr == bool(true))> type;
         };
         template<class _Tp, class _ArgT = void*>
         struct _type_is_nullptr:
@@ -300,6 +305,11 @@ namespace stdex
                     return *_ptr;
                 }
 
+                _Tp& get() const
+                {
+                    return *_ptr;
+                }
+
             private:
                 _Tp* _ptr;
             };
@@ -326,13 +336,13 @@ namespace stdex
             inline
             _Tp& operator,(const _ref_wrapper<_Tp> &value, nullptr_t)
             {
-                return value;
+                return value.get();
             }
 
             inline
             stdex::nullptr_t& operator,(const _ref_wrapper<stdex::nullptr_t> &value, nullptr_t)
             {
-                return value;
+                return value.get();
             }
 
             template<class _Tp>
@@ -479,10 +489,9 @@ namespace stdex
                             int
                         >::type args, _ObjectT &fp)
                     {
-                        typedef intern::thread_asserts check;
 
-                        typedef typename check::operator_comma_is_user_defined_for_this_type_assert<
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg1>::value
+                        typedef typename intern::thread_asserts::operator_comma_is_user_defined_for_this_type_assert<
+                            bool(thread_detail::_has_no_user_defined_operator_comma_op<_Arg1>::value == bool(true))
                         >::operator_comma_is_user_defined_for_this_type_assert_failed
                         check1; // if you are there means there is user defined operator comma somewhere in global namespace
                         

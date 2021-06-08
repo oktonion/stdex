@@ -21,8 +21,12 @@
 #include <sys/sysctl.h>
 #endif
 
-#if defined(__QNXNTO__) || defined(__QNX__)
-#include <sys/syspage.h>
+#if defined(__QNX__) 
+    #if defined(__QNXNTO__) // qnx6
+        #include <sys/syspage.h>
+    #else // qnx4
+        
+    #endif
 #endif
 
 // since windows is a 'special' platform there is some macro definitions to define platform

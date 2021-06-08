@@ -18,7 +18,11 @@ void timespec_add(stdex::timespec &result, const stdex::timespec &in)
     enum {BILLION = 1000000000};
 
     const stdex::time_t _ts_sec_max = 
+    #ifdef max
         (std::numeric_limits<stdex::time_t>::max)();
+    #else
+        std::numeric_limits<stdex::time_t>::max();
+    #endif
     
     if(result.tv_sec == _ts_sec_max || result.tv_sec < 0 ||
         in.tv_sec == _ts_sec_max)
@@ -381,7 +385,11 @@ namespace clock_gettime_impl
 
         LARGE_INTEGER _ts_sec_max;
         _ts_sec_max.QuadPart =
+        #ifdef max
             (std::numeric_limits<stdex::time_t>::max)();
+        #else
+            std::numeric_limits<stdex::time_t>::max();
+        #endif
 
         if (delta_sec.QuadPart < _ts_sec_max.QuadPart)
         {
@@ -392,7 +400,12 @@ namespace clock_gettime_impl
         }
         else
         {
-            ts.tv_sec = (std::numeric_limits<stdex::time_t>::max)();
+            ts.tv_sec = 
+            #ifdef max
+                (std::numeric_limits<stdex::time_t>::max)();
+            #else
+                std::numeric_limits<stdex::time_t>::max();
+            #endif
             ts.tv_nsec = 999999999;
         }
 
@@ -510,7 +523,11 @@ namespace clock_gettime_impl
         }
 
         const stdex::time_t _ts_sec_max =
+        #ifdef max
             (std::numeric_limits<stdex::time_t>::max)();
+        #else
+            std::numeric_limits<stdex::time_t>::max();
+        #endif
 
         if (delta_sec.QuadPart < _ts_sec_max)
         {
@@ -840,8 +857,14 @@ namespace stdex {
             stdex::intmax_t _big_int::to_integer() const
             {
                 duration_long_long result = convert(*this);
+                const stdex::intmax_t intmax_max =
+                #ifdef max
+                    (std::numeric_limits<stdex::intmax_t>::max)();
+                #else
+                    std::numeric_limits<stdex::intmax_t>::max();
+                #endif
 
-                if (cmp_greater( result, (std::numeric_limits<stdex::intmax_t>::max)() ))
+                if (cmp_greater( result,  intmax_max))
                     throw(std::out_of_range("overflow in stdex::chrono::duration cast to stdex::intmax_t"));
 
                 return static_cast<stdex::intmax_t>(result);
@@ -920,29 +943,29 @@ namespace stdex {
                 return *this;
             }
 
-            _big_int operator+(_big_int a, const _big_int& b)
+            _big_int operator+(const _big_int& a, const _big_int& b)
             {
-                return a += b;
+                return _big_int(a) += b;
             }
 
-            _big_int operator-(_big_int a, const _big_int& b)
+            _big_int operator-(const _big_int& a, const _big_int& b)
             {
-                return a -= b;
+                return _big_int(a) -= b;
             }
 
-            _big_int operator*(_big_int a, const _big_int& b)
+            _big_int operator*(const _big_int& a, const _big_int& b)
             {
-                return a *= b;
+                return _big_int(a) *= b;
             }
 
-            _big_int operator/(_big_int a, const _big_int& b)
+            _big_int operator/(const _big_int& a, const _big_int& b)
             {
-                return a /= b;
+                return _big_int(a) /= b;
             }
 
-            _big_int operator%(_big_int a, const _big_int& b)
+            _big_int operator%(const _big_int& a, const _big_int& b)
             {
-                return a %= b;
+                return _big_int(a) %= b;
             }
             
             bool operator< (const _big_int& a, const _big_int& b)
@@ -978,22 +1001,71 @@ namespace stdex {
     } // namespace chrono
 } // namespace stdex
 
+namespace stdex 
+{
+    namespace chrono
+    {
+        template<class _Dur>
+        static
+        stdex::intmax_t _get_duration_count(
+            typename conditional<
+                detail::_is_duration<_Dur>::value,
+                const _Dur&,
+                seconds&
+            >::type dur)
+        {
+            return dur.count();
+        }
+
+        template<class _Dur>
+        static
+        stdex::intmax_t _get_duration_count(
+            typename conditional<
+                detail::_is_duration<_Dur>::value,
+                int,
+                const _Dur&
+            >::type)
+        {
+            return 0;
+        }
+
+        static void _get_ns(const nanoseconds &ns, stdex::timespec &out)
+        {
+            out.tv_nsec = static_cast<long>(_get_duration_count<nanoseconds>(ns));
+        }
+
+        static void _get_ns(const microseconds &mcs, stdex::timespec &out)
+        {
+            out.tv_nsec = static_cast<long>(_get_duration_count<microseconds>(mcs) * 1000);
+        }
+
+        static void _get_ns(const milliseconds &ms, stdex::timespec &out)
+        {
+            out.tv_nsec = static_cast<long>(_get_duration_count<milliseconds>(ms) * 1000 * 1000);
+        }
+
+        static void _get_ns(const seconds &sec, stdex::timespec &out)
+        {
+            out.tv_nsec = static_cast<long>(_get_duration_count<seconds>(sec) * 1000 * 1000 * 1000);
+        }
+    }
+}
+
 stdex::timespec
     stdex::chrono::system_clock::to_timespec(const time_point &_t) _STDEX_NOEXCEPT_FUNCTION
 {
     chrono::time_point<system_clock, chrono::seconds> _s = 
         chrono::time_point_cast<chrono::seconds>(_t);
-    chrono::nanoseconds _ns = 
-        chrono::duration_cast<chrono::nanoseconds>(_t - _s);
-
-    stdex::time_t _s_count = 
-        detail::_chrono_convert<stdex::time_t>(
-            detail::duration_count(_s.time_since_epoch()), detail::chrono_detail::_priority_tag<4>() );
 
     stdex::timespec _ts;
+    _ts.tv_nsec = 0;
 
-    _ts.tv_sec = _s_count;
-    _ts.tv_nsec = static_cast<long>(_ns.count());
+    _ts.tv_sec = 
+        detail::_chrono_convert_func::call(
+            detail::_duration_count_func::call(_s.time_since_epoch()),
+            stdex::detail::_chrono_force_tmpl_param<stdex::time_t>());
+
+    _get_ns(_t - _s, _ts);
 
     return local_ts_to_system_ts(_ts);
 
@@ -1049,15 +1121,47 @@ weekday_from_days(duration_long_long z) _STDEX_NOEXCEPT_FUNCTION
     return static_cast<duration_ulong_long>(z >= -4 ? (z+4) % 7 : (z+5) % 7 + 6);
 }
 
-template <class To, class Rep, class Period>
-To
-round_down(const stdex::chrono::duration<Rep, Period>& d)
+namespace stdex
 {
-    To t = stdex::chrono::duration_cast<To>(d);
+    namespace chrono
+    {
+        struct _duration_cast
+        {
+            template<class _To, class _From>
+            static _To call(const _From &_from, 
+                const stdex::detail::_chrono_force_tmpl_param<_To>&)
+            {
+                return duration_cast<_To>(_from);
+            }
+        };
+    }
+}
+
+template <class To, class Rep, class Period>
+static
+To round_down(const stdex::chrono::duration<Rep, Period>& d)
+{
+    To t = 
+        stdex::chrono::_duration_cast::call(
+            d, 
+            stdex::detail::_chrono_force_tmpl_param<To>()
+        );
     if (t > d)
         --t;
     return t;
 }
+
+typedef         
+stdex::ratio_multiply<
+    stdex::chrono::hours::period,
+    stdex::ratio<24>
+>::type days_period;
+
+typedef 
+stdex::chrono::duration<
+    stdex::chrono::system_clock::rep,
+    days_period
+> days;
 
 static
 stdex::tm
@@ -1065,21 +1169,8 @@ make_utc_tm(stdex::chrono::system_clock::time_point tp)
 {
     using namespace stdex::chrono;
 
-
-    typedef         
-    stdex::ratio_multiply<
-        hours::period,
-        stdex::ratio<24>
-    >::type days_period;
-
-    typedef 
-    stdex::chrono::duration<
-        stdex::chrono::system_clock::rep,
-        days_period
-    > days;
-
     // t is time duration since 1970-01-01
-    stdex::chrono::system_clock::duration t = tp.time_since_epoch();
+    system_clock::duration t = tp.time_since_epoch();
     // d is days since 1970-01-01
     days d = round_down<days>(t);
     // t is now time duration since midnight of day d
@@ -1087,42 +1178,60 @@ make_utc_tm(stdex::chrono::system_clock::time_point tp)
     // break d down into year/month/day
     civil_date civ_date = civil_from_days(d.count());
     // start filling in the tm with calendar info
-    std::tm tm;
-    tm.tm_isdst = 0;
-    tm.tm_year = civ_date.year - 1900;
-    tm.tm_mon = civ_date.month - 1;
-    tm.tm_mday = civ_date.day;
-    tm.tm_wday = weekday_from_days(d.count());
-    tm.tm_yday = d.count() - days_from_civil(civ_date.year, 1, 1);
+    stdex::tm result;
+    result.tm_isdst = 0;
+    result.tm_year = civ_date.year - 1900;
+    result.tm_mon = civ_date.month - 1;
+    result.tm_mday = civ_date.day;
+    result.tm_wday = weekday_from_days(d.count());
+    result.tm_yday = d.count() - days_from_civil(civ_date.year, 1, 1);
     // Fill in the time
-    tm.tm_hour = duration_cast<hours>(t).count();
-    t -= hours(tm.tm_hour);
-    tm.tm_min = duration_cast<minutes>(t).count();
-    t -= minutes(tm.tm_min);
-    tm.tm_sec = duration_cast<seconds>(t).count();
-    return tm;
+    result.tm_hour = duration_cast<hours>(t).count();
+    t -= hours(result.tm_hour);
+    result.tm_min = duration_cast<minutes>(t).count();
+    t -= minutes(result.tm_min);
+    result.tm_sec = duration_cast<seconds>(t).count();
+
+    return result;
 }
 
 static
-stdex::tm get_time_t_epoch()
+stdex::tm get_time_t_epoch_with_UTC()
 {
-    const stdex::chrono::system_clock::time_point stdex_sys_clock_tp_epoch = 
-        stdex::chrono::system_clock::time_point(0);
+    const stdex::chrono::system_clock::time_point stdex_sys_clock_tp_epoch; // should be 1970-1-1
     stdex::tm stdex_tm_time_point = 
         make_utc_tm(stdex_sys_clock_tp_epoch);
+    
+    if(
+        stdex_tm_time_point.tm_year != 70 ||
+        stdex_tm_time_point.tm_mon != 0 ||
+        stdex_tm_time_point.tm_mday != 1 ||
+        stdex_tm_time_point.tm_hour != 0 ||
+        stdex_tm_time_point.tm_min != 0 ||
+        stdex_tm_time_point.tm_sec != 0
+      )
+    {
+        std::abort();
+    }
+
     const stdex::time_t time_t_epoch(0);
     const stdex::time_t invalid_time_t(-1);
     stdex::time_t time_t_time_point = invalid_time_t;
+    short d_shift = -299;
     do{ 
+        d_shift += 30;
         if(stdex_tm_time_point.tm_year > 1900 + 1000) 
             break; 
-        stdex_tm_time_point.tm_year++;
+        stdex_tm_time_point = make_utc_tm(stdex_sys_clock_tp_epoch + days(d_shift));
+        
         stdex_tm_time_point.tm_isdst = 0;
-        time_t_time_point = stdex::mktime(&stdex_tm_time_point);
+        stdex::tm tmp = stdex_tm_time_point;
+        time_t_time_point = stdex::mktime(&tmp);
         if(invalid_time_t == time_t_time_point)
         {
             stdex_tm_time_point.tm_isdst = 1;
-            time_t_time_point = stdex::mktime(&stdex_tm_time_point);
+            tmp = stdex_tm_time_point;
+            time_t_time_point = stdex::mktime(&tmp);
         }
     }
     while(invalid_time_t == time_t_time_point);
@@ -1132,112 +1241,208 @@ stdex::tm get_time_t_epoch()
         const double secs_since_time_t_epoch = 
             stdex::difftime(time_t_time_point, time_t_epoch) - ( (1 == stdex_tm_time_point.tm_isdst) ? (1.0 * 60.0 * 60.0) : 0.0 );
         
+        stdex::chrono::seconds 
+            stdex_secs_since_time_t_epoch = duration_long_long(secs_since_time_t_epoch), // with GMT shift
+            stdex_d_shift_secs_delta = days(d_shift); // without GMT shift
+        
         stdex::chrono::seconds
-            secs_since_tm_epoch = // since 1 jan 1900
-                stdex::chrono::hours(stdex_tm_time_point.tm_yday * 24 * stdex_tm_time_point.tm_year) +
-                stdex::chrono::hours(stdex_tm_time_point.tm_hour) +
-                stdex::chrono::minutes(stdex_tm_time_point.tm_min) +
-                stdex::chrono::seconds(stdex_tm_time_point.tm_sec);
-        stdex::chrono::seconds secs_since_tm_epoch_to_tt_epoch =
-            secs_since_tm_epoch -
-            stdex::chrono::seconds(stdex::chrono::seconds::rep(secs_since_time_t_epoch));
+            stdex_secs_delta = stdex_secs_since_time_t_epoch - stdex_d_shift_secs_delta; // sys_clock and time_t epoches delta with GMT shift
 
-        stdex_tm_time_point =
-            make_utc_tm(stdex_sys_clock_tp_epoch + secs_since_tm_epoch);
+        stdex::chrono::system_clock::time_point stdex_sys_clock_time_point = stdex_sys_clock_tp_epoch + stdex_secs_delta;
 
+        stdex_sys_clock_time_point -= stdex::chrono::hours(24);
+        time_t_time_point = invalid_time_t;
+        for(std::size_t i = 0; i < 24 * 2; ++i)
+        {
+            stdex_tm_time_point = make_utc_tm(stdex_sys_clock_time_point);
+            stdex::tm tmp = stdex_tm_time_point;
+            time_t_time_point = stdex::mktime(&tmp);
+
+            if(invalid_time_t == time_t_time_point)
+            {
+                tmp = make_utc_tm(stdex_sys_clock_time_point + stdex::chrono::seconds(1));
+                time_t_time_point = stdex::mktime(&tmp);
+                if(invalid_time_t != time_t_time_point)
+                {
+                    tmp = stdex_tm_time_point;
+                    time_t_time_point = time_t_epoch;
+                }
+            }
+
+            if(time_t_epoch == time_t_time_point)
+            {
+                stdex_tm_time_point = tmp;
+                break;
+            }
+
+            stdex_sys_clock_time_point += stdex::chrono::hours(1);
+        }
+
+        if(time_t_epoch != time_t_time_point)
+            stdex_tm_time_point.tm_year = -987654321;
     }
     else
     {
         stdex_tm_time_point.tm_year = -987654321;
     }
-    
+
     return stdex_tm_time_point;
 }
 
 static
-int get_UTC_shift()
+stdex::chrono::system_clock::time_point tm_to_time_point(const stdex::tm &value)
 {
-    static stdex::tm time_t_epoch = get_time_t_epoch();
+    using stdex::chrono::seconds;
 
-    if(time_t_epoch.tm_year == -987654321)
+    days d1 = 
+        days_from_civil(value.tm_year, value.tm_mon + 1, 1) - days_from_civil(70, 1, 1);
+    seconds result =
+        d1 +
+        days(value.tm_mday - 1) +
+        seconds(value.tm_hour * 3600 + value.tm_min * 60 + value.tm_sec);
+    
+    return stdex::chrono::system_clock::time_point(result);
+}
+
+static 
+int get_GM_offset()
+{
+    static stdex::tm time_t_epoch_with_UTC = get_time_t_epoch_with_UTC();
+    
+    if(-987654321 == time_t_epoch_with_UTC.tm_year)
     {
-        stdex::tm time_t_epoch = get_time_t_epoch();
-        if(time_t_epoch.tm_year == -987654321)
-            return -1;
+        time_t_epoch_with_UTC = get_time_t_epoch_with_UTC();
+        if(-987654321 == time_t_epoch_with_UTC.tm_year)
+            return 0;
     }
 
-    stdex::tm stdex_tm_time_point = time_t_epoch;
-    stdex::time_t time_t_time_point = stdex::mktime(&time_t_epoch);
-    const stdex::time_t invalid_time_t(-1);
-
-    int UTC_shift = 0;
-    stdex_tm_time_point.tm_sec++;
-
-    while (invalid_time_t == time_t_time_point)
-    {
-        stdex_tm_time_point.tm_hour++;
-        UTC_shift++;
-        time_t_time_point = stdex::mktime(&stdex_tm_time_point);
-
-        if(stdex_tm_time_point.tm_hour > 23)
-        {
-            UTC_shift = -1;
-            break;
-        }
-    }
-
-    return UTC_shift;
+    return 
+        time_t_epoch_with_UTC.tm_hour > 12 ? 
+            (time_t_epoch_with_UTC.tm_hour - 24) : time_t_epoch_with_UTC.tm_hour; // assuming that time_t epoch starts from 00:00:00
 }
 
 stdex::time_t
     stdex::chrono::system_clock::to_time_t(const time_point &_t) _STDEX_NOEXCEPT_FUNCTION
 {
-    int UTC_shift = get_UTC_shift();
+    const stdex::time_t invalid_tt(-1);
 
-    if(-1 == UTC_shift)
-        return -1;
-
-    stdex::tm stdex_sys_clock_epoch = make_utc_tm(time_point(0));
+    static stdex::tm time_t_epoch_with_UTC = get_time_t_epoch_with_UTC();
     
-    stdex::tm UTC_result = make_utc_tm(_t + hours(UTC_shift));
-    stdex::time_t result =
-        stdex::mktime(&UTC_result);
-    const stdex::time_t invalid_time_t(-1);
-    if(invalid_time_t == result)
+    if(-987654321 == time_t_epoch_with_UTC.tm_year)
     {
-        UTC_result.tm_sec++;
-        stdex::time_t tmp =
-          stdex::mktime(&UTC_result),
-          time_t_epoch(0);
-        if(int(stdex::difftime(tmp, time_t_epoch)) == 1)
-            result = time_t_epoch;
+        time_t_epoch_with_UTC = get_time_t_epoch_with_UTC();
+        if(-987654321 == time_t_epoch_with_UTC.tm_year)
+            return invalid_tt;
     }
-    return result;
+
+    static int GM_offset = get_GM_offset();
+
+    time_point _t_with_GM_offset = _t + hours(GM_offset);
+
+    stdex::tm 
+        result_tm = make_utc_tm(_t_with_GM_offset);
+    stdex::time_t 
+        result_tt = stdex::mktime(&result_tm);
+    
+    if(invalid_tt == result_tt)
+    {
+        result_tm = make_utc_tm(_t_with_GM_offset + stdex::chrono::seconds(1));
+        stdex::time_t tmp =
+          stdex::mktime(&result_tm),
+          time_t_epoch(0);
+
+        if(invalid_tt != tmp && duration_long_long(stdex::difftime(tmp, time_t_epoch)) == 1)
+            result_tt = time_t_epoch;
+    }
+    return result_tt;
 }
 
 
 stdex::chrono::system_clock::time_point
     stdex::chrono::system_clock::from_time_t(stdex::time_t _t) _STDEX_NOEXCEPT_FUNCTION
 {
-    typedef chrono::time_point<system_clock, seconds>    _from;
+    const stdex::time_t invalid_tt(-1);
 
-    int UTC_shift = get_UTC_shift();
-    stdex::tm stdex_sys_clock_epoch = make_utc_tm(time_point(0) + hours(UTC_shift));
-    stdex_sys_clock_epoch.tm_mon++;
-    stdex_sys_clock_epoch.tm_yday = 31;
-    stdex::time_t stdex_sys_clock_epoch_tt = stdex::mktime(&stdex_sys_clock_epoch);
+    if(invalid_tt == _t)
+        return time_point();
 
-    double seconds_from_epoch = 
-        stdex::difftime(_t, stdex_sys_clock_epoch_tt);
-    const duration_long_long sec_in_jan = (31 * 24 * 60 * 60);
-      
-    stdex::chrono::detail::_big_int result = 
-        stdex::chrono::detail::convert(
-            static_cast<duration_long_long>(duration_long_long(0) + duration_long_long(seconds_from_epoch) + sec_in_jan)
-        );
+    static stdex::tm time_t_epoch_with_UTC = get_time_t_epoch_with_UTC();
+    
 
-    return time_point_cast<system_clock::duration>
-        (_from(chrono::seconds(result)));
+    if(-987654321 == time_t_epoch_with_UTC.tm_year)
+    {
+        time_t_epoch_with_UTC = get_time_t_epoch_with_UTC();
+        if(-987654321 == time_t_epoch_with_UTC.tm_year)
+            return time_point();
+    }
+
+    const stdex::time_t tt_epoch(0);
+
+    double _t_secs = 
+        stdex::difftime(_t, tt_epoch);
+    seconds _t_chrono = duration_long_long(_t_secs);
+
+    time_point time_t_epoch_with_UTC_chrono = 
+        tm_to_time_point(time_t_epoch_with_UTC);
+    
+    static int GM_offset = get_GM_offset();
+
+    duration time_from_time_t_epoch = 
+        duration_cast<duration>(_t_chrono) - time_t_epoch_with_UTC_chrono.time_since_epoch() + hours(GM_offset);
+    
+    return time_point() + time_from_time_t_epoch;
+}
+
+namespace stdex 
+{
+    namespace chrono
+    {
+        template<class _Dur>
+        static
+        void _add_duration(
+            typename conditional<
+                detail::_is_duration<_Dur>::value,
+                long,
+                void*
+            >::type delta, _Dur & dur)
+        {
+            dur += delta;
+        }
+
+        template<class _Dur>
+        static
+        void _add_duration(
+            typename conditional<
+                detail::_is_duration<_Dur>::value,
+                void*,
+                long
+            >::type, _Dur &)
+        {
+        }
+
+        static void _convert_to_duration(long ts_nsec, nanoseconds &out)
+        {
+            _add_duration(ts_nsec, out);
+        }
+
+        static void _convert_to_duration(long ts_nsec, microseconds &out)
+        {
+            _add_duration(ts_nsec/1000, out);
+        }
+
+        static void _convert_to_duration(long ts_nsec, milliseconds &out)
+        {
+            ts_nsec /= 1000;
+            _add_duration(ts_nsec/1000, out);
+        }
+
+        static void _convert_to_duration(long ts_nsec, seconds &out)
+        {
+            ts_nsec /= 1000;
+            ts_nsec /= 1000;
+            _add_duration(ts_nsec/1000, out);
+        }
+    }
 }
 
 stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDEX_NOEXCEPT_FUNCTION
@@ -1252,9 +1457,13 @@ stdex::chrono::system_clock::time_point stdex::chrono::system_clock::now() _STDE
             std::terminate();
         }
         
+        duration tv_nsec = 0;
+
+        _convert_to_duration(ts.tv_nsec, tv_nsec);
+
         return
         time_point( 
-            seconds(ts.tv_sec) + duration_cast<duration>(nanoseconds(ts.tv_nsec)) );
+            seconds(ts.tv_sec) + tv_nsec);
     }
 }
 
@@ -1270,8 +1479,12 @@ stdex::chrono::steady_clock::time_point stdex::chrono::steady_clock::now() _STDE
             std::terminate();
         }
 
+        duration tv_nsec = 0;
+
+        _convert_to_duration(ts.tv_nsec, tv_nsec);
+
         return
-        time_point(
-            seconds(ts.tv_sec) + duration_cast<duration>(nanoseconds(ts.tv_nsec)));
+        time_point( 
+            seconds(ts.tv_sec) + tv_nsec);
     }
 }
