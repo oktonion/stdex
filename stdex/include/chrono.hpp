@@ -44,11 +44,8 @@ namespace stdex
     {
         namespace detail
         {
-            namespace chrono_detail
-            {
-                template<unsigned _Rank> struct _priority_tag : _priority_tag < _Rank - 1 > {};
-                template<> struct _priority_tag<0> {};
-            }
+            template<unsigned _Rank> struct _priority_tag : _priority_tag < _Rank - 1 > {};
+            template<> struct _priority_tag<0> {};
 
             template<class _Tp>
             struct _is_ratio
@@ -249,8 +246,8 @@ namespace stdex
                 conditional<bool(
                     is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(false) &&
                     is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(false) ),
-                    const chrono_detail::_priority_tag<0>&,
-                    _disabled_chrono_convert<__LINE__>/**/
+                    const _priority_tag<0>&,
+                    _disabled_chrono_convert<__LINE__>&
                 >::type)
             {
                 return static_cast<_To>(_from);
@@ -263,8 +260,8 @@ namespace stdex
                 conditional<bool(
                     is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(false) &&
                     is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(true) ),
-                    const chrono_detail::_priority_tag<1>&,
-                    _disabled_chrono_convert<__LINE__>/**/
+                    const _priority_tag<1>&,
+                    _disabled_chrono_convert<__LINE__>&
                 >::type)
             {
                 return intmax_t(_from);
@@ -278,8 +275,8 @@ namespace stdex
                     is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(true) &&
                     is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(false) &&
                     is_floating_point<_To>::value == bool(true) ),
-                    const chrono_detail::_priority_tag<2>&,
-                    _disabled_chrono_convert<__LINE__>/**/
+                    const _priority_tag<2>&,
+                    _disabled_chrono_convert<__LINE__>&
                 >::type)
             {
                 return _To(_from.to_floating_point());
@@ -293,8 +290,8 @@ namespace stdex
                  is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(true) &&
                  is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(false) &&
                     is_floating_point<_To>::value == bool(false) ),
-                    const chrono_detail::_priority_tag<3>&,
-                    _disabled_chrono_convert<__LINE__>/**/
+                    const _priority_tag<3>&,
+                    _disabled_chrono_convert<__LINE__>&
                 >::type)
             {
                 return _To(_from.to_integer());
@@ -307,8 +304,8 @@ namespace stdex
                 conditional<bool(
                     is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(true) &&
                     is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(true) ),
-                    const chrono_detail::_priority_tag<4>&,
-                    _disabled_chrono_convert<__LINE__>/**/
+                    const _priority_tag<4>&,
+                    _disabled_chrono_convert<__LINE__>&
                 >::type)
             {
                 return _from;
@@ -320,7 +317,7 @@ namespace stdex
                 template<class _To, class _From>
                 static _To call(const _From& _from, const stdex::detail::_chrono_force_tmpl_param<_To>&)
                 {
-                    return _chrono_convert<_To>(_from, chrono_detail::_priority_tag<4>());
+                    return _chrono_convert<_To>(_from, _priority_tag<4>());
                 }
             };
 
@@ -352,7 +349,7 @@ namespace stdex
 
                 template <class _Rep2>
                 duration_base(const _Rep2& _r_in) :
-                    _r(_chrono_convert<_Rep>(_r_in, chrono_detail::_priority_tag<4>())) {}
+                    _r(_chrono_convert<_Rep>(_r_in, _priority_tag<4>())) {}
 
                 internal_value_type &_get_r()
                 {
@@ -381,7 +378,7 @@ namespace stdex
 
                 template <class _Rep2>
                 duration_base(const _Rep2& _r_in) :
-                    _r(_chrono_convert<_Rep>(_r_in, chrono_detail::_priority_tag<4>())) {}
+                    _r(_chrono_convert<_Rep>(_r_in, _priority_tag<4>())) {}
                 
                 internal_value_type &_get_r()
                 {
@@ -471,10 +468,10 @@ namespace stdex
                         _to_rep;
                     return _ToDur(
                         _chrono_convert<_to_rep>(
-                            _chrono_convert<_CR>(_duration_count_func::call(_d), chrono_detail::_priority_tag<4>())
-                            * _chrono_convert<_CR>(_cf.num, chrono_detail::_priority_tag<4>())
-                            / _chrono_convert<_CR>(_cf.den, chrono_detail::_priority_tag<4>())
-                        , chrono_detail::_priority_tag<4>())
+                            _chrono_convert<_CR>(_duration_count_func::call(_d), _priority_tag<4>())
+                            * _chrono_convert<_CR>(_cf.num, _priority_tag<4>())
+                            / _chrono_convert<_CR>(_cf.den, _priority_tag<4>())
+                        , _priority_tag<4>())
                     );
                 }
             };
@@ -493,7 +490,7 @@ namespace stdex
                     return _ToDur(
                         _chrono_convert<_to_rep>(
                             _duration_count_func::call(_d), 
-                            chrono_detail::_priority_tag<4>())
+                            _priority_tag<4>())
                     );
                 }
             };
@@ -511,9 +508,9 @@ namespace stdex
                         _to_rep;
                     return _ToDur(
                         _chrono_convert<_to_rep>(
-                            _chrono_convert<_CR>(_duration_count_func::call(_d), chrono_detail::_priority_tag<4>()) / 
-                            _chrono_convert<_CR>(_cf.den, chrono_detail::_priority_tag<4>())
-                        , chrono_detail::_priority_tag<4>())
+                            _chrono_convert<_CR>(_duration_count_func::call(_d), _priority_tag<4>()) / 
+                            _chrono_convert<_CR>(_cf.den, _priority_tag<4>())
+                        , _priority_tag<4>())
                     );
                 }
             };
@@ -531,9 +528,9 @@ namespace stdex
                         _to_rep;
                     return _ToDur(
                         _chrono_convert<_to_rep>(
-                            _chrono_convert<_CR>(_duration_count_func::call(_d), chrono_detail::_priority_tag<4>()) * 
-                            _chrono_convert<_CR>(_cf.num, chrono_detail::_priority_tag<4>()), 
-                        chrono_detail::_priority_tag<4>())
+                            _chrono_convert<_CR>(_duration_count_func::call(_d), _priority_tag<4>()) * 
+                            _chrono_convert<_CR>(_cf.num, _priority_tag<4>()), 
+                        _priority_tag<4>())
                     );
                 }
             };
