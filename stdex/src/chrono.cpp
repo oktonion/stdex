@@ -1061,8 +1061,9 @@ stdex::timespec
     _ts.tv_nsec = 0;
 
     _ts.tv_sec = 
-        detail::_chrono_convert<stdex::time_t>(
-            detail::duration_count(_s.time_since_epoch()), detail::chrono_detail::_priority_tag<4>() );
+        detail::_chrono_convert_func::call(
+            detail::_duration_count_func::call(_s.time_since_epoch()),
+            stdex::detail::_chrono_force_tmpl_param<stdex::time_t>());
 
     _get_ns(_t - _s, _ts);
 
@@ -1120,11 +1121,31 @@ weekday_from_days(duration_long_long z) _STDEX_NOEXCEPT_FUNCTION
     return static_cast<duration_ulong_long>(z >= -4 ? (z+4) % 7 : (z+5) % 7 + 6);
 }
 
-template <class To, class Rep, class Period>
-To
-round_down(const stdex::chrono::duration<Rep, Period>& d)
+namespace stdex
 {
-    To t = stdex::chrono::duration_cast<To>(d);
+    namespace chrono
+    {
+        struct _duration_cast
+        {
+            template<class _To, class _From>
+            static _To call(const _From &_from, 
+                const stdex::detail::_chrono_force_tmpl_param<_To>&)
+            {
+                return duration_cast<_To>(_from);
+            }
+        };
+    }
+}
+
+template <class To, class Rep, class Period>
+static
+To round_down(const stdex::chrono::duration<Rep, Period>& d)
+{
+    To t = 
+        stdex::chrono::_duration_cast::call(
+            d, 
+            stdex::detail::_chrono_force_tmpl_param<To>()
+        );
     if (t > d)
         --t;
     return t;
