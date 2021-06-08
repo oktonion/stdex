@@ -34,17 +34,18 @@
 
 namespace stdex
 {
-    //! Minimal implementation of the @c chrono namespace.
-    //! The @c chrono namespace provides types for specifying time intervals.
+    namespace detail
+    {
+        template<class>
+        struct _chrono_force_tmpl_param{};
+    }
+
     namespace chrono
     {
         namespace detail
         {
-            namespace chrono_detail
-            {
-                template<unsigned _Rank> struct _priority_tag : _priority_tag < _Rank - 1 > {};
-                template<> struct _priority_tag<0> {};
-            }
+            template<unsigned _Rank> struct _priority_tag : _priority_tag < _Rank - 1 > {};
+            template<> struct _priority_tag<0> {};
 
             template<class _Tp>
             struct _is_ratio
@@ -245,8 +246,8 @@ namespace stdex
                 conditional<bool(
                     is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(false) &&
                     is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(false) ),
-                    const chrono_detail::_priority_tag<0>&,
-                    _disabled_chrono_convert<__LINE__>/**/
+                    const _priority_tag<0>&,
+                    _disabled_chrono_convert<__LINE__>&
                 >::type)
             {
                 return static_cast<_To>(_from);
@@ -259,8 +260,8 @@ namespace stdex
                 conditional<bool(
                     is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(false) &&
                     is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(true) ),
-                    const chrono_detail::_priority_tag<1>&,
-                    _disabled_chrono_convert<__LINE__>/**/
+                    const _priority_tag<1>&,
+                    _disabled_chrono_convert<__LINE__>&
                 >::type)
             {
                 return intmax_t(_from);
@@ -274,8 +275,8 @@ namespace stdex
                     is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(true) &&
                     is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(false) &&
                     is_floating_point<_To>::value == bool(true) ),
-                    const chrono_detail::_priority_tag<2>&,
-                    _disabled_chrono_convert<__LINE__>/**/
+                    const _priority_tag<2>&,
+                    _disabled_chrono_convert<__LINE__>&
                 >::type)
             {
                 return _To(_from.to_floating_point());
@@ -289,8 +290,8 @@ namespace stdex
                  is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(true) &&
                  is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(false) &&
                     is_floating_point<_To>::value == bool(false) ),
-                    const chrono_detail::_priority_tag<3>&,
-                    _disabled_chrono_convert<__LINE__>/**/
+                    const _priority_tag<3>&,
+                    _disabled_chrono_convert<__LINE__>&
                 >::type)
             {
                 return _To(_from.to_integer());
@@ -303,18 +304,28 @@ namespace stdex
                 conditional<bool(
                     is_same<typename remove_reference<typename remove_cv<_From>::type>::type, _big_int>::value == bool(true) &&
                     is_same<typename remove_reference<typename remove_cv<_To>::type>::type, _big_int>::value == bool(true) ),
-                    const chrono_detail::_priority_tag<4>&,
-                    _disabled_chrono_convert<__LINE__>/**/
+                    const _priority_tag<4>&,
+                    _disabled_chrono_convert<__LINE__>&
                 >::type)
             {
                 return _from;
             }
 
+            
+            struct _chrono_convert_func
+            {
+                template<class _To, class _From>
+                static _To call(const _From& _from, const stdex::detail::_chrono_force_tmpl_param<_To>&)
+                {
+                    return _chrono_convert<_To>(_from, _priority_tag<4>());
+                }
+            };
+
             template <class _Rep, class _Period,
                 bool _Fallback>
             class duration_base;
 
-            struct  duration_secret
+            struct duration_secret
             {
                 template<class _Rep, class _Period,
                     bool _Fallback>
@@ -338,7 +349,17 @@ namespace stdex
 
                 template <class _Rep2>
                 duration_base(const _Rep2& _r_in) :
-                    _r(_chrono_convert<_Rep>(_r_in, chrono_detail::_priority_tag<4>())) {}
+                    _r(_chrono_convert<_Rep>(_r_in, _priority_tag<4>())) {}
+
+                internal_value_type &_get_r()
+                {
+                    return _r;
+                }
+
+                const internal_value_type &_get_r() const
+                {
+                    return _r;
+                }
 
                 friend
                 struct stdex::chrono::detail::duration_secret;
@@ -357,27 +378,37 @@ namespace stdex
 
                 template <class _Rep2>
                 duration_base(const _Rep2& _r_in) :
-                    _r(_chrono_convert<_Rep>(_r_in, chrono_detail::_priority_tag<4>())) {}
+                    _r(_chrono_convert<_Rep>(_r_in, _priority_tag<4>())) {}
                 
+                internal_value_type &_get_r()
+                {
+                    return _r;
+                }
+
+                const internal_value_type &_get_r() const
+                {
+                    return _r;
+                }
+
                 friend
                 struct stdex::chrono::detail::duration_secret;
             };
 
-            template <class _Rep, class _Period>
-            _Rep
-            duration_count(
-                const duration_base<_Rep, _Period, false>& _dur)
+            struct _duration_count_func
             {
-                return duration_secret::duration_count(_dur);
-            }
-
-            template <class _Rep, class _Period>
-            _big_int
-            duration_count(
-                const duration_base<_Rep, _Period, true>& _dur)
-            {
-                return duration_secret::duration_count(_dur);
-            }
+                template <class _Rep, class _Period>
+                static _Rep call(
+                    const duration_base<_Rep, _Period, false>& _dur)
+                {
+                    return duration_secret::duration_count(_dur);
+                }
+                template <class _Rep, class _Period>
+                static _big_int call(
+                    const duration_base<_Rep, _Period, true>& _dur)
+                {
+                    return duration_secret::duration_count(_dur);
+                }
+            };
 
             template<class _ToRep, class _FromRep, bool>
             struct _duration_common_type_impl
@@ -437,10 +468,10 @@ namespace stdex
                         _to_rep;
                     return _ToDur(
                         _chrono_convert<_to_rep>(
-                            _chrono_convert<_CR>(detail::duration_count(_d), chrono_detail::_priority_tag<4>())
-                            * _chrono_convert<_CR>(_cf.num, chrono_detail::_priority_tag<4>())
-                            / _chrono_convert<_CR>(_cf.den, chrono_detail::_priority_tag<4>())
-                        , chrono_detail::_priority_tag<4>())
+                            _chrono_convert<_CR>(_duration_count_func::call(_d), _priority_tag<4>())
+                            * _chrono_convert<_CR>(_cf.num, _priority_tag<4>())
+                            / _chrono_convert<_CR>(_cf.den, _priority_tag<4>())
+                        , _priority_tag<4>())
                     );
                 }
             };
@@ -458,8 +489,8 @@ namespace stdex
                         _to_rep;
                     return _ToDur(
                         _chrono_convert<_to_rep>(
-                            detail::duration_count(_d), 
-                            chrono_detail::_priority_tag<4>())
+                            _duration_count_func::call(_d), 
+                            _priority_tag<4>())
                     );
                 }
             };
@@ -477,9 +508,9 @@ namespace stdex
                         _to_rep;
                     return _ToDur(
                         _chrono_convert<_to_rep>(
-                            _chrono_convert<_CR>(detail::duration_count(_d), chrono_detail::_priority_tag<4>()) / 
-                            _chrono_convert<_CR>(_cf.den, chrono_detail::_priority_tag<4>())
-                        , chrono_detail::_priority_tag<4>())
+                            _chrono_convert<_CR>(_duration_count_func::call(_d), _priority_tag<4>()) / 
+                            _chrono_convert<_CR>(_cf.den, _priority_tag<4>())
+                        , _priority_tag<4>())
                     );
                 }
             };
@@ -497,9 +528,9 @@ namespace stdex
                         _to_rep;
                     return _ToDur(
                         _chrono_convert<_to_rep>(
-                            _chrono_convert<_CR>(detail::duration_count(_d), chrono_detail::_priority_tag<4>()) * 
-                            _chrono_convert<_CR>(_cf.num, chrono_detail::_priority_tag<4>()), 
-                        chrono_detail::_priority_tag<4>())
+                            _chrono_convert<_CR>(_duration_count_func::call(_d), _priority_tag<4>()) * 
+                            _chrono_convert<_CR>(_cf.num, _priority_tag<4>()), 
+                        _priority_tag<4>())
                     );
                 }
             };
@@ -582,13 +613,12 @@ namespace stdex
                 typedef typename _FromDur::period _from_period;
                 typedef typename _FromDur::rep _from_rep;
                 typedef ratio_divide<_from_period, _to_period> _cf;
-                typedef typename detail::_duration_common_type<_to_rep, _from_rep, _from_period>::type
+                typedef typename _duration_common_type<_to_rep, _from_rep, _from_period>::type
                     _cr;
-                typedef  detail::_duration_cast_ct_impl<_ToDur, _cr,
+                typedef  _duration_cast_ct_impl<_ToDur, _cr,
                     bool(_cf::num == 1), bool(_cf::den == 1)> type;
 
-                template<class _Rep, class _Period>
-                static _ToDur _cast(const duration<_Rep, _Period>& _d)
+                static _ToDur _cast(const _FromDur& _d)
                 {
                     _cf _cf_value;
                     return type::_cast(_d, _cf_value);
@@ -633,15 +663,23 @@ namespace stdex
                 }
 
                 template<class _R1, class _R2>
-                static ratio ratio_divide()
+                struct _ratio_divide
                 {
-                    typedef stdex::ratio<_R2::den, _R2::num> _R2_inv;
+                    static ratio call()
+                    {
+                        typedef stdex::ratio<_R2::den, _R2::num> _R2_inv;
 
-                    STATIC_ASSERT(_R2::num != 0, should_not_be_zero);
+                        STATIC_ASSERT(_R2::num != 0, should_not_be_zero);
 
-                    return ratio_multiply<_R1, _R2_inv>();
-                }
+                        return ratio_multiply<_R1, _R2_inv>();
+                    }
+                };
             } // namespace runtime_ratio
+
+            template<class _R1, class _R2>
+            struct _runtime_ratio_ratio_divide
+                : runtime_ratio::_ratio_divide<_R1, _R2>
+            { };
 
             template<class _FromDur, class _ToDur>
             struct _duration_cast_impl<_FromDur, _ToDur, true> // rt-cast
@@ -650,15 +688,14 @@ namespace stdex
                 typedef typename _ToDur::rep _to_rep;
                 typedef typename _FromDur::period _from_period;
                 typedef typename _FromDur::rep _from_rep;
-                typedef typename detail::_duration_common_type<_to_rep, _from_rep, _from_period>::type
+                typedef typename _duration_common_type<_to_rep, _from_rep, _from_period>::type
                     _cr;
-                typedef  detail::_duration_cast_rt_impl<_ToDur, _cr> type;
+                typedef  _duration_cast_rt_impl<_ToDur, _cr> type;
 
-                template<class _Rep, class _Period>
-                static _ToDur _cast(const duration<_Rep, _Period>& _d)
-                {
+                static _ToDur _cast(const _FromDur& _d)
+                { 
                     runtime_ratio::ratio _cf_value = 
-                        runtime_ratio::ratio_divide<_from_period, _to_period>();
+                        _runtime_ratio_ratio_divide<_from_period, _to_period>::call();
 
                     return type::_cast(_d, _cf_value);
                 }
@@ -676,8 +713,13 @@ namespace stdex
 
             template<class _FromDur, class _ToDur>
             struct _duration_cast
-                : _duration_cast_impl_chooser<_FromDur, _ToDur>::type
-            { };
+            { 
+                typedef typename _duration_cast_impl_chooser<_FromDur, _ToDur>::type impl;
+                static _ToDur call(const _FromDur &_from)
+                {
+                    return impl::_cast(_from);
+                }
+            };
 
         } // namespace detail
 
@@ -687,11 +729,12 @@ namespace stdex
         typename detail::_enable_if_is_duration<_ToDur>::type 
         duration_cast(const duration<_Rep, _Period> &_d)
         {
+            using stdex::chrono::detail::_duration_cast;
             typedef duration<_Rep, _Period> _from_dur;
             typedef _ToDur _to_dur;
-            typedef detail::_duration_cast<_from_dur, _ToDur> _dc;
+            typedef _duration_cast<_from_dur, _to_dur> _dc;
                 
-            return _dc::_cast(_d);
+            return _dc::call(_d);
         }
         
 
@@ -890,8 +933,8 @@ namespace stdex
             struct _disabled1;
             struct _disabled2;
             
-            void _modulus(const _Rep &_r_in) { base_type::_r %= _r_in; }
-            void _modulus(const duration &other) { base_type::_r %= detail::duration_count(other); }
+            void _modulus(const _Rep &_r_in) { _get_r() %= _r_in; }
+            void _modulus(const duration &other) { _get_r() %= detail::duration_count(other); }
             void _modulus(const _disabled1 &) { }
             void _modulus(const _disabled2 &) { }
 
@@ -937,7 +980,7 @@ namespace stdex
 
             template<class _Rep2, class _Period2>
             duration(const duration<_Rep2, _Period2> &other):
-                base_type(detail::duration_count( duration_cast<duration>(other) ))
+                base_type(detail::_duration_count_func::call( duration_cast<duration>(other) ))
             {    // construct from a duration
                 typedef stdex::detail::_ratio_divide_den<_Period2, _Period> _Checked_type;
 
@@ -956,9 +999,8 @@ namespace stdex
             //! Return the value of the duration object.
             rep count() const
             {
-                return 
-                    detail::_chrono_convert<rep>(
-                        base_type::_r, detail::chrono_detail::_priority_tag<4>());
+                return detail::_chrono_convert_func::call( _get_r(), 
+                    stdex::detail::_chrono_force_tmpl_param<rep>() );
             }
 
             duration operator+() const
@@ -968,52 +1010,52 @@ namespace stdex
 
             duration operator-() const
             {    // get negated value
-                return (-base_type::_r);
+                return (-_get_r());
             }
 
             duration& operator++()
             {    // increment rep
-                ++base_type::_r;
+                ++_get_r();
                 return (*this);
             }
 
             duration operator++(int)
             {    // postincrement rep
-                return (duration<_Rep, _Period>(base_type::_r++));
+                return (duration<_Rep, _Period>(_get_r()++));
             }
 
             duration& operator--()
             {    // decrement rep
-                --base_type::_r;
+                --_get_r();
                 return (*this);
             }
 
             duration operator--(int)
             {    // postdecrement rep
-                return (duration<_Rep, _Period>(base_type::_r--));
+                return (duration<_Rep, _Period>(_get_r()--));
             }
 
             duration& operator+=(const duration &other)
             {    // add other to rep
-                base_type::_r += other.base_type::_r;
+                _get_r() += other._get_r();
                 return (*this);
             }
 
             duration& operator-=(const duration &other)
             {    // subtract other from rep
-                base_type::_r -= other.base_type::_r;
+                _get_r() -= other._get_r();
                 return (*this);
             }
 
             duration& operator*=(const _Rep &_r_in)
             {    // multiply rep by r
-                base_type::_r *= _r_in;
+                _get_r() *= _r_in;
                 return (*this);
             }
 
             duration& operator/=(const _Rep &_r_in)
             {    // divide rep by r
-                base_type::_r /= _r_in;
+                _get_r() /= _r_in;
                 return (*this);
             }
 
@@ -1077,8 +1119,8 @@ namespace stdex
             typedef typename common_type<_dur1, _dur2>::type    _cd;
 
             return _cd(
-                detail::duration_count(_cd(lhs)) + 
-                detail::duration_count(_cd(rhs))
+                detail::_duration_count_func::call(_cd(lhs)) + 
+                detail::_duration_count_func::call(_cd(rhs))
             );
         }
 
@@ -1098,8 +1140,8 @@ namespace stdex
             typedef typename common_type<_dur1, _dur2>::type    _cd;
 
             return _cd(
-                detail::duration_count(_cd(lhs)) -
-                detail::duration_count(_cd(rhs))
+                detail::_duration_count_func::call(_cd(lhs)) -
+                detail::_duration_count_func::call(_cd(rhs))
             );
         }
 
@@ -1129,7 +1171,7 @@ namespace stdex
             typedef duration<typename common_type<_Rep1, _Rep2>::type, _Period> _cd;
 
             return _cd(
-                detail::duration_count(_cd(_d)) * _s
+                detail::_duration_count_func::call(_cd(_d)) * _s
             );
         }
 
@@ -1147,7 +1189,7 @@ namespace stdex
             typedef duration<typename common_type<_Rep1, _Rep2>::type, _Period> _cd;
 
             return _cd(
-                detail::duration_count(_cd(_d)) / _s
+                detail::_duration_count_func::call(_cd(_d)) / _s
             );
         }
 
@@ -1162,8 +1204,8 @@ namespace stdex
 
             return 
                 _cd(
-                    detail::duration_count(_cd(lhs)) / 
-                    detail::duration_count(_cd(rhs))
+                    detail::_duration_count_func::call(_cd(lhs)) / 
+                    detail::_duration_count_func::call(_cd(rhs))
                 ).count();
         }
 
@@ -1174,7 +1216,7 @@ namespace stdex
         {
             typedef duration<typename common_type<_Rep1, _Rep2>::type, _Period> _cd;
             return _cd(
-                detail::duration_count(_cd(_d)) % _s
+                detail::_duration_count_func::call(_cd(_d)) % _s
             );
         }
 
@@ -1186,8 +1228,8 @@ namespace stdex
             typedef duration<_Rep2, _Period2>            _dur2;
             typedef typename common_type<_dur1, _dur2>::type    _cd;
             return _cd(
-                detail::duration_count(_cd(lhs)) % 
-                detail::duration_count(_cd(rhs))
+                detail::_duration_count_func::call(_cd(lhs)) % 
+                detail::_duration_count_func::call(_cd(rhs))
             );
         }
 
@@ -1200,8 +1242,8 @@ namespace stdex
             typedef typename common_type<_dur1, _dur2>::type    _ct;
 
             return 
-                detail::duration_count(_ct(lhs)) == 
-                detail::duration_count(_ct(rhs));
+                detail::_duration_count_func::call(_ct(lhs)) == 
+                detail::_duration_count_func::call(_ct(rhs));
         }
 
         template<class _Rep1, class _Period1, class _Rep2, class _Period2>
@@ -1212,8 +1254,8 @@ namespace stdex
             typedef typename common_type<_dur1, _dur2>::type    _ct;
 
             return
-                detail::duration_count(_ct(lhs)) <
-                detail::duration_count(_ct(rhs));
+                detail::_duration_count_func::call(_ct(lhs)) <
+                detail::_duration_count_func::call(_ct(rhs));
         }
 
         template<class _Rep1, class _Period1, class _Rep2, class _Period2>
