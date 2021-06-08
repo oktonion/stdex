@@ -105,6 +105,12 @@ namespace stdex
                 using std::ptrdiff_t;
             }
 
+            template<class _T1, class _T2>
+            struct _sizeof_cmp
+            {
+                static const bool value = sizeof(_T1) == sizeof(_T2);
+            };
+
             template<bool>
             struct _pointer_as_long_type { typedef const long type; };
             template<>
@@ -112,11 +118,11 @@ namespace stdex
             template<bool>
             struct _pointer_as_short_type { typedef const short type; };
             template<>
-            struct _pointer_as_short_type<false> { typedef _pointer_as_long_type<sizeof(long) == sizeof(void*)>::type type; };
+            struct _pointer_as_short_type<false> { typedef _pointer_as_long_type<_sizeof_cmp<long, void*>::value>::type type; };
             template<bool>
             struct _pointer_as_int_type { typedef const int type; };
             template<>
-            struct _pointer_as_int_type<false> { typedef _pointer_as_short_type<sizeof(short) == sizeof(void*)>::type type; };
+            struct _pointer_as_int_type<false> { typedef _pointer_as_short_type<_sizeof_cmp<short, void*>::value>::type type; };
 
             template<bool>
             struct _pointer_as_ulong_type { typedef const unsigned long type; };
@@ -125,16 +131,16 @@ namespace stdex
             template<bool>
             struct _pointer_as_ushort_type { typedef const unsigned short type; };
             template<>
-            struct _pointer_as_ushort_type<false> { typedef _pointer_as_long_type<sizeof(unsigned long) == sizeof(void*)>::type type; };
+            struct _pointer_as_ushort_type<false> { typedef _pointer_as_long_type<_sizeof_cmp<unsigned long, void*>::value>::type type; };
             template<bool>
             struct _pointer_as_uint_type { typedef const unsigned int type; };
             template<>
-            struct _pointer_as_uint_type<false> { typedef _pointer_as_short_type<sizeof(unsigned short) == sizeof(void*)>::type type; };
+            struct _pointer_as_uint_type<false> { typedef _pointer_as_short_type<_sizeof_cmp<unsigned short, void*>::value>::type type; };
 
             template<bool>
-            struct _pointer_as_integral_type_impl { typedef _pointer_as_int_type<sizeof(int) == sizeof(void*)>::type type; };
+            struct _pointer_as_integral_type_impl { typedef _pointer_as_int_type<_sizeof_cmp<int, void*>::value>::type type; };
             template<>
-            struct _pointer_as_integral_type_impl<false> { typedef _pointer_as_uint_type<sizeof(int) == sizeof(void*)>::type type; };
+            struct _pointer_as_integral_type_impl<false> { typedef _pointer_as_uint_type<_sizeof_cmp<int, void*>::value>::type type; };
 
             struct _ptrdiff_is_signed
             {
@@ -156,7 +162,7 @@ namespace stdex
 
             template<bool>
             struct _nullptr_as_ptrdiff_type:
-                _pointer_as_ptrdiff_type<sizeof(ptrdiff_detail::ptrdiff_t) == sizeof(void*)>
+                _pointer_as_ptrdiff_type<_sizeof_cmp<ptrdiff_detail::ptrdiff_t, void*>::value>
             { };
 
             template<>
@@ -166,7 +172,7 @@ namespace stdex
 
             typedef _pointer_as_integral_type_impl<false>::type _nullptr_t_as_uint;
             typedef _pointer_as_integral_type_impl<true>::type _nullptr_t_as_int;
-            typedef _nullptr_as_ptrdiff_type<_ptrdiff_is_signed::value == _pointer_is_signed::value>::type _nullptr_t_as_integral;
+            typedef _nullptr_as_ptrdiff_type<(_ptrdiff_is_signed::value == _pointer_is_signed::value)>::type _nullptr_t_as_integral;
             
             template<bool>
             struct _nullptr_t_as_enum_chooser;
@@ -199,7 +205,7 @@ namespace stdex
                 typedef 
                 _nullptr_t_as_enum_chooser_helper<
                     _type,
-                    sizeof(_type) == sizeof(void*)
+                    _sizeof_cmp<_type, void*>::value
                 >::type type;
             };
 
@@ -238,25 +244,32 @@ namespace stdex
             static const bool value = false;// (sizeof(nullptr_detail::_nullptr_can_be_ct_constant<T>(0)) == sizeof(nullptr_detail::_yes_type));
         };
 
-        template<class _Tp>
-        struct _is_convertable_to_void_ptr_impl
+        namespace nullptr_detail
         {
-            static const bool value = (sizeof(nullptr_detail::_is_convertable_to_void_ptr_tester((_Tp) (STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-        };
+            template<class _Tp>
+            struct _is_convertable_to_void_ptr_impl
+            {
+                static const bool value = (sizeof(_is_convertable_to_void_ptr_tester((_Tp) (STDEX_NULL))) == sizeof(_yes_type));
+            };
 
-        template<class _Tp>
-        struct _is_convertable_to_member_function_ptr_impl
-        {
-            static const bool value = 
-                (sizeof(nullptr_detail::_is_convertable_to_member_function_ptr_tester((_Tp) (STDEX_NULL))) == sizeof(nullptr_detail::_yes_type)) &&
-                (sizeof(nullptr_detail::_is_convertable_to_const_member_function_ptr_tester((_Tp) (STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-        };
+            template<class _Tp>
+            struct _is_convertable_to_member_function_ptr_impl
+            {
+                static const bool value = 
+                    (sizeof(_is_convertable_to_member_function_ptr_tester((_Tp) (STDEX_NULL))) == sizeof(_yes_type)) &&
+                    (sizeof(_is_convertable_to_const_member_function_ptr_tester((_Tp) (STDEX_NULL))) == sizeof(_yes_type));
+            };
 
-        template<class NullPtrType, class _Tp>
-        struct _is_convertable_to_any_ptr_impl_helper
-        {
-            static const bool value = (sizeof(nullptr_detail::_is_convertable_to_ptr_tester<_Tp>((NullPtrType) (STDEX_NULL))) == sizeof(nullptr_detail::_yes_type));
-        };
+            template<class NullPtrType, class _Tp>
+            struct _is_convertable_to_any_ptr_impl_helper
+            {
+                static const bool value = (sizeof(_is_convertable_to_ptr_tester<_Tp>((NullPtrType) (STDEX_NULL))) == sizeof(_yes_type));
+            };
+        }
+
+        using nullptr_detail::_is_convertable_to_void_ptr_impl;
+        using nullptr_detail::_is_convertable_to_member_function_ptr_impl;
+        using nullptr_detail::_is_convertable_to_any_ptr_impl_helper;
 
         template<class _Tp>
         struct _is_convertable_to_any_ptr_impl
@@ -363,7 +376,9 @@ namespace stdex
                 static const bool _can_be_compared_to_ptr = _nullptr_t_can_be_compared_to_ptr<_nullptr_t_as_integral>::value;
             };
 
-            typedef _nullptr_choose_as_int<_as_int::_is_convertable_to_ptr == bool(true) && _as_int::_equal_void_ptr == bool(true) && _as_int::_can_be_compared_to_ptr == bool(true)>::type type;
+            typedef _nullptr_choose_as_int<
+                (_as_int::_is_convertable_to_ptr == bool(true) && _as_int::_equal_void_ptr == bool(true) && _as_int::_can_be_compared_to_ptr == bool(true))
+            >::type type;
         };
 
         template<>
@@ -378,7 +393,9 @@ namespace stdex
                 static const bool _can_be_ct_constant = true;//_nullptr_can_be_ct_constant_impl<_nullptr_t_as_enum>::value;
             };
 
-            typedef _nullptr_choose_as_enum<_as_enum::_is_convertable_to_ptr == bool(true) && _as_enum::_equal_void_ptr == bool(true) && _as_enum::_can_be_ct_constant == bool(true)>::type type;
+            typedef _nullptr_choose_as_enum<
+                (_as_enum::_is_convertable_to_ptr == bool(true) && _as_enum::_equal_void_ptr == bool(true) && _as_enum::_can_be_ct_constant == bool(true))
+            >::type type;
         };
 
         struct _nullptr_chooser
@@ -393,7 +410,9 @@ namespace stdex
                 static const bool _can_be_ct_constant = _nullptr_can_be_ct_constant_impl<_nullptr_t_as_class>::value;
             };
 
-            typedef _nullptr_choose_as_class<_as_class::_equal_void_ptr == bool(true) && _as_class::_can_be_ct_constant == bool(true)>::type type;
+            typedef _nullptr_choose_as_class<
+                (_as_class::_equal_void_ptr == bool(true) && _as_class::_can_be_ct_constant == bool(true))
+            >::type type;
         };
     } // namespace detail
 

@@ -23,10 +23,13 @@ int test1(void)
         bool is_steady = system_clock::is_steady;
         (void)(&is_steady); // suppress unused warning
         stdex::time_t t2 = system_clock::to_time_t(t1);
+        DYNAMIC_VERIFY(-1 != t2);
+        DYNAMIC_VERIFY(-1 != t1_tt);
         double sec_diff = stdex::difftime(t2, t1_tt);
         system_clock::time_point t3 = system_clock::from_time_t(t2);
         t3 = t3; // suppress unused warning
         stdex::time_t t4 = system_clock::to_time_t(t3);
+        std::cout << "t4 == " << t4 << ", t2 == " << t2 << " with diff " << sec_diff << std::endl;
         DYNAMIC_VERIFY(t4 == t2);
 
         microseconds mcs = duration_cast<microseconds>(t3 - t1);
@@ -68,5 +71,7 @@ int main(void)
 {
     if(0 == res)
         return test1();
+    
+    std::cout << "static test failed" << std::endl;
     return res;
 }

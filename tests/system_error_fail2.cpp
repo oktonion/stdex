@@ -72,19 +72,6 @@ int test4()
 {
     using namespace stdex;
 
-    try
-    {
-        throw fuzzy_logic();
-    }
-    catch (const fuzzy_logic& obj)
-    {
-        DYNAMIC_VERIFY(std::string(obj.what()).find("whoa") != std::string::npos);
-    }
-    catch (...)
-    {
-        DYNAMIC_VERIFY_FAIL ;
-    }
-
     {
         error_condition e;
         int i = e; // error "cannot convert"
