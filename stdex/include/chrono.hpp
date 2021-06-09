@@ -351,16 +351,6 @@ namespace stdex
                 duration_base(const _Rep2& _r_in) :
                     _r(_chrono_convert<_Rep>(_r_in, _priority_tag<4>())) {}
 
-                internal_value_type &_get_r()
-                {
-                    return _r;
-                }
-
-                const internal_value_type &_get_r() const
-                {
-                    return _r;
-                }
-
                 friend
                 struct stdex::chrono::detail::duration_secret;
             };
@@ -380,15 +370,6 @@ namespace stdex
                 duration_base(const _Rep2& _r_in) :
                     _r(_chrono_convert<_Rep>(_r_in, _priority_tag<4>())) {}
                 
-                internal_value_type &_get_r()
-                {
-                    return _r;
-                }
-
-                const internal_value_type &_get_r() const
-                {
-                    return _r;
-                }
 
                 friend
                 struct stdex::chrono::detail::duration_secret;
@@ -929,7 +910,18 @@ namespace stdex
             typedef detail::duration_base<_Rep, _Period, 
                 detail::_use_big_int<_Rep, _Period>::value> base_type;
 
-            
+            typedef typename base_type::internal_value_type internal_value_type;
+
+            internal_value_type &_get_r()
+            {
+                return base_type::_r;
+            }
+
+            const internal_value_type &_get_r() const
+            {
+                return base_type::_r;
+            }
+
             struct _disabled1;
             struct _disabled2;
             
