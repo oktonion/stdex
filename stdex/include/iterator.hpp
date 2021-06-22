@@ -411,7 +411,7 @@ namespace stdex
         // returns an iterator to the beginning of a container or array 
         template<class _ContainerType>
         inline
-        typename _ContainerType::iterator begin(const _ContainerType &value)
+        typename _ContainerType::const_iterator begin(const _ContainerType &value)
         {    // get beginning of sequence
             return (value.begin());
         }
@@ -447,7 +447,7 @@ namespace stdex
         // returns an iterator to the end of a container or array 
         template<class _ContainerType>
         inline
-        typename _ContainerType::iterator end(const _ContainerType &value)
+        typename _ContainerType::const_iterator end(const _ContainerType &value)
         {    // get end of sequence
             return (value.end());
         }
