@@ -926,7 +926,7 @@ namespace stdex
             struct _disabled2;
             
             void _modulus(const _Rep &_r_in) { _get_r() %= _r_in; }
-            void _modulus(const duration &other) { _get_r() %= detail::duration_count(other); }
+            void _modulus(const duration &other) { _get_r() %= detail::_duration_count_func::call(other); }
             void _modulus(const _disabled1 &) { }
             void _modulus(const _disabled2 &) { }
 

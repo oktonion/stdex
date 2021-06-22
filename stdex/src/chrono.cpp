@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <numeric>
 #include <cstring>
+#include <stdexcept>
 
 void timespec_add(stdex::timespec &result, const stdex::timespec &in)
 {
@@ -865,7 +866,7 @@ namespace stdex {
                 #endif
 
                 if (cmp_greater( result,  intmax_max))
-                    throw(std::out_of_range("overflow in stdex::chrono::duration cast to stdex::intmax_t"));
+                    throw(std::range_error("overflow in stdex::chrono::duration cast to stdex::intmax_t"));
 
                 return static_cast<stdex::intmax_t>(result);
             }
