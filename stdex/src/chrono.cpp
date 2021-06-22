@@ -1221,7 +1221,7 @@ stdex::tm get_time_t_epoch_with_UTC()
     short d_shift = -299;
     do{ 
         d_shift += 30;
-        if(stdex_tm_time_point.tm_year > 1900 + 1000) 
+        if(stdex_tm_time_point.tm_year > 70 + 100) 
             break; 
         stdex_tm_time_point = make_utc_tm(stdex_sys_clock_tp_epoch + days(d_shift));
         
