@@ -703,26 +703,41 @@ void detail::sleep_for_impl(const stdex::timespec *reltime)
     if (!check_timings)
         us100 += 1000 * 10;
 
-    try
+    if (check_timings)
     {
-        WaitableTimer timer;
+        try
+        {
+            WaitableTimer timer;
 
-        do {
-            us100 -= (nElapsed.QuadPart * 10);
-            
-            check_timings =
-                (0 != ::QueryPerformanceCounter(&nStartTime));
+            do {
+                us100 -= (nElapsed.QuadPart * 10);
 
-            timer.Start(us100);
+                check_timings =
+                    (0 != ::QueryPerformanceCounter(&nStartTime));
 
-            check_timings =
-                (0 != ::QueryPerformanceCounter(&nStopTime));
+                if (!check_timings)
+                    break;
 
-            nElapsed.QuadPart = (nStopTime.QuadPart - nStartTime.QuadPart) * 1000000;
-            nElapsed.QuadPart /= nFrequency.QuadPart;
-        } while (check_timings && (nElapsed.QuadPart * 10) < us100);
+                timer.Start(us100);
+
+                check_timings =
+                    (0 != ::QueryPerformanceCounter(&nStopTime));
+
+                if (!check_timings)
+                    break;
+
+                nElapsed.QuadPart = (nStopTime.QuadPart - nStartTime.QuadPart) * 1000000;
+                nElapsed.QuadPart /= nFrequency.QuadPart; // microseconds
+
+            } while (check_timings && (nElapsed.QuadPart * 10) < us100);
+        }
+        catch (...)
+        {
+            check_timings = false;
+        }
     }
-    catch(...)
+
+    if (!check_timings)
     {
         Sleep(us100 / 10 / 1000);
     }
