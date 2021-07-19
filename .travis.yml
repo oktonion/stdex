@@ -114,13 +114,12 @@ matrix:
       - RUN_SCRIPT="./run_tests.sh"
       ignore:
       - "*/tests/*"  # ignore folders and all its contents
-      before_install: 
-      - sudo pip install --upgrade pyOpenSSL
-      #- sudo -H pip install codecov
       after_success:
-      #- chmod +x ./get_code_cov.sh
-      #- ./get_code_cov.sh
-      #- codecov
+      - sudo pip install --upgrade pyOpenSSL
+      - sudo pip install codecov
+      - chmod +x ./get_code_cov.sh
+      - ./get_code_cov.sh
+      - codecov
 
     - os: osx
       osx_image: xcode9
