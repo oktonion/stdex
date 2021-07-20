@@ -1,9 +1,5 @@
 #!/bin/bash
-#for filename in `find ./tests/ | egrep '\.cpp'`; 
-#do 
- # gcov -n -o ./tests/bin/ $filename > /dev/null; 
-#done
-
-for file in ./tests/bin/*; do
-    gcov $file.gcda
+for filename in `find . | egrep '\.h*'`; 
+do 
+  gcov -n -o . $filename > /dev/null; 
 done
