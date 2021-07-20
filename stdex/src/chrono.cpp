@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <numeric>
 #include <cstring>
+#include <stdexcept>
 
 void timespec_add(stdex::timespec &result, const stdex::timespec &in)
 {
@@ -865,7 +866,7 @@ namespace stdex {
                 #endif
 
                 if (cmp_greater( result,  intmax_max))
-                    throw(std::out_of_range("overflow in stdex::chrono::duration cast to stdex::intmax_t"));
+                    throw(std::range_error("overflow in stdex::chrono::duration cast to stdex::intmax_t"));
 
                 return static_cast<stdex::intmax_t>(result);
             }
@@ -1220,7 +1221,7 @@ stdex::tm get_time_t_epoch_with_UTC()
     short d_shift = -299;
     do{ 
         d_shift += 30;
-        if(stdex_tm_time_point.tm_year > 1900 + 1000) 
+        if(stdex_tm_time_point.tm_year > 70 + 100) 
             break; 
         stdex_tm_time_point = make_utc_tm(stdex_sys_clock_tp_epoch + days(d_shift));
         
