@@ -95,8 +95,8 @@ namespace stdex
             {
                 class _is_integral_constant_std_impl_helper_type;
 
-                static cstdint_detail::_yes_type check(_is_integral_constant_std_impl_helper_type*);
-                static cstdint_detail::_no_type check(_constructible_from_any);
+                cstdint_detail::_yes_type check(_is_integral_constant_std_impl_helper_type*);
+                cstdint_detail::_no_type check(_constructible_from_any);
 
                 template<class _Tp>
                 struct _is_integral_constant_std_impl
@@ -111,18 +111,18 @@ namespace stdex
 
             namespace _is_integral_constant_hack_impl_ns
             {
-                static cstdint_detail::_yes_type check1(int);
-                static cstdint_detail::_no_type check1(_constructible_from_any);
+                cstdint_detail::_yes_type check1(int);
+                cstdint_detail::_no_type check1(_constructible_from_any);
 
                 template<class _Tp>
-                static cstdint_detail::_yes_type check2(_Tp);
+                cstdint_detail::_yes_type check2(_Tp);
                 template<class>
-                static cstdint_detail::_no_type check2(_constructible_from_any);
+                cstdint_detail::_no_type check2(_constructible_from_any);
 
-                static cstdint_detail::_yes_type check3(_constructible_from_any);
-                static cstdint_detail::_no_type check3(const float*);
-                static cstdint_detail::_no_type check3(const double*);
-                static cstdint_detail::_no_type check3(const long double*);
+                cstdint_detail::_yes_type check3(_constructible_from_any);
+                cstdint_detail::_no_type check3(const float*);
+                cstdint_detail::_no_type check3(const double*);
+                cstdint_detail::_no_type check3(const long double*);
 
                 template<class _Tp>
                 struct _is_integral_constant_hack_impl

@@ -6,7 +6,7 @@ for file in ./tests/bin/*; do
   filename=$(basename -- "$file")
   filename=$([[ "$filename" = *.* ]] && echo "${filename%.*}" || echo "$filename")
   echo "running test $filename..."
-  output=$(($file) 2>&1)
+  output=$(($file --duration) 2>&1)
   run_result=$?
   if [ $run_result -eq 0 ]; then
     echo "$output"
