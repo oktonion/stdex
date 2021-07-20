@@ -105,8 +105,6 @@ matrix:
     - os: linux
       compiler: gcc
       dist: precise
-      install:
-      - sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/gcov-5 90
       env:
       - COMPILER=g++
       - CODE_COVERAGE_LIBS=-lgcov
@@ -114,11 +112,12 @@ matrix:
       - BUILD_LIB_SCRIPT="./build_lib.sh"
       - BUILD_SCRIPT="./build_tests.sh"
       - RUN_SCRIPT="./run_tests.sh"
-      ignore:
-      - "*/tests/*"  # ignore folders and all its contents
       after_success:
+      - sudo pip install --upgrade pyOpenSSL
+      - sudo pip install codecov
       - chmod +x ./get_code_cov.sh
       - ./get_code_cov.sh
+      - codecov
       - bash <(curl -s https://codecov.io/bash)
 
     - os: osx
