@@ -32,7 +32,7 @@ jobs:
             LINKER: gcc
             CPP_COMPILER: g++
 
-          - os: ubuntu-trusty
+          - os: ubuntu-18.04
             addons:
               apt:
                 sources: 
