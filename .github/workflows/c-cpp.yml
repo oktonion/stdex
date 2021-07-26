@@ -1,0 +1,25 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ tests ]
+  pull_request:
+    branches: [ tests ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: build
+      env:
+        COMPILER: g++
+      run: |
+        chmod a+rwx ./build_tests.sh
+        ./build_tests.sh
+    - name: run
+      run: |
+        chmod a+rwx ./run_tests.sh
+        ./run_tests.sh
