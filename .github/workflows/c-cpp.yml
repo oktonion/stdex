@@ -18,7 +18,7 @@ jobs:
             TARGET: x86_64-apple-darwin
             COMPILER: clang
             LINKER: clang
-            CPP_COMPILER: clang
+            CPP_COMPILER: clang++
 
           - os: ubuntu-latest
             TARGET: armv7-unknown-linux-musleabihf
