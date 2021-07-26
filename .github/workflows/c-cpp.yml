@@ -13,13 +13,21 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: build
+    - name: build lib
+      env:
+        COMPILER: g++
+      run: |
+        cd ./stdex
+        chmod a+rwx ./build_lib.sh
+        ./build_lib.sh
+        cd ..
+    - name: build tests
       env:
         COMPILER: g++
       run: |
         chmod a+rwx ./build_tests.sh
         ./build_tests.sh
-    - name: run
+    - name: run tests
       run: |
         chmod a+rwx ./run_tests.sh
         ./run_tests.sh
