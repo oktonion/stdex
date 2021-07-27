@@ -205,14 +205,14 @@
 #else //no C++11 support
 
     // nullptr and nullptr_t implementation
-    #ifdef _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
+    #if defined(_STDEX_IMPLEMENTS_NULLPTR_SUPPORT) && !defined(_STDEX_NATIVE_NULLPTR_SUPPORT)
         #include "nullptr.h"
     #else
     namespace stdex
     {
         typedef std::nullptr_t nullptr_t;
     }
-    #endif // _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
+    #endif // _STDEX_IMPLEMENTS_NULLPTR_SUPPORT && !_STDEX_NATIVE_NULLPTR_SUPPORT
 
     namespace stdex
     {
