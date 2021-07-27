@@ -10,7 +10,9 @@
 
 int test01()
 {
-  std::vector<int> c(3);    
+  typedef std::vector<int>::size_type size_type;
+
+  std::vector<int> c(static_cast<size_type>(3));    
   std::vector<int>::iterator i = c.end(), j;
 
   j = stdex::prev(i, 3);
@@ -22,7 +24,9 @@ int test01()
 
 int test02()
 {
-  std::list<int> c(3);    
+  typedef std::list<int>::size_type size_type;
+
+  std::list<int> c(static_cast<size_type>(3));    
   std::list<int>::iterator i = c.end(), j;
 
   j = stdex::prev(i, 3);
@@ -34,7 +38,9 @@ int test02()
 
 int test03()
 {
-  std::list<int> c(1);    
+  typedef std::list<int>::size_type size_type;
+
+  std::list<int> c(static_cast<size_type>(1));    
   std::list<int>::iterator i = c.end(), j;
 
   j = stdex::prev(i);
