@@ -434,7 +434,7 @@ namespace stdex
     #undef nullptr
 #endif
 
-//#define nullptr (stdex::nullptr_t)(STDEX_NULL)
+#define nullptr (stdex::nullptr_t)(STDEX_NULL)
 
 
 #endif // _STDEX_NULLPTR_H
