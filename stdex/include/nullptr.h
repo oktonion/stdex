@@ -45,6 +45,9 @@ namespace stdex
             template<class>
             _no_type _is_convertable_to_ptr_tester(...);
 
+            _yes_type _is_convertable_to_int_tester(int);
+            _no_type _is_convertable_to_int_tester(...);
+
             /*template<int> struct sfinae_true
             {
                 typedef _yes_type type;
@@ -252,6 +255,12 @@ namespace stdex
                 static const bool value = (sizeof(_is_convertable_to_void_ptr_tester((_Tp) (STDEX_NULL))) == sizeof(_yes_type));
             };
 
+            struct _NULL_is_convertable_to_int
+            {
+                static const bool value = 
+                    (sizeof(_is_convertable_to_int_tester(STDEX_NULL)) == sizeof(_yes_type));
+            };
+
             template<class _Tp>
             struct _is_convertable_to_member_function_ptr_impl
             {
@@ -377,6 +386,7 @@ namespace stdex
             };
 
             typedef _nullptr_choose_as_int<
+                (nullptr_detail::_NULL_is_convertable_to_int::value == bool(true)) &&
                 (_as_int::_is_convertable_to_ptr == bool(true) && _as_int::_equal_void_ptr == bool(true) && _as_int::_can_be_compared_to_ptr == bool(true))
             >::type type;
         };
