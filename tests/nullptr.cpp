@@ -9,7 +9,8 @@ int main()
     std::endl;
 
     std::cout << 
-        "nullptr as enum sizeof(" << sizeof(stdex::detail::nullptr_detail::_nullptr_t_as_enum) << ") is convertable to ptr: " <<
+        "nullptr as enum sizeof(" << sizeof(stdex::detail::nullptr_detail::_nullptr_t_as_enum) << 
+        "), is convertable to ptr: " <<
             (stdex::detail::_nullptr_choose_as_class<false>::_as_enum::_is_convertable_to_ptr ? "true" : "false") <<
         ", is equal to void ptr sizeof(" << sizeof(void*) << "): " <<
             (stdex::detail::_nullptr_choose_as_class<false>::_as_enum::_equal_void_ptr ? "true" : "false") <<
@@ -18,7 +19,8 @@ int main()
     std::endl;
 
     std::cout << 
-        "nullptr as int is convertable to ptr: " <<
+        "nullptr as int sizeof(" << sizeof(stdex::detail::_nullptr_choose_as_enum<false>::type) <<
+        "), nullptr as int is convertable to ptr: " <<
             (stdex::detail::_nullptr_choose_as_enum<false>::_as_int::_is_convertable_to_ptr ? "true" : "false") <<
         ", is equal to void ptr: " <<
             (stdex::detail::_nullptr_choose_as_enum<false>::_as_int::_equal_void_ptr ? "true" : "false") <<

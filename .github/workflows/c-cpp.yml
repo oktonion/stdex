@@ -1,0 +1,66 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ tests, function_feature, move_feature, future_feature ]
+  pull_request:
+    branches: [ tests, function_feature, move_feature, future_feature ]
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, ubuntu-latest, ubuntu-18.04]
+        include:
+          - os: macos-latest
+            TARGET: x86_64-apple-darwin
+            COMPILER: clang
+            LINKER: clang
+            CPP_COMPILER: clang++
+
+          - os: ubuntu-latest
+            TARGET: armv7-unknown-linux-musleabihf
+            COMPILER: arm-linux-gnueabihf-gcc-5
+            LINKER: gcc-5-arm-linux-gnueabihf
+            CPP_COMPILER: g++
+  
+          - os: ubuntu-latest
+            TARGET: x86_64-unknown-linux-musl
+            COMPILER: gcc
+            LINKER: gcc
+            CPP_COMPILER: g++
+
+          - os: ubuntu-18.04
+            addons:
+              apt:
+                sources: 
+                  - sourceline: 'deb     http://old-releases.ubuntu.com/ubuntu/ hardy universe'
+                  - sourceline: 'deb-src http://old-releases.ubuntu.com/ubuntu/ hardy universe'
+                packages: ['gcc-3.4', 'g++-3.4', 'gcc-multilib', 'g++-multilib']
+            COMPILER: gcc
+            LINKER: gcc
+            CPP_COMPILER: g++
+    steps:
+    - uses: actions/checkout@v2
+    - run: echo ${{matrix.TARGET}}
+    - name: build lib
+      env:
+        COMPILER: ${{ matrix.CPP_COMPILER }}
+      run: |
+        cd ./stdex
+        chmod a+rwx ./build_lib.sh
+        ./build_lib.sh
+        cd ..
+    - name: build tests
+      env:
+        COMPILER: ${{ matrix.CPP_COMPILER }}
+      run: |
+        chmod a+rwx ./build_tests.sh
+        ./build_tests.sh
+        ./tests/bin/nullptr
+    - name: run tests
+      run: |
+        chmod a+rwx ./run_tests.sh
+        ./run_tests.sh
