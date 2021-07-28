@@ -20,20 +20,12 @@
 // POSIX includes
 
 // std includes
-#ifdef _STDEX_NULLPTR_H
-    #undef nullptr
-#endif
-
 #include <functional>
 #include <bitset> // for hash
 #include <vector> // for hash
 #include <algorithm>
 #include <exception>
 #include <typeinfo> // for function::target_type()
-
-#ifdef _STDEX_NULLPTR_H
-    #define nullptr (stdex::nullptr_t)(STDEX_NULL)
-#endif
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
