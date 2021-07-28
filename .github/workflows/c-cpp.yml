@@ -37,14 +37,14 @@ jobs:
             LINKER: gcc
             CPP_COMPILER: g++-3.4
             SETUP_SCRIPT: |
-              echo "deb     http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
-              echo "deb-src http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
+              echo "deb     [trusted=yes] http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
+              echo "deb-src [trusted=yes] http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
               #echo "deb     http://snapshot.debian.org/archive/debian/20070730T000000Z/ lenny main" | sudo tee -a /etc/apt/sources.list
               #echo "deb-src http://snapshot.debian.org/archive/debian/20070730T000000Z/ lenny main" | sudo tee -a /etc/apt/sources.list
               #echo "deb     http://snapshot.debian.org/archive/debian-security/20070730T000000Z/ lenny/updates main" | sudo tee -a /etc/apt/sources.list
               #echo "deb-src http://snapshot.debian.org/archive/debian-security/20070730T000000Z/ lenny/updates main" | sudo tee -a /etc/apt/sources.list
-              sudo apt-add-repository universe
-              sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 40976EAF437D05B5
+              #sudo apt-add-repository universe
+              #sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 40976EAF437D05B5
               sudo apt-get update
               sudo -E apt-get -yq --no-install-suggests --no-install-recommends install gcc-3.4 g++-3.4 gcc-multilib g++-multilib
               dpkg --list | grep compiler
