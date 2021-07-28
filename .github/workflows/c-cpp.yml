@@ -33,15 +33,16 @@ jobs:
             CPP_COMPILER: g++
 
           - os: ubuntu-18.04
-            addons:
-              apt:
-                sources: 
-                  - sourceline: 'deb     http://old-releases.ubuntu.com/ubuntu/ hardy universe'
-                  - sourceline: 'deb-src http://old-releases.ubuntu.com/ubuntu/ hardy universe'
-                packages: ['gcc-3.4', 'g++-3.4', 'gcc-multilib', 'g++-multilib']
-            COMPILER: gcc
-            LINKER: gcc
-            CPP_COMPILER: g++
+          - run: |
+            echo "deb     http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
+            echo "deb-src http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
+            apt install gcc-3.4
+            apt install g++-3.4
+            apt install gcc-multilib
+            apt install g++-multilib
+          COMPILER: gcc
+          LINKER: gcc
+          CPP_COMPILER: g++-3.4
     steps:
     - uses: actions/checkout@v2
     - run: echo ${{matrix.TARGET}}
