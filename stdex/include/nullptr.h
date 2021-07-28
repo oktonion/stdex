@@ -11,7 +11,11 @@
 #ifdef NULL
 #define STDEX_NULL NULL
 #else
-#define STDEX_NULL 0
+    #ifdef __null
+        #define STDEX_NULL __null
+    #else
+        #define STDEX_NULL 0
+    #endif
 #endif
 
 namespace stdex
