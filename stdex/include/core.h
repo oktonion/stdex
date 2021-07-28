@@ -49,11 +49,14 @@
 
 #endif
 
+#if (_STDEX_HAS_FEATURE_BUILTIN(cxx_nullptr) || _STDEX_HAS_EXTENSION_BUILTIN(cxx_nullptr))
+    #define _STDEX_NATIVE_NULLPTR_SUPPORT
+#endif
+
 #if ((!defined(_MSC_VER) || _MSC_VER < 1600) && !defined(_STDEX_NATIVE_CPP11_SUPPORT))
 
-    #if (_STDEX_HAS_FEATURE_BUILTIN(cxx_nullptr) || _STDEX_HAS_EXTENSION_BUILTIN(cxx_nullptr))
-        #define _STDEX_NATIVE_NULLPTR_SUPPORT
-    #else
+    
+    #if !defined(_STDEX_NATIVE_NULLPTR_SUPPORT)
         #if !defined(nullptr)
             #define _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
         #else
@@ -89,7 +92,9 @@
 
 #else
 
+#if !defined(_STDEX_NATIVE_NULLPTR_SUPPORT)
     #define _STDEX_NATIVE_NULLPTR_SUPPORT
+#endif
     #define _STDEX_NATIVE_STATIC_ASSERT_SUPPORT
 
 #endif
@@ -200,14 +205,14 @@
 #else //no C++11 support
 
     // nullptr and nullptr_t implementation
-    #ifdef _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
+    #if defined(_STDEX_IMPLEMENTS_NULLPTR_SUPPORT) && !defined(_STDEX_NATIVE_NULLPTR_SUPPORT)
         #include "nullptr.h"
     #else
     namespace stdex
     {
         typedef std::nullptr_t nullptr_t;
     }
-    #endif // _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
+    #endif // _STDEX_IMPLEMENTS_NULLPTR_SUPPORT && !_STDEX_NATIVE_NULLPTR_SUPPORT
 
     namespace stdex
     {
