@@ -866,12 +866,13 @@ int test14()
             steady_clock::now() - start;
         std::cout << "duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired is " << desired_dur << " ms; " << std::endl;
 
-        intmax_type treshold = 2500; // 2.5 sec is bullshit but better than nothing
+        static intmax_type treshold = 1000; // 1 sec is bullshit but better than nothing
         #if defined(_STDEX_NATIVE_CPP11_SUPPORT) || defined(__MACH__)
         std::cout << "std::duration is " << std_dur << " ms, stdex::duration is " << duration_cast<milliseconds>(dur).count() << " ms; " << std::endl;
         std::cout << "std::desired is " << std_desired_dur << " ms, stdex::desired is " << desired_dur << " ms; " << std::endl;
-        treshold = (std_dur - std_desired_dur);
-        treshold = ((treshold < 0) ? -treshold : treshold) + 1000;
+        intmax_type std_treshold = (std_dur - std_desired_dur);
+        std_treshold = ((std_treshold < 0) ? -std_treshold : std_treshold);
+        treshold = std_treshold > treshold ? (std_treshold + 100) : treshold ;
         #endif
 
         DYNAMIC_VERIFY(desired_dur >= intmax_type(25000));
