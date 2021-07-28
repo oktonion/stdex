@@ -43,7 +43,8 @@ jobs:
               dpkg --list | grep compiler
               sudo /sbin/ldconfig -p | grep libgcc
               sudo ln -s /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/libgcc_s.so.1
-            env: LIBRARY_PATH: /usr/lib/x86_64-linux-gnu:$LIBRARY_PATH
+            env: 
+              LIBRARY_PATH: /usr/lib/x86_64-linux-gnu:$LIBRARY_PATH
     steps:
     - uses: actions/checkout@v2
     - run: echo ${{matrix.TARGET}}
