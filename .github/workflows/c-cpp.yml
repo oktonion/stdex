@@ -36,7 +36,7 @@ jobs:
             COMPILER: gcc
             LINKER: gcc
             CPP_COMPILER: g++-3.4
-            run: |
+            SETUP_SCRIPT: |
               echo "deb     http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
               echo "deb-src http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
               apt install gcc-3.4
@@ -46,6 +46,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - run: echo ${{matrix.TARGET}}
+    - name: setup enviroment
+      run: ${{matrix.SETUP_SCRIPT}}
     - name: build lib
       env:
         COMPILER: ${{ matrix.CPP_COMPILER }}
