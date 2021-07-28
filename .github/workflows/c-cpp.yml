@@ -41,6 +41,9 @@ jobs:
               echo "deb-src http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
               sudo -E apt-get -yq --no-install-suggests --no-install-recommends install gcc-3.4 g++-3.4 gcc-multilib g++-multilib
               dpkg --list | grep compiler
+              sudo /sbin/ldconfig -p | grep libgcc
+              sudo ln -s /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/libgcc_s.so.1
+            env: LIBRARY_PATH: /usr/lib/x86_64-linux-gnu:$LIBRARY_PATH
     steps:
     - uses: actions/checkout@v2
     - run: echo ${{matrix.TARGET}}
