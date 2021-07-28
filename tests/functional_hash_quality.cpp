@@ -1,12 +1,12 @@
-#include "../stdex/include/core.h"
-#include "../stdex/include/functional.hpp"
-#include "../stdex/include/system_error.hpp"
-#include "../stdex/include/string.hpp"
-
 #include <iostream>
 #include <string>
 #include <bitset>
 #include <set>
+
+//#include "../stdex/include/core.h"
+#include "../stdex/include/functional.hpp"
+#include "../stdex/include/system_error.hpp"
+#include "../stdex/include/string.hpp"
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
