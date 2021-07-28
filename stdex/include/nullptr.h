@@ -5,13 +5,30 @@
 #pragma once
 #endif // _MSC_VER > 1000
 
-#include <cstddef>
 #include <climits>
 
+// searching for NULL
+#include <cstddef>
+#ifndef NULL
+    #include <cstdio>
+#endif
+#ifndef NULL
+    #include <cstdlib>
+#endif
+#ifndef NULL
+    #include <cstring>
+#endif
+#ifndef NULL
+    #include <ctime>
+#endif
+#ifndef NULL
+    #include <clocale>
+#endif
+
 #ifdef NULL
-#define STDEX_NULL NULL
+    #define STDEX_NULL NULL
 #else
-#define STDEX_NULL 0
+    #define STDEX_NULL (void*)0
 #endif
 
 namespace stdex
