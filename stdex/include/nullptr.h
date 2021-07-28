@@ -25,7 +25,11 @@
     #include <clocale>
 #endif
 
-#define STDEX_NULL (void*)0
+#ifdef NULL
+    #define STDEX_NULL NULL
+#else
+    #define STDEX_NULL (void*)0
+#endif
 
 namespace stdex
 {
