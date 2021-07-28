@@ -43,8 +43,7 @@ jobs:
               echo "deb-src http://snapshot.debian.org/archive/debian/20070730T000000Z/ lenny main" | sudo tee -a /etc/apt/sources.list
               echo "deb     http://snapshot.debian.org/archive/debian-security/20070730T000000Z/ lenny/updates main" | sudo tee -a /etc/apt/sources.list
               echo "deb-src http://snapshot.debian.org/archive/debian-security/20070730T000000Z/ lenny/updates main" | sudo tee -a /etc/apt/sources.list
-              gpg --keyserver subkeys.pgp.net --recv A70DAF536070D3A1
-              gpg --export --armor A70DAF536070D3A1 | sudo apt-key add -
+              sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com A70DAF536070D3A1
               sudo apt-get update
               sudo -E apt-get -yq --no-install-suggests --no-install-recommends install gcc-3.4 g++-3.4 gcc-multilib g++-multilib
               dpkg --list | grep compiler
