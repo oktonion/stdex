@@ -59,7 +59,6 @@ jobs:
       run: |
         chmod a+rwx ./build_tests.sh
         ./build_tests.sh
-        ./tests/bin/nullptr
     - name: run tests
       run: |
         chmod a+rwx ./run_tests.sh
