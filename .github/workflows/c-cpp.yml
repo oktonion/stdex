@@ -7,8 +7,7 @@ on:
     branches: [ tests, function_feature, move_feature, future_feature ]
 
 jobs:
-  build:
-
+  build unix:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -115,25 +114,7 @@ jobs:
               chmod a+rwx ./build_lib.sh
               cd ..
               chmod a+rwx ./build_tests.sh
-              chmod a+rwx ./run_tests.sh
-    
-          #- os: windows-latest
-          #  COMPILER: cl
-          #  LINKER: ilink
-          #  CPP_COMPILER: cl
-          #  LIBRARY_PATH: ""
-          #  BUILD_LIB_SCRIPT: ~build_lib.bat
-          #  BUILD_SCRIPT: ~build_tests.bat
-          #  RUN_SCRIPT: run_tests.bat
-          #  SETUP_SCRIPT: |
-          #    cmd
-          #    cd ./stdex
-          #    echo "call \"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat\"" > ~build_lib.bat
-          #    cat build_lib.bat >> ~build_lib.bat
-          #    cd ..
-          #    echo "call \"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat\"" > ~build_tests.bat
-          #    cat build_tests.bat >> ~build_tests.bat
-              
+              chmod a+rwx ./run_tests.sh      
     
     steps:
     - uses: actions/checkout@v2
@@ -154,5 +135,54 @@ jobs:
       run: |
         ./${{ matrix.BUILD_SCRIPT }}
     - name: run tests
+      run: |
+        ./${{ matrix.RUN_SCRIPT }}
+  build windows:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+    
+          - os: windows-latest
+            COMPILER: cl
+            LINKER: ilink
+            CPP_COMPILER: cl
+            LIBRARY_PATH: ""
+            BUILD_LIB_SCRIPT: ~build_lib.bat
+            BUILD_SCRIPT: ~build_tests.bat
+            RUN_SCRIPT: run_tests.bat
+            SETUP_SCRIPT: |
+              cmd
+              cd ./stdex
+              echo "call \"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat\"" > ~build_lib.bat
+              cat build_lib.bat >> ~build_lib.bat
+              cd ..
+              echo "call \"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat\"" > ~build_tests.bat
+              cat build_tests.bat >> ~build_tests.bat
+              
+    
+    steps:
+    - uses: actions/checkout@v2
+    - name: setup enviroment
+      shell: cmd
+      run: ${{matrix.SETUP_SCRIPT}}
+    - name: build lib
+      env:
+        COMPILER: ${{ matrix.CPP_COMPILER }}
+        LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
+      shell: cmd
+      run: |
+        cd ./stdex
+        ./${{ matrix.BUILD_LIB_SCRIPT }}
+        cd ..
+    - name: build tests
+      env:
+        COMPILER: ${{ matrix.CPP_COMPILER }}
+        LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
+      shell: cmd
+      run: |
+        ./${{ matrix.BUILD_SCRIPT }}
+    - name: run tests
+      shell: cmd
       run: |
         ./${{ matrix.RUN_SCRIPT }}
