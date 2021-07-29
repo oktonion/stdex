@@ -153,7 +153,7 @@ jobs:
             BUILD_SCRIPT: ~build_tests.bat
             RUN_SCRIPT: run_tests.bat
             SETUP_SCRIPT: |
-              set MSVS_VSVARS_PATH="%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+              set MSVS_VSVARS_PATH="%ProgramFiles(x86)%\Ticrosoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
               echo %MSVS_VSVARS_PATH%
               if exist %MSVS_VSVARS_PATH% (
                 cd .\\stdex
