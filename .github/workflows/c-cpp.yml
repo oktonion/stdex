@@ -154,13 +154,17 @@ jobs:
             RUN_SCRIPT: run_tests.bat
             SETUP_SCRIPT: |
               cd .\\stdex
-              echo "call \"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat\"" > ~build_lib.bat
-              cat build_lib.bat >> ~build_lib.bat
-              cd ..
-              cat .\\stdex\~build_lib.bat
-              echo "call \"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat\"" > ~build_tests.bat
+              if exist "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat" (
+                echo "call \"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat\"" > ~build_lib.bat
+                cat build_lib.bat >> ~build_lib.bat
+                cd ..
+                cat .\\stdex\~build_lib.bat
+                echo "call \"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat\"" > ~build_tests.bat
               cat build_tests.bat >> ~build_tests.bat
-              dir "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build"
+              ) else (
+                echo "cannot find MS VS vcvars64.bat"
+                exit /B 1
+              )
               
     
     steps:
@@ -174,8 +178,9 @@ jobs:
         LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
       shell: cmd
       run: |
+        dir
         cd .\\stdex
-        .\\${{ matrix.BUILD_LIB_SCRIPT }}
+        ${{ matrix.BUILD_LIB_SCRIPT }}
         cd ..
     - name: build tests
       env:
@@ -183,8 +188,8 @@ jobs:
         LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
       shell: cmd
       run: |
-        .\\${{ matrix.BUILD_SCRIPT }}
+        ${{ matrix.BUILD_SCRIPT }}
     - name: run tests
       shell: cmd
       run: |
-        .\\${{ matrix.RUN_SCRIPT }}
+        ${{ matrix.RUN_SCRIPT }}
