@@ -178,11 +178,11 @@ jobs:
           COMPILER: ${{ matrix.CPP_COMPILER }}
           LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
         run: |
-          ls
           cd .\\stdex
           ${{ matrix.BUILD_LIB_SCRIPT }}
           cd ..
-        shell: cmd
+        shell: cmd  
+        
         
       - name: build tests
         env:
