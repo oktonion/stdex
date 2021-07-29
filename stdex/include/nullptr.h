@@ -62,8 +62,9 @@ namespace stdex
             template<class>
             _no_type _is_convertable_to_ptr_tester(...);
 
-            _yes_type _is_convertable_to_int_tester(int);
-            _no_type _is_convertable_to_int_tester(...);
+            template<class T>
+            _yes_type _is_convertable_to_int_tester(T);
+            _no_type _is_convertable_to_int_tester(void*);
 
             /*template<int> struct sfinae_true
             {
