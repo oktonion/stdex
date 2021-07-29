@@ -152,12 +152,13 @@ jobs:
             BUILD_SCRIPT: ~build_tests.bat
             RUN_SCRIPT: run_tests.bat
             SETUP_SCRIPT: |
-              cd ./stdex
+              cd .\\stdex
               echo "call \"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat\"" > ~build_lib.bat
               cat build_lib.bat >> ~build_lib.bat
               cd ..
               echo "call \"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat\"" > ~build_tests.bat
               cat build_tests.bat >> ~build_tests.bat
+              cat ~build_tests.bat
               
     
     steps:
@@ -171,8 +172,8 @@ jobs:
         LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
       shell: cmd
       run: |
-        cd ./stdex
-        ./${{ matrix.BUILD_LIB_SCRIPT }}
+        cd .\\stdex
+        .\\${{ matrix.BUILD_LIB_SCRIPT }}
         cd ..
     - name: build tests
       env:
@@ -180,8 +181,8 @@ jobs:
         LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
       shell: cmd
       run: |
-        ./${{ matrix.BUILD_SCRIPT }}
+        .\\${{ matrix.BUILD_SCRIPT }}
     - name: run tests
       shell: cmd
       run: |
-        ./${{ matrix.RUN_SCRIPT }}
+        .\\${{ matrix.RUN_SCRIPT }}
