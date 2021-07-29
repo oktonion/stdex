@@ -153,13 +153,13 @@ jobs:
             BUILD_SCRIPT: ~build_tests.bat
             RUN_SCRIPT: run_tests.bat
             SETUP_SCRIPT: |
-              if exist "C:\Program Files \(x86\)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat" (
+              if exist "%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat" (
                 cd .\\stdex
-                echo "call \"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat\"" > ~build_lib.bat
+                echo "call \"%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat\"" > ~build_lib.bat
                 cat build_lib.bat >> ~build_lib.bat
                 cd ..
                 cat .\\stdex\~build_lib.bat
-                echo "call \"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat\"" > ~build_tests.bat
+                echo "call \"%ProgramFiles(x86)%\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat\"" > ~build_tests.bat
                 cat build_tests.bat >> ~build_tests.bat
               ) else (
                 echo "cannot find MS VS vcvars64.bat"
