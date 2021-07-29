@@ -18,7 +18,6 @@ jobs:
             COMPILER: clang
             LINKER: clang
             LIBRARY_PATH: $LIBRARY_PATH
-            SHELL: default
             CPP_COMPILER: clang++
             BUILD_LIB_SCRIPT: build_lib.sh
             BUILD_SCRIPT: build_tests.sh
@@ -36,7 +35,6 @@ jobs:
             COMPILER: arm-linux-gnueabihf-gcc-5
             LINKER: gcc-5-arm-linux-gnueabihf
             LIBRARY_PATH: $LIBRARY_PATH
-            SHELL: default
             CPP_COMPILER: g++
             BUILD_LIB_SCRIPT: build_lib.sh
             BUILD_SCRIPT: build_tests.sh
@@ -53,7 +51,6 @@ jobs:
             COMPILER: gcc
             LINKER: gcc
             LIBRARY_PATH: $LIBRARY_PATH
-            SHELL: default
             CPP_COMPILER: g++
             BUILD_LIB_SCRIPT: build_lib.sh
             BUILD_SCRIPT: build_tests.sh
@@ -70,7 +67,6 @@ jobs:
             LINKER: gcc
             CPP_COMPILER: g++-3.4
             LIBRARY_PATH: /usr/lib/x86_64-linux-gnu:$LIBRARY_PATH
-            SHELL: default
             BUILD_LIB_SCRIPT: build_lib.sh
             BUILD_SCRIPT: build_tests.sh
             RUN_SCRIPT: run_tests.sh
@@ -97,7 +93,6 @@ jobs:
             LINKER: gcc
             CPP_COMPILER: g++-4.4
             LIBRARY_PATH: $LIBRARY_PATH
-            SHELL: default
             SETUP_SCRIPT: |
               echo "deb     [trusted=yes] http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
               echo "deb-src [trusted=yes] http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
@@ -127,8 +122,8 @@ jobs:
             BUILD_LIB_SCRIPT: ~build_lib.bat
             BUILD_SCRIPT: ~build_tests.bat
             RUN_SCRIPT: run_tests.bat
-            SHELL: cmd
             SETUP_SCRIPT: |
+              cmd
               cd ./stdex
               echo "call \"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat\"" > ~build_lib.bat
               cat build_lib.bat >> ~build_lib.bat
@@ -149,15 +144,12 @@ jobs:
         cd ./stdex
         ./${{ matrix.BUILD_LIB_SCRIPT }}
         cd ..
-      shell: ${{ matrix.SHELL }}
     - name: build tests
       env:
         COMPILER: ${{ matrix.CPP_COMPILER }}
         LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
       run: |
         ./${{ matrix.BUILD_SCRIPT }}
-      shell: ${{ matrix.SHELL }}
     - name: run tests
       run: |
         ./${{ matrix.RUN_SCRIPT }}
-      shell: ${{ matrix.SHELL }}
