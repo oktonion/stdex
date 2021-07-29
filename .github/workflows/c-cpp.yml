@@ -181,6 +181,8 @@ jobs:
           LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
         run: |
           cd .\\stdex
+          dir
+          dir .\\pthreads-win32
           ${{ matrix.BUILD_LIB_SCRIPT }}
           cd ..
         shell: cmd  
