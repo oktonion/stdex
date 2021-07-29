@@ -169,28 +169,29 @@ jobs:
               
     
     steps:
-    - uses: actions/checkout@v2
-    - name: setup enviroment
-      run: ${{matrix.SETUP_SCRIPT}}
-      shell: cmd
-    - name: build lib
-      env:
-        COMPILER: ${{ matrix.CPP_COMPILER }}
-        LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
-      run: |
-        ls
-        cd .\\stdex
-        ${{ matrix.BUILD_LIB_SCRIPT }}
-        cd ..
-      shell: cmd
-    - name: build tests
-      env:
-        COMPILER: ${{ matrix.CPP_COMPILER }}
-        LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
-      shell: cmd
-      run: |
-        ${{ matrix.BUILD_SCRIPT }}
-    - name: run tests
-      run: |
-        ${{ matrix.RUN_SCRIPT }}
-      shell: cmd
+      - uses: actions/checkout@v2
+      - name: setup enviroment
+        run: ${{matrix.SETUP_SCRIPT}}
+        shell: cmd
+      - name: build lib
+        env:
+          COMPILER: ${{ matrix.CPP_COMPILER }}
+          LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
+        run: |
+          ls
+          cd .\\stdex
+          ${{ matrix.BUILD_LIB_SCRIPT }}
+          cd ..
+        shell: cmd
+        
+      - name: build tests
+        env:
+          COMPILER: ${{ matrix.CPP_COMPILER }}
+          LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
+        run: |
+          ${{ matrix.BUILD_SCRIPT }}
+        shell: cmd
+      - name: run tests
+        run: |
+          ${{ matrix.RUN_SCRIPT }}
+        shell: cmd
