@@ -94,9 +94,9 @@ jobs:
             CPP_COMPILER: g++-4.4
             LIBRARY_PATH: $LIBRARY_PATH
             SETUP_SCRIPT: |
-              sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+              sudo -E apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
               sudo apt-get update
-              sudo -E apt-get -yq --no-install-suggests --no-install-recommends install gcc-4.4 g++-4.4 gcc-multilib g++-multilib
+              sudo -E apt-get -yq --no-install-suggests --no-install-recommends install g++-4.4
               dpkg --list | grep compiler
               #sudo /sbin/ldconfig -p | grep libgcc
               #sudo ln -s /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/libgcc_s.so.1
