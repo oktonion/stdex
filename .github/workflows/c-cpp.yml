@@ -140,14 +140,14 @@ jobs:
         LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
       run: |
         cd ./stdex
-        ${{ matrix.BUILD_LIB_SCRIPT }}
+        ./${{ matrix.BUILD_LIB_SCRIPT }}
         cd ..
     - name: build tests
       env:
         COMPILER: ${{ matrix.CPP_COMPILER }}
         LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
       run: |
-        ${{ matrix.BUILD_SCRIPT }}
+        ./${{ matrix.BUILD_SCRIPT }}
     - name: run tests
       run: |
-        ${{ matrix.RUN_SCRIPT }}
+        ./${{ matrix.RUN_SCRIPT }}
