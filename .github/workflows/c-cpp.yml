@@ -101,6 +101,8 @@ jobs:
               echo "deb     [trusted=yes] http://snapshot.debian.org/archive/debian-security/20070730T000000Z/ lenny/updates main" | sudo tee -a /etc/apt/sources.list
               echo "deb-src [trusted=yes] http://snapshot.debian.org/archive/debian-security/20070730T000000Z/ lenny/updates main" | sudo tee -a /etc/apt/sources.list
               sudo -E apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+              sudo add-apt-repository 'deb http://archive.ubuntu.com/ubuntu/ trusty main'
+              sudo add-apt-repository 'deb http://archive.ubuntu.com/ubuntu/ trusty universe'
               sudo apt-get update
               sudo -E apt-get -yq --no-install-suggests --no-install-recommends install g++-4.4
               dpkg --list | grep compiler
