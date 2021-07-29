@@ -7,7 +7,7 @@ on:
     branches: [ tests, function_feature, move_feature, future_feature ]
 
 jobs:
-  build unix:
+  unix:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -137,7 +137,7 @@ jobs:
     - name: run tests
       run: |
         ./${{ matrix.RUN_SCRIPT }}
-  build windows:
+  windows:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
