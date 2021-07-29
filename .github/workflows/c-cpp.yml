@@ -18,36 +18,50 @@ jobs:
             TARGET: x86_64-apple-darwin
             COMPILER: clang
             LINKER: clang
+            LIBRARY_PATH: $LIBRARY_PATH
             CPP_COMPILER: clang++
 
           - os: ubuntu-latest
             TARGET: armv7-unknown-linux-musleabihf
             COMPILER: arm-linux-gnueabihf-gcc-5
             LINKER: gcc-5-arm-linux-gnueabihf
+            LIBRARY_PATH: $LIBRARY_PATH
             CPP_COMPILER: g++
   
           - os: ubuntu-latest
             TARGET: x86_64-unknown-linux-musl
             COMPILER: gcc
             LINKER: gcc
+            LIBRARY_PATH: $LIBRARY_PATH
             CPP_COMPILER: g++
 
           - os: ubuntu-18.04
-            addons:
-              apt:
-                sources: 
-                  - sourceline: 'deb     http://old-releases.ubuntu.com/ubuntu/ hardy universe'
-                  - sourceline: 'deb-src http://old-releases.ubuntu.com/ubuntu/ hardy universe'
-                packages: ['gcc-3.4', 'g++-3.4', 'gcc-multilib', 'g++-multilib']
             COMPILER: gcc
             LINKER: gcc
-            CPP_COMPILER: g++
+            CPP_COMPILER: g++-3.4
+            LIBRARY_PATH: /usr/lib/x86_64-linux-gnu:$LIBRARY_PATH
+            SETUP_SCRIPT: |
+              echo "deb     [trusted=yes] http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
+              echo "deb-src [trusted=yes] http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
+              #echo "deb     http://snapshot.debian.org/archive/debian/20070730T000000Z/ lenny main" | sudo tee -a /etc/apt/sources.list
+              #echo "deb-src http://snapshot.debian.org/archive/debian/20070730T000000Z/ lenny main" | sudo tee -a /etc/apt/sources.list
+              #echo "deb     http://snapshot.debian.org/archive/debian-security/20070730T000000Z/ lenny/updates main" | sudo tee -a /etc/apt/sources.list
+              #echo "deb-src http://snapshot.debian.org/archive/debian-security/20070730T000000Z/ lenny/updates main" | sudo tee -a /etc/apt/sources.list
+              sudo apt-get update
+              sudo -E apt-get -yq --no-install-suggests --no-install-recommends install gcc-3.4 g++-3.4 gcc-multilib g++-multilib
+              dpkg --list | grep compiler
+              sudo /sbin/ldconfig -p | grep libgcc
+              sudo ln -s /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/libgcc_s.so.1
+            
     steps:
     - uses: actions/checkout@v2
     - run: echo ${{matrix.TARGET}}
+    - name: setup enviroment
+      run: ${{matrix.SETUP_SCRIPT}}
     - name: build lib
       env:
         COMPILER: ${{ matrix.CPP_COMPILER }}
+        LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
       run: |
         cd ./stdex
         chmod a+rwx ./build_lib.sh
@@ -56,6 +70,7 @@ jobs:
     - name: build tests
       env:
         COMPILER: ${{ matrix.CPP_COMPILER }}
+        LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
       run: |
         chmod a+rwx ./build_tests.sh
         ./build_tests.sh
