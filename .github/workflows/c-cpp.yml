@@ -157,10 +157,10 @@ jobs:
               echo %MSVS_VSVARS_PATH%
               if exist %MSVS_VSVARS_PATH% (
                 cd .\\stdex
-                echo "call \"%MSVS_VSVARS_PATH%\"" > ~build_lib.bat
+                echo call %MSVS_VSVARS_PATH% > ~build_lib.bat
                 cat build_lib.bat >> ~build_lib.bat
                 cd ..
-                echo "call \"%MSVS_VSVARS_PATH%\"" > ~build_tests.bat
+                echo call %MSVS_VSVARS_PATH% > ~build_tests.bat
                 cat build_tests.bat >> ~build_tests.bat
               ) else (
                 echo "cannot find %MSVS_VSVARS_PATH%"
