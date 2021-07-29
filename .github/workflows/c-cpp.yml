@@ -160,7 +160,7 @@ jobs:
               cat .\\stdex\~build_lib.bat
               echo "call \"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat\"" > ~build_tests.bat
               cat build_tests.bat >> ~build_tests.bat
-              dir "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise"
+              dir "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build"
               
     
     steps:
