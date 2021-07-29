@@ -172,8 +172,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: setup enviroment
         run: |
+          git submodule update --init --recursive
           ${{matrix.SETUP_SCRIPT}}
-          git submodule sync --recursive
         shell: cmd
       - name: build lib
         env:
@@ -181,8 +181,6 @@ jobs:
           LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
         run: |
           cd .\\stdex
-          dir
-          dir .\\pthreads-win32
           ${{ matrix.BUILD_LIB_SCRIPT }}
           cd ..
         shell: cmd  
