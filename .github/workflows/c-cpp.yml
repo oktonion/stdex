@@ -12,7 +12,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, ubuntu-latest, ubuntu-18.04, ubuntu-18.04, windows-latest]
         include:
           - os: macos-latest
             TARGET: x86_64-apple-darwin
