@@ -94,6 +94,8 @@ jobs:
             CPP_COMPILER: g++-4.4
             LIBRARY_PATH: $LIBRARY_PATH
             SETUP_SCRIPT: |
+              echo "deb     [trusted=yes] http://dk.archive.ubuntu.com/ubuntu/ xenial main" | sudo tee -a /etc/apt/sources.list
+              echo "deb     [trusted=yes] http://dk.archive.ubuntu.com/ubuntu/ xenial universe" | sudo tee -a /etc/apt/sources.list
               sudo -E apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
               sudo apt-get update
               sudo -E apt-get -yq --no-install-suggests --no-install-recommends install g++-4.4
