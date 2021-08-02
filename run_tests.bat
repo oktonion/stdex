@@ -10,6 +10,8 @@ set run_ok=!true!
 for /f %%f in ('dir /b ".\tests\bin\*.exe"') do (
   echo "running test %%~nf..."
   
+  ver > nul
+
   .\tests\bin\%%f --duration
 
   if not !errorlevel!==0 (
