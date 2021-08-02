@@ -12,14 +12,12 @@ for /f %%f in ('dir /b ".\tests\bin\*.exe"') do (
   
   ver > nul
 
-  .\tests\bin\%%f --duration
-
-  if not !errorlevel!==0 (
+  .\tests\bin\%%f --duration && (
+    echo "...ok."
+  ) || (
     set run_ok=!false!
     echo "...failed with !errorlevel!."
     set "tests_failed=!tests_failed! %%~nf"
-  ) else (
-    echo "...ok."
   )
 )
 
