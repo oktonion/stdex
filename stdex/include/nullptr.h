@@ -220,7 +220,7 @@ namespace stdex
                 enum _type
                 {
                     _nullptr_val = _nullptr_t_as_integral(STDEX_NULL),
-                    _max_nullptr = _nullptr_t_as_integral((_nullptr_t_as_uint(1) << (CHAR_BIT * sizeof(void*) - 1)) / 2)
+                    _max_nullptr = _nullptr_t_as_integral((_nullptr_t_as_uint(1) << (CHAR_BIT * sizeof(void*) - 2)) / 2)
                 };
 
                 typedef 
