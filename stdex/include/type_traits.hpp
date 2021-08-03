@@ -1794,7 +1794,7 @@ namespace stdex
     {
         template<class _Tp>
         struct _is_member_pointer_helper:
-            public bool_constant<bool( is_member_function_pointer<_Tp>::value == bool(true) )>::type
+            public is_member_function_pointer<_Tp>
         { 
         };
 

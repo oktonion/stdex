@@ -7,12 +7,11 @@ on:
     branches: [ tests, function_feature, move_feature, future_feature ]
 
 jobs:
-  build:
-
+  unix:
+    #if: ${{ false }} # disable for now
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, ubuntu-latest, ubuntu-latest, ubuntu-18.04]
         include:
           - os: macos-latest
             TARGET: x86_64-apple-darwin
@@ -20,6 +19,16 @@ jobs:
             LINKER: clang
             LIBRARY_PATH: $LIBRARY_PATH
             CPP_COMPILER: clang++
+            BUILD_LIB_SCRIPT: build_lib.sh
+            BUILD_SCRIPT: build_tests.sh
+            RUN_SCRIPT: run_tests.sh
+            SETUP_SCRIPT: |
+              cd ./stdex
+              chmod a+rwx ./build_lib.sh
+              cd ..
+              chmod a+rwx ./build_tests.sh
+              chmod a+rwx ./run_tests.sh
+
 
           - os: ubuntu-latest
             TARGET: armv7-unknown-linux-musleabihf
@@ -27,6 +36,15 @@ jobs:
             LINKER: gcc-5-arm-linux-gnueabihf
             LIBRARY_PATH: $LIBRARY_PATH
             CPP_COMPILER: g++
+            BUILD_LIB_SCRIPT: build_lib.sh
+            BUILD_SCRIPT: build_tests.sh
+            RUN_SCRIPT: run_tests.sh
+            SETUP_SCRIPT: |
+              cd ./stdex
+              chmod a+rwx ./build_lib.sh
+              cd ..
+              chmod a+rwx ./build_tests.sh
+              chmod a+rwx ./run_tests.sh
   
           - os: ubuntu-latest
             TARGET: x86_64-unknown-linux-musl
@@ -34,12 +52,24 @@ jobs:
             LINKER: gcc
             LIBRARY_PATH: $LIBRARY_PATH
             CPP_COMPILER: g++
+            BUILD_LIB_SCRIPT: build_lib.sh
+            BUILD_SCRIPT: build_tests.sh
+            RUN_SCRIPT: run_tests.sh
+            SETUP_SCRIPT: |
+              cd ./stdex
+              chmod a+rwx ./build_lib.sh
+              cd ..
+              chmod a+rwx ./build_tests.sh
+              chmod a+rwx ./run_tests.sh
 
           - os: ubuntu-18.04
             COMPILER: gcc
             LINKER: gcc
             CPP_COMPILER: g++-3.4
             LIBRARY_PATH: /usr/lib/x86_64-linux-gnu:$LIBRARY_PATH
+            BUILD_LIB_SCRIPT: build_lib.sh
+            BUILD_SCRIPT: build_tests.sh
+            RUN_SCRIPT: run_tests.sh
             SETUP_SCRIPT: |
               echo "deb     [trusted=yes] http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
               echo "deb-src [trusted=yes] http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
@@ -52,10 +82,43 @@ jobs:
               dpkg --list | grep compiler
               sudo /sbin/ldconfig -p | grep libgcc
               sudo ln -s /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/libgcc_s.so.1
-            
+              cd ./stdex
+              chmod a+rwx ./build_lib.sh
+              cd ..
+              chmod a+rwx ./build_tests.sh
+              chmod a+rwx ./run_tests.sh
+
+          - os: ubuntu-18.04
+            COMPILER: gcc
+            LINKER: gcc
+            CPP_COMPILER: g++-4.4
+            LIBRARY_PATH: $LIBRARY_PATH
+            BUILD_LIB_SCRIPT: build_lib.sh
+            BUILD_SCRIPT: build_tests.sh
+            RUN_SCRIPT: run_tests.sh
+            SETUP_SCRIPT: |
+              echo "deb     [trusted=yes] http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
+              echo "deb-src [trusted=yes] http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
+              echo "deb     [trusted=yes] http://snapshot.debian.org/archive/debian/20070730T000000Z/ lenny main" | sudo tee -a /etc/apt/sources.list
+              echo "deb-src [trusted=yes] http://snapshot.debian.org/archive/debian/20070730T000000Z/ lenny main" | sudo tee -a /etc/apt/sources.list
+              echo "deb     [trusted=yes] http://snapshot.debian.org/archive/debian-security/20070730T000000Z/ lenny/updates main" | sudo tee -a /etc/apt/sources.list
+              echo "deb-src [trusted=yes] http://snapshot.debian.org/archive/debian-security/20070730T000000Z/ lenny/updates main" | sudo tee -a /etc/apt/sources.list
+              sudo -E apt-add-repository -y "ppa:ubuntu-toolchain-r/test"
+              sudo add-apt-repository 'deb http://archive.ubuntu.com/ubuntu/ trusty main'
+              sudo add-apt-repository 'deb http://archive.ubuntu.com/ubuntu/ trusty universe'
+              sudo apt-get update
+              sudo -E apt-get -yq --no-install-suggests --no-install-recommends install g++-4.4
+              dpkg --list | grep compiler
+              #sudo /sbin/ldconfig -p | grep libgcc
+              #sudo ln -s /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/libgcc_s.so.1
+              cd ./stdex
+              chmod a+rwx ./build_lib.sh
+              cd ..
+              chmod a+rwx ./build_tests.sh
+              chmod a+rwx ./run_tests.sh      
+    
     steps:
     - uses: actions/checkout@v2
-    - run: echo ${{matrix.TARGET}}
     - name: setup enviroment
       run: ${{matrix.SETUP_SCRIPT}}
     - name: build lib
@@ -64,18 +127,73 @@ jobs:
         LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
       run: |
         cd ./stdex
-        chmod a+rwx ./build_lib.sh
-        ./build_lib.sh
+        ./${{ matrix.BUILD_LIB_SCRIPT }}
         cd ..
     - name: build tests
       env:
         COMPILER: ${{ matrix.CPP_COMPILER }}
         LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
       run: |
-        chmod a+rwx ./build_tests.sh
-        ./build_tests.sh
-        ./tests/bin/nullptr
+        ./${{ matrix.BUILD_SCRIPT }}
     - name: run tests
       run: |
-        chmod a+rwx ./run_tests.sh
-        ./run_tests.sh
+        ./${{ matrix.RUN_SCRIPT }}
+  windows:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+    
+          - os: windows-latest
+            COMPILER: cl
+            LINKER: ilink
+            CPP_COMPILER: cl
+            LIBRARY_PATH: ""
+            BUILD_LIB_SCRIPT: ~build_lib.bat
+            BUILD_SCRIPT: ~build_tests.bat
+            RUN_SCRIPT: run_tests.bat
+            SETUP_SCRIPT: |
+              set MSVS_VSVARS_PATH="C:\PROGRA~2\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
+              echo %MSVS_VSVARS_PATH%
+              if exist %MSVS_VSVARS_PATH% (
+                cd .\\stdex
+                echo call %MSVS_VSVARS_PATH% > ~build_lib.bat
+                cat build_lib.bat >> ~build_lib.bat
+                cd ..
+                echo call %MSVS_VSVARS_PATH% > ~build_tests.bat
+                cat build_tests.bat >> ~build_tests.bat
+              ) else (
+                echo "cannot find %MSVS_VSVARS_PATH%"
+                exit /B 1
+              )
+              
+    
+    steps:
+      - uses: actions/checkout@v2
+      - name: setup enviroment
+        run: |
+          git submodule update --init --recursive
+          ${{matrix.SETUP_SCRIPT}}
+        shell: cmd
+      - name: build lib
+        env:
+          COMPILER: ${{ matrix.CPP_COMPILER }}
+          LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
+        run: |
+          cd .\\stdex
+          ${{ matrix.BUILD_LIB_SCRIPT }}
+          cd ..
+        shell: cmd  
+        
+        
+      - name: build tests
+        env:
+          COMPILER: ${{ matrix.CPP_COMPILER }}
+          LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
+        run: |
+          ${{ matrix.BUILD_SCRIPT }}
+        shell: cmd
+      - name: run tests
+        run: |
+          ${{ matrix.RUN_SCRIPT }}
+        shell: cmd
