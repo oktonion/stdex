@@ -16,7 +16,7 @@ int main(void)
         typedef int (ClassType::*member5_t) (int) const;
         typedef int (ClassType::*member6_t) (float, ...);
         typedef ClassType(ClassType::*member7_t) (ClassType);
-        typedef float (ClassType::*member8_t) (int, float, int [], int&);
+        typedef float (ClassType::*member8_t) (int, float, int [], int&, ...);
 
         STATIC_ASSERT(is_member_pointer<member1_t>::value == (true), should_be_member_pointer);
         STATIC_ASSERT(is_member_pointer<member2_t>::value == (true), should_be_member_pointer);
