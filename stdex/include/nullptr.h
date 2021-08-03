@@ -62,8 +62,9 @@ namespace stdex
             template<class>
             _no_type _is_convertable_to_ptr_tester(...);
 
-            _yes_type _is_convertable_to_int_tester(int);
-            _no_type _is_convertable_to_int_tester(...);
+            template<class _Tp>
+            _yes_type _is_convertable_to_int_tester(_Tp);
+            _no_type _is_convertable_to_int_tester(void*);
 
             /*template<int> struct sfinae_true
             {
@@ -219,7 +220,7 @@ namespace stdex
                 enum _type
                 {
                     _nullptr_val = _nullptr_t_as_integral(STDEX_NULL),
-                    _max_nullptr = _nullptr_t_as_integral((_nullptr_t_as_uint(1) << (CHAR_BIT * sizeof(void*) - 1)) / 2)
+                    _max_nullptr = _nullptr_t_as_integral((_nullptr_t_as_uint(1) << (CHAR_BIT * sizeof(void*) - 2)) / 2)
                 };
 
                 typedef 

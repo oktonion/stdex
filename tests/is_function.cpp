@@ -10,6 +10,7 @@ typedef float foo2_t(int&, double);
 typedef void foo3_t(int&, bool, int, int);
 typedef int& foo4_t(int, bool, int*, int [], int, int, int, int, int);
 typedef void foo5_t(int, bool, int*, int [], ...);
+typedef void foo6_t(...);
 
 struct Test
 {
@@ -26,6 +27,7 @@ namespace stdcall_f
     typedef void _STDEX_STDCALL foo3_t(int&, bool, int, int);
     typedef int& _STDEX_STDCALL foo4_t(int, bool, int*, int [], int, int, int, int, int);
     typedef void _STDEX_STDCALL foo5_t(int, bool, int*, int [], ...);
+    typedef void _STDEX_STDCALL foo6_t(...);
 
     struct Test
     {
@@ -44,6 +46,7 @@ namespace cdecl_f
     typedef void _STDEX_CDECL foo3_t(int&, bool, int, int);
     typedef int& _STDEX_CDECL foo4_t(int, bool, int*, int [], int, int, int, int, int);
     typedef void _STDEX_CDECL foo5_t(int, bool, int*, int [], ...);
+    typedef void _STDEX_CDECL foo6_t(...);
 
     struct Test
     {
@@ -62,6 +65,7 @@ namespace fastcall_f
     typedef void _STDEX_FASTCALL foo3_t(int&, bool, int, int);
     typedef int& _STDEX_FASTCALL foo4_t(int, bool, int*, int [], int, int, int, int, int);
     typedef void _STDEX_FASTCALL foo5_t(int, bool, int*, int [], ...);
+    typedef void _STDEX_FASTCALL foo6_t(...);
 
     struct Test
     {
@@ -85,6 +89,7 @@ int main(void)
         STATIC_ASSERT(is_function<foo3_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<foo4_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<foo5_t>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<foo6_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<Test::mfunc_type>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<Test::mfunc_margs_type>::value == (true), should_be_function);
 
@@ -94,6 +99,7 @@ int main(void)
         STATIC_ASSERT(is_function<const foo3_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<const foo4_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<const foo5_t>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<const foo6_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<const Test::mfunc_type>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<const Test::mfunc_margs_type>::value == (true), should_be_function);
 
@@ -103,6 +109,7 @@ int main(void)
         STATIC_ASSERT(is_function<volatile foo3_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<volatile foo4_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<volatile foo5_t>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<volatile foo6_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<volatile Test::mfunc_type>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<volatile Test::mfunc_margs_type>::value == (true), should_be_function);
 
@@ -113,6 +120,7 @@ int main(void)
         STATIC_ASSERT(is_function<stdcall_f::foo3_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<stdcall_f::foo4_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<stdcall_f::foo5_t>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<stdcall_f::foo6_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<stdcall_f::Test::mfunc_type>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<stdcall_f::Test::mfunc_margs_type>::value == (true), should_be_function);
 #endif
@@ -124,6 +132,7 @@ int main(void)
         STATIC_ASSERT(is_function<cdecl_f::foo3_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<cdecl_f::foo4_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<cdecl_f::foo5_t>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<cdecl_f::foo6_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<cdecl_f::Test::mfunc_type>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<cdecl_f::Test::mfunc_margs_type>::value == (true), should_be_function);
 #endif
@@ -135,6 +144,7 @@ int main(void)
         STATIC_ASSERT(is_function<fastcall_f::foo3_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<fastcall_f::foo4_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<fastcall_f::foo5_t>::value == (true), should_be_function);
+        STATIC_ASSERT(is_function<fastcall_f::foo6_t>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<fastcall_f::Test::mfunc_type>::value == (true), should_be_function);
         STATIC_ASSERT(is_function<fastcall_f::Test::mfunc_margs_type>::value == (true), should_be_function);
 #endif
