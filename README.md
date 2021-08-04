@@ -180,8 +180,7 @@ In your project:
 2. link with system libraries for POSIX-threads and real-time clocks:
 
     * `librt.lib` and `libpthread.lib` for UNIX;
-    * `ntdll.lib` and [POSIX-threads lib](https://github.com/oktonion/pthread-win32 "I'm using this implementation") for Windows (if you have built stdex static library with `pthreads-win32` sources then you have no need to link with pthreads anymore - it's already in `stdex.lib`);
-    > Note: `ntdll.lib` is not present in Borland C++ Builder 6.0 Updt4 so you should make one with `coff2omf.exe` utility (located in "Borland\CBuilder6\Bin" folder) from Windows SDK/Windows Kit version of `ntdll.lib`.
+    * [POSIX-threads lib](https://github.com/oktonion/pthread-win32 "I'm using this implementation") for Windows (if you have built stdex static library with `pthreads-win32` sources then you have no need to link with pthreads anymore - it's already in `stdex.lib`);
     * `m.lib` for QNX 6.x.x;
     * `libpthread.lib` for Mac OS;
 
