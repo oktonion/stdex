@@ -200,14 +200,14 @@ call "C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\Tools\vsvars32.
 set LIB=%LIB%C:\Program Files (x86)\Windows Kits\8.1\Lib\winv6.3\um\x86\;
 set INCLUDE=%INCLUDE%;%cd%\pthread;
 cl -EHsc -Fo.\obj\main.obj -c ".\main.cpp"
-cl .\obj\main.obj stdex.lib ntdll.lib -Fe.\bin\main.exe -link -LIBPATH:.\stdex\lib
+cl .\obj\main.obj stdex.lib -Fe.\bin\main.exe -link -LIBPATH:.\stdex\lib
 ```
 
 example script build for Windows (with Borland C++ Builder 6.0 Updt4 and generated `ntdll.lib` with `coff2omf.exe`):
 
 ```bat
 bcc32 -w-inl -w-ccc -tWM -Q -n.\obj\ -I%cd%\pthread\ -c ".\main.cpp"
-bcc32 -w-inl -w-ccc -tWM -Q -L.\stdex\lib\ -lap -I%cd%\pthread\ -e.\bin\main.exe stdex.lib cw32mt.lib ntdll.lib .\obj\main.obj
+bcc32 -w-inl -w-ccc -tWM -Q -L.\stdex\lib\ -lap -I%cd%\pthread\ -e.\bin\main.exe stdex.lib cw32mt.lib .\obj\main.obj
 ```
 
 example script build for QNX 6.x.x (with `qcc` installed):
