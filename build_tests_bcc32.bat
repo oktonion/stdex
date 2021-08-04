@@ -98,7 +98,7 @@ for /f  %%f in ('dir /b ".\tests\*.cpp"') do (
   
   if !current_test_is_ok!==!true! if !has_compile_error!==!false! (
     set /A line_n=0
-    for /f "delims=" %%i in ('bcc32 -X- -w-inl -w-ccc -tWC -Q -L.\stdex\lib\ -lap -I%cd%\pthread\ -e.\tests\bin\%%~nf.exe stdex.lib cw32mt.lib ntdll.lib .\tests\obj\%%~nf.obj') do (
+    for /f "delims=" %%i in ('bcc32 -X- -w-inl -w-ccc -tWC -Q -L.\stdex\lib\ -lap -I%cd%\pthread\ -e.\tests\bin\%%~nf.exe stdex.lib cw32mt.lib .\tests\obj\%%~nf.obj') do (
       set "MYOUTPUT=!MYOUTPUT!%%i"
       set "origin_str=!MYOUTPUT!"
       set "replaced_str=!origin_str:Error E=!"
