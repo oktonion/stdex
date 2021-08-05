@@ -906,11 +906,8 @@ int main(void)
         
     }
 
-    for (size_t i = 0; i < 5; ++i)
-    {
-        DYNAMIC_VERIFY(thread::hardware_concurrency() >= 1);
-        RUN_TEST(check_for_stdex_sleep_for_accuracy);
-    }
+    DYNAMIC_VERIFY(thread::hardware_concurrency() >= 1);
+    RUN_TEST(check_for_stdex_sleep_for_accuracy);
     
     test_thread_id();
 
