@@ -4,7 +4,7 @@ build_ok=1
 exclude_warn=""
 tests_failed="unsuccessful tests:"
 build_libs="-lrt"
-compiler_options="-std=c++03"
+compiler_options="-std=c++03 -O3"
 
 $COMPILER -v
 
@@ -30,9 +30,6 @@ case "$(uname -s)" in
      echo 'MS Windows'
      compiler_options="-I./pthread/ -fms-extensions -Wno-language-extension-token"
      ;;
-
-   # Add here more strings to compare
-   # See correspondence table at the bottom of this answer
 
    *)
      echo 'other OS' 
@@ -79,8 +76,6 @@ case "$(uname -s)" in
      compiler_options="-I./pthread/ -fms-extensions -Wno-language-extension-token"
      ;;
 
-   # Add here more strings to compare
-   # See correspondence table at the bottom of this answer
 
    *) 
    compiler_options="-std=c++98"

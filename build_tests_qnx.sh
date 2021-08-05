@@ -15,7 +15,7 @@ for file in ./tests/*.cpp; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
   echo "compiling test c++03 $filename"
-  output=$(($COMPILER -pedantic $exclude_warn $file -L./stdex/lib/ -lstdex -lm -o "./tests/bin/$filename") 2>&1)
+  output=$(($COMPILER -pedantic -O3 $exclude_warn $file -L./stdex/lib/ -lstdex -lm -o "./tests/bin/$filename") 2>&1)
   if [[ $? -ne 0 ]]; then
     if [[ $filename == *"fail"* ]]; then
       echo "failed as expected"

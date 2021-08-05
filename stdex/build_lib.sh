@@ -4,7 +4,7 @@ $COMPILER --version
 
 mkdir ./obj
 build_ok=1
-compiler_options="-std=c++98"
+compiler_options="-std=c++98 -O3"
 
 case "$(uname -s)" in
 
