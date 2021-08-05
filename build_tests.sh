@@ -31,9 +31,6 @@ case "$(uname -s)" in
      compiler_options="-I./pthread/ -fms-extensions -Wno-language-extension-token"
      ;;
 
-   # Add here more strings to compare
-   # See correspondence table at the bottom of this answer
-
    *)
      echo 'other OS' 
      ;;
