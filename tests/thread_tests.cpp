@@ -796,97 +796,87 @@ int test13()
     return 0;
 }
 
-int test14()
+
+
+stdex::chrono::milliseconds standard_sleep_for_accuracy()
 {
-    #if defined(_STDEX_NATIVE_CPP11_SUPPORT) || defined(__MACH__)
+#if defined(_STDEX_NATIVE_CPP11_SUPPORT) || defined(__MACH__)
+    namespace clocks = std::chrono;
+    typedef clocks::steady_clock clock_type;
 
-    std::intmax_t std_dur, std_desired_dur;
+    clock_type::time_point begin = clock_type::now();
 
-    {
-        using namespace std;
-        using namespace std::chrono;
-        typedef std::intmax_t intmax_type;
+    std::this_thread::sleep_for(clocks::milliseconds(25000));
 
-        steady_clock::time_point start = steady_clock::now();
+    clocks::milliseconds dur_25000_ms = 
+        clocks::duration_cast<clocks::milliseconds>(clock_type::now() - begin);
 
-        stdex::this_thread::sleep_for(stdex::chrono::milliseconds(25000));
 
-        steady_clock::duration dur =
-            steady_clock::now() - start;
+    begin = clock_type::now();
 
-        intmax_type desired_dur = duration_cast<milliseconds>(dur).count();
-
-        start = steady_clock::now();
-
-        for(std::size_t i = 0; i < 100; ++i)
-        {
-            stdex::this_thread::sleep_for(stdex::chrono::milliseconds(250));
-        }
-        dur = 
-            steady_clock::now() - start;
-        std::cout << "std-measured duration is " << duration_cast<milliseconds>(dur).count() << " ms, std-measured desired is " << desired_dur << " ms; " << std::endl;
-        DYNAMIC_VERIFY(
-            desired_dur >= intmax_type(25000) ? 
-            true : 
-            (std::cout << "CONDITION: \n" << desired_dur << " >= 25000" << "\n Failed" <<  std::endl, false)
-        );
-        DYNAMIC_VERIFY(
-            duration_cast<milliseconds>(dur).count() >= intmax_type(25000) ? 
-            true : 
-            (std::cout << duration_cast<milliseconds>(dur).count() << " >= 25000" <<  std::endl, false)
-        );
-        //DYNAMIC_VERIFY(duration_cast<milliseconds>(dur).count() < desired_dur + intmax_type(2000)); // 2 sec is bullshit but better than nothing
-
-        std_dur = duration_cast<milliseconds>(dur).count();
-        std_desired_dur = desired_dur;
-    }
-    #endif
+    for(std::size_t i = 0; i < 100; ++i)
+        std::this_thread::sleep_for(clocks::milliseconds(250));
     
-    {   
-        using namespace stdex;
-        using namespace stdex::chrono;
-        typedef stdex::intmax_t intmax_type;
+    clocks::milliseconds dur_250x100_ms = 
+        clocks::duration_cast<clocks::milliseconds>(clock_type::now() - begin);
+    
+    return (dur_250x100_ms - dur_25000_ms).count();
+#else
+    return 1500;
+#endif
+}
 
-        steady_clock::time_point start = steady_clock::now();
+stdex::chrono::milliseconds stdex_sleep_for_accuracy()
+{
+#if defined(_STDEX_NATIVE_CPP11_SUPPORT) || defined(__MACH__)
+    namespace clocks = std::chrono;
+#else
+    namespace clocks = stdex::chrono;
+#endif
+    typedef clocks::steady_clock clock_type;
 
-        this_thread::sleep_for(milliseconds(25000));
+    clock_type::time_point begin = clock_type::now();
 
-        steady_clock::duration dur = 
-            steady_clock::now() - start;
+    stdex::this_thread::sleep_for(stdex::chrono::milliseconds(25000));
 
-        intmax_type desired_dur = duration_cast<milliseconds>(dur).count();
+    clocks::milliseconds dur_25000_ms = 
+        clocks::duration_cast<clocks::milliseconds>(clock_type::now() - begin);
 
-        start = steady_clock::now();
 
-        for(std::size_t i = 0; i < 100; ++i)
-        {
-            this_thread::sleep_for(milliseconds(250));
-        }
-        dur = 
-            steady_clock::now() - start;
-        std::cout << "duration is " << duration_cast<milliseconds>(dur).count() << " ms, desired is " << desired_dur << " ms; " << std::endl;
+    begin = clock_type::now();
 
-        static intmax_type treshold = 3500; // 2.5 sec is bullshit but better than nothing
-        #if defined(_STDEX_NATIVE_CPP11_SUPPORT) || defined(__MACH__)
-        std::cout << "std::duration is " << std_dur << " ms, stdex::duration is " << duration_cast<milliseconds>(dur).count() << " ms; " << std::endl;
-        std::cout << "std::desired is " << std_desired_dur << " ms, stdex::desired is " << desired_dur << " ms; " << std::endl;
-        intmax_type std_treshold = (std_dur - std_desired_dur);
-        std_treshold = ((std_treshold < 0) ? -std_treshold : std_treshold);
-        treshold = std_treshold > treshold ? (std_treshold + 100) : treshold ;
-        #endif
+    for(std::size_t i = 0; i < 100; ++i)
+        stdex::this_thread::sleep_for(stdex::chrono::milliseconds(250));
+    
+    clocks::milliseconds dur_250x100_ms = 
+        clocks::duration_cast<clocks::milliseconds>(clock_type::now() - begin);
+    
+    return (dur_250x100_ms - dur_25000_ms).count();
+}
 
-        DYNAMIC_VERIFY(desired_dur >= intmax_type(25000));
-        DYNAMIC_VERIFY(
-            duration_cast<milliseconds>(dur).count() >= intmax_type(25000) ? 
-                true : 
-                (std::cout << "CONDITION: \n" << duration_cast<milliseconds>(dur).count() << " >= 25000" << "\n Failed" <<  std::endl, false)
-        );
-        DYNAMIC_VERIFY(
-            duration_cast<milliseconds>(dur).count() < desired_dur + treshold ? 
+int check_stdex__sleep_for__accuracy()
+{
+    stdex::chrono::milliseconds 
+        average_std_sleep_for_acc,
+        average_stdex_sleep_for_acc;
+
+    const std::size_t avrg_n = 5;
+
+    for(std::size_t i = 0; i < avrg_n; ++i)
+        average_std_sleep_for_acc += standard_sleep_for_accuracy();
+    
+    average_std_sleep_for_acc /= avrg_n;
+
+    for(std::size_t i = 0; i < avrg_n; ++i)
+        average_stdex_sleep_for_acc += stdex_sleep_for_accuracy();
+    
+    average_stdex_sleep_for_acc /= avrg_n;
+
+    DYNAMIC_VERIFY(
+        (average_stdex_sleep_for_acc.count() <=  (average_std_sleep_for_acc.count() + 100)) ? 
             true : 
-            (std::cout << "CONDITION: \n" << duration_cast<milliseconds>(dur).count() << " >= " << desired_dur << " + " << treshold << "\n Failed" <<  std::endl, false)
-        ); 
-    }
+            (std::cout << "CONDITION: \n" << average_stdex_sleep_for_acc.count() << " <= " << average_std_sleep_for_acc.count() << " + 100" << "\n Failed" <<  std::endl, false)
+    );
 
     return 0;
 }
@@ -916,11 +906,8 @@ int main(void)
         
     }
 
-    for (size_t i = 0; i < 5; ++i)
-    {
-        DYNAMIC_VERIFY(thread::hardware_concurrency() >= 1);
-        RUN_TEST(test14);
-    }
+    DYNAMIC_VERIFY(thread::hardware_concurrency() >= 1);
+    RUN_TEST(check_stdex__sleep_for__accuracy);
     
     test_thread_id();
 
