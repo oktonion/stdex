@@ -4,7 +4,7 @@ build_ok=1
 exclude_warn=""
 tests_failed="unsuccessful tests:"
 build_libs="-lrt"
-compiler_options="-std=c++03"
+compiler_options="-std=c++03 -O3"
 
 $COMPILER -v
 
