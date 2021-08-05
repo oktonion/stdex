@@ -14,7 +14,7 @@ for file in ./src/*.cpp; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
   echo "compiling $filename"
-  if $COMPILER -ftemplate-depth-900 -pedantic $exclude_warn -lstdlib -c "$file" -o "./obj/$filename.o"; then
+  if $COMPILER -ftemplate-depth-900 -O3 -pedantic $exclude_warn -lstdlib -c "$file" -o "./obj/$filename.o"; then
     echo ""
   else
     build_ok=0
