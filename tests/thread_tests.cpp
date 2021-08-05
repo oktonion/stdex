@@ -854,7 +854,7 @@ stdex::chrono::milliseconds stdex_sleep_for_accuracy()
     return (dur_250x100_ms - dur_25000_ms).count();
 }
 
-int check_for_stdex_sleep_for_accuracy()
+int check_stdex__sleep_for__accuracy()
 {
     stdex::chrono::milliseconds 
         average_std_sleep_for_acc,
