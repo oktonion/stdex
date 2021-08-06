@@ -4,6 +4,30 @@ All notable changes to stdex library project will be documented in this file.
 
 visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library
 
+## [0.2.11] - 2021-XX-XX
+
+### Added
+
+- something
+
+### Removed
+
+- something
+
+### Changed
+
+- something
+
+### Fixed
+
+- something
+
+### Working on
+
+- **futures** implementation
+- **move semantics** emulation
+- **function** implementation
+
 ## [0.2.10] - 2021-08-06
 
 ### Added
