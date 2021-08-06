@@ -4,21 +4,30 @@ All notable changes to stdex library project will be documented in this file.
 
 visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library
 
-## [0.2.10] - 2021-XX-XX
+## [0.2.10] - 2021-08-06
 
-### Added
+### Removed
 
-- something
+- extra headers includes
 
 ### Changed
 
-- something
+- pthreads library for windows to latest version
+- checks for `nullptr` be compatible with `NULL` provided by compiler
 
 ### Fixed
 
 - some warnings for GCC
 - comparison detection for int type nullptr emulation
 - nullptr as enum implementation with valid sizeof(enum) == sizeof(void*)
+- Visual Studio 2015 bug for `stdex::is_member_pointer` detection 
+- `nullptr` feature detection
+
+### Working on
+
+- **futures** implementation
+- **move semantics** emulation
+- **function** implementation
 
 ## [0.2.9] - 2021-03-26
 
