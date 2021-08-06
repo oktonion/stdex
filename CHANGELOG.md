@@ -6,6 +6,10 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 ## [0.2.10] - 2021-08-06
 
+### Added
+
+- GitHub actions as main CI pipeline for tests
+
 ### Removed
 
 - extra headers includes
