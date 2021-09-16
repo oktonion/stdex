@@ -1,5 +1,6 @@
 name: Coverage report
-on: [push]
+  push:
+    branches: [ tests ]
 jobs:
   run:
     runs-on: ${{ matrix.os }}
