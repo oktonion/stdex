@@ -1,0 +1,63 @@
+name: Coverage report
+on: [push]
+jobs:
+  run:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            TARGET: armv7-unknown-linux-musleabihf
+            COMPILER: arm-linux-gnueabihf-gcc-5
+            LINKER: gcc-5-arm-linux-gnueabihf
+            LIBRARY_PATH: $LIBRARY_PATH
+            CPP_COMPILER: g++
+            BUILD_LIB_SCRIPT: build_lib.sh
+            BUILD_SCRIPT: build_tests.sh
+            RUN_SCRIPT: run_tests.sh
+            SETUP_SCRIPT: |
+              cd ./stdex
+              chmod a+rwx ./build_lib.sh
+              cd ..
+              chmod a+rwx ./build_tests.sh
+              chmod a+rwx ./run_tests.sh
+    env:
+      OS: ${{ matrix.os }}
+      PYTHON: '3.7'
+    steps:
+    - uses: actions/checkout@master
+    - name: setup enviroment
+      run: ${{matrix.SETUP_SCRIPT}}
+    - name: build lib
+      env:
+        COMPILER: ${{ matrix.CPP_COMPILER }}
+        LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
+      run: |
+        cd ./stdex
+        ./${{ matrix.BUILD_LIB_SCRIPT }}
+        cd ..
+    - name: build tests
+      env:
+        COMPILER: ${{ matrix.CPP_COMPILER }}
+        LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
+      run: |
+        ./${{ matrix.BUILD_SCRIPT }}
+    - name: run tests
+      run: |
+        ./${{ matrix.RUN_SCRIPT }}
+    - name: Setup Python
+      uses: actions/setup-python@master
+      with:
+        python-version: 3.7
+    - name: Generate coverage report
+      run: |
+        chmod +x ./get_code_cov.sh
+        ./get_code_cov.sh
+    - name: Upload coverage to Codecov
+      uses: codecov/codecov-action@v2
+      with:
+        directory: ./tests/bin/
+        env_vars: OS,PYTHON
+        fail_ci_if_error: true
+        path_to_write_report: ./coverage/codecov_report.txt
+        verbose: true
