@@ -45,6 +45,8 @@ jobs:
       env:
         COMPILER: ${{ matrix.CPP_COMPILER }}
         LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
+        CODE_COVERAGE_FLAGS: --coverage -fprofile-arcs -ftest-coverage
+        CODE_COVERAGE_LIBS: -lgcov
       run: |
         ./${{ matrix.BUILD_SCRIPT }}
     - name: run tests
