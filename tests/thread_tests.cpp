@@ -780,7 +780,7 @@ int test13()
             static_cast<void*>(&wild_ptr[0]));
         tt.join();
     }
-    return 0; // disable current test for now till <functional.hpp> is ready
+#ifdef _STDEX_FUNCTIONAL_H // disable current test for now till <functional.hpp> is ready
     {
         // for some reason GCC can not use local class as functor for templated thread constructor
         // so we have to improvise
@@ -793,7 +793,8 @@ int test13()
         thread tt2(ff, int(1), long(2), std::ptrdiff_t(3), short(4), (unsigned int)(5), (unsigned long)(6), (unsigned short)(7));
         tt2.join();
     }
-    
+#endif
+
     return 0;
 }
 
