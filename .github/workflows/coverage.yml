@@ -35,6 +35,8 @@ jobs:
       env:
         COMPILER: ${{ matrix.CPP_COMPILER }}
         LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
+        CODE_COVERAGE_FLAGS: --coverage -fprofile-arcs -ftest-coverage
+        CODE_COVERAGE_LIBS: -lgcov
       run: |
         cd ./stdex
         ./${{ matrix.BUILD_LIB_SCRIPT }}
