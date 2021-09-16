@@ -1,4 +1,6 @@
 name: Coverage report
+
+on:
   push:
     branches: [ tests ]
 jobs:
