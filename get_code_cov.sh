@@ -4,10 +4,16 @@
  # gcov -n -o ./tests/bin/ $filename > /dev/null; 
 #done
 
-#cp *.gcda ./tests/bin/
-#cp *.gcno ./tests/bin/
 
 
-for file in ./tests/bin/*; do
+mkdir ./tests/tmp
+
+cp ./tests/bin/* ./tests/tmp/
+cp *.gcda ./tests/bin/
+cp *.gcno ./tests/bin/
+
+cd ./tests/bin/
+
+for file in ./../../tests/tmp/*; do
     gcov -abcfu ./$file.gcda
 done
