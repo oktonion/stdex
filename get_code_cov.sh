@@ -4,6 +4,8 @@
  # gcov -n -o ./tests/bin/ $filename > /dev/null; 
 #done
 
+ls ./tests/bin/
+
 for file in ./tests/bin/*; do
     gcov -abcfu $file.gcda
 done
