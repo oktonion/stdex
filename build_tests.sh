@@ -89,6 +89,8 @@ else
   compiler_options="-std=c++98 -g"
 fi
 
+rm ./tests/bin/*
+
 tests_failed="failed tests for c++98:"
 
 for file in ./tests/*.cpp; do
