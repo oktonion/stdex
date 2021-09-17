@@ -3,8 +3,10 @@
 #do 
  # gcov -n -o ./tests/bin/ $filename > /dev/null; 
 #done
-ls
-ls ./tests/bin/
+
+cp *.gcda ./tests/bin/
+cp *.gcno ./tests/bin/
+
 
 for file in ./tests/bin/*; do
     gcov -abcfu $file.gcda
