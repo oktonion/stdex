@@ -6,6 +6,13 @@ mkdir ./obj
 build_ok=1
 compiler_options="-std=c++98 -O3"
 
+if [ -z ${CODE_COVERAGE_LIBS+x} ]; then
+  echo "c++98 build"
+else
+  echo "c++98 coverage build"
+  compiler_options="-std=c++98 -g"
+fi
+
 case "$(uname -s)" in
 
    Darwin)
