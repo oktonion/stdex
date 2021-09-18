@@ -79,6 +79,18 @@ int test4()
   return 0;
 }
 
+int test5()
+{
+  stdex::error_category &c1 = *(new test_category());
+
+  DYNAMIC_VERIFY( !(c1 != c1) );
+  DYNAMIC_VERIFY( c1 == c1 );
+
+  delete &c1;
+
+  return 0;
+}
+
 int main(void)
 {
     using namespace stdex;
@@ -87,6 +99,7 @@ int main(void)
     RUN_TEST(test2);
     RUN_TEST(test3);
     RUN_TEST(test4);
+    RUN_TEST(test5);
 
     return 0;
 }

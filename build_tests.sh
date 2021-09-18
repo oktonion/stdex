@@ -78,9 +78,18 @@ case "$(uname -s)" in
 
 
    *) 
-   compiler_options="-std=c++98"
+   compiler_options="-std=c++98 -O3"
      ;;
 esac
+
+if [ -z ${CODE_COVERAGE_LIBS+x} ]; then
+  echo "c++98 build"
+else
+  echo "c++98 coverage build"
+  compiler_options="-std=c++98 -g -O0"
+fi
+
+rm ./tests/bin/*
 
 tests_failed="failed tests for c++98:"
 
