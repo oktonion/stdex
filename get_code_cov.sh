@@ -15,5 +15,6 @@ cp *.gcno ./tests/bin/
 cd ./tests/bin/
 
 for file in ./../../tests/tmp/*; do
-    gcov -abcfu ./$file.gcda
+    fname="$(basename -- $file)"
+    gcov -abcfu ./$fname.gcda
 done
