@@ -75,6 +75,7 @@ int test4()
     {
         error_condition e;
         int i = e; // error "cannot convert"
+        (void)(i);
     }
 
     return 0;

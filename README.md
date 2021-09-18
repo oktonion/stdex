@@ -1,9 +1,9 @@
 ### CI Status and tests coverage
 
-Branch   | Travis | Appveyor| Github  | Codecov
----------|--------|---------|---------|---------
-tests (development)    | [![Build Status](https://www.travis-ci.com/oktonion/stdex.svg?branch=tests)](https://www.travis-ci.com/github/oktonion/stdex) | [![Build Status](https://ci.appveyor.com/api/projects/status/hu8800gu31xldj25?svg=true)](https://ci.appveyor.com/project/oktonion/stdex) | [![C/C++ CI](https://github.com/oktonion/stdex/actions/workflows/c-cpp.yml/badge.svg?branch=tests)](https://github.com/oktonion/stdex/actions/workflows/c-cpp.yml)| [![codecov](https://codecov.io/gh/oktonion/stdex/branch/tests/graph/badge.svg)](https://codecov.io/gh/oktonion/stdex/branch/tests)
-master   | [![Build Status](https://www.travis-ci.com/oktonion/stdex.svg?branch=master)](https://www.travis-ci.com/github/oktonion/stdex) | [![Build Status](https://ci.appveyor.com/api/projects/status/3c53qm34v1j37hy5/branch/master?svg=true)](https://ci.appveyor.com/project/oktonion/stdex-a309e/branch/master) | [![C/C++ CI](https://github.com/oktonion/stdex/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/oktonion/stdex/actions/workflows/c-cpp.yml) | [![codecov](https://codecov.io/gh/oktonion/stdex/branch/tests/graph/badge.svg)](https://codecov.io/gh/oktonion/stdex)
+Branch   | Appveyor| Github  | Codecov
+---------|---------|---------|---------
+tests (development)    | [![Build Status](https://ci.appveyor.com/api/projects/status/hu8800gu31xldj25?svg=true)](https://ci.appveyor.com/project/oktonion/stdex) | [![C/C++ CI](https://github.com/oktonion/stdex/actions/workflows/c-cpp.yml/badge.svg?branch=tests)](https://github.com/oktonion/stdex/actions/workflows/c-cpp.yml)| [![codecov](https://codecov.io/gh/oktonion/stdex/branch/tests/graph/badge.svg)](https://codecov.io/gh/oktonion/stdex/branch/tests)
+master   | [![Build Status](https://ci.appveyor.com/api/projects/status/3c53qm34v1j37hy5/branch/master?svg=true)](https://ci.appveyor.com/project/oktonion/stdex-a309e/branch/master) | [![C/C++ CI](https://github.com/oktonion/stdex/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/oktonion/stdex/actions/workflows/c-cpp.yml) | [![codecov](https://codecov.io/gh/oktonion/stdex/branch/tests/graph/badge.svg)](https://codecov.io/gh/oktonion/stdex)
 
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/oktonion/stdex.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/oktonion/stdex/context:cpp) | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b74b5f48d04641de81c8c76e3fc26f90)](https://www.codacy.com/app/oktonion/stdex?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=oktonion/stdex&amp;utm_campaign=Badge_Grade)
 
