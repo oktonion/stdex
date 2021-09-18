@@ -12,9 +12,7 @@ cp ./tests/bin/* ./tests/tmp/
 cp *.gcda ./tests/bin/
 cp *.gcno ./tests/bin/
 
-cd ./tests/bin/
-
-for file in ./../../tests/tmp/*; do
+for file in ./tests/tmp/*; do
     fname="$(basename -- $file)"
-    gcov -abcfu ./$fname.gcda
+    gcov -abcfu ./tests/bin/$fname.gcda
 done
