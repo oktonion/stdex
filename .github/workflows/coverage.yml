@@ -9,26 +9,15 @@ jobs:
     strategy:
       matrix:
         include:
-          - os: ubuntu-18.04
+          - os: ubuntu-latest
             COMPILER: gcc
             LINKER: gcc
-            CPP_COMPILER: g++-3.4
-            LIBRARY_PATH: /usr/lib/x86_64-linux-gnu:$LIBRARY_PATH
+            CPP_COMPILER: g++
+            LIBRARY_PATH: $LIBRARY_PATH
             BUILD_LIB_SCRIPT: build_lib.sh
             BUILD_SCRIPT: build_tests.sh
             RUN_SCRIPT: run_tests.sh
             SETUP_SCRIPT: |
-              echo "deb     [trusted=yes] http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
-              echo "deb-src [trusted=yes] http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
-              #echo "deb     http://snapshot.debian.org/archive/debian/20070730T000000Z/ lenny main" | sudo tee -a /etc/apt/sources.list
-              #echo "deb-src http://snapshot.debian.org/archive/debian/20070730T000000Z/ lenny main" | sudo tee -a /etc/apt/sources.list
-              #echo "deb     http://snapshot.debian.org/archive/debian-security/20070730T000000Z/ lenny/updates main" | sudo tee -a /etc/apt/sources.list
-              #echo "deb-src http://snapshot.debian.org/archive/debian-security/20070730T000000Z/ lenny/updates main" | sudo tee -a /etc/apt/sources.list
-              sudo apt-get update
-              sudo -E apt-get -yq --no-install-suggests --no-install-recommends install gcc-3.4 g++-3.4 gcc-multilib g++-multilib
-              dpkg --list | grep compiler
-              sudo /sbin/ldconfig -p | grep libgcc
-              sudo ln -s /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/libgcc_s.so.1
               cd ./stdex
               chmod a+rwx ./build_lib.sh
               cd ..
