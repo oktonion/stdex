@@ -1845,12 +1845,13 @@ namespace stdex
         //! Default constructor.
         //! Construct a @c thread object without an associated thread of execution
         //! (i.e. non-joinable).
-        thread() _STDEX_NOEXCEPT_FUNCTION:
-            _handle() 
+        thread() _STDEX_NOEXCEPT_FUNCTION
+            : _handle() 
         { }
 
         template<class _FuncT>
         explicit thread(_FuncT fx)
+            : _handle() 
         {
             typedef typename detail::_thread_args_helper<0>::arguments_type args_t;
             typedef _FuncT func_t;
@@ -1859,6 +1860,7 @@ namespace stdex
 
         template<class _FuncT, class _Arg0T>
         explicit thread(_FuncT fx, _Arg0T t0)
+            : _handle() 
         {
             typedef typename detail::_thread_args_helper<1, _Arg0T>::arguments_type args_t;
             typedef _FuncT func_t;
@@ -1867,6 +1869,7 @@ namespace stdex
 
         template<class _FuncT, class _Arg0T, class _Arg1T>
         explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1)
+            : _handle() 
         {
             typedef typename detail::_thread_args_helper<2, _Arg0T, _Arg1T>::arguments_type args_t;
             typedef _FuncT func_t;
@@ -1875,6 +1878,7 @@ namespace stdex
 
         template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T>
         explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2)
+            : _handle() 
         {
             typedef typename detail::_thread_args_helper<3, _Arg0T, _Arg1T, _Arg2T>::arguments_type args_t;
             typedef _FuncT func_t;
@@ -1883,6 +1887,7 @@ namespace stdex
 
         template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T, class _Arg3T>
         explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2, _Arg3T t3)
+            : _handle() 
         {
             typedef typename detail::_thread_args_helper<4, _Arg0T, _Arg1T, _Arg2T, _Arg3T>::arguments_type args_t;
             typedef _FuncT func_t;
@@ -1891,6 +1896,7 @@ namespace stdex
 
         template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T, class _Arg3T, class _Arg4T>
         explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2, _Arg3T t3, _Arg4T t4)
+            : _handle() 
         {
             typedef typename detail::_thread_args_helper<5, _Arg0T, _Arg1T, _Arg2T, _Arg3T, _Arg4T>::arguments_type args_t;
             typedef _FuncT func_t;
@@ -1899,6 +1905,7 @@ namespace stdex
 
         template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T, class _Arg3T, class _Arg4T, class _Arg5T>
         explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2, _Arg3T t3, _Arg4T t4, _Arg5T t5)
+            : _handle() 
         {
             typedef typename detail::_thread_args_helper<6, _Arg0T, _Arg1T, _Arg2T, _Arg3T, _Arg4T, _Arg5T>::arguments_type args_t;
             typedef _FuncT func_t;
@@ -1907,6 +1914,7 @@ namespace stdex
 
         template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T, class _Arg3T, class _Arg4T, class _Arg5T, class _Arg6T>
         explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2, _Arg3T t3, _Arg4T t4, _Arg5T t5, _Arg6T t6)
+            : _handle() 
         {
             typedef typename detail::_thread_args_helper<7, _Arg0T, _Arg1T, _Arg2T, _Arg3T, _Arg4T, _Arg5T, _Arg6T>::arguments_type args_t;
             typedef _FuncT func_t;
@@ -1915,6 +1923,7 @@ namespace stdex
 
         template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T, class _Arg3T, class _Arg4T, class _Arg5T, class _Arg6T, class _Arg7T>
         explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2, _Arg3T t3, _Arg4T t4, _Arg5T t5, _Arg6T t6, _Arg7T t7)
+            : _handle() 
         {
             typedef typename detail::_thread_args_helper<8, _Arg0T, _Arg1T, _Arg2T, _Arg3T, _Arg4T, _Arg5T, _Arg6T, _Arg7T>::arguments_type args_t;
             typedef _FuncT func_t;
