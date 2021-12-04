@@ -904,7 +904,7 @@ int main(void)
         //RUN_TEST(test10);
         //RUN_TEST(test11);
         //RUN_TEST(test12);
-        //RUN_TEST(test13);
+        RUN_TEST(test13);
         
     }
 
