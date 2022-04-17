@@ -874,7 +874,7 @@ int check_stdex__sleep_for__accuracy()
     
     average_stdex_sleep_for_acc /= avrg_n;
     std::size_t acceptable_delta = 
-        average_std_sleep_for_acc.count()*0.1;
+        average_std_sleep_for_acc.count()*0.95;
 
     DYNAMIC_VERIFY(
         (average_stdex_sleep_for_acc.count() <=  (average_std_sleep_for_acc.count() + acceptable_delta)) ? 
