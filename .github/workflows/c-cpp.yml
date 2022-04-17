@@ -155,7 +155,7 @@ jobs:
             SETUP_SCRIPT: |
               if exist "C:\PROGRA~1\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat" (
                 set MSVS_VSVARS_PATH="C:\PROGRA~1\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
-              ) elif exist "C:\PROGRA~2\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat" (
+              ) else if exist "C:\PROGRA~2\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat" (
                 set MSVS_VSVARS_PATH="C:\PROGRA~2\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
               ) else (
                 echo "cannot find %MSVS_VSVARS_PATH%"
