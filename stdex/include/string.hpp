@@ -124,6 +124,7 @@ namespace stdex
             using std_cpp11::wcstoull;
             using std_cpp11::strtold;
             using std_cpp11::wcstold;
+            using std_cpp11::snprintf;
 
             struct _strtoll_present
             {
@@ -310,9 +311,9 @@ namespace stdex
 
         template<class _ArgT>
         inline
-        void _sprintf4_std_impl(char* buffer, std::size_t, const char* format, _ArgT arg)
+        void _sprintf4_std_impl(char* buffer, std::size_t len, const char* format, _ArgT arg)
         {
-            _swprintf_impl<_has_4arg_swprintf::value>::call(ws, len, format, arg);
+            _sprintf_impl<string_detail::_snprintf_present::value>::call(buffer, len, format, arg);
         }
 
         template<>
