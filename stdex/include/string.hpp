@@ -111,11 +111,6 @@ namespace stdex
 
             _yes_type _wcstold_tester(_wcstold_type);
             _no_type _wcstold_tester(...);
-
-            typedef int(*_snprintf_type)(char* buffer, std::size_t buf_size, const char* format, ...);
-
-            _yes_type _snprintf_tester(_snprintf_type);
-            _no_type _snprintf_tester(...);
             
 
             using std_cpp11::strtoll;
@@ -175,7 +170,9 @@ namespace stdex
             struct _has_4arg_snprintf
             {
                 static const bool value = 
-                    sizeof(_has_4arg_snprintf_tester(snprintf(_declptr<char>(), 42, _declptr<char>(), 0 ))) == sizeof(_yes_type);
+                    sizeof(_has_4arg_snprintf_tester(
+                            snprintf(_declptr<char>(), *_declptr<std::size_t>(), _declptr<const char>(), 0 )
+                        )) == sizeof(_yes_type);
             };
 
         }
@@ -306,7 +303,7 @@ namespace stdex
         };
 
         template<>
-        struct _sprintf_impl<true>
+        struct _sprintf_impl<false>
         {
             template<class _ArgT>
             static int call(char* buffer, std::size_t, const char* format, _ArgT arg)
