@@ -301,6 +301,7 @@ namespace stdex
             static int call(char* buffer, std::size_t buf_size, const char* format, _ArgT arg)
             {
                 using namespace std;
+                using string_detail::std_cpp11::snprintf;
                 return snprintf(buffer, buf_size, format, arg);
             }
         };
