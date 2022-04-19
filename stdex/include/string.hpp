@@ -61,7 +61,7 @@ namespace stdex
                     void strtold(); // dummy
                     void wcstold(); // dummy
                     float swprintf(...);
-                    int snprintf(...); 
+                    float snprintf(...); 
                 }
                 using namespace std;
                 using namespace std_dummy;
@@ -124,7 +124,7 @@ namespace stdex
             using std_cpp11::wcstoull;
             using std_cpp11::strtold;
             using std_cpp11::wcstold;
-            using std_cpp11::snprintf;
+           
 
             struct _strtoll_present
             {
@@ -156,11 +156,6 @@ namespace stdex
                 static const bool value = sizeof(_wcstold_tester(&wcstold)) == sizeof(_yes_type);
             };
 
-            struct _snprintf_present
-            {
-                static const bool value = sizeof(_snprintf_tester(&snprintf)) == sizeof(_yes_type);
-            };
-
             using std_cpp11::swprintf;
 
             _yes_type _has_4arg_swprintf_tester(int);
@@ -171,6 +166,18 @@ namespace stdex
                 static const bool value = 
                     sizeof(_has_4arg_swprintf_tester(swprintf(_declptr<wchar_t>(), 42, _declptr<wchar_t>(), 0 ))) == sizeof(_yes_type);
             };
+
+            using std_cpp11::snprintf;
+
+            _yes_type _has_4arg_snprintf_tester(int);
+            _no_type _has_4arg_snprintf_tester(float);
+
+            struct _has_4arg_snprintf
+            {
+                static const bool value = 
+                    sizeof(_has_4arg_snprintf_tester(snprintf(_declptr<char>(), 42, _declptr<char>(), 0 ))) == sizeof(_yes_type);
+            };
+
         }
 
         template<bool _IsSigned>
@@ -313,7 +320,7 @@ namespace stdex
         inline
         void _sprintf4_std_impl(char* buffer, std::size_t len, const char* format, _ArgT arg)
         {
-            _sprintf_impl<string_detail::_snprintf_present::value>::call(buffer, len, format, arg);
+            _sprintf_impl<string_detail::_has_4arg_snprintf::value>::call(buffer, len, format, arg);
         }
 
         template<>
