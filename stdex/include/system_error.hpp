@@ -13,9 +13,25 @@
 
 // std includes
 
+#ifndef __STDC_WANT_LIB_EXT1__
+#define _STDEX_DEFINES_STDC_WANT_LIB_EXT1__
+#define __STDC_WANT_LIB_EXT1__ 1
+#else
+#define __STDC_WANT_LIB_EXT1__ 1
+#endif
+// As with all bounds-checked functions, strerror_s and strerrorlen_s are only guaranteed to be available 
+// if __STDC_LIB_EXT1__ is defined by the implementation and 
+// if the user defines __STDC_WANT_LIB_EXT1__ to the integer constant 1 before including string.h.
+#include <string.h>
+
+#ifdef _STDEX_DEFINES_STDC_WANT_LIB_EXT1__
+#undef _STDEX_DEFINES_STDC_WANT_LIB_EXT1__
+#undef __STDC_WANT_LIB_EXT1__
+#endif
+
 #include <errno.h>
 #include <cerrno>
-#include <cstdlib>        // std::strerror
+#include <cstdlib>        // std::strerror 
 #include <cstring>        // std::strerror
 #include <stdexcept>    // std::runtime_error
 #include <string>         // std::string
@@ -1118,6 +1134,7 @@ namespace stdex
     {
         namespace system_error_detail
         {
+
             static const char* _unknown_error()
             {return "unknown error";}
 
@@ -1135,7 +1152,6 @@ namespace stdex
                 }
             };
 
-#ifdef __STDC_WANT_LIB_EXT1__
             template<class _DummyT>
             struct strerror_impl_helper<true, _DummyT>
             {
@@ -1162,19 +1178,18 @@ namespace stdex
                 }
             };
 
-#endif
-            struct has_safe_strerror
+            struct _has_safe_strerror
             {
                 static const bool value =
-#ifndef __STDC_WANT_LIB_EXT1__
-                    false;
-#else
+#if ( defined(__STDC_WANT_LIB_EXT1__) || (defined(_MSC_VER) && __STDC_WANT_SECURE_LIB__ == 1) )
                     true;
+#else
+                    false;
 #endif
             };
 
             struct strerror_impl:
-                strerror_impl_helper<has_safe_strerror::value, int>
+                strerror_impl_helper<_has_safe_strerror::value, int>
             { };
 
             static inline std::string _strerror(int _errnum)
