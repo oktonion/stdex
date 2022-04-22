@@ -1188,7 +1188,7 @@ make_utc_tm(stdex::chrono::system_clock::time_point tp)
     result.tm_year = static_cast<int>(civ_date.year) - 1900;
     result.tm_mon = static_cast<int>(civ_date.month) - 1;
     result.tm_mday = static_cast<int>(civ_date.day);
-    result.tm_wday = weekday_from_days(d.count());
+    result.tm_wday = static_cast<int>( weekday_from_days(d.count()) );
     result.tm_yday = static_cast<int>( d.count() - days_from_civil(civ_date.year, 1, 1) );
     // Fill in the time
     result.tm_hour = static_cast<int>( duration_cast<hours>(t).count() );
