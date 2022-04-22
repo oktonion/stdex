@@ -1138,7 +1138,7 @@ namespace stdex
             static const char* _unknown_error()
             {return "unknown error";}
 
-            template<bool, class _DummyT>
+            template<bool, bool, class _DummyT>
             struct strerror_impl_helper
             {
                 static std::string call(_DummyT _Errcode)
@@ -1153,7 +1153,7 @@ namespace stdex
             };
 
             template<class _DummyT>
-            struct strerror_impl_helper<true, _DummyT>
+            struct strerror_impl_helper<true, true, _DummyT>
             {
                 static std::string call(_DummyT _Errcode)
                 {
@@ -1162,7 +1162,7 @@ namespace stdex
                     std::string result;
 
                     size_t len = ::strerrorlen_s(_Errcode);
-                    if(len)
+                    if (len)
                     {
                         struct _RAII{
                             char *buf;
@@ -1178,10 +1178,35 @@ namespace stdex
                 }
             };
 
-            struct _has_safe_strerror
+            template<class _DummyT>
+            struct strerror_impl_helper<true, false, _DummyT>
+            { // MS specific
+                static std::string call(_DummyT _Errcode)
+                {                    
+                    std::string result;
+
+                    char buf[2048] = {0};
+
+                    if(0 == ::strerror_s(buf, sizeof(buf), _Errcode))
+                        result = buf;
+                    return result;
+                }
+            };
+
+            struct _has_strerror_s
             {
                 static const bool value =
 #if ( defined(__STDC_WANT_LIB_EXT1__) || (defined(_MSC_VER) && __STDC_WANT_SECURE_LIB__ == 1) )
+                    true;
+#else
+                    false;
+#endif
+            };
+
+            struct _has_strerrorlen_s
+            {
+                static const bool value =
+#if defined(__STDC_WANT_LIB_EXT1__)
                     true;
 #else
                     false;
