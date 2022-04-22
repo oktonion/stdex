@@ -14,11 +14,15 @@
 // std includes
 
 
+#ifdef __STDC_WANT_LIB_EXT1__
+
 #define __STDC_WANT_LIB_EXT1__ 1
 // As with all bounds-checked functions, strerror_s and strerrorlen_s are only guaranteed to be available 
 // if __STDC_LIB_EXT1__ is defined by the implementation and 
 // if the user defines __STDC_WANT_LIB_EXT1__ to the integer constant 1 before including string.h.
 #include <string.h>
+
+#endif
 
 #include <errno.h>
 #include <cerrno>
@@ -27,6 +31,7 @@
 #include <stdexcept>    // std::runtime_error
 #include <string>         // std::string
 #include <functional>
+
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
@@ -1125,38 +1130,53 @@ namespace stdex
     {
         namespace system_error_detail
         {
+            template<bool, class>
             struct _has_conforming_strerror_s;
             struct _has_nonconforming_strerror_s;
             struct _has_conforming_strerrorlen_s;
-        }
-    }
+        } // namespace system_error_detail
+    } // namespace detail
 } // namespace stdex
 
-namespace 
+
+#ifndef _STDEX_NATIVE_CPP11_SUPPORT
+namespace stdex
 {
-    // we need all this mess at global namespace
-    // to detect if following C-functions are defined or not
-    class strerror_s
+    namespace detail
     {
-        typedef int return_type; // would be errno_t fo C
-        char buf[sizeof(return_type) * 14];
-        strerror_s(...);
-        operator return_type();
+        namespace system_error_detail
+        {
+#endif
 
-        friend struct stdex::detail::system_error_detail::_has_conforming_strerror_s;
-        friend struct stdex::detail::system_error_detail::_has_nonconforming_strerror_s;
-    };
+// we need all this mess at global namespace
+// to detect if following C11-functions are defined or not
+class strerror_s
+{
+    typedef int return_type; // would be errno_t fo C
+    char buf[sizeof(return_type) * 14];
+    strerror_s(...);
+    operator return_type();
 
-    class strerrorlen_s
-    {
-        typedef size_t return_type;
-        char buf[sizeof(return_type) * 12];
-        strerrorlen_s(...);
-        operator return_type();
+    template<bool, class>
+    friend struct stdex::detail::system_error_detail::_has_conforming_strerror_s;
+    friend struct stdex::detail::system_error_detail::_has_nonconforming_strerror_s;
+};
 
-        friend struct stdex::detail::system_error_detail::_has_conforming_strerrorlen_s;
-    };
-}
+class strerrorlen_s
+{
+    typedef size_t return_type;
+    char buf[sizeof(return_type) * 12];
+    strerrorlen_s(...);
+    operator return_type();
+
+    friend struct stdex::detail::system_error_detail::_has_conforming_strerrorlen_s;
+};
+
+#ifndef _STDEX_NATIVE_CPP11_SUPPORT
+        } // namespace system_error_detail
+    } // namespace detail
+} // namespace stdex
+#endif
 
 namespace stdex 
 {
@@ -1233,14 +1253,19 @@ namespace stdex
                         strerrorlen_s(*_declptr<int>())
                     ) != sizeof(class strerrorlen_s);
             };
-
+                
+            template<bool, class _T>
             struct _has_conforming_strerror_s
             {
                 static const bool value =
                     sizeof(
-                        strerror_s(_declptr<char>(), *_declptr<std::size_t>(), *_declptr<int>())
+                        strerror_s(_declptr<_T>(), *_declptr<std::size_t>(), *_declptr<int>())
                     ) != sizeof(class strerror_s);
             };
+
+            template<class _T>
+            struct _has_conforming_strerror_s<true, _T>
+                : stdex::false_type {};
 
             struct _has_nonconforming_strerror_s
             {
@@ -1252,7 +1277,7 @@ namespace stdex
 
             typedef 
             stdex::bool_constant<
-                    _has_conforming_strerror_s::value ||
+                    _has_conforming_strerror_s<_has_nonconforming_strerror_s::value, char>::value ||
                     _has_nonconforming_strerror_s::value
             > _has_strerror_s;
 
