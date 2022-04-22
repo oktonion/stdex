@@ -1143,15 +1143,6 @@ namespace stdex
 } // namespace stdex
 
 
-#ifndef _STDEX_NATIVE_CPP11_SUPPORT
-namespace stdex
-{
-    namespace detail
-    {
-        namespace system_error_detail
-        {
-#endif
-
 // we need all this mess at global namespace
 // to detect if following C11-functions are defined or not
 stdex::detail::system_error_detail::strerror_s_arg 
@@ -1169,12 +1160,6 @@ stdex::detail::system_error_detail::strerrorlen_s_arg
 strerrorlen_s(
     stdex::detail::system_error_detail::strerrorlen_s_arg
 );
-
-#ifndef _STDEX_NATIVE_CPP11_SUPPORT
-        } // namespace system_error_detail
-    } // namespace detail
-} // namespace stdex
-#endif
 
 namespace stdex 
 {
