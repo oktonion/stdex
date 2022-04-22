@@ -1134,6 +1134,10 @@ namespace stdex
             struct _has_conforming_strerror_s;
             struct _has_nonconforming_strerror_s;
             struct _has_conforming_strerrorlen_s;
+
+            class strerror_s_arg;
+
+            class strerrorlen_s_arg;
         } // namespace system_error_detail
     } // namespace detail
 } // namespace stdex
@@ -1150,27 +1154,21 @@ namespace stdex
 
 // we need all this mess at global namespace
 // to detect if following C11-functions are defined or not
-class strerror_s
-{
-    typedef int return_type; // would be errno_t fo C
-    char buf[sizeof(return_type) * 14];
-    strerror_s(...);
-    operator return_type();
-
-    template<bool, class>
-    friend struct stdex::detail::system_error_detail::_has_conforming_strerror_s;
-    friend struct stdex::detail::system_error_detail::_has_nonconforming_strerror_s;
-};
-
-class strerrorlen_s
-{
-    typedef size_t return_type;
-    char buf[sizeof(return_type) * 12];
-    strerrorlen_s(...);
-    operator return_type();
-
-    friend struct stdex::detail::system_error_detail::_has_conforming_strerrorlen_s;
-};
+stdex::detail::system_error_detail::strerror_s_arg 
+strerror_s(
+    stdex::detail::system_error_detail::strerror_s_arg, 
+    stdex::detail::system_error_detail::strerror_s_arg
+);
+stdex::detail::system_error_detail::strerror_s_arg 
+strerror_s(
+    stdex::detail::system_error_detail::strerror_s_arg, 
+    stdex::detail::system_error_detail::strerror_s_arg,
+    stdex::detail::system_error_detail::strerror_s_arg
+);
+stdex::detail::system_error_detail::strerrorlen_s_arg
+strerrorlen_s(
+    stdex::detail::system_error_detail::strerrorlen_s_arg
+);
 
 #ifndef _STDEX_NATIVE_CPP11_SUPPORT
         } // namespace system_error_detail
@@ -1246,12 +1244,34 @@ namespace stdex
             template<class _T, int _Size>
             _T (&_declarray_ref())[_Size];
 
+            class strerror_s_arg
+            {
+                typedef int return_type; // would be errno_t fo C
+                char buf[sizeof(return_type) * 14];
+                strerror_s_arg(...);
+                operator return_type();
+
+                template<bool, class>
+                friend struct _has_conforming_strerror_s;
+                friend struct _has_nonconforming_strerror_s;
+            };
+
+            class strerrorlen_s_arg
+            {
+                typedef size_t return_type;
+                char buf[sizeof(return_type) * 12];
+                strerrorlen_s_arg(...);
+                operator return_type();
+
+                friend struct _has_conforming_strerrorlen_s;
+            };
+
             struct _has_conforming_strerrorlen_s
             {
                 static const bool value =
                     sizeof(
                         strerrorlen_s(*_declptr<int>())
-                    ) != sizeof(class strerrorlen_s);
+                    ) != sizeof(strerrorlen_s_arg);
             };
                 
             template<bool, class _T>
@@ -1260,7 +1280,7 @@ namespace stdex
                 static const bool value =
                     sizeof(
                         strerror_s(_declptr<_T>(), *_declptr<std::size_t>(), *_declptr<int>())
-                    ) != sizeof(class strerror_s);
+                    ) != sizeof(strerror_s_arg);
             };
 
             template<class _T>
@@ -1272,7 +1292,7 @@ namespace stdex
                 static const bool value =
                     sizeof(
                         strerror_s(_declarray_ref<char, 42>(), *_declptr<int>())
-                    ) != sizeof(class strerror_s);
+                    ) != sizeof(strerror_s_arg);
             };
 
             typedef 
