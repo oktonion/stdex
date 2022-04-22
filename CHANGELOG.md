@@ -8,7 +8,7 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 ### Added
 
-- polluting global namespace with `strerror_s` and `strerrorlen_s` symbols
+- polluting global namespace with `strerror_s` and `strerrorlen_s` symbols, sorry for that
 
 ### Removed
 
