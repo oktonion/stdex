@@ -1,3 +1,5 @@
+#ifdef __cplusplus
+
 #ifndef _STDEX_CORE_H
 #define _STDEX_CORE_H
 
@@ -290,3 +292,5 @@
 #undef _STDEX_HAS_EXTENSION_BUILTIN
 
 #endif // _STDEX_CORE_H
+
+#endif // __cplusplus

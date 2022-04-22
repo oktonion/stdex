@@ -4,23 +4,24 @@ All notable changes to stdex library project will be documented in this file.
 
 visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library
 
-## [0.2.11] - 2021-XX-XX
+## [0.2.11] - 2022-04-22
 
 ### Added
 
-- something
+- polluting global namespace with `strerror_s` and `strerrorlen_s` symbols, sorry for that
 
 ### Removed
 
-- something
+- stupid MS visual studio warnings
 
 ### Changed
 
-- something
+- pthread implementation for Windows updated
+- `stdex::error_category` string messages now thread-safe when possible (detecting and using thr-safe strerror_s if possible)
 
 ### Fixed
 
-- something
+- `stdex::thread` handle now is initialized properly to default value
 
 ### Working on
 

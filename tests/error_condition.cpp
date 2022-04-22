@@ -83,6 +83,17 @@ int test1()
   DYNAMIC_VERIFY( e3.category() == stdex::generic_category() );
   DYNAMIC_VERIFY( e3.category().name() == get_name(stdex::generic_category()) );
 
+  {
+      stdex::error_condition ec(6, stdex::system_category());
+      DYNAMIC_VERIFY(ec.value() == 6);
+      DYNAMIC_VERIFY(ec.category() == stdex::system_category());
+  }
+  {
+      stdex::error_condition ec(8, stdex::generic_category());
+      DYNAMIC_VERIFY(ec.value() == 8);
+      DYNAMIC_VERIFY(ec.category() == stdex::generic_category());
+  }
+
   return 0;
 }
 

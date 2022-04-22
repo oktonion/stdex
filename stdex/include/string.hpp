@@ -61,6 +61,7 @@ namespace stdex
                     void strtold(); // dummy
                     void wcstold(); // dummy
                     float swprintf(...);
+                    float snprintf(...); 
                 }
                 using namespace std;
                 using namespace std_dummy;
@@ -118,6 +119,7 @@ namespace stdex
             using std_cpp11::wcstoull;
             using std_cpp11::strtold;
             using std_cpp11::wcstold;
+           
 
             struct _strtoll_present
             {
@@ -159,6 +161,20 @@ namespace stdex
                 static const bool value = 
                     sizeof(_has_4arg_swprintf_tester(swprintf(_declptr<wchar_t>(), 42, _declptr<wchar_t>(), 0 ))) == sizeof(_yes_type);
             };
+
+            using std_cpp11::snprintf;
+
+            _yes_type _has_4arg_snprintf_tester(int);
+            _no_type _has_4arg_snprintf_tester(float);
+
+            struct _has_4arg_snprintf
+            {
+                static const bool value = 
+                    sizeof(_has_4arg_snprintf_tester(
+                            snprintf(_declptr<char>(), *_declptr<std::size_t>(), _declptr<const char>(), 0 )
+                        )) == sizeof(_yes_type);
+            };
+
         }
 
         template<bool _IsSigned>
@@ -275,6 +291,35 @@ namespace stdex
             }
         };
 
+        template<bool>
+        struct _snprintf_impl
+        {
+            template<class _ArgT>
+            static int call(char* buffer, std::size_t buf_size, const char* format, _ArgT arg)
+            {
+                using namespace std;
+                return snprintf(buffer, buf_size, format, arg);
+            }
+        };
+
+        template<>
+        struct _snprintf_impl<false>
+        {
+            template<class _ArgT>
+            static int call(char* buffer, std::size_t, const char* format, _ArgT arg)
+            {
+                using namespace std;
+                return sprintf(buffer, format, arg);
+            }
+        };
+
+        template<class _ArgT>
+        inline
+        void _snprintf4_std_impl(char* buffer, std::size_t len, const char* format, _ArgT arg)
+        {
+            _snprintf_impl<string_detail::_has_4arg_snprintf::value>::call(buffer, len, format, arg);
+        }
+
         template<>
         struct _str_to_integral_chooser_impl<false>
         {
@@ -306,7 +351,7 @@ namespace stdex
                     string ulong_max_str;
                     {
                         char buf[512] = {0};
-                        sprintf(buf, "%lu", ULONG_MAX);
+                        _snprintf4_std_impl(buf, sizeof(buf), "%lu", ULONG_MAX);
 
                         stringstream ss;
                         ss << setbase(base) << ULONG_MAX;
@@ -380,7 +425,7 @@ namespace stdex
                             return value;
 
                         char buf[512] = {0};
-                        sprintf(buf, "%lu", ULONG_MAX);
+                        _snprintf4_std_impl(buf, sizeof(buf), "%lu", ULONG_MAX);
 
                         wstring::size_type length = strlen(buf);
 
@@ -1953,7 +1998,7 @@ namespace stdex
 #else
         char buf[32];
 #endif
-        sprintf(buf, "%d", value);
+        detail::_snprintf4_std_impl(buf, sizeof(buf), "%d", value);
         
         return string(buf);
     }
@@ -1981,7 +2026,7 @@ namespace stdex
 #else
         char buf[32];
 #endif
-        sprintf(buf, "%u", value);
+        detail::_snprintf4_std_impl(buf, sizeof(buf), "%u", value);
 
         return string(buf);
     }
@@ -2025,7 +2070,7 @@ namespace stdex
 #else
         char buf[256];
 #endif
-        sprintf(buf, "%f", value);
+        detail::_snprintf4_std_impl(buf, sizeof(buf), "%f", value);
 
         return string(buf);
     }
@@ -2053,7 +2098,7 @@ namespace stdex
 #else
         char buf[2048]; // strange assumption, I know
 #endif
-        sprintf(buf, "%f", value);
+        detail::_snprintf4_std_impl(buf, sizeof(buf), "%f", value);
         
         return string(buf);
     }
@@ -2099,7 +2144,7 @@ namespace stdex
         char buf[256]; // strange assumption, I know
 #endif
 #endif
-        sprintf(buf, "%ld", value);
+        detail::_snprintf4_std_impl(buf, sizeof(buf), "%ld", value);
 
         return string(buf);
     }
@@ -2139,7 +2184,7 @@ namespace stdex
         char buf[512]; // strange assumption, I know
 #endif
 #endif
-        sprintf(buf, "%lu", value);
+        detail::_snprintf4_std_impl(buf, sizeof(buf), "%lu", value);
 
         return string(buf);
     }
@@ -2175,7 +2220,7 @@ namespace stdex
 #else
         char buf[4096]; // strange assumption, I know
 #endif
-        sprintf(buf, "%Lf", value);
+        detail::_snprintf4_std_impl(buf, sizeof(buf), "%Lf", value);
 
         string result(buf);
 
@@ -2301,7 +2346,7 @@ namespace stdex
         char buf[1024]; // strange assumption, I know
 #endif
 #endif
-        sprintf(buf, "%lld", value);
+        detail::_snprintf4_std_impl(buf, sizeof(buf), "%lld", value);
 
         return string(buf);
     }
@@ -2341,7 +2386,7 @@ namespace stdex
         char buf[1024]; // strange assumption, I know
 #endif
 #endif
-        sprintf(buf, "%llu", value);
+        detail::_snprintf4_std_impl(buf, sizeof(buf), "%llu", value);
 
         return string(buf);
     }

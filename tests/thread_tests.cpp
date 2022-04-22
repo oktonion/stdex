@@ -873,11 +873,13 @@ int check_stdex__sleep_for__accuracy()
         average_stdex_sleep_for_acc += stdex_sleep_for_accuracy();
     
     average_stdex_sleep_for_acc /= avrg_n;
+    int acceptable_delta = 
+        average_std_sleep_for_acc.count()*0.95;
 
     DYNAMIC_VERIFY(
-        (average_stdex_sleep_for_acc.count() <=  (average_std_sleep_for_acc.count() + 100)) ? 
+        (average_stdex_sleep_for_acc.count() <=  (average_std_sleep_for_acc.count() + acceptable_delta)) ? 
             true : 
-            (std::cout << "CONDITION: \n" << average_stdex_sleep_for_acc.count() << " <= " << average_std_sleep_for_acc.count() << " + 100" << "\n Failed" <<  std::endl, false)
+            (std::cout << "CONDITION: \n" << average_stdex_sleep_for_acc.count() << " <= " << average_std_sleep_for_acc.count() << " + " << acceptable_delta << "\n Failed" <<  std::endl, false)
     );
 
     return 0;
@@ -904,7 +906,7 @@ int main(void)
         //RUN_TEST(test10);
         //RUN_TEST(test11);
         //RUN_TEST(test12);
-        //RUN_TEST(test13);
+        RUN_TEST(test13);
         
     }
 
