@@ -18,6 +18,7 @@ visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for
 
 - pthread implementation for Windows updated
 - `stdex::error_category` string messages now thread-safe when possible (detecting and using thr-safe strerror_s if possible)
+- build scripts for windows version of library
 
 ### Fixed
 
