@@ -1030,21 +1030,25 @@ namespace stdex
             return 0;
         }
 
+        inline
         static void _get_ns(const nanoseconds &ns, stdex::timespec &out)
         {
             out.tv_nsec = static_cast<long>(_get_duration_count<nanoseconds>(ns));
         }
 
+        inline
         static void _get_ns(const microseconds &mcs, stdex::timespec &out)
         {
             out.tv_nsec = static_cast<long>(_get_duration_count<microseconds>(mcs) * 1000);
         }
 
+        inline
         static void _get_ns(const milliseconds &ms, stdex::timespec &out)
         {
             out.tv_nsec = static_cast<long>(_get_duration_count<milliseconds>(ms) * 1000 * 1000);
         }
 
+        inline
         static void _get_ns(const seconds &sec, stdex::timespec &out)
         {
             out.tv_nsec = static_cast<long>(_get_duration_count<seconds>(sec) * 1000 * 1000 * 1000);
