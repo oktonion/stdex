@@ -13,21 +13,12 @@
 
 // std includes
 
-#ifndef __STDC_WANT_LIB_EXT1__
-#define _STDEX_DEFINES_STDC_WANT_LIB_EXT1__
+
 #define __STDC_WANT_LIB_EXT1__ 1
-#else
-#define __STDC_WANT_LIB_EXT1__ 1
-#endif
 // As with all bounds-checked functions, strerror_s and strerrorlen_s are only guaranteed to be available 
 // if __STDC_LIB_EXT1__ is defined by the implementation and 
 // if the user defines __STDC_WANT_LIB_EXT1__ to the integer constant 1 before including string.h.
 #include <string.h>
-
-#ifdef _STDEX_DEFINES_STDC_WANT_LIB_EXT1__
-#undef _STDEX_DEFINES_STDC_WANT_LIB_EXT1__
-#undef __STDC_WANT_LIB_EXT1__
-#endif
 
 #include <errno.h>
 #include <cerrno>
@@ -1134,6 +1125,45 @@ namespace stdex
     {
         namespace system_error_detail
         {
+            struct _has_conforming_strerror_s;
+            struct _has_nonconforming_strerror_s;
+            struct _has_conforming_strerrorlen_s;
+        }
+    }
+} // namespace stdex
+
+namespace 
+{
+    // we need all this mess at global namespace
+    // to detect if following C-functions are defined or not
+    class strerror_s
+    {
+        typedef int return_type; // would be errno_t fo C
+        char buf[sizeof(return_type) * 14];
+        strerror_s(...);
+        operator return_type();
+
+        friend struct stdex::detail::system_error_detail::_has_conforming_strerror_s;
+        friend struct stdex::detail::system_error_detail::_has_nonconforming_strerror_s;
+    };
+
+    class strerrorlen_s
+    {
+        typedef size_t return_type;
+        char buf[sizeof(return_type) * 12];
+        strerrorlen_s(...);
+        operator return_type();
+
+        friend struct stdex::detail::system_error_detail::_has_conforming_strerrorlen_s;
+    };
+}
+
+namespace stdex 
+{
+    namespace detail
+    {
+        namespace system_error_detail
+        {
 
             static const char* _unknown_error()
             {return "unknown error";}
@@ -1161,7 +1191,7 @@ namespace stdex
                     
                     std::string result;
 
-                    size_t len = ::strerrorlen_s(_Errcode);
+                    size_t len = strerrorlen_s(_Errcode);
                     if (len)
                     {
                         struct _RAII{
@@ -1171,7 +1201,7 @@ namespace stdex
                         } _tmp;
 
                         _tmp.buf = new char[len + 1];
-                        if(0 == ::strerror_s(_tmp.buf, len + 1, _Errcode))
+                        if(0 == strerror_s(_tmp.buf, len + 1, _Errcode))
                             result = _tmp.buf;
                     }
                     return result;
@@ -1187,34 +1217,47 @@ namespace stdex
 
                     char buf[2048] = {0};
 
-                    if(0 == ::strerror_s(buf, sizeof(buf), _Errcode))
+                    if(0 == strerror_s(buf, _Errcode))
                         result = buf;
                     return result;
                 }
             };
 
-            struct _has_strerror_s
+            template<class _T, int _Size>
+            _T (&_declarray_ref())[_Size];
+
+            struct _has_conforming_strerrorlen_s
             {
                 static const bool value =
-#if ( defined(__STDC_WANT_LIB_EXT1__) || (defined(_MSC_VER) && __STDC_WANT_SECURE_LIB__ == 1) )
-                    true;
-#else
-                    false;
-#endif
+                    sizeof(
+                        strerrorlen_s(*_declptr<int>())
+                    ) != sizeof(class strerrorlen_s);
             };
 
-            struct _has_strerrorlen_s
+            struct _has_conforming_strerror_s
             {
                 static const bool value =
-#if defined(__STDC_WANT_LIB_EXT1__)
-                    true;
-#else
-                    false;
-#endif
+                    sizeof(
+                        strerror_s(_declptr<char>(), *_declptr<std::size_t>(), *_declptr<int>())
+                    ) != sizeof(class strerror_s);
             };
+
+            struct _has_nonconforming_strerror_s
+            {
+                static const bool value =
+                    sizeof(
+                        strerror_s(_declarray_ref<char, 42>(), *_declptr<int>())
+                    ) != sizeof(class strerror_s);
+            };
+
+            typedef 
+            stdex::bool_constant<
+                    _has_conforming_strerror_s::value ||
+                    _has_nonconforming_strerror_s::value
+            > _has_strerror_s;
 
             struct strerror_impl:
-                strerror_impl_helper<_has_safe_strerror::value, int>
+                strerror_impl_helper<_has_strerror_s::value, _has_conforming_strerrorlen_s::value, int>
             { };
 
             static inline std::string _strerror(int _errnum)
