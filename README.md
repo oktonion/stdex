@@ -203,7 +203,7 @@ cl -EHsc -Fo.\obj\main.obj -c ".\main.cpp"
 cl .\obj\main.obj stdex.lib -Fe.\bin\main.exe -link -LIBPATH:.\stdex\lib
 ```
 
-example script build for Windows (with Borland C++ Builder 6.0 Updt4 and generated `ntdll.lib` with `coff2omf.exe`):
+example script build for Windows (with Borland C++ Builder 6.0 Updt4):
 
 ```bat
 bcc32 -w-inl -w-ccc -tWM -Q -n.\obj\ -I%cd%\pthread\ -c ".\main.cpp"
