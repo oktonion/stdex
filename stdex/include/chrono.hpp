@@ -508,6 +508,7 @@ namespace stdex
                     typename 
                     detail::_duration_common_type<_to_dur_rep, _to_dur_rep, _Period>::type
                         _to_rep;
+                    (void)(_cf); // removes stupid MS warning of unreferenced formal parameter
                     return _ToDur(
                         _chrono_convert<_to_rep>(
                             _chrono_convert<_CR>(_duration_count_func::call(_d), _priority_tag<4>()) * 

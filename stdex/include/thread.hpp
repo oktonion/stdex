@@ -1761,6 +1761,9 @@ namespace stdex
 
                 delete pf;
             }
+
+        private:
+            void operator=(const _thread_function_proxy&) _STDEX_DELETED_FUNCTION;
         };
 }
 
