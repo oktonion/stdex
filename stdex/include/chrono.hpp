@@ -487,6 +487,7 @@ namespace stdex
                     typename 
                     detail::_duration_common_type<_to_dur_rep, _to_dur_rep, _Period>::type
                         _to_rep;
+                    (void)(_cf); // removes stupid MS warning of unreferenced formal parameter
                     return _ToDur(
                         _chrono_convert<_to_rep>(
                             _chrono_convert<_CR>(_duration_count_func::call(_d), _priority_tag<4>()) / 
@@ -507,6 +508,7 @@ namespace stdex
                     typename 
                     detail::_duration_common_type<_to_dur_rep, _to_dur_rep, _Period>::type
                         _to_rep;
+                    (void)(_cf); // removes stupid MS warning of unreferenced formal parameter
                     return _ToDur(
                         _chrono_convert<_to_rep>(
                             _chrono_convert<_CR>(_duration_count_func::call(_d), _priority_tag<4>()) * 
@@ -988,6 +990,14 @@ namespace stdex
                 check6; // if you are there means rep type is integer but floating-point duration type is passed as argument
             }
 
+            duration& operator=(const duration& other)
+            {
+                static_cast<base_type&>(*this) = 
+                    static_cast<const base_type&>(other);
+                
+                return *this;
+            }
+
             //! Return the value of the duration object.
             rep count() const
             {
@@ -1342,6 +1352,13 @@ namespace stdex
             time_point(const time_point<_Clock, _Duration2> &_tp)
                 : _d(_tp.time_since_epoch())
             {}
+
+            time_point& operator=(const time_point &other)
+            {
+                _d = other._d;
+
+                return *this;
+            }
 
             duration time_since_epoch() const
             {    // get duration from epoch
