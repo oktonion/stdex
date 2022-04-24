@@ -1030,21 +1030,25 @@ namespace stdex
             return 0;
         }
 
+        inline
         static void _get_ns(const nanoseconds &ns, stdex::timespec &out)
         {
             out.tv_nsec = static_cast<long>(_get_duration_count<nanoseconds>(ns));
         }
 
+        inline
         static void _get_ns(const microseconds &mcs, stdex::timespec &out)
         {
             out.tv_nsec = static_cast<long>(_get_duration_count<microseconds>(mcs) * 1000);
         }
 
+        inline
         static void _get_ns(const milliseconds &ms, stdex::timespec &out)
         {
             out.tv_nsec = static_cast<long>(_get_duration_count<milliseconds>(ms) * 1000 * 1000);
         }
 
+        inline
         static void _get_ns(const seconds &sec, stdex::timespec &out)
         {
             out.tv_nsec = static_cast<long>(_get_duration_count<seconds>(sec) * 1000 * 1000 * 1000);
@@ -1181,17 +1185,17 @@ make_utc_tm(stdex::chrono::system_clock::time_point tp)
     // start filling in the tm with calendar info
     stdex::tm result;
     result.tm_isdst = 0;
-    result.tm_year = civ_date.year - 1900;
-    result.tm_mon = civ_date.month - 1;
-    result.tm_mday = civ_date.day;
-    result.tm_wday = weekday_from_days(d.count());
-    result.tm_yday = d.count() - days_from_civil(civ_date.year, 1, 1);
+    result.tm_year = static_cast<int>(civ_date.year) - 1900;
+    result.tm_mon = static_cast<int>(civ_date.month) - 1;
+    result.tm_mday = static_cast<int>(civ_date.day);
+    result.tm_wday = static_cast<int>( weekday_from_days(d.count()) );
+    result.tm_yday = static_cast<int>( d.count() - days_from_civil(civ_date.year, 1, 1) );
     // Fill in the time
-    result.tm_hour = duration_cast<hours>(t).count();
+    result.tm_hour = static_cast<int>( duration_cast<hours>(t).count() );
     t -= hours(result.tm_hour);
-    result.tm_min = duration_cast<minutes>(t).count();
+    result.tm_min = static_cast<int>( duration_cast<minutes>(t).count() );
     t -= minutes(result.tm_min);
-    result.tm_sec = duration_cast<seconds>(t).count();
+    result.tm_sec = static_cast<int>( duration_cast<seconds>(t).count() );
 
     return result;
 }
@@ -1421,22 +1425,26 @@ namespace stdex
         {
         }
 
+        inline
         static void _convert_to_duration(long ts_nsec, nanoseconds &out)
         {
             _add_duration(ts_nsec, out);
         }
 
+        inline
         static void _convert_to_duration(long ts_nsec, microseconds &out)
         {
             _add_duration(ts_nsec/1000, out);
         }
 
+        inline
         static void _convert_to_duration(long ts_nsec, milliseconds &out)
         {
             ts_nsec /= 1000;
             _add_duration(ts_nsec/1000, out);
         }
 
+        inline
         static void _convert_to_duration(long ts_nsec, seconds &out)
         {
             ts_nsec /= 1000;

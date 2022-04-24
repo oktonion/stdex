@@ -492,7 +492,9 @@ namespace stdex
                 _clock::duration _rt = 
                     chrono::duration_cast<_clock::duration>(_rtime);
 
-                if (ratio_greater<_clock::period, _Period>::value)
+                const bool check =
+                    ratio_greater<_clock::period, _Period>::value;
+                if (check)
                     ++_rt;
                 return try_lock_until1(_mutex_handle, _clock::now() + _rt);
             }

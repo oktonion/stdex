@@ -144,7 +144,7 @@ jobs:
       matrix:
         include:
     
-          - os: windows-latest
+          - os: windows-2019
             COMPILER: cl
             LINKER: ilink
             CPP_COMPILER: cl
@@ -153,19 +153,21 @@ jobs:
             BUILD_SCRIPT: ~build_tests.bat
             RUN_SCRIPT: run_tests.bat
             SETUP_SCRIPT: |
-              set MSVS_VSVARS_PATH="C:\PROGRA~2\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
-              echo %MSVS_VSVARS_PATH%
-              if exist %MSVS_VSVARS_PATH% (
-                cd .\\stdex
-                echo call %MSVS_VSVARS_PATH% > ~build_lib.bat
-                cat build_lib.bat >> ~build_lib.bat
-                cd ..
-                echo call %MSVS_VSVARS_PATH% > ~build_tests.bat
-                cat build_tests.bat >> ~build_tests.bat
+              if exist "C:\PROGRA~1\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat" (
+                set MSVS_VSVARS_PATH="C:\PROGRA~1\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
+              ) else if exist "C:\PROGRA~2\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat" (
+                set MSVS_VSVARS_PATH="C:\PROGRA~2\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
               ) else (
                 echo "cannot find %MSVS_VSVARS_PATH%"
                 exit /B 1
               )
+              echo %MSVS_VSVARS_PATH%
+              cd .\\stdex
+              echo call %MSVS_VSVARS_PATH% > ~build_lib.bat
+              cat build_lib.bat >> ~build_lib.bat
+              cd ..
+              echo call %MSVS_VSVARS_PATH% > ~build_tests.bat
+              cat build_tests.bat >> ~build_tests.bat
               
     
     steps:

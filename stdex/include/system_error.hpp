@@ -6,20 +6,32 @@
 #endif // _MSC_VER > 1000
 
 // stdex includes
-#include "./type_traits.hpp" // stdex::enable_if
+#include "./type_traits.hpp" // stdex::enable_if, stdex::integral_constant
 
 // POSIX includes
 /*none*/
 
 // std includes
 
+
+#ifdef __STDC_WANT_LIB_EXT1__
+
+#define __STDC_WANT_LIB_EXT1__ 1
+// As with all bounds-checked functions, strerror_s and strerrorlen_s are only guaranteed to be available 
+// if __STDC_LIB_EXT1__ is defined by the implementation and 
+// if the user defines __STDC_WANT_LIB_EXT1__ to the integer constant 1 before including string.h.
+#include <string.h>
+
+#endif
+
 #include <errno.h>
 #include <cerrno>
-#include <cstdlib>        // std::strerror
+#include <cstdlib>        // std::strerror 
 #include <cstring>        // std::strerror
 #include <stdexcept>    // std::runtime_error
 #include <string>         // std::string
 #include <functional>
+
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
@@ -1118,10 +1130,48 @@ namespace stdex
     {
         namespace system_error_detail
         {
+            template<bool, class>
+            struct _has_conforming_strerror_s;
+            struct _has_nonconforming_strerror_s;
+            struct _has_conforming_strerrorlen_s;
+
+            class _strerror_s_arg;
+
+            class _strerrorlen_s_arg;
+        } // namespace system_error_detail
+    } // namespace detail
+} // namespace stdex
+
+
+// we need all this mess at global namespace
+// to detect if following C11-functions are defined or not
+stdex::detail::system_error_detail::_strerror_s_arg 
+strerror_s(
+    stdex::detail::system_error_detail::_strerror_s_arg, 
+    stdex::detail::system_error_detail::_strerror_s_arg
+);
+stdex::detail::system_error_detail::_strerror_s_arg 
+strerror_s(
+    stdex::detail::system_error_detail::_strerror_s_arg, 
+    stdex::detail::system_error_detail::_strerror_s_arg,
+    stdex::detail::system_error_detail::_strerror_s_arg
+);
+stdex::detail::system_error_detail::_strerrorlen_s_arg
+strerrorlen_s(
+    stdex::detail::system_error_detail::_strerrorlen_s_arg
+);
+
+namespace stdex 
+{
+    namespace detail
+    {
+        namespace system_error_detail
+        {
+
             static const char* _unknown_error()
             {return "unknown error";}
 
-            template<bool, class _DummyT>
+            template<bool, bool, class _DummyT>
             struct strerror_impl_helper
             {
                 static std::string call(_DummyT _Errcode)
@@ -1135,9 +1185,8 @@ namespace stdex
                 }
             };
 
-#ifdef __STDC_WANT_LIB_EXT1__
             template<class _DummyT>
-            struct strerror_impl_helper<true, _DummyT>
+            struct strerror_impl_helper<true, true, _DummyT>
             {
                 static std::string call(_DummyT _Errcode)
                 {
@@ -1145,8 +1194,8 @@ namespace stdex
                     
                     std::string result;
 
-                    size_t len = ::strerrorlen_s(_Errcode);
-                    if(len)
+                    size_t len = strerrorlen_s(_Errcode);
+                    if (len)
                     {
                         struct _RAII{
                             char *buf;
@@ -1155,26 +1204,87 @@ namespace stdex
                         } _tmp;
 
                         _tmp.buf = new char[len + 1];
-                        if(0 == ::strerror_s(_tmp.buf, len + 1, _Errcode))
+                        if(0 == strerror_s(_tmp.buf, len + 1, _Errcode))
                             result = _tmp.buf;
                     }
                     return result;
                 }
             };
 
-#endif
-            struct has_safe_strerror
-            {
-                static const bool value =
-#ifndef __STDC_WANT_LIB_EXT1__
-                    false;
-#else
-                    true;
-#endif
+            template<class _DummyT>
+            struct strerror_impl_helper<true, false, _DummyT>
+            { // MS specific
+                static std::string call(_DummyT _Errcode)
+                {                    
+                    std::string result;
+
+                    char buf[2048] = {0};
+
+                    if(0 == strerror_s(buf, _Errcode))
+                        result = buf;
+                    return result;
+                }
             };
 
+            class _strerror_s_arg
+            {
+                typedef int return_type; // would be errno_t fo C
+                char buf[sizeof(return_type) * 14];
+                _strerror_s_arg(...);
+                operator return_type();
+
+                template<bool, class>
+                friend struct _has_conforming_strerror_s;
+                friend struct _has_nonconforming_strerror_s;
+            };
+
+            class _strerrorlen_s_arg
+            {
+                typedef size_t return_type;
+                char buf[sizeof(return_type) * 12];
+                _strerrorlen_s_arg(...);
+                operator return_type();
+
+                friend struct _has_conforming_strerrorlen_s;
+            };
+
+            struct _has_conforming_strerrorlen_s
+            {
+                static const bool value =
+                    sizeof(
+                        strerrorlen_s(*_declptr<int>())
+                    ) != sizeof(_strerrorlen_s_arg);
+            };
+                
+            template<bool, class _T>
+            struct _has_conforming_strerror_s
+            {
+                static const bool value =
+                    sizeof(
+                        strerror_s(_declptr<_T>(), *_declptr<std::size_t>(), *_declptr<int>())
+                    ) != sizeof(_strerror_s_arg);
+            };
+
+            template<class _T>
+            struct _has_conforming_strerror_s<true, _T>
+                : stdex::false_type {};
+
+            struct _has_nonconforming_strerror_s
+            {
+                static const bool value =
+                    sizeof(
+                        strerror_s(_declptr<_strerror_s_arg>()->buf, *_declptr<int>())
+                    ) != sizeof(_strerror_s_arg);
+            };
+
+            typedef 
+            stdex::bool_constant<
+                    _has_conforming_strerror_s<_has_nonconforming_strerror_s::value, char>::value ||
+                    _has_nonconforming_strerror_s::value
+            > _has_strerror_s;
+
             struct strerror_impl:
-                strerror_impl_helper<has_safe_strerror::value, int>
+                strerror_impl_helper<_has_strerror_s::value, _has_conforming_strerrorlen_s::value, int>
             { };
 
             static inline std::string _strerror(int _errnum)
