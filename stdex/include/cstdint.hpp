@@ -150,8 +150,10 @@ namespace stdex
             template<class _Tp>
             struct _is_integral_constant:
                 _is_integral_constant_impl<_Tp, 
-                _is_integral_constant_std_impl<unsigned long>::value == bool(true) &&
-                _is_integral_constant_std_impl<long>::value == bool(true)>
+                    _is_integral_constant_std_impl<unsigned short>::value == bool(true)
+                    && _is_integral_constant_std_impl<long>::value == bool(true)
+                    && _is_integral_constant_std_impl<signed char>::value == bool(true)
+            >
             {
 
             };
