@@ -782,6 +782,13 @@ int test13()
     }
 #ifdef _STDEX_FUNCTIONAL_H // disable current test for now till <functional.hpp> is ready
     {
+        std::cout << 
+            "nullptr is nativly supported by compiler: " << 
+                (stdex::intern::_has_feature<intern::_stdex_has_native_nullptr>::value ? "true" : "false") <<
+            ", is implemented as distinct type: " <<
+                (stdex::intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value ? "true" : "false") <<
+        std::endl;
+
         // for some reason GCC can not use local class as functor for templated thread constructor
         // so we have to improvise
         typedef dummy_functor2 dummy_functor_local;
