@@ -351,14 +351,14 @@ namespace stdex
 
     template<class _Tp, class _ObjectT>
     inline
-    _Tp& invoke(_Tp _ObjectT::* _data_member, _ObjectT& _obj)
+    _Tp& invoke1(_Tp _ObjectT::* _data_member, _ObjectT& _obj)
     {
         return _obj.*_data_member;
     }
 
     template<class _Tp, class _ObjectT>
     inline
-    const _Tp& invoke(const _Tp _ObjectT::* _data_member, const _ObjectT& _obj)
+    const _Tp& invoke1(const _Tp _ObjectT::* _data_member, const _ObjectT& _obj)
     {
         return _obj.*_data_member;
     }
@@ -372,7 +372,7 @@ namespace stdex
 
     template<class _Tp, class _ObjectT>
     inline
-    _Tp& invoke(_Tp _ObjectT::* _data_member, _ObjectT* _obj)
+    _Tp& invoke1(_Tp _ObjectT::* _data_member, _ObjectT* _obj)
     {
         return (*_obj).*_data_member;
     }
@@ -1032,6 +1032,9 @@ namespace stdex
 
         namespace functional_detail
         {
+            template<unsigned _Rank> struct _priority_tag : _priority_tag < _Rank - 1 > {};
+            template<> struct _priority_tag<0> {};
+
             template<bool>
             struct _invokable_tag{};
         }
@@ -1049,6 +1052,7 @@ namespace stdex
                     is_member_function_pointer<_FuncT>::value == bool(true) ||
                     is_member_pointer<_FuncT>::value == bool(true)
                 >()
+                , functional_detail::_priority_tag<10>()
             );
         }
 
@@ -1098,13 +1102,13 @@ namespace stdex
                 : base_type(other) {}
 
             template<class _R, class _FuncT, class _Invokable>
-            void call(_FuncT &fx, _return_arg<_R> &result, _Invokable)
+            void call(_FuncT &fx, _return_arg<_R> &result, _Invokable, const functional_detail::_priority_tag<0>&)
             {
                 result = fx();
             }
 
             template<class _FuncT, class _Invokable>
-            void call(_FuncT &fx, _return_arg<void> &, _Invokable)
+            void call(_FuncT &fx, _return_arg<void> &, _Invokable, const functional_detail::_priority_tag<1>&)
             {
                 fx();
             }
@@ -1123,37 +1127,37 @@ namespace stdex
                 : base_type(other) {} \
         \
             template<class _R, class _FuncT> \
-            void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<false>) \
+            void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<false>, const functional_detail::_priority_tag<5>&) \
             { \
                 result = _return_arg<_R>(fx( \
                 _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) ));} \
         \
             template<class _FuncT> \
-            void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<false>) \
+            void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<false>, const functional_detail::_priority_tag<6>&) \
             { \
                 fx( \
                 _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) );} \
         \
             template<class _R, class _FuncT> \
-            void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<true>) \
+            void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<true>, const functional_detail::_priority_tag<3>&) \
             { \
                 result = _return_arg<_R>(stdex::invoke(fx, \
                 _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) ));} \
         \
             template<class _FuncT> \
-            void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<true>) \
+            void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<true>, const functional_detail::_priority_tag<4>&) \
             { \
                 stdex::invoke(fx, \
                 _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) );} \
         \
             template<class _R, class _FuncT> \
-            void call(_FuncT *fx, _return_arg<_R> &result, functional_detail::_invokable_tag<true>) \
+            void call(_FuncT *fx, _return_arg<_R> &result, functional_detail::_invokable_tag<true>, const functional_detail::_priority_tag<1>&) \
             { \
                 result = _return_arg<_R>(stdex::invoke(fx, \
                 _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) ));} \
         \
             template<class _FuncT> \
-            void call(_FuncT *fx, _return_arg<void> &, functional_detail::_invokable_tag<true>) \
+            void call(_FuncT *fx, _return_arg<void> &, functional_detail::_invokable_tag<true>, const functional_detail::_priority_tag<2>&) \
             { \
                 stdex::invoke(fx, \
                 _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) );} \
@@ -1169,7 +1173,7 @@ namespace stdex
                 base_type(other) {} 
 
             template<class _R, class _FuncT> 
-            void call(_FuncT& fx, _return_arg<_R>& result, functional_detail::_invokable_tag<false>) 
+            void call(_FuncT& fx, _return_arg<_R>& result, functional_detail::_invokable_tag<false>, const functional_detail::_priority_tag<5>&) 
             { 
                 result = 
                     _return_arg<_R>(
@@ -1178,34 +1182,34 @@ namespace stdex
             } 
             
             template<class _FuncT> 
-            void call(_FuncT& fx, _return_arg<void>&, functional_detail::_invokable_tag<false>) 
+            void call(_FuncT& fx, _return_arg<void>&, functional_detail::_invokable_tag<false>, const functional_detail::_priority_tag<6>&) 
             { 
                 fx(_get_args_traits<base_type, 0>::arg_type::value); 
             } 
-            
-            template<class _R, class _FuncT> 
-            void call(_FuncT& fx, _return_arg<_R>& result, functional_detail::_invokable_tag<true>) 
-            { 
-                result = _return_arg<_R>(stdex::invoke(fx, _get_args_traits<base_type, 0>::arg_type::value)); 
-            } 
-            
-            template<class _FuncT> 
-            void call(_FuncT& fx, _return_arg<void>&, functional_detail::_invokable_tag<true>) 
-            { 
-                stdex::invoke(fx, _get_args_traits<base_type, 0>::arg_type::value); 
-            } 
 
             template<class _R, class _FuncT> 
-            void call(_FuncT* fx, _return_arg<_R>& result, functional_detail::_invokable_tag<true>) 
+            void call(_FuncT* fx, _return_arg<_R>& result, functional_detail::_invokable_tag<true>, const functional_detail::_priority_tag<3>&) 
             { 
                 result = _return_arg<_R>(stdex::invoke(fx, _get_args_traits<base_type, 0>::arg_type::value)); 
             } 
             
             template<class _FuncT> 
-            void call(_FuncT* fx, _return_arg<void>&, functional_detail::_invokable_tag<true>) 
+            void call(_FuncT* fx, _return_arg<void>&, functional_detail::_invokable_tag<true>, const functional_detail::_priority_tag<4>&) 
             { 
                 stdex::invoke(fx, _get_args_traits<base_type, 0>::arg_type::value); 
+            }
+            
+            template<class _R, class _FuncT> 
+            void call(_FuncT& fx, _return_arg<_R>& result, functional_detail::_invokable_tag<true>, const functional_detail::_priority_tag<1>&) 
+            { 
+                result = _return_arg<_R>(stdex::invoke(fx, _get_args_traits<base_type, 0>::arg_type::value)); 
             } 
+            
+            template<class _FuncT> 
+            void call(_FuncT& fx, _return_arg<void>&, functional_detail::_invokable_tag<true>, const functional_detail::_priority_tag<2>&) 
+            { 
+                stdex::invoke(fx, _get_args_traits<base_type, 0>::arg_type::value); 
+            }  
         };
 
 #if (STDEX_FUNCTION_MAX_ARG_N >= 0)
@@ -1449,12 +1453,6 @@ namespace stdex
 
             func_type _func;
         };
-
-        namespace functional_detail
-        {
-            template<unsigned _Rank> struct _priority_tag : _priority_tag < _Rank - 1 > {};
-            template<> struct _priority_tag<0> {};
-        }
 
         template<
             class _R, 
@@ -2902,7 +2900,7 @@ private:
         return binder<_R, _FuncT>(fx);
     }
 
-    template<class _ObjectT, class _ArgObjectT, class _R>
+    template<class _R, class _ObjectT, class _ArgObjectT>
     binder<_R, 
         typename detail::_member_function_ptr<_R, _ObjectT, 0>::type,
         _ArgObjectT>
@@ -2913,7 +2911,7 @@ private:
             _ArgObjectT>(fx, obj);
     }
 
-    template<class _ObjectT, class _ArgObjectT, class _R>
+    template<class _R, class _ObjectT, class _ArgObjectT>
     binder<_R,
         typename detail::_member_function_ptr<_R, _ObjectT, 0>::type_const,
         _ArgObjectT>
@@ -2924,7 +2922,7 @@ private:
             _ArgObjectT>(fx, obj);
     }
 
-    template<class _ObjectT, class _ArgObjectT, class _R>
+    template<class _R, class _ObjectT, class _ArgObjectT>
     binder<_R, 
         typename detail::_member_function_ptr<_R, _ObjectT, 0>::type_varg,
         _ArgObjectT>
@@ -2935,7 +2933,7 @@ private:
             _ArgObjectT>(fx, obj);
     }
 
-    template<class _ObjectT, class _ArgObjectT, class _R>
+    template<class _R, class _ObjectT, class _ArgObjectT>
     binder<_R,
         typename detail::_member_function_ptr<_R, _ObjectT, 0>::type_const_varg,
         _ArgObjectT>
@@ -3003,7 +3001,7 @@ private:
         typename detail::_member_function_ptr<_R, _ObjectT, count + 1, _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>::type_const, \
         _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) \
     > \
-    bind(_R(_ObjectT::*fx)( _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM) ), \
+    bind(_R(_ObjectT::*fx)( _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM) ) const, \
         _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK) ) \
     { \
         typedef \

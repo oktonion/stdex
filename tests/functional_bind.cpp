@@ -313,6 +313,8 @@ namespace invoke_lvalue
             save_count = count;
         }
 
+        (void)(save_count);
+
         return 0;
     }
 
@@ -361,20 +363,20 @@ namespace invoke_lvalue
         // member function pointer
         {
             A_int_1 a;
-            DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::mem1, _1)(a) == 3);
-            DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::mem1, a)() == 3);
+            DYNAMIC_VERIFY(stdex::bind(&A_int_1::mem1, _1)(a) == 3);
+            DYNAMIC_VERIFY(stdex::bind(&A_int_1::mem1, a)() == 3);
             A_int_1* ap = &a;
-            DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::mem1, _1)(ap) == 3);
-            DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::mem1, ap)() == 3);
+            DYNAMIC_VERIFY(stdex::bind(&A_int_1::mem1, _1)(ap) == 3);
+            DYNAMIC_VERIFY(stdex::bind(&A_int_1::mem1, ap)() == 3);
         }
         // const member function pointer
         {
             A_int_1 a;
-            DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::mem2, _1)(A_int_1()) == 4);
-            DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::mem2, A_int_1())() == 4);
+            DYNAMIC_VERIFY(stdex::bind(&A_int_1::mem2, _1)(A_int_1()) == 4);
+            DYNAMIC_VERIFY(stdex::bind(&A_int_1::mem2, A_int_1())() == 4);
             A_int_1* ap = &a;
-            DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::mem2, _1)(ap) == 4);
-            DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::mem2, ap)() == 4);
+            DYNAMIC_VERIFY(stdex::bind(&A_int_1::mem2, _1)(ap) == 4);
+            DYNAMIC_VERIFY(stdex::bind(&A_int_1::mem2, ap)() == 4);
         }
         // member data pointer
         {
@@ -388,6 +390,7 @@ namespace invoke_lvalue
             //DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::data_, _1)(ap) == 6);
             //stdex::bind<int&>(&A_int_1::data_, _1)(ap) = 7;
             //DYNAMIC_VERIFY(stdex::bind<int>(&A_int_1::data_, _1)(ap) == 7);
+            (void)(ap);
         }
 
         return 0;
@@ -440,6 +443,8 @@ namespace invoke_lvalue
             save_count = count;
         }
 
+        (void)(save_count);
+
         return 0;
     }
 
@@ -458,10 +463,10 @@ namespace invoke_lvalue
         typedef bool(TFENode::*member_type)(unsigned long) const;
         typedef binder<bool, member_type, placeholders::ph_1, unsigned long> binder_type;
         const binder_type f =
-            bind<bool, member_type, placeholders::ph_1>(&TFENode::foo, _1, 0UL);
+            bind<bool>(&TFENode::foo, _1, 0UL);
         const TFENode n = TFENode();
-        //bool b = f(n);
-        //DYNAMIC_VERIFY(b);
+        bool b = f(n);
+        DYNAMIC_VERIFY(b);
 
         return 0;
     }
