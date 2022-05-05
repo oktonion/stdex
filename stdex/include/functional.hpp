@@ -889,7 +889,7 @@ namespace stdex
         {
             template<class _CheckedArgsT, class _RawArgsT>
             static void call(_FuncT &fx, _callable_args<_RawArgsT> &args,
-                const _CheckedArgsT &checked_args, _return_arg<_R> &result, functional_detail::_any, bool)
+                const _CheckedArgsT &checked_args, _return_arg<_R> &result, functional_detail::_any)
             {
                 typedef _func_invoker_impl<_R, _FuncT, _Index + 1, _Count> func_invoker;
                 func_invoker::call(fx, args, checked_args, result);
@@ -901,7 +901,7 @@ namespace stdex
         {
             template<class _CheckedArgsT, class _RawArgsT>
             static void call(_FuncT &fx, _callable_args<_RawArgsT> &args,
-                const _checked_args<_CheckedArgsT> &checked_args, _return_arg<_R> &result, functional_detail::_any, bool)
+                const _checked_args<_CheckedArgsT> &checked_args, _return_arg<_R> &result, functional_detail::_any)
             {
                 typedef 
                 typename _get_args_traits<_RawArgsT, _Index>::value_type value_type;
@@ -913,7 +913,7 @@ namespace stdex
 
             template<class _RawArgsT>
             static void call(_FuncT& fx, _callable_args<_RawArgsT>& args,
-                const _checked_args<_RawArgsT>& checked_args, _return_arg<_R> &result, functional_detail::_any, bool)
+                const _checked_args<_RawArgsT>& checked_args, _return_arg<_R> &result, functional_detail::_any)
             {
                 typedef _func_invoker_impl<_R, _FuncT, _Index + 1, _Count> func_invoker;
                 func_invoker::call(fx, args, checked_args, result);
@@ -921,11 +921,8 @@ namespace stdex
 
             template<class _CheckedArgsT, class _RawArgsT>
             static void call(_FuncT &fx, _callable_args<_RawArgsT> &args,
-                const _checked_args<_CheckedArgsT> &checked_args, _return_arg<_R> &result, void*, bool is_equal_to_nullptr)
+                const _checked_args<_CheckedArgsT> &checked_args, _return_arg<_R> &result, void*)
             {
-                if (!is_equal_to_nullptr)
-                    return call(fx, args, checked_args, result, functional_detail::_any(), false);
-
                 typedef _args<_CheckedArgsT, _nullptr_place_holder, _Index> checked_args_t;
                 typedef _func_invoker_impl<_R, _FuncT, _Index + 1, _Count> func_invoker;
 
@@ -934,11 +931,8 @@ namespace stdex
 
             template<class _RawArgsT>
             static void call(_FuncT& fx, _callable_args<_RawArgsT>& args,
-                const _checked_args<_RawArgsT>& checked_args, _return_arg<_R> &result, void*, bool is_equal_to_nullptr)
-            {
-                if (!is_equal_to_nullptr)
-                    return call(fx, args, checked_args, result, functional_detail::_any(), false);
-                
+                const _checked_args<_RawArgsT>& checked_args, _return_arg<_R> &result, void*)
+            {                
                 typedef 
                 typename _get_args_traits<_RawArgsT, _Index>::base_type args_type;
 
@@ -964,14 +958,11 @@ namespace stdex
             {
                 typedef _check_args_for_null_impl_helper<
                     _R, _FuncT, _Index, _Count,
-                    true
-                    //intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value == bool(true)
+                    intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value == bool(true)
                     //|| is_class<_FuncT>::value == bool(false)
                 > helper;
-                helper::call(fx, args, checked_args, result, base_type::value, 
-                    base_type::value == detail::_get_arg<_Index>(
-                        static_cast<typename _callable_args<_RawArgsT>::base_type&>(args)
-                    ).value);                        
+
+                helper::call(fx, args, checked_args, result, base_type::value);
             }
         };
 
@@ -1050,9 +1041,69 @@ namespace stdex
             template<unsigned _Rank> struct _priority_tag : _priority_tag < _Rank - 1 > {};
             template<> struct _priority_tag<0> {};
 
-            template<bool>
-            struct _invokable_tag{};
+            struct _functor_call
+            {
+                struct _member { 
+                    struct _rw {};
+                    struct _function {
+                        struct _rw {};
+                    }; 
+                };
+            };
+
+            template<bool, bool, bool>
+            struct _call_functor_impl;
+
+            template</*is_member_pointer, is_function, is_reference_wrapper*/>
+            struct _call_functor_impl<true, true, false>
+            { typedef _functor_call::_member::_function type; };
+
+            template</*is_member_pointer, is_function, is_reference_wrapper*/>
+            struct _call_functor_impl<true, true, true>
+            { typedef _functor_call::_member::_function::_rw type; };
+
+            template</*is_member_pointer, is_function, is_reference_wrapper*/>
+            struct _call_functor_impl<true, false, false>
+            { typedef _functor_call::_member type; };
+
+            template</*is_member_pointer, is_function, is_reference_wrapper*/>
+            struct _call_functor_impl<true, false, true>
+            { typedef _functor_call::_member::_rw type; };     
+
+            template</*is_member_pointer, is_function, is_reference_wrapper*/>
+            struct _call_functor_impl<false, false, false>
+            { typedef _functor_call type; };
+
+            template</*is_member_pointer, is_function, is_reference_wrapper*/>
+            struct _call_functor_impl<false, true, false>
+                : _call_functor_impl<false, false, false>
+            {};
+
         }
+
+        template<class _Tp>
+        struct _is_reference_wrapper
+            : false_type {};
+
+        template<class _Tp>
+        struct _is_reference_wrapper<
+            reference_wrapper<_Tp>
+        >   : true_type {};
+
+        template<class _Tp>
+        struct _is_reference_wrapper<
+            const reference_wrapper<_Tp>
+        >   : true_type {};
+
+        template<class _Tp>
+        struct _is_reference_wrapper<
+            volatile reference_wrapper<_Tp>
+        >   : true_type {};
+
+        template<class _Tp>
+        struct _is_reference_wrapper<
+            const volatile reference_wrapper<_Tp>
+        >   : true_type {};
 
         template<class _FuncT, class _ArgsT, class _R>
         void _invoke_clear(_FuncT &fx, _callable_args<_ArgsT> &args, _return_arg<_R> &result)
@@ -1062,11 +1113,14 @@ namespace stdex
             STATIC_ASSERT(is_compound<func_type>::value, callable_should_be_compound);
 
             args.call(fx, result, 
-                functional_detail::_invokable_tag< 
-                    is_function<func_type>::value == bool(true) ||
-                    is_member_function_pointer<_FuncT>::value == bool(true) ||
-                    is_member_pointer<_FuncT>::value == bool(true)
-                >()
+                typename
+                functional_detail::_call_functor_impl< 
+                    is_member_pointer<_FuncT>::value,
+                    is_function<_FuncT>::value == bool(true) || is_member_function_pointer<_FuncT>::value == bool(true),
+                    _is_reference_wrapper<
+                        typename _get_args_traits<_ArgsT, 0>::value_type
+                    >::value
+                >::type()
                 , functional_detail::_priority_tag<10>()
             );
         }
@@ -1116,66 +1170,98 @@ namespace stdex
             _callable_args(const _empty_args &other)
                 : base_type(other) {}
 
-            template<class _R, class _FuncT, class _Invokable>
-            void call(_FuncT &fx, _return_arg<_R> &result, _Invokable, const functional_detail::_priority_tag<0>&)
+            template<class _R, class _FuncT, class _CallType>
+            void call(_FuncT &fx, _return_arg<_R> &result, _CallType, const functional_detail::_priority_tag<0>&)
             {
                 result = fx();
             }
 
-            template<class _FuncT, class _Invokable>
-            void call(_FuncT &fx, _return_arg<void> &, _Invokable, const functional_detail::_priority_tag<1>&)
+            template<class _FuncT, class _CallType>
+            void call(_FuncT &fx, _return_arg<void> &, _CallType, const functional_detail::_priority_tag<1>&)
             {
                 fx();
             }
         };
 
-#define _STDEX_ARG_VALUE(arg_n) _get_args_traits<base_type, arg_n>::arg_type::value
+#define _STDEX_ARG_VALUE(arg_n) _get_args_traits<base_type, arg_n + 1>::arg_type::value
 
 #define _STDEX_CALLABLE_ARGS(arg_n) \
         template<class _ArgsT, class _ArgT> \
-        struct _callable_args<_args<_ArgsT, _ArgT, arg_n>/**/> : _args<_ArgsT, _ArgT, arg_n> \
+        struct _callable_args<_args<_ArgsT, _ArgT, arg_n + 1>/**/> : _args<_ArgsT, _ArgT, arg_n + 1> \
         { \
-            typedef _args<_ArgsT, _ArgT, arg_n> base_type; \
+            typedef _args<_ArgsT, _ArgT, arg_n + 1> base_type; \
         \
             template<class _OtherArgsT, class _OtherArgT> \
             _callable_args(const _args<_OtherArgsT, _OtherArgT, base_type::count - 1> &other) \
                 : base_type(other) {} \
         \
             template<class _R, class _FuncT> \
-            void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<false>, const functional_detail::_priority_tag<5>&) \
+            void call(_FuncT *fx, _return_arg<_R> &result, functional_detail::_functor_call, const functional_detail::_priority_tag<7>&) \
             { \
                 result = _return_arg<_R>(fx( \
-                _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) ));} \
+                _STDEX_ARG_VALUE(-1), _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) ));} \
         \
             template<class _FuncT> \
-            void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<false>, const functional_detail::_priority_tag<6>&) \
+            void call(_FuncT *fx, _return_arg<void> &, functional_detail::_functor_call, const functional_detail::_priority_tag<8>&) \
             { \
                 fx( \
-                _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) );} \
+                _STDEX_ARG_VALUE(-1), _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) );} \
         \
             template<class _R, class _FuncT> \
-            void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_invokable_tag<true>, const functional_detail::_priority_tag<3>&) \
+            void call(_FuncT &fx, _return_arg<_R> &result, functional_detail::_functor_call, const functional_detail::_priority_tag<5>&) \
             { \
-                result = _return_arg<_R>(stdex::invoke(fx, \
-                _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) ));} \
+                result = _return_arg<_R>(fx( \
+                _STDEX_ARG_VALUE(-1), _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) ));} \
         \
             template<class _FuncT> \
-            void call(_FuncT &fx, _return_arg<void> &, functional_detail::_invokable_tag<true>, const functional_detail::_priority_tag<4>&) \
+            void call(_FuncT &fx, _return_arg<void> &, functional_detail::_functor_call, const functional_detail::_priority_tag<6>&) \
             { \
-                stdex::invoke(fx, \
-                _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) );} \
+                fx( \
+                _STDEX_ARG_VALUE(-1), _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) );} \
         \
-            template<class _R, class _FuncT> \
-            void call(_FuncT *fx, _return_arg<_R> &result, functional_detail::_invokable_tag<true>, const functional_detail::_priority_tag<1>&) \
+            template<class _ObjectT, class _R, class _FuncT> \
+            void call_impl(_FuncT fx, _ObjectT *obj, _return_arg<_R>& result, const functional_detail::_priority_tag<7>&) \
             { \
-                result = _return_arg<_R>(stdex::invoke(fx, \
+                result = _return_arg<_R>( ((*obj).*fx)( \
                 _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) ));} \
         \
-            template<class _FuncT> \
-            void call(_FuncT *fx, _return_arg<void> &, functional_detail::_invokable_tag<true>, const functional_detail::_priority_tag<2>&) \
+            template<class _ObjectT, class _FuncT> \
+            void call_impl(_FuncT fx, _ObjectT *obj, _return_arg<void>&, const functional_detail::_priority_tag<8>&) \
             { \
-                stdex::invoke(fx, \
+                ((*obj).*fx)( \
                 _STDEX_ARGS##arg_n##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_ARG_VALUE) );} \
+        \
+            template<class _ObjectT, class _R1, class _R2, class _FuncT> \
+            void call_impl(_FuncT fx, const _ObjectT *obj, _return_arg<_R1, _R2>& result, const functional_detail::_priority_tag<6>&) \
+            { \
+                call_impl<const _ObjectT>(fx, obj, result, functional_detail::_priority_tag<10>()); \
+            } \
+        \
+            template<class _ObjectT, class _R1, class _R2, class _FuncT> \
+            void call_impl(_FuncT fx, _ObjectT &obj, _return_arg<_R1, _R2>& result, const functional_detail::_priority_tag<5>&) \
+            { \
+                call_impl(fx, &obj, result, functional_detail::_priority_tag<10>()); \
+            } \
+        \
+            template<class _ObjectT, class _R1, class _R2, class _FuncT> \
+            void call_impl(_FuncT fx, const _ObjectT &obj, _return_arg<_R1, _R2>& result, const functional_detail::_priority_tag<4>&) \
+            { \
+                call_impl(fx, &obj, result, functional_detail::_priority_tag<10>()); \
+            } \
+        \
+            template<class _R1, class _R2, class _FuncT>  \
+            void call(_FuncT fx, _return_arg<_R1, _R2>& result, functional_detail::_functor_call::_member::_function, const functional_detail::_priority_tag<4>&) \
+            { \
+                typedef typename _get_args_traits<base_type, 0>::arg_type _object_type; \
+                call_impl(fx, _object_type::value, result, functional_detail::_priority_tag<10>()); \
+            } \
+        \
+            template<class _R1, class _R2, class _FuncT> \
+            void call(_FuncT fx, _return_arg<_R1, _R2>& result, functional_detail::_functor_call::_member::_function::_rw, const functional_detail::_priority_tag<3>&) \
+            { \
+                typedef typename _get_args_traits<base_type, 0>::arg_type _object_type; \
+                call_impl(fx, _object_type::value.get(), result, functional_detail::_priority_tag<10>()); \
+            } \
         };
 
         template<class _ArgsT, class _ArgT> 
@@ -1188,7 +1274,7 @@ namespace stdex
                 base_type(other) {} 
 
             template<class _R, class _FuncT> 
-            void call(_FuncT& fx, _return_arg<_R>& result, functional_detail::_invokable_tag<false>, const functional_detail::_priority_tag<5>&) 
+            void call(_FuncT* fx, _return_arg<_R>& result, functional_detail::_functor_call, const functional_detail::_priority_tag<7>&) 
             { 
                 result = 
                     _return_arg<_R>(
@@ -1197,131 +1283,199 @@ namespace stdex
             } 
             
             template<class _FuncT> 
-            void call(_FuncT& fx, _return_arg<void>&, functional_detail::_invokable_tag<false>, const functional_detail::_priority_tag<6>&) 
+            void call(_FuncT* fx, _return_arg<void>&, functional_detail::_functor_call, const functional_detail::_priority_tag<8>&) 
             { 
                 fx(_get_args_traits<base_type, 0>::arg_type::value); 
             } 
 
             template<class _R, class _FuncT> 
-            void call(_FuncT* fx, _return_arg<_R>& result, functional_detail::_invokable_tag<true>, const functional_detail::_priority_tag<3>&) 
+            void call(_FuncT& fx, _return_arg<_R>& result, functional_detail::_functor_call, const functional_detail::_priority_tag<5>&) 
             { 
-                result = _return_arg<_R>(stdex::invoke(fx, _get_args_traits<base_type, 0>::arg_type::value)); 
+                result = 
+                    _return_arg<_R>(
+                        fx(_get_args_traits<base_type, 0>::arg_type::value)
+                    );
             } 
             
             template<class _FuncT> 
-            void call(_FuncT* fx, _return_arg<void>&, functional_detail::_invokable_tag<true>, const functional_detail::_priority_tag<4>&) 
+            void call(_FuncT& fx, _return_arg<void>&, functional_detail::_functor_call, const functional_detail::_priority_tag<6>&) 
             { 
-                stdex::invoke(fx, _get_args_traits<base_type, 0>::arg_type::value); 
+                fx(_get_args_traits<base_type, 0>::arg_type::value);
+            } 
+
+            template<class _ObjectT, class _R, class _FuncT>
+            void call_impl(_FuncT fx, _ObjectT *obj, _return_arg<_R>& result, const functional_detail::_priority_tag<7>&)
+            {
+                result = 
+                    _return_arg<_R>(
+                        ((*obj).*fx)()
+                    );
+            }
+
+            template<class _ObjectT, class _FuncT>
+            void call_impl(_FuncT fx, _ObjectT *obj, _return_arg<void>&, const functional_detail::_priority_tag<8>&)
+            {
+                ((*obj).*fx)();
+            }
+
+            template<class _ObjectT, class _R1, class _R2, class _FuncT>
+            void call_impl(_FuncT fx, const _ObjectT *obj, _return_arg<_R1, _R2>& result, const functional_detail::_priority_tag<6>&)
+            {
+                call_impl<const _ObjectT>(fx, obj, result, functional_detail::_priority_tag<10>());
+            }
+
+            template<class _ObjectT, class _R1, class _R2, class _FuncT>
+            void call_impl(_FuncT fx, _ObjectT &obj, _return_arg<_R1, _R2>& result, const functional_detail::_priority_tag<5>&)
+            {
+                call_impl(fx, &obj, result, functional_detail::_priority_tag<10>());
+            }
+
+            template<class _ObjectT, class _R1, class _R2, class _FuncT>
+            void call_impl(_FuncT fx, const _ObjectT &obj, _return_arg<_R1, _R2>& result, const functional_detail::_priority_tag<4>&)
+            {
+                call_impl(fx, &obj, result, functional_detail::_priority_tag<10>());
+            }
+
+            template<class _R1, class _R2, class _FuncT> 
+            void call(_FuncT fx, _return_arg<_R1, _R2>& result, functional_detail::_functor_call::_member::_function, const functional_detail::_priority_tag<4>&) 
+            { 
+                typedef typename _get_args_traits<base_type, 0>::arg_type _object_type;
+                call_impl(fx, _object_type::value, result, functional_detail::_priority_tag<10>());
+            } 
+            
+            template<class _R1, class _R2, class _FuncT> 
+            void call(_FuncT fx, _return_arg<_R1, _R2>& result, functional_detail::_functor_call::_member::_function::_rw, const functional_detail::_priority_tag<3>&) 
+            { 
+                typedef typename _get_args_traits<base_type, 0>::arg_type _object_type;
+                call_impl(fx, _object_type::value.get(), result, functional_detail::_priority_tag<10>());
+            }
+
+            template<class _ObjectT, class _R, class _MemberT>
+            void get_member(_MemberT* member, _ObjectT *obj, _return_arg<_R>& result, const functional_detail::_priority_tag<8>&)
+            {
+                result = 
+                    _return_arg<_R>(
+                        (*obj).*member
+                    );
+            }
+
+            template<class _ObjectT, class _R, class _MemberT>
+            void get_member(_MemberT* member, _ObjectT &obj, _return_arg<_R>& result, const functional_detail::_priority_tag<7>&)
+            {
+                result = 
+                    _return_arg<_R>(
+                        obj.*member
+                    );
             }
             
-            template<class _R, class _FuncT> 
-            void call(_FuncT& fx, _return_arg<_R>& result, functional_detail::_invokable_tag<true>, const functional_detail::_priority_tag<1>&) 
+            template<class _R, class _MemberT> 
+            void call(_MemberT* member, _return_arg<_R>& result, functional_detail::_functor_call::_member, const functional_detail::_priority_tag<4>&) 
             { 
-                result = _return_arg<_R>(stdex::invoke(fx, _get_args_traits<base_type, 0>::arg_type::value)); 
+                typedef typename _get_args_traits<base_type, 0>::arg_type _object_type;
+                get_member(member, _object_type::value, result, functional_detail::_priority_tag<10>());
             } 
-            
-            template<class _FuncT> 
-            void call(_FuncT& fx, _return_arg<void>&, functional_detail::_invokable_tag<true>, const functional_detail::_priority_tag<2>&) 
+
+            template<class _R, class _MemberT> 
+            void call(_MemberT* member, _return_arg<_R>& result, functional_detail::_functor_call::_member::_rw, const functional_detail::_priority_tag<4>&) 
             { 
-                stdex::invoke(fx, _get_args_traits<base_type, 0>::arg_type::value); 
-            }  
+                typedef typename _get_args_traits<base_type, 0>::arg_type _object_type;
+                get_member(member, _object_type::value.get(), result, functional_detail::_priority_tag<10>());
+            }
+            
         };
 
-#if (STDEX_FUNCTION_MAX_ARG_N >= 0)
-    //_STDEX_CALLABLE_ARGS(0)
-#endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 1)
-    _STDEX_CALLABLE_ARGS(1)
+    _STDEX_CALLABLE_ARGS(0)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 2)
-    _STDEX_CALLABLE_ARGS(2)
+    _STDEX_CALLABLE_ARGS(1)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 3)
-    _STDEX_CALLABLE_ARGS(3)
+    _STDEX_CALLABLE_ARGS(2)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 4)
-    _STDEX_CALLABLE_ARGS(4)
+    _STDEX_CALLABLE_ARGS(3)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 5)
-    _STDEX_CALLABLE_ARGS(5)
+    _STDEX_CALLABLE_ARGS(4)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 6)
-    _STDEX_CALLABLE_ARGS(6)
+    _STDEX_CALLABLE_ARGS(5)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 7)
-    _STDEX_CALLABLE_ARGS(7)
+    _STDEX_CALLABLE_ARGS(6)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 8)
-    _STDEX_CALLABLE_ARGS(8)
+    _STDEX_CALLABLE_ARGS(7)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 9)
-    _STDEX_CALLABLE_ARGS(9)
+    _STDEX_CALLABLE_ARGS(8)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 10)
-    _STDEX_CALLABLE_ARGS(10)
+    _STDEX_CALLABLE_ARGS(9)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 11)
-    _STDEX_CALLABLE_ARGS(11)
+    _STDEX_CALLABLE_ARGS(10)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 12)
-    _STDEX_CALLABLE_ARGS(12)
+    _STDEX_CALLABLE_ARGS(11)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 13)
-    _STDEX_CALLABLE_ARGS(13)
+    _STDEX_CALLABLE_ARGS(12)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 14)
-    _STDEX_CALLABLE_ARGS(14)
+    _STDEX_CALLABLE_ARGS(13)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 15)
-    _STDEX_CALLABLE_ARGS(15)
+    _STDEX_CALLABLE_ARGS(14)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 16)
-    _STDEX_CALLABLE_ARGS(16)
+    _STDEX_CALLABLE_ARGS(15)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 17)
-    _STDEX_CALLABLE_ARGS(17)
+    _STDEX_CALLABLE_ARGS(16)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 18)
-    _STDEX_CALLABLE_ARGS(18)
+    _STDEX_CALLABLE_ARGS(17)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 19)
-    _STDEX_CALLABLE_ARGS(19)
+    _STDEX_CALLABLE_ARGS(18)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 20)
-    _STDEX_CALLABLE_ARGS(20)
+    _STDEX_CALLABLE_ARGS(19)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 21)
-    _STDEX_CALLABLE_ARGS(21)
+    _STDEX_CALLABLE_ARGS(20)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 22)
-    _STDEX_CALLABLE_ARGS(22)
+    _STDEX_CALLABLE_ARGS(21)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 23)
-    _STDEX_CALLABLE_ARGS(23)
+    _STDEX_CALLABLE_ARGS(22)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 24)
-    _STDEX_CALLABLE_ARGS(24)
+    _STDEX_CALLABLE_ARGS(23)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 25)
-    _STDEX_CALLABLE_ARGS(25)
+    _STDEX_CALLABLE_ARGS(24)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 26)
-    _STDEX_CALLABLE_ARGS(26)
+    _STDEX_CALLABLE_ARGS(25)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 27)
-    _STDEX_CALLABLE_ARGS(27)
+    _STDEX_CALLABLE_ARGS(26)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 28)
-    _STDEX_CALLABLE_ARGS(28)
+    _STDEX_CALLABLE_ARGS(27)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 29)
-    _STDEX_CALLABLE_ARGS(29)
+    _STDEX_CALLABLE_ARGS(28)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 30)
-    _STDEX_CALLABLE_ARGS(30)
+    _STDEX_CALLABLE_ARGS(29)
 #endif
 #if (STDEX_FUNCTION_MAX_ARG_N >= 31)
-    _STDEX_CALLABLE_ARGS(31)
+    _STDEX_CALLABLE_ARGS(30)
 #endif
 
 #undef _STDEX_ARG_VALUE
