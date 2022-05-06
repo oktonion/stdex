@@ -1183,7 +1183,62 @@ namespace stdex
             }
         };
 
-#define _STDEX_ARG_VALUE(arg_n) _get_args_traits<base_type, arg_n + 1>::arg_type::value
+        namespace functional_detail
+        {
+            template<class _Tp, int _N, bool _IsNullPtr>
+            struct _get_arg_type_helper1_impl;
+
+            template<class _Tp, int _N>
+            struct _get_arg_type_helper1_impl<_Tp, _N, false>
+            {
+                typedef _nullptr_place_holder type;
+            };
+
+            template<class _Tp, int _N>
+            struct _get_arg_type_helper1_impl<_Tp, _N, true>
+            {
+                typedef _arg<_Tp, _N> type;
+            };
+
+            template<class _Tp>
+            struct _get_arg_type_helper1;
+
+            template<class _Tp, int _N>
+            struct _get_arg_type_helper1<_arg<_Tp, _N>/**/>
+                : _get_arg_type_helper1_impl<_Tp, _N, is_null_pointer<_Tp>::value>
+            { };
+
+            template<class _Tp, int _N, bool _IsNullPtr>
+            struct _get_arg_type_helper2_impl;
+
+            template<class _Tp, int _N>
+            struct _get_arg_type_helper2_impl<_Tp, _N, false>
+            {
+                typedef _arg<_Tp, _N> type;
+            };
+
+            template<class _Tp, int _N>
+            struct _get_arg_type_helper2_impl<_Tp, _N, true>
+            {
+                typedef _nullptr_place_holder type;
+            };
+
+            template<class _Tp>
+            struct _get_arg_type_helper2;
+
+            template<class _Tp, int _N>
+            struct _get_arg_type_helper2<_arg<_Tp, _N>/**/>
+                : _get_arg_type_helper2_impl<_Tp, _N, is_null_pointer<_Tp>::value>
+            { };
+
+        } // namespace functional_detail
+
+#define _STDEX_ARG_VALUE(arg_n) \
+    (\
+        stdex::detail::functional_detail::_get_arg_type_helper1<typename stdex::detail::_get_args_traits<base_type, arg_n + 1>::arg_type>::type::value == nullptr ? \
+        stdex::detail::_get_args_traits<base_type, arg_n + 1>::arg_type::value : \
+        stdex::detail::functional_detail::_get_arg_type_helper2<typename stdex::detail::_get_args_traits<base_type, arg_n + 1>::arg_type>::type::value \
+    )
 
 #define _STDEX_CALLABLE_ARGS(arg_n) \
         template<class _ArgsT, class _ArgT> \
@@ -1278,14 +1333,14 @@ namespace stdex
             { 
                 result = 
                     _return_arg<_R>(
-                        fx(_get_args_traits<base_type, 0>::arg_type::value)
+                        fx(_STDEX_ARG_VALUE(-1))
                     ); 
             } 
             
             template<class _FuncT> 
             void call(_FuncT* fx, _return_arg<void>&, functional_detail::_functor_call, const functional_detail::_priority_tag<8>&) 
             { 
-                fx(_get_args_traits<base_type, 0>::arg_type::value); 
+                fx(_STDEX_ARG_VALUE(-1)); 
             } 
 
             template<class _R, class _FuncT> 
@@ -1293,14 +1348,14 @@ namespace stdex
             { 
                 result = 
                     _return_arg<_R>(
-                        fx(_get_args_traits<base_type, 0>::arg_type::value)
+                        fx(_STDEX_ARG_VALUE(-1))
                     );
             } 
             
             template<class _FuncT> 
             void call(_FuncT& fx, _return_arg<void>&, functional_detail::_functor_call, const functional_detail::_priority_tag<6>&) 
             { 
-                fx(_get_args_traits<base_type, 0>::arg_type::value);
+                fx(_STDEX_ARG_VALUE(-1));
             } 
 
             template<class _ObjectT, class _R, class _FuncT>
