@@ -296,7 +296,10 @@ namespace stdex
             _nullptr_place_holder_impl<
                 stdex::nullptr_t,
                 intern::_has_feature<intern::_stdex_has_native_nullptr>::value>
-        { };
+        { 
+            _nullptr_place_holder(...){}
+            operator stdex::nullptr_t() const {return nullptr;}
+        };
 
         template<int _N>
         struct _arg<_nullptr_place_holder, _N>:

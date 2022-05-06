@@ -1183,62 +1183,8 @@ namespace stdex
             }
         };
 
-        namespace functional_detail
-        {
-            template<class _Tp, int _N, bool _IsNullPtr>
-            struct _get_arg_type_helper1_impl;
-
-            template<class _Tp, int _N>
-            struct _get_arg_type_helper1_impl<_Tp, _N, false>
-            {
-                typedef _nullptr_place_holder type;
-            };
-
-            template<class _Tp, int _N>
-            struct _get_arg_type_helper1_impl<_Tp, _N, true>
-            {
-                typedef _arg<_Tp, _N> type;
-            };
-
-            template<class _Tp>
-            struct _get_arg_type_helper1;
-
-            template<class _Tp, int _N>
-            struct _get_arg_type_helper1<_arg<_Tp, _N>/**/>
-                : _get_arg_type_helper1_impl<_Tp, _N, is_null_pointer<_Tp>::value>
-            { };
-
-            template<class _Tp, int _N, bool _IsNullPtr>
-            struct _get_arg_type_helper2_impl;
-
-            template<class _Tp, int _N>
-            struct _get_arg_type_helper2_impl<_Tp, _N, false>
-            {
-                typedef _arg<_Tp, _N> type;
-            };
-
-            template<class _Tp, int _N>
-            struct _get_arg_type_helper2_impl<_Tp, _N, true>
-            {
-                typedef _nullptr_place_holder type;
-            };
-
-            template<class _Tp>
-            struct _get_arg_type_helper2;
-
-            template<class _Tp, int _N>
-            struct _get_arg_type_helper2<_arg<_Tp, _N>/**/>
-                : _get_arg_type_helper2_impl<_Tp, _N, is_null_pointer<_Tp>::value>
-            { };
-
-        } // namespace functional_detail
-
 #define _STDEX_ARG_VALUE(arg_n) \
-    (\
-        stdex::detail::functional_detail::_get_arg_type_helper1<typename stdex::detail::_get_args_traits<base_type, arg_n + 1>::arg_type>::type::value == nullptr ? \
-        stdex::detail::_get_args_traits<base_type, arg_n + 1>::arg_type::value : \
-        stdex::detail::functional_detail::_get_arg_type_helper2<typename stdex::detail::_get_args_traits<base_type, arg_n + 1>::arg_type>::type::value \
-    )
+    stdex::detail::_get_args_traits<base_type, arg_n + 1>::arg_type::value
 
 #define _STDEX_CALLABLE_ARGS(arg_n) \
         template<class _ArgsT, class _ArgT> \
@@ -3202,6 +3148,24 @@ private:
         >(fx, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)); \
     } \
 \
+    template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK), \
+        _STDEX_TMPL_ARGS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> \
+    binder< \
+        _R, \
+        _R(*)( _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM) ), \
+        _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM2) \
+    > \
+    bind(_R(*fx)( _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM) ), \
+        _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK) ) \
+    { \
+        return \
+        binder< \
+            _R, \
+            _R(*)( _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM) ), \
+            _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM2) \
+        >(fx, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)); \
+    } \
+\
     template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK), \
         _STDEX_TMPL_ARGS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> \
     binder< \
@@ -3235,7 +3199,11 @@ private:
     }
 
 #define _STDEX_TYPE_CUSTOM(count) _MemberArg##count##T
-#define _STDEX_ARG_CUSTOM(count) member_arg##count
+#define _STDEX_TYPE_CUSTOM2(count) \
+    typename \
+    conditional< \
+        is_null_pointer<_STDEX_TYPE_DEFAULT(count)>::value && is_pointer<_MemberArg##count##T>::value, \
+        detail::_nullptr_place_holder, _STDEX_TYPE_DEFAULT(count)>::type
 
 #if (STDEX_FUNCTION_MAX_ARG_N >= 0)
         _STDEX_BIND(0 )
@@ -3336,7 +3304,7 @@ private:
 
 #undef _STDEX_BIND
 #undef _STDEX_TYPE_CUSTOM
-#undef _STDEX_ARG_CUSTOM
+#undef _STDEX_TYPE_CUSTOM2
 
     // Hashing
 
