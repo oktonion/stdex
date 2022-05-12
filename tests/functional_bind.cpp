@@ -463,11 +463,13 @@ namespace invoke_lvalue
         typedef bool(TFENode::*member_type)(unsigned long) const;
         typedef binder<bool, member_type, placeholders::ph_1, unsigned long> binder_type;
         const binder_type f =
-            bind<bool>(&TFENode::foo, _1, 0UL);
-        { const binder_type ff = bind(&TFENode::foo, _1, 0UL); }
+            bind(&TFENode::foo, _1, 0UL);
+        
         const TFENode n = TFENode();
         bool b = f(n);
         DYNAMIC_VERIFY(b);
+
+        { const binder_type ff = bind<bool>(&TFENode::foo, _1, 0UL); }
 
         return 0;
     }
