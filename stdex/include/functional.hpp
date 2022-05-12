@@ -3184,7 +3184,7 @@ private:
     binder< \
         _R, \
         _FuncT, \
-        _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) \
+        _STDEX_TYPE_DEFAULT(First), _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) \
     > \
     bind(_FuncT _func, _STDEX_TYPE_DEFAULT(First) _arg_first, _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK)) \
     { \

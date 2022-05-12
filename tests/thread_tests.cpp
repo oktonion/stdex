@@ -616,7 +616,7 @@ struct dummy_functor2
     }
 };
 
-int test13()
+int test10()
 {
     using namespace stdex;
 
@@ -624,19 +624,9 @@ int test13()
         thread tt(&dummy_func_0);
         tt.join();
     }
-    {
-        dummy_functor ff;
-        thread tt(ff);
-        tt.join();
-    }
 
     {
         thread tt(&dummy_func_1, nullptr);
-        tt.join();
-    }
-    {
-        dummy_functor ff;
-        thread tt(ff, nullptr);
         tt.join();
     }
 
@@ -644,19 +634,9 @@ int test13()
         thread tt(&dummy_func_2, nullptr, nullptr);
         tt.join();
     }
-    {
-        dummy_functor ff;
-        thread tt(ff, nullptr, nullptr);
-        tt.join();
-    }
 
     {
         thread tt(&dummy_func_3, nullptr, nullptr, nullptr);
-        tt.join();
-    }
-    {
-        dummy_functor ff;
-        thread tt(ff, nullptr, nullptr, nullptr);
         tt.join();
     }
     
@@ -664,19 +644,9 @@ int test13()
         thread tt(&dummy_func_4, nullptr, nullptr, nullptr, nullptr);
         tt.join();
     }
-    {
-        dummy_functor ff;
-        thread tt(ff, nullptr, nullptr, nullptr, nullptr);
-        tt.join();
-    }
     
     {
         thread tt(&dummy_func_5, nullptr, nullptr, nullptr, nullptr, nullptr);
-        tt.join();
-    }
-    {
-        dummy_functor ff;
-        thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr);
         tt.join();
     }
     
@@ -684,29 +654,14 @@ int test13()
         thread tt(&dummy_func_6, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
         tt.join();
     }
-    {
-        dummy_functor ff;
-        thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
-        tt.join();
-    }
     
     {
         thread tt(&dummy_func_7, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
         tt.join();
     }
-    {
-        dummy_functor ff;
-        thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
-        tt.join();
-    }
     
     {
         thread tt(&dummy_func_8, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
-        tt.join();
-    }
-    {
-        dummy_functor ff;
-        thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
         tt.join();
     }
 
@@ -780,30 +735,149 @@ int test13()
             static_cast<void*>(&wild_ptr[0]));
         tt.join();
     }
-#ifdef _STDEX_FUNCTIONAL_H // disable current test for now till <functional.hpp> is ready
-    {
-        std::cout << 
-            "nullptr is nativly supported by compiler: " << 
-                (stdex::intern::_has_feature<intern::_stdex_has_native_nullptr>::value ? "true" : "false") <<
-            ", is implemented as distinct type: " <<
-                (stdex::intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value ? "true" : "false") <<
-        std::endl;
-
-        // for some reason GCC can not use local class as functor for templated thread constructor
-        // so we have to improvise
-        typedef dummy_functor2 dummy_functor_local;
-        dummy_functor_local ff;
-
-        thread tt(ff, 1, 2, 3, 4, 5, 6, 7);
-        tt.join();
-
-        thread tt2(ff, int(1), long(2), std::ptrdiff_t(3), short(4), (unsigned int)(5), (unsigned long)(6), (unsigned short)(7));
-        tt2.join();
-    }
-#endif
 
     return 0;
 }
+
+// hack to check for stdex version of nullptr passed to function
+template<bool Enabled = 
+    stdex::intern::_has_feature<stdex::intern::_stdex_nullptr_implemented_as_distinct_type>::value> 
+struct np_tests_impl
+{
+    typedef stdex::thread thread;
+
+    static int test01()
+    {
+#ifdef _STDEX_FUNCTIONAL_H // disable current test for now till <functional.hpp> is ready
+        {
+            dummy_functor ff;
+            thread tt(ff);
+            tt.join();
+        }
+
+        return 0;
+    }
+    static int test02()
+    {
+        {
+            dummy_functor ff;
+            thread tt(ff, nullptr);
+            tt.join();
+        }
+
+        return 0;
+    }
+    static int test03()
+    {
+        {
+            dummy_functor ff;
+            thread tt(ff, nullptr, nullptr);
+            tt.join();
+        }
+
+        return 0;
+    }
+    static int test04()
+    {
+        {
+            dummy_functor ff;
+            thread tt(ff, nullptr, nullptr, nullptr);
+            tt.join();
+        }
+
+        return 0;
+    }
+    static int test05()
+    {
+        {
+            dummy_functor ff;
+            thread tt(ff, nullptr, nullptr, nullptr, nullptr);
+            tt.join();
+        }
+
+        return 0;
+    }
+    static int test06()
+    {
+        {
+            dummy_functor ff;
+            thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr);
+            tt.join();
+        }
+
+        return 0;
+    }
+    static int test07()
+    {
+        {
+            dummy_functor ff;
+            thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+            tt.join();
+        }
+
+        return 0;
+    }
+    static int test08()
+    {
+        {
+            dummy_functor ff;
+            thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+            tt.join();
+        }
+
+        return 0;
+    }
+    static int test09()
+    {
+        {
+            dummy_functor ff;
+            thread tt(ff, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr);
+            tt.join();
+        }
+
+        return 0;
+    }
+    static int test10()
+    {
+        {
+            std::cout << 
+                "nullptr is nativly supported by compiler: " << 
+                    (stdex::intern::_has_feature<stdex::intern::_stdex_has_native_nullptr>::value ? "true" : "false") <<
+                ", is implemented as distinct type: " <<
+                    (stdex::intern::_has_feature<stdex::intern::_stdex_nullptr_implemented_as_distinct_type>::value ? "true" : "false") <<
+            std::endl;
+
+            // for some reason GCC can not use local class as functor for templated thread constructor
+            // so we have to improvise
+            typedef dummy_functor2 dummy_functor_local;
+            dummy_functor_local ff;
+
+            thread tt(ff, 1, 2, 3, 4, 5, 6, 7);
+            tt.join();
+
+            thread tt2(ff, int(1), long(2), std::ptrdiff_t(3), short(4), (unsigned int)(5), (unsigned long)(6), (unsigned short)(7));
+            tt2.join();
+        }
+
+        return 0;
+    }
+#endif
+};
+
+template<>
+struct np_tests_impl<false>
+{
+    static int test01() { return 0; }
+    static int test02() { return 0; }
+    static int test03() { return 0; }
+    static int test04() { return 0; }
+    static int test05() { return 0; }
+    static int test06() { return 0; }
+    static int test07() { return 0; }
+    static int test08() { return 0; }
+    static int test09() { return 0; }
+    static int test10() { return 0; }
+};
 
 
 
@@ -910,10 +984,19 @@ int main(void)
         RUN_TEST(test6);
         RUN_TEST(test8);
         RUN_TEST(test9);
-        //RUN_TEST(test10);
-        //RUN_TEST(test11);
-        //RUN_TEST(test12);
-        RUN_TEST(test13);
+        RUN_TEST(test10);
+
+        typedef np_tests_impl<> np_tests;
+        RUN_TEST(np_tests::test01);
+        RUN_TEST(np_tests::test02);
+        RUN_TEST(np_tests::test03);
+        RUN_TEST(np_tests::test04);
+        RUN_TEST(np_tests::test05);
+        RUN_TEST(np_tests::test06);
+        RUN_TEST(np_tests::test07);
+        RUN_TEST(np_tests::test08);
+        RUN_TEST(np_tests::test09);
+        RUN_TEST(np_tests::test10);
         
     }
 
