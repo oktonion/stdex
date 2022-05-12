@@ -464,12 +464,15 @@ namespace invoke_lvalue
         typedef binder<bool, member_type, placeholders::ph_1, unsigned long> binder_type;
         const binder_type f =
             bind<bool>(&TFENode::foo, _1, 0UL);
+        { const binder_type ff = bind(&TFENode::foo, _1, 0UL); }
         const TFENode n = TFENode();
         bool b = f(n);
         DYNAMIC_VERIFY(b);
 
         return 0;
     }
+
+
 
 
     int run()
@@ -483,6 +486,77 @@ namespace invoke_lvalue
     }
 }
 
+struct CallableWithPtr
+{
+    bool foo(void* ptr) const
+    {
+        return ptr == nullptr;
+    }
+
+    bool operator()(void* ptr) const {return foo( ptr ); }
+};
+
+// hack to check for stdex version of nullptr passed to function
+template<bool Enabled = 
+    stdex::intern::_has_feature<stdex::intern::_stdex_nullptr_implemented_as_distinct_type>::value> 
+struct np_tests_impl
+{
+    static int test1()
+    {
+        CallableWithPtr n;
+        DYNAMIC_VERIFY(
+            true == stdex::bind(&CallableWithPtr::foo, stdex::placeholders::_1, nullptr)(n)
+        );
+        return 0;
+    }
+
+    static int test2()
+    {
+        CallableWithPtr n;
+        DYNAMIC_VERIFY(
+            true == stdex::bind(&CallableWithPtr::foo, n, nullptr)()
+        );
+        return 0;
+    }
+
+    static int test3()
+    {
+        CallableWithPtr n;
+        DYNAMIC_VERIFY(
+            true == stdex::bind(&CallableWithPtr::foo, n, stdex::placeholders::_1)(nullptr)
+        );
+        return 0;
+    }
+
+    static int test4()
+    {
+        CallableWithPtr n;
+        DYNAMIC_VERIFY(
+            true == stdex::bind<bool>(n, stdex::placeholders::_1)(nullptr)
+        );
+        return 0;
+    }
+
+    static int test5()
+    {
+        CallableWithPtr n;
+        DYNAMIC_VERIFY(
+            true == stdex::bind<bool>(n, nullptr)()
+        );
+        return 0;
+    }
+};
+
+template<>
+struct np_tests_impl<false>
+{
+    static int test1() { return 0; }
+    static int test2() { return 0; }
+    static int test3() { return 0; }
+    static int test4() { return 0; }
+    static int test5() { return 0; }
+};
+
 int main()
 {
     RUN_TEST(bind_return);
@@ -490,6 +564,13 @@ int main()
     RUN_TEST(invoke_function_object);
     RUN_TEST(invoke_int_0);
     RUN_TEST(invoke_lvalue::run);
+
+    typedef np_tests_impl<> np_tests;
+    RUN_TEST(np_tests::test1);
+    RUN_TEST(np_tests::test2);
+    RUN_TEST(np_tests::test3);
+    RUN_TEST(np_tests::test4);
+    RUN_TEST(np_tests::test5);
 
     return 0;
 }
