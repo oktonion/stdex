@@ -47,7 +47,7 @@ namespace stdex
             template<class _ConvT>
             _thread_param_wrapper(_ConvT arg)
             {
-                STATIC_ASSERT(sizeof(_ConvT) <= sizeof(_pointer_buf), stdex_thread_param_type_is_not_supported);
+                STATIC_ASSERT((sizeof(_ConvT) <= max_type_size::value), stdex_thread_param_type_is_not_supported);
 
                 _convert_func = &_converter<_ConvT>;
                 _delete_func = &_deleter<_ConvT>;
@@ -81,8 +81,8 @@ namespace stdex
             max_type_size;
 
             typedef unsigned char (&pointer_buf_ref)[max_type_size::value];
-            typedef _Tp (*conversion_func)(const pointer_buf_ref);
-            typedef void (*deleter_func)(const pointer_buf_ref);
+            typedef _Tp (*conversion_func)(pointer_buf_ref);
+            typedef void (*deleter_func)(pointer_buf_ref);
 
             template<class _ConvT>
             static _Tp _converter(pointer_buf_ref _ptr_buf)
