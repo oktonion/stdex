@@ -3067,7 +3067,7 @@ private:
         return binder<_R, _FuncT>(_func);
     }
 
-    template<class _R, class _ObjectT, class _ArgObjectT>
+    template<class _ObjectT, class _R, class _ArgObjectT>
     binder<_R, 
         typename detail::_member_function_ptr<_R, _ObjectT, 0>::type,
         _ArgObjectT>
@@ -3078,7 +3078,7 @@ private:
             _ArgObjectT>(_func, obj);
     }
 
-    template<class _R, class _ObjectT, class _ArgObjectT>
+    template<class _ObjectT, class _R, class _ArgObjectT>
     binder<_R,
         typename detail::_member_function_ptr<_R, _ObjectT, 0>::type_const,
         _ArgObjectT>
@@ -3089,7 +3089,7 @@ private:
             _ArgObjectT>(_func, obj);
     }
 
-    template<class _R, class _ObjectT, class _ArgObjectT>
+    template<class _ObjectT, class _R, class _ArgObjectT>
     binder<_R, 
         typename detail::_member_function_ptr<_R, _ObjectT, 0>::type_varg,
         _ArgObjectT>
@@ -3100,7 +3100,7 @@ private:
             _ArgObjectT>(_func, obj);
     }
 
-    template<class _R, class _ObjectT, class _ArgObjectT>
+    template<class _ObjectT, class _R, class _ArgObjectT>
     binder<_R,
         typename detail::_member_function_ptr<_R, _ObjectT, 0>::type_const_varg,
         _ArgObjectT>
