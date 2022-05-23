@@ -87,19 +87,19 @@ namespace stdex
             template<class _ConvT>
             static _Tp _converter(pointer_buf_ref _ptr_buf)
             {
-                _ConvT *ptr = 0;
-                std::memcpy(&ptr, &_ptr_buf[0], sizeof(ptr));
+                _ConvT *ptr_ = 0;
+                std::memcpy(&ptr_, &_ptr_buf[0], sizeof(ptr_));
 
-                return *ptr;
+                return *ptr_;
             }
 
             template<class _ConvT>
             static void _deleter(pointer_buf_ref _ptr_buf)
             {
-                _ConvT *ptr = 0;
-                std::memcpy(&ptr, &_ptr_buf[0], sizeof(ptr));
+                _ConvT *ptr_ = 0;
+                std::memcpy(&ptr_, &_ptr_buf[0], sizeof(ptr_));
 
-                delete ptr;
+                delete ptr_;
             }
             
             conversion_func _convert_func;
