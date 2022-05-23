@@ -3072,21 +3072,6 @@ private:
 
     }
 
-    namespace detail
-    {
-        template<class _R, class _ObjectT>
-        struct _function_return_impl_helper<_R(_ObjectT::*)(), true> { typedef _R type; };
- 
-        template<class _R, class _ObjectT>
-        struct _function_return_impl_helper<_R(_ObjectT::*)() const, true> { typedef _R type; };
-
-        template<class _R, class _ObjectT>
-        struct _function_return_impl_helper<_R(_ObjectT::*)(...), true> { typedef _R type; };
-
-        template<class _R, class _ObjectT>
-        struct _function_return_impl_helper<_R(_ObjectT::*)(...) const, true> { typedef _R type; };
-    }
-
     template<class _FuncT>
     binder<typename detail::_function_return<_FuncT>::type, _FuncT>
     bind(_FuncT _func)
@@ -3211,19 +3196,46 @@ private:
         >(_func, _arg_first, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)); \
     } \
 \
-    namespace detail \
+    template<class _R, class _ObjectT, class _STDEX_TYPE_DEFAULT(First), _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK), \
+        _STDEX_TMPL_ARGS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> \
+    binder< \
+        _R, \
+        typename detail::_member_function_ptr<_R, _ObjectT, count + 1, _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>::type, \
+        _STDEX_TYPE_DEFAULT(First), _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) \
+    > \
+    bind(_R(_ObjectT::*_func)( _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM) ), \
+        _STDEX_TYPE_DEFAULT(First) _arg_mem_first, _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK) ) \
     { \
-        template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
-        struct _function_return_impl_helper<_R(_ObjectT::*)( _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK) ), true> { typedef _R type; }; \
+        typedef \
+        typename \
+        detail::_member_function_ptr<_R, _ObjectT, count + 1, _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>::type func_type; \
+        return \
+        binder< \
+            _R, \
+            func_type, \
+            _STDEX_TYPE_DEFAULT(First), _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) \
+        > (_func, _arg_mem_first, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)); \
+    } \
 \
-        template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
-        struct _function_return_impl_helper<_R(_ObjectT::*)( _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK) ) const, true> { typedef _R type; }; \
-\
-        template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
-        struct _function_return_impl_helper<_R(_ObjectT::*)( _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK) , ...), true> { typedef _R type; }; \
-\
-        template<class _R, class _ObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
-        struct _function_return_impl_helper<_R(_ObjectT::*)( _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK) , ...) const, true> { typedef _R type; }; \
+    template<class _R, class _ObjectT, class _STDEX_TYPE_DEFAULT(First), _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK), \
+        _STDEX_TMPL_ARGS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)> \
+    binder< \
+        _R, \
+        typename detail::_member_function_ptr<_R, _ObjectT, count + 1, _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>::type_const, \
+        _STDEX_TYPE_DEFAULT(First), _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) \
+    > \
+    bind(_R(_ObjectT::*_func)( _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM) ) const, \
+        _STDEX_TYPE_DEFAULT(First) _arg_mem_first, _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK) ) \
+    { \
+        typedef \
+        typename \
+        detail::_member_function_ptr<_R, _ObjectT, count + 1, _STDEX_TYPES##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM)>::type_const func_type; \
+        return \
+        binder< \
+            _R, \
+            func_type, \
+            _STDEX_TYPE_DEFAULT(First), _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) \
+        > (_func, _arg_mem_first, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)); \
     }
 
 #define _STDEX_TYPE_CUSTOM(count) _MemberArg##count##T
