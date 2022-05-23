@@ -369,13 +369,13 @@ void* thread::wrapper_function(void *aArg)
     return 0;
 }
 
-void thread::init(void(*aFunction)(void *), void *aArg)
+void thread::init(init_args args)
 {
     // Fill out the thread startup information (passed to the thread wrapper,
     // which will eventually free it)
     thread_start_info *thread_info = new thread_start_info;
-    thread_info->exec_function = aFunction;
-    thread_info->argument = aArg;
+    thread_info->exec_function = args.caller_function;
+    thread_info->argument = args.bindable_ptr;
 
     stdex::mutex mtx;
     stdex::condition_variable cond;

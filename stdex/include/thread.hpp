@@ -9,6 +9,11 @@
 #include "./chrono.hpp"
 #include "./condition_variable.hpp"
 #include "./type_traits.hpp"
+#include "./functional.hpp"
+
+#define _STDEX_PARAMETER_PACK_DEFINE
+#include "./parameter_pack.h"
+#undef _STDEX_PARAMETER_PACK_DEFINE
 
 // POSIX includes
 #include <pthread.h>
@@ -34,1743 +39,109 @@
 
 namespace stdex
 {
-    namespace intern
-    {
-        // since we have no static_assert in pre-C++11 we just compile-time assert this way:
-        struct thread_asserts
-        {
-            template<bool> 
-            struct operator_comma_is_user_defined_for_this_type_assert;
-        };
-
-        template<>
-        struct thread_asserts::operator_comma_is_user_defined_for_this_type_assert<true>
-        {
-            typedef bool operator_comma_is_user_defined_for_this_type_assert_failed;
-        };
-    }
-
-
     namespace detail
     {
-        namespace thread_detail
+        template<class _Tp>
+        struct _thread_param_wrapper
         {
-            template<class _Tp>
-            _Tp declval();
-
-            template<unsigned _Rank> struct _priority_tag : _priority_tag < _Rank - 1 > {};
-            template<> struct _priority_tag<0> {};
-        }
-
-        enum eTypeNullptr { _type_nullptr };
-        enum eTypeNotNullptr { _type_not_nullptr };
-
-        template<class _FuncT> struct _function_traits;
-
-        template<class _R>
-        struct _function_traits<_R(*)(void)>
-        {
-            typedef _R result_type;
-        };
-
-        template<class _R, class _T1>
-        struct _function_traits<_R(*)(_T1)>
-        {
-            typedef _R result_type;
-            typedef _T1 arg1_type;
-            typedef _T1 argument_type;
-        };
-
-        template<class _R, class _T1, class _T2>
-        struct _function_traits<_R(*)(_T1, _T2)>
-        {
-            typedef _R result_type;
-            typedef _T1 arg1_type;
-            typedef _T2 arg2_type;
-            
-            
-        };
-
-        template<class _R, class _T1, class _T2, class _T3>
-        struct _function_traits<_R(*)(_T1, _T2, _T3)>
-        {
-            typedef _R result_type;
-            typedef _T1 arg1_type;
-            typedef _T2 arg2_type;
-            typedef _T3 arg3_type;
-        };
-
-        template<class _R, class _T1, class _T2, class _T3, class _T4>
-        struct _function_traits<_R(*)(_T1, _T2, _T3, _T4)>
-        {
-            typedef _R result_type;
-            typedef _T1 arg1_type;
-            typedef _T2 arg2_type;
-            typedef _T3 arg3_type;
-            typedef _T4 arg4_type;
-        };
-
-        template<class _R, class _T1, class _T2, class _T3, class _T4,
-            class _T5>
-        struct _function_traits<_R(*)(_T1, _T2, _T3, _T4, _T5)>
-        {
-            typedef _R result_type;
-            typedef _T1 arg1_type;
-            typedef _T2 arg2_type;
-            typedef _T3 arg3_type;
-            typedef _T4 arg4_type;
-            typedef _T5 arg5_type;
-        };
-
-        template<class _R, class _T1, class _T2, class _T3, class _T4,
-            class _T5, class _T6>
-        struct _function_traits<_R(*)(_T1, _T2, _T3, _T4, _T5, _T6)>
-        {
-            typedef _R result_type;
-            typedef _T1 arg1_type;
-            typedef _T2 arg2_type;
-            typedef _T3 arg3_type;
-            typedef _T4 arg4_type;
-            typedef _T5 arg5_type;
-            typedef _T6 arg6_type;
-        };
-
-        template<class _R, class _T1, class _T2, class _T3, class _T4,
-            class _T5, class _T6, class _T7>
-        struct _function_traits<_R(*)(_T1, _T2, _T3, _T4, _T5, _T6, _T7)>
-        {
-            typedef _R result_type;
-            typedef _T1 arg1_type;
-            typedef _T2 arg2_type;
-            typedef _T3 arg3_type;
-            typedef _T4 arg4_type;
-            typedef _T5 arg5_type;
-            typedef _T6 arg6_type;
-            typedef _T7 arg7_type;
-        };
-
-        template<class _R, class _T1, class _T2, class _T3, class _T4,
-            class _T5, class _T6, class _T7, class _T8>
-        struct _function_traits<_R(*)(_T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8)>
-        {
-            typedef _R result_type;
-            typedef _T1 arg1_type;
-            typedef _T2 arg2_type;
-            typedef _T3 arg3_type;
-            typedef _T4 arg4_type;
-            typedef _T5 arg5_type;
-            typedef _T6 arg6_type;
-            typedef _T7 arg7_type;
-            typedef _T8 arg8_type;
-        };
-
-
-        template<bool>
-        struct _type_is_nullptr_helper
-        { 
-            typedef eTypeNullptr type;
-            static const type value = _type_nullptr;
-        };
-
-        template<>
-        struct _type_is_nullptr_helper<false>
-        { 
-            typedef eTypeNotNullptr type;
-            static const type value = _type_not_nullptr;
-        };
-
-        template<class _Tp, class _ArgT>
-        struct _type_is_nullptr_base_chooser_helper
-        {
-            static const bool _is_nullptr =
-                _is_nullptr_t<_Tp>::value == bool(true) && 
-                (is_pointer<_ArgT>::value == bool(true) || is_member_function_pointer<_ArgT>::value == bool(true));
-        };
-
-        template<class _Tp, class _ArgT>
-        struct _type_is_nullptr_base_chooser
-        {
-            typedef _type_is_nullptr_base_chooser_helper<_Tp, _ArgT> _helper;
-            typedef _type_is_nullptr_helper<bool(_helper::_is_nullptr == bool(true))> type;
-        };
-        template<class _Tp, class _ArgT = void*>
-        struct _type_is_nullptr:
-            _type_is_nullptr_base_chooser<_Tp, _ArgT>::type
-        { };
-
-        template<class _Arg1, class _Arg2>
-        struct _args_are_same_helper:
-            stdex::is_same<_Arg1, _Arg2>
-        { };
-
-        template<class _Arg1>
-        struct _args_are_same_helper<_Arg1, detail::void_type>:
-            stdex::true_type
-        { };
-
-        template<class _Arg2>
-        struct _args_are_same_helper<detail::void_type, _Arg2>:
-            stdex::true_type
-        { };
-
-        template<>
-        struct _args_are_same_helper<detail::void_type, detail::void_type>:
-            stdex::true_type
-        { };
-
-        template<
-            class _FArg1 = detail::void_type, class _Arg1 = detail::void_type,
-            class _FArg2 = detail::void_type, class _Arg2 = detail::void_type,
-            class _FArg3 = detail::void_type, class _Arg3 = detail::void_type,
-            class _FArg4 = detail::void_type, class _Arg4 = detail::void_type
-        >
-        struct _args_are_same
-        {
-            static const bool value =
-                _args_are_same_helper<_Arg1, _FArg1>::value &&
-                _args_are_same_helper<_Arg2, _FArg2>::value &&
-                _args_are_same_helper<_Arg3, _FArg3>::value &&
-                _args_are_same_helper<_Arg4, _FArg4>::value;
-        };
-
-        namespace thread_detail
-        {
-            class _dummy;
-            _yes_type _is_able_to_pass_nullptr_with_comma_op_tester1(void*);
-            _no_type _is_able_to_pass_nullptr_with_comma_op_tester1(...);
-            _yes_type _is_able_to_pass_nullptr_with_comma_op_tester2(void(_dummy::*)(float, int));
-            _no_type _is_able_to_pass_nullptr_with_comma_op_tester2(...);
-
-            void _dummy_void_f();
-
-            struct _is_able_to_pass_nullptr_with_comma_op
+            template<class _ConvT>
+            _thread_param_wrapper(_ConvT arg)
             {
-                static const bool value = 
-                    /*sizeof(
-                        _is_able_to_pass_nullptr_with_comma_op_tester1((_dummy_void_f(), nullptr))
-                    ) == sizeof(_yes_type) &&
-                    sizeof(
-                        _is_able_to_pass_nullptr_with_comma_op_tester2((_dummy_void_f(), nullptr))
-                    ) == sizeof(_yes_type)*/false;
-            };
-        }
-    } // namespace detail
+                STATIC_ASSERT(sizeof(_ConvT) <= sizeof(_pointer_buf), stdex_thread_param_type_is_not_supported);
 
-    namespace intern
-    {
-        template<class>
-        struct _has_feature;
-
-        template<class>
-        struct _has_bug;
-
-        template<>
-        struct _has_feature<class _stdex_could_pass_nullptr_with_comma_operator>:
-            detail::thread_detail::_is_able_to_pass_nullptr_with_comma_op
-        { };
-
-        template<>
-        struct _has_bug<class _stdex_could_not_pass_nullptr_with_comma_operator>
-        { 
-            static const bool value = 
-                !_has_feature<_stdex_could_pass_nullptr_with_comma_operator>::value;
-        };
-    } // namespace intern
-
-    namespace detail
-    {
-        namespace thread_detail
-        {
-            template<class _Tp>
-            class _ref_wrapper
-            {
-            public:
-                _ref_wrapper(_Tp& ref_) :
-                    _ptr(&ref_)
-                { }
-
-                _ref_wrapper(const _ref_wrapper& other) :
-                    _ptr(other._ptr)
-                { }
-
-                _ref_wrapper& operator=(const _ref_wrapper& other)
-                {
-                    _ptr = other._ptr;
-                    return (*this);
-                }
-
-                operator _Tp& () const
-                {
-                    return *_ptr;
-                }
-
-                _Tp& get() const
-                {
-                    return *_ptr;
-                }
-
-            private:
-                _Tp* _ptr;
-            };
-
-            template<class _Tp>
-            inline
-            _Tp& operator,(_Tp &value, 
-                typename
-                conditional<is_null_pointer<_Tp>::value, class _disable1&, nullptr_t>::type)
-            {
-                return value;
+                _convert_func = &_converter<_ConvT>;
+                _delete_func = &_deleter<_ConvT>;
+                _ConvT *copy = new _ConvT(arg);
+                std::memcpy(&_pointer_buf[0], &copy, sizeof(copy));
             }
 
-            template<class _Tp>
-            inline
-            const _Tp& operator,(const _Tp& value,
-                typename
-                conditional<is_null_pointer<_Tp>::value, class _disable2&, nullptr_t>::type)
+            _thread_param_wrapper(const _thread_param_wrapper& other)
             {
-                return value;
-            }
-            
-            template<class _Tp>
-            inline
-            _Tp& operator,(const _ref_wrapper<_Tp> &value, nullptr_t)
-            {
-                return value.get();
+                _convert_func = other._convert_func;
+                _delete_func = other._delete_func;
+                std::memcpy(&_pointer_buf[0], &other._pointer_buf[0], sizeof(_pointer_buf));
+                std::memset(&other._pointer_buf[0], 0, sizeof(_pointer_buf));
             }
 
-            inline
-            stdex::nullptr_t& operator,(const _ref_wrapper<stdex::nullptr_t> &value, nullptr_t)
+            operator _Tp() const
             {
-                return value.get();
+                return _convert_func(_pointer_buf);
             }
 
-            template<class _Tp>
-            inline
-            typename
-            conditional<
-                is_scalar<_Tp>::value, 
-                typename
-                conditional<
-                    _and_<is_null_pointer<_Tp>, _or_<is_class<_Tp>, is_enum<_Tp>/**/>/**/>::value,
-                    void,
-                    _ref_wrapper<_Tp>
-                >::type,
-                _Tp&
-            >::type _arg(_Tp &value)
+            ~_thread_param_wrapper()
             {
-                return _ref_wrapper<_Tp>(value);
-            }
-
-            template<class _Tp>
-            inline
-            typename
-            conditional<
-                is_scalar<_Tp>::value, 
-                typename
-                conditional<
-                    _and_<is_null_pointer<_Tp>, _or_<is_class<_Tp>, is_enum<_Tp>/**/>/**/>::value,
-                    void,
-                    _ref_wrapper<const _Tp>
-                >::type,
-                const _Tp&
-            >::type _arg(const _Tp& value)
-            {
-                return _ref_wrapper<const _Tp>(value);
-            }
-
-            //inline void _arg(nullptr_t) {}
-            
-            template<class _Tp>
-            _yes_type _is_same_return_type(_Tp, _Tp);
-            template<class _Tp1, class _Tp2>
-            _no_type _is_same_return_type(_Tp1, _Tp2);
-
-            template<class _Tp>
-            struct _has_no_user_defined_operator_comma_op
-            {
-                static const bool value = 
-                    sizeof(_is_same_return_type( (declval<_Tp>(), declval<_Tp>()), declval<_Tp>() )) == sizeof(_yes_type);
-            };
-        }
-
-        template<std::size_t, class _T0 = detail::void_type, class _T1 = detail::void_type, class _T2 = detail::void_type, class _T3 = detail::void_type, class _T4 = detail::void_type, class _T5 = detail::void_type, class _T6 = detail::void_type, class _T7 = detail::void_type, class _T8 = detail::void_type, class _T9 = detail::void_type, class _T10 = detail::void_type, class _T11 = detail::void_type, class _T12 = detail::void_type, class _T13 = detail::void_type, class _T14 = detail::void_type, class _T15 = detail::void_type, class _T16 = detail::void_type, class _T17 = detail::void_type, class _T18 = detail::void_type, class _T19 = detail::void_type, class _T20 = detail::void_type, class _T21 = detail::void_type, class _T22 = detail::void_type, class _T23 = detail::void_type, class _T24 = detail::void_type>
-        struct _thread_args_helper;
-        
-
-        template<>
-        struct _thread_args_helper<0>
-        {
-            struct _arguments
-            {
-                static const unsigned int count = 0;
-
-                template<class _FuncT>
-                struct _call_helper
-                {
-                    static void call(_FuncT &fp) { fp(); }
-                };
-
-                _arguments()
-                { }
-
-                template<class _FuncT>
-                void push(_FuncT &fp)
-                {
-                    _call_helper<_FuncT>::call(fp);
-                }
-
-                template<class _ObjectT>
-                struct _functor
-                {
-                    /*template<class _ReturnT>
-                    struct _member_function
-                    {
-                        typedef _ReturnT(_ObjectT::*type)();
-                        typedef _ReturnT(_ObjectT::*type_const)() const;
-                    };*/
-
-                    template<class _ReturnT>
-                    static void push(const thread_detail::_priority_tag<5>&,
-                        _arguments& args, const _ObjectT &fp)
-                    {
-                        _call_helper<const _ObjectT>::call(fp);
-                    }
-
-                    template<class _ReturnT>
-                    static void push(const thread_detail::_priority_tag<4>&, 
-                        _arguments& args, _ObjectT &fp)
-                    {
-                        _call_helper<_ObjectT>::call(fp);
-                    }
-                };
-                
-            };
-
-            typedef _arguments arguments_type;
-        };
-
-        template<class _Arg1>
-        struct _thread_args_helper<1, _Arg1>
-        {
-            struct _arguments
-            {
-                static const unsigned int count = 1;
-
-                _Arg1 arg1;
-
-                _arguments(_Arg1 arg1_) :
-                    arg1(arg1_)
-                { }
-
-                template<class _FuncT>
-                struct _call_helper
-                {
-                    static void call(_FuncT &fp, _arguments &ina, eTypeNotNullptr) { fp(ina.arg1); }
-                    static void call(_FuncT &fp, _arguments &, eTypeNullptr) { fp(nullptr); }
-                };
-                
-                template<class _ObjectT>
-                struct _functor
-                {
-                    /*template<class _ReturnT>
-                    struct _member_function
-                    {
-                        typedef _ReturnT(_ObjectT::*type)(_Arg1);
-                        typedef _ReturnT(_ObjectT::*type_const)(_Arg1) const;
-                    };*/
-
-                    static 
-                    void push(const thread_detail::_priority_tag<4>&, 
-                        typename
-                        conditional<
-                            intern::_has_feature<intern::_stdex_could_pass_nullptr_with_comma_operator>::value,
-                            _arguments&, 
-                            int
-                        >::type args, _ObjectT &fp)
-                    {
-
-                        typedef typename intern::thread_asserts::operator_comma_is_user_defined_for_this_type_assert<
-                            bool(thread_detail::_has_no_user_defined_operator_comma_op<_Arg1>::value == bool(true))
-                        >::operator_comma_is_user_defined_for_this_type_assert_failed
-                        check1; // if you are there means there is user defined operator comma somewhere in global namespace
-                        
-                        using thread_detail::operator,;
-                        using thread_detail::_arg;
-                        
-                        fp((_arg(args.arg1), nullptr));
-                    }
-
-                    static 
-                    void push(const thread_detail::_priority_tag<4>&, 
-                        typename
-                        conditional<
-                            intern::_has_bug<intern::_stdex_could_not_pass_nullptr_with_comma_operator>::value,
-                            _arguments&, 
-                            int
-                        >::type args, _ObjectT &fp)
-                    {
-                        _call_helper<_ObjectT>::call(fp, args,
-                            _type_is_nullptr<_Arg1>::value);
-                    }
-                };
-            
-                template<class _FuncT>
-                void push(_FuncT &fp)
-                {
-                    _call_helper<_FuncT>::call(fp, *this,
-                        _type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value);
-                }
-            };
-
-            typedef _arguments arguments_type;
-        };
-
-        template<class _Arg1, class _Arg2>
-        struct _thread_args_helper<2, _Arg1, _Arg2>
-        {
-            struct _arguments
-            {
-                static const unsigned int count = 2;
-
-                _Arg1 arg1;
-                _Arg2 arg2;
-
-                _arguments(_Arg1 arg1_, _Arg2 arg2_) :
-                    arg1(arg1_), arg2(arg2_)
-                { }
-
-                template<class _FuncT>
-                struct _call_helper
-                {
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2); }
-                    static void call(_FuncT &fp, _arguments &,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr); }
-                };
-
-                template<class _FuncT>
-                void push(_FuncT &fp)
-                {
-                    _call_helper<_FuncT>::call(fp, *this,
-                        _type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
-                        _type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value);
-                }
-
-                template<class _ObjectT>
-                struct _functor
-                {
-                    /*template<class _ReturnT>
-                    struct _member_function
-                    {
-                        typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2);
-                        typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2) const;
-                    };*/
-
-                    static 
-                    void push(const thread_detail::_priority_tag<4>&, 
-                        typename
-                        conditional<
-                            intern::_has_feature<intern::_stdex_could_pass_nullptr_with_comma_operator>::value,
-                            _arguments&, 
-                            int
-                        >::type args, _ObjectT &fp)
-                    {
-                        typedef intern::thread_asserts check;
-
-                        typedef typename check::operator_comma_is_user_defined_for_this_type_assert<
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg1>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg2>::value
-                        >::operator_comma_is_user_defined_for_this_type_assert_failed
-                        check1; // if you are there means there is user defined operator comma somewhere in global namespace
-                        
-                        using thread_detail::operator,;
-                        using thread_detail::_arg;
-                        
-                        fp((_arg(args.arg1), nullptr),
-                           (_arg(args.arg2), nullptr));
-                    }
-
-                    static 
-                    void push(const thread_detail::_priority_tag<4>&, 
-                        typename
-                        conditional<
-                            intern::_has_bug<intern::_stdex_could_not_pass_nullptr_with_comma_operator>::value,
-                            _arguments&, 
-                            int
-                        >::type args, _ObjectT &fp)
-                    {
-                        _call_helper<_ObjectT>::call(fp, args,
-                            _type_is_nullptr<_Arg1>::value,
-                            _type_is_nullptr<_Arg2>::value);
-                    }
-                };
-            };
-
-            typedef _arguments arguments_type;
-        };
-
-        template<class _Arg1, class _Arg2, class _Arg3>
-        struct _thread_args_helper<3, _Arg1, _Arg2, _Arg3>
-        {
-            struct _arguments
-            {
-                static const unsigned int count = 3;
-
-                _Arg1 arg1;
-                _Arg2 arg2;
-                _Arg3 arg3;
-
-                _arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_) :
-                    arg1(arg1_), arg2(arg2_), arg3(arg3_)
-                { }
-
-                template<class _FuncT>
-                struct _call_helper
-                {
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3); }
-                    static void call(_FuncT &fp, _arguments &,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr); }
-                };
-
-                template<class _FuncT>
-                void push(_FuncT &fp)
-                {
-                    _call_helper<_FuncT>::call(fp, *this,
-                        _type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
-                        _type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value,
-                        _type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value);
-                }
-
-                template<class _ObjectT>
-                struct _functor
-                {
-                    /*template<class _ReturnT>
-                    struct _member_function
-                    {
-                        typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2, _Arg3);
-                        typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2, _Arg3) const;
-                    };*/
-
-                    static 
-                    void push(const thread_detail::_priority_tag<4>&, 
-                        typename
-                        conditional<
-                            intern::_has_feature<intern::_stdex_could_pass_nullptr_with_comma_operator>::value,
-                            _arguments&, 
-                            int
-                        >::type args, _ObjectT &fp)
-                    {
-                        typedef intern::thread_asserts check;
-
-                        typedef typename check::operator_comma_is_user_defined_for_this_type_assert<
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg1>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg2>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg3>::value
-                        >::operator_comma_is_user_defined_for_this_type_assert_failed
-                        check1; // if you are there means there is user defined operator comma somewhere in global namespace
-                        
-                        using thread_detail::operator,;
-                        using thread_detail::_arg;
-                        
-                        fp((_arg(args.arg1), nullptr),
-                           (_arg(args.arg2), nullptr),
-                           (_arg(args.arg3), nullptr));
-                    }
-
-                    static 
-                    void push(const thread_detail::_priority_tag<4>&, 
-                        typename
-                        conditional<
-                            intern::_has_bug<intern::_stdex_could_not_pass_nullptr_with_comma_operator>::value,
-                            _arguments&, 
-                            int
-                        >::type args, _ObjectT &fp)
-                    {
-                        _call_helper<_ObjectT>::call(fp, args,
-                            _type_is_nullptr<_Arg1>::value,
-                            _type_is_nullptr<_Arg2>::value,
-                            _type_is_nullptr<_Arg3>::value);
-                    }
-                };
-            };
-
-            typedef _arguments arguments_type;
-        };
-
-        template<class _Arg1, class _Arg2, class _Arg3, class _Arg4>
-        struct _thread_args_helper<4, _Arg1, _Arg2, _Arg3, _Arg4>
-        {
-            struct _arguments
-            {
-                static const unsigned int count = 4;
-
-                _Arg1 arg1;
-                _Arg2 arg2;
-                _Arg3 arg3;
-                _Arg4 arg4;
-
-                _arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg4 arg4_) :
-                    arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_)
-                { }
-
-                template<class _FuncT>
-                struct _call_helper
-                {
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4); }
-                    static void call(_FuncT &fp, _arguments &,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr, nullptr, nullptr, nullptr); }
-                };
-
-                template<class _FuncT>
-                void push(_FuncT &fp)
-                {
-                    _call_helper<_FuncT>::call(fp, *this,
-                        _type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
-                        _type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value,
-                        _type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value,
-                        _type_is_nullptr<_Arg4, typename _function_traits<_FuncT>::arg4_type>::value);
-                }
-
-                template<class _ObjectT>
-                struct _functor
-                {
-                    /*template<class _ReturnT>
-                    struct _member_function
-                    {
-                        typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2, _Arg3, _Arg4);
-                        typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2, _Arg3, _Arg4) const;
-                    };*/
-
-                    static 
-                    void push(const thread_detail::_priority_tag<4>&, 
-                        typename
-                        conditional<
-                            intern::_has_feature<intern::_stdex_could_pass_nullptr_with_comma_operator>::value,
-                            _arguments&, 
-                            int
-                        >::type args, _ObjectT &fp)
-                    {
-                        typedef intern::thread_asserts check;
-
-                        typedef typename check::operator_comma_is_user_defined_for_this_type_assert<
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg1>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg2>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg3>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg4>::value
-                        >::operator_comma_is_user_defined_for_this_type_assert_failed
-                        check1; // if you are there means there is user defined operator comma somewhere in global namespace
-                        
-                        using thread_detail::operator,;
-                        using thread_detail::_arg;
-                        
-                        fp((_arg(args.arg1), nullptr),
-                           (_arg(args.arg2), nullptr),
-                           (_arg(args.arg3), nullptr),
-                           (_arg(args.arg4), nullptr));
-                    }
-
-                    static 
-                    void push(const thread_detail::_priority_tag<4>&, 
-                        typename
-                        conditional<
-                            intern::_has_bug<intern::_stdex_could_not_pass_nullptr_with_comma_operator>::value,
-                            _arguments&, 
-                            int
-                        >::type args, _ObjectT &fp)
-                    {
-                        _call_helper<_ObjectT>::call(fp, args,
-                            _type_is_nullptr<_Arg1>::value,
-                            _type_is_nullptr<_Arg2>::value,
-                            _type_is_nullptr<_Arg3>::value,
-                            _type_is_nullptr<_Arg4>::value);
-                    }
-                };
-            };
-
-            typedef _arguments arguments_type;
-        };
-
-        template<class _Arg1, class _Arg2, class _Arg3, class _Arg4, class _Arg5>
-        struct _thread_args_helper<5, _Arg1, _Arg2, _Arg3, _Arg4, _Arg5>
-        {
-            struct _arguments
-            {
-                static const unsigned int count = 5;
-
-                _Arg1 arg1;
-                _Arg2 arg2;
-                _Arg3 arg3;
-                _Arg4 arg4;
-                _Arg5 arg5;
-
-                _arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg4 arg4_, _Arg5 arg5_) :
-                    arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_), arg5(arg5_)
-                { }
-
-                template<class _FuncT>
-                struct _call_helper
-                {
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,ina.arg5); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,ina.arg5); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,ina.arg5); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,ina.arg5); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,ina.arg5); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,ina.arg5); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,ina.arg5); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,ina.arg5); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,ina.arg5); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,ina.arg5); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,ina.arg5); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,ina.arg5); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,ina.arg5); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,ina.arg5); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,ina.arg5); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,ina.arg5); }
-                    static void call(_FuncT &fp, _arguments &,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr); }
-                };
-
-                template<class _FuncT>
-                void push(_FuncT &fp)
-                {
-                    _call_helper<_FuncT>::call(fp, *this,
-                        _type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
-                        _type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value,
-                        _type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value,
-                        _type_is_nullptr<_Arg4, typename _function_traits<_FuncT>::arg4_type>::value,
-                        _type_is_nullptr<_Arg5, typename _function_traits<_FuncT>::arg5_type>::value);
-                }
-
-                template<class _ObjectT>
-                struct _functor
-                {
-                    /*template<class _ReturnT>
-                    struct _member_function
-                    {
-                        typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5);
-                        typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5) const;
-                    };*/
-
-                    static 
-                    void push(const thread_detail::_priority_tag<4>&, 
-                        typename
-                        conditional<
-                            intern::_has_feature<intern::_stdex_could_pass_nullptr_with_comma_operator>::value,
-                            _arguments&, 
-                            int
-                        >::type args, _ObjectT &fp)
-                    {
-                        typedef intern::thread_asserts check;
-
-                        typedef typename check::operator_comma_is_user_defined_for_this_type_assert<
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg1>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg2>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg3>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg4>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg5>::value
-                        >::operator_comma_is_user_defined_for_this_type_assert_failed
-                        check1; // if you are there means there is user defined operator comma somewhere in global namespace
-                        
-                        using thread_detail::operator,;
-                        using thread_detail::_arg;
-
-                        fp((_arg(args.arg1), nullptr),
-                           (_arg(args.arg2), nullptr),
-                           (_arg(args.arg3), nullptr),
-                           (_arg(args.arg4), nullptr),
-                           (_arg(args.arg5), nullptr));
-                    }
-
-                    static 
-                    void push(const thread_detail::_priority_tag<4>&, 
-                        typename
-                        conditional<
-                            intern::_has_bug<intern::_stdex_could_not_pass_nullptr_with_comma_operator>::value,
-                            _arguments&, 
-                            int
-                        >::type args, _ObjectT &fp)
-                    {
-                        _call_helper<_ObjectT>::call(fp, args,
-                            _type_is_nullptr<_Arg1>::value,
-                            _type_is_nullptr<_Arg2>::value,
-                            _type_is_nullptr<_Arg3>::value,
-                            _type_is_nullptr<_Arg4>::value,
-                            _type_is_nullptr<_Arg5>::value);
-                    }
-                };
-            };
-
-            typedef _arguments arguments_type;
-        };
-
-        template<class _Arg1, class _Arg2, class _Arg3, class _Arg4, class _Arg5, class _Arg6>
-        struct _thread_args_helper<6, _Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6>
-        {
-            struct _arguments
-            {
-                static const unsigned int count = 6;
-
-                _Arg1 arg1;
-                _Arg2 arg2;
-                _Arg3 arg3;
-                _Arg4 arg4;
-                _Arg5 arg5;
-                _Arg6 arg6;
-
-                _arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg4 arg4_, _Arg5 arg5_, _Arg6 arg6_) :
-                    arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_), arg5(arg5_), arg6(arg6_)
-                { }
-
-                template<class _FuncT>
-                struct _call_helper
-                {
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,ina.arg5,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,ina.arg5,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,nullptr,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,ina.arg5,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,ina.arg5,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,nullptr,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,ina.arg5,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,ina.arg5,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,nullptr,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,ina.arg5,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,ina.arg5,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,nullptr,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,ina.arg5,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,ina.arg5,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,nullptr,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,ina.arg5,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,ina.arg5,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,nullptr,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,ina.arg5,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,ina.arg5,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,nullptr,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,ina.arg5,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,ina.arg5,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,nullptr,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,ina.arg5,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,ina.arg5,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,nullptr,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,ina.arg5,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,ina.arg5,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,nullptr,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,ina.arg5,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,ina.arg5,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,nullptr,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,ina.arg5,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,ina.arg5,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,nullptr,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,ina.arg5,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,ina.arg5,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,nullptr,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,ina.arg5,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,ina.arg5,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,nullptr,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,ina.arg5,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,ina.arg5,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,nullptr,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,ina.arg5,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,ina.arg5,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,ina.arg6); }
-                    static void call(_FuncT &fp, _arguments &,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,nullptr); }
-                };
-
-                template<class _FuncT>
-                void push(_FuncT &fp)
-                {
-                    _call_helper<_FuncT>::call(fp, *this,
-                        _type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
-                        _type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value,
-                        _type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value,
-                        _type_is_nullptr<_Arg4, typename _function_traits<_FuncT>::arg4_type>::value,
-                        _type_is_nullptr<_Arg5, typename _function_traits<_FuncT>::arg5_type>::value,
-                        _type_is_nullptr<_Arg6, typename _function_traits<_FuncT>::arg6_type>::value);
-                }
-
-                template<class _ObjectT>
-                struct _functor
-                {
-                    /*template<class _ReturnT>
-                    struct _member_function
-                    {
-                        typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6);
-                        typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6) const;
-                    };*/
-
-                    static 
-                    void push(const thread_detail::_priority_tag<4>&, 
-                        typename
-                        conditional<
-                            intern::_has_feature<intern::_stdex_could_pass_nullptr_with_comma_operator>::value,
-                            _arguments&, 
-                            int
-                        >::type args, _ObjectT &fp)
-                    {
-                        typedef intern::thread_asserts check;
-
-                        typedef typename check::operator_comma_is_user_defined_for_this_type_assert<
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg1>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg2>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg3>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg4>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg5>::value && 
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg6>::value
-                        >::operator_comma_is_user_defined_for_this_type_assert_failed
-                        check1; // if you are there means there is user defined operator comma somewhere in global namespace
-                        
-                        using thread_detail::operator,;
-                        using thread_detail::_arg;
-                        
-                        fp((_arg(args.arg1), nullptr),
-                           (_arg(args.arg2), nullptr),
-                           (_arg(args.arg3), nullptr),
-                           (_arg(args.arg4), nullptr),
-                           (_arg(args.arg5), nullptr),
-                           (_arg(args.arg6), nullptr));
-                    }
-
-                    static 
-                    void push(const thread_detail::_priority_tag<4>&, 
-                        typename
-                        conditional<
-                            intern::_has_bug<intern::_stdex_could_not_pass_nullptr_with_comma_operator>::value,
-                            _arguments&, 
-                            int
-                        >::type args, _ObjectT &fp)
-                    {
-                        _call_helper<_ObjectT>::call(fp, args,
-                            _type_is_nullptr<_Arg1>::value,
-                            _type_is_nullptr<_Arg2>::value,
-                            _type_is_nullptr<_Arg3>::value,
-                            _type_is_nullptr<_Arg4>::value,
-                            _type_is_nullptr<_Arg5>::value,
-                            _type_is_nullptr<_Arg6>::value);
-                    }
-                };
-            };
-
-            typedef _arguments arguments_type;
-        };
-
-        template<class _Arg1, class _Arg2, class _Arg3, class _Arg4, class _Arg5, class _Arg6, class _Arg7>
-        struct _thread_args_helper<7, _Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7>
-        {
-            struct _arguments
-            {
-                static const unsigned int count = 7;
-
-                _Arg1 arg1;
-                _Arg2 arg2;
-                _Arg3 arg3;
-                _Arg4 arg4;
-                _Arg5 arg5;
-                _Arg6 arg6;
-                _Arg7 arg7;
-
-                _arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg4 arg4_, _Arg5 arg5_, _Arg6 arg6_, _Arg7 arg7_) :
-                    arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_), arg5(arg5_), arg6(arg6_), arg7(arg7_)
-                { }
-
-                template<class _FuncT>
-                struct _call_helper
-                {
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,ina.arg5,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,ina.arg5,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,ina.arg5,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,ina.arg5,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,nullptr,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,nullptr,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,nullptr,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,ina.arg5,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,ina.arg5,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,ina.arg5,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,ina.arg5,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,nullptr,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,nullptr,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,nullptr,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,ina.arg5,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,ina.arg5,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,ina.arg5,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,ina.arg5,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,nullptr,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,nullptr,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,nullptr,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,ina.arg5,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,ina.arg5,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,ina.arg5,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,ina.arg5,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,nullptr,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,nullptr,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,nullptr,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,ina.arg5,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,ina.arg5,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,ina.arg5,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,ina.arg5,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,nullptr,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,nullptr,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,nullptr,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,ina.arg5,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,ina.arg5,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,ina.arg5,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,ina.arg5,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,nullptr,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,nullptr,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,nullptr,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,ina.arg5,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,ina.arg5,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,ina.arg5,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,ina.arg5,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,nullptr,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,nullptr,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,nullptr,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,ina.arg5,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,ina.arg5,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,ina.arg5,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,ina.arg5,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,nullptr,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,nullptr,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,nullptr,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,ina.arg5,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,ina.arg5,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,ina.arg5,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,ina.arg5,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,nullptr,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,nullptr,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,nullptr,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,ina.arg5,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,ina.arg5,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,ina.arg5,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,ina.arg5,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,nullptr,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,nullptr,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,nullptr,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,ina.arg5,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,ina.arg5,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,ina.arg5,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,ina.arg5,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,nullptr,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,nullptr,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,nullptr,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,ina.arg5,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,ina.arg5,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,ina.arg5,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,ina.arg5,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,nullptr,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,nullptr,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,nullptr,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,ina.arg5,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,ina.arg5,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,ina.arg5,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,ina.arg5,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,nullptr,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,nullptr,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,nullptr,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,ina.arg5,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,ina.arg5,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,ina.arg5,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,ina.arg5,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,nullptr,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,nullptr,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,nullptr,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,ina.arg5,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,ina.arg5,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,ina.arg5,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,ina.arg5,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,nullptr,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,nullptr,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,nullptr,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,ina.arg5,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,ina.arg5,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,ina.arg5,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,ina.arg5,nullptr,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,ina.arg6,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,ina.arg6,nullptr); }
-                    static void call(_FuncT &fp,_arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,ina.arg7); }
-                    static void call(_FuncT &fp,_arguments &,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr); }
-                };
-
-                template<class _FuncT>
-                void push(_FuncT &fp)
-                {
-                    _call_helper<_FuncT>::call(fp, *this, 
-                        _type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value,
-                        _type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value,
-                        _type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value,
-                        _type_is_nullptr<_Arg4, typename _function_traits<_FuncT>::arg4_type>::value,
-                        _type_is_nullptr<_Arg5, typename _function_traits<_FuncT>::arg5_type>::value,
-                        _type_is_nullptr<_Arg6, typename _function_traits<_FuncT>::arg6_type>::value,
-                        _type_is_nullptr<_Arg7, typename _function_traits<_FuncT>::arg7_type>::value);
-                }
-
-                template<class _ObjectT>
-                struct _functor
-                {
-                    /*template<class _ReturnT>
-                    struct _member_function
-                    {
-                        typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7);
-                        typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7) const;
-                    };*/
-
-                    static 
-                    void push(const thread_detail::_priority_tag<4>&, 
-                        typename
-                        conditional<
-                            intern::_has_feature<intern::_stdex_could_pass_nullptr_with_comma_operator>::value,
-                            _arguments&, 
-                            int
-                        >::type args, _ObjectT &fp)
-                    {
-                        typedef intern::thread_asserts check;
-
-                        typedef typename check::operator_comma_is_user_defined_for_this_type_assert<
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg1>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg2>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg3>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg4>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg5>::value && 
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg6>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg7>::value
-                        >::operator_comma_is_user_defined_for_this_type_assert_failed
-                        check1; // if you are there means there is user defined operator comma somewhere in global namespace
-                        
-                        using thread_detail::operator,;
-                        using thread_detail::_arg;
-                        
-                        fp((_arg(args.arg1), nullptr),
-                           (_arg(args.arg2), nullptr),
-                           (_arg(args.arg3), nullptr),
-                           (_arg(args.arg4), nullptr),
-                           (_arg(args.arg5), nullptr),
-                           (_arg(args.arg6), nullptr),
-                           (_arg(args.arg7), nullptr));
-                    }
-
-                    static 
-                    void push(const thread_detail::_priority_tag<4>&, 
-                        typename
-                        conditional<
-                            intern::_has_bug<intern::_stdex_could_not_pass_nullptr_with_comma_operator>::value,
-                            _arguments&, 
-                            int
-                        >::type args, _ObjectT &fp)
-                    {
-                        _call_helper<_ObjectT>::call(fp, args,
-                            _type_is_nullptr<_Arg1>::value,
-                            _type_is_nullptr<_Arg2>::value,
-                            _type_is_nullptr<_Arg3>::value,
-                            _type_is_nullptr<_Arg4>::value,
-                            _type_is_nullptr<_Arg5>::value,
-                            _type_is_nullptr<_Arg6>::value,
-                            _type_is_nullptr<_Arg7>::value);
-                    }
-                };
-            };
-
-            typedef _arguments arguments_type;
-        };
-
-
-        template<class _Arg1, class _Arg2, class _Arg3, class _Arg4, class _Arg5, class _Arg6, class _Arg7, class _Arg8>
-        struct _thread_args_helper<8, _Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7, _Arg8>
-        {
-            struct _arguments
-            {
-                static const unsigned int count = 8;
-
-                _Arg1 arg1;
-                _Arg2 arg2;
-                _Arg3 arg3;
-                _Arg4 arg4;
-                _Arg5 arg5;
-                _Arg6 arg6;
-                _Arg7 arg7;
-                _Arg8 arg8;
-
-                _arguments(_Arg1 arg1_, _Arg2 arg2_, _Arg3 arg3_, _Arg4 arg4_, _Arg5 arg5_, _Arg6 arg6_, _Arg7 arg7_, _Arg8 arg8_) :
-                    arg1(arg1_), arg2(arg2_), arg3(arg3_), arg4(arg4_), arg5(arg5_), arg6(arg6_), arg7(arg7_), arg8(arg8_)
-                { }
-
-                template<class _FuncT>
-                struct _call_helper
-                {
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,ina.arg5,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,ina.arg5,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,ina.arg5,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,ina.arg5,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,ina.arg5,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,ina.arg5,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,ina.arg5,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,ina.arg5,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,nullptr,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,nullptr,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,nullptr,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,nullptr,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,nullptr,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,nullptr,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,nullptr,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,ina.arg4,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,ina.arg5,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,ina.arg5,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,ina.arg5,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,ina.arg5,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,ina.arg5,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,ina.arg5,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,ina.arg5,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,ina.arg5,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,nullptr,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,nullptr,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,nullptr,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,nullptr,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,nullptr,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,nullptr,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,nullptr,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,ina.arg3,nullptr,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,ina.arg5,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,ina.arg5,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,ina.arg5,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,ina.arg5,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,ina.arg5,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,ina.arg5,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,ina.arg5,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,ina.arg5,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,nullptr,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,nullptr,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,nullptr,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,nullptr,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,nullptr,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,nullptr,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,nullptr,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,ina.arg4,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,ina.arg5,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,ina.arg5,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,ina.arg5,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,ina.arg5,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,ina.arg5,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,ina.arg5,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,ina.arg5,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,ina.arg5,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,nullptr,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,nullptr,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,nullptr,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,nullptr,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,nullptr,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,nullptr,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,nullptr,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,ina.arg2,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,ina.arg5,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,ina.arg5,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,ina.arg5,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,ina.arg5,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,ina.arg5,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,ina.arg5,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,ina.arg5,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,ina.arg5,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,nullptr,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,nullptr,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,nullptr,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,nullptr,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,nullptr,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,nullptr,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,nullptr,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,ina.arg4,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,ina.arg5,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,ina.arg5,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,ina.arg5,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,ina.arg5,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,ina.arg5,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,ina.arg5,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,ina.arg5,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,ina.arg5,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,nullptr,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,nullptr,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,nullptr,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,nullptr,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,nullptr,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,nullptr,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,nullptr,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,ina.arg3,nullptr,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,ina.arg5,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,ina.arg5,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,ina.arg5,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,ina.arg5,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,ina.arg5,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,ina.arg5,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,ina.arg5,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,ina.arg5,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,nullptr,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,nullptr,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,nullptr,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,nullptr,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,nullptr,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,nullptr,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,nullptr,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,ina.arg4,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,ina.arg5,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,ina.arg5,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,ina.arg5,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,ina.arg5,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,ina.arg5,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,ina.arg5,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,ina.arg5,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,ina.arg5,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,nullptr,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,nullptr,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,nullptr,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,nullptr,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,nullptr,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,nullptr,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(ina.arg1,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,ina.arg5,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,ina.arg5,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,ina.arg5,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,ina.arg5,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,ina.arg5,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,ina.arg5,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,ina.arg5,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,ina.arg5,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,nullptr,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,nullptr,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,nullptr,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,nullptr,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,nullptr,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,nullptr,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,nullptr,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,ina.arg4,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,ina.arg5,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,ina.arg5,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,ina.arg5,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,ina.arg5,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,ina.arg5,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,ina.arg5,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,ina.arg5,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,ina.arg5,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,nullptr,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,nullptr,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,nullptr,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,nullptr,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,nullptr,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,nullptr,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,nullptr,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,ina.arg3,nullptr,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,ina.arg5,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,ina.arg5,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,ina.arg5,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,ina.arg5,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,ina.arg5,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,ina.arg5,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,ina.arg5,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,ina.arg5,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,nullptr,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,nullptr,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,nullptr,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,nullptr,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,nullptr,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,nullptr,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,nullptr,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,ina.arg4,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,ina.arg5,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,ina.arg5,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,ina.arg5,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,ina.arg5,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,ina.arg5,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,ina.arg5,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,ina.arg5,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,ina.arg5,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,nullptr,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,nullptr,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,nullptr,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,nullptr,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,nullptr,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,nullptr,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,nullptr,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,ina.arg2,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,ina.arg5,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,ina.arg5,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,ina.arg5,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,ina.arg5,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,ina.arg5,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,ina.arg5,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,ina.arg5,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,ina.arg5,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,nullptr,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,nullptr,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,nullptr,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,nullptr,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,nullptr,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,nullptr,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,nullptr,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,ina.arg4,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,ina.arg5,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,ina.arg5,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,ina.arg5,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,ina.arg5,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,ina.arg5,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,ina.arg5,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,ina.arg5,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,ina.arg5,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,nullptr,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,nullptr,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,nullptr,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,nullptr,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,nullptr,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,nullptr,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,nullptr,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,ina.arg3,nullptr,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,ina.arg5,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,ina.arg5,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,ina.arg5,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,ina.arg5,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,ina.arg5,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,ina.arg5,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,ina.arg5,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,ina.arg5,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,nullptr,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,nullptr,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,nullptr,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,nullptr,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,nullptr,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,nullptr,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,nullptr,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,ina.arg4,nullptr,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,ina.arg5,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,ina.arg5,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,ina.arg5,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,ina.arg5,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,ina.arg5,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,ina.arg5,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,ina.arg5,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,ina.arg5,nullptr,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,ina.arg6,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,ina.arg6,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,ina.arg6,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,ina.arg6,nullptr,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,ina.arg7,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,ina.arg7,nullptr); }
-                    static void call(_FuncT &fp, _arguments &ina,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNotNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,ina.arg8); }
-                    static void call(_FuncT &fp, _arguments &,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr,eTypeNullptr) { fp(nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr,nullptr); }
-                };
-
-                template<class _FuncT>
-                void push(_FuncT &fp)
-                {
-                    _call_helper<_FuncT>::call(fp, *this,
-                        _type_is_nullptr<_Arg1, typename _function_traits<_FuncT>::arg1_type>::value, 
-                        _type_is_nullptr<_Arg2, typename _function_traits<_FuncT>::arg2_type>::value, 
-                        _type_is_nullptr<_Arg3, typename _function_traits<_FuncT>::arg3_type>::value,
-                        _type_is_nullptr<_Arg4, typename _function_traits<_FuncT>::arg4_type>::value,
-                        _type_is_nullptr<_Arg5, typename _function_traits<_FuncT>::arg5_type>::value,
-                        _type_is_nullptr<_Arg6, typename _function_traits<_FuncT>::arg6_type>::value,
-                        _type_is_nullptr<_Arg7, typename _function_traits<_FuncT>::arg7_type>::value,
-                        _type_is_nullptr<_Arg8, typename _function_traits<_FuncT>::arg8_type>::value);
-                }
-
-                template<class _ObjectT>
-                struct _functor
-                {
-                    /*template<class _ReturnT>
-                    struct _member_function
-                    {
-                        typedef _ReturnT(_ObjectT::*type)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7, _Arg8);
-                        typedef _ReturnT(_ObjectT::*type_const)(_Arg1, _Arg2, _Arg3, _Arg4, _Arg5, _Arg6, _Arg7, _Arg8) const;
-                    };*/
-
-                    static 
-                    void push(const thread_detail::_priority_tag<4>&, 
-                        typename
-                        conditional<
-                            intern::_has_feature<intern::_stdex_could_pass_nullptr_with_comma_operator>::value,
-                            _arguments&, 
-                            int
-                        >::type args, _ObjectT &fp)
-                    {
-                        typedef intern::thread_asserts check;
-
-                        typedef typename check::operator_comma_is_user_defined_for_this_type_assert<
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg1>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg2>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg3>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg4>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg5>::value && 
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg6>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg7>::value &&
-                            thread_detail::_has_no_user_defined_operator_comma_op<_Arg8>::value
-                        >::operator_comma_is_user_defined_for_this_type_assert_failed
-                        check1; // if you are there means there is user defined operator comma somewhere in global namespace
-                        
-                        using thread_detail::operator,;
-                        using thread_detail::_arg;
-                        
-                        fp((_arg(args.arg1), nullptr),
-                           (_arg(args.arg2), nullptr),
-                           (_arg(args.arg3), nullptr),
-                           (_arg(args.arg4), nullptr),
-                           (_arg(args.arg5), nullptr),
-                           (_arg(args.arg6), nullptr),
-                           (_arg(args.arg7), nullptr),
-                           (_arg(args.arg8), nullptr));
-                    }
-
-                    static 
-                    void push(const thread_detail::_priority_tag<4>&, 
-                        typename
-                        conditional<
-                            intern::_has_bug<intern::_stdex_could_not_pass_nullptr_with_comma_operator>::value,
-                            _arguments&, 
-                            int
-                        >::type args, _ObjectT &fp)
-                    {
-                        _call_helper<_ObjectT>::call(fp, args,
-                            _type_is_nullptr<_Arg1>::value,
-                            _type_is_nullptr<_Arg2>::value,
-                            _type_is_nullptr<_Arg3>::value,
-                            _type_is_nullptr<_Arg4>::value,
-                            _type_is_nullptr<_Arg5>::value,
-                            _type_is_nullptr<_Arg6>::value,
-                            _type_is_nullptr<_Arg7>::value,
-                            _type_is_nullptr<_Arg8>::value);
-                    }
-                };
-            };
-
-            typedef _arguments arguments_type;
-        };
-
-        enum eTypeIsClass { _type_is_class };
-        enum eTypeIsNotClass { _type_is_not_class };
-
-        template<bool>
-        struct _choose_class_overload
-        {
-            static const eTypeIsClass tag = 
-                _type_is_class;
-        };
-
-        template<>
-        struct _choose_class_overload<false>
-        {
-            static const eTypeIsNotClass tag = 
-                _type_is_not_class;
-        };
-
-        template<class _FuncT, class _ArgT>
-        struct _thread_function_proxy
-        {
-            typedef _ArgT arguments_type;
-            typedef _FuncT function_type;
-
-            function_type fp;
-            arguments_type args;
-
-            _thread_function_proxy(function_type fp_, arguments_type args_) :
-                fp(fp_),
-                args(args_)
-            { }
-
-            ~_thread_function_proxy()
-            { }
-
-            void call()
-            {
-                call(
-                    _choose_class_overload<
-                        is_class<_FuncT>::value && 
-                        (arguments_type::count > 0) == bool(true)
-                    >::tag);
-            }
-
-            void call(eTypeIsClass)
-            {
-                arguments_type::template _functor<function_type>::
-                    push(thread_detail::_priority_tag<5>(), args, fp);
-            }
-
-            void call(eTypeIsNotClass)
-            {
-                args.push(fp);
-            }
-
-            static void gproxy(void *data)
-            {
-                _thread_function_proxy *pf = reinterpret_cast<_thread_function_proxy*>(data);
-
-                pf->call();
-
-                delete pf;
+                _delete_func(_pointer_buf);
             }
 
         private:
-            void operator=(const _thread_function_proxy&) _STDEX_DELETED_FUNCTION;
+            typedef 
+            integral_constant<
+                int, 
+                sizeof(void*) * 4> 
+            max_type_size;
+
+            typedef unsigned char (&pointer_buf_ref)[max_type_size::value];
+            typedef _Tp (*conversion_func)(const pointer_buf_ref);
+            typedef void (*deleter_func)(const pointer_buf_ref);
+
+            template<class _ConvT>
+            static _Tp _converter(pointer_buf_ref _ptr_buf)
+            {
+                _ConvT *ptr = 0;
+                std::memcpy(&ptr, &_ptr_buf[0], sizeof(ptr));
+
+                return *ptr;
+            }
+
+            template<class _ConvT>
+            static void _deleter(pointer_buf_ref _ptr_buf)
+            {
+                _ConvT *ptr = 0;
+                std::memcpy(&ptr, &_ptr_buf[0], sizeof(ptr));
+
+                delete ptr;
+            }
+            
+            conversion_func _convert_func;
+            deleter_func _delete_func;
+            mutable unsigned char _pointer_buf[max_type_size::value];
         };
-}
+    }
 
     //! Thread class.
     class thread {
 
-        void init(void(*aFunction)(void *), void * aArg);
+        typedef void(*caller_function_type)(void *);
+        struct init_args
+        {
+            caller_function_type caller_function;
+            void *bindable_ptr;
+        };
+        
+        void init(init_args);
+
+        template<class _BindableT>
+        static init_args call_bindable(const _BindableT& bindable)
+        {
+            struct lambdas
+            {
+                static void call(void *bindable_void)
+                {
+                    _BindableT &bindable = 
+                        *reinterpret_cast<_BindableT*>(bindable_void);
+
+                    bindable();
+
+                    delete &bindable;
+                }
+            };
+
+            init_args result;
+            result.caller_function = &lambdas::call;
+            result.bindable_ptr = new _BindableT(bindable);
+
+            return result;
+        }
 
     public:
         typedef pthread_t native_handle_type;
@@ -1853,85 +224,156 @@ namespace stdex
         { }
 
         template<class _FuncT>
-        explicit thread(_FuncT fx)
+        explicit thread(_FuncT _func)
             : _handle() 
-        {
-            typedef typename detail::_thread_args_helper<0>::arguments_type args_t;
-            typedef _FuncT func_t;
-            init(&detail::_thread_function_proxy<func_t, args_t>::gproxy, new detail::_thread_function_proxy<func_t, args_t>(fx, args_t()));
-        }
+        { init(call_bindable(stdex::bind(_func))); }
 
-        template<class _FuncT, class _Arg0T>
-        explicit thread(_FuncT fx, _Arg0T t0)
+        template<class _R, class _ObjectT>
+        explicit thread(_R(stdex::remove_pointer<typename stdex::remove_reference<_ObjectT>::type>::type::*_func)(), _ObjectT _obj)
             : _handle() 
-        {
-            typedef typename detail::_thread_args_helper<1, _Arg0T>::arguments_type args_t;
-            typedef _FuncT func_t;
-            init(&detail::_thread_function_proxy<func_t, args_t>::gproxy, new detail::_thread_function_proxy<func_t, args_t>(fx, args_t(t0)));
-        }
+        { init(call_bindable(stdex::bind(_func, _obj))); }
 
-        template<class _FuncT, class _Arg0T, class _Arg1T>
-        explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1)
+        template<class _R, class _ObjectT>
+        explicit thread(_R(stdex::remove_pointer<typename stdex::remove_reference<_ObjectT>::type>::type::*_func)() const, _ObjectT _obj)
             : _handle() 
-        {
-            typedef typename detail::_thread_args_helper<2, _Arg0T, _Arg1T>::arguments_type args_t;
-            typedef _FuncT func_t;
-            init(&detail::_thread_function_proxy<func_t, args_t>::gproxy, new detail::_thread_function_proxy<func_t, args_t>(fx, args_t(t0, t1)));
-        }
+        { init(call_bindable(stdex::bind(_func, _obj))); }
 
-        template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T>
-        explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2)
-            : _handle() 
-        {
-            typedef typename detail::_thread_args_helper<3, _Arg0T, _Arg1T, _Arg2T>::arguments_type args_t;
-            typedef _FuncT func_t;
-            init(&detail::_thread_function_proxy<func_t, args_t>::gproxy, new detail::_thread_function_proxy<func_t, args_t>(fx, args_t(t0, t1, t2)));
-        }
+#define _STDEX_THREAD_CONSTRUCTOR(count) \
+        template<class _FuncT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+        thread(_FuncT _func, _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK) \
+                , typename stdex::enable_if< \
+                    intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value == bool(true) || \
+                    stdex::is_union<_FuncT>::value == bool(true) || \
+                    stdex::is_class<_FuncT>::value == bool(true)>::type* = 0) \
+            : _handle() \
+        { init(call_bindable(stdex::bind(_func, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)))); } \
+\
+        template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+        explicit thread(_R(*_func)( _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) ) \
+            , _STDEX_PARAMS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM, _STDEX_ARG_DEFAULT)) \
+            : _handle() \
+        { init(call_bindable(stdex::bind(_func, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)))); } \
+\
+        template<class _R, class _ObjectT, class _ArgObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+        explicit thread(_R(_ObjectT::*_func)( _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) ) \
+            , _ArgObjectT _obj \
+            , _STDEX_PARAMS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM, _STDEX_ARG_DEFAULT)) \
+            : _handle() \
+        { init(call_bindable(stdex::bind(_func, _obj, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)))); } \
+\
+        template<class _R, class _ObjectT, class _ArgObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+        explicit thread(_R(_ObjectT::*_func)( _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) ) const \
+            , _ArgObjectT _obj \
+            , _STDEX_PARAMS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM, _STDEX_ARG_DEFAULT)) \
+            : _handle() \
+        { init(call_bindable(stdex::bind(_func, _obj, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)))); }
 
-        template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T, class _Arg3T>
-        explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2, _Arg3T t3)
-            : _handle() 
-        {
-            typedef typename detail::_thread_args_helper<4, _Arg0T, _Arg1T, _Arg2T, _Arg3T>::arguments_type args_t;
-            typedef _FuncT func_t;
-            init(&detail::_thread_function_proxy<func_t, args_t>::gproxy, new detail::_thread_function_proxy<func_t, args_t>(fx, args_t(t0, t1, t2, t3)));
-        }
+#define _STDEX_TYPE_CUSTOM(count) \
+    typename \
+    stdex::conditional< \
+        stdex::is_pointer<_STDEX_TYPE_DEFAULT(count)>::value == bool(true) || \
+        stdex::is_member_function_pointer<_STDEX_TYPE_DEFAULT(count)>::value == bool(true), \
+        _STDEX_TYPE_DEFAULT(count), stdex::detail::_thread_param_wrapper<_STDEX_TYPE_DEFAULT(count)> >::type
 
-        template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T, class _Arg3T, class _Arg4T>
-        explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2, _Arg3T t3, _Arg4T t4)
-            : _handle() 
-        {
-            typedef typename detail::_thread_args_helper<5, _Arg0T, _Arg1T, _Arg2T, _Arg3T, _Arg4T>::arguments_type args_t;
-            typedef _FuncT func_t;
-            init(&detail::_thread_function_proxy<func_t, args_t>::gproxy, new detail::_thread_function_proxy<func_t, args_t>(fx, args_t(t0, t1, t2, t3, t4)));
-        }
+#if (STDEX_FUNCTION_MAX_ARG_N >= 0)
+        _STDEX_THREAD_CONSTRUCTOR(0 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 1)
+        _STDEX_THREAD_CONSTRUCTOR(1 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 2)
+        _STDEX_THREAD_CONSTRUCTOR(2 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 3)
+        _STDEX_THREAD_CONSTRUCTOR(3 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 4)
+        _STDEX_THREAD_CONSTRUCTOR(4 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 5)
+        _STDEX_THREAD_CONSTRUCTOR(5 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 6)
+        _STDEX_THREAD_CONSTRUCTOR(6 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 7)
+        _STDEX_THREAD_CONSTRUCTOR(7 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 8)
+        _STDEX_THREAD_CONSTRUCTOR(8 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 9)
+        _STDEX_THREAD_CONSTRUCTOR(9 )
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 10)
+        _STDEX_THREAD_CONSTRUCTOR(10)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 11)
+        _STDEX_THREAD_CONSTRUCTOR(11)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 12)
+        _STDEX_THREAD_CONSTRUCTOR(12)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 13)
+        _STDEX_THREAD_CONSTRUCTOR(13)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 14)
+        _STDEX_THREAD_CONSTRUCTOR(14)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 15)
+        _STDEX_THREAD_CONSTRUCTOR(15)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 16)
+        _STDEX_THREAD_CONSTRUCTOR(16)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 17)
+        _STDEX_THREAD_CONSTRUCTOR(17)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 18)
+        _STDEX_THREAD_CONSTRUCTOR(18)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 19)
+        _STDEX_THREAD_CONSTRUCTOR(19)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 20)
+        _STDEX_THREAD_CONSTRUCTOR(20)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 21)
+        _STDEX_THREAD_CONSTRUCTOR(21)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 22)
+        _STDEX_THREAD_CONSTRUCTOR(22)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 23)
+        _STDEX_THREAD_CONSTRUCTOR(23)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 24)
+        _STDEX_THREAD_CONSTRUCTOR(24)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 25)
+        _STDEX_THREAD_CONSTRUCTOR(25)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 26)
+        _STDEX_THREAD_CONSTRUCTOR(26)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 27)
+        _STDEX_THREAD_CONSTRUCTOR(27)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 28)
+        _STDEX_THREAD_CONSTRUCTOR(28)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 29)
+        _STDEX_THREAD_CONSTRUCTOR(29)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 30)
+        _STDEX_THREAD_CONSTRUCTOR(30)
+#endif
+#if (STDEX_FUNCTION_MAX_ARG_N >= 31)
+        _STDEX_THREAD_CONSTRUCTOR(31)
+#endif
 
-        template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T, class _Arg3T, class _Arg4T, class _Arg5T>
-        explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2, _Arg3T t3, _Arg4T t4, _Arg5T t5)
-            : _handle() 
-        {
-            typedef typename detail::_thread_args_helper<6, _Arg0T, _Arg1T, _Arg2T, _Arg3T, _Arg4T, _Arg5T>::arguments_type args_t;
-            typedef _FuncT func_t;
-            init(&detail::_thread_function_proxy<func_t, args_t>::gproxy, new detail::_thread_function_proxy<func_t, args_t>(fx, args_t(t0, t1, t2, t3, t4, t5)));
-        }
+#undef _STDEX_TYPE_CUSTOM
 
-        template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T, class _Arg3T, class _Arg4T, class _Arg5T, class _Arg6T>
-        explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2, _Arg3T t3, _Arg4T t4, _Arg5T t5, _Arg6T t6)
-            : _handle() 
-        {
-            typedef typename detail::_thread_args_helper<7, _Arg0T, _Arg1T, _Arg2T, _Arg3T, _Arg4T, _Arg5T, _Arg6T>::arguments_type args_t;
-            typedef _FuncT func_t;
-            init(&detail::_thread_function_proxy<func_t, args_t>::gproxy, new detail::_thread_function_proxy<func_t, args_t>(fx, args_t(t0, t1, t2, t3, t4, t5, t6)));
-        }
-
-        template<class _FuncT, class _Arg0T, class _Arg1T, class _Arg2T, class _Arg3T, class _Arg4T, class _Arg5T, class _Arg6T, class _Arg7T>
-        explicit thread(_FuncT fx, _Arg0T t0, _Arg1T t1, _Arg2T t2, _Arg3T t3, _Arg4T t4, _Arg5T t5, _Arg6T t6, _Arg7T t7)
-            : _handle() 
-        {
-            typedef typename detail::_thread_args_helper<8, _Arg0T, _Arg1T, _Arg2T, _Arg3T, _Arg4T, _Arg5T, _Arg6T, _Arg7T>::arguments_type args_t;
-            typedef _FuncT func_t;
-            init(&detail::_thread_function_proxy<func_t, args_t>::gproxy, new detail::_thread_function_proxy<func_t, args_t>(fx, args_t(t0, t1, t2, t3, t4, t5, t6, t7)));
-        }
 
         //! Destructor.
         //! @note If the thread is joinable upon destruction, @c std::terminate()
@@ -2098,5 +540,9 @@ namespace stdex
 
 #undef _STDEX_DELETED_FUNCTION
 #undef _STDEX_NOEXCEPT_FUNCTION
+
+#define _STDEX_PARAMETER_PACK_UNDEF
+#include "./parameter_pack.h"
+#undef _STDEX_PARAMETER_PACK_UNDEF
 
 #endif // _STDEX_THREAD_H
