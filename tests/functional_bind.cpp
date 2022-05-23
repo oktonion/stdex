@@ -503,6 +503,35 @@ template<bool Enabled =
     stdex::intern::_has_feature<stdex::intern::_stdex_nullptr_implemented_as_distinct_type>::value> 
 struct np_tests_impl
 {
+    static int test0()
+    {
+        struct lambdas{
+            static bool func(void* ptr, float &val)
+            {
+                DYNAMIC_VERIFY_ABORT(ptr == 0 || ptr == &val);
+                val = 1.f;
+
+                return true;
+            }
+        };
+
+        float val = 0.f;
+
+        DYNAMIC_VERIFY(
+            true == stdex::bind(&lambdas::func, nullptr, stdex::placeholders::_1)(val)
+        );
+
+        DYNAMIC_VERIFY(val == 0.f);
+
+        DYNAMIC_VERIFY(
+            true == stdex::bind(&lambdas::func, nullptr, stdex::placeholders::_1)(stdex::ref(val))
+        );
+
+        DYNAMIC_VERIFY(val == 1.f);
+
+        return 0;
+    }
+
     static int test1()
     {
         CallableWithPtr n;
@@ -552,6 +581,7 @@ struct np_tests_impl
 template<>
 struct np_tests_impl<false>
 {
+    static int test0() { return 0; }
     static int test1() { return 0; }
     static int test2() { return 0; }
     static int test3() { return 0; }
@@ -568,6 +598,7 @@ int main()
     RUN_TEST(invoke_lvalue::run);
 
     typedef np_tests_impl<> np_tests;
+    RUN_TEST(np_tests::test0);
     RUN_TEST(np_tests::test1);
     RUN_TEST(np_tests::test2);
     RUN_TEST(np_tests::test3);
