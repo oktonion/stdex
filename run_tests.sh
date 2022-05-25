@@ -18,7 +18,7 @@ for file in ./tests/bin/*; do
   fi 
 done
 
-if [ $run_ok -eq -1 ]; then
+if [ $run_ok -eq 1 ]; then
   echo "$tests_failed"
 fi
 
