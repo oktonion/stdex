@@ -12,7 +12,7 @@ for file in ./tests/bin/*; do
     echo "...ok."
   else
     run_ok=1
-    echo $output
+    echo "$output"
     echo "...failed with $run_result."
     tests_failed="$tests_failed $filename;"
   fi 
