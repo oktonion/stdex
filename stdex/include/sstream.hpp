@@ -50,7 +50,7 @@ namespace stdex
 
     //typedef wistringstream;
     //typedef wostringstream;
-    typedef stringstream wstringstream; // temporarily, need to be redone
+    typedef std::stringstream wstringstream; // temporarily, need to be redone
     //typedef wstringbuf;
 }
 
