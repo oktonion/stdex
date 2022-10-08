@@ -1240,7 +1240,7 @@ namespace stdex
 
             class _strerrorlen_s_arg
             {
-                typedef size_t return_type;
+                typedef std::size_t return_type;
                 char buf[sizeof(return_type) * 12];
                 _strerrorlen_s_arg(...);
                 operator return_type();
