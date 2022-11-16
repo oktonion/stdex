@@ -30,8 +30,8 @@ int main(void)
 
     // nullptr checks:
     volatile void *ptr = nullptr; ((void)(ptr)); 
-    STATIC_ASSERT(nullptr == nullptr && !(nullptr != nullptr), nullptr_should_be_equal_itself);
-    STATIC_ASSERT(0 == nullptr && nullptr == 0, nullptr_should_be_equal_zero);
+    //STATIC_ASSERT(nullptr == nullptr && !(nullptr != nullptr), nullptr_should_be_equal_itself);
+    //STATIC_ASSERT(0 == nullptr && nullptr == 0, nullptr_should_be_equal_zero);
     //STATIC_ASSERT(!(nullptr > nullptr), nullptr_should_not_be_more_than_itself);
     //STATIC_ASSERT(!(nullptr < nullptr), nullptr_should_not_be_less_than_itself);
     //STATIC_ASSERT(nullptr >= nullptr, nullptr_should_more_equal_than_itself);
