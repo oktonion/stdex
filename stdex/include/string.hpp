@@ -353,7 +353,7 @@ namespace stdex
                         char buf[512] = {0};
                         _snprintf4_std_impl(buf, sizeof(buf), "%lu", ULONG_MAX);
 
-                        stdex::stringstream ss;
+                        stringstream ss;
                         ss << setbase(base) << ULONG_MAX;
                         if(std::string(str) == ss.str())
                             return value;
@@ -417,7 +417,7 @@ namespace stdex
 #ifdef ULONG_MAX
                     wstring ulong_max_str;
                     {
-                        stdex::stringstream ss;
+                        stringstream ss;
                         ss << setbase(base) << ULONG_MAX;
                         string ulong_max_str_base = ss.str();
                         
