@@ -216,6 +216,11 @@
     // nullptr and nullptr_t implementation
     #if defined(_STDEX_IMPLEMENTS_NULLPTR_SUPPORT)
         #include "nullptr.h"
+    #elif defined(_STDEX_NATIVE_NULLPTR_SUPPORT)
+        namespace stdex
+        {
+            typedef std::nullptr_t nullptr_t;
+        }
     #endif // _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
 
     namespace stdex
