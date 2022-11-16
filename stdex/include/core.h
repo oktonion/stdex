@@ -178,9 +178,10 @@
 #endif
 #endif
 
+#include <cstddef>
+
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
 
-    #include <cstddef>
     namespace stdex
     {
         namespace detail
