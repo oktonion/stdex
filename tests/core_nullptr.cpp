@@ -1,6 +1,8 @@
 #define forever while(1)
 
+#if !( defined(_MSC_VER) && _MSC_VER > 1600)
 #define nullptr 0
+#endif
 
 #include "../stdex/include/core.h"
 
