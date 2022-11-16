@@ -38,7 +38,11 @@
 #endif
 #else
 #ifndef _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
+#ifdef nullptr
+#error "stdex does not implement nullptr, nullptr is not supported by compiler but somehow nullptr is defined elsewhere"
+#else
 #error "stdex does not implement nullptr however nullptr is not supported by compiler"
+#endif
 #endif
 #endif
 
