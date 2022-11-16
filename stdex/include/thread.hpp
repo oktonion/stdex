@@ -32,19 +32,6 @@
 
 #endif
 
-#ifdef _STDEX_NATIVE_NULLPTR_SUPPORT
-#ifdef _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
-#error "stdex implements nullptr however nullptr supported by compiler"
-#endif
-#else
-#ifndef _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
-#ifdef nullptr
-#error "stdex does not implement nullptr, nullptr is not supported by compiler but somehow nullptr is defined elsewhere"
-#else
-#error "stdex does not implement nullptr however nullptr is not supported by compiler1"
-#endif
-#endif
-#endif
 
 namespace stdex
 {
