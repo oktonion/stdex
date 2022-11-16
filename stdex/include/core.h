@@ -59,19 +59,19 @@
 
     
     #if !defined(_STDEX_NATIVE_NULLPTR_SUPPORT)
-        //#if !defined(nullptr)
+        #if !defined(nullptr)
             #define _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
-        //#else
-        //    #define STRINGIZE_HELPER(xxx) #xxx
-        //    #define STRINGIZE(xxx) STRINGIZE_HELPER(xxx)
-        //    #define WARNING(desc) message(__FILE__ "(" STRINGIZE(__LINE__) ") : warning: " desc)
+        #else
+            #define STRINGIZE_HELPER(xxx) #xxx
+            #define STRINGIZE(xxx) STRINGIZE_HELPER(xxx)
+            #define WARNING(desc) message(__FILE__ "(" STRINGIZE(__LINE__) ") : warning: " desc)
 
-        //    #pragma WARNING("stdex library - macro 'nullptr' was previously defined by user; ignoring stdex macro definition")
+            #pragma WARNING("stdex library - macro 'nullptr' was previously defined by user; ignoring stdex macro definition")
 
-        //    #undef STRINGIZE_HELPER
-        //    #undef STRINGIZE
-        //    #undef WARNING
-        //#endif
+            #undef STRINGIZE_HELPER
+            #undef STRINGIZE
+            #undef WARNING
+        #endif
     #endif
 
     #if (_STDEX_HAS_FEATURE_BUILTIN(cxx_static_assert) || _STDEX_HAS_EXTENSION_BUILTIN(cxx_static_assert))
@@ -220,6 +220,11 @@
         namespace stdex
         {
             typedef std::nullptr_t nullptr_t;
+        }
+    #else
+        namespace stdex
+        {
+            typedef nullptr_t nullptr_t;
         }
     #endif // _STDEX_IMPLEMENTS_NULLPTR_SUPPORT
 
