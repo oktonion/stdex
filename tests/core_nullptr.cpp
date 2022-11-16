@@ -38,7 +38,7 @@ int main(void)
     //STATIC_ASSERT(nullptr >= 0, nullptr_should_more_equal_zero);
     //STATIC_ASSERT(nullptr <= 0, nullptr_should_less_equal_zero);
     //STATIC_ASSERT(!nullptr && nullptr == false && false == nullptr, nullptr_should_be_equal_false);
-    STATIC_ASSERT(sizeof(nullptr) == sizeof(void*), nullptr_should_be_sized_equal_to_void_ptr);
+    //STATIC_ASSERT(sizeof(nullptr) == sizeof(void*), nullptr_should_be_sized_equal_to_void_ptr);
     {
         int i = 0;
         int *ptr2 = &i;
