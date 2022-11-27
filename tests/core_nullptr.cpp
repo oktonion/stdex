@@ -1,6 +1,6 @@
 #define forever while(1)
 
-#if !( defined(_MSC_VER) && _MSC_VER > 1600)
+#if !( defined(_MSC_VER) && _MSC_VER >= 1600)
 #define nullptr 0
 typedef int nullptr_t;
 #endif
