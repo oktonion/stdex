@@ -8,12 +8,12 @@ set "tests_failed=unsuccessful tests:"
 set run_ok=!true!
 
 for /f %%f in ('dir /b ".\tests\bin\*.exe"') do (
-  echo "running test %%~nf..."
+  echo "%date% %time% running test %%~nf..."
   
   ver > nul
 
   .\tests\bin\%%f --duration && (
-    echo "...ok."
+    echo "%date% %time% ...ok."
   ) || (
     echo "...failed with !errorlevel!."
     set run_ok=!false!

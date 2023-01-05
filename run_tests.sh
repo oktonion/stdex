@@ -5,11 +5,11 @@ for file in ./tests/bin/*; do
   chmod +x "$file"
   filename=$(basename -- "$file")
   filename=$([[ "$filename" = *.* ]] && echo "${filename%.*}" || echo "$filename")
-  echo "running test $filename..."
+  echo "$(date -u) running test $filename..."
   output=$(($file --duration) 2>&1)
   run_result=$?
   if [ $run_result -eq 0 ]; then
-    echo "...ok."
+    echo "$(date -u) ...ok."
   else
     run_ok=1
     echo "$output"
