@@ -4,7 +4,12 @@ build_ok=1
 exclude_warn=""
 tests_failed="unsuccessful tests:"
 build_libs="-lrt"
-compiler_options="-std=c++03 -O3"
+compiler_options="-O3"
+
+if [ -z ${COMPILER} ]; then
+   echo "COMPILER var is not set"
+   exit 1
+fi
 
 $COMPILER -v
 
@@ -35,6 +40,37 @@ case "$(uname -s)" in
      echo 'other OS' 
      ;;
 esac
+
+
+for file in ./tests/*.cpp; do
+  filename=$(basename -- "$file")
+  filename="${filename%.*}"
+  echo "$(date): compiling test c++ recent $filename"
+  output=$(($COMPILER $compiler_options -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
+  if [[ $? -ne 0 ]]; then
+    if [[ $filename == *"fail"* ]]; then
+      echo "failed as expected"
+    else
+      build_ok=0
+      tests_failed="$tests_failed $filename;"
+      echo $output
+    fi
+  else
+    if [[ $filename == *"fail"* ]]; then
+      build_ok=0
+      tests_failed="$tests_failed $filename;"
+      echo "not failed as expected"
+    fi
+  fi
+done
+
+
+if [ $build_ok -eq 0 ]; then
+  echo "$tests_failed"
+fi
+
+tests_failed="unsuccessful tests C++03:"
+compiler_options="-std=c++03 -O3"
 
 if [[ $COMPILER = *"g++-4."* ]]; then
   echo "c++03 option is not supported"
