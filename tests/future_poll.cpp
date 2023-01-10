@@ -33,7 +33,6 @@ namespace toolbox
     template<class T>
     std::string to_string(const T &value)
     {
-        std::cout << "test line " << __LINE__ << std::endl;
         return stdex::to_string(value);
     }
 
@@ -49,7 +48,7 @@ namespace toolbox
   template<class RhsT> \
   result& operator op (const RhsT &rhs) \
   { \
-    std::cout << "test line " << __LINE__ << std::endl; string += (op_str + toolbox::detail::to_string(rhs)); \
+    string += (op_str + toolbox::detail::to_string(rhs)); \
     (outcome = outcome && op_macro(lhs, rhs)); \
     return *this; \
   }
@@ -65,7 +64,6 @@ namespace toolbox
       bool outcome;  
 
       result() : outcome(true) {
-          std::cout << "test line " << __LINE__ << std::endl;
       }
   };
 
@@ -77,11 +75,9 @@ namespace toolbox
           : base(other) {}
 
       bool operator !() const {
-          std::cout << "test line " << __LINE__ << std::endl;
           return !outcome;
       }
       operator std::string() const {
-          std::cout << "test line " << __LINE__ << std::endl;
           return string;
       }
   };
@@ -102,7 +98,6 @@ namespace toolbox
     result(const LhsT &lhs_in)
       : lhs(lhs_in)
     {
-        std::cout << "test line " << __LINE__ << std::endl;
         string = (toolbox::detail::to_string(lhs_in));
     }
 
@@ -111,12 +106,10 @@ namespace toolbox
         : base(other)
         , lhs(other.lhs)
     {
-        std::cout << "test line " << __LINE__ << std::endl;
     }
 
     operator final_result() const
     {
-        std::cout << "test line " << __LINE__ << std::endl;
         return static_cast<const base&>(*this);
     }
   };
@@ -135,8 +128,8 @@ namespace toolbox
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 #define DYNAMIC_VERIFY_IMPL(cond, op) { \
-    std::cout << "making result..." << std::endl; TESTS_TOOLBOX_MAKE_RESULT(cond) \
-    std::cout << "checking result..." << std::endl; if(!(result)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl << \
+    TESTS_TOOLBOX_MAKE_RESULT(cond) \
+    if(!(result)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl << \
         "logged: condition '" << result.string << "' failed" << std::endl; op;} \
 }
 #define DYNAMIC_VERIFY_RETURN_NEGATIVE return 1
