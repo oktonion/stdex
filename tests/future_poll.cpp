@@ -125,8 +125,8 @@ namespace toolbox
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 #define DYNAMIC_VERIFY_IMPL(cond, op) { \
-    TESTS_TOOLBOX_MAKE_RESULT(cond) \
-    if(!(result)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl << \
+    std::cout << "making result..." << std::endl; TESTS_TOOLBOX_MAKE_RESULT(cond) \
+    std::cout << "checking result..." << std::endl; if(!(result)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl << \
         "logged: condition '" << result.string << "' failed" << std::endl; op;} \
 }
 #define DYNAMIC_VERIFY_RETURN_NEGATIVE return 1
