@@ -33,6 +33,7 @@ namespace toolbox
     template<class T>
     std::string to_string(const T &value)
     {
+        std::cout << "test line " << __LINE__ << std::endl;
         return stdex::to_string(value);
     }
 
@@ -48,7 +49,7 @@ namespace toolbox
   template<class RhsT> \
   result& operator op (const RhsT &rhs) \
   { \
-    string += (op_str + toolbox::detail::to_string(rhs)); \
+    std::cout << "test line " << __LINE__ << std::endl; string += (op_str + toolbox::detail::to_string(rhs)); \
     (outcome = outcome && op_macro(lhs, rhs)); \
     return *this; \
   }
@@ -63,7 +64,9 @@ namespace toolbox
       std::string string;
       bool outcome;  
 
-      result() : outcome(true) {}
+      result() : outcome(true) {
+          std::cout << "test line " << __LINE__ << std::endl;
+      }
   };
 
   struct final_result
@@ -74,9 +77,11 @@ namespace toolbox
           : base(other) {}
 
       bool operator !() const {
+          std::cout << "test line " << __LINE__ << std::endl;
           return !outcome;
       }
       operator std::string() const {
+          std::cout << "test line " << __LINE__ << std::endl;
           return string;
       }
   };
@@ -97,16 +102,20 @@ namespace toolbox
     result(const LhsT &lhs_in)
       : lhs(lhs_in)
     {
+        std::cout << "test line " << __LINE__ << std::endl;
         string = (toolbox::detail::to_string(lhs_in));
     }
 
     result(const result &other)
         : base(other)
         , lhs(other.lhs)
-    {}
+    {
+        std::cout << "test line " << __LINE__ << std::endl;
+    }
 
     operator final_result() const
     {
+        std::cout << "test line " << __LINE__ << std::endl;
         return *this;
     }
   };
