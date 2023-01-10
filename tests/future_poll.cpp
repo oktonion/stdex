@@ -85,6 +85,7 @@ namespace toolbox
   struct result
       : result<>
   {
+    typedef result<> base;
     LhsT lhs;
     TESTS_TOOLBOX_DO_BINARY_EXPRESSION_COMPARISON(== , " == ", TESTS_TOOLBOX_CMP_EQ)
     TESTS_TOOLBOX_DO_BINARY_EXPRESSION_COMPARISON(!= , " != ", TESTS_TOOLBOX_CMP_NE)
@@ -98,6 +99,11 @@ namespace toolbox
     {
         string = (toolbox::detail::to_string(lhs_in));
     }
+
+    result(const result &other)
+        : base(other)
+        , lhs(other.lhs)
+    {}
 
     operator final_result() const
     {
