@@ -106,7 +106,8 @@ namespace toolbox
         string = (toolbox::detail::to_string(lhs_in));
     }
 
-    result(const result &other)
+    template<class OtherLhsT>
+    result(const result<OtherLhsT> &other)
         : base(other)
         , lhs(other.lhs)
     {
@@ -116,7 +117,7 @@ namespace toolbox
     operator final_result() const
     {
         std::cout << "test line " << __LINE__ << std::endl;
-        return *this;
+        return static_cast<const base&>(*this);
     }
   };
 
