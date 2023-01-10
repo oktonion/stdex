@@ -85,7 +85,7 @@ namespace toolbox
   struct result
       : result<>
   {
-    const LhsT &lhs;
+    LhsT lhs;
     TESTS_TOOLBOX_DO_BINARY_EXPRESSION_COMPARISON(== , " == ", TESTS_TOOLBOX_CMP_EQ)
     TESTS_TOOLBOX_DO_BINARY_EXPRESSION_COMPARISON(!= , " != ", TESTS_TOOLBOX_CMP_NE)
     TESTS_TOOLBOX_DO_BINARY_EXPRESSION_COMPARISON(>  , " >  ", TESTS_TOOLBOX_CMP_GT) 
