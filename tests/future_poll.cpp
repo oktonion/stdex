@@ -123,11 +123,11 @@ namespace toolbox
     if(!(result)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl << \
         "logged: condition '" << result.string << "' failed" << std::endl; op;} \
 }
-#define DYNAMIC_VERIFY_RETURN_NEGATIVE return -1
+#define DYNAMIC_VERIFY_RETURN_NEGATIVE return 1
 #define DYNAMIC_VERIFY_CALL_ABORT {using namespace std; abort();}
 #define DYNAMIC_VERIFY(cond) DYNAMIC_VERIFY_IMPL(cond, DYNAMIC_VERIFY_RETURN_NEGATIVE)
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
-#define DYNAMIC_VERIFY_FAIL {std::cout << "check condition " << "failed at line " << __LINE__ << std::endl; return -1;}
+#define DYNAMIC_VERIFY_FAIL {std::cout << "check condition " << "failed at line " << __LINE__ << std::endl; DYNAMIC_VERIFY_RETURN_NEGATIVE;}
 #define DYNAMIC_VERIFY_ABORT(cond) DYNAMIC_VERIFY_IMPL(cond, DYNAMIC_VERIFY_CALL_ABORT)
 
 int iterations = 200;
@@ -141,7 +141,7 @@ print(const char* desc, Duration dur)
   chrono::nanoseconds::rep ns = chrono::duration_cast<chrono::nanoseconds>(dur).count();
   double d = double(ns) / iterations;
   std::cout << desc << ": " << ns << "ns for " << iterations
-    << " calls, avg " << d << "ns per call\n";
+    << " calls, avg " << d << "ns per call" << std::endl;
   return d;
 }
 
