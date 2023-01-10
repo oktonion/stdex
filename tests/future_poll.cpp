@@ -2,14 +2,133 @@
 #include "../stdex/include/future.hpp"
 #include "../stdex/include/chrono.hpp"
 
+#include "../stdex/include/string.hpp"
+
 #include <iostream>
 #include <string>
 
+namespace toolbox
+{
+  namespace detail
+  {
+    template<class LhsT, class RhsT>
+    bool eq(const LhsT &lhs, const RhsT &rhs) { return lhs == (rhs); }
+    template<class LhsT, class RhsT>
+    bool ne(const LhsT &lhs, const RhsT &rhs) { return lhs != (rhs); }
+    template<class LhsT, class RhsT>
+    bool lt(const LhsT &lhs, const RhsT &rhs) { return lhs <  (rhs); }
+    template<class LhsT, class RhsT>
+    bool gt(const LhsT &lhs, const RhsT &rhs) { return lhs >  (rhs); }
+    template<class LhsT, class RhsT>
+    bool le(const LhsT &lhs, const RhsT &rhs) { return lhs <= (rhs); }
+    template<class LhsT, class RhsT>
+    bool ge(const LhsT &lhs, const RhsT &rhs) { return lhs >= (rhs); }
+    //inline bool eq(const char* lhs, const char* rhs) { return std::string(lhs) == std::string(rhs); }
+    //inline bool ne(const char* lhs, const char* rhs) { return std::string(lhs) != std::string(rhs); }
+    //inline bool lt(const char* lhs, const char* rhs) { return std::string(lhs) < std::string(rhs); }
+    //inline bool gt(const char* lhs, const char* rhs) { return std::string(lhs) > std::string(rhs); }
+    //inline bool le(const char* lhs, const char* rhs) { return std::string(lhs) <= std::string(rhs); }
+    //inline bool ge(const char* lhs, const char* rhs) { return std::string(lhs) >= std::string(rhs); }
+
+    template<class T>
+    std::string to_string(const T &value)
+    {
+        return stdex::to_string(value);
+    }
+
+    class void_type;
+  }
+#define TESTS_TOOLBOX_CMP_EQ(l, r) toolbox::detail::eq(l, r)
+#define TESTS_TOOLBOX_CMP_NE(l, r) toolbox::detail::ne(l, r)
+#define TESTS_TOOLBOX_CMP_GT(l, r) toolbox::detail::gt(l, r)
+#define TESTS_TOOLBOX_CMP_LT(l, r) toolbox::detail::lt(l, r)
+#define TESTS_TOOLBOX_CMP_GE(l, r) toolbox::detail::ge(l, r)
+#define TESTS_TOOLBOX_CMP_LE(l, r) toolbox::detail::le(l, r)
+#define TESTS_TOOLBOX_DO_BINARY_EXPRESSION_COMPARISON(op, op_str, op_macro) \
+  template<class RhsT> \
+  result& operator op (const RhsT &rhs) \
+  { \
+    string += (op_str + toolbox::detail::to_string(rhs)); \
+    (outcome = outcome && op_macro(lhs, rhs)); \
+    return *this; \
+  }
+
+  template<class LhsT = toolbox::detail::void_type>
+  struct result;
+
+
+  template<>
+  struct result<toolbox::detail::void_type>
+  {
+      std::string string;
+      bool outcome;  
+
+      result() : outcome(true) {}
+  };
+
+  struct final_result
+      : result<>
+  {
+      typedef result<> base;
+      final_result(const base &other = base())
+          : base(other) {}
+
+      bool operator !() const {
+          return !outcome;
+      }
+      operator std::string() const {
+          return string;
+      }
+  };
+
+  template<class LhsT>
+  struct result
+      : result<>
+  {
+    const LhsT &lhs;
+    TESTS_TOOLBOX_DO_BINARY_EXPRESSION_COMPARISON(== , " == ", TESTS_TOOLBOX_CMP_EQ)
+    TESTS_TOOLBOX_DO_BINARY_EXPRESSION_COMPARISON(!= , " != ", TESTS_TOOLBOX_CMP_NE)
+    TESTS_TOOLBOX_DO_BINARY_EXPRESSION_COMPARISON(>  , " >  ", TESTS_TOOLBOX_CMP_GT) 
+    TESTS_TOOLBOX_DO_BINARY_EXPRESSION_COMPARISON(<  , " <  ", TESTS_TOOLBOX_CMP_LT) 
+    TESTS_TOOLBOX_DO_BINARY_EXPRESSION_COMPARISON(>= , " >= ", TESTS_TOOLBOX_CMP_GE)
+    TESTS_TOOLBOX_DO_BINARY_EXPRESSION_COMPARISON(<= , " <= ", TESTS_TOOLBOX_CMP_LE)
+
+    result(const LhsT &lhs_in)
+      : lhs(lhs_in)
+    {
+        string = (toolbox::detail::to_string(lhs_in));
+    }
+
+    operator final_result() const
+    {
+        return *this;
+    }
+  };
+
+  struct expression_decomposer
+  {
+    template<class LhsT>
+    result<LhsT> operator/(const LhsT &lhs) const
+    {
+      return result<LhsT>(lhs);
+    }
+  };
+
+#define TESTS_TOOLBOX_MAKE_RESULT(cond) toolbox::final_result result = (toolbox::expression_decomposer() / cond);
+}
+
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
-#define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
+#define DYNAMIC_VERIFY_IMPL(cond, op) { \
+    TESTS_TOOLBOX_MAKE_RESULT(cond) \
+    if(!(result)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl << \
+        "logged: condition '" << result.string << "' failed" << std::endl; op;} \
+}
+#define DYNAMIC_VERIFY_RETURN_NEGATIVE return -1
+#define DYNAMIC_VERIFY_CALL_ABORT {using namespace std; abort();}
+#define DYNAMIC_VERIFY(cond) DYNAMIC_VERIFY_IMPL(cond, DYNAMIC_VERIFY_RETURN_NEGATIVE)
 #define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
 #define DYNAMIC_VERIFY_FAIL {std::cout << "check condition " << "failed at line " << __LINE__ << std::endl; return -1;}
-#define DYNAMIC_VERIFY_ABORT(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; std::abort();}
+#define DYNAMIC_VERIFY_ABORT(cond) DYNAMIC_VERIFY_IMPL(cond, DYNAMIC_VERIFY_CALL_ABORT)
 
 int iterations = 200;
 
