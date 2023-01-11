@@ -140,7 +140,7 @@ namespace toolbox
 #define DYNAMIC_VERIFY_FAIL {std::cout << "check condition " << "failed at line " << __LINE__ << std::endl; DYNAMIC_VERIFY_RETURN_NEGATIVE;}
 #define DYNAMIC_VERIFY_ABORT(cond) DYNAMIC_VERIFY_IMPL(cond, DYNAMIC_VERIFY_CALL_ABORT)
 
-int iterations = 200;
+int iterations = 500;
 
 using namespace stdex;
 
