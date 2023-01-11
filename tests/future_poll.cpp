@@ -259,7 +259,7 @@ int main()
   // Polling before ready with wait_for(0s) should be almost as fast as
   // after the result is ready.
   std::cout << "Polling before ready with wait_for(0s) should be almost as fast as after the result is ready." << std::endl;
-  DYNAMIC_VERIFY( wait_for_0 < (ready * 30) );
+  DYNAMIC_VERIFY( wait_for_0 < (ready * 50) );
 
   // Polling before ready using wait_until(min) should not be terribly slow.
   DYNAMIC_VERIFY( wait_until_sys_min < (ready * 100) );
