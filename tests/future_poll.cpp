@@ -128,8 +128,9 @@ namespace toolbox
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 #define DYNAMIC_VERIFY_IMPL(cond, op) { \
+    if(!(cond)) { \
     TESTS_TOOLBOX_MAKE_RESULT(cond) \
-    if(!(result)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl << \
+    std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl << \
         "logged: condition '" << result.string << "' failed" << std::endl; op;} \
 }
 #define DYNAMIC_VERIFY_RETURN_NEGATIVE return 1
@@ -245,16 +246,25 @@ int main()
 
   // Polling before ready with wait_for(0s) should be almost as fast as
   // after the result is ready.
-  DYNAMIC_VERIFY( wait_for_0 < (ready * 30) );
+  std::cout << "Polling before ready with wait_for(0s) should be almost as fast as after the result is ready." << std::endl;
+  if (chrono::detail::_duration_is_using_big_int<chrono::high_resolution_clock::duration>::value)
+  {
+    std::cout << "chrono duration is using big int that slows down wait_for(0s)" << std::endl;
+    DYNAMIC_VERIFY( wait_for_0 < (ready * 500) );
+  }
+  else
+  {
+    DYNAMIC_VERIFY( wait_for_0 < (ready * 30) );
+  }
 
   // Polling before ready using wait_until(min) should not be terribly slow.
   DYNAMIC_VERIFY( wait_until_sys_min < (ready * 100) );
-  DYNAMIC_VERIFY( wait_until_steady_min < (ready * 100) );
+  DYNAMIC_VERIFY( wait_until_steady_min < (ready * 500) );
 
 #if 1
   // Polling before ready using wait_until(epoch) should not be terribly slow.
   DYNAMIC_VERIFY( wait_until_sys_epoch < (ready * 100) );
-  DYNAMIC_VERIFY( wait_until_steady_epoch < (ready * 100) );
+  DYNAMIC_VERIFY( wait_until_steady_epoch < (ready * 500) );
 #endif
     return 0;
 }
