@@ -68,9 +68,9 @@ namespace toolbox
   };
 
   struct final_result
-      : result<>
+      : result<toolbox::detail::void_type>
   {
-      typedef result<> base;
+      typedef result<toolbox::detail::void_type> base;
       final_result(const base &other = base())
           : base(other) {}
 
@@ -84,9 +84,9 @@ namespace toolbox
 
   template<class LhsT>
   struct result
-      : result<>
+      : result<toolbox::detail::void_type>
   {
-    typedef result<> base;
+    typedef result<toolbox::detail::void_type> base;
     LhsT lhs;
     TESTS_TOOLBOX_DO_BINARY_EXPRESSION_COMPARISON(== , " == ", TESTS_TOOLBOX_CMP_EQ)
     TESTS_TOOLBOX_DO_BINARY_EXPRESSION_COMPARISON(!= , " != ", TESTS_TOOLBOX_CMP_NE)
@@ -98,7 +98,7 @@ namespace toolbox
     result(const LhsT &lhs_in)
       : lhs(lhs_in)
     {
-        string = (toolbox::detail::to_string(lhs_in));
+      string = (toolbox::detail::to_string(lhs_in));
     }
 
     template<class OtherLhsT>
@@ -108,9 +108,9 @@ namespace toolbox
     {
     }
 
-    operator final_result() const
+    final_result get() const
     {
-        return static_cast<const base&>(*this);
+      return static_cast<const base&>(*this);
     }
   };
 
@@ -238,24 +238,28 @@ int main()
 
   p.set_value(1);
 
-  start = chrono::high_resolution_clock::now();
+  double ready = 0.0;
+  
   for(int i = 0; i < iterations; i++)
-    f.wait_for(chrono::seconds(0));
-  stop = chrono::high_resolution_clock::now();
-  double ready = print("wait_for when ready", stop - start) + 1.0;
+  {
+    start = chrono::high_resolution_clock::now();
+    for(int i = 0; i < iterations; i++)
+      f.wait_for(chrono::seconds(0));
+    stop = chrono::high_resolution_clock::now();
+    {
+      chrono::nanoseconds::rep ns = chrono::duration_cast<chrono::nanoseconds>(stop - start).count();
+      ready = double(ns) / iterations;
+    }
+
+    if (ready > 0.0)
+      break;
+  }
+  ready = print("wait_for when ready", stop - start) + 1.0;
 
   // Polling before ready with wait_for(0s) should be almost as fast as
   // after the result is ready.
   std::cout << "Polling before ready with wait_for(0s) should be almost as fast as after the result is ready." << std::endl;
-  if (chrono::detail::_duration_is_using_big_int<chrono::high_resolution_clock::duration>::value)
-  {
-    std::cout << "chrono duration is using big int that slows down wait_for(0s)" << std::endl;
-    DYNAMIC_VERIFY( wait_for_0 < (ready * 500) );
-  }
-  else
-  {
-    DYNAMIC_VERIFY( wait_for_0 < (ready * 30) );
-  }
+  DYNAMIC_VERIFY( wait_for_0 < (ready * 30) );
 
   // Polling before ready using wait_until(min) should not be terribly slow.
   DYNAMIC_VERIFY( wait_until_sys_min < (ready * 100) );
