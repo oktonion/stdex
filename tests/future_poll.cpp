@@ -166,13 +166,13 @@ int main()
   for(int i = 0; i < iterations; i++)
     f.wait_for(chrono::seconds(0));
   chrono::high_resolution_clock::time_point stop = chrono::high_resolution_clock::now();
-  std::cout << "We've run too few iterations for the clock resolution. \n"
-     "Attempt to calibrate it." << std::endl;
   print("wait_for(0s) next iteration", stop - start);
   /* We've run too few iterations for the clock resolution.
      Attempt to calibrate it.  */
   if (start == stop)
     {
+        std::cout << "We've run too few iterations for the clock resolution. \n"
+          "Attempt to calibrate it." << std::endl;
       /* After set_value, wait_for is faster, so use that for the
      calibration to avoid zero at low clock resultions.  */
       promise<int> pc;
