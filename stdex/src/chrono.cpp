@@ -228,6 +228,9 @@ namespace WinAPI
                         return true;
                     }
                 }
+            } else
+            {
+                hKernel32 = GetModuleHandleW(L"kernel32.dll");
             }
             return false;
         }
@@ -246,6 +249,9 @@ namespace WinAPI
                         return true;
                     }
                 }
+            } else
+            {
+                hKernel32 = GetModuleHandleW(L"kernel32.dll");
             }
             return false;
         }
