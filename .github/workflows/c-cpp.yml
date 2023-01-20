@@ -138,6 +138,23 @@ jobs:
     - name: run tests
       run: |
         ./${{ matrix.RUN_SCRIPT }}
+        ./tests/bin/thread_test &
+        end=$((SECONDS+30))
+        year=2023 
+        while [ $SECONDS -lt $end ]; do
+            year=$((year-1))
+            sudo date $(year)1226200133
+            sleep 10
+            :
+        done
+        counter=20231226245533
+        end=$((SECONDS+300))
+        while [ $SECONDS -lt $end ]; do
+            counter=$((counter-1))
+            sudo date $(counter)
+            sleep 9
+            :
+        done
   windows:
     runs-on: ${{ matrix.os }}
     strategy:
