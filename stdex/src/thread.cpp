@@ -914,11 +914,40 @@ namespace thread_cpp_detail
             return err;
         }
 
+        static int clock_nanosleep_rel(const ::timespec *req, ::timespec *rem)
+        {
+            errno = 0;
+            int err =
+                ::clock_nanosleep(_STDEX_THREAD_CLOCK_SLEEP_MONOTONIC, 0, req, rem);
+
+            if (0 == err || ENOTSUP != errno)
+                return err;
+
+            errno = 0;
+            err =
+                ::clock_nanosleep(CLOCK_MONOTONIC, 0, req, rem);
+
+            if (0 == err || ENOTSUP != errno)
+                return err;
+
+            errno = 0;
+            err = 
+                ::clock_nanosleep(CLOCK_REALTIME, 0, req, rem);
+
+            return err;
+        }
+
         static int call_impl(const ::timespec *req, ::timespec *rem)
         {
+            int err = 
+                clock_nanosleep_rel(req, rem);
+            
+            if (err == 0)
+                return 0;
+            
             ::timespec tp;
 
-            int err = 
+            err = 
                 ::clock_gettime(_STDEX_THREAD_CLOCK_SLEEP_MONOTONIC, &tp);
 
             if(err != 0)
