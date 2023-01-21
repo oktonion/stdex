@@ -138,14 +138,14 @@ jobs:
     - name: run tests
       run: |
         ./${{ matrix.RUN_SCRIPT }}
-        sudo date 042708002253
+        sudo date 042708002153
         ./tests/bin/thread_tests&
         while ! pidof ./tests/bin/thread_tests >> /dev/null ;
         do
         sleep 1
         done
         end=$((SECONDS+30))
-        year=2253
+        year=2153
         while [ $SECONDS -lt $end ]; do
             year=$((year-1))
             sudo date 04270800$year
