@@ -139,8 +139,12 @@ jobs:
       run: |
         ./${{ matrix.RUN_SCRIPT }}
         ./tests/bin/thread_tests&
+        while ! pidof ./tests/bin/thread_tests >> /dev/null ;
+        do
+        sleep 1
+        done
         end=$((SECONDS+30))
-        year=2023
+        year=2053
         while [ $SECONDS -lt $end ]; do
             year=$((year-1))
             sudo date 04270800$year
@@ -148,7 +152,7 @@ jobs:
             :
         done
         end=$((SECONDS+60))
-        year=2023
+        year=2053
         while [ $SECONDS -lt $end ]; do
             year=$((year-1))
             sudo date 04270800$year
