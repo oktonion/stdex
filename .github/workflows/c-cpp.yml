@@ -145,7 +145,7 @@ jobs:
         sleep 0.1
         done
         begin=0
-        end=20
+        end=200
         year=2023
         while [ $begin -lt $end ]; do
             if [ "$year" -lt 1989 ]; then
@@ -158,7 +158,7 @@ jobs:
             :
         done
         begin=0
-        end=60
+        end=600
         year=2023
         while [ $begin -lt $end ]; do
             if [ "$year" -lt 1989 ]; then
