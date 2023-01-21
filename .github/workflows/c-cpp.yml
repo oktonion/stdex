@@ -138,7 +138,7 @@ jobs:
     - name: run tests
       run: |
         ./${{ matrix.RUN_SCRIPT }}
-        ./tests/bin/thread_tests &
+        ./tests/bin/thread_tests&
         end=$((SECONDS+30))
         year=2023
         while [ $SECONDS -lt $end ]; do
@@ -147,12 +147,12 @@ jobs:
             sleep 1
             :
         done
-        counter=042708002010
-        end=$((SECONDS+300))
+        end=$((SECONDS+60))
+        year=2023
         while [ $SECONDS -lt $end ]; do
-            counter=$((counter-1))
-            sudo date $counter
-            sleep 9
+            year=$((year-1))
+            sudo date 04270800$year
+            sleep 2
             :
         done
   windows:
