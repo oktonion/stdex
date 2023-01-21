@@ -149,7 +149,7 @@ jobs:
         while [ $SECONDS -lt $end ]; do
             year=$((year-1))
             sudo date 04270800$year
-            sleep 0.1
+            sleep 0.5
             :
         done
         end=$((SECONDS+60))
@@ -157,7 +157,7 @@ jobs:
         while [ $SECONDS -lt $end ]; do
             year=$((year-1))
             sudo date 04270800$year
-            sleep 0.2
+            sleep 0.6
             :
         done
   windows:
