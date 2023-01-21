@@ -142,33 +142,28 @@ jobs:
         ./tests/bin/thread_tests&
         while ! pidof ./tests/bin/thread_tests >> /dev/null ;
         do
-        sleep 0.1
+        sleep 0.01
         done
-        begin=0
-        end=200
-        year=2023
-        while [ $begin -lt $end ]; do
-            if [ "$year" -lt 1989 ]; then
-              year=2022
-            fi
-            begin=$((begin+1))
-            year=$((year-1))
-            sudo date 04270800$year
-            sleep 0.1
-            :
-        done
-        begin=0
-        end=600
-        year=2023
-        while [ $begin -lt $end ]; do
-            if [ "$year" -lt 1989 ]; then
-              year=2022
-            fi
-            begin=$((begin+1))
-            year=$((year-1))
-            sudo date 04270800$year
-            sleep 0.01
-            :
+        lcount=10000
+        while pidof ./tests/bin/thread_tests >> /dev/null ;
+        do
+          minutes=0
+          begin=0
+          end=200
+          if [ "$lcount" -lt 0 ]; then
+            break
+          fi
+          lcount=$((lcount-1))
+          while [ $begin -lt $end ]; do
+              if [ "$minutes" -lt 57 ]; then
+                minutes=0
+              fi
+              begin=$((begin+1))
+              minutes=$((minutes+1))
+              sudo date 04$minutes08002020
+              sleep 0.01
+              :
+          done
         done
   windows:
     runs-on: ${{ matrix.os }}
