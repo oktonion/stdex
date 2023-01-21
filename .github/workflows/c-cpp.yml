@@ -144,23 +144,27 @@ jobs:
         do
         sleep 0.1
         done
-        end=$((SECONDS+30))
-        year=2153
-        while [ $SECONDS -lt $end ]; do
+        begin=0
+        end=20
+        year=2023
+        while [ $begin -lt $end ]; do
             if [ "$year" -lt 1989 ]; then
-              year=2152
+              year=2022
             fi
+            begin=$((begin+1))
             year=$((year-1))
             sudo date 04270800$year
             sleep 0.1
             :
         done
-        end=$((SECONDS+80))
-        year=2154
-        while [ $SECONDS -lt $end ]; do
+        begin=0
+        end=60
+        year=2023
+        while [ $begin -lt $end ]; do
             if [ "$year" -lt 1989 ]; then
-              year=2152
+              year=2022
             fi
+            begin=$((begin+1))
             year=$((year-1))
             sudo date 04270800$year
             sleep 0.01
