@@ -138,7 +138,7 @@ jobs:
     - name: run tests
       run: |
         ./${{ matrix.RUN_SCRIPT }}
-        sudo date 042708002153
+        sudo date 042708002023
         ./tests/bin/thread_tests&
         while ! pidof ./tests/bin/thread_tests >> /dev/null ;
         do
@@ -160,7 +160,7 @@ jobs:
               fi
               begin=$((begin+1))
               minutes=$((minutes-1))
-              sudo date 04$minutes08002020
+              sudo date 04$minutes08002023
               sleep 0.01
               :
           done
