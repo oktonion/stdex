@@ -142,22 +142,28 @@ jobs:
         ./tests/bin/thread_tests&
         while ! pidof ./tests/bin/thread_tests >> /dev/null ;
         do
-        sleep 1
+        sleep 0.1
         done
         end=$((SECONDS+30))
         year=2153
         while [ $SECONDS -lt $end ]; do
+            if [ "$year" -lt 1989 ]; then
+              year=2152
+            fi
             year=$((year-1))
             sudo date 04270800$year
-            sleep 0.5
+            sleep 0.1
             :
         done
-        end=$((SECONDS+60))
-        year=2253
+        end=$((SECONDS+80))
+        year=2154
         while [ $SECONDS -lt $end ]; do
+            if [ "$year" -lt 1989 ]; then
+              year=2152
+            fi
             year=$((year-1))
             sudo date 04270800$year
-            sleep 0.6
+            sleep 0.01
             :
         done
   windows:
