@@ -159,8 +159,7 @@ jobs:
               fi
               begin=$((begin+1))
               minutes=$((minutes-1))
-              sudo date --date="-15 seconds" '+%Y-%m-%d %T'
-
+              sudo date -d '1 hour ago' "+%m/%d/%Y -%H:%M:%S"
               sleep 0.01
               :
           done
