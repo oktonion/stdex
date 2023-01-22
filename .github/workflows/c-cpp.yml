@@ -159,7 +159,9 @@ jobs:
               fi
               begin=$((begin+1))
               minutes=$((minutes-1))
-              sudo date -d '1 hour ago' "+%m/%d/%Y -%H:%M:%S"
+              curr=$(date +%d/%m/%Y-%H:%M:%S)
+              echo current:$curr
+              sudo date -d "($curr) -5mins" +%d/%m/%Y-%H:%M:%S
               sleep 0.01
               :
           done
