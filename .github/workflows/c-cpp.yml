@@ -159,7 +159,7 @@ jobs:
               fi
               begin=$((begin+1))
               minutes=$((minutes-1))
-              sudo date -s "$(date +'%Y-%m-%d %H:$minutes:%S')"
+              sudo date -s "$(date +'%Y-%m-%d %H:($(minutes)):%S')"
               sleep 0.01
               :
           done
