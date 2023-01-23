@@ -140,14 +140,17 @@ jobs:
         ./${{ matrix.RUN_SCRIPT }}
         ./tests/bin/thread_tests&
         echo "waiting for process to start"
-        while ! pgrep ./tests/bin/thread_tests >> /dev/null ;
+        proc_number=$(ps | grep -v grep | grep -ci thread_tests)
+        while [ "$proc_number" -lt 1 ];
         do
-        sleep 0.01
+          proc_number=$(ps | grep -v grep | grep -ci thread_tests)
+          sleep 0.01
         done
         echo "process started - shifting time"
         lcount=10000
-        while pgrep ./tests/bin/thread_tests >> /dev/null ;
+        while [ "$number" -gt 0 ];
         do
+          proc_number=$(ps | grep -v grep | grep -ci thread_tests)
           minutes=57
           begin=0
           end=200
@@ -156,7 +159,7 @@ jobs:
           fi
           lcount=$((lcount-1))
           while [ $begin -lt $end ]; do
-              if [ "$minutes" -lt 0 ]; then
+              if [ "$minutes" -lt 1 ]; then
                 minutes=57
               fi
               begin=$((begin+1))
