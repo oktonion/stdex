@@ -151,7 +151,7 @@ jobs:
         while [ "$number" -gt 0 ];
         do
           proc_number=$(ps | grep -v grep | grep -ci thread_tests)
-          minutes=57
+          minutes=59
           begin=0
           end=200
           if [ "$lcount" -lt 0 ]; then
@@ -159,8 +159,8 @@ jobs:
           fi
           lcount=$((lcount-1))
           while [ $begin -lt $end ]; do
-              if [ "$minutes" -lt 1 ]; then
-                minutes=57
+              if [ "$minutes" -lt 11 ]; then
+                minutes=59
               fi
               begin=$((begin+1))
               minutes=$((minutes-1))
