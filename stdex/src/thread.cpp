@@ -955,7 +955,7 @@ namespace thread_cpp_detail
         {
             ::timespec _begin;
             int err = 
-                ::clock_gettime(_STDEX_CHRONO_CLOCK_MONOTONIC, &_begin);
+                ::clock_gettime(_STDEX_THREAD_CLOCK_SLEEP_MONOTONIC, &_begin);
             
             int nanosleep_err = 
                 call_impl(req, rem);
@@ -968,7 +968,7 @@ namespace thread_cpp_detail
                 {
                     int myerrno = errno;
                     err = 
-                        ::clock_gettime(_STDEX_CHRONO_CLOCK_MONOTONIC, &_end);
+                        ::clock_gettime(_STDEX_THREAD_CLOCK_SLEEP_MONOTONIC, &_end);
                     errno = 0;
                     if (0 != err)
                     {
