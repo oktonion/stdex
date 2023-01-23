@@ -139,12 +139,14 @@ jobs:
       run: |
         ./${{ matrix.RUN_SCRIPT }}
         ./tests/bin/thread_tests&
-        while ! pidof ./tests/bin/thread_tests >> /dev/null ;
+        echo "waiting for process to start"
+        while ! pgrep ./tests/bin/thread_tests >> /dev/null ;
         do
         sleep 0.01
         done
+        echo "process started - shifting time"
         lcount=10000
-        while pidof ./tests/bin/thread_tests >> /dev/null ;
+        while pgrep ./tests/bin/thread_tests >> /dev/null ;
         do
           minutes=57
           begin=0
@@ -161,7 +163,7 @@ jobs:
               minutes=$((minutes-1))
               curr=$(date +%d/%m/%Y-%H:%M:%S)
               echo current:$curr
-              sudo date -d "($curr) -5mins" +%d/%m/%Y-%H:%M:%S
+              sudo date 112308$minutes
               sleep 0.01
               :
           done
