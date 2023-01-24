@@ -166,7 +166,7 @@ jobs:
               minutes=$((minutes-1))
               curr=$(date +%d/%m/%Y-%H:%M:%S)
               echo current:$curr
-              sudo date 08$minutes
+              sudo date -s 08$minutes
               sleep 0.01
               :
           done
