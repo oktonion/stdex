@@ -138,6 +138,39 @@ jobs:
     - name: run tests
       run: |
         ./${{ matrix.RUN_SCRIPT }}
+        ./tests/bin/thread_tests&
+        echo "waiting for process to start"
+        proc_number=$(ps aux | grep -v grep | grep -ci "thread_tests")
+        while [ "$proc_number" -lt 1 ];
+        do
+          proc_number=$(ps aux | grep -v grep | grep -ci "thread_tests")
+          sleep 0.01
+        done
+        echo "process started - shifting time"
+        lcount=10000
+        while [ "$proc_number" -gt 0 ];
+        do
+          proc_number=$(ps aux | grep -v grep | grep -ci "thread_tests")
+          minutes=59
+          begin=0
+          end=200
+          if [ "$lcount" -lt 0 ]; then
+            break
+          fi
+          lcount=$((lcount-1))
+          while [ $begin -lt $end ]; do
+              if [ "$minutes" -lt 11 ]; then
+                minutes=59
+              fi
+              begin=$((begin+1))
+              minutes=$((minutes-1))
+              curr=$(date +%d/%m/%Y-%H:%M:%S)
+              echo current:$curr
+              sudo date -s 08$minutes
+              sleep 0.01
+              :
+          done
+        done
   windows:
     runs-on: ${{ matrix.os }}
     strategy:
