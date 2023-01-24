@@ -953,14 +953,17 @@ namespace thread_cpp_detail
 
         static int call(const ::timespec &req, ::timespec &rem)
         {
-            ::timespec _begin;
+            ::timespec _begin, _end;
+            _begin.tv_sec = 0;
+            _end.tv_sec = 0;
+            _begin.tv_nsec = 0;
+            _end.tv_nsec = 0;
+            
             int err = 
                 ::clock_gettime(_STDEX_THREAD_CLOCK_SLEEP_MONOTONIC, &_begin);
             
             int nanosleep_err = 
                 call_impl(req, rem);
-
-            ::timespec _end, _passed;
 
             if (0 == nanosleep_err || EINTR == errno)
             {
@@ -969,34 +972,21 @@ namespace thread_cpp_detail
                     int myerrno = errno;
                     err = 
                         ::clock_gettime(_STDEX_THREAD_CLOCK_SLEEP_MONOTONIC, &_end);
-                    errno = 0;
-                    if (0 != err)
+                    errno = myerrno;
+                    if (0 == err)
                     {
-                        errno = myerrno;
-                        return nanosleep_err;
+                        ::timespec _passed;
+                        
+                        timespec_math::diff(_end, _begin, _passed);
+                        timespec_math::diff(req, _passed, rem);
                     }
                 }
-                else
-                {
-                    return nanosleep_err;
-                }
             }
-
-            timespec_math::diff(_end, _begin, _passed);
-            if (_passed.tv_sec > req.tv_sec ||
-                (_passed.tv_sec == req.tv_sec && _passed.tv_nsec > req.tv_nsec))
-                return 0;
-
-            timespec_math::diff(req, _passed, rem);
-
             
-            int myerrno = EINTR;
-            if (rem.tv_sec < 0) 
-            {rem.tv_sec = 0; myerrno = 0;}
-            if (rem.tv_nsec < 0) 
-            {rem.tv_nsec = 0; myerrno = 0;}
-            errno = myerrno;
-            return -1;
+            if (rem.tv_sec < 0)  rem.tv_sec = 0;
+            if (rem.tv_nsec < 0) rem.tv_nsec = 0;
+            
+            return nanosleep_err;
         }
     };
 
@@ -1039,7 +1029,7 @@ void detail::sleep_for_impl(const stdex::timespec *reltime)
         do
         {
             using thread_cpp_detail::nanosleep_impl;
-            if(remaining.tv_sec < 0 || remaining.tv_nsec < 0)
+            if((remaining.tv_sec < 1 && remaining.tv_nsec < 1) || remaining.tv_sec < 0 || remaining.tv_nsec < 0)
                 break;
             err = nanosleep_impl::call(remaining, remaining);
         }
@@ -1047,11 +1037,11 @@ void detail::sleep_for_impl(const stdex::timespec *reltime)
 
         const st_cl::duration _rem = _end - st_cl::now();
 
-        if(_rem.count() < 0)
+        if(_rem.count() < 1)
             break;
 
         remaining.tv_sec = duration_cast<seconds>(_rem).count();
-        remaining.tv_nsec = duration_cast<nanoseconds>(_rem).count();
+        remaining.tv_nsec = duration_cast<nanoseconds>(_rem - seconds(remaining.tv_sec)).count();
     }
 }
 
