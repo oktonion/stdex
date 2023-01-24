@@ -154,7 +154,8 @@ jobs:
           minutes=59
           begin=0
           end=200
-          if [ "$lcount" -lt 0 ]; then
+          if [ "$lcount" -lt 10 ]; then
+            echo "timeout..."
             break
           fi
           lcount=$((lcount-1))
@@ -171,6 +172,7 @@ jobs:
               :
           done
         done
+        echo "done"
   windows:
     runs-on: ${{ matrix.os }}
     strategy:
