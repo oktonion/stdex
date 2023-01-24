@@ -148,7 +148,7 @@ jobs:
         done
         echo "process started - shifting time"
         lcount=10000
-        while [ "$number" -gt 0 ];
+        while [ "$proc_number" -gt 0 ];
         do
           proc_number=$(ps aux | grep -v grep | grep -ci "thread_tests")
           minutes=59
