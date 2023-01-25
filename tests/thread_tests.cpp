@@ -866,16 +866,20 @@ int check_stdex__sleep_for__accuracy()
 
     for(std::size_t i = 0; i < avrg_n; ++i)
     {
-        std::cout << "standard_sleep_for_accuracy(" << i << ")" << std::endl;
-        average_std_sleep_for_acc += standard_sleep_for_accuracy();
+        std::cout << "standard_sleep_for_accuracy(" << i << "): ";
+        stdex::chrono::milliseconds acc_ms = standard_sleep_for_accuracy();
+        std::cout << acc_ms.count() << std::endl;
+        average_std_sleep_for_acc += acc_ms;
     }
     
     average_std_sleep_for_acc /= avrg_n;
 
     for(std::size_t i = 0; i < avrg_n; ++i)
     {
-        std::cout << "stdex_sleep_for_accuracy(" << i << ")" << std::endl;
-        average_stdex_sleep_for_acc += stdex_sleep_for_accuracy();
+        std::cout << "stdex_sleep_for_accuracy(" << i << "): ";
+        stdex::chrono::milliseconds acc_ms = standard_sleep_for_accuracy();
+        std::cout << acc_ms.count() << std::endl;
+        average_stdex_sleep_for_acc += acc_ms;
     }
     
     average_stdex_sleep_for_acc /= avrg_n;
