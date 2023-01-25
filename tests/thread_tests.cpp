@@ -923,6 +923,7 @@ int main(void)
     DYNAMIC_VERIFY(thread::hardware_concurrency() >= 1);
     RUN_TEST(check_stdex__sleep_for__accuracy);
     
+    std::cout << "testing thread id" << std::endl;
     test_thread_id();
 
     return 0;
