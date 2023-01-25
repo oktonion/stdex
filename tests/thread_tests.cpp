@@ -21,7 +21,7 @@ using std::size_t;
 namespace thread_tests_std
 {
     template<class T>
-    class reference_wrapper
+    class reference_wrapper 
     {
     public:
         reference_wrapper(T &ref_) :
@@ -865,12 +865,18 @@ int check_stdex__sleep_for__accuracy()
     const std::size_t avrg_n = 5;
 
     for(std::size_t i = 0; i < avrg_n; ++i)
+    {
+        std::cout << "standard_sleep_for_accuracy(" << i << ")" << std::endl;
         average_std_sleep_for_acc += standard_sleep_for_accuracy();
+    }
     
     average_std_sleep_for_acc /= avrg_n;
 
     for(std::size_t i = 0; i < avrg_n; ++i)
+    {
+        std::cout << "stdex_sleep_for_accuracy(" << i << ")" << std::endl;
         average_stdex_sleep_for_acc += stdex_sleep_for_accuracy();
+    }
     
     average_stdex_sleep_for_acc /= avrg_n;
     int acceptable_delta = 
