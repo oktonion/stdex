@@ -147,7 +147,7 @@ jobs:
           sleep 0.01
         done
         echo "process started - shifting time"
-        lcount=150
+        lcount=100
         while [ "$proc_number" -gt 0 ];
         do
           proc_number=$(ps aux | grep -v grep | grep -ci "thread_tests")
