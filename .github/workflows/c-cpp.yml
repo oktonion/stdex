@@ -147,7 +147,8 @@ jobs:
           sleep 0.01
         done
         echo "process started - shifting time"
-        lcount=100
+        current_time=$(date +%H%M%S)
+        lcount=80
         while [ "$proc_number" -gt 0 ];
         do
           proc_number=$(ps aux | grep -v grep | grep -ci "thread_tests")
@@ -171,6 +172,7 @@ jobs:
               sleep 0.01
               :
           done
+          sudo date -s $current_time
         done
         echo "done"
   windows:
