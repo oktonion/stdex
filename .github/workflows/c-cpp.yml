@@ -146,6 +146,7 @@ jobs:
           proc_number=$(ps aux | grep -v grep | grep -ci "thread_tests")
           sleep 0.01
         done
+        thread_tests_pid=$!
         echo "process started - shifting time"
         current_time=$(date +%H%M)
         lcount=80
@@ -174,6 +175,7 @@ jobs:
           done
           sudo date -s $current_time
         done
+        wait $thread_tests_pid
         echo "done"
   windows:
     runs-on: ${{ matrix.os }}
