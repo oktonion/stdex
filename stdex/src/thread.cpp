@@ -1019,9 +1019,11 @@ namespace thread_cpp_detail
 void detail::sleep_for_impl(const stdex::timespec *reltime)
 {
     using namespace std;
-    ::timespec remaining;
-    remaining.tv_sec = reltime->tv_sec;
-    remaining.tv_nsec = reltime->tv_nsec;
+    ::timespec required, remaining;
+    remaining.tv_sec = 0;
+    remaining.tv_nsec = 0;
+    required.tv_sec = reltime->tv_sec;
+    required.tv_nsec = reltime->tv_nsec;
     
     using namespace stdex::chrono;
     typedef stdex::chrono::steady_clock st_cl;
@@ -1038,9 +1040,13 @@ void detail::sleep_for_impl(const stdex::timespec *reltime)
             using thread_cpp_detail::nanosleep_impl;
             if((remaining.tv_sec < 1 && remaining.tv_nsec < 1) || remaining.tv_sec < 0 || remaining.tv_nsec < 0)
                 break;
-            err = nanosleep_impl::call(remaining, remaining);
+            err = nanosleep_impl::call(required, remaining);
+            required.tv_sec = remaining.tv_sec;
+            required.tv_nsec = remaining.tv_nsec;
+            remaining.tv_sec = 0;
+            remaining.tv_nsec = 0;
         }
-        while (err == -1 && errno == EINTR);
+        while (err == EINTR || (err == -1 && errno == EINTR));
 
         const st_cl::duration _rem = _end - st_cl::now();
 
