@@ -147,7 +147,7 @@ jobs:
           sleep 0.01
         done
         echo "process started - shifting time"
-        current_time=$(date +%H%M%S)
+        current_time=$(date +%H%M)
         lcount=80
         while [ "$proc_number" -gt 0 ];
         do
