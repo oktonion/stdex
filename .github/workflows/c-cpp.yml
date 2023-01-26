@@ -149,7 +149,7 @@ jobs:
         thread_tests_pid=$!
         echo "process started $thread_tests_pid - shifting time"
         current_time=$(date +%H%M)
-        lcount=80
+        lcount=300
         while [ "$proc_number" -gt 0 ];
         do
           proc_number=$(ps aux | grep -v grep | grep -ci "thread_tests" || true)
