@@ -140,21 +140,24 @@ jobs:
         ./${{ matrix.RUN_SCRIPT }}
         ./tests/bin/thread_tests&
         echo "waiting for process to start"
-        proc_number=$(ps aux | grep -v grep | grep -ci thread_tests)
+        proc_number=$(ps aux | grep -v grep | grep -ci "thread_tests")
         while [ "$proc_number" -lt 1 ];
         do
-          proc_number=$(ps aux | grep -v grep | grep -ci thread_tests)
+          proc_number=$(ps aux | grep -v grep | grep -ci "thread_tests")
           sleep 0.01
         done
-        echo "process started - shifting time"
-        lcount=10000
-        while [ "$number" -gt 0 ];
+        thread_tests_pid=$!
+        echo "process started $thread_tests_pid - shifting time"
+        current_time=$(date +%H%M)
+        lcount=300
+        while [ "$proc_number" -gt 0 ];
         do
-          proc_number=$(ps aux | grep -v grep | grep -ci thread_tests)
+          proc_number=$(ps aux | grep -v grep | grep -ci "thread_tests" || true)
           minutes=59
           begin=0
-          end=200
-          if [ "$lcount" -lt 0 ]; then
+          end=100
+          if [ "$lcount" -lt 10 ]; then
+            echo "timeout..."
             break
           fi
           lcount=$((lcount-1))
@@ -166,11 +169,25 @@ jobs:
               minutes=$((minutes-1))
               curr=$(date +%d/%m/%Y-%H:%M:%S)
               echo current:$curr
-              sudo date 112308$minutes
+              if [ "$RUNNER_OS" == "Linux" ]; then
+                sudo date -s 08$minutes
+              else
+                sudo date 08$minutes
+              fi
               sleep 0.01
               :
           done
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo date -s $current_time
+          else
+            sudo date $current_time
+          fi
+          echo "current ret code:$?"
         done
+        thread_tests_ec=$(wait $thread_tests_pid)
+        echo thread_tests ret code: 
+        echo "$thread_tests_ec"
+        exit $thread_tests_ec
   windows:
     runs-on: ${{ matrix.os }}
     strategy:
