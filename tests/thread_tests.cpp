@@ -943,7 +943,7 @@ int check_stdex__sleep_for__accuracy()
         average_std_sleep_for_acc,
         average_stdex_sleep_for_acc;
 
-    const std::size_t avrg_n = 5;
+    const std::size_t avrg_n = 6;
 
     for(std::size_t i = 0; i < avrg_n; ++i)
     {
