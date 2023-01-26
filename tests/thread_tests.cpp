@@ -877,7 +877,7 @@ int check_stdex__sleep_for__accuracy()
     for(std::size_t i = 0; i < avrg_n; ++i)
     {
         std::cout << "stdex_sleep_for_accuracy(" << i << "): ";
-        stdex::chrono::milliseconds acc_ms = standard_sleep_for_accuracy();
+        stdex::chrono::milliseconds acc_ms = stdex_sleep_for_accuracy();
         std::cout << acc_ms.count() << std::endl;
         average_stdex_sleep_for_acc += acc_ms;
     }
