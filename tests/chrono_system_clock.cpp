@@ -4,7 +4,8 @@
 #include <ctime>
 
 #include <iostream>
-#define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
+#define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
+#define RUN_TEST(test) {std::cout << #test << std::endl; int line = test(); if(line != 0) {std::cout << "failed at line " << line << std::endl; return line;}}
 
 int test1(void)
 {
@@ -67,11 +68,54 @@ int test1(void)
 
 static int res = test1();
 
+int test2()
+{
+    using namespace stdex;
+    using namespace stdex::chrono;
+    system_clock::time_point t1 = system_clock::now();
+
+    system_clock::time_point t2;
+
+    for (std::size_t i = 0; i < std::size_t(std::size_t(-1) / std::size_t(2)); ++i)
+    {
+        t2 = system_clock::now();
+        milliseconds diff = duration_cast<milliseconds>(t2 - t1);
+        if (diff.count() > 1) break;
+    }
+    system_clock::duration diff1 = t1 - t2;
+    system_clock::duration diff2 = t2 - t1;
+
+    DYNAMIC_VERIFY((diff1.count() < 0 && diff2.count() > 0) || (diff2.count() < 0 && diff1.count() > 0));
+
+    if (diff1.count() < 0)
+    {
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(diff1).count() < 0);
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(diff2).count() > 0);
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(diff1).count() == (-duration_cast<milliseconds>(diff2).count()));
+        DYNAMIC_VERIFY(diff1.count() == (-diff2.count()));
+    }
+    else
+    {
+        std::cout << "there was an OS time shift" << std::endl;
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(diff2).count() < 0);
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(diff1).count() > 0);
+        DYNAMIC_VERIFY(duration_cast<milliseconds>(diff2).count() == (-duration_cast<milliseconds>(diff1).count()));
+        DYNAMIC_VERIFY(diff2.count() == (-diff1.count()));
+    }
+
+    return 0;
+}
+
 int main(void)
 {
     if(0 == res)
-        return test1();
-    
-    std::cout << "static test failed" << std::endl;
-    return res;
+        RUN_TEST(test1)
+    else
+    {
+        std::cout << "static test failed at line " << res << std::endl;
+        return -1;
+    }
+
+    RUN_TEST(test2);
+    return 0;
 }

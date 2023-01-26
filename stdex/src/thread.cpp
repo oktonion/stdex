@@ -756,12 +756,19 @@ namespace thread_cpp_detail
         static int call_impl(const ::timespec &req, ::timespec &rem)
         {
             errno = 0;
+            rem.tv_sec = req.tv_sec;
+            rem.tv_nsec = req.tv_nsec;
             int err = ::nanosleep(&req, &rem);
 
             if(err && (rem.tv_sec || rem.tv_nsec))
             {
+                ::timespec req_tmp;
+                req_tmp.tv_sec = rem.tv_sec;
+                req_tmp.tv_nsec = rem.tv_nsec;
+                rem.tv_sec = 0;
+                rem.tv_nsec = 0;
                 errno = 0;
-                err = ::nanosleep(&rem, &rem);
+                err = ::nanosleep(&req_tmp, &rem);
             }
             return err;
         }
@@ -886,7 +893,7 @@ namespace thread_cpp_detail
             int err =
                 ::clock_nanosleep(_STDEX_THREAD_CLOCK_SLEEP_MONOTONIC, 0, &req, &rem);
 
-            if (0 == err || ENOTSUP != errno)
+            if (0 == err || ENOTSUP != err || ENOTSUP != errno)
                 return err;
 
             // best monotonic clock _STDEX_THREAD_CLOCK_SLEEP_MONOTONIC not supported
@@ -896,7 +903,7 @@ namespace thread_cpp_detail
             err =
                 ::clock_nanosleep(CLOCK_BOOTTIME, 0, &req, &rem);
 
-            if (0 == err || ENOTSUP != errno)
+            if (0 == err || ENOTSUP != err || ENOTSUP != errno)
                 return err;
 #endif
 
@@ -905,7 +912,7 @@ namespace thread_cpp_detail
             err =
                 ::clock_nanosleep(CLOCK_MONOTONIC, 0, &req, &rem);
 
-            if (0 == err || ENOTSUP != errno)
+            if (0 == err || ENOTSUP != err || ENOTSUP != errno)
                 return err;
 #endif
 
@@ -914,7 +921,7 @@ namespace thread_cpp_detail
             err =
                 ::clock_nanosleep(CLOCK_MONOTONIC_RAW, 0, &req, &rem);
 
-            if (0 == err || ENOTSUP != errno)
+            if (0 == err || ENOTSUP != err || ENOTSUP != errno)
                 return err;
 #endif
 
@@ -965,7 +972,7 @@ namespace thread_cpp_detail
             int nanosleep_err = 
                 call_impl(req, rem);
 
-            if (0 == nanosleep_err || EINTR == errno)
+            if (0 == nanosleep_err)
             {
                 if (0 == err)
                 {
@@ -1012,9 +1019,11 @@ namespace thread_cpp_detail
 void detail::sleep_for_impl(const stdex::timespec *reltime)
 {
     using namespace std;
-    ::timespec remaining;
-    remaining.tv_sec = reltime->tv_sec;
-    remaining.tv_nsec = reltime->tv_nsec;
+    ::timespec required, remaining;
+    remaining.tv_sec = 0;
+    remaining.tv_nsec = 0;
+    required.tv_sec = reltime->tv_sec;
+    required.tv_nsec = reltime->tv_nsec;
     
     using namespace stdex::chrono;
     typedef stdex::chrono::steady_clock st_cl;
@@ -1031,9 +1040,13 @@ void detail::sleep_for_impl(const stdex::timespec *reltime)
             using thread_cpp_detail::nanosleep_impl;
             if((remaining.tv_sec < 1 && remaining.tv_nsec < 1) || remaining.tv_sec < 0 || remaining.tv_nsec < 0)
                 break;
-            err = nanosleep_impl::call(remaining, remaining);
+            err = nanosleep_impl::call(required, remaining);
+            required.tv_sec = remaining.tv_sec;
+            required.tv_nsec = remaining.tv_nsec;
+            remaining.tv_sec = 0;
+            remaining.tv_nsec = 0;
         }
-        while (err == -1 && errno == EINTR);
+        while (err == EINTR || (err == -1 && errno == EINTR));
 
         const st_cl::duration _rem = _end - st_cl::now();
 
