@@ -2,7 +2,8 @@ run_ok=0
 tests_failed="unsuccessful tests:"
 
 for file in ./tests/bin/*; do
-  if [ file "$file" | grep -q "exec" ]; then
+  if file "$file" | grep -q "exec"
+  then
     chmod +x "$file"
 
     filename=$(basename -- "$file")
