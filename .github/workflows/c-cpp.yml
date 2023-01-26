@@ -177,6 +177,7 @@ jobs:
           echo "current ret code:$?"
         done
         thread_tests_ec=$(wait $thread_tests_pid)
+        echo "thread_tests ret code:$thread_tests_ec"
         exit $thread_tests_ec
   windows:
     runs-on: ${{ matrix.os }}
