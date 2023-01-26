@@ -3,7 +3,13 @@ mkdir ./tests/bin
 build_ok=1
 tests_failed="unsuccessful tests:"
 exclude_warn=""
-COMPILER=g++
+
+if test -n "${COMPILER-}"; then
+	libname="libstdex-$COMPILER.a"
+else
+	COMPILER=g++
+	libname="libstdex.a"
+fi
 
 if [[ $COMPILER = *"clang"* ]]; then
   exclude_warn="-Wno-c++11-long-long -Wno-non-literal-null-conversion"
@@ -15,7 +21,7 @@ for file in ./tests/*.cpp; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
   echo "compiling test c++03 $filename"
-  output=$(($COMPILER -pedantic -O3 $exclude_warn $file -L./stdex/lib/ -lstdex -lm -o "./tests/bin/$filename") 2>&1)
+  output=$(($COMPILER -pedantic -O3 $exclude_warn $file -L./stdex/lib/ -l$libname -lm -o "./tests/bin/$filename") 2>&1)
   if [[ $? -ne 0 ]]; then
     if [[ $filename == *"fail"* ]]; then
       echo "failed as expected"
@@ -44,7 +50,7 @@ for file in ./tests/*.cpp; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
   echo "compiling test c++98 $filename"
-  output=$(($COMPILER -std=c++98 -pedantic $exclude_warn $file -L./stdex/lib/ -lstdex -lm -o "./tests/bin/$filename") 2>&1)
+  output=$(($COMPILER -std=c++98 -pedantic $exclude_warn $file -L./stdex/lib/ -l$libname -lm -o "./tests/bin/$filename") 2>&1)
   if [[ $? -ne 0 ]]; then
     if [[ $filename == *"fail"* ]]; then
       echo "failed as expected"

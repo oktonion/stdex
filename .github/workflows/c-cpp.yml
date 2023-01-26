@@ -138,6 +138,56 @@ jobs:
     - name: run tests
       run: |
         ./${{ matrix.RUN_SCRIPT }}
+        ./tests/bin/thread_tests&
+        echo "waiting for process to start"
+        proc_number=$(ps aux | grep -v grep | grep -ci "thread_tests")
+        while [ "$proc_number" -lt 1 ];
+        do
+          proc_number=$(ps aux | grep -v grep | grep -ci "thread_tests")
+          sleep 0.01
+        done
+        thread_tests_pid=$!
+        echo "process started $thread_tests_pid - shifting time"
+        current_time=$(date +%H%M)
+        lcount=300
+        while [ "$proc_number" -gt 0 ];
+        do
+          proc_number=$(ps aux | grep -v grep | grep -ci "thread_tests" || true)
+          minutes=59
+          begin=0
+          end=100
+          if [ "$lcount" -lt 10 ]; then
+            echo "timeout..."
+            break
+          fi
+          lcount=$((lcount-1))
+          while [ $begin -lt $end ]; do
+              if [ "$minutes" -lt 11 ]; then
+                minutes=59
+              fi
+              begin=$((begin+1))
+              minutes=$((minutes-1))
+              curr=$(date +%d/%m/%Y-%H:%M:%S)
+              echo current:$curr
+              if [ "$RUNNER_OS" == "Linux" ]; then
+                sudo date -s 08$minutes
+              else
+                sudo date 08$minutes
+              fi
+              sleep 0.01
+              :
+          done
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            sudo date -s $current_time
+          else
+            sudo date $current_time
+          fi
+          echo "current ret code:$?"
+        done
+        thread_tests_ec=$(wait $thread_tests_pid)
+        echo thread_tests ret code: 
+        echo "$thread_tests_ec"
+        exit $thread_tests_ec
   windows:
     runs-on: ${{ matrix.os }}
     strategy:

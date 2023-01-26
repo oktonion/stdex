@@ -21,7 +21,7 @@ using std::size_t;
 namespace thread_tests_std
 {
     template<class T>
-    class reference_wrapper
+    class reference_wrapper 
     {
     public:
         reference_wrapper(T &ref_) :
@@ -946,12 +946,22 @@ int check_stdex__sleep_for__accuracy()
     const std::size_t avrg_n = 5;
 
     for(std::size_t i = 0; i < avrg_n; ++i)
-        average_std_sleep_for_acc += standard_sleep_for_accuracy();
+    {
+        std::cout << "standard_sleep_for_accuracy(" << i << "): ";
+        stdex::chrono::milliseconds acc_ms = standard_sleep_for_accuracy();
+        std::cout << acc_ms.count() << std::endl;
+        average_std_sleep_for_acc += acc_ms;
+    }
     
     average_std_sleep_for_acc /= avrg_n;
 
     for(std::size_t i = 0; i < avrg_n; ++i)
-        average_stdex_sleep_for_acc += stdex_sleep_for_accuracy();
+    {
+        std::cout << "stdex_sleep_for_accuracy(" << i << "): ";
+        stdex::chrono::milliseconds acc_ms = stdex_sleep_for_accuracy();
+        std::cout << acc_ms.count() << std::endl;
+        average_stdex_sleep_for_acc += acc_ms;
+    }
     
     average_stdex_sleep_for_acc /= avrg_n;
     int acceptable_delta = 
@@ -1003,6 +1013,7 @@ int main(void)
     DYNAMIC_VERIFY(thread::hardware_concurrency() >= 1);
     RUN_TEST(check_stdex__sleep_for__accuracy);
     
+    std::cout << "testing thread id" << std::endl;
     test_thread_id();
 
     return 0;
