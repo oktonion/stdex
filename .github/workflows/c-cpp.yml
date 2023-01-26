@@ -155,7 +155,7 @@ jobs:
           proc_number=$(ps aux | grep -v grep | grep -ci "thread_tests" || true)
           minutes=59
           begin=0
-          end=200
+          end=100
           if [ "$lcount" -lt 10 ]; then
             echo "timeout..."
             break
