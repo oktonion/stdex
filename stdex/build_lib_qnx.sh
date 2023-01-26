@@ -1,6 +1,11 @@
 #!/bin/sh
 
-COMPILER=g++
+if test -n "${COMPILER-}"; then
+	libname="libstdex-$COMPILER.a"
+else
+	COMPILER=g++
+	libname="libstdex.a"
+fi
 
 $COMPILER --version
 
@@ -22,18 +27,18 @@ for file in ./src/*.cpp; do
 done
 
 if [ $build_ok -eq 0 ]; then
-  echo "libstdex.a build failed"
+  echo "$libname build failed"
   exit 1
 fi
 
 mkdir ./lib
 
-ar_args="rcs ./lib/libstdex.a"
+ar_args="rcs ./lib/$libname"
 
 for file in ./obj/*.o; do
   filename=$(basename -- "$file")
   filename="${filename%.*}"
-  echo "archiving $filename to libstdex.a"
+  echo "archiving $filename to $libname"
   ar_args="$ar_args $file"
 done
 
@@ -45,6 +50,6 @@ ls ./lib
 
 echo "lib done"
 echo "contains:"
-ar -t "./lib/libstdex.a"
+ar -t "./lib/$libname"
 
 
