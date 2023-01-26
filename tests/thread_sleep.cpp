@@ -2,6 +2,8 @@
 #include "../stdex/include/chrono.hpp"
 #include "../stdex/include/thread.hpp"
 
+#include <iostream>
+#include <string>
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
 
 int main(void)
