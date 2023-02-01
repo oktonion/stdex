@@ -64,7 +64,7 @@ jobs:
         ./build_lib.sh
         cd ..
         chmod a+rwx ./build_tests.sh
-        ./build_tests.sh
+        bash ./build_tests.sh
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v2
