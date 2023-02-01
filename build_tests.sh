@@ -13,7 +13,9 @@ fi
 
 $COMPILER -v
 
-if [ $COMPILER = *"clang"* ]; then
+stringContain() { [ -z "$1" ] || { [ -z "${2##*$1*}" ] && [ -n "$2" ];};}
+
+if stringContain '$COMPILER' 'clang'; then
   exclude_warn="-Wno-c++11-long-long -Wno-non-literal-null-conversion"
 else
   exclude_warn="-Wno-long-long"
@@ -48,7 +50,7 @@ for file in ./tests/*.cpp; do
   echo "$(date): compiling test c++ recent $filename"
   output=$( ($COMPILER $compiler_options -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
   if [ $? -ne 0 ]; then
-    if [ $filename == *"fail"* ]; then
+    if stringContain '$filename' 'fail'; then
       echo "failed as expected"
     else
       build_ok=0
@@ -56,7 +58,7 @@ for file in ./tests/*.cpp; do
       echo $output
     fi
   else
-    if [ $filename == *"fail"* ]; then
+    if stringContain '$filename' 'fail'; then
       build_ok=0
       tests_failed="$tests_failed $filename;"
       echo "not failed as expected"
@@ -72,9 +74,9 @@ fi
 tests_failed="unsuccessful tests C++03:"
 compiler_options="-std=c++03 -O3"
 
-if [ $COMPILER = *"g++-4."* ]; then
+if stringContain '$COMPILER' 'g++-4.'; then
   echo "c++03 option is not supported"
-elif [ $COMPILER = *"g++-3."* ]; then
+elif stringContain '$COMPILER' 'g++-3.'; then
   echo "c++03 option is not supported"
 else
   for file in ./tests/*.cpp; do
@@ -83,7 +85,7 @@ else
     echo "$(date): compiling test c++03 $filename"
     output=$( ($COMPILER $compiler_options -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
     if [ $? -ne 0 ]; then
-      if [ $filename == *"fail"* ]; then
+      if stringContain '$filename' 'fail'; then
         echo "failed as expected"
       else
         build_ok=0
@@ -91,7 +93,7 @@ else
         echo $output
       fi
     else
-      if [ $filename == *"fail"* ]; then
+      if stringContain '$filename' 'fail'; then
         build_ok=0
         tests_failed="$tests_failed $filename;"
         echo "not failed as expected"
@@ -135,7 +137,7 @@ for file in ./tests/*.cpp; do
   echo "$(date): compiling test c++98 $filename"
   output=$( ($COMPILER $compiler_options -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
   if [ $? -ne 0 ]; then
-    if [ $filename == *"fail"* ]; then
+    if stringContain '$filename' 'fail'; then
       echo "failed as expected"
     else
       build_ok=0
@@ -143,7 +145,7 @@ for file in ./tests/*.cpp; do
       echo "$output"
     fi
   else
-    if [ $filename == *"fail"* ]; then
+    if stringContain '$filename' 'fail'; then
       build_ok=0
       tests_failed="$tests_failed $filename;"
       echo "not failed as expected"
