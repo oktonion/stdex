@@ -57,9 +57,9 @@ jobs:
 
     - name: Build
       run: |
-	    cd ./stdex
+        cd ./stdex
         chmod a+rwx ./build_lib.sh
-		./build_lib.sh
+        ./build_lib.sh
         cd ..
         chmod a+rwx ./build_tests.sh
         ./build_tests.sh
