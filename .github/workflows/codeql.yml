@@ -57,7 +57,7 @@ jobs:
 
     - name: Build
       env:
-        COMPILER: gcc
+        COMPILER: g++
       run: |
         cd ./stdex
         chmod a+rwx ./build_lib.sh
