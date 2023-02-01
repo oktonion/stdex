@@ -134,8 +134,8 @@ for file in ./tests/*.cpp; do
   filename="${filename%.*}"
   echo "$(date): compiling test c++98 $filename"
   output=$(($COMPILER $compiler_options -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
-  if [[ $? -ne 0 ]]; then
-    if [[ $filename == *"fail"* ]]; then
+  if [ $? -ne 0 ]; then
+    if [ $filename == *"fail"* ]; then
       echo "failed as expected"
     else
       build_ok=0
@@ -143,7 +143,7 @@ for file in ./tests/*.cpp; do
       echo "$output"
     fi
   else
-    if [[ $filename == *"fail"* ]]; then
+    if [ $filename == *"fail"* ]; then
       build_ok=0
       tests_failed="$tests_failed $filename;"
       echo "not failed as expected"
