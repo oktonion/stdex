@@ -13,7 +13,7 @@ fi
 
 $COMPILER -v
 
-stringContain() { [ -z "$1" ] || { [ -z "${2##*$1*}" ] && [ -n "$2" ];};}
+stringContain() { [ -z "$2" ] || { [ -z "${1##*$2*}" ] && [ -n "$1" ];};}
 
 if stringContain '$COMPILER' 'clang'; then
   exclude_warn="-Wno-c++11-long-long -Wno-non-literal-null-conversion"
