@@ -13,7 +13,7 @@ fi
 
 $COMPILER -v
 
-if [[ $COMPILER = *"clang"* ]]; then
+if [ $COMPILER = *"clang"* ]; then
   exclude_warn="-Wno-c++11-long-long -Wno-non-literal-null-conversion"
 else
   exclude_warn="-Wno-long-long"
@@ -72,9 +72,9 @@ fi
 tests_failed="unsuccessful tests C++03:"
 compiler_options="-std=c++03 -O3"
 
-if [[ $COMPILER = *"g++-4."* ]]; then
+if [ $COMPILER = *"g++-4."* ]; then
   echo "c++03 option is not supported"
-elif [[ $COMPILER = *"g++-3."* ]]; then
+elif [ $COMPILER = *"g++-3."* ]; then
   echo "c++03 option is not supported"
 else
   for file in ./tests/*.cpp; do
