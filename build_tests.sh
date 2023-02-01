@@ -81,7 +81,7 @@ else
     filename=$(basename -- "$file")
     filename="${filename%.*}"
     echo "$(date): compiling test c++03 $filename"
-    output=$(($COMPILER $compiler_options -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
+    output=$( ($COMPILER $compiler_options -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
     if [[ $? -ne 0 ]]; then
       if [[ $filename == *"fail"* ]]; then
         echo "failed as expected"
