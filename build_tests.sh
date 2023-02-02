@@ -6,41 +6,62 @@ tests_failed="unsuccessful tests:"
 build_libs="-lrt"
 compiler_options="-O3"
 
+case "$(uname -s)" in
+
+   Darwin)
+     echo 'OS: Mac OS X'
+     build_libs="-lpthread"
+	 compiler_of_choice=clang
+   ;;
+
+   Linux)
+     echo 'OS: Linux'
+     build_libs="-lrt -lpthread"
+	 compiler_of_choice=g++
+   ;;
+
+   CYGWIN*|MINGW32*|MSYS*|MINGW64*)
+     echo 'OS: MS Windows'
+     compiler_options="-I./pthread/ -fms-extensions -Wno-language-extension-token"
+	 compiler_of_choice=g++
+   ;;
+   
+   QNX)
+     echo 'OS: QNX' 
+     build_libs="-lm"
+	 compiler_of_choice=qcc
+   ;;
+   
+   *)
+     echo 'OS: unknown'
+	 compiler_of_choice=g++
+   ;;
+esac
+
 if [ -z ${COMPILER} ]; then
-   echo "COMPILER var is not set"
-   exit 1
+  output=$( (g++ -v) 2>&1)
+  case "$output" in
+    *cannot*|*such*|*directory*)
+	  echo "cannot find 'g++' compiler"
+    ;;
+	*)
+	  compiler_of_choice=g++
+	;;
+  esac
+  
+  echo "COMPILER var is not set, setting to '$compiler_of_choice'"
+  COMPILER=$compiler_of_choice
 fi
 
 $COMPILER -v
 
-stringContain() { [ -z "$2" ] || { [ -z "${1##*$2*}" ] && [ -n "$1" ];};}
-
-if stringContain '$COMPILER' 'clang'; then
-  exclude_warn="-Wno-c++11-long-long -Wno-non-literal-null-conversion"
-else
-  exclude_warn="-Wno-long-long"
-fi
-
-case "$(uname -s)" in
-
-   Darwin)
-     echo 'Mac OS X'
-     build_libs="-lpthread"
-     ;;
-
-   Linux)
-     echo 'Linux'
-     build_libs="-lrt -lpthread"
-     ;;
-
-   CYGWIN*|MINGW32*|MSYS*|MINGW64*)
-     echo 'MS Windows'
-     compiler_options="-I./pthread/ -fms-extensions -Wno-language-extension-token"
-     ;;
-
-   *)
-     echo 'other OS' 
-     ;;
+case "$COMPILER" in 
+  *clang*)
+    exclude_warn="-Wno-c++11-long-long -Wno-non-literal-null-conversion"
+  ;;
+  *)
+    exclude_warn="-Wno-long-long"
+  ;;
 esac
 
 
@@ -50,19 +71,24 @@ for file in ./tests/*.cpp; do
   echo "$(date): compiling test c++ recent $filename"
   output=$( ($COMPILER $compiler_options -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
   if [ $? -ne 0 ]; then
-    if stringContain '$filename' 'fail'; then
-      echo "failed as expected"
-    else
-      build_ok=0
-      tests_failed="$tests_failed $filename;"
-      echo $output
-    fi
+    case "$filename" in
+      *fail*)
+        echo "failed as expected"
+      ;;
+      *)
+        build_ok=0
+        tests_failed="$tests_failed $filename;"
+        echo $output
+      ;;
+    esac
   else
-    if stringContain '$filename' 'fail'; then
-      build_ok=0
-      tests_failed="$tests_failed $filename;"
-      echo "not failed as expected"
-    fi
+    case "$filename" in
+      *fail*)
+        build_ok=0
+        tests_failed="$tests_failed $filename;"
+        echo "not failed as expected"
+      ;;
+    esac
   fi
 done
 
@@ -71,36 +97,49 @@ if [ $build_ok -eq 0 ]; then
   echo "$tests_failed"
 fi
 
-tests_failed="unsuccessful tests C++03:"
-compiler_options="-std=c++03 -O3"
 
-if stringContain '$COMPILER' 'g++-4.'; then
-  echo "c++03 option is not supported"
-elif stringContain '$COMPILER' 'g++-3.'; then
-  echo "c++03 option is not supported"
-else
-  for file in ./tests/*.cpp; do
-    filename=$(basename -- "$file")
-    filename="${filename%.*}"
-    echo "$(date): compiling test c++03 $filename"
-    output=$( ($COMPILER $compiler_options -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
-    if [ $? -ne 0 ]; then
-      if stringContain '$filename' 'fail'; then
-        echo "failed as expected"
+case "$COMPILER" in 
+  g++-4.*|g++-3.*)
+    echo "outdated compiler: c++03 option is not supported"
+  ;;
+  *)
+    tests_failed="unsuccessful tests C++03:"
+    compiler_options="-std=c++03 -O3"
+    for file in ./tests/*.cpp; do
+      filename=$(basename -- "$file")
+      filename="${filename%.*}"
+      echo "$(date): compiling test c++03 $filename"
+      output=$( ($COMPILER $compiler_options -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
+      if [ $? -ne 0 ]; then
+      case "$output" in
+      *error*c++03*)
+        echo "c++03 option is not supported"
+      break
+      ;;
+    esac
+    
+        case "$filename" in 
+          *fail*)
+            echo "failed as expected"
+          ;;
+          *)
+            build_ok=0
+            tests_failed="$tests_failed $filename;"
+            echo $output
+          ;;
+        esac
       else
-        build_ok=0
-        tests_failed="$tests_failed $filename;"
-        echo $output
+        case "$filename" in 
+          *fail*)
+            build_ok=0
+            tests_failed="$tests_failed $filename;"
+            echo "not failed as expected"
+          ;;
+        esac
       fi
-    else
-      if stringContain '$filename' 'fail'; then
-        build_ok=0
-        tests_failed="$tests_failed $filename;"
-        echo "not failed as expected"
-      fi
-    fi
-  done
-fi
+    done
+  ;;
+esac
 
 if [ $build_ok -eq 0 ]; then
   echo "$tests_failed"
@@ -109,15 +148,15 @@ fi
 
 case "$(uname -s)" in
 
-   CYGWIN*|MINGW32*|MSYS*|MINGW64*)
+  CYGWIN*|MINGW32*|MSYS*|MINGW64*)
      echo 'MS Windows'
      compiler_options="-I./pthread/ -fms-extensions -Wno-language-extension-token"
-     ;;
+  ;;
 
 
    *) 
-   compiler_options="-std=c++98 -O3"
-     ;;
+     compiler_options="-std=c++98 -O3"
+   ;;
 esac
 
 if [ -z ${CODE_COVERAGE_LIBS+x} ]; then
@@ -137,19 +176,24 @@ for file in ./tests/*.cpp; do
   echo "$(date): compiling test c++98 $filename"
   output=$( ($COMPILER $compiler_options -pedantic $exclude_warn $CODE_COVERAGE_FLAGS $file -L./stdex/lib/ -lstdex $build_libs $CODE_COVERAGE_LIBS -o "./tests/bin/$filename") 2>&1)
   if [ $? -ne 0 ]; then
-    if stringContain '$filename' 'fail'; then
-      echo "failed as expected"
-    else
-      build_ok=0
-      tests_failed="$tests_failed $filename;"
-      echo "$output"
-    fi
+    case "$filename" in 
+      *fail*)
+        echo "failed as expected"
+      ;;
+      *)
+        build_ok=0
+        tests_failed="$tests_failed $filename;"
+        echo $output
+      ;;
+    esac
   else
-    if stringContain '$filename' 'fail'; then
-      build_ok=0
-      tests_failed="$tests_failed $filename;"
-      echo "not failed as expected"
-    fi
+    case "$filename" in 
+      *fail*)
+        build_ok=0
+        tests_failed="$tests_failed $filename;"
+        echo "not failed as expected"
+      ;;
+    esac
   fi
 done
 
