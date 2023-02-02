@@ -4,6 +4,34 @@ All notable changes to stdex library project will be documented in this file.
 
 visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library
 
+## [0.2.12] - 2023-02-02
+
+### Added
+
+- CodeQL build for code quality checks
+
+### Removed
+
+- LGTM code quality checks
+
+### Changed
+
+- QNX build script
+- correct integral constant identification
+- silently failing for `stdex::..._clock::now` if OS failed to provide correct time
+
+### Fixed
+
+- added missing includes
+- `stdex::nullptr_t` implementation
+- `stdex::this_thread::sleep_for` implementation handling for OS time shifts
+
+### Working on
+
+- **futures** implementation
+- **move semantics** emulation
+- **function** implementation
+
 ## [0.2.11] - 2022-04-22
 
 ### Added
