@@ -11,7 +11,7 @@ case "$(uname -s)" in
    Darwin)
      echo 'OS: Mac OS X'
      build_libs="-lpthread"
-	 compiler_of_choice=clang
+	 compiler_of_choice=clang++
    ;;
 
    Linux)
