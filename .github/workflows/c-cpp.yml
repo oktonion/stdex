@@ -168,21 +168,19 @@ jobs:
               begin=$((begin+1))
               minutes=$((minutes-1))
               curr=$(date +%d/%m/%Y-%H:%M:%S)
-              echo current:$curr
               if [ "$RUNNER_OS" == "Linux" ]; then
-                sudo date -s 08$minutes
+                sudo date -s 08$minutes >> /dev/null
               else
-                sudo date 08$minutes
+                sudo date 08$minutes >> /dev/null
               fi
               sleep 0.01
               :
           done
           if [ "$RUNNER_OS" == "Linux" ]; then
-            sudo date -s $current_time
+            sudo date -s $current_time >> /dev/null
           else
-            sudo date $current_time
+            sudo date $current_time >> /dev/null
           fi
-          echo "current ret code:$?"
         done
         thread_tests_ec=$(wait $thread_tests_pid)
         echo thread_tests ret code: 
