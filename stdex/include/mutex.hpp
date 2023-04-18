@@ -247,6 +247,8 @@ namespace stdex
     template<class _Lockbl>
     class unique_lock
     {
+        typedef void(*unspecified_bool_type)();
+        static void unspecified_bool_true() {}
     public:
         typedef _Lockbl mutex_type;
 
@@ -432,9 +434,14 @@ namespace stdex
             return _owns;
         }
 
-        operator bool() const _STDEX_NOEXCEPT_FUNCTION
+        operator unspecified_bool_type() const _STDEX_NOEXCEPT_FUNCTION
         {
-            return owns_lock();
+            return owns_lock() ? unspecified_bool_true : 0;
+        }
+
+        bool operator!() const _STDEX_NOEXCEPT_FUNCTION
+        {
+            return !owns_lock();
         }
 
         mutex_type* mutex() const _STDEX_NOEXCEPT_FUNCTION
