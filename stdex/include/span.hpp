@@ -37,46 +37,56 @@ namespace stdex
     namespace detail
     {
         template<class T, std::size_t Size>
-        struct span_internal {
+        struct _span_internal {
             T* begin;
             enum {size = Size};
-            span_internal() : begin(0) {}
-            span_internal(T* begin, T*) 
+            _span_internal() : begin(0) {}
+            _span_internal(T* begin, T*) 
                 : begin(begin) {}
-            span_internal(T* begin, std::size_t)
+            _span_internal(T* begin, std::size_t)
                 : begin(begin) {}
-            span_internal(T (&arr)[Size]) 
+            _span_internal(T (&arr)[Size]) 
                 : begin(arr) {}
         };
 
         template<class T>
-        struct span_internal<T, dynamic_extent> {
+        struct _span_internal<T, dynamic_extent> {
             T* begin;
             std::size_t size;
-            span_internal() : begin(0), size(0) {}
-            span_internal(T* begin, T* end) 
+            _span_internal() : begin(0), size(0) {}
+            _span_internal(T* begin, T* end) 
                 : begin(begin)
                 , size(end - begin) {}
-            span_internal(T* begin, std::size_t size) 
+            _span_internal(T* begin, std::size_t size) 
                 : begin(begin)
                 , size(size) {}
             template<class TT, std::size_t Size>
-            span_internal(TT (&arr)[Size]) 
+            _span_internal(TT (&arr)[Size]) 
                 : begin(arr)
                 , size(Size) {}
         };
 
         template<class T>
-        struct span_internal<T, 0> {
+        struct _span_internal<T, 0> {
             T* begin;
             enum { size = 0 };
-            span_internal() : begin(0) {}
-            span_internal(T* begin, T*)
+            _span_internal() : begin(0) {}
+            _span_internal(T* begin, T*)
                 : begin(begin) {}
-            span_internal(T* begin, std::size_t)
+            _span_internal(T* begin, std::size_t)
                 : begin(begin) {}
-            span_internal(T* begin)
+            _span_internal(T* begin)
                 : begin(begin) {}
+        };
+
+        struct _span_range
+        {
+            typedef detail::_span_internal<const void, dynamic_extent> _span_internal;
+            _span_internal internal;
+            template<class _Tp, class _AllocT, template<class, class> class _R>
+            _span_range(_R<_Tp, _AllocT>& range) _STDEX_NOEXCEPT_FUNCTION
+                : internal(range.data(), range.size())
+            {}
         };
     }
 
@@ -88,7 +98,7 @@ namespace stdex
 #endif // _STDEX_SPAN_BODY_DEFINE
         typedef void(*unspecified_bool_type)();
         static void unspecified_bool_true() {}
-        typedef detail::span_internal<T, Extent> span_internal;
+        typedef detail::_span_internal<T, Extent> _span_internal;
     public:
         static const std::size_t extent = Extent;
     
@@ -121,6 +131,9 @@ namespace stdex
             : internal(other.internal)
         {}
 
+        span(detail::_span_range range) _STDEX_NOEXCEPT_FUNCTION
+            : internal(reinterpret_cast<pointer>(const_cast<void*>(range.internal.begin)), range.internal.size)
+        {}
 
         span& operator=(const span &other) _STDEX_NOEXCEPT_FUNCTION
         {
@@ -254,17 +267,17 @@ namespace stdex
                     this->data() + Offset, this->size() - Offset);
         }
 
-        span<element_type> subspan(size_type off, size_type count = dynamic_extent) const _STDEX_NOEXCEPT_FUNCTION
+        span<element_type, dynamic_extent> subspan(size_type off, size_type count = dynamic_extent) const _STDEX_NOEXCEPT_FUNCTION
         {
             if ( begin() + off > end() )
             {
                 iterator end = span::end();
-                return span<element_type>(end, static_cast<size_type>(0));
+                return span<element_type, dynamic_extent>(end, static_cast<size_type>(0));
             }
             size_type newSize = size() - off;
             if ( count > newSize ) count = newSize;
             iterator begin = span::begin();
-            return span<element_type>(begin + off, count);
+            return span<element_type, dynamic_extent>(begin + off, count);
         }
 
         template<std::size_t Count>
@@ -277,7 +290,7 @@ namespace stdex
             return subspan<0, Count>();
         }
 
-        span<element_type> first(size_type count) const _STDEX_NOEXCEPT_FUNCTION
+        span<element_type, dynamic_extent> first(size_type count) const _STDEX_NOEXCEPT_FUNCTION
         {
             return subspan(0, count);
         }
@@ -292,13 +305,13 @@ namespace stdex
             return subspan<Extent - Count, Count>();
         }
 
-        span<element_type> last(size_type count) const _STDEX_NOEXCEPT_FUNCTION
+        span<element_type, dynamic_extent> last(size_type count) const _STDEX_NOEXCEPT_FUNCTION
         {
             return subspan(size() - count, count);
         }
 
     private:
-        span_internal internal;
+        _span_internal internal;
 
 #ifndef _STDEX_SPAN_BODY_DEFINE
     // just for non-const version
@@ -346,7 +359,7 @@ namespace stdex
         // assign non-const span to const
         span& operator=(const span<StrippedConstT> &other) _STDEX_NOEXCEPT_FUNCTION
         {
-            internal = span_internal(other.begin(), other.end());
+            internal = _span_internal(other.begin(), other.end());
             return *this;
         }
     };
