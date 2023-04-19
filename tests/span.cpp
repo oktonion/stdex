@@ -1,11 +1,14 @@
 #include "../stdex/include/span.hpp"
 
+#include <vector>
+
 #include <iostream>
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
 
 template<class T>
 struct span_tests
 {
+    typedef T type;
     static int test1(T (&data)[9])
     {
         stdex::span<T, 9> data_span = stdex::make_span<T>(data);
@@ -73,14 +76,37 @@ struct span_tests
 
         return 0;
     }
+
+    template<class R>
+    static int test2(R &range)
+    {
+        stdex::span<T> range_span(range);
+
+        DYNAMIC_VERIFY(range_span.size() == range.size());
+
+        return 0;
+    }
 };
 
 int main(void)
 {
     {
-        const int data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
-        DYNAMIC_VERIFY(0 == span_tests<const int>::test1(data));
+        typedef span_tests<const int> tests;
+
+        tests::type data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+        DYNAMIC_VERIFY(0 == tests::test1(data));
     }
+
+    {
+        typedef span_tests<int> tests;
+
+        tests::type data[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+        DYNAMIC_VERIFY(0 == tests::test1(data));
+
+        //std::vector<tests::type> range(10);
+        //DYNAMIC_VERIFY(0 == tests::test2(range));
+    }
+    
     {
         stdex::span<int> S;
         
