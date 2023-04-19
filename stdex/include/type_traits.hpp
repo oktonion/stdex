@@ -127,6 +127,14 @@ namespace stdex
 
     namespace detail
     {
+        template<bool _Cond, class _Iftrue, class _Iffalse>
+        struct _conditional_t
+            : conditional<_Cond, _Iftrue, _Iffalse>::type
+        { };
+    }
+
+    namespace detail
+    {
         struct void_type {};
 
         //typedef void void_type;
