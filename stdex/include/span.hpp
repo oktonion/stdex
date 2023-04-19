@@ -32,7 +32,7 @@
 namespace stdex
 {
     static const std::size_t dynamic_extent =
-        integral_constant<std::size_t, 0>::value - 1;
+        integral_constant<std::size_t, static_cast<std::size_t>(0) - static_cast<std::size_t>(1)>::value;
 
     namespace detail
     {
