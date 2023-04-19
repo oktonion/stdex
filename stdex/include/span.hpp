@@ -268,7 +268,7 @@ namespace stdex
         template<std::size_t Count>
         typename
         conditional<
-            bool_constant<bool(Count <= Extent)>::value == bool(true),
+            bool_constant<bool(Count > Extent)>::value == bool(false),
             span<element_type, Count>, void
         >::type first() const _STDEX_NOEXCEPT_FUNCTION
         {
