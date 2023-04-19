@@ -27,7 +27,7 @@ struct span_tests
         DYNAMIC_VERIFY(!data_span.empty());
         DYNAMIC_VERIFY(data_span.extent == 9);
 
-        stdex::span<T, 3> data_span_first = data_span.first<3>();
+        stdex::span<T, 3> data_span_first = data_span.template first<3>();
         DYNAMIC_VERIFY(data_span_first.extent == 3);
         DYNAMIC_VERIFY(data_span_first.size() == 3);
         DYNAMIC_VERIFY(data_span_first.front() == 0);
@@ -39,7 +39,7 @@ struct span_tests
         DYNAMIC_VERIFY(data_span_first_dyn.front() == 0);
         DYNAMIC_VERIFY(data_span_first_dyn.back() == 3);
 
-        stdex::span<T, 5> data_span_last = data_span.last<5>();
+        stdex::span<T, 5> data_span_last = data_span.template last<5>();
         DYNAMIC_VERIFY(data_span_last.extent == 5);
         DYNAMIC_VERIFY(data_span_last.size() == 5);
         DYNAMIC_VERIFY(data_span_last.front() == 4);
@@ -51,13 +51,13 @@ struct span_tests
         DYNAMIC_VERIFY(data_span_last_dyn.front() == 3);
         DYNAMIC_VERIFY(data_span_last_dyn.back() == 8);
 
-        stdex::span<T, 3> data_span_subspan = data_span.subspan<1, 3>();
+        stdex::span<T, 3> data_span_subspan = data_span.template subspan<1, 3>();
         DYNAMIC_VERIFY(data_span_subspan.extent == 3);
         DYNAMIC_VERIFY(data_span_subspan.size() == 3);
         DYNAMIC_VERIFY(data_span_subspan.front() == 1);
         DYNAMIC_VERIFY(data_span_subspan.back() == 3);
 
-        stdex::span<T, 1> data_span_subspan_offset = data_span.subspan<8>();
+        stdex::span<T, 1> data_span_subspan_offset = data_span.template subspan<8>();
         DYNAMIC_VERIFY(data_span_subspan_offset.extent == 1);
         DYNAMIC_VERIFY(data_span_subspan_offset.size() == 1);
         DYNAMIC_VERIFY(data_span_subspan_offset.front() == 8);
@@ -67,7 +67,7 @@ struct span_tests
         DYNAMIC_VERIFY(data_span_subspan_empty.extent == stdex::dynamic_extent);
         DYNAMIC_VERIFY(data_span_subspan_empty.size() == 0);
 
-        stdex::span<T, 0> data_span_subspan_empty_static = data_span.subspan<9>();
+        stdex::span<T, 0> data_span_subspan_empty_static = data_span.template subspan<9>();
         DYNAMIC_VERIFY(data_span_subspan_empty_static.extent == 0);
         DYNAMIC_VERIFY(data_span_subspan_empty.size() == 0);
 
