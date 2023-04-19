@@ -1,10 +1,10 @@
-#ifndef _STDEX_SPAN_H
+#if !defined(_STDEX_SPAN_H) || defined(_STDEX_SPAN_BODY_DEFINE)
 #define _STDEX_SPAN_H
 
 #ifndef _STDEX_SPAN_BODY_DEFINE
 
 #if _MSC_VER > 1000
-#pragma once
+//#pragma once
 #endif // _MSC_VER > 1000
 
 // stdex includes
@@ -39,8 +39,10 @@ namespace stdex
         struct span_internal {
             T* begin;
             enum {size = Size};
-            span_internal() : begin(0), end(0) {}
-            span_internal(T* begin) 
+            span_internal() : begin(0) {}
+            span_internal(T* begin, T*) 
+                : begin(begin) {}
+            span_internal(T* begin, std::size_t)
                 : begin(begin) {}
             span_internal(T (&arr)[Size]) 
                 : begin(arr) {}
@@ -64,9 +66,16 @@ namespace stdex
         };
 
         template<class T>
-        struct span_element
-        {
-            typedef T type;
+        struct span_internal<T, 0> {
+            T* begin;
+            enum { size = 0 };
+            span_internal() : begin(0) {}
+            span_internal(T* begin, T*)
+                : begin(begin) {}
+            span_internal(T* begin, std::size_t)
+                : begin(begin) {}
+            span_internal(T* begin)
+                : begin(begin) {}
         };
     }
 
@@ -76,13 +85,12 @@ namespace stdex
     class span
     {
 #endif // _STDEX_SPAN_BODY_DEFINE
-        typedef span<false_type, 0>*& disabled_type;
         typedef void(*unspecified_bool_type)();
         static void unspecified_bool_true() {}
         typedef detail::span_internal<T, Extent> span_internal;
     public:
         static const std::size_t extent = Extent;
-	
+    
         typedef T element_type;
         typedef typename stdex::remove_cv<T>::type value_type;
         typedef std::size_t size_type;
@@ -100,47 +108,18 @@ namespace stdex
 
         // from range
         template <class U>
-        span(U* begin,
-            typename
-            conditional<
-               is_same<T, U>::value == bool(true) ||
-               is_same<T, const U>::value == bool(true),
-               U*, disabled_type
-            >::type end)
+        span(pointer begin, pointer end)
             : internal(begin, end)
         {}
 
-        template <class U>
-        span(U* begin,
-            typename
-            conditional<
-               is_same<T, U>::value == bool(true) ||
-               is_same<T, const U>::value == bool(true),
-               size_type, disabled_type
-            >::type size)
+        span(pointer begin, size_type size)
             : internal(begin, size)
         {}
 
-        span(
-            typename
-            conditional<
-                is_same<typename remove_const<T>::type, T>::value,
-                const span<T>&, 
-                disabled_type // disable
-            >::type other)
-            : internal(other.data(), other.size())
+        span(const span& other) _STDEX_NOEXCEPT_FUNCTION
+            : internal(other.internal)
         {}
 
-        // span of const from span of non-const
-        span(
-            typename
-            conditional<
-                is_same<typename add_const<T>::type, T>::value, // instead of is_const
-                disabled_type, // disable
-                const span<typename add_const<T>::type>&
-            >::type other)
-            : internal(other.data(), other.size())
-        {}
 
         span& operator=(const span &other) _STDEX_NOEXCEPT_FUNCTION
         {
@@ -148,27 +127,14 @@ namespace stdex
             return *this;
         }
 
-        // assign non-const span to const
-        span& operator=(
-            typename
-            conditional<
-                is_same<typename add_const<T>::type, T>::value, // instead of is_const
-                const span<typename remove_const<T>::type>&,
-                disabled_type // disable
-            >::type other) _STDEX_NOEXCEPT_FUNCTION
-        {
-            internal = span_internal(other.begin(), other.end());
-            return *this;
-        }
-
         operator unspecified_bool_type() const _STDEX_NOEXCEPT_FUNCTION
         {
-            return !!m_begin ? unspecified_bool_true : 0;
+            return !!internal.begin ? unspecified_bool_true : 0;
         }
 
         bool operator!() const _STDEX_NOEXCEPT_FUNCTION
         {
-            return !!!m_begin;
+            return !!!internal.begin;
         }
 
         reference operator[](size_type pos) const
@@ -244,12 +210,21 @@ namespace stdex
 
         // slicing
         template<std::size_t Offset, std::size_t Count>
-        span<element_type, Count> 
-        subspan() const _STDEX_NOEXCEPT_FUNCTION
+        typename
+        conditional<
+            bool_constant<bool(Offset <= Extent)>::value == bool(true) &&
+            bool_constant<bool(Count <= (Extent - Offset))>::value == bool(true),
+            span<element_type, Count>, void
+        >::type
+        subspan(typename
+            enable_if<
+                bool_constant<bool(Offset <= Extent)>::value == bool(true) &&
+                bool_constant<bool(Count <= (Extent - Offset))>::value == bool(true),
+                std::size_t
+             >::type count = Count) const _STDEX_NOEXCEPT_FUNCTION
         {
-            typedef span<element_type, Count> result_type;
-
-            return result_type();
+            return span<element_type, Count>(
+                    this->data() + Offset, Count);
         }
 
         template<std::size_t Offset>
@@ -264,34 +239,58 @@ namespace stdex
             enable_if<
                 bool_constant<bool(Offset <= Extent)>::value,
                 std::size_t
-             >::type size = Size) const _STDEX_NOEXCEPT_FUNCTION
+             >::type offset = Offset) const _STDEX_NOEXCEPT_FUNCTION
         {
             typedef
-            span<element_type, 
             detail::_conditional_t<
                 bool_constant<bool(dynamic_extent != Extent)>::value,
                 integral_constant<size_type, Extent - Offset>,
                 integral_constant<size_type, dynamic_extent>
-            >::value> result_type;
+            > span_count;
 
-            return result_type();
+            return span<element_type, span_count::value>(
+                    this->data() + Offset, this->size() - Offset);
         }
 
         span<element_type> subspan(size_type off, size_type count = dynamic_extent) const _STDEX_NOEXCEPT_FUNCTION
         {
-            typedef span<element_type> result_type;
-            if (begin() + off > end()) return result_type(end(), 0);
+            if ( begin() + off > end() )
+            {
+                iterator end = span::end();
+                return span<element_type>(end, static_cast<size_type>(0));
+            }
             size_type newSize = size() - off;
-            if (count > newSize) count = newSize;
-            return result_type(begin() + off, count);
+            if ( count > newSize ) count = newSize;
+            iterator begin = span::begin();
+            return span<element_type>(begin + off, count);
         }
 
-        span first(size_type count) const _STDEX_NOEXCEPT_FUNCTION
+        template<std::size_t Count>
+        typename
+        conditional<
+            bool_constant<bool(Count <= Extent)>::value == bool(true),
+            span<element_type, Count>, void
+        >::type first() const _STDEX_NOEXCEPT_FUNCTION
+        {
+            return subspan<0, Count>();
+        }
+
+        span<element_type> first(size_type count) const _STDEX_NOEXCEPT_FUNCTION
         {
             return subspan(0, count);
         }
 
-        span last(size_type count) const _STDEX_NOEXCEPT_FUNCTION
+        template<std::size_t Count>
+        typename
+        conditional<
+            bool_constant<bool(Count <= Extent)>::value == bool(true),
+            span<element_type, Count>, void
+        >::type last() const _STDEX_NOEXCEPT_FUNCTION
+        {
+            return subspan<Extent - Count, Count>();
+        }
+
+        span<element_type> last(size_type count) const _STDEX_NOEXCEPT_FUNCTION
         {
             return subspan(size() - count, count);
         }
@@ -311,6 +310,7 @@ namespace stdex
              >::type size = Size) _STDEX_NOEXCEPT_FUNCTION
             : internal(arr, size)
         { }
+
     };
 
     template <class StrippedConstT,
@@ -321,15 +321,13 @@ namespace stdex
 // to simply copy-paste code: 
 // non-const version of span into span of const element type
 #define _STDEX_SPAN_BODY_DEFINE
-#undef _STDEX_SPAN_H
         typedef const StrippedConstT T;
-    #include "./span.hpp"    
-#define _STDEX_SPAN_H
+    #include "./span.hpp" 
 #undef _STDEX_SPAN_BODY_DEFINE
     // just for const version
     public:
         template<class TT, size_type Size>
-        span(const TT (&arr)[Size], 
+        span(TT const (&arr)[Size],
             typename
             enable_if<
                 is_same<typename remove_cv<TT>::type, value_type>::value == bool(true),
@@ -337,6 +335,18 @@ namespace stdex
              >::type size = Size) _STDEX_NOEXCEPT_FUNCTION
             : internal(arr, size)
         { }
+
+        // span of const from span of non-const
+        span(const span<StrippedConstT>& other)
+            : internal(other.data(), other.size())
+        {}
+
+        // assign non-const span to const
+        span& operator=(const span<StrippedConstT> &other) _STDEX_NOEXCEPT_FUNCTION
+        {
+            internal = span_internal(other.begin(), other.end());
+            return *this;
+        }
     };
     
     template <class T>
@@ -354,7 +364,13 @@ namespace stdex
     template <class T, std::size_t N>
     span<T, N> make_span(T(&arr)[N])
     {
-        return span<T, N>(arr);
+        return span<T, N>(arr, N);
+    }
+
+    template <class T, std::size_t N>
+    span<const T, N> make_span(T const (&arr)[N], ...)
+    {
+        return span<const T, N>(arr);
     }
 
     template <class T>
