@@ -212,8 +212,8 @@ namespace stdex
         template<std::size_t Offset, std::size_t Count>
         typename
         conditional<
-            bool_constant<bool(Offset <= Extent)>::value == bool(true) &&
-            bool_constant<bool(Count <= (Extent - Offset))>::value == bool(true),
+            bool_constant<bool(Offset > Extent)>::value == bool(false) &&
+            bool_constant<bool(Count > (Extent - Offset))>::value == bool(false),
             span<element_type, Count>, void
         >::type
         subspan(typename
@@ -237,7 +237,7 @@ namespace stdex
         subspan(
             typename
             enable_if<
-                bool_constant<bool(Offset <= Extent)>::value,
+                bool_constant<bool(Offset > Extent)>::value == bool(false),
                 std::size_t
              >::type offset = Offset) const _STDEX_NOEXCEPT_FUNCTION
         {
@@ -283,7 +283,7 @@ namespace stdex
         template<std::size_t Count>
         typename
         conditional<
-            bool_constant<bool(Count <= Extent)>::value == bool(true),
+            bool_constant<bool(Count > Extent)>::value == bool(false),
             span<element_type, Count>, void
         >::type last() const _STDEX_NOEXCEPT_FUNCTION
         {
