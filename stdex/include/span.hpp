@@ -96,8 +96,6 @@ namespace stdex
     class span
     {
 #endif // _STDEX_SPAN_BODY_DEFINE
-        typedef void(*unspecified_bool_type)();
-        static void unspecified_bool_true() {}
         typedef detail::_span_internal<T, Extent> _span_internal;
     public:
         static const std::size_t extent = Extent;
@@ -139,16 +137,6 @@ namespace stdex
         {
             internal = other.internal;
             return *this;
-        }
-
-        operator unspecified_bool_type() const _STDEX_NOEXCEPT_FUNCTION
-        {
-            return !!internal.begin ? unspecified_bool_true : 0;
-        }
-
-        bool operator!() const _STDEX_NOEXCEPT_FUNCTION
-        {
-            return !!!internal.begin;
         }
 
         reference operator[](size_type pos) const
