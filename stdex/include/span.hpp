@@ -31,7 +31,8 @@
 
 namespace stdex
 {
-    enum {dynamic_extent = std::size_t(-1)};
+    static const std::size_t dynamic_extent =
+        integral_constant<std::size_t, 0>::value - 1;
 
     namespace detail
     {
@@ -218,10 +219,11 @@ namespace stdex
         >::type
         subspan(typename
             enable_if<
-                bool_constant<bool(Offset <= Extent)>::value == bool(true) &&
-                bool_constant<bool(Count <= (Extent - Offset))>::value == bool(true),
+                bool_constant<bool(Offset > Extent)>::value == bool(false) &&
+                bool_constant<bool(Count > (Extent - Offset))>::value == bool(false),
                 std::size_t
-             >::type count = Count) const _STDEX_NOEXCEPT_FUNCTION
+             >::type count = Count
+        ) const _STDEX_NOEXCEPT_FUNCTION
         {
             return span<element_type, Count>(
                     this->data() + Offset, Count);
