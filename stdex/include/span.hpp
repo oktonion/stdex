@@ -88,6 +88,55 @@ namespace stdex
                 : internal(range.data(), range.size())
             {}
         };
+
+        
+        template<class _Tp,
+            _Tp _LhsVal, _Tp _RhsVal>
+        struct _ct_compare_less
+        {
+            static const bool value = _LhsVal < _RhsVal;
+            typedef bool_constant<
+                bool(_ct_compare_less<_Tp, _LhsVal, _RhsVal>::value == bool(true))
+            > type;
+        };
+
+        template<class _Tp,
+            _Tp _LhsVal, _Tp _RhsVal>
+        struct _ct_compare_greater
+        {
+            static const bool value = _LhsVal > _RhsVal;
+            typedef bool_constant<
+                bool(_ct_compare_greater<_Tp, _LhsVal, _RhsVal>::value == bool(true))
+            > type;
+        };
+
+        template<class _Tp,
+            _Tp _LhsVal, _Tp _RhsVal>
+        struct _ct_compare_equal
+        {
+            static const bool value = bool(_LhsVal == _RhsVal);
+            typedef bool_constant<
+                bool(_ct_compare_equal<_Tp, _LhsVal, _RhsVal>::value == bool(true))
+            > type;
+        };
+
+        template<class _Tp,
+            _Tp _LhsVal, _Tp _RhsVal>
+        struct _ct_less
+             : _ct_compare_less<_Tp, _LhsVal, _RhsVal>::type
+        { };
+
+        template<class _Tp,
+            _Tp _LhsVal, _Tp _RhsVal>
+        struct _ct_greater
+             : _ct_compare_greater<_Tp, _LhsVal, _RhsVal>::type
+        { };
+
+        template<class _Tp,
+            _Tp _LhsVal, _Tp _RhsVal>
+        struct _ct_equal
+             : _ct_compare_equal<_Tp, _LhsVal, _RhsVal>::type
+        { };
     }
 
 
@@ -214,14 +263,14 @@ namespace stdex
         template<std::size_t Offset, std::size_t Count>
         typename
         conditional<
-            bool_constant<bool(Offset > Extent)>::value == bool(false) &&
-            bool_constant<bool(Count > (Extent - Offset))>::value == bool(false),
+            detail::_ct_greater<std::size_t, Offset, Extent>::value == bool(false) &&
+            detail::_ct_greater<std::size_t, Count, (Extent - Offset)>::value == bool(false),
             span<element_type, Count>, void
         >::type
         subspan(typename
             enable_if<
-                bool_constant<bool(Offset > Extent)>::value == bool(false) &&
-                bool_constant<bool(Count > (Extent - Offset))>::value == bool(false),
+                detail::_ct_greater<std::size_t, Offset, Extent>::value == bool(false) &&
+                detail::_ct_greater<std::size_t, Count, (Extent - Offset)>::value == bool(false),
                 std::size_t
              >::type count = Count
         ) const _STDEX_NOEXCEPT_FUNCTION
@@ -233,14 +282,14 @@ namespace stdex
         template<std::size_t Offset>
         span<element_type, 
             detail::_conditional_t<
-                bool_constant<bool(dynamic_extent != Extent)>::value,
+                detail::_ct_equal<std::size_t, dynamic_extent, Extent>::value == bool(false),
                 integral_constant<size_type, Extent - Offset>,
                 integral_constant<size_type, dynamic_extent>
             >::value> 
         subspan(
             typename
             enable_if<
-                bool_constant<bool(Offset > Extent)>::value == bool(false),
+                detail::_ct_greater<std::size_t, Offset, Extent>::value == bool(false),
                 std::size_t
              >::type offset = Offset) const _STDEX_NOEXCEPT_FUNCTION
         {
@@ -271,7 +320,7 @@ namespace stdex
         template<std::size_t Count>
         typename
         conditional<
-            bool_constant<bool(Count > Extent)>::value == bool(false),
+            detail::_ct_greater<std::size_t, Count, Extent>::value == bool(false),
             span<element_type, Count>, void
         >::type first() const _STDEX_NOEXCEPT_FUNCTION
         {
@@ -286,7 +335,7 @@ namespace stdex
         template<std::size_t Count>
         typename
         conditional<
-            bool_constant<bool(Count > Extent)>::value == bool(false),
+            detail::_ct_greater<std::size_t, Count, Extent>::value == bool(false),
             span<element_type, Count>, void
         >::type last() const _STDEX_NOEXCEPT_FUNCTION
         {
