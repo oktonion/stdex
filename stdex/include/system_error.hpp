@@ -1282,7 +1282,7 @@ namespace stdex
             {
                 static const bool value =
                     sizeof(
-                        strerrorlen_s(*_declptr<int>())
+                        ::strerrorlen_s(*_declptr<int>())
                     ) != sizeof(_strerrorlen_s_as_struct);
             };
                 
@@ -1291,7 +1291,7 @@ namespace stdex
             {
                 static const bool value =
                     sizeof(
-                        strerror_s(_declptr<_T>(), *_declptr<std::size_t>(), *_declptr<int>())
+                        ::strerror_s(_declptr<_T>(), *_declptr<std::size_t>(), *_declptr<int>())
                     ) != sizeof(_strerror_s_as_struct);
             };
 
@@ -1303,7 +1303,7 @@ namespace stdex
             {
                 static const bool value =
                     sizeof(
-                        strerror_s(_declptr<_strerror_s_arg>()->buf, *_declptr<int>())
+                        ::strerror_s(_declptr<_strerror_s_arg>()->buf, *_declptr<int>())
                     ) != sizeof(_strerror_s_as_struct);
             };
 
