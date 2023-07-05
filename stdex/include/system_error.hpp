@@ -1210,7 +1210,7 @@ namespace stdex
                         is_same<size_t, _DummyT>::value,
                         _DummyT, 
                         size_t
-                    >::type len = strerrorlen_s(_Errcode);
+                    >::type len = ::strerrorlen_s(_Errcode);
                     
                     if (len)
                     {
@@ -1221,7 +1221,7 @@ namespace stdex
                         } _tmp;
 
                         _tmp.buf = new char[len + 1];
-                        if(_DummyT(0) == strerror_s(_tmp.buf, len + 1, _Errcode))
+                        if(_DummyT(0) == ::strerror_s(_tmp.buf, len + 1, _Errcode))
                             result = _tmp.buf;
                     }
                     return result;
@@ -1239,7 +1239,7 @@ namespace stdex
 
                     char buf[2048] = {0};
 
-                    if(_DummyT(0) == strerror_s(buf, _Errcode))
+                    if(_DummyT(0) == ::strerror_s(buf, _Errcode))
                         result = buf;
                     return result;
                 }
