@@ -1148,13 +1148,38 @@ namespace stdex
             struct _has_nonconforming_strerror_s;
             struct _has_conforming_strerrorlen_s;
 
-            class _strerror_s_arg;
+            class _strerror_s_arg
+            {
+                typedef int return_type; // would be errno_t fo C
+                char buf[sizeof(return_type) * 14];
+                _strerror_s_arg(...);
+                operator return_type();
 
-            class _strerrorlen_s_arg;
+                template<bool, class>
+                friend struct _has_conforming_strerror_s;
+                friend struct _has_nonconforming_strerror_s;
+            };
+
+            class _strerrorlen_s_arg
+            {
+                typedef std::size_t return_type;
+                char buf[sizeof(return_type) * 12];
+                _strerrorlen_s_arg(...);
+                operator return_type();
+
+                friend struct _has_conforming_strerrorlen_s;
+            };
             
-            struct _strerror_s_as_struct;
+            struct _strerror_s_as_struct {
+                _strerror_s_as_struct(_strerror_s_arg, _strerror_s_arg);
+                _strerror_s_as_struct(_strerror_s_arg, _strerror_s_arg, _strerror_s_arg);
+                _strerror_s_arg _dummy_arg;
+            };
             
-            struct _strerrorlen_s_as_struct;
+            struct _strerrorlen_s_as_struct {
+                _strerrorlen_s_as_struct(_strerrorlen_s_arg, ...);
+                _strerrorlen_s_arg _dummy_arg;
+            };
         } // namespace system_error_detail
     } // namespace detail
 } // namespace stdex
@@ -1163,13 +1188,20 @@ namespace stdex
 // we need all this mess at global namespace
 // to detect if following C11-functions are defined or not
 //namespace {
-    typedef
-    stdex::detail::system_error_detail::_strerror_s_as_struct 
-    strerror_s;
+    struct strerror_s
+        : ::stdex::detail::system_error_detail::_strerror_s_as_struct 
+    {
+        typedef ::stdex::detail::system_error_detail::_strerror_s_arg _strerror_s_arg;
+        strerror_s(_strerror_s_arg, _strerror_s_arg);
+        strerror_s(_strerror_s_arg, _strerror_s_arg, _strerror_s_arg);
+    };
     
-    typedef
-    stdex::detail::system_error_detail::_strerrorlen_s_as_struct
-    strerrorlen_s;
+    struct strerrorlen_s
+        : ::stdex::detail::system_error_detail::_strerrorlen_s_as_struct
+    {
+        typedef ::stdex::detail::system_error_detail::_strerrorlen_s_arg _strerrorlen_s_arg;
+        strerrorlen_s(_strerrorlen_s_arg, ...);
+    };
 //} // anonymous namespace for strerror_s and strerrorlen_s
 
 namespace stdex 
@@ -1243,39 +1275,6 @@ namespace stdex
                         result = buf;
                     return result;
                 }
-            };
-
-            class _strerror_s_arg
-            {
-                typedef int return_type; // would be errno_t fo C
-                char buf[sizeof(return_type) * 14];
-                _strerror_s_arg(...);
-                operator return_type();
-
-                template<bool, class>
-                friend struct _has_conforming_strerror_s;
-                friend struct _has_nonconforming_strerror_s;
-            };
-
-            class _strerrorlen_s_arg
-            {
-                typedef std::size_t return_type;
-                char buf[sizeof(return_type) * 12];
-                _strerrorlen_s_arg(...);
-                operator return_type();
-
-                friend struct _has_conforming_strerrorlen_s;
-            };
-            
-            struct _strerror_s_as_struct {
-                _strerror_s_as_struct(_strerror_s_arg, _strerror_s_arg);
-                _strerror_s_as_struct(_strerror_s_arg, _strerror_s_arg, _strerror_s_arg);
-                _strerror_s_arg _dummy_arg;
-            };
-            
-            struct _strerrorlen_s_as_struct {
-                _strerrorlen_s_as_struct(_strerrorlen_s_arg, ...);
-                _strerrorlen_s_arg _dummy_arg;
             };
 
             struct _has_conforming_strerrorlen_s
