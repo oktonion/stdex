@@ -1160,9 +1160,9 @@ namespace stdex
 } // namespace stdex
 
 
-// we need all this mess at global(anonymous) namespace
+// we need all this mess at global namespace
 // to detect if following C11-functions are defined or not
-namespace {
+//namespace {
     typedef
     stdex::detail::system_error_detail::_strerror_s_as_struct 
     strerror_s;
@@ -1170,7 +1170,7 @@ namespace {
     typedef
     stdex::detail::system_error_detail::_strerrorlen_s_as_struct
     strerrorlen_s;
-} // anonymous namespace for strerror_s and strerrorlen_s
+//} // anonymous namespace for strerror_s and strerrorlen_s
 
 namespace stdex 
 {
