@@ -1160,9 +1160,9 @@ namespace stdex
 } // namespace stdex
 
 
-// we need all this mess at global(anonymous) namespace
+// we need all this mess at global namespace
 // to detect if following C11-functions are defined or not
-namespace {
+//namespace {
     typedef
     stdex::detail::system_error_detail::_strerror_s_as_struct 
     strerror_s;
@@ -1170,7 +1170,7 @@ namespace {
     typedef
     stdex::detail::system_error_detail::_strerrorlen_s_as_struct
     strerrorlen_s;
-} // anonymous namespace for strerror_s and strerrorlen_s
+//} // anonymous namespace for strerror_s and strerrorlen_s
 
 namespace stdex 
 {
@@ -1210,7 +1210,7 @@ namespace stdex
                         is_same<size_t, _DummyT>::value,
                         _DummyT, 
                         size_t
-                    >::type len = ::strerrorlen_s(_Errcode);
+                    >::type len = strerrorlen_s(_Errcode);
                     
                     if (len)
                     {
@@ -1221,7 +1221,7 @@ namespace stdex
                         } _tmp;
 
                         _tmp.buf = new char[len + 1];
-                        if(_DummyT(0) == ::strerror_s(_tmp.buf, len + 1, _Errcode))
+                        if(_DummyT(0) == strerror_s(_tmp.buf, len + 1, _Errcode))
                             result = _tmp.buf;
                     }
                     return result;
@@ -1239,7 +1239,7 @@ namespace stdex
 
                     char buf[2048] = {0};
 
-                    if(_DummyT(0) == ::strerror_s(buf, _Errcode))
+                    if(_DummyT(0) == strerror_s(buf, _Errcode))
                         result = buf;
                     return result;
                 }
@@ -1282,7 +1282,7 @@ namespace stdex
             {
                 static const bool value =
                     sizeof(
-                        ::strerrorlen_s(*_declptr<int>())
+                        strerrorlen_s(*_declptr<int>())
                     ) != sizeof(_strerrorlen_s_as_struct);
             };
                 
@@ -1291,7 +1291,7 @@ namespace stdex
             {
                 static const bool value =
                     sizeof(
-                        ::strerror_s(_declptr<_T>(), *_declptr<std::size_t>(), *_declptr<int>())
+                        strerror_s(_declptr<_T>(), *_declptr<std::size_t>(), *_declptr<int>())
                     ) != sizeof(_strerror_s_as_struct);
             };
 
@@ -1303,7 +1303,7 @@ namespace stdex
             {
                 static const bool value =
                     sizeof(
-                        ::strerror_s(_declptr<_strerror_s_arg>()->buf, *_declptr<int>())
+                        strerror_s(_declptr<_strerror_s_arg>()->buf, *_declptr<int>())
                     ) != sizeof(_strerror_s_as_struct);
             };
 
