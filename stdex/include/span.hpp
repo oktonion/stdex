@@ -276,7 +276,7 @@ namespace stdex
         ) const _STDEX_NOEXCEPT_FUNCTION
         {
             return span<element_type, Count>(
-                    this->data() + Offset, Count);
+                    this->data() + Offset, count);
         }
 
         template<std::size_t Offset>
@@ -301,7 +301,7 @@ namespace stdex
             > span_count;
 
             return span<element_type, span_count::value>(
-                    this->data() + Offset, this->size() - Offset);
+                    this->data() + Offset, this->size() - offset);
         }
 
         span<element_type, dynamic_extent> subspan(size_type off, size_type count = dynamic_extent) const _STDEX_NOEXCEPT_FUNCTION
