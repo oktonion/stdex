@@ -718,6 +718,14 @@ namespace stdex
         typedef _Tp type;
     };
 
+#ifdef _STDEX_NATIVE_CPP11_SUPPORT
+    template< class _Tp >
+    struct remove_reference<_Tp&&>
+    {
+        typedef _Tp type;
+    };
+#endif
+
     namespace detail
     {
         template<class _Tp, bool = _is_referenceable<_Tp>::value>//_and_<_is_referenceable<_Tp>, _not_< _and_<is_const<_Tp>, is_volatile<_Tp> > > >::value>
@@ -1000,6 +1008,17 @@ namespace stdex
     template<class _Tp>
     struct is_lvalue_reference<_Tp&> :
         public true_type { };
+
+    // is_rvalue_reference
+    template<class>
+    struct is_rvalue_reference :
+        public false_type { };
+
+#ifdef _STDEX_NATIVE_CPP11_SUPPORT
+    template<class _Tp>
+    struct is_rvalue_reference<_Tp&&> :
+        public true_type { };
+#endif
 
     namespace detail
     {
@@ -2227,6 +2246,13 @@ namespace stdex
         public true_type
     {};
 
+#ifdef _STDEX_NATIVE_CPP11_SUPPORT
+    template<class _Tp>
+    struct is_reference<_Tp&&> :
+        public true_type
+    {};
+#endif
+
     // is_arithmetic
     template<class _Tp>
     struct is_arithmetic :
@@ -3218,20 +3244,147 @@ namespace stdex
         };
 
         template<class _Tp, class _U>
+        struct _common_other_type_impl_dumb
+        { 
+            typedef typename conditional<(sizeof(_Tp) > sizeof(_U)), _Tp, _U >::type type;
+            typedef type _common_type;
+        };
+
+        template<class _Tp>
+        _Tp _declval();
+
+        template<class _Tp, class _U, int Size = sizeof(false ? _declval<_U>() : _declval<_Tp>()) >
+        struct _common_other_type_impl1_any_value {
+            _common_other_type_impl1_any_value(_Tp) {}
+        };
+
+        template<class _Tp>
+        struct _common_other_type_impl2_any_value {
+            _common_other_type_impl2_any_value(_Tp) {}
+        };
+
+        template<class _Tp, class _U>
+        _yes_type _common_other_type_impl1_std_tester(_common_other_type_impl1_any_value<_Tp, _U>);
+        template<class _Tp, class _U>
+        _no_type  _common_other_type_impl1_std_tester(...); // fallback
+
+        template<class _Tp>
+        _yes_type _common_other_type_impl2_std_tester(_common_other_type_impl2_any_value<_Tp>);
+        template<class _Tp>
+        _no_type  _common_other_type_impl2_std_tester(...); // fallback
+
+        template<class _Tp, class _U, bool _Tp_is_common_type, bool _U_is_common_type>
+        struct _common_other_type_impl_std_chooser
+        { 
+            typedef void_type _common_type;
+        };
+
+        template<class _Tp, class _U>
+        struct _common_other_type_impl_std_chooser<_Tp, _U, false, true>
+        {
+            typedef _U type;
+            typedef type _common_type;
+        };
+
+        template<class _Tp, class _U>
+        struct _common_other_type_impl_std_chooser<_Tp, _U, true, false>
+        {
+            typedef _Tp type;
+            typedef type _common_type;
+        };
+
+        template<class _Tp, class _U>
+        struct _common_other_type_impl_std_chooser<_Tp, _U, true, true>
+        {
+            typedef _Tp type;
+            typedef type _common_type;
+        };
+
+        template<class _Tp, class _U>
+        struct _common_other_type_impl1_std
+        {
+            typedef typename add_pointer<_Tp>::type _Tp_pointer;
+            typedef typename add_pointer<_U>::type  _U_pointer;
+
+            static const bool _Tp_is_common_type =
+                sizeof(_common_other_type_impl1_std_tester<_Tp_pointer, _U_pointer>(_declval<_U_pointer>())) ==
+                sizeof(_Tp);
+
+            static const bool _U_is_common_type =
+                sizeof(_common_other_type_impl1_std_tester<_Tp_pointer, _U_pointer>(_declval<_Tp_pointer>())) ==
+                sizeof(_U);
+
+            typedef
+                _common_other_type_impl_std_chooser<
+                _Tp, _U,
+                _common_other_type_impl1_std::_Tp_is_common_type,
+                _common_other_type_impl1_std::_U_is_common_type
+            > impl;
+        };
+
+        template<class _Tp, class _U>
+        struct _common_other_type_impl2_std
+        {
+            typedef typename add_pointer<_Tp>::type _Tp_pointer;
+            typedef typename add_pointer<_U>::type  _U_pointer;
+
+            static const bool _Tp_is_common_type =
+                sizeof( _common_other_type_impl2_std_tester<_Tp_pointer>(_declval<_U_pointer>()) ) ==
+                sizeof( _yes_type );
+
+            static const bool _U_is_common_type =
+                sizeof(_common_other_type_impl2_std_tester<_U_pointer>(_declval<_Tp_pointer>())) ==
+                sizeof(_yes_type);
+
+            typedef 
+            _common_other_type_impl_std_chooser< 
+                _Tp, _U, 
+                _common_other_type_impl2_std::_Tp_is_common_type,
+                _common_other_type_impl2_std::_U_is_common_type
+            > impl;
+        };
+
+        template<class _Tp, class _U, bool>
+        struct _common_other_type_impl_std
+            : _common_other_type_impl1_std<_Tp, _U>
+        { };
+
+        template<class _Tp, class _U>
+        struct _common_other_type_impl_std<_Tp, _U, false>
+            : _common_other_type_impl2_std<_Tp, _U>
+        { };
+
+        template<class _Tp, class _U, bool>
+        struct _common_other_type_impl
+        {
+            typedef typename _common_other_type_impl_dumb<_Tp, _U>::type type;
+            typedef type _common_type;
+        };
+
+        template<class _Tp, class _U>
+        struct _common_other_type_impl<_Tp, _U, true>
+            : _common_other_type_impl_std<_Tp, _U
+                , true // use impl 1 ?
+            >::impl
+        { };
+
+        template<class _Tp, class _U>
         struct _common_other_type :
-            conditional<(sizeof(_Tp) > sizeof(_U)), _Tp, _U >
+            _common_other_type_impl<_Tp, _U, true>
         { };
 
         template<class _Tp>
         struct _common_other_type<_Tp, detail::void_type>
         { 
             typedef _Tp type;
+            typedef type _common_type;
         };
 
         template<class _Tp>
         struct _common_other_type<detail::void_type, _Tp>
         {
             typedef _Tp type;
+            typedef type _common_type;
         };
 
         template<class _Tp, class _U, bool _IsArithmetic>
@@ -3253,6 +3406,7 @@ namespace stdex
         struct _common_type_impl<_Tp, _Tp>
         {
             typedef typename decay<_Tp>::type type;
+            typedef type _common_type;
         };
 
 
@@ -3279,7 +3433,7 @@ namespace stdex
 
     template<class _Tp, class _T0, class _T1, class _T2, class _T3, class _T4, class _T5, class _T6, class _T7, class _T8, class _T9, class _T10, class _T11, class _T12, class _T13, class _T14, class _T15, class _T16, class _T17, class _T18, class _T19, class _T20, class _T21, class _T22, class _T23, class _T24 >
     struct common_type :
-        common_type<typename detail::_common_type_decay_helper<_Tp, _T0>::type, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23, _T24, detail::void_type>
+        common_type<typename detail::_common_type_decay_helper<_Tp, _T0>::_common_type, _T1, _T2, _T3, _T4, _T5, _T6, _T7, _T8, _T9, _T10, _T11, _T12, _T13, _T14, _T15, _T16, _T17, _T18, _T19, _T20, _T21, _T22, _T23, _T24, detail::void_type>
     { };
 
     template<class _Tp>
@@ -3293,7 +3447,6 @@ namespace stdex
         detail::_common_type_decay_helper<_T1, _T2>
     {
     };
-
 
 } // namespace stdex
 
