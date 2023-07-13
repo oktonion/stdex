@@ -3241,6 +3241,8 @@ namespace stdex
                     >::value != int(0) )
                 >::value
             >::type type;
+
+            typedef type _common_type;
         };
 
         template<class _Tp, class _U>
