@@ -17,27 +17,27 @@ void COMMON_TYPE_TEST_1_CPP98()
 {
   using namespace stdex;
 #define uid cpp98
-  typedef common_type<type1>::type JOIN(test_t,uid); 
+  typedef typename common_type<type1>::type JOIN(test_t,uid); 
   {STATIC_ASSERT( (is_same<JOIN(test_t,uid), JOIN(test_t,uid)>::value), check_1);} 
-  typedef common_type<const type1>::type JOIN(test_t,JOIN(uid,c)); 
+  typedef typename common_type<const type1>::type JOIN(test_t,JOIN(uid,c));
   {STATIC_ASSERT( (is_same<JOIN(test_t,JOIN(uid,c)), 
                    JOIN(test_t,JOIN(uid,c))>::value), check_2);} 
-  typedef common_type<volatile type1>::type JOIN(test_t,JOIN(uid,v)); 
+  typedef typename common_type<volatile type1>::type JOIN(test_t,JOIN(uid,v));
   {STATIC_ASSERT( (is_same<JOIN(test_t,JOIN(uid,v)), 
                    JOIN(test_t,JOIN(uid,v))>::value), check_3);} 
-  typedef common_type<const volatile type1>::type JOIN(test_t,JOIN(uid,cv)); 
+  typedef typename common_type<const volatile type1>::type JOIN(test_t,JOIN(uid,cv));
   {STATIC_ASSERT( (is_same<JOIN(test_t,JOIN(uid,cv)), 
                    JOIN(test_t,JOIN(uid,cv))>::value), check_4);} 
-  typedef common_type<type1 &>::type JOIN(test_t,JOIN(uid,l)); 
+  typedef typename common_type<type1 &>::type JOIN(test_t,JOIN(uid,l));
   {STATIC_ASSERT( (is_same<JOIN(test_t,JOIN(uid,l)), 
                    JOIN(test_t,JOIN(uid,l))>::value), check_5);} 
-  typedef common_type<const type1 &>::type JOIN(test_t,JOIN(uid,lc)); 
+  typedef typename common_type<const type1 &>::type JOIN(test_t,JOIN(uid,lc));
   {STATIC_ASSERT( (is_same<JOIN(test_t,JOIN(uid,lc)), 
                    JOIN(test_t,JOIN(uid,lc))>::value), check_6);} 
-  typedef common_type<volatile type1 &>::type JOIN(test_t,JOIN(uid,lv)); 
+  typedef typename common_type<volatile type1 &>::type JOIN(test_t,JOIN(uid,lv));
   {STATIC_ASSERT( (is_same<JOIN(test_t,JOIN(uid,lv)), 
                    JOIN(test_t,JOIN(uid,lv))>::value), check_7);} 
-  typedef common_type<const volatile type1 &>::type JOIN(test_t,JOIN(uid,lcv)); 
+  typedef typename common_type<const volatile type1 &>::type JOIN(test_t,JOIN(uid,lcv));
   {STATIC_ASSERT( (is_same<JOIN(test_t,JOIN(uid,lcv)), 
                    JOIN(test_t,JOIN(uid,lcv))>::value), check_8);} 
 #undef uid
@@ -48,16 +48,16 @@ void COMMON_TYPE_TEST_1_CPP11()
 {
   using namespace stdex;
 #define uid cpp11
-  typedef common_type<type1 &&>::type JOIN(test_t,JOIN(uid,r)); 
+  typedef typename common_type<type1 &&>::type JOIN(test_t,JOIN(uid,r));
   {STATIC_ASSERT( (is_same<JOIN(test_t,JOIN(uid,r)), 
                    JOIN(test_t,JOIN(uid,r))>::value), check_9);} 
-  typedef common_type<const type1 &&>::type JOIN(test_t,JOIN(uid,rc)); 
+  typedef typename common_type<const type1 &&>::type JOIN(test_t,JOIN(uid,rc));
   {STATIC_ASSERT( (is_same<JOIN(test_t,JOIN(uid,rc)), 
                    JOIN(test_t,JOIN(uid,rc))>::value), check_10);} 
-  typedef common_type<volatile type1 &&>::type JOIN(test_t,JOIN(uid,rv)); 
+  typedef typename common_type<volatile type1 &&>::type JOIN(test_t,JOIN(uid,rv));
   {STATIC_ASSERT( (is_same<JOIN(test_t,JOIN(uid,rv)), 
                    JOIN(test_t,JOIN(uid,rv))>::value), check_11);} 
-  typedef common_type<const volatile type1 &&>::type JOIN(test_t,JOIN(uid,rcv)); 
+  typedef typename common_type<const volatile type1 &&>::type JOIN(test_t,JOIN(uid,rcv));
   {STATIC_ASSERT( (is_same<JOIN(test_t,JOIN(uid,rcv)), 
                    JOIN(test_t,JOIN(uid,rcv))>::value), check_12);}
 #undef uid
