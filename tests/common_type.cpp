@@ -7,8 +7,10 @@
 
 #define VERIFY(cond) STATIC_ASSERT((cond), check)
 
+struct B_ctor_param;
+
 struct A { };
-struct B : A { };
+struct B : A { explicit B(B_ctor_param&) {} };
 struct C : A { };
 struct D : B { };
 
