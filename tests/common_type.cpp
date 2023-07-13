@@ -94,7 +94,7 @@ void COMMON_TYPE_TEST_3()
     typedef typename common_type<type1&, type2&, type3&, type4>::type  	JOIN(JOIN(test, uid), _t7);
     typedef typename common_type<type1&, type2&, type3&, type4&>::type  	JOIN(JOIN(test, uid), _t8);
 
-    typedef typename common_type<type1&, type2&, type3, type4>::type  	JOIN(JOIN(test, uid), _t8);
+    typedef typename common_type<type1&, type2&, type3, type4>::type  	JOIN(JOIN(test, uid), _t9);
     typedef typename common_type<type1, type2&, type3&, type4>::type  	JOIN(JOIN(test, uid), _t10);
     typedef typename common_type<type1, type2&, type3&, type4&>::type  	JOIN(JOIN(test, uid), _t11);
     typedef typename common_type<type1, type2&, type3&, type4&>::type  	JOIN(JOIN(test, uid), _t12);
