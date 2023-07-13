@@ -46,6 +46,7 @@ void COMMON_TYPE_TEST_1_CPP98()
 template<class type1>
 void COMMON_TYPE_TEST_1_CPP11() 
 {
+#ifdef _STDEX_NATIVE_CPP11_SUPPORT
   using namespace stdex;
 #define uid cpp11
   typedef typename common_type<type1 &&>::type JOIN(test_t,JOIN(uid,r));
@@ -61,6 +62,7 @@ void COMMON_TYPE_TEST_1_CPP11()
   {STATIC_ASSERT( (is_same<JOIN(test_t,JOIN(uid,rcv)), 
                    JOIN(test_t,JOIN(uid,rcv))>::value), check_12);}
 #undef uid
+#endif // _STDEX_NATIVE_CPP11_SUPPORT
 }
 
 template<class type1, class type2, class type3>
@@ -87,7 +89,7 @@ void COMMON_TYPE_TEST_2_IMPL()
   COMMON_TYPE_TEST_2_IMPL<cv_qual type1 &, type2, type3>(); \
   COMMON_TYPE_TEST_2_IMPL<cv_qual type1 &&, type2, type3>()
 
-#else
+#else // _STDEX_NATIVE_CPP11_SUPPORT
 
 #define COMMON_TYPE_TEST_1(type1) \
     COMMON_TYPE_TEST_1_CPP98<type1>()
@@ -96,7 +98,7 @@ void COMMON_TYPE_TEST_2_IMPL()
   COMMON_TYPE_TEST_2_IMPL<cv_qual type1, type2, type3>(); \
   COMMON_TYPE_TEST_2_IMPL<cv_qual type1 &, type2, type3>();
 
-#endif
+#endif // _STDEX_NATIVE_CPP11_SUPPORT
 
 int main(void)
 {
