@@ -1281,7 +1281,7 @@ namespace stdex
             {
                 static const bool value =
                     sizeof(
-                        strerrorlen_s(*_declptr<int>())
+                        strerrorlen_s((*_declptr<int>(), *_declptr<int>()))
                     ) != sizeof(_strerrorlen_s_as_struct);
             };
                 
