@@ -67,15 +67,63 @@ void COMMON_TYPE_TEST_1_CPP11()
 #endif // _STDEX_NATIVE_CPP11_SUPPORT
 }
 
-template<class type1, class type2, class type3>
+template<class type1, class type2, class check_type>
 void COMMON_TYPE_TEST_2_IMPL()
 {
   using namespace stdex;
 #define uid COMMON_TYPE_TEST_2_IMPL
   typedef typename common_type<type1, type2>::type  	JOIN(JOIN(test, uid),_t1);
   typedef typename common_type<type2, type1>::type  	JOIN(JOIN(test, uid),_t2);
-  {STATIC_ASSERT( (is_same<JOIN(JOIN(test, uid),_t1), type3>::value), check1);}
-  {STATIC_ASSERT( (is_same<JOIN(JOIN(test, uid),_t2), type3>::value), check2);}
+  {STATIC_ASSERT( (is_same<JOIN(JOIN(test, uid),_t1), check_type>::value), check1);}
+  {STATIC_ASSERT( (is_same<JOIN(JOIN(test, uid),_t2), check_type>::value), check2);}
+#undef uid
+}
+
+template<class type1, class type2, class type3, class type4, class check_type>
+void COMMON_TYPE_TEST_3()
+{
+    using namespace stdex;
+#define uid COMMON_TYPE_TEST_3
+    typedef typename common_type<type1, type2, type3, type4>::type  	JOIN(JOIN(test, uid), _t1);
+    typedef typename common_type<type1, type2, type3, type4>::type  	JOIN(JOIN(test, uid), _t2);
+    typedef typename common_type<type1, type2, type3, type4>::type  	JOIN(JOIN(test, uid), _t3);
+    typedef typename common_type<type1, type2, type3, type4>::type  	JOIN(JOIN(test, uid), _t4);
+
+    typedef typename common_type<type1&, type2, type3, type4>::type  	JOIN(JOIN(test, uid), _t5);
+    typedef typename common_type<type1&, type2&, type3, type4>::type  	JOIN(JOIN(test, uid), _t6);
+    typedef typename common_type<type1&, type2&, type3&, type4>::type  	JOIN(JOIN(test, uid), _t7);
+    typedef typename common_type<type1&, type2&, type3&, type4&>::type  	JOIN(JOIN(test, uid), _t8);
+
+    typedef typename common_type<type1&, type2&, type3, type4>::type  	JOIN(JOIN(test, uid), _t8);
+    typedef typename common_type<type1, type2&, type3&, type4>::type  	JOIN(JOIN(test, uid), _t10);
+    typedef typename common_type<type1, type2&, type3&, type4&>::type  	JOIN(JOIN(test, uid), _t11);
+    typedef typename common_type<type1, type2&, type3&, type4&>::type  	JOIN(JOIN(test, uid), _t12);
+
+    typedef typename common_type<type1&, type2, type3&, type4>::type  	JOIN(JOIN(test, uid), _t13);
+    typedef typename common_type<type1&, type2&, type3&, type4&>::type  	JOIN(JOIN(test, uid), _t14);
+    typedef typename common_type<type1, type2, type3&, type4&>::type  	JOIN(JOIN(test, uid), _t15);
+    typedef typename common_type<type1, type2, type3&, type4&>::type  	JOIN(JOIN(test, uid), _t16);
+
+
+    {STATIC_ASSERT((is_same<JOIN(JOIN(test, uid), _t1), check_type>::value), check1); }
+    {STATIC_ASSERT((is_same<JOIN(JOIN(test, uid), _t2), check_type>::value), check2); }
+    {STATIC_ASSERT((is_same<JOIN(JOIN(test, uid), _t3), check_type>::value), check3); }
+    {STATIC_ASSERT((is_same<JOIN(JOIN(test, uid), _t4), check_type>::value), check4); }
+
+    {STATIC_ASSERT((is_same<JOIN(JOIN(test, uid), _t5), check_type>::value), check5); }
+    {STATIC_ASSERT((is_same<JOIN(JOIN(test, uid), _t6), check_type>::value), check6); }
+    {STATIC_ASSERT((is_same<JOIN(JOIN(test, uid), _t7), check_type>::value), check7); }
+    {STATIC_ASSERT((is_same<JOIN(JOIN(test, uid), _t8), check_type>::value), check8); }
+
+    {STATIC_ASSERT((is_same<JOIN(JOIN(test, uid), _t8 ), check_type>::value), check8 ); }
+    {STATIC_ASSERT((is_same<JOIN(JOIN(test, uid), _t10), check_type>::value), check10); }
+    {STATIC_ASSERT((is_same<JOIN(JOIN(test, uid), _t11), check_type>::value), check11); }
+    {STATIC_ASSERT((is_same<JOIN(JOIN(test, uid), _t12), check_type>::value), check12); }
+
+    {STATIC_ASSERT((is_same<JOIN(JOIN(test, uid), _t13), check_type>::value), check13); }
+    {STATIC_ASSERT((is_same<JOIN(JOIN(test, uid), _t14), check_type>::value), check14); }
+    {STATIC_ASSERT((is_same<JOIN(JOIN(test, uid), _t15), check_type>::value), check15); }
+    {STATIC_ASSERT((is_same<JOIN(JOIN(test, uid), _t16), check_type>::value), check16); }
 #undef uid
 }
 
@@ -328,9 +376,26 @@ int main(void)
     }
 
     // variadic
+
+    COMMON_TYPE_TEST_3<A, B, C, D, A>();
+    COMMON_TYPE_TEST_3<B, A, C, D, A>();
+    COMMON_TYPE_TEST_3<C, A, B, D, A>();
+    COMMON_TYPE_TEST_3<D, A, B, C, A>();
+
+    COMMON_TYPE_TEST_3<const A, volatile B, const C, D, A>();
+    COMMON_TYPE_TEST_3<B, A, C, D, A>();
+    COMMON_TYPE_TEST_3<C, const A, B, volatile D, A>();
+    COMMON_TYPE_TEST_3<D, volatile A, B, C, A>();
+
     STATIC_ASSERT((is_same<common_type<A, B, C, D>::type, A>::value), common_type_for_A_and_B_and_C_and_D_should_be_A);
     STATIC_ASSERT((is_same<common_type<B, A, C, D>::type, A>::value), common_type_for_A_and_B_and_C_and_D_should_be_A);
+    STATIC_ASSERT((is_same<common_type<B, A, C, D>::type, B>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_should_not_be_B);
+    STATIC_ASSERT((is_same<common_type<B, A, C, D>::type, C>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_should_not_be_C);
+    STATIC_ASSERT((is_same<common_type<B, A, C, D>::type, D>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_should_not_be_D);
     STATIC_ASSERT((is_same<common_type<C, A, B, D>::type, A>::value), common_type_for_A_and_B_and_C_and_D_should_be_A);
+    STATIC_ASSERT((is_same<common_type<C, A, B, D>::type, B>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_should_not_be_B);
+    STATIC_ASSERT((is_same<common_type<C, A, B, D>::type, C>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_should_not_be_C);
+    STATIC_ASSERT((is_same<common_type<C, A, B, D>::type, D>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_should_not_be_D);
     STATIC_ASSERT((is_same<common_type<D, A, B, C>::type, A>::value), common_type_for_A_and_B_and_C_and_D_should_be_A);
 
     STATIC_ASSERT((is_same<common_type<A&, B, C, D>::type, A>::value), common_type_for_A_and_B_and_C_and_D_should_be_A);
