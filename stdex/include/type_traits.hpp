@@ -3255,7 +3255,7 @@ namespace stdex
         template<class _Tp>
         _Tp _declval();
 
-        template<class _Tp, class _U, int Size = sizeof(false ? _declval<_U>() : _declval<_Tp>()) >
+        template<class _Tp, class _U, int Size = sizeof(false ? _U() : _Tp()) >
         struct _common_other_type_impl1_any_value {
             _common_other_type_impl1_any_value(_Tp) {}
         };
