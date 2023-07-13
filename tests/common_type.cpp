@@ -12,7 +12,7 @@ struct B_ctor_param;
 struct A { };
 struct B : A { explicit B(B_ctor_param&) {} };
 struct C : A { };
-struct D : B { };
+struct D : B { D(B_ctor_param *&param) : B(*param) {} };
 
 template<class type1>
 void COMMON_TYPE_TEST_1_CPP98() 
