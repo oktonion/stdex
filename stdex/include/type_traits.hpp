@@ -3305,46 +3305,6 @@ namespace stdex
             typedef type _common_type;
         };
 
-    } // namespace detail
-
-    namespace intern
-    {
-        
-        struct _static_cast_can_override_private_inheritance_tester_base  { };
-        struct _static_cast_can_override_private_inheritance_tester_child
-            : private _static_cast_can_override_private_inheritance_tester_base { };
-
-        template<class _Tp, class _U, _Tp = static_cast<_Tp>(_U(0)) >
-        struct _static_cast_can_override_private_inheritance_helper {
-            _static_cast_can_override_private_inheritance_helper(_Tp) {}
-        };
-
-        template<class _Tp, class _U>
-        detail::_yes_type _static_cast_can_override_private_inheritance_tester(_static_cast_can_override_private_inheritance_helper<_Tp, _U>);
-        template<class _Tp, class _U>
-        detail::_no_type  _static_cast_can_override_private_inheritance_tester(...); // fallback
-
-        struct _static_cast_can_override_private_inheritance_in_tmpl_arg_impl
-        {
-            static const bool value =
-                sizeof
-                (_static_cast_can_override_private_inheritance_tester<
-                        _static_cast_can_override_private_inheritance_tester_base*, 
-                        _static_cast_can_override_private_inheritance_tester_child*>(
-                            static_cast<_static_cast_can_override_private_inheritance_tester_base*>(0)
-                        )
-                )
-                == sizeof(detail::_yes_type);
-        };
-
-        template<>
-        struct _has_bug<struct _stdex_static_cast_can_override_private_inheritance_in_tmpl_arg>
-            : bool_constant<_static_cast_can_override_private_inheritance_in_tmpl_arg_impl::value>
-        { };
-    } // namespace intern
-
-    namespace detail {
-
         template<class _Tp, class _U>
         struct _common_other_type_impl1_std // almost canonical to 'decltype(false ? std::declval<T1>() : std::declval<T2>())' implementation
         {
