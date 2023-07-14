@@ -13,6 +13,7 @@ struct A { };
 struct B : A { explicit B(B_ctor_param&) {} };
 struct C : A { };
 struct D : B { D(B_ctor_param *&param) : B(*param) {} };
+struct E { public: operator A() { return a; } A a; };
 
 template<class type1>
 void COMMON_TYPE_TEST_1_CPP98() 
@@ -372,6 +373,9 @@ int main(void)
         COMMON_TYPE_TEST_2(NO_CV, A, A, A);
         COMMON_TYPE_TEST_2(const, A, A, A);
         STATIC_ASSERT((is_same<common_type<A, B>::type, A>::value), common_type_for_A_and_B_should_be_A);
+        STATIC_ASSERT((is_same<common_type<B, A>::type, A>::value), common_type_for_B_and_A_should_be_A);
+        STATIC_ASSERT((is_same<common_type<A, E>::type, A>::value), common_type_for_A_and_E_should_be_A);
+        STATIC_ASSERT((is_same<common_type<A*, B*>::type, A*>::value), common_type_for_A_ptr_and_B_ptr_should_be_A_ptr);
         COMMON_TYPE_TEST_2(NO_CV, B, A, A);
     }
 
