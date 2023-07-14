@@ -3547,7 +3547,7 @@ namespace stdex
     template<class _From, class _To>
     struct is_convertible
         : detail::_is_convertible_impl<_From, _To, 
-            typename common_type<_To, _From>::type
+            typename detail::_common_type_decay_helper<_To, _From>::_common_type
         >::type
     { };
 
