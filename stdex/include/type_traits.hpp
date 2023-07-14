@@ -3253,9 +3253,14 @@ namespace stdex
         template<class _Tp>
         _Tp _declval();
 
+        template<int _Value, class>
+        struct _common_other_type_impl1_any_value_dummy
+            : integral_constant<int, _Value>
+        { };
+
         template<class _Tp, class _U,
             const int _Dummy [sizeof( false ? ( *(_Tp(0)) ) : ( *(_U(0)) ) ) / sizeof(false ? ( *(_Tp(0)) ) : ( *(_U(0)) ))] =
-                &integral_constant<int, 0>::value
+                &_common_other_type_impl1_any_value_dummy<0, int>::value
         >
         struct _common_other_type_impl1_any_value {
             _common_other_type_impl1_any_value(_Tp) {}
@@ -3280,10 +3285,11 @@ namespace stdex
             int _Tp_is_common_type_score, int _U_is_common_type_score>
         struct _common_other_type_impl_std_chooser
         {
+            static const bool _U_is_common_type = (_U_is_common_type_score > _Tp_is_common_type_score);
             typedef
             typename
             conditional<
-                bool(_U_is_common_type_score > _Tp_is_common_type_score),
+                _common_other_type_impl_std_chooser::_U_is_common_type == bool(true),
                 _U, _Tp
             >::type type;
             typedef type _common_type;
