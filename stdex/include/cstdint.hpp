@@ -91,6 +91,14 @@ namespace stdex
                 char _padding[8];
             };
 
+            struct _true_type {
+                static const bool value = true;
+            };
+
+            struct _false_type {
+                static const bool value = false;
+            };
+
             namespace _is_integral_constant_std_impl_ns
             {
                 class _is_integral_constant_std_impl_helper_type;
@@ -160,27 +168,28 @@ namespace stdex
 
             template<class _Tp>
             struct _is_integral_constant<_Tp&>
-            {
-                static const bool value = false;
-            };
+                : _false_type
+            { };
 
             template<class _Tp>
             struct _is_integral_constant<_Tp*>
-            {
-                static const bool value = false;
-            };
+                : _false_type
+            { };
 
             template<class _Tp, class _Cp>
             struct _is_integral_constant<_Tp _Cp::*>
-            {
-                static const bool value = false;
-            };
+                : _false_type
+            { };
 
             template<>
             struct _is_integral_constant<void>
-            {
-                static const bool value = false;
-            };
+                : _false_type
+            { };
+
+            template<>
+            struct _is_integral_constant<bool>
+                : _true_type
+            { };
 
             template<class _Tp>
             struct _is_signed
