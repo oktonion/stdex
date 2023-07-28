@@ -33,6 +33,7 @@ int main(void)
     
     STATIC_ASSERT(is_integral<void>::value == (false), can_not_be_integral);
                                  
+    STATIC_ASSERT(is_integral<bool>::value == (true), should_be_integral);
     STATIC_ASSERT(is_integral<char>::value == (true), should_be_integral);
     STATIC_ASSERT(is_integral<signed char>::value == (true), should_be_integral);
     STATIC_ASSERT(is_integral<unsigned char>::value == (true), should_be_integral);
