@@ -3255,7 +3255,7 @@ namespace stdex
 
         template<class _Tp, class _U,
             const int _Dummy [1 + sizeof( false ? ( *(_declval<_Tp>()) ) : ( *(_declval<_U>()) ) ) / sizeof(false ? ( *(_declval<_Tp>()) ) : ( *(_declval<_U>()) ))] =
-                &integral_constant<int, 0>::value
+                &(integral_constant<int, 0>::value)
         >
         struct _common_other_type_impl1_any_value {
             _common_other_type_impl1_any_value(_Tp) {}
