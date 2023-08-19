@@ -3255,10 +3255,18 @@ namespace stdex
 
         template<class _Tp, class _U,
             const int _Dummy [1 + sizeof( false ? ( *(_declval<_Tp>()) ) : ( *(_declval<_U>()) ) ) / sizeof(false ? ( *(_declval<_Tp>()) ) : ( *(_declval<_U>()) ))] =
-                &(integral_constant<int, 0>::value)
+                &integral_constant<int, 0>::value
         >
-        struct _common_other_type_impl1_any_value {
-            _common_other_type_impl1_any_value(_Tp) {}
+        struct _common_other_type_impl1_any_value1 {
+            _common_other_type_impl1_any_value1(_Tp) {}
+        };
+
+        template<class _Tp, class _U,
+            const int _Dummy = ( sizeof( false ? ( *(_declval<_Tp>()) ) : ( *(_declval<_U>()) ) ) 
+                                    / sizeof(false ? ( *(_declval<_Tp>()) ) : ( *(_declval<_U>()) )) )
+        >
+        struct _common_other_type_impl1_any_value2 {
+            _common_other_type_impl1_any_value2(_Tp) {}
         };
 
         template<class _Tp>
@@ -3267,9 +3275,13 @@ namespace stdex
         };
 
         template<class _Tp, class _U>
-        _yes_type _common_other_type_impl1_std_tester(_common_other_type_impl1_any_value<_Tp, _U>);
+        _yes_type _common_other_type_impl1_std_tester1(_common_other_type_impl1_any_value1<_Tp, _U>);
         template<class _Tp, class _U>
-        _no_type  _common_other_type_impl1_std_tester(...); // fallback
+        _no_type  _common_other_type_impl1_std_tester1(...); // fallback
+        template<class _Tp, class _U>
+        _yes_type _common_other_type_impl1_std_tester2(_common_other_type_impl1_any_value2<_Tp, _U>);
+        template<class _Tp, class _U>
+        _no_type  _common_other_type_impl1_std_tester2(...); // fallback
 
         template<class _Tp>
         _yes_type _common_other_type_impl2_std_tester(_common_other_type_impl2_any_value<_Tp>);
@@ -3314,7 +3326,7 @@ namespace stdex
         };
 
         template<class _Tp, class _U>
-        struct _common_other_type_impl1_std // almost canonical to 'decltype(false ? std::declval<T1>() : std::declval<T2>())' implementation
+        struct _common_other_type_impl1_std1 // almost canonical to 'decltype(false ? std::declval<T1>() : std::declval<T2>())' implementation
         {
             typedef 
             typename
@@ -3333,38 +3345,101 @@ namespace stdex
             >::type _U_pointer;
 
             static const bool _Tp_is_explicit_common_type =
-                sizeof(_common_other_type_impl1_std_tester<_Tp_pointer, _U_pointer>(_declval<_U_pointer>())) ==
+                sizeof(_common_other_type_impl1_std_tester1<_Tp_pointer, _U_pointer>(_declval<_U_pointer>())) ==
                 sizeof(_yes_type);
 
             static const bool _U_is_explicit_common_type =
-                sizeof(_common_other_type_impl1_std_tester<_U_pointer, _Tp_pointer>(_declval<_Tp_pointer>())) ==
+                sizeof(_common_other_type_impl1_std_tester1<_U_pointer, _Tp_pointer>(_declval<_Tp_pointer>())) ==
                 sizeof(_yes_type);
 
             static const bool _Tp_is_implicit_common_type =
-                sizeof(_common_other_type_impl1_std_tester<_Tp_pointer, _U_pointer>(_declval<_Tp_pointer>())) ==
+                sizeof(_common_other_type_impl1_std_tester1<_Tp_pointer, _U_pointer>(_declval<_Tp_pointer>())) ==
                 sizeof(_yes_type);
 
             static const bool _U_is_implicit_common_type =
-                sizeof(_common_other_type_impl1_std_tester<_U_pointer, _Tp_pointer>(_declval<_U_pointer>())) ==
+                sizeof(_common_other_type_impl1_std_tester1<_U_pointer, _Tp_pointer>(_declval<_U_pointer>())) ==
                 sizeof(_yes_type);
 
             
             static const int _Tp_is_common_type_score =
-                (_common_other_type_impl1_std::_Tp_is_explicit_common_type == bool(true) ? 2 : 0) +
-                (_common_other_type_impl1_std::_Tp_is_implicit_common_type == bool(true) ? 1 : 0);
+                (_common_other_type_impl1_std1::_Tp_is_explicit_common_type == bool(true) ? 2 : 0) +
+                (_common_other_type_impl1_std1::_Tp_is_implicit_common_type == bool(true) ? 1 : 0);
 
             static const int _U_is_common_type_score =
-                (_common_other_type_impl1_std::_U_is_explicit_common_type == bool(true) ? 2 : 0) +
-                (_common_other_type_impl1_std::_U_is_implicit_common_type == bool(true) ? 1 : 0);
+                (_common_other_type_impl1_std1::_U_is_explicit_common_type == bool(true) ? 2 : 0) +
+                (_common_other_type_impl1_std1::_U_is_implicit_common_type == bool(true) ? 1 : 0);
 
             typedef
             _common_other_type_impl_std_chooser<
                 _Tp, _U, 
-                _common_other_type_impl1_std::_Tp_is_common_type_score, 
-                _common_other_type_impl1_std::_U_is_common_type_score
+                _common_other_type_impl1_std1::_Tp_is_common_type_score, 
+                _common_other_type_impl1_std1::_U_is_common_type_score
             > impl;
         };
 
+        template<class _Tp, class _U>
+        struct _common_other_type_impl1_std2 // almost canonical to 'decltype(false ? std::declval<T1>() : std::declval<T2>())' implementation
+        {
+            typedef 
+            typename
+            conditional<
+                is_pointer<_Tp>::value == bool(true),
+                _Tp,
+                typename add_pointer<_Tp>::type
+            >::type _Tp_pointer;
+
+            typedef 
+            typename
+            conditional<
+                is_pointer<_U>::value == bool(true),
+                _U,
+                typename add_pointer<_U>::type
+            >::type _U_pointer;
+
+            static const bool _Tp_is_explicit_common_type =
+                sizeof(_common_other_type_impl1_std_tester2<_Tp_pointer, _U_pointer>(_declval<_U_pointer>())) ==
+                sizeof(_yes_type);
+
+            static const bool _U_is_explicit_common_type =
+                sizeof(_common_other_type_impl1_std_tester2<_U_pointer, _Tp_pointer>(_declval<_Tp_pointer>())) ==
+                sizeof(_yes_type);
+
+            static const bool _Tp_is_implicit_common_type =
+                sizeof(_common_other_type_impl1_std_tester2<_Tp_pointer, _U_pointer>(_declval<_Tp_pointer>())) ==
+                sizeof(_yes_type);
+
+            static const bool _U_is_implicit_common_type =
+                sizeof(_common_other_type_impl1_std_tester2<_U_pointer, _Tp_pointer>(_declval<_U_pointer>())) ==
+                sizeof(_yes_type);
+
+            
+            static const int _Tp_is_common_type_score =
+                (_common_other_type_impl1_std2::_Tp_is_explicit_common_type == bool(true) ? 2 : 0) +
+                (_common_other_type_impl1_std2::_Tp_is_implicit_common_type == bool(true) ? 1 : 0);
+
+            static const int _U_is_common_type_score =
+                (_common_other_type_impl1_std2::_U_is_explicit_common_type == bool(true) ? 2 : 0) +
+                (_common_other_type_impl1_std2::_U_is_implicit_common_type == bool(true) ? 1 : 0);
+
+            typedef
+            _common_other_type_impl_std_chooser<
+                _Tp, _U, 
+                _common_other_type_impl1_std2::_Tp_is_common_type_score, 
+                _common_other_type_impl1_std2::_U_is_common_type_score
+            > impl;
+        };
+
+        template<class _Tp, class _U, 
+            bool>
+        struct _common_other_type_impl1_std // almost canonical to 'decltype(false ? std::declval<T1>() : std::declval<T2>())' implementation
+            : _common_other_type_impl1_std1<_Tp, _U>
+        { };
+
+        template<class _Tp, class _U>
+        struct _common_other_type_impl1_std<_Tp, _U, false> // almost canonical to 'decltype(false ? std::declval<T1>() : std::declval<T2>())' implementation
+            : _common_other_type_impl1_std2<_Tp, _U>
+        { };
+        
         template<class _Tp, class _U>
         struct _common_other_type_impl2_std // unused: fallback for BCC6
         {
@@ -3387,9 +3462,18 @@ namespace stdex
             > impl;
         };
 
+        struct _common_other_type_parent_class {};
+        struct _common_other_type_child_class: public _common_other_type_parent_class {};
+        typedef is_same<
+            _common_other_type_impl1_std1<
+                _common_other_type_parent_class,
+                _common_other_type_child_class
+            >::impl::_common_type, _common_other_type_parent_class
+        > _common_other_type_std_tester1_works;
+
         template<class _Tp, class _U, bool>
         struct _common_other_type_impl_std
-            : _common_other_type_impl1_std<_Tp, _U>
+            : _common_other_type_impl1_std<_Tp, _U, _common_other_type_std_tester1_works::value>
         { };
 
         template<class _Tp, class _U>
