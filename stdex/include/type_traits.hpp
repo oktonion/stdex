@@ -3262,8 +3262,8 @@ namespace stdex
         };
 
         template<class _Tp, class _U,
-            const int _Dummy = ( sizeof( false ? ( *(_declval<_Tp>()) ) : ( *(_declval<_U>()) ) ) 
-                                    / sizeof(false ? ( *(_declval<_Tp>()) ) : ( *(_declval<_U>()) )) )
+            int _Dummy = 
+                sizeof(int[1 + sizeof( false ? ( *(_declval<_Tp>()) ) : ( *(_declval<_U>()) ) ) / sizeof(false ? ( *(_declval<_Tp>()) ) : ( *(_declval<_U>()) ))])
         >
         struct _common_other_type_impl1_any_value2 {
             _common_other_type_impl1_any_value2(_Tp) {}
