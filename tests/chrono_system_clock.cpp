@@ -19,25 +19,27 @@ int test1(void)
 
     // system_clock
     {
-        system_clock::time_point t1 = system_clock::now();
-        std::time_t t1_tt = std::time(0);
-        bool is_steady = system_clock::is_steady;
-        (void)(&is_steady); // suppress unused warning
-        stdex::time_t t2 = system_clock::to_time_t(t1);
-        DYNAMIC_VERIFY(-1 != t2);
-        DYNAMIC_VERIFY(-1 != t1_tt);
-        double sec_diff = stdex::difftime(t2, t1_tt);
-        system_clock::time_point t3 = system_clock::from_time_t(t2);
-        t3 = t3; // suppress unused warning
-        stdex::time_t t4 = system_clock::to_time_t(t3);
-        std::cout << "t4 == " << t4 << ", t2 == " << t2 << " with diff " << sec_diff << std::endl;
-        DYNAMIC_VERIFY(t4 == t2);
+        {
+            system_clock::time_point t1 = system_clock::now();
+            std::time_t t1_tt = std::time(0);
+            bool is_steady = system_clock::is_steady;
+            (void)(&is_steady); // suppress unused warning
+            stdex::time_t t2 = system_clock::to_time_t(t1);
+            DYNAMIC_VERIFY(-1 != t2);
+            DYNAMIC_VERIFY(-1 != t1_tt);
+            double sec_diff = stdex::difftime(t2, t1_tt);
+            system_clock::time_point t3 = system_clock::from_time_t(t2);
+            t3 = t3; // suppress unused warning
+            stdex::time_t t4 = system_clock::to_time_t(t3);
+            std::cout << "t4 == " << t4 << ", t2 == " << t2 << " with diff " << sec_diff << std::endl;
+            DYNAMIC_VERIFY(t4 == t2);
 
-        microseconds mcs = duration_cast<microseconds>(t3 - t1);
-        mcs = mcs; // suppress unused warning
+            microseconds mcs = duration_cast<microseconds>(t3 - t1);
+            mcs = mcs; // suppress unused warning
 
-        mcs = duration_cast<microseconds>(system_clock::now() - t1);
-        mcs = mcs; // suppress unused warning
+            mcs = duration_cast<microseconds>(system_clock::now() - t1);
+            mcs = mcs; // suppress unused warning
+        }
 
         {
             stdex::time_t 

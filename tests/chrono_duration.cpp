@@ -1,8 +1,11 @@
 #include "../stdex/include/core.h"
 #include "../stdex/include/chrono.hpp"
+//#include <chrono>
 
 #include <iostream>
 #define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return -1;}
+
+//#define stdex std
 
 class ClockTime
 {
@@ -173,10 +176,10 @@ int main(void)
     }
 
     {
-        chrono::duration<long, ratio_divide<kilo, milli> >   d1;
-        chrono::duration<long, ratio_multiply<kilo, milli> > d2;
-        chrono::duration<long, ratio_add<kilo, milli> >      d3;
-        chrono::duration<long, ratio_subtract<kilo, milli> > d4;
+        chrono::duration<long, ratio_divide<kilo, milli> >   d1; d1=d1;
+        chrono::duration<long, ratio_multiply<kilo, milli> > d2; d2=d2;
+        chrono::duration<long, ratio_add<kilo, milli> >      d3; d3=d3;
+        chrono::duration<long, ratio_subtract<kilo, milli> > d4; d4=d4;
     }
 
     {
