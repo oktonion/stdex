@@ -569,6 +569,21 @@ namespace stdex
             true_type
         { };
 
+#if _MSC_VER
+#define _STDEX_MSVC_SUPPRESS_WARNING_PUSH __pragma(warning(push))
+#define _STDEX_MSVC_SUPPRESS_WARNING(w) __pragma(warning(disable : w))
+#define _STDEX_MSVC_SUPPRESS_WARNING_POP __pragma(warning(pop))
+#define _STDEX_MSVC_SUPPRESS_WARNING_WITH_PUSH(w)\
+    _STDEX_MSVC_SUPPRESS_WARNING_PUSH _STDEX_MSVC_SUPPRESS_WARNING(w)
+#else // _MSC_VER
+#define _STDEX_MSVC_SUPPRESS_WARNING_PUSH
+#define _STDEX_MSVC_SUPPRESS_WARNING(w)
+#define _STDEX_MSVC_SUPPRESS_WARNING_POP
+#define _STDEX_MSVC_SUPPRESS_WARNING_WITH_PUSH(w)\
+    _STDEX_MSVC_SUPPRESS_WARNING_PUSH _STDEX_MSVC_SUPPRESS_WARNING(w)
+#endif // else _MSC_VER
+
+_STDEX_MSVC_SUPPRESS_WARNING_WITH_PUSH(4180) // suppress stupid warning C4180: qualifier applied to function type has no meaning; ignored
         template<class _FuncT>
         struct _canonical_is_function_const:
             bool_constant<( _canonical_is_const<const _FuncT>::value == bool(false) )> { };
@@ -576,6 +591,12 @@ namespace stdex
         template<class _FuncT>
         struct _canonical_is_function_volatile:
             bool_constant<( _canonical_is_volatile<volatile _FuncT>::value == bool(false) )> { };
+_STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
+
+#undef _STDEX_MSVC_SUPPRESS_WARNING_PUSH
+#undef _STDEX_MSVC_SUPPRESS_WARNING
+#undef _STDEX_MSVC_SUPPRESS_WARNING_POP
+#undef _STDEX_MSVC_SUPPRESS_WARNING_WITH_PUSH
     } // namespace detail
 
     namespace intern
@@ -3262,8 +3283,8 @@ namespace stdex
         };
 
         template<class _Tp, class _U,
-            int _Dummy = 
-                sizeof(int[1 + sizeof( false ? ( *(_declval<_Tp>()) ) : ( *(_declval<_U>()) ) ) / sizeof(false ? ( *(_declval<_Tp>()) ) : ( *(_declval<_U>()) ))])
+            class _Dummy = 
+                int[1 + sizeof( false ? ( *(_declval<_Tp>()) ) : ( *(_declval<_U>()) ) ) / sizeof(false ? ( *(_declval<_Tp>()) ) : ( *(_declval<_U>()) ))]
         >
         struct _common_other_type_impl1_any_value2 {
             _common_other_type_impl1_any_value2(_Tp) {}
