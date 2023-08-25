@@ -3350,20 +3350,10 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         struct _common_other_type_impl1_std1 // almost canonical to 'decltype(false ? std::declval<T1>() : std::declval<T2>())' implementation
         {
             typedef 
-            typename
-            conditional<
-                is_pointer<_Tp>::value == bool(true),
-                _Tp,
-                typename add_pointer<_Tp>::type
-            >::type _Tp_pointer;
+            typename add_pointer<_Tp>::type _Tp_pointer;
 
             typedef 
-            typename
-            conditional<
-                is_pointer<_U>::value == bool(true),
-                _U,
-                typename add_pointer<_U>::type
-            >::type _U_pointer;
+            typename add_pointer<_U>::type _U_pointer;
 
             static const bool _Tp_is_explicit_common_type =
                 sizeof(_common_other_type_impl1_std_tester1<_Tp_pointer, _U_pointer>(_declval<_U_pointer>())) ==
@@ -3402,20 +3392,10 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         struct _common_other_type_impl1_std2 // almost canonical to 'decltype(false ? std::declval<T1>() : std::declval<T2>())' implementation
         {
             typedef 
-            typename
-            conditional<
-                is_pointer<_Tp>::value == bool(true),
-                _Tp,
-                typename add_pointer<_Tp>::type
-            >::type _Tp_pointer;
+            typename add_pointer<_Tp>::type _Tp_pointer;
 
             typedef 
-            typename
-            conditional<
-                is_pointer<_U>::value == bool(true),
-                _U,
-                typename add_pointer<_U>::type
-            >::type _U_pointer;
+            typename add_pointer<_U>::type _U_pointer;
 
             static const bool _Tp_is_explicit_common_type =
                 sizeof(_common_other_type_impl1_std_tester2<_Tp_pointer, _U_pointer>(_declval<_U_pointer>())) ==
