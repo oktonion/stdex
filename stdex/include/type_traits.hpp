@@ -3274,20 +3274,24 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         template<class _Tp>
         _Tp _declval();
 
-        template<class _Tp, class _U,
-            const int _Dummy [1 + sizeof( false ? ( *(_declval<_Tp>()) ) : ( *(_declval<_U>()) ) ) / sizeof(false ? ( *(_declval<_Tp>()) ) : ( *(_declval<_U>()) ))] =
+        template<class _Tp, class _U, class _CommonT,
+            const int _Dummy [1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))] =
                 &integral_constant<int, 0>::value
         >
         struct _common_other_type_impl1_any_value1 {
-            _common_other_type_impl1_any_value1(_Tp) {}
+            _common_other_type_impl1_any_value1(
+                _CommonT[1 + sizeof(false ? ((_declval<_U>())) : ((_declval<_Tp>()))) / sizeof(false ? ((_declval<_Tp>())) : ((_declval<_U>())))]
+            ) {}
         };
 
-        template<class _Tp, class _U,
+        template<class _Tp, class _U, class _CommonT,
             class _Dummy = 
-                int[1 + sizeof( false ? ( *(_declval<_Tp>()) ) : ( *(_declval<_U>()) ) ) / sizeof(false ? ( *(_declval<_Tp>()) ) : ( *(_declval<_U>()) ))]
+                _CommonT[1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))]
         >
         struct _common_other_type_impl1_any_value2 {
-            _common_other_type_impl1_any_value2(_Tp) {}
+            _common_other_type_impl1_any_value2(
+                _Dummy
+            ) {}
         };
 
         template<class _Tp>
@@ -3295,19 +3299,36 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
             _common_other_type_impl2_any_value(_Tp) {}
         };
 
-        template<class _Tp, class _U>
-        _yes_type _common_other_type_impl1_std_tester1(_common_other_type_impl1_any_value1<_Tp, _U>);
-        template<class _Tp, class _U>
-        _no_type  _common_other_type_impl1_std_tester1(...); // fallback
-        template<class _Tp, class _U>
-        _yes_type _common_other_type_impl1_std_tester2(_common_other_type_impl1_any_value2<_Tp, _U>);
-        template<class _Tp, class _U>
-        _no_type  _common_other_type_impl1_std_tester2(...); // fallback
+        
+        struct _common_other_type_any_value {
+            template<class _AnyT>
+            _common_other_type_any_value(_AnyT) {}
+        };
+
+        template<int Lvl>
+        struct _common_other_type_priority_tag : public _common_other_type_priority_tag<Lvl - 1> {};
+        template<>
+        struct _common_other_type_priority_tag<0> {};
+
+        template<class _Tp, class _U, class _CommonT>
+        _yes_type _common_other_type_impl1_std_tester1(_common_other_type_priority_tag<2>, _common_other_type_impl1_any_value1<_Tp, _U, _CommonT>);
+        template<class _Tp, class _U, class _CommonT>
+        _no_type  _common_other_type_impl1_std_tester1(_common_other_type_priority_tag<1>, _common_other_type_any_value); // fallback
+        template<class _Tp, class _U, class _CommonT>
+        _no_type  _common_other_type_impl1_std_tester1(_common_other_type_priority_tag<0>, ...); // fallback
+        template<class _Tp, class _U, class _CommonT>
+        _yes_type _common_other_type_impl1_std_tester2(_common_other_type_priority_tag<2>, _common_other_type_impl1_any_value2<_Tp, _U, _CommonT>);
+        template<class _Tp, class _U, class _CommonT>
+        _no_type  _common_other_type_impl1_std_tester2(_common_other_type_priority_tag<1>, _common_other_type_any_value); // fallback
+        template<class _Tp, class _U, class _CommonT>
+        _no_type  _common_other_type_impl1_std_tester2(_common_other_type_priority_tag<0>, ...); // fallback
 
         template<class _Tp>
-        _yes_type _common_other_type_impl2_std_tester(_common_other_type_impl2_any_value<_Tp>);
+        _yes_type _common_other_type_impl2_std_tester(_common_other_type_priority_tag<2>, _common_other_type_impl2_any_value<_Tp>);
         template<class _Tp>
-        _no_type  _common_other_type_impl2_std_tester(...); // fallback
+        _no_type  _common_other_type_impl2_std_tester(_common_other_type_priority_tag<1>, _common_other_type_any_value); // fallback
+        template<class _Tp>
+        _no_type  _common_other_type_impl2_std_tester(_common_other_type_priority_tag<0>, ...); // fallback
 
         template<class _Tp, class _U, 
             int _Tp_is_common_type_score, int _U_is_common_type_score>
@@ -3355,20 +3376,20 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
             typedef 
             typename add_pointer<_U>::type _U_pointer;
 
-            static const bool _Tp_is_explicit_common_type =
-                sizeof(_common_other_type_impl1_std_tester1<_Tp_pointer, _U_pointer>(_declval<_U_pointer>())) ==
-                sizeof(_yes_type);
-
-            static const bool _U_is_explicit_common_type =
-                sizeof(_common_other_type_impl1_std_tester1<_U_pointer, _Tp_pointer>(_declval<_Tp_pointer>())) ==
-                sizeof(_yes_type);
-
             static const bool _Tp_is_implicit_common_type =
-                sizeof(_common_other_type_impl1_std_tester1<_Tp_pointer, _U_pointer>(_declval<_Tp_pointer>())) ==
+                sizeof(_common_other_type_impl1_std_tester1<_Tp, _U, _Tp>(_common_other_type_priority_tag<3>(), _declval<_Tp_pointer>())) ==
                 sizeof(_yes_type);
 
             static const bool _U_is_implicit_common_type =
-                sizeof(_common_other_type_impl1_std_tester1<_U_pointer, _Tp_pointer>(_declval<_U_pointer>())) ==
+                sizeof(_common_other_type_impl1_std_tester1<_U, _Tp, _U>(_common_other_type_priority_tag<3>(), _declval<_U_pointer>())) ==
+                sizeof(_yes_type);
+
+            static const bool _Tp_is_explicit_common_type =
+                sizeof(_common_other_type_impl1_std_tester1<_Tp, _U, _Tp>(_common_other_type_priority_tag<3>(), _declval<_U_pointer>())) ==
+                sizeof(_yes_type);
+
+            static const bool _U_is_explicit_common_type =
+                sizeof(_common_other_type_impl1_std_tester1<_U, _Tp, _U>(_common_other_type_priority_tag<3>(), _declval<_Tp_pointer>())) ==
                 sizeof(_yes_type);
 
             
@@ -3397,20 +3418,20 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
             typedef 
             typename add_pointer<_U>::type _U_pointer;
 
-            static const bool _Tp_is_explicit_common_type =
-                sizeof(_common_other_type_impl1_std_tester2<_Tp_pointer, _U_pointer>(_declval<_U_pointer>())) ==
-                sizeof(_yes_type);
-
-            static const bool _U_is_explicit_common_type =
-                sizeof(_common_other_type_impl1_std_tester2<_U_pointer, _Tp_pointer>(_declval<_Tp_pointer>())) ==
-                sizeof(_yes_type);
-
             static const bool _Tp_is_implicit_common_type =
-                sizeof(_common_other_type_impl1_std_tester2<_Tp_pointer, _U_pointer>(_declval<_Tp_pointer>())) ==
+                sizeof(_common_other_type_impl1_std_tester2<_Tp, _U, _Tp>(_common_other_type_priority_tag<3>(), _declval<_Tp_pointer>())) ==
                 sizeof(_yes_type);
 
             static const bool _U_is_implicit_common_type =
-                sizeof(_common_other_type_impl1_std_tester2<_U_pointer, _Tp_pointer>(_declval<_U_pointer>())) ==
+                sizeof(_common_other_type_impl1_std_tester2<_U, _Tp, _U>(_common_other_type_priority_tag<3>(), _declval<_U_pointer>())) ==
+                sizeof(_yes_type);
+
+            static const bool _Tp_is_explicit_common_type =
+                sizeof(_common_other_type_impl1_std_tester2<_Tp, _U, _Tp>(_common_other_type_priority_tag<3>(), _declval<_U_pointer>())) ==
+                sizeof(_yes_type);
+
+            static const bool _U_is_explicit_common_type =
+                sizeof(_common_other_type_impl1_std_tester2<_U, _Tp, _U>(_common_other_type_priority_tag<3>(), _declval<_Tp_pointer>())) ==
                 sizeof(_yes_type);
 
             
@@ -3448,11 +3469,11 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
             typedef typename add_pointer<_U>::type  _U_pointer;
 
             static const bool _Tp_is_common_type =
-                sizeof( _common_other_type_impl2_std_tester<_Tp_pointer>(_declval<_U_pointer>()) ) ==
+                sizeof( _common_other_type_impl2_std_tester<_Tp_pointer>(_declval<_U_pointer>(), _common_other_type_priority_tag<3>()) ) ==
                 sizeof( _yes_type );
 
             static const bool _U_is_common_type =
-                sizeof(_common_other_type_impl2_std_tester<_U_pointer>(_declval<_Tp_pointer>())) ==
+                sizeof(_common_other_type_impl2_std_tester<_U_pointer>(_declval<_Tp_pointer>(), _common_other_type_priority_tag<3>())) ==
                 sizeof(_yes_type);
 
             typedef 
