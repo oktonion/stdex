@@ -3274,18 +3274,18 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         template<class _Tp>
         _Tp _declval();
 
-        template<class _Tp, class _U, class _CommonT,
-            const int _Dummy [1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))] =
+        template<class _Tp, class _U, class _CommonT
+            , const int _Dummy [1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))] =
                 &integral_constant<int, 0>::value
         >
         struct _common_other_type_impl1_any_value1 {
             _common_other_type_impl1_any_value1(
-                _CommonT[1 + sizeof(false ? ((_declval<_U>())) : ((_declval<_Tp>()))) / sizeof(false ? ((_declval<_Tp>())) : ((_declval<_U>())))]
+                _CommonT[1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))]
             ) {}
         };
 
-        template<class _Tp, class _U, class _CommonT,
-            class _Dummy = 
+        template<class _Tp, class _U, class _CommonT
+            , class _Dummy = 
                 _CommonT[1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))]
         >
         struct _common_other_type_impl1_any_value2 {
