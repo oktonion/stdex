@@ -949,13 +949,34 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         { };
 
         template<class _Tp>
-        struct _arr_is_incomplete_type:
-            _is_incomplete_type<_Tp[]>
-        { };
+        _Tp* _arr_is_incomplete_type_tester_helper(_Tp(*)[]);
+        
+        template<class _Tp>
+        void* _arr_is_incomplete_type_tester_helper(...);
+        
+        template<class _Tp>
+        _no_type _arr_is_incomplete_type_tester(_Tp*);
+        
+        _yes_type _arr_is_incomplete_type_tester(...);
+
+        template<class _Tp>
+        struct _arr_is_incomplete_type
+            //_is_incomplete_type<_Tp[]>
+        { 
+
+            static const bool value = 
+                sizeof( _arr_is_incomplete_type_tester(_arr_is_incomplete_type_tester_helper<_Tp>(0)) )
+                    == sizeof(_yes_type); 
+        };
 
         template<class _Tp>
         struct _arr_is_incomplete_type<_Tp&>:
-            _is_incomplete_type<_Tp[]>
+            _arr_is_incomplete_type<_Tp>
+        { };
+
+        template<>
+        struct _arr_is_incomplete_type<void>:
+            _is_incomplete_type<void>
         { };
 
         template<>
