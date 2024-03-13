@@ -156,14 +156,13 @@ namespace stdex
             { };
 
             template<class _Tp>
-            struct _is_integral_constant:
-                _is_integral_constant_impl<_Tp, 
-                    _is_integral_constant_std_impl<unsigned short>::value == bool(true)
-                    && _is_integral_constant_std_impl<long>::value == bool(true)
-                    && _is_integral_constant_std_impl<signed char>::value == bool(true)
-            >
+            struct _is_integral_constant
             {
-
+                static const bool flag = 
+                    (_is_integral_constant_std_impl<unsigned short>::value == bool(true)
+                    && _is_integral_constant_std_impl<long>::value == bool(true)
+                    && _is_integral_constant_std_impl<signed char>::value == bool(true));
+                static const bool value = _is_integral_constant_impl<_Tp, flag>::value;
             };
 
             template<class _Tp>

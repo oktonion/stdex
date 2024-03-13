@@ -402,11 +402,10 @@ namespace stdex
                 static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<_nullptr_t_as_integral>::value;
                 static const bool _can_be_compared_to_ptr = _nullptr_t_can_be_compared_to_ptr<_nullptr_t_as_integral>::value;
             };
-
-            typedef _nullptr_choose_as_int<
+			static const bool _nullptr_choose_as_int_flag = 
                 (nullptr_detail::_NULL_is_convertable_to_int::value == bool(true)) &&
-                (_as_int::_is_convertable_to_ptr == bool(true) && _as_int::_equal_void_ptr == bool(true) && _as_int::_can_be_compared_to_ptr == bool(true))
-            >::type type;
+                (_as_int::_is_convertable_to_ptr == bool(true) && _as_int::_equal_void_ptr == bool(true) && _as_int::_can_be_compared_to_ptr == bool(true));
+            typedef _nullptr_choose_as_int< _nullptr_choose_as_int_flag >::type type;
         };
 
         template<>
@@ -420,10 +419,10 @@ namespace stdex
                 static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<_nullptr_t_as_enum>::value;
                 static const bool _can_be_ct_constant = true;//_nullptr_can_be_ct_constant_impl<_nullptr_t_as_enum>::value;
             };
+			static const bool _nullptr_choose_as_enum_flag = 
+                (_as_enum::_is_convertable_to_ptr == bool(true) && _as_enum::_equal_void_ptr == bool(true) && _as_enum::_can_be_ct_constant == bool(true));
 
-            typedef _nullptr_choose_as_enum<
-                (_as_enum::_is_convertable_to_ptr == bool(true) && _as_enum::_equal_void_ptr == bool(true) && _as_enum::_can_be_ct_constant == bool(true))
-            >::type type;
+            typedef _nullptr_choose_as_enum< _nullptr_choose_as_enum_flag >::type type;
         };
 
         struct _nullptr_chooser
@@ -437,10 +436,10 @@ namespace stdex
                 static const bool _equal_void_ptr = _is_equal_size_to_void_ptr<_nullptr_t_as_class>::value;
                 static const bool _can_be_ct_constant = _nullptr_can_be_ct_constant_impl<_nullptr_t_as_class>::value;
             };
+			static const bool _nullptr_choose_as_class_flag = 
+                (_as_class::_equal_void_ptr == bool(true) && _as_class::_can_be_ct_constant == bool(true));
 
-            typedef _nullptr_choose_as_class<
-                (_as_class::_equal_void_ptr == bool(true) && _as_class::_can_be_ct_constant == bool(true))
-            >::type type;
+            typedef _nullptr_choose_as_class< _nullptr_choose_as_class_flag >::type type;
         };
     } // namespace detail
 
