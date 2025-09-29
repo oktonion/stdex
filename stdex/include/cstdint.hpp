@@ -370,7 +370,7 @@ namespace stdex
         template<class _Unsigned, int _Size>
         struct _sized_integer_umax_impl
         {
-            char _sized_integer_umax_size_is_invalid_assert[_Size > 0 ? 1 : (sizeof(_Unsigned) / sizeof(_Unsigned) - 3)]; // should never ever happen!
+            char _sized_integer_umax_size_is_invalid_assert[_Size > 0 ? 1 : ((sizeof(_Unsigned) + 1) / sizeof(_Unsigned) - 3)]; // should never ever happen!
             static const _Unsigned umax_value = _Size > 0 ? (((_Unsigned(1) << (_Size - 1)) - 1) * _Unsigned(2) + _Unsigned(1)) : 0;
         };
 
