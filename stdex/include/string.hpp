@@ -210,7 +210,7 @@ namespace stdex
                 if(errno == 0 && _str_to_integral_chooser_impl::check(value)) 
                 {
                     ptrdiff_t length = 
-                        endptr ? (*endptr - str) : (str - str + strlen(str));
+                        endptr ? (*endptr - str) : (str + strlen(str) - str);
                     string positive_str(str, str + length);
                     bool is_negative = (value == LONG_MIN);
 
@@ -256,7 +256,7 @@ namespace stdex
                 if(errno == 0 && _str_to_integral_chooser_impl::check(value)) 
                 {
                     ptrdiff_t length = 
-                        endptr ? (*endptr - str) : (str - str + wcslen(str));
+                        endptr ? (*endptr - str) : (str + wcslen(str) - str);
                     wstring positive_str(str, str + length);
                     bool is_negative = (value == LONG_MIN);
 
