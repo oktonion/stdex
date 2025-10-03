@@ -97,6 +97,10 @@ jobs:
             BUILD_SCRIPT: build_tests.sh
             RUN_SCRIPT: run_tests.sh
             SETUP_SCRIPT: |
+              sudo gpg --keyserver keyserver.ubuntu.com --recv-keys 40976EAF437D05B5
+              sudo gpg --export --armor 40976EAF437D05B5 | sudo apt-key add -
+              sudo gpg --keyserver keyserver.ubuntu.com --recv-keys 3B4FE6ACC0B21F32
+              sudo gpg --export --armor 3B4FE6ACC0B21F32 | sudo apt-key add -
               echo "deb     [trusted=yes] http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
               echo "deb-src [trusted=yes] http://old-releases.ubuntu.com/ubuntu/ hardy universe" | sudo tee -a /etc/apt/sources.list
               echo "deb     [trusted=yes] http://snapshot.debian.org/archive/debian/20070730T000000Z/ lenny main" | sudo tee -a /etc/apt/sources.list
