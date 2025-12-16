@@ -979,11 +979,6 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
             _is_incomplete_type<void>
         { };
 
-        template<>
-        struct _arr_is_incomplete_type<void>:
-            _is_incomplete_type<void>
-        { };
-
         template<class _Tp, bool ImplCh = _arr_is_incomplete_type<char>::value>
         struct _is_array_impl:
             _and_<_is_incomplete_type<_Tp>, _not_<is_function<_Tp> > >::type
