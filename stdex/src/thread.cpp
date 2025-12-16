@@ -469,7 +469,7 @@ thread::id thread::get_id() const _STDEX_NOEXCEPT_FUNCTION
     };
     
     if (0 != err && _STDEX_PTHREAD_KILL_EINVAL != err) // if we get ESRCH (!0 && !EINVAL) value it might be the case that thread is dead or detached
-        _id = id();
+        thread::id().swap(_id);
 
     return _id;
 }

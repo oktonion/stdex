@@ -1776,6 +1776,8 @@ namespace stdex
         typedef pthread_t native_handle_type;
 
         class id {
+        protected:
+            typedef stdex::uintmax_t id_type;
         public:
             
             id() _STDEX_NOEXCEPT_FUNCTION :
@@ -1792,6 +1794,8 @@ namespace stdex
 
                 return *this;
             }
+
+            void swap(id &other) { id_type tmp = _uid; _uid = other._uid; other._uid = tmp; }
 
             bool operator==(const id &other) const _STDEX_NOEXCEPT_FUNCTION
             {
@@ -1832,7 +1836,6 @@ namespace stdex
             }
 
         protected:
-            typedef stdex::uintmax_t id_type;
             static const id_type invalid_id =
                 id_type(-1);
 
