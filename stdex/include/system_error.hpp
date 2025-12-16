@@ -15,13 +15,26 @@
 // std includes
 
 
-#ifdef __STDC_WANT_LIB_EXT1__
+#if defined(__STDC_LIB_EXT1__)
+
+#ifndef __STDC_WANT_LIB_EXT1__
 
 #define __STDC_WANT_LIB_EXT1__ 1
+#define _STDEX_DEFINED__STDC_WANT_LIB_EXT1__
+
+#endif
+
 // As with all bounds-checked functions, strerror_s and strerrorlen_s are only guaranteed to be available 
 // if __STDC_LIB_EXT1__ is defined by the implementation and 
 // if the user defines __STDC_WANT_LIB_EXT1__ to the integer constant 1 before including string.h.
 #include <string.h>
+
+#ifdef _STDEX_DEFINED__STDC_WANT_LIB_EXT1__
+
+#undef __STDC_WANT_LIB_EXT1__
+#undef _STDEX_DEFINED__STDC_WANT_LIB_EXT1__
+
+#endif
 
 #endif
 
@@ -1136,9 +1149,38 @@ namespace stdex
             struct _has_nonconforming_strerror_s;
             struct _has_conforming_strerrorlen_s;
 
-            class _strerror_s_arg;
+            class _strerror_s_arg
+            {
+                typedef int return_type; // would be errno_t fo C
+                char buf[sizeof(return_type) * 14];
+                _strerror_s_arg(...);
+                operator return_type();
 
-            class _strerrorlen_s_arg;
+                template<bool, class>
+                friend struct _has_conforming_strerror_s;
+                friend struct _has_nonconforming_strerror_s;
+            };
+
+            class _strerrorlen_s_arg
+            {
+                typedef std::size_t return_type;
+                char buf[sizeof(return_type) * 12];
+                _strerrorlen_s_arg(...);
+                operator return_type();
+
+                friend struct _has_conforming_strerrorlen_s;
+            };
+            
+            struct _strerror_s_as_struct {
+                _strerror_s_as_struct(_strerror_s_arg, _strerror_s_arg);
+                _strerror_s_as_struct(_strerror_s_arg, _strerror_s_arg, _strerror_s_arg);
+                _strerror_s_arg _dummy_arg;
+            };
+            
+            struct _strerrorlen_s_as_struct {
+                _strerrorlen_s_as_struct(_strerrorlen_s_arg, ...);
+                _strerrorlen_s_arg _dummy_arg;
+            };
         } // namespace system_error_detail
     } // namespace detail
 } // namespace stdex
@@ -1146,21 +1188,22 @@ namespace stdex
 
 // we need all this mess at global namespace
 // to detect if following C11-functions are defined or not
-stdex::detail::system_error_detail::_strerror_s_arg 
-strerror_s(
-    stdex::detail::system_error_detail::_strerror_s_arg, 
-    stdex::detail::system_error_detail::_strerror_s_arg
-);
-stdex::detail::system_error_detail::_strerror_s_arg 
-strerror_s(
-    stdex::detail::system_error_detail::_strerror_s_arg, 
-    stdex::detail::system_error_detail::_strerror_s_arg,
-    stdex::detail::system_error_detail::_strerror_s_arg
-);
-stdex::detail::system_error_detail::_strerrorlen_s_arg
-strerrorlen_s(
-    stdex::detail::system_error_detail::_strerrorlen_s_arg
-);
+//namespace {
+    struct strerror_s
+        : ::stdex::detail::system_error_detail::_strerror_s_as_struct 
+    {
+        typedef ::stdex::detail::system_error_detail::_strerror_s_arg _strerror_s_arg;
+        strerror_s(_strerror_s_arg, _strerror_s_arg);
+        strerror_s(_strerror_s_arg, _strerror_s_arg, _strerror_s_arg);
+    };
+    
+    struct strerrorlen_s
+        : ::stdex::detail::system_error_detail::_strerrorlen_s_as_struct
+    {
+        typedef ::stdex::detail::system_error_detail::_strerrorlen_s_arg _strerrorlen_s_arg;
+        strerrorlen_s(_strerrorlen_s_arg, ...);
+    };
+//} // anonymous namespace for strerror_s and strerrorlen_s
 
 namespace stdex 
 {
@@ -1194,8 +1237,14 @@ namespace stdex
                     using namespace std;
                     
                     std::string result;
-
-                    size_t len = strerrorlen_s(_Errcode);
+                    
+                    typename 
+                    conditional<
+                        is_same<size_t, _DummyT>::value,
+                        _DummyT, 
+                        size_t
+                    >::type len = strerrorlen_s(_Errcode);
+                    
                     if (len)
                     {
                         struct _RAII{
@@ -1205,7 +1254,7 @@ namespace stdex
                         } _tmp;
 
                         _tmp.buf = new char[len + 1];
-                        if(0 == strerror_s(_tmp.buf, len + 1, _Errcode))
+                        if(_DummyT(0) == strerror_s(_tmp.buf, len + 1, _Errcode))
                             result = _tmp.buf;
                     }
                     return result;
@@ -1216,45 +1265,25 @@ namespace stdex
             struct strerror_impl_helper<true, false, _DummyT>
             { // MS specific
                 static std::string call(_DummyT _Errcode)
-                {                    
+                {        
+                    using namespace std;
+                    
                     std::string result;
 
                     char buf[2048] = {0};
 
-                    if(0 == strerror_s(buf, _Errcode))
+                    if(_DummyT(0) == strerror_s(buf, _Errcode))
                         result = buf;
                     return result;
                 }
-            };
-
-            class _strerror_s_arg
-            {
-                typedef int return_type; // would be errno_t fo C
-                char buf[sizeof(return_type) * 14];
-                _strerror_s_arg(...);
-                operator return_type();
-
-                template<bool, class>
-                friend struct _has_conforming_strerror_s;
-                friend struct _has_nonconforming_strerror_s;
-            };
-
-            class _strerrorlen_s_arg
-            {
-                typedef std::size_t return_type;
-                char buf[sizeof(return_type) * 12];
-                _strerrorlen_s_arg(...);
-                operator return_type();
-
-                friend struct _has_conforming_strerrorlen_s;
             };
 
             struct _has_conforming_strerrorlen_s
             {
                 static const bool value =
                     sizeof(
-                        strerrorlen_s(*_declptr<int>())
-                    ) != sizeof(_strerrorlen_s_arg);
+                        strerrorlen_s((*_declptr<int>(), *_declptr<int>()))
+                    ) != sizeof(_strerrorlen_s_as_struct);
             };
                 
             template<bool, class _T>
@@ -1263,7 +1292,7 @@ namespace stdex
                 static const bool value =
                     sizeof(
                         strerror_s(_declptr<_T>(), *_declptr<std::size_t>(), *_declptr<int>())
-                    ) != sizeof(_strerror_s_arg);
+                    ) != sizeof(_strerror_s_as_struct);
             };
 
             template<class _T>
@@ -1275,7 +1304,7 @@ namespace stdex
                 static const bool value =
                     sizeof(
                         strerror_s(_declptr<_strerror_s_arg>()->buf, *_declptr<int>())
-                    ) != sizeof(_strerror_s_arg);
+                    ) != sizeof(_strerror_s_as_struct);
             };
 
             typedef 
