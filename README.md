@@ -5,7 +5,7 @@ Branch   | Appveyor| Github  | Codecov
 tests (development)    | [![Build Status](https://ci.appveyor.com/api/projects/status/hu8800gu31xldj25?svg=true)](https://ci.appveyor.com/project/oktonion/stdex) | [![C/C++ CI](https://github.com/oktonion/stdex/actions/workflows/c-cpp.yml/badge.svg?branch=tests)](https://github.com/oktonion/stdex/actions/workflows/c-cpp.yml)| [![codecov](https://codecov.io/gh/oktonion/stdex/branch/tests/graph/badge.svg)](https://codecov.io/gh/oktonion/stdex/branch/tests)
 master   | [![Build Status](https://ci.appveyor.com/api/projects/status/3c53qm34v1j37hy5/branch/master?svg=true)](https://ci.appveyor.com/project/oktonion/stdex-a309e/branch/master) | [![C/C++ CI](https://github.com/oktonion/stdex/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/oktonion/stdex/actions/workflows/c-cpp.yml) | [![codecov](https://codecov.io/gh/oktonion/stdex/branch/tests/graph/badge.svg)](https://codecov.io/gh/oktonion/stdex)
 
-[![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/oktonion/stdex.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/oktonion/stdex/context:cpp) | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b74b5f48d04641de81c8c76e3fc26f90)](https://www.codacy.com/app/oktonion/stdex?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=oktonion/stdex&amp;utm_campaign=Badge_Grade)
+[![CodeQL](https://github.com/oktonion/stdex/actions/workflows/codeql.yml/badge.svg)](https://github.com/oktonion/stdex/actions/workflows/codeql.yml) | [![Codacy Badge](https://api.codacy.com/project/badge/Grade/b74b5f48d04641de81c8c76e3fc26f90)](https://www.codacy.com/app/oktonion/stdex?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=oktonion/stdex&amp;utm_campaign=Badge_Grade)
 
 # stdex
 
@@ -53,7 +53,7 @@ A:
 |----------------------|--------------------------------------------------------------------------------|:------------:|----------|
 | `<typeindex>`        | stdex::type_index                                                              | 100%         | maybe    |
 | `<type_traits>`      | Compile-time type information                                                  | 70%          | no       |
-| `<functional>`       | Function objects, Function invocations, Bind operations and Reference wrappers | no           | no       |
+| `<functional>`       | Function objects, Function invocations, Bind operations and Reference wrappers | in progress  | no       |
 | `<chrono>`           | C++ time utilities                                                             | 100%         | yes      |
 | `<initializer_list>` | stdex::initializer_list class template                                         | no and never | yes      |
 | `<tuple>`            | stdex::tuple class template                                                    | no           | no       |
@@ -136,9 +136,10 @@ A:
 | name                   | purpose                                       | implemented | is final |
 |------------------------|-----------------------------------------------|:-----------:|----------|
 | `<thread>`             | stdex::thread class and  supporting functions | 90%         | no       |
-| `<mutex>`              | mutual exclusion primitives                   | 90%         | no       |
-| `<future>`             | primitives for asynchronous computations      | no          | maybe    |
+| `<mutex>`              | mutual exclusion primitives                   | 100%        | yes      |
+| `<future>`             | primitives for asynchronous computations      | in progress | no       |
 | `<condition_variable>` | thread waiting conditions                     | 100%        | yes      |
+
 
 </details>
 
