@@ -47,6 +47,11 @@
 
 #include <winnt.h>
 
+#else
+
+// #define _POSIX_C_SOURCE 199506L
+#include <signal.h> // for pthread_kill
+
 #endif
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
@@ -434,7 +439,7 @@ void thread::join()
 
 bool thread::joinable() const _STDEX_NOEXCEPT_FUNCTION
 {
-    return _id != id();
+    return get_id() != id();
 }
 
 void thread::detach()
@@ -455,10 +460,25 @@ void thread::detach()
     _id = id();
 }
 
+void thread::id::invalidate() const {
+    _uid = invalid_id;
+}
+
 thread::id thread::get_id() const _STDEX_NOEXCEPT_FUNCTION
 {
-    if (!joinable())
-        return id();
+    if (_id == id())
+        return _id;
+    
+    const int err = pthread_kill(_handle, 0); // signal is zero so error checking is performed but no signal is actually sent
+    
+    enum { _STDEX_PTHREAD_KILL_EINVAL
+#   ifdef EINVAL
+    = EINVAL
+#   endif
+    };
+    
+    if (0 != err && _STDEX_PTHREAD_KILL_EINVAL != err) // if we get ESRCH (!0 && !EINVAL) value it might be the case that thread is dead or detached
+        _id.invalidate();
 
     return _id;
 }

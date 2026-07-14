@@ -599,6 +599,22 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
 #undef _STDEX_MSVC_SUPPRESS_WARNING_WITH_PUSH
     } // namespace detail
 
+    namespace detail
+    {
+        namespace type_traits_detail
+        {
+            struct _nullptr_cannot_be_passed_with_comma_impl
+            {
+                static _no_type tester(void*);
+                static _yes_type tester(...);
+                static const bool value =
+                    sizeof(tester((nullptr_t(), nullptr))) == sizeof(_yes_type);
+            };
+
+            typedef bool_constant<bool(_nullptr_cannot_be_passed_with_comma_impl::value == bool(true))>::type _nullptr_cannot_be_passed_with_comma_bug;
+        }
+    }
+
     namespace intern
     {
         template<class>
@@ -625,7 +641,15 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
                 detail::_canonical_is_const<const volatile int[4]>::value == bool(false) ||
                 detail::_canonical_is_volatile<const volatile int[4]>::value == bool(false);
         };
+
+        template<>
+        struct _has_bug<struct _stdex_nullptr_cannot_be_passed_with_comma_bug> :
+            detail::type_traits_detail::_nullptr_cannot_be_passed_with_comma_bug
+        { };
+
     } //namespace intern
+
+
 
     namespace detail
     {
@@ -949,7 +973,7 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         { };
 
         template<class _Tp>
-        _Tp* _arr_is_incomplete_type_tester_helper(_Tp(*)[]);
+        _Tp* _arr_is_incomplete_type_tester_helper(_Tp(*)[1]);
         
         template<class _Tp>
         void* _arr_is_incomplete_type_tester_helper(...);
@@ -972,11 +996,6 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         template<class _Tp>
         struct _arr_is_incomplete_type<_Tp&>:
             _arr_is_incomplete_type<_Tp>
-        { };
-
-        template<>
-        struct _arr_is_incomplete_type<void>:
-            _is_incomplete_type<void>
         { };
 
         template<>
@@ -2208,18 +2227,57 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
     {
     };
 
+    template<class _From, class _To>
+    struct is_convertible;
+
     namespace detail
     {
+        template<class _Tp>
+        _Tp _declval();
+
         typedef remove_cv<nullptr_t>::type _nullptr_t_clear;
 
         template<class>
-        struct _is_null_pointer_helper
-            : public false_type { };
+        struct _is_null_pointer_helper;
 
         template<>
         struct _is_null_pointer_helper<_nullptr_t_clear>:
             public true_type { };
 
+        // from nullptr.h:
+        namespace nullptr_detail
+        {
+            class _nullptr_t_as_class_impl;
+            class _nullptr_t_as_class_impl1;
+        } // namespace nullptr_detail
+
+
+        template<class _To>
+        _yes_type _is_convertible_impl_tester_simple_types(_To);
+
+        template<class _To>
+        _no_type  _is_convertible_impl_tester_simple_types(...);
+
+        template<class _From, class _To, bool>
+        struct _is_convertible_impl_helper
+        {
+            static const bool value =
+                sizeof(_is_convertible_impl_tester_simple_types<_To>(_declval<_From>())) == sizeof(_yes_type);
+            typedef bool_constant< _is_convertible_impl_helper::value == bool(true)> type;
+        };
+
+        template<class _Tp>
+        struct _is_null_pointer_helper {
+            typedef typename remove_reference<_Tp>::type rr_type;
+            typedef
+            typename
+            conditional<
+                _is_convertible_impl_helper<rr_type*, nullptr_detail::_nullptr_t_as_class_impl*, false>::value == bool(true) ||
+                _is_convertible_impl_helper<rr_type*, nullptr_detail::_nullptr_t_as_class_impl1*, false>::value == bool(true),
+                true_type,
+                false_type
+            >::type type;
+        };
     }
     // is_null_pointer (LWG 2247).
     template<class _Tp>
@@ -3039,8 +3097,15 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
     // add_pointer
     template<class _Tp>
     struct add_pointer
-        : public detail::_add_pointer_helper<_Tp, detail::_or_<detail::_is_referenceable<_Tp>, is_void<_Tp> >::value>
-    { };
+    { 
+        typedef 
+        typename
+        detail::_add_pointer_helper<_Tp, 
+            detail::_or_<
+                detail::_is_referenceable<_Tp>, is_void<_Tp> 
+            >::value == bool(true)
+        >::type type;
+    };
 
     namespace detail
     {
@@ -3292,8 +3357,6 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
             typedef type _common_type;
         };
 
-        template<class _Tp>
-        _Tp _declval();
 
         template<class _Tp, class _U, class _CommonT
             , const int _Dummy [1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))] =
@@ -3633,20 +3696,6 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
 
         template<class _To>
         _no_type  _is_convertible_impl_tester_complex_types(const _is_convertible_dummy<_To>&);
-
-        template<class _To>
-        _yes_type _is_convertible_impl_tester_simple_types(_To);
-
-        template<class _To>
-        _no_type  _is_convertible_impl_tester_simple_types(...);
-
-        template<class _From, class _To, bool>
-        struct _is_convertible_impl_helper
-        {
-            static const bool value =
-                sizeof(_is_convertible_impl_tester_simple_types<_To>(_declval<_From>())) == sizeof(_yes_type);
-            typedef bool_constant< _is_convertible_impl_helper::value == bool(true)> type;
-        };
 
         template<class _From, class _To>
         struct _is_convertible_impl_helper<_From, _To, true>
