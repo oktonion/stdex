@@ -4,6 +4,37 @@ All notable changes to stdex library project will be documented in this file.
 
 visit [https://github.com/oktonion/stdex](https://github.com/oktonion/stdex) for the latest version of stdex library
 
+## [0.2.13] - 2026-07-07
+
+### Added
+
+- `stdex::is_convertible`
+- Cmake settings file
+- 
+
+### Removed
+
+- `stdex::copy_n`, `stdex::begin`, `stdex::end` implementation for c-arrays (bugged in Borland C++ Builder 6.0)
+
+### Changed
+
+- `stdex::common_type` implementation
+- `stdex::thread::id` implementation
+
+### Fixed
+
+- added missing includes
+- static analysis checks
+- `stdex::string` `NaN` and `Inf` calls
+- `<strstream>` header includes
+- `nullptr` forwarding
+
+### Working on
+
+- **futures** implementation
+- **move semantics** emulation
+- **function** implementation
+
 ## [0.2.12] - 2023-02-02
 
 ### Added
