@@ -3,7 +3,7 @@
 #
 cmake_minimum_required (VERSION 3.15)
 
-project ("stdex" VERSION 0.2.12 LANGUAGES C CXX)
+project ("stdex" VERSION 0.2.13 LANGUAGES C CXX)
 
 # Set project variables
 

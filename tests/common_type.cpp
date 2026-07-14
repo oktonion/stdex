@@ -15,7 +15,7 @@ struct C : A { };
 struct D : B { D(B_ctor_param *&param) : B(*param) {} };
 struct E { public: operator A() { return a; } A a; };
 struct PrivateE : private E {};
-struct PrivateB : private B {};
+struct PrivateB : private B { PrivateB(B_ctor_param *&param) : B(*param) {} };
 
 template<class type1>
 void COMMON_TYPE_TEST_1_CPP98() 
