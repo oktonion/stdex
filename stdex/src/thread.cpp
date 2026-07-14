@@ -47,6 +47,11 @@
 
 #include <winnt.h>
 
+#else
+
+// #define _POSIX_C_SOURCE 199506L
+#include <signal.h> // for pthread_kill
+
 #endif
 
 #ifdef _STDEX_NATIVE_CPP11_SUPPORT
@@ -455,6 +460,10 @@ void thread::detach()
     _id = id();
 }
 
+void thread::id::invalidate() const {
+    _uid = invalid_id;
+}
+
 thread::id thread::get_id() const _STDEX_NOEXCEPT_FUNCTION
 {
     if (_id == id())
@@ -469,7 +478,7 @@ thread::id thread::get_id() const _STDEX_NOEXCEPT_FUNCTION
     };
     
     if (0 != err && _STDEX_PTHREAD_KILL_EINVAL != err) // if we get ESRCH (!0 && !EINVAL) value it might be the case that thread is dead or detached
-        thread::id().swap(_id);
+        _id.invalidate();
 
     return _id;
 }
