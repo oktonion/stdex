@@ -38,8 +38,9 @@ struct OutputContainer : public BoundsContainer<T>
   bool* writtento;
 
   OutputContainer(T* _first, T* _last)
-  : BoundsContainer<T>(_first, _last), incrementedto(_first)
-  { writtento = new bool[this->size()]; }
+  : BoundsContainer<T>(_first, _last), incrementedto(_first),
+  writtento(new bool[this->size()])
+  { }
 
   ~OutputContainer()
   { delete[] writtento; }

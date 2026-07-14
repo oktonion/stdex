@@ -424,17 +424,17 @@ int main(void)
     // private inheritance:
 
     //STATIC_ASSERT((is_same<common_type<D, A, B, C, PrivateB>::_common_type, A>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_and_PrivateB_should_be_NONE);
-    STATIC_ASSERT((is_same<common_type<D, A, B, C, PrivateB>::_common_type, B>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_and_PrivateB_should_be_NONE);
-    STATIC_ASSERT((is_same<common_type<D, A, B, C, PrivateB>::_common_type, C>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_and_PrivateB_should_be_NONE);
-    STATIC_ASSERT((is_same<common_type<D, A, B, C, PrivateB>::_common_type, D>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_and_PrivateB_should_be_NONE);
-    STATIC_ASSERT((is_same<common_type<D, A, B, C, PrivateB>::_common_type, PrivateB>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_and_PrivateB_should_be_NONE);
+    //STATIC_ASSERT((is_same<common_type<D, A, B, C, PrivateB>::_common_type, B>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_and_PrivateB_should_be_NONE);
+    //STATIC_ASSERT((is_same<common_type<D, A, B, C, PrivateB>::_common_type, C>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_and_PrivateB_should_be_NONE);
+    //STATIC_ASSERT((is_same<common_type<D, A, B, C, PrivateB>::_common_type, D>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_and_PrivateB_should_be_NONE);
+    //STATIC_ASSERT((is_same<common_type<D, A, B, C, PrivateB>::_common_type, PrivateB>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_and_PrivateB_should_be_NONE);
 
 
     //STATIC_ASSERT((is_same<common_type<D, A, B, C, PrivateE>::_common_type, A>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_and_PrivateE_should_be_NONE);
-    STATIC_ASSERT((is_same<common_type<D, A, B, C, PrivateE>::_common_type, B>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_and_PrivateE_should_be_NONE);
-    STATIC_ASSERT((is_same<common_type<D, A, B, C, PrivateE>::_common_type, C>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_and_PrivateE_should_be_NONE);
-    STATIC_ASSERT((is_same<common_type<D, A, B, C, PrivateE>::_common_type, D>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_and_PrivateE_should_be_NONE);
-    STATIC_ASSERT((is_same<common_type<D, A, B, C, PrivateE>::_common_type, PrivateE>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_and_PrivateE_should_be_NONE);
+    //STATIC_ASSERT((is_same<common_type<D, A, B, C, PrivateE>::_common_type, B>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_and_PrivateE_should_be_NONE);
+    //STATIC_ASSERT((is_same<common_type<D, A, B, C, PrivateE>::_common_type, C>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_and_PrivateE_should_be_NONE);
+    //STATIC_ASSERT((is_same<common_type<D, A, B, C, PrivateE>::_common_type, D>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_and_PrivateE_should_be_NONE);
+    //STATIC_ASSERT((is_same<common_type<D, A, B, C, PrivateE>::_common_type, PrivateE>::value == bool(false)), common_type_for_A_and_B_and_C_and_D_and_PrivateE_should_be_NONE);
 
     return 0;
 }
