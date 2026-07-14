@@ -25,7 +25,7 @@ jobs:
               chmod a+rwx ./run_tests.sh
     env:
       OS: ${{ matrix.os }}
-      PYTHON: '3.7'
+      PYTHON: '3.8'
     steps:
     - uses: actions/checkout@master
     - name: setup enviroment
@@ -54,7 +54,7 @@ jobs:
     - name: Setup Python
       uses: actions/setup-python@master
       with:
-        python-version: 3.7
+        python-version: 3.8
     - name: Generate coverage report
       run: |
         chmod +x ./get_code_cov.sh
