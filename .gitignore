@@ -50,3 +50,5 @@ stdex/obj/*
 *.log
 *.$ln
 *.orig
+/build
+/tests/tmp
