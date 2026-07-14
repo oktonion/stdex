@@ -53,7 +53,7 @@ A:
 |----------------------|--------------------------------------------------------------------------------|:------------:|----------|
 | `<typeindex>`        | stdex::type_index                                                              | 100%         | maybe    |
 | `<type_traits>`      | Compile-time type information                                                  | 70%          | no       |
-| `<functional>`       | Function objects, Function invocations, Bind operations and Reference wrappers | no           | no       |
+| `<functional>`       | Function objects, Function invocations, Bind operations and Reference wrappers | in progress  | no       |
 | `<chrono>`           | C++ time utilities                                                             | 100%         | yes      |
 | `<initializer_list>` | stdex::initializer_list class template                                         | no and never | yes      |
 | `<tuple>`            | stdex::tuple class template                                                    | no           | no       |
@@ -136,9 +136,10 @@ A:
 | name                   | purpose                                       | implemented | is final |
 |------------------------|-----------------------------------------------|:-----------:|----------|
 | `<thread>`             | stdex::thread class and  supporting functions | 90%         | no       |
-| `<mutex>`              | mutual exclusion primitives                   | 90%         | no       |
-| `<future>`             | primitives for asynchronous computations      | no          | maybe    |
+| `<mutex>`              | mutual exclusion primitives                   | 100%        | yes      |
+| `<future>`             | primitives for asynchronous computations      | in progress | no       |
 | `<condition_variable>` | thread waiting conditions                     | 100%        | yes      |
+
 
 </details>
 
