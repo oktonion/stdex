@@ -91,6 +91,14 @@ namespace stdex
                 char _padding[8];
             };
 
+            struct _true_type {
+                static const bool value = true;
+            };
+
+            struct _false_type {
+                static const bool value = false;
+            };
+
             namespace _is_integral_constant_std_impl_ns
             {
                 class _is_integral_constant_std_impl_helper_type;
@@ -148,39 +156,39 @@ namespace stdex
             { };
 
             template<class _Tp>
-            struct _is_integral_constant:
-                _is_integral_constant_impl<_Tp, 
-                    _is_integral_constant_std_impl<unsigned short>::value == bool(true)
-                    && _is_integral_constant_std_impl<long>::value == bool(true)
-                    && _is_integral_constant_std_impl<signed char>::value == bool(true)
-            >
+            struct _is_integral_constant
             {
-
+                static const bool flag = 
+                    (_is_integral_constant_std_impl<unsigned short>::value == bool(true)
+                    && _is_integral_constant_std_impl<long>::value == bool(true)
+                    && _is_integral_constant_std_impl<signed char>::value == bool(true));
+                static const bool value = _is_integral_constant_impl<_Tp, flag>::value;
             };
 
             template<class _Tp>
             struct _is_integral_constant<_Tp&>
-            {
-                static const bool value = false;
-            };
+                : _false_type
+            { };
 
             template<class _Tp>
             struct _is_integral_constant<_Tp*>
-            {
-                static const bool value = false;
-            };
+                : _false_type
+            { };
 
             template<class _Tp, class _Cp>
             struct _is_integral_constant<_Tp _Cp::*>
-            {
-                static const bool value = false;
-            };
+                : _false_type
+            { };
 
             template<>
             struct _is_integral_constant<void>
-            {
-                static const bool value = false;
-            };
+                : _false_type
+            { };
+
+            template<>
+            struct _is_integral_constant<bool>
+                : _true_type
+            { };
 
             template<class _Tp>
             struct _is_signed
@@ -362,7 +370,7 @@ namespace stdex
         template<class _Unsigned, int _Size>
         struct _sized_integer_umax_impl
         {
-            char _sized_integer_umax_size_is_invalid_assert[_Size > 0 ? 1 : (sizeof(_Unsigned) / sizeof(_Unsigned) - 3)]; // should never ever happen!
+            char _sized_integer_umax_size_is_invalid_assert[_Size > 0 ? 1 : ((sizeof(_Unsigned) + 1) / sizeof(_Unsigned) - 3)]; // should never ever happen!
             static const _Unsigned umax_value = _Size > 0 ? (((_Unsigned(1) << (_Size - 1)) - 1) * _Unsigned(2) + _Unsigned(1)) : 0;
         };
 

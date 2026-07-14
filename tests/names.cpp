@@ -204,6 +204,10 @@
 #undef h
 #endif
 
+#ifdef _MSC_VER
+#undef L
+#endif
+
 #include "../stdex/include/core.h"
 #include "../stdex/include/algorithm.hpp"
 #include "../stdex/include/chrono.hpp"
