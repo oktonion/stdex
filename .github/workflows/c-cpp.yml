@@ -65,7 +65,7 @@ jobs:
           - os: ubuntu-22.04
             COMPILER: gcc
             LINKER: gcc
-            CPP_COMPILER: g++-3.4
+            CPP_COMPILER: g++-3.4 -U_FORTIFY_SOURCE
             LIBRARY_PATH: /usr/lib/x86_64-linux-gnu:$LIBRARY_PATH
             BUILD_LIB_SCRIPT: build_lib.sh
             BUILD_SCRIPT: build_tests.sh
@@ -91,7 +91,7 @@ jobs:
           - os: ubuntu-22.04
             COMPILER: gcc
             LINKER: gcc
-            CPP_COMPILER: g++-4.4
+            CPP_COMPILER: g++-4.4 -U_FORTIFY_SOURCE
             LIBRARY_PATH: $LIBRARY_PATH
             BUILD_LIB_SCRIPT: build_lib.sh
             BUILD_SCRIPT: build_tests.sh
