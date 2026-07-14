@@ -49,3 +49,5 @@ tests/bin/*
 stdex/obj/*
 *.log
 *.orig
+/build
+/tests/tmp
