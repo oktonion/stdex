@@ -510,7 +510,7 @@ namespace stdex
         template<class _Tp, bool _HasQuietNaN, bool _HasSignalingNaN>
         struct _not_a_number_impl
         {
-            static _Tp NaN() { return std::numeric_limits<_Tp>::quiet_NaN();}
+            static _Tp NaN() { typedef _Tp type; return type(); }
         };
 
         template<class _Tp>
@@ -520,9 +520,9 @@ namespace stdex
         };
 
         template<class _Tp>
-        struct _not_a_number_impl<_Tp, false, false>
+        struct _not_a_number_impl<_Tp, true, false>
         {
-            static _Tp NaN() { typedef _Tp type; return type(); }
+            static _Tp NaN() { return std::numeric_limits<_Tp>::quiet_NaN(); } 
         };
 
         template<class _Tp>
@@ -534,13 +534,13 @@ namespace stdex
         template<class _Tp, bool _HasInfinity>
         struct _infinity_impl
         {
-            static _Tp inf() { return std::numeric_limits<_Tp>::infinity(); }
+            static _Tp inf() { return _STDEX_NUMERIC_LIMITS_MAX(_Tp); }
         };
 
         template<class _Tp>
-        struct _infinity_impl<_Tp, false>
+        struct _infinity_impl<_Tp, true>
         {
-            static _Tp inf() { return _STDEX_NUMERIC_LIMITS_MAX(_Tp); }
+            static _Tp inf() { return std::numeric_limits<_Tp>::infinity(); } 
         };
 
         template<class _Tp>

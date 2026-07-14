@@ -5,10 +5,10 @@ tests_failed="unsuccessful tests:"
 exclude_warn=""
 
 if test -n "${COMPILER-}"; then
-	libname="libstdex-$COMPILER.a"
+	libname="stdex-$COMPILER"
 else
 	COMPILER=g++
-	libname="libstdex.a"
+	libname="stdex"
 fi
 
 if [[ $COMPILER = *"clang"* ]]; then

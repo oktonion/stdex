@@ -319,7 +319,7 @@ namespace stdex
         // copies a number of elements to a new location
         template<class _InputT, cstddef::size_t _InputSize, class _OutputIt>
         inline
-        _OutputIt copy_n(_InputT(&_first_arr)[_InputSize],
+        _OutputIt copy_n_carray(_InputT(&_first_arr)[_InputSize],
             typename detail::_copy_n_output_it_check<_OutputIt>::type _count, _OutputIt _result)
         {
             assert(_count <= _InputSize);
@@ -339,7 +339,7 @@ namespace stdex
         // copies a number of elements to a new location
         template<class _InputIt, class _OutputT, cstddef::size_t _OutputSize>
         inline
-        _OutputT* copy_n(_InputIt _first,
+        _OutputT* copy_n_carray(_InputIt _first,
             typename detail::_copy_n_input_it_check<_InputIt, _OutputT>::type _count, _OutputT(&_result_arr)[_OutputSize])
         {
             assert(_count <= _OutputSize);
@@ -362,7 +362,7 @@ namespace stdex
             class _OutputT, cstddef::size_t _OutputSize
         >
         inline
-        _OutputT* copy_n(_InputT(&_first_arr)[_InputSize],
+        _OutputT* copy_n_carray(_InputT(&_first_arr)[_InputSize],
             cstddef::size_t _count, _OutputT(&_result_arr)[_OutputSize])
         {
             assert(_count <= _OutputSize);

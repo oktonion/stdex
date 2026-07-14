@@ -10,7 +10,6 @@
 
 int test01()
 {
-  using namespace stdex;
   std::vector<int> c(3);
 
   DYNAMIC_VERIFY( (stdex::end(c) == c.end()) );

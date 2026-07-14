@@ -34,7 +34,9 @@
 
 // LWG 310     C++98     it is unspecified whether errno is a macro or an identifier with external linkage     errno must be macro
 #ifdef errno
-    #define _STDEX_NATIVE_CPP_98_SUPPORT
+    #ifndef _STDEX_NATIVE_CPP_98_SUPPORT
+        #define _STDEX_NATIVE_CPP_98_SUPPORT
+    #endif
 #endif
 
 #if !defined(_STDEX_NATIVE_CPP11_TYPES_SUPPORT)
@@ -119,7 +121,9 @@
     #define _STDEX_FASTCALL __fastcall
 
     #if (__cplusplus >= 199711L)
-        #define _STDEX_NATIVE_CPP_98_SUPPORT
+        #ifndef _STDEX_NATIVE_CPP_98_SUPPORT
+            #define _STDEX_NATIVE_CPP_98_SUPPORT
+        #endif
     #endif
 
 #endif
