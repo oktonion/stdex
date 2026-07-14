@@ -896,9 +896,9 @@ movable_only movable_only_return()
     return stdex::move(mv);
 }
 
-struct movable_only_with_deleted_icc:
-    stdex::detail::delete_implicit_copy_constructor
+struct movable_only_with_deleted_icc
 {
+    stdex::detail::delete_implicit_copy_constructor delete_implicit_copy_constructor;
     movable_only_with_deleted_icc():
         delete_implicit_copy_constructor(true)
     { }

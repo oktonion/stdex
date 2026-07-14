@@ -235,14 +235,15 @@ namespace stdex
     template<class _Lockbl>
     class unique_lock
     {
+        typedef void(*unspecified_bool_type)();
+        static void unspecified_bool_true() {}
+        
         typedef unique_lock<_Lockbl> self_type;
         STDEX_MOVABLE_BUT_NOT_COPYABLE(self_type)
 
         // this nonsense below added to satisfy bugged compilers 
         // that restrict access to private members of the  s a m e  templated class:
         template<class> friend class unique_lock; 
-        typedef void(*unspecified_bool_type)();
-        static void unspecified_bool_true() {}
     public:
         typedef _Lockbl mutex_type;
 
