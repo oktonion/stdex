@@ -93,7 +93,14 @@ int test02()
 {
     typedef stdex::function<stdex::remove_pointer<void(*)(int&, void*)>::type> function;
     typedef stdex::function<stdex::remove_pointer<void(*)(operations_counter&, void*)>::type> function_oc;
+    typedef stdex::function<stdex::remove_pointer<void(*)(void*)>::type> function_void_ptr;
     //typedef std::function<void(int&, void*)> function;
+
+    {
+        typedef stdex::detail::_arg_impl<int&, true>::value_type int_ref_type;
+        VERIFY(stdex::is_reference<int_ref_type>::value == true);
+        VERIFY(stdex::is_const<stdex::remove_reference<int_ref_type>::type>::value == false);
+    }
     struct lambdas
     {
         static void func0(operations_counter& a, void* ptr) {
@@ -109,6 +116,9 @@ int test02()
         static void func1(int& a, void* ptr) {
             a++;
             DYNAMIC_VERIFY_ABORT(ptr != nullptr);
+        }
+        static void func2(void* ptr) {
+            DYNAMIC_VERIFY_ABORT(ptr == nullptr);
         }
     };
 
@@ -142,6 +152,10 @@ int test02()
     f5(a, nullptr);
 
     DYNAMIC_VERIFY(a == 5);
+
+    function_void_ptr f6(&lambdas::func2);
+
+    f6(nullptr);
 
     return 0;
 }

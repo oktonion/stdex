@@ -351,14 +351,14 @@ namespace stdex
 
     template<class _Tp, class _ObjectT>
     inline
-    _Tp& invoke1(_Tp _ObjectT::* _data_member, _ObjectT& _obj)
+    _Tp& invoke(_Tp _ObjectT::* _data_member, _ObjectT& _obj)
     {
         return _obj.*_data_member;
     }
 
     template<class _Tp, class _ObjectT>
     inline
-    const _Tp& invoke1(const _Tp _ObjectT::* _data_member, const _ObjectT& _obj)
+    const _Tp& invoke(const _Tp _ObjectT::* _data_member, const _ObjectT& _obj)
     {
         return _obj.*_data_member;
     }
@@ -372,7 +372,7 @@ namespace stdex
 
     template<class _Tp, class _ObjectT>
     inline
-    _Tp& invoke1(_Tp _ObjectT::* _data_member, _ObjectT* _obj)
+    _Tp& invoke(_Tp _ObjectT::* _data_member, _ObjectT* _obj)
     {
         return (*_obj).*_data_member;
     }
@@ -802,14 +802,20 @@ namespace stdex
             _return_arg(const _return_arg& other):
                 _ptr(0)
             { 
-                using std::swap;
-                swap(other._ptr, _ptr);
+                {
+                    _R* _tmp = _ptr;
+                    _ptr = other._ptr;
+                    other._ptr = _tmp;
+                }
             }
 
             _return_arg& operator=(const _return_arg& other)
             {
-                using std::swap;
-                swap(other._ptr, _ptr);
+                {
+                    _R* _tmp = _ptr;
+                    _ptr = other._ptr;
+                    other._ptr = _tmp;
+                }
                 return *this;
             }
         };
@@ -1056,9 +1062,11 @@ namespace stdex
             struct _call_functor_impl<false, true, false>
                 : _call_functor_impl<false, false, false>
             {};
+        } // namespace functional_detail
+    } // namespace detail
 
-        }
-
+    namespace detail 
+    {
         template<class _Tp>
         struct _is_reference_wrapper
             : false_type {};
@@ -1093,11 +1101,11 @@ namespace stdex
             typedef
             typename
             functional_detail::_call_functor_impl< 
-                is_member_pointer<_FuncT>::value,
+                is_member_pointer<_FuncT>::value == bool(true),
                 is_function<_FuncT>::value == bool(true) || is_member_function_pointer<_FuncT>::value == bool(true),
                 _is_reference_wrapper<
                     typename _get_args_traits<_ArgsT, 0>::value_type
-                >::value
+                >::value == bool(true)
             >::type functor_type;
 
             args.call(fx, result 
@@ -1163,9 +1171,14 @@ namespace stdex
                 fx();
             }
         };
+        
+    } // namespace detail
+
+    namespace detail
+    {
 
 #define _STDEX_ARG_VALUE(arg_n) \
-    stdex::detail::_get_args_traits<base_type, arg_n + 1>::arg_type::value
+    (static_cast<typename stdex::detail::_get_args_traits<base_type, arg_n + 1>::arg_type&>(*this), nullptr)
 
 #define _STDEX_CALLABLE_ARGS(arg_n) \
         template<class _ArgsT, class _ArgT> \
@@ -1765,7 +1778,7 @@ namespace stdex
         class _reference_wrapper_impl
         {
             explicit _reference_wrapper_impl(_Tp& ref) _STDEX_NOEXCEPT_FUNCTION :
-                _ptr(addressof(ref))
+                _ptr(stdex::addressof(ref))
             { }
 
         protected:
@@ -1779,7 +1792,7 @@ namespace stdex
             typedef _R(type)();
 
             explicit _reference_wrapper_impl(type& ref) _STDEX_NOEXCEPT_FUNCTION :
-                _ptr(addressof(ref))
+                _ptr(stdex::addressof(ref))
             { }
 
         protected:
@@ -1801,7 +1814,7 @@ namespace stdex
         typedef _Tp type;
 
         explicit reference_wrapper(type &ref) _STDEX_NOEXCEPT_FUNCTION:
-            _ptr( addressof(ref) )
+            _ptr( stdex::addressof(ref) )
         { }
 
         operator _Tp&() const _STDEX_NOEXCEPT_FUNCTION {
@@ -2990,7 +3003,12 @@ private:
 
         template<class _R, class _ObjectT, int _N,
             _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, =void_type)>
-        struct _member_function_ptr_helper{};
+        struct _member_function_ptr_helper{
+            typedef void type;
+            typedef void type_const;
+            typedef void type_varg;
+            typedef void type_const_varg;
+        };
 
         template<class _R, class _ObjectT, _STDEX_TMPL_ARGS_MAX(_STDEX_BLANK, _STDEX_BLANK)>
         struct _member_function_ptr_helper<_R, _ObjectT, 0, _STDEX_TYPES_MAX(_STDEX_BLANK, _STDEX_BLANK)>

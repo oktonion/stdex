@@ -44,7 +44,40 @@ namespace stdex
             static const bool value =
                 sizeof(_rt_nullptr_can_be_ptr_checker(declnull())) == sizeof(_yes_type);
         };
+
+        namespace tuple_detail
+        {
+            struct _nullptr_t_as_class
+            {
+            public:
+                // Required in order to create const nullptr_t objects without an
+                // explicit initializer in GCC 4.5, a la:
+                //
+                // const std::nullptr_t nullptr;
+                _nullptr_t_as_class() {}
+                _nullptr_t_as_class(int) {}
+
+                // Make nullptr convertible to any pointer type.
+                template<class _Tp> operator _Tp* () const { return 0; }
+
+                bool operator==(_nullptr_t_as_class) const { return true; }
+                bool operator!=(_nullptr_t_as_class) const { return false; }
+            private:
+                // Do not allow taking the address of nullptr.
+                void operator&();
+
+
+
+                void* _padding;
+            };
+        } // namespace tuple_detail
+
     } // namespace detail
+
+    template<>
+    struct is_null_pointer<detail::tuple_detail::_nullptr_t_as_class> : true_type { };
+    template<>
+    struct is_null_pointer<const detail::tuple_detail::_nullptr_t_as_class> : true_type {};
 
     namespace intern
     {
@@ -54,9 +87,9 @@ namespace stdex
         template<>
         struct _has_feature<class _stdex_has_native_nullptr> :
             integral_constant<
-            bool,
-            detail::_rt_nullptr_can_be_ptr::value == bool(true) &&
-            is_class<stdex::nullptr_t>::value == bool(false)
+                bool,
+                detail::_rt_nullptr_can_be_ptr::value == bool(true) &&
+                is_class<stdex::nullptr_t>::value == bool(false)
             >
         { };
 
@@ -82,17 +115,24 @@ namespace stdex
         template<class _Tp>
         struct _nullptr_ref_arg_helper
         {
-            typedef _Tp type;
-        };
+            typedef typename remove_reference<_Tp>::type _Tp_rr;
 
-        template<>
-        struct _nullptr_ref_arg_helper<stdex::nullptr_t>
-        {
             typedef
+            typename
             conditional<
-                intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value,
+                intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value == bool(true)
+                || is_const<_Tp_rr>::value == bool(true),
                 const stdex::nullptr_t,
-                stdex::nullptr_t>::type type;
+                remove_const<stdex::nullptr_t>::type
+            >::type nullptr_type;
+
+            typedef
+            typename
+            conditional<
+                is_null_pointer<_Tp_rr>::value == bool(true),
+                nullptr_type,
+                _Tp
+            >::type type;
         };
 
         template<class _Tp, bool>
@@ -442,6 +482,35 @@ namespace stdex
         const _arg<_RArgT, _RArgN>& operator,(const _arg<_LArgT, _LArgN>&, const _arg<_RArgT, _RArgN>& value) { 
             return value; 
         }
+
+    } // namespace detail
+
+    namespace detail
+    {
+        template<class _ArgT, int _End>
+        inline
+        typename
+        remove_reference<
+            typename _arg<_ArgT, _End>::value_type
+        >::type& operator,(_arg<_ArgT, _End>& arg,
+            typename conditional<
+                intern::_has_feature<intern::_stdex_has_native_nullptr>::value == bool(false)
+                && intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value == bool(true)
+                && is_null_pointer<typename remove_reference<typename _arg<_ArgT, _End>::value_type>::type>::value == bool(true),
+                detail::void_type&, // bullshit class to disable operator
+                nullptr_t
+            >::type) { return arg.value; }
+
+        template<class _ArgT, int _End>
+        inline tuple_detail::_nullptr_t_as_class operator,(_arg<_ArgT, _End>&,
+            typename conditional<
+                intern::_has_feature<intern::_stdex_has_native_nullptr>::value == bool(false)
+                && intern::_has_bug<intern::_stdex_nullptr_cannot_be_passed_with_comma_bug>::value == bool(true)
+                && intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value == bool(true)
+                && is_null_pointer<typename remove_reference<typename _arg<_ArgT, _End>::value_type>::type>::value == bool(true),
+                nullptr_t,
+                detail::void_type& // bullshit class to disable operator
+            >::type) { return tuple_detail::_nullptr_t_as_class(); }
 
         template<class _ArgsT, class _ArgT, int _N>
         struct _args: _ArgsT, _arg<_ArgT, _N>

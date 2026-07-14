@@ -42,6 +42,15 @@ namespace stdex
 {
     namespace detail
     {
+
+        typedef 
+        integral_constant<
+            int, 
+            sizeof(void*) * 4> 
+        _thread_param_wrapper_max_type_size;
+
+        typedef unsigned char (&_thread_param_wrapper_pointer_buf_ref)[_thread_param_wrapper_max_type_size::value];
+
         template<class _Tp>
         struct _thread_param_wrapper
         {
@@ -76,12 +85,10 @@ namespace stdex
 
         private:
             typedef 
-            integral_constant<
-                int, 
-                sizeof(void*) * 4> 
+            _thread_param_wrapper_max_type_size
             max_type_size;
 
-            typedef unsigned char (&pointer_buf_ref)[max_type_size::value];
+            typedef _thread_param_wrapper_pointer_buf_ref pointer_buf_ref;
             typedef _Tp (*conversion_func)(pointer_buf_ref);
             typedef void (*deleter_func)(pointer_buf_ref);
 
@@ -107,7 +114,26 @@ namespace stdex
             deleter_func _delete_func;
             mutable unsigned char _pointer_buf[max_type_size::value];
         };
-    }
+
+        template<class _R, class _ObjectT>
+        struct _thread_ctor_traits {
+            typedef typename stdex::remove_pointer<typename stdex::remove_reference<_ObjectT>::type>::type object_type;
+            typedef _R(object_type::* function_type)();
+            typedef _R(object_type::* function_const_type)() const;
+            typedef _R return_type;
+        };
+
+        template<class _Tp, class>
+        struct _thread_lvalue_reference {
+            typedef typename stdex::add_lvalue_reference<typename stdex::decay<_Tp>::type>::type type;
+        };
+
+        template<class _Tp>
+        struct _thread_lvalue_reference<_Tp, false_type> {
+            typedef _Tp type;
+        };
+
+    } // namespace detail
 
     //! Thread class.
     class thread {
@@ -124,12 +150,13 @@ namespace stdex
         template<class _BindableT>
         static init_args call_bindable(const _BindableT& bindable)
         {
+            typedef _BindableT bindable_type;
             struct lambdas
             {
                 static void call(void *bindable_void)
                 {
-                    _BindableT &bindable = 
-                        *reinterpret_cast<_BindableT*>(bindable_void);
+                    bindable_type &bindable =
+                        *reinterpret_cast<bindable_type*>(bindable_void);
 
                     bindable();
 
@@ -234,44 +261,59 @@ namespace stdex
         { init(call_bindable(stdex::bind(_func))); }
 
         template<class _R, class _ObjectT>
-        explicit thread(_R(stdex::remove_pointer<typename stdex::remove_reference<_ObjectT>::type>::type::*_func)(), _ObjectT _obj)
+        explicit thread(typename detail::_thread_ctor_traits<_R, _ObjectT>::function_type _func, _ObjectT _obj)
             : _handle() 
         { init(call_bindable(stdex::bind(_func, _obj))); }
 
         template<class _R, class _ObjectT>
-        explicit thread(_R(stdex::remove_pointer<typename stdex::remove_reference<_ObjectT>::type>::type::*_func)() const, _ObjectT _obj)
+        explicit thread(typename detail::_thread_ctor_traits<_R, _ObjectT>::function_const_type _func, _ObjectT _obj)
             : _handle() 
         { init(call_bindable(stdex::bind(_func, _obj))); }
 
 #define _STDEX_THREAD_CONSTRUCTOR(count) \
+public:\
         template<class _FuncT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
-        thread(_FuncT _func, _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK) \
-                , typename stdex::enable_if< \
-                    intern::_has_feature<intern::_stdex_nullptr_implemented_as_distinct_type>::value == bool(true) || \
-                    stdex::is_union<_FuncT>::value == bool(true) || \
-                    stdex::is_class<_FuncT>::value == bool(true)>::type* = 0) \
+        thread(_FuncT _func, _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK)) \
             : _handle() \
+\
+        {\
+            typedef typename \
+            stdex::conditional< \
+                stdex::is_class<_FuncT>::value == bool(true) || \
+                stdex::is_enum<_FuncT>::value == bool(true), \
+                stdex::true_type, \
+                stdex::false_type \
+            >::type flag_type; \
+            ctor<typename detail::_thread_lvalue_reference<_FuncT, flag_type>::type, \
+                _STDEX_TYPES##count(typename detail::_thread_lvalue_reference<, _STDEX_DELIM_DEFAULT flag_type>::type)>\
+            (_func, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK), detail::functional_detail::_priority_tag<4>()); } \
+\
+private:\
+        template<class _FuncT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
+        inline void ctor(_FuncT _func, _STDEX_PARAMS##count(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK) \
+                , detail::functional_detail::_priority_tag<0>) \
         { init(call_bindable(stdex::bind(_func, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)))); } \
 \
         template<class _R, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
-        explicit thread(_R(*_func)( _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) ) \
-            , _STDEX_PARAMS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM, _STDEX_ARG_DEFAULT)) \
-            : _handle() \
+        inline void ctor(_R(*_func)( _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) ) \
+            , _STDEX_PARAMS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM, _STDEX_ARG_DEFAULT) \
+                , detail::functional_detail::_priority_tag<1>) \
         { init(call_bindable(stdex::bind(_func, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)))); } \
 \
         template<class _R, class _ObjectT, class _ArgObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
-        explicit thread(_R(_ObjectT::*_func)( _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) ) \
+        inline void ctor(_R(_ObjectT::*_func)( _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) ) \
             , _ArgObjectT _obj \
-            , _STDEX_PARAMS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM, _STDEX_ARG_DEFAULT)) \
-            : _handle() \
+            , _STDEX_PARAMS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM, _STDEX_ARG_DEFAULT) \
+                , detail::functional_detail::_priority_tag<2>) \
         { init(call_bindable(stdex::bind(_func, _obj, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)))); } \
 \
         template<class _R, class _ObjectT, class _ArgObjectT, _STDEX_TMPL_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)> \
-        explicit thread(_R(_ObjectT::*_func)( _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) ) const \
+        inline void ctor(_R(_ObjectT::*_func)( _STDEX_TYPES##count(_STDEX_BLANK, _STDEX_BLANK) ) const \
             , _ArgObjectT _obj \
-            , _STDEX_PARAMS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM, _STDEX_ARG_DEFAULT)) \
-            : _handle() \
-        { init(call_bindable(stdex::bind(_func, _obj, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)))); }
+            , _STDEX_PARAMS##count##_IMPL(_STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_BLANK, _STDEX_TYPE_CUSTOM, _STDEX_ARG_DEFAULT) \
+                , detail::functional_detail::_priority_tag<3>) \
+        { init(call_bindable(stdex::bind(_func, _obj, _STDEX_ARGS##count(_STDEX_BLANK, _STDEX_BLANK)))); }\
+public:
 
 #define _STDEX_TYPE_CUSTOM(count) \
     typename \

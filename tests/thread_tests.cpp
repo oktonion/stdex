@@ -736,11 +736,29 @@ int test10()
 }
 
 // hack to check for stdex version of nullptr passed to function
-template<bool Enabled = 
-    stdex::intern::_has_feature<stdex::intern::_stdex_nullptr_implemented_as_distinct_type>::value> 
-struct np_tests_impl
+template<
+    class,
+    bool nullptr_implemented_as_distinct_type,
+    bool nullptr_can_be_passed_with_comma
+> struct np_tests_impl
+{
+    static int test01() { return 0; }
+    static int test02() { return 0; }
+    static int test03() { return 0; }
+    static int test04() { return 0; }
+    static int test05() { return 0; }
+    static int test06() { return 0; }
+    static int test07() { return 0; }
+    static int test08() { return 0; }
+    static int test09() { return 0; }
+    static int test10() { return 0; }
+};
+
+template<class T>
+struct np_tests_impl<T, true, true>
 {
     typedef stdex::thread thread;
+
 
     static int test01()
     {
@@ -860,21 +878,12 @@ struct np_tests_impl
 #endif
 };
 
-template<>
-struct np_tests_impl<false>
-{
-    static int test01() { return 0; }
-    static int test02() { return 0; }
-    static int test03() { return 0; }
-    static int test04() { return 0; }
-    static int test05() { return 0; }
-    static int test06() { return 0; }
-    static int test07() { return 0; }
-    static int test08() { return 0; }
-    static int test09() { return 0; }
-    static int test10() { return 0; }
-};
-
+struct np_tests
+    : public np_tests_impl<int,
+        stdex::intern::_has_feature<stdex::intern::_stdex_nullptr_implemented_as_distinct_type>::value == bool(true),
+        stdex::intern::_has_bug<stdex::intern::_stdex_nullptr_cannot_be_passed_with_comma_bug>::value == bool(false)
+    >
+{ };
 
 
 stdex::chrono::milliseconds standard_sleep_for_accuracy()
@@ -992,7 +1001,7 @@ int main(void)
         RUN_TEST(test9);
         RUN_TEST(test10);
 
-        typedef np_tests_impl<> np_tests;
+
         RUN_TEST(np_tests::test01);
         RUN_TEST(np_tests::test02);
         RUN_TEST(np_tests::test03);
