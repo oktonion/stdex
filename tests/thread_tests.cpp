@@ -616,6 +616,47 @@ struct dummy_functor2
     }
 };
 
+struct lambdas
+{
+    static void call7_1(
+        int arg1, long arg2, std::ptrdiff_t arg3, short arg4,
+        unsigned int arg5, unsigned long arg6, unsigned short arg7)
+    {
+        DYNAMIC_VERIFY_ABORT(arg1 != 0);
+        DYNAMIC_VERIFY_ABORT(arg2 != 0);
+        DYNAMIC_VERIFY_ABORT(arg3 != 0);
+        DYNAMIC_VERIFY_ABORT(arg4 != 0);
+        DYNAMIC_VERIFY_ABORT(arg5 != 0);
+        DYNAMIC_VERIFY_ABORT(arg6 != 0);
+        DYNAMIC_VERIFY_ABORT(arg7 != 0);
+    }
+    static void call7_2(
+        int arg1, long arg2, std::ptrdiff_t arg3, short arg4,
+        unsigned int arg5, unsigned long arg6, unsigned short arg7)
+    {
+        DYNAMIC_VERIFY_ABORT(arg1 == 0);
+        DYNAMIC_VERIFY_ABORT(arg2 == 1);
+        DYNAMIC_VERIFY_ABORT(arg3 == 2);
+        DYNAMIC_VERIFY_ABORT(arg4 == 3);
+        DYNAMIC_VERIFY_ABORT(arg5 == 4);
+        DYNAMIC_VERIFY_ABORT(arg6 == 0);
+        DYNAMIC_VERIFY_ABORT(arg7 == 5);
+    }
+    static void call8(
+        int arg1, long arg2, std::ptrdiff_t arg3, short arg4,
+        unsigned int arg5, unsigned long arg6, unsigned short arg7, void* arg8)
+    {
+        DYNAMIC_VERIFY_ABORT(arg1 == 1);
+        DYNAMIC_VERIFY_ABORT(arg2 == 2);
+        DYNAMIC_VERIFY_ABORT(arg3 == 3);
+        DYNAMIC_VERIFY_ABORT(arg4 == 4);
+        DYNAMIC_VERIFY_ABORT(arg5 == 5);
+        DYNAMIC_VERIFY_ABORT(arg6 == 6);
+        DYNAMIC_VERIFY_ABORT(arg7 == 7);
+        DYNAMIC_VERIFY_ABORT(arg8);
+    }
+};
+
 int test10()
 {
     using namespace stdex;
@@ -667,65 +708,20 @@ int test10()
 
     // lambdas
     {
-        struct lambdas
-        {
-            static void call(
-                int arg1, long arg2, std::ptrdiff_t arg3, short arg4,
-                unsigned int arg5, unsigned long arg6, unsigned short arg7)
-            {
-                DYNAMIC_VERIFY_ABORT(arg1 != 0);
-                DYNAMIC_VERIFY_ABORT(arg2 != 0);
-                DYNAMIC_VERIFY_ABORT(arg3 != 0);
-                DYNAMIC_VERIFY_ABORT(arg4 != 0);
-                DYNAMIC_VERIFY_ABORT(arg5 != 0);
-                DYNAMIC_VERIFY_ABORT(arg6 != 0);
-                DYNAMIC_VERIFY_ABORT(arg7 != 0);
-            }
-        };
-        thread tt(&lambdas::call, 1, 2, 3, 4, 5, 6, 7);
+        
+        thread tt(&lambdas::call7_1, 1, 2, 3, 4, 5, 6, 7);
         tt.join();
     }
 
     {
-        struct lambdas
-        {
-            static void call(
-                int arg1, long arg2, std::ptrdiff_t arg3, short arg4,
-                unsigned int arg5, unsigned long arg6, unsigned short arg7)
-            {
-                DYNAMIC_VERIFY_ABORT(arg1 == 0);
-                DYNAMIC_VERIFY_ABORT(arg2 == 1);
-                DYNAMIC_VERIFY_ABORT(arg3 == 2);
-                DYNAMIC_VERIFY_ABORT(arg4 == 3);
-                DYNAMIC_VERIFY_ABORT(arg5 == 4);
-                DYNAMIC_VERIFY_ABORT(arg6 == 0);
-                DYNAMIC_VERIFY_ABORT(arg7 == 5);
-            }
-        };
-        thread tt(&lambdas::call, 0, 1, 2, 3, 4, 0, 5);
+        thread tt(&lambdas::call7_2, 0, 1, 2, 3, 4, 0, 5);
         tt.join();
     }
 
     {
-        struct lambdas
-        {
-            static void call(
-                int arg1, long arg2, std::ptrdiff_t arg3, short arg4,
-                unsigned int arg5, unsigned long arg6, unsigned short arg7, void *arg8)
-            {
-                DYNAMIC_VERIFY_ABORT(arg1 == 1);
-                DYNAMIC_VERIFY_ABORT(arg2 == 2);
-                DYNAMIC_VERIFY_ABORT(arg3 == 3);
-                DYNAMIC_VERIFY_ABORT(arg4 == 4);
-                DYNAMIC_VERIFY_ABORT(arg5 == 5);
-                DYNAMIC_VERIFY_ABORT(arg6 == 6);
-                DYNAMIC_VERIFY_ABORT(arg7 == 7);
-                DYNAMIC_VERIFY_ABORT(arg8);
-            }
-        };
         char wild_ptr[1];
         thread tt(
-            &lambdas::call, 
+            &lambdas::call8, 
             int(1), long(2), 
             std::ptrdiff_t(3), 
             short(4), 

@@ -49,3 +49,4 @@ tests/bin/*
 stdex/obj/*
 *.log
 *.$ln
+*.orig

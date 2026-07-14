@@ -167,7 +167,7 @@ namespace stdex
                 return *this;
             }
 
-            void swap(id &other) { id_type tmp = _uid; _uid = other._uid; other._uid = tmp; }
+            void swap(id &other) { id_type tmp_v = _uid; _uid = other._uid; other._uid = tmp_v; }
 
             bool operator==(const id &other) const _STDEX_NOEXCEPT_FUNCTION
             {
@@ -217,7 +217,8 @@ namespace stdex
 
         private:
             friend class thread;
-            id_type _uid;
+            mutable id_type _uid;
+            void invalidate() const;
         };
 
         //! Default constructor.

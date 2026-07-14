@@ -420,7 +420,7 @@ namespace stdex
         // returns an iterator to the beginning of a container or array 
         template<class _Tp, cstddef::size_t Size>
         inline
-        _Tp* begin(_Tp(&value)[Size]) _STDEX_NOEXCEPT_FUNCTION
+        _Tp* begin_carray(_Tp(&value)[Size]) _STDEX_NOEXCEPT_FUNCTION
         {    // get beginning of array
             return (value);
         }
@@ -429,7 +429,7 @@ namespace stdex
         // returns an iterator to the beginning of a container or array 
         template<class _Tp, cstddef::size_t Size>
         inline
-        const _Tp* begin(const _Tp(&value)[Size]) _STDEX_NOEXCEPT_FUNCTION
+        const _Tp* begin_carray(const _Tp(&value)[Size]) _STDEX_NOEXCEPT_FUNCTION
         {    // get beginning of array
             return (value);
         }
@@ -456,7 +456,7 @@ namespace stdex
         // returns an iterator to the end of a container or array 
         template<class _Tp, cstddef::size_t Size>
         inline
-        _Tp* end(_Tp(&value)[Size]) _STDEX_NOEXCEPT_FUNCTION
+        _Tp* end_carray(_Tp(&value)[Size]) _STDEX_NOEXCEPT_FUNCTION
         {    // get end of array
             return (value + Size);
         }
@@ -465,7 +465,7 @@ namespace stdex
         // returns an iterator to the end of a container or array 
         template<class _Tp, cstddef::size_t Size>
         inline
-        const _Tp* end(const _Tp(&value)[Size]) _STDEX_NOEXCEPT_FUNCTION
+        const _Tp* end_carray(const _Tp(&value)[Size]) _STDEX_NOEXCEPT_FUNCTION
         {    // get end of array
             return (value + Size);
         }
