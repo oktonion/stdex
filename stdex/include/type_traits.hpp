@@ -3359,8 +3359,8 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
 
 
         template<class _Tp, class _U, class _CommonT
-            , const int _Dummy [1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))] =
-                &integral_constant<int, 0>::value
+            , const int (*_Dummy) [1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))] =
+                0
         >
         struct _common_other_type_impl1_any_value1 {
             _common_other_type_impl1_any_value1(
