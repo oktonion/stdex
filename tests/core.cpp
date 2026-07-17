@@ -30,7 +30,8 @@ int main(void)
     volatile void *ptr = nullptr; ((void)(ptr)); 
     DYNAMIC_VERIFY((nullptr == nullptr));
     DYNAMIC_VERIFY(!(nullptr != nullptr));
-    STATIC_ASSERT(0 == nullptr && nullptr == 0, nullptr_should_be_equal_zero);
+    DYNAMIC_VERIFY(0 == nullptr);
+    DYNAMIC_VERIFY(nullptr == 0);
     //STATIC_ASSERT(!(nullptr > nullptr), nullptr_should_not_be_more_than_itself);
     //STATIC_ASSERT(!(nullptr < nullptr), nullptr_should_not_be_less_than_itself);
     //STATIC_ASSERT(nullptr >= nullptr, nullptr_should_more_equal_than_itself);

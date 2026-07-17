@@ -11,6 +11,7 @@
     #include <sstream> // + <__mutex_base>
     #include <string>
     #include <map>
+    #include <iomanip> 
 #elif defined(_MSC_VER) // vstudio 
     #include <string>
     #include <cmath>
