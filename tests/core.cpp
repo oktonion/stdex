@@ -1,6 +1,10 @@
 #define forever while(1)
 #include "../stdex/include/core.h"
 
+#include <iostream>
+#define DYNAMIC_VERIFY(cond) if(!(cond)) {std::cout << "check condition \'" << #cond << "\' failed at line " << __LINE__ << std::endl; return __LINE__;}
+
+
 struct Test
 {
     typedef char(Test::*mfunc_ptr_type)(int, int, int);
@@ -24,9 +28,10 @@ int main(void)
 
     // nullptr checks:
     volatile void *ptr = nullptr; ((void)(ptr)); 
-    STATIC_ASSERT((nullptr == nullptr), nullptr_should_be_equal_itself);
-    STATIC_ASSERT(!(nullptr != nullptr), nullptr_should_be_equal_itself);
-    STATIC_ASSERT(0 == nullptr && nullptr == 0, nullptr_should_be_equal_zero);
+    DYNAMIC_VERIFY((nullptr == nullptr));
+    DYNAMIC_VERIFY(!(nullptr != nullptr));
+    DYNAMIC_VERIFY(0 == nullptr);
+    DYNAMIC_VERIFY(nullptr == 0);
     //STATIC_ASSERT(!(nullptr > nullptr), nullptr_should_not_be_more_than_itself);
     //STATIC_ASSERT(!(nullptr < nullptr), nullptr_should_not_be_less_than_itself);
     //STATIC_ASSERT(nullptr >= nullptr, nullptr_should_more_equal_than_itself);

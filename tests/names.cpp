@@ -10,6 +10,8 @@
     #include <algorithm> // + <stdexcept>
     #include <sstream> // + <__mutex_base>
     #include <string>
+    #include <map>
+    #include <iomanip> 
 #elif defined(_MSC_VER) // vstudio 
     #include <string>
     #include <cmath>
@@ -206,6 +208,13 @@
 
 #ifdef _MSC_VER
 #undef L
+#endif
+
+#ifdef __APPLE__
+#undef X
+#undef Y
+#undef x
+#undef y
 #endif
 
 #include "../stdex/include/core.h"
