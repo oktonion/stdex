@@ -3371,16 +3371,14 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
             ) {}
         };
 
-        template<class _Tp, class _U>
-        struct _common_other_type_impl1_any_value2_sizeof {
-            enum {value = 
-                1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))
-            };
+        template<class _Tp, class _U, class _CommonT>
+        struct _common_other_type_impl1_any_value2_size {
+            const _CommonT _DummyArr [1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))];
         };
 
         template<class _Tp, class _U, class _CommonT
             , class _Dummy = 
-                _CommonT[_common_other_type_impl1_any_value2_sizeof<_Tp, _U>::value]
+                _CommonT[ sizeof (_common_other_type_impl1_any_value2_size<_Tp, _U, _CommonT>) ]
         >
         struct _common_other_type_impl1_any_value2 {
             _common_other_type_impl1_any_value2(
