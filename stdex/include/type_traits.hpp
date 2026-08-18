@@ -3372,9 +3372,8 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         };
 
         template<class _Tp, class _U, class _CommonT
-            , int Size = 1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))
             , class _Dummy = 
-                _CommonT[Size]
+                _CommonT[1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))]
         >
         struct _common_other_type_impl1_any_value2 {
             _common_other_type_impl1_any_value2(
