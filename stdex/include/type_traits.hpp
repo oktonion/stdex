@@ -3371,10 +3371,16 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
             ) {}
         };
 
+        template<class _Tp, class _U>
+        struct _common_other_type_impl1_any_value2_sizeof {
+            enum {value = 
+                1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))
+            };
+        };
+
         template<class _Tp, class _U, class _CommonT
-            , int Size = 1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))
             , class _Dummy = 
-                _CommonT[Size]
+                _CommonT[_common_other_type_impl1_any_value2_sizeof<_Tp, _U>::value]
         >
         struct _common_other_type_impl1_any_value2 {
             _common_other_type_impl1_any_value2(
@@ -3508,30 +3514,30 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
             typedef 
             typename add_pointer<_U>::type _U_pointer;
 
-            enum { _Tp_is_implicit_common_type =
+            static const bool _Tp_is_implicit_common_type =
                 sizeof(_common_other_type_impl1_std_tester2<_Tp, _U, _Tp>(_common_other_type_priority_tag<3>(), _declval<_Tp_pointer>())) ==
-                sizeof(_yes_type)};
+                sizeof(_yes_type);
 
-            enum { _U_is_implicit_common_type =
+            static const bool _U_is_implicit_common_type =
                 sizeof(_common_other_type_impl1_std_tester2<_U, _Tp, _U>(_common_other_type_priority_tag<3>(), _declval<_U_pointer>())) ==
-                sizeof(_yes_type)};
+                sizeof(_yes_type);
 
-            enum { _Tp_is_explicit_common_type =
+            static const bool _Tp_is_explicit_common_type =
                 sizeof(_common_other_type_impl1_std_tester2<_Tp, _U, _Tp>(_common_other_type_priority_tag<3>(), _declval<_U_pointer>())) ==
-                sizeof(_yes_type)};
+                sizeof(_yes_type);
 
-            enum { _U_is_explicit_common_type =
+            static const bool _U_is_explicit_common_type =
                 sizeof(_common_other_type_impl1_std_tester2<_U, _Tp, _U>(_common_other_type_priority_tag<3>(), _declval<_Tp_pointer>())) ==
-                sizeof(_yes_type)};
+                sizeof(_yes_type);
 
             
             static const int _Tp_is_common_type_score =
-                (_common_other_type_impl1_std2::_Tp_is_explicit_common_type == 1 ? 2 : 0) +
-                (_common_other_type_impl1_std2::_Tp_is_implicit_common_type == 1 ? 1 : 0);
+                (_common_other_type_impl1_std2::_Tp_is_explicit_common_type == bool(true) ? 2 : 0) +
+                (_common_other_type_impl1_std2::_Tp_is_implicit_common_type == bool(true) ? 1 : 0);
 
             static const int _U_is_common_type_score =
-                (_common_other_type_impl1_std2::_U_is_explicit_common_type == 1 ? 2 : 0) +
-                (_common_other_type_impl1_std2::_U_is_implicit_common_type == 1 ? 1 : 0);
+                (_common_other_type_impl1_std2::_U_is_explicit_common_type == bool(true) ? 2 : 0) +
+                (_common_other_type_impl1_std2::_U_is_implicit_common_type == bool(true) ? 1 : 0);
 
             typedef
             _common_other_type_impl_std_chooser<
