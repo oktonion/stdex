@@ -3371,9 +3371,17 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
             ) {}
         };
 
+        template<class _Tp>
+        struct _common_other_type_any_value_declval {
+            static _Tp value;
+        };
+
+        template<class _Tp>
+        _Tp _common_other_type_any_value_declval<_Tp>::value;
+
         template<class _Tp, class _U, class _CommonT
             , class _Dummy = 
-                _CommonT[1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))]
+                _CommonT[1 + sizeof( false ? ( (_common_other_type_any_value_declval<_U>::value) ) : ( (_common_other_type_any_value_declval<_Tp>::value) ) ) / sizeof(false ? ( (_common_other_type_any_value_declval<_Tp>::value) ) : ( (_common_other_type_any_value_declval<_U>::value) ))]
         >
         struct _common_other_type_impl1_any_value2 {
             _common_other_type_impl1_any_value2(
