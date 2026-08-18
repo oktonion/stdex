@@ -2232,8 +2232,10 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
 
     namespace detail
     {
+        namespace {
         template<class _Tp>
-        _Tp _declval();
+        static _Tp _declval();
+        }
 
         typedef remove_cv<nullptr_t>::type _nullptr_t_clear;
 
@@ -3359,12 +3361,13 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
 
 
         template<class _Tp, class _U, class _CommonT
-            , const int _Dummy [1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))] =
-                &integral_constant<int, 0>::value
+            , const int (*_DummyArr) [1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))] =
+                0
         >
         struct _common_other_type_impl1_any_value1 {
+            typedef _CommonT(_Dummy)[1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))];
             _common_other_type_impl1_any_value1(
-                _CommonT[1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))]
+                _Dummy
             ) {}
         };
 
@@ -3394,25 +3397,27 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         template<>
         struct _common_other_type_priority_tag<0> {};
 
+        namespace {
         template<class _Tp, class _U, class _CommonT>
-        _yes_type _common_other_type_impl1_std_tester1(_common_other_type_priority_tag<2>, _common_other_type_impl1_any_value1<_Tp, _U, _CommonT>);
+        static _yes_type _common_other_type_impl1_std_tester1(_common_other_type_priority_tag<2>, _common_other_type_impl1_any_value1<_Tp, _U, _CommonT>);
         template<class _Tp, class _U, class _CommonT>
-        _no_type  _common_other_type_impl1_std_tester1(_common_other_type_priority_tag<1>, _common_other_type_any_value); // fallback
+        static _no_type  _common_other_type_impl1_std_tester1(_common_other_type_priority_tag<1>, _common_other_type_any_value); // fallback
         template<class _Tp, class _U, class _CommonT>
-        _no_type  _common_other_type_impl1_std_tester1(_common_other_type_priority_tag<0>, ...); // fallback
+        static _no_type  _common_other_type_impl1_std_tester1(_common_other_type_priority_tag<0>, ...); // fallback
         template<class _Tp, class _U, class _CommonT>
-        _yes_type _common_other_type_impl1_std_tester2(_common_other_type_priority_tag<2>, _common_other_type_impl1_any_value2<_Tp, _U, _CommonT>);
+        static _yes_type _common_other_type_impl1_std_tester2(_common_other_type_priority_tag<2>, _common_other_type_impl1_any_value2<_Tp, _U, _CommonT>);
         template<class _Tp, class _U, class _CommonT>
-        _no_type  _common_other_type_impl1_std_tester2(_common_other_type_priority_tag<1>, _common_other_type_any_value); // fallback
+        static _no_type  _common_other_type_impl1_std_tester2(_common_other_type_priority_tag<1>, _common_other_type_any_value); // fallback
         template<class _Tp, class _U, class _CommonT>
-        _no_type  _common_other_type_impl1_std_tester2(_common_other_type_priority_tag<0>, ...); // fallback
+        static _no_type  _common_other_type_impl1_std_tester2(_common_other_type_priority_tag<0>, ...); // fallback
 
         template<class _Tp>
-        _yes_type _common_other_type_impl2_std_tester(_common_other_type_priority_tag<2>, _common_other_type_impl2_any_value<_Tp>);
+        static _yes_type _common_other_type_impl2_std_tester(_common_other_type_priority_tag<2>, _common_other_type_impl2_any_value<_Tp>);
         template<class _Tp>
-        _no_type  _common_other_type_impl2_std_tester(_common_other_type_priority_tag<1>, _common_other_type_any_value); // fallback
+        static _no_type  _common_other_type_impl2_std_tester(_common_other_type_priority_tag<1>, _common_other_type_any_value); // fallback
         template<class _Tp>
-        _no_type  _common_other_type_impl2_std_tester(_common_other_type_priority_tag<0>, ...); // fallback
+        static _no_type  _common_other_type_impl2_std_tester(_common_other_type_priority_tag<0>, ...); // fallback
+        }
 
         template<class _Tp, class _U, 
             int _Tp_is_common_type_score, int _U_is_common_type_score>
