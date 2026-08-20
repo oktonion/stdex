@@ -311,7 +311,11 @@ namespace stdex
         condition_variable& operator=(const condition_variable&) _STDEX_DELETED_FUNCTION;
     };
 
-    void notify_all_at_thread_exit(condition_variable &cond, unique_lock<mutex> &lk); 
+#   if defined(_STDEX_MOVE_H)
+    void notify_all_at_thread_exit(condition_variable& cond, unique_lock<mutex> lk);
+#   else
+    void notify_all_at_thread_exit(condition_variable& cond, unique_lock<mutex>& lk);
+#   endif
 } // namespace stdex
 
 #undef _STDEX_DELETED_FUNCTION
