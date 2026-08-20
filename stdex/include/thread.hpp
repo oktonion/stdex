@@ -1846,8 +1846,7 @@ namespace stdex
 
         private:
             friend class thread;
-            mutable id_type _uid;
-            void invalidate() const;
+            id_type _uid;
         };
 
         //! Default constructor.
@@ -1987,9 +1986,6 @@ namespace stdex
         //thread(thread&) _STDEX_DELETED_FUNCTION;
         thread(const thread&) _STDEX_DELETED_FUNCTION;
         thread& operator=(const thread&) _STDEX_DELETED_FUNCTION;
-
-        // This is the internal thread wrapper function.
-        static void* wrapper_function(void *aArg);
     };
 
     namespace detail
@@ -2075,8 +2071,6 @@ namespace stdex
         }
     }
 } // namespace stdex
-
-
 
 namespace
 {
