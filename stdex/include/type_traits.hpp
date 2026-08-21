@@ -3596,9 +3596,9 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         };
         
         template<class _Tp>
-        static _yes_type _stdex_could_convert_pointer_to_array_types_tester(_Tp[sizeof(_Tp) / sizeof(_Tp)]);
+        static _yes_type _stdex_could_convert_pointer_to_array_type_tester(_Tp[sizeof(_Tp) / sizeof(_Tp)]);
         template<class _Tp>
-        static _no_type _stdex_could_convert_pointer_to_array_types_tester(...);
+        static _no_type _stdex_could_convert_pointer_to_array_type_tester(...);
 
     } // namespace detail
 
@@ -3608,10 +3608,10 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         struct _has_feature;
 
         template<>
-        struct _has_feature<class _stdex_could_convert_pointer_to_array_types>
+        struct _has_feature<class _stdex_could_convert_pointer_to_array_type>
         {
             static const bool value = 
-                sizeof( detail::_stdex_could_convert_pointer_to_array_types_tester<int>(&integral_constant<int, 0>::value) )
+                sizeof( detail::_stdex_could_convert_pointer_to_array_type_tester<int>(&integral_constant<int, 0>::value) )
                 ==
                 sizeof( detail::_yes_type );
         };
@@ -3622,28 +3622,27 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         struct _common_other_type_parent_class {};
         struct _common_other_type_child_class: public _common_other_type_parent_class {};
         template<class _ParentT, class _ChildT, bool>
-        struct _common_other_type_std_tester1_works
-            : is_same<
-                _common_other_type_impl1_std1<
-                    _ParentT,
-                    _ChildT
-                >::impl::_common_type, _ParentT
-            >
-        { };
+        struct _common_other_type_std_tester1_works_impl
+        { 
+            typedef typename _common_other_type_impl1_std1< _ParentT, _ChildT >::impl impl;
+            typedef is_same< typename impl::_common_type, _ParentT > type;
+        };
         template<class _ParentT, class _ChildT, bool>
-        struct _common_other_type_std_tester1_works<_ParentT, _ChildT, false> 
-            : false_type
-        { };
-        typedef  _common_other_type_std_tester1_works;
+        struct _common_other_type_std_tester1_works_impl<_ParentT, _ChildT, false>
+        { 
+            typedef false_type type;
+        };
+        typedef  
+        _common_other_type_std_tester1_works_impl<
+            _common_other_type_parent_class, 
+            _common_other_type_child_class,
+            intern::_has_feature<intern::_stdex_could_convert_pointer_to_array_type>::value
+        >::type _common_other_type_std_tester1_works;
 
         template<class _Tp, class _U, bool>
         struct _common_other_type_impl_std
             : _common_other_type_impl1_std<_Tp, _U, 
-                    _common_other_type_std_tester1_works<
-                        _common_other_type_parent_class, 
-                        _common_other_type_child_class,
-                        intern::_has_feature<intern::_stdex_could_convert_pointer_to_array_types>::value
-                    >::value == bool(true)
+                    _common_other_type_std_tester1_works::value == bool(true)
               >
         { };
 
