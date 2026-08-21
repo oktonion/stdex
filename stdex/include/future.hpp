@@ -34,6 +34,15 @@
 
 #endif
 
+// library implementation details declaration
+namespace stdex
+{
+    namespace detail
+    {
+        void _notify_all_at_thread_exit(condition_variable&, unique_lock<mutex>&);
+    }
+}
+
 namespace stdex
 {
     namespace detail
@@ -806,7 +815,7 @@ namespace stdex
             // TRANSITION, ABI: This is virtual, but never overridden.
             _has_stored_result = true;
             if (_at_thread_exit) { // notify at thread exit
-                notify_all_at_thread_exit(_condition, *lock);
+                detail::_notify_all_at_thread_exit(_condition, *lock); // lock will be invalidated
             } else { // notify immediately
                 _ready = true;
                 _condition.notify_all();
