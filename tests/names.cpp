@@ -208,6 +208,7 @@
 
 #ifdef _MSC_VER
 #undef L
+#undef h
 #endif
 
 #ifdef __APPLE__
