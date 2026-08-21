@@ -3378,7 +3378,7 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
                 sizeof( false ? ( (_common_other_type_any_value_declval<_U>::value) ) : ( (_common_other_type_any_value_declval<_Tp>::value) ) ) / 
                 sizeof( false ? ( (_common_other_type_any_value_declval<_Tp>::value) ) : ( (_common_other_type_any_value_declval<_U>::value) ) )
 #               endif
-            ] = &integral_constant<int, 0>::value
+            - 1] = &integral_constant<int, 0>::value
         >
         struct _common_other_type_impl1_any_value1 {
             _common_other_type_impl1_any_value1(
@@ -3395,7 +3395,7 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
                 sizeof( false ? ( (_common_other_type_any_value_declval<_U>::value) ) : ( (_common_other_type_any_value_declval<_Tp>::value) ) ) / 
                 sizeof( false ? ( (_common_other_type_any_value_declval<_Tp>::value) ) : ( (_common_other_type_any_value_declval<_U>::value) ) )
 #               endif
-                ]
+                - 1]
         >
         struct _common_other_type_impl1_any_value2 {
             _common_other_type_impl1_any_value2(
