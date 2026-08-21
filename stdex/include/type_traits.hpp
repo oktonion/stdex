@@ -3596,7 +3596,7 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         };
         
         template<class _Tp>
-        static _yes_type _stdex_could_convert_pointer_to_array_type_tester(_Tp[sizeof(_Tp) / sizeof(_Tp)]);
+        static _yes_type _stdex_could_convert_pointer_to_array_type_tester(const _Tp[sizeof(_Tp) / sizeof(_Tp)]);
         template<class _Tp>
         static _no_type _stdex_could_convert_pointer_to_array_type_tester(...);
 
