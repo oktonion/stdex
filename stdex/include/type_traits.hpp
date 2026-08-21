@@ -3627,7 +3627,7 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
             typedef typename _common_other_type_impl1_std1< _ParentT, _ChildT >::impl impl;
             typedef is_same< typename impl::_common_type, _ParentT > type;
         };
-        template<class _ParentT, class _ChildT, bool>
+        template<class _ParentT, class _ChildT>
         struct _common_other_type_std_tester1_works_impl<_ParentT, _ChildT, false>
         { 
             typedef false_type type;
