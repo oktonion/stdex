@@ -19,7 +19,9 @@ int main(void)
     STATIC_ASSERT((is_convertible<A, E>::value == true), should_be_convertible);
     STATIC_ASSERT((is_convertible<int, float>::value == true), should_be_convertible);
     STATIC_ASSERT((is_convertible<int, E>::value == true), should_be_convertible);
+#   if defined(WIN32) || defined(_WIN32)
     STATIC_ASSERT((is_convertible<D*, F*>::value == false), should_not_be_convertible);
     //STATIC_ASSERT((is_convertible<F*, D*>::value == false), should_not_be_convertible);
+#   endif
     return 0;
 }

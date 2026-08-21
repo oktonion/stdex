@@ -639,6 +639,9 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         template<class>
         struct _has_bug;
 
+        template<class>
+        struct _has_feature;
+
         template<>
         struct _has_bug<class _stdex_array_can_not_be_const>
         {
@@ -2729,21 +2732,43 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
             typedef type _common_type;
         };
 
+        template<class _Tp>
+        struct _common_other_type_any_value_declval {
+            static _Tp value;
+        };
+
+        template<class _Tp>
+        _Tp _common_other_type_any_value_declval<_Tp>::value;
 
         template<class _Tp, class _U, class _CommonT
-            , const int (*_DummyArr) [1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))] =
-                0
+            , const int 
+#           if defined(_MSC_VER) // since GCC has internal bug with Itanium mangling for 'sizeof(callable_arg)' and MSVS is bugged beyond infinity this has to be done:
+            (*_Dummy)[1 +
+                sizeof( false ? ( (_common_other_type_any_value_declval<_U>::value) ) : ( (_common_other_type_any_value_declval<_Tp>::value) ) ) / 
+                sizeof( false ? ( (_common_other_type_any_value_declval<_Tp>::value) ) : ( (_common_other_type_any_value_declval<_U>::value) ) )
+            - 1] = 0
+#           else
+            _Dummy[1 +
+                sizeof( false ? ((_declval<_U>())) : ((_declval<_Tp>())) ) / sizeof( false ? ((_declval<_Tp>())) : ((_declval<_U>())) )
+            - 1] = &integral_constant<int, 0>::value
+#           endif
         >
         struct _common_other_type_impl1_any_value1 {
-            typedef _CommonT(_Dummy)[1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))];
             _common_other_type_impl1_any_value1(
-                _Dummy
+                typename add_pointer<_CommonT>::type
             ) {}
         };
 
         template<class _Tp, class _U, class _CommonT
             , class _Dummy = 
-                _CommonT[1 + sizeof( false ? ( (_declval<_U>()) ) : ( (_declval<_Tp>()) ) ) / sizeof(false ? ( (_declval<_Tp>()) ) : ( (_declval<_U>()) ))]
+                _CommonT[1 + 
+#               if defined(_MSC_VER) // since GCC has internal bug with Itanium mangling for sizeof(callable_arg) and MSVS is bugged beyond infinity this has to be done:
+                sizeof( false ? ((_declval<_U>())) : ((_declval<_Tp>())) ) / sizeof( false ? ((_declval<_Tp>())) : ((_declval<_U>())) )
+#               else
+                sizeof( false ? ( (_common_other_type_any_value_declval<_U>::value) ) : ( (_common_other_type_any_value_declval<_Tp>::value) ) ) / 
+                sizeof( false ? ( (_common_other_type_any_value_declval<_Tp>::value) ) : ( (_common_other_type_any_value_declval<_U>::value) ) )
+#               endif
+                - 1]
         >
         struct _common_other_type_impl1_any_value2 {
             _common_other_type_impl1_any_value2(
@@ -2942,19 +2967,56 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
                 _common_other_type_impl2_std::_U_is_common_type
             > impl;
         };
+        
+        template<class _Tp>
+        static _yes_type _stdex_could_convert_pointer_to_array_type_tester(const _Tp[sizeof(_Tp) / sizeof(_Tp)]);
+        template<class _Tp>
+        static _no_type _stdex_could_convert_pointer_to_array_type_tester(...);
 
+    } // namespace detail
+
+    namespace intern
+    {
+        template<class>
+        struct _has_feature;
+
+        template<>
+        struct _has_feature<class _stdex_could_convert_pointer_to_array_type>
+        {
+            static const bool value = 
+                sizeof( detail::_stdex_could_convert_pointer_to_array_type_tester<int>(&integral_constant<int, 0>::value) )
+                ==
+                sizeof( detail::_yes_type );
+        };
+    } // namespace internal
+
+    namespace detail 
+    {
         struct _common_other_type_parent_class {};
         struct _common_other_type_child_class: public _common_other_type_parent_class {};
-        typedef is_same<
-            _common_other_type_impl1_std1<
-                _common_other_type_parent_class,
-                _common_other_type_child_class
-            >::impl::_common_type, _common_other_type_parent_class
-        > _common_other_type_std_tester1_works;
+        template<class _ParentT, class _ChildT, bool>
+        struct _common_other_type_std_tester1_works_impl
+        { 
+            typedef typename _common_other_type_impl1_std1< _ParentT, _ChildT >::impl impl;
+            typedef is_same< typename impl::_common_type, _ParentT > type;
+        };
+        template<class _ParentT, class _ChildT>
+        struct _common_other_type_std_tester1_works_impl<_ParentT, _ChildT, false>
+        { 
+            typedef false_type type;
+        };
+        typedef  
+        _common_other_type_std_tester1_works_impl<
+            _common_other_type_parent_class, 
+            _common_other_type_child_class,
+            intern::_has_feature<intern::_stdex_could_convert_pointer_to_array_type>::value
+        >::type _common_other_type_std_tester1_works;
 
         template<class _Tp, class _U, bool>
         struct _common_other_type_impl_std
-            : _common_other_type_impl1_std<_Tp, _U, _common_other_type_std_tester1_works::value>
+            : _common_other_type_impl1_std<_Tp, _U, 
+                    _common_other_type_std_tester1_works::value == bool(true)
+              >
         { };
 
         template<class _Tp, class _U>

@@ -207,6 +207,22 @@ static void _pthread_t_ID(const eThreadIDOperation operation, thread_id_access::
     // shared section end
 }
 
+static bool _pthread_is_dead_or_detached(pthread_t thread)
+{
+    const int err = pthread_kill(thread, 0); // signal is zero so error checking is performed but no signal is actually sent
+
+    enum {
+        _STDEX_PTHREAD_KILL_EINVAL
+#   ifdef EINVAL
+        = EINVAL
+#   endif
+    };
+
+    if (0 != err && _STDEX_PTHREAD_KILL_EINVAL != err) // if we get ESRCH (!0 && !EINVAL) value it might be the case that thread is dead or detached
+        return true;
+    return false;
+}
+
 using namespace stdex;
 
 /// Information to pass to the new thread (what to run).
@@ -217,7 +233,7 @@ struct thread_start_info {
     stdex::mutex *mtx;
     stdex::condition_variable *cond;
     bool *notified;
-    stdex::thread::id *id;
+    thread_id_access::id_type *uid;
 };
 
 
@@ -226,23 +242,23 @@ struct thread_notification_data {
     typedef std::vector<std::pair<condition_variable*, mutex*>
     > notify_list_t;
 
-    notify_list_t notify;
-    mutex sync;
+    notify_list_t notify; // thread local
+    //mutex sync;
 
-    void notify_all_at_thread_exit(condition_variable* cv, mutex* m)
+    void notify_all_at_thread_exit(condition_variable* cv, mutex* m) // thread local
     {
         notify.push_back(std::make_pair(cv, m));
     }
 
     ~thread_notification_data()
     {
-        for (notify_list_t::iterator i = notify.begin(), e = notify.end();
-            i != e; ++i)
+        for (notify_list_t::iterator it = notify.begin();
+            notify.end() != it; ++it)
         {
-            if(i->second)
-                i->second->unlock();
-            if(i->first)
-                i->first->notify_all();
+            if (it->second)
+                it->second->unlock();
+            if (it->first)
+                it->first->notify_all();
         }
     }
 
@@ -266,7 +282,7 @@ struct thread_notification_data {
         {
             thread_notification_data *result = dataMap[this_thread::get_id()];
 
-            if(result)
+            if (result)
             {
                 lock.unlock();
                 result->notify_all_at_thread_exit(cond, lk->release());
@@ -276,20 +292,20 @@ struct thread_notification_data {
         {
             thread_notification_data *result = dataMap[this_thread::get_id()];
 
-            if(result)
+            if (result)
             {
                 lock.unlock();
                 std::pair<condition_variable*, mutex*> key(cond, sync);
-                for(std::size_t i = 0; i < result->notify.size(); ++i)
+                for (std::size_t i = 0; i < result->notify.size(); ++i)
                 {
-                    if(result->notify[i] == key)
+                    if (result->notify[i] == key)
                     {
                         result->notify[i].first = nullptr;
                         result->notify[i].second = nullptr;
                         break;
                     }
                 }
-            }          
+            }
         }
         else if (operation == SetThreadData)
         {
@@ -332,8 +348,8 @@ void remove_from_this_thread_notification_data(condition_variable *cond, mutex *
 
 
 
-// Thread wrapper function.
-void* thread::wrapper_function(void *aArg)
+// This is the internal thread wrapper function.
+static void* _thread_wrapper_function(void* aArg) throw()
 {
     // Get thread startup information
     thread_start_info *ti = (thread_start_info *) aArg;
@@ -342,7 +358,7 @@ void* thread::wrapper_function(void *aArg)
     {
         stdex::unique_lock<stdex::mutex> lock((*ti->mtx));
 
-        _pthread_t_ID(AddThreadID, &ti->id->_uid);
+        _pthread_t_ID(AddThreadID, ti->uid);
         thread_notification_data::set_this_thread_notification_data(&nd);
 
         (*ti->notified) = true;
@@ -374,6 +390,12 @@ void* thread::wrapper_function(void *aArg)
     return 0;
 }
 
+extern "C" {
+    static void* thread_wrapper_function(void* aArg) {
+        return _thread_wrapper_function(aArg);
+    }
+}
+
 void thread::init(init_args args)
 {
     // Fill out the thread startup information (passed to the thread wrapper,
@@ -384,22 +406,18 @@ void thread::init(init_args args)
 
     stdex::mutex mtx;
     stdex::condition_variable cond;
-    bool notified = false;
+    bool notified = false; // protected by mtx
 
     thread_info->mtx = &mtx;
     thread_info->cond = &cond;
     thread_info->notified = &notified;
-    thread_info->id = &_id;
-
-    stdex::unique_lock<stdex::mutex> lock(mtx);
+    thread_info->uid = &(_id._uid);
 
     // Create the thread
-    int _e = pthread_create(&_handle, NULL, &wrapper_function, (void *) thread_info);
+    int _e = pthread_create(&_handle, NULL, &thread_wrapper_function, (void *) thread_info);
 
     if (_e)
     {// Did we fail to create the thread?
-
-        lock.unlock();
 
         delete thread_info;
 
@@ -409,7 +427,8 @@ void thread::init(init_args args)
     }
     else
     {
-        while(!notified)
+        stdex::unique_lock<stdex::mutex> lock(mtx); // lock to access 'notified' flag
+        while(!notified) // technically same as 'cond.wait(lock, [&]{ return notified; })'
             cond.wait(lock);
     }
 }
@@ -426,7 +445,10 @@ void thread::join()
 
     if (joinable())
     {
-        _e = pthread_join(_handle, NULL);
+        if (_pthread_is_dead_or_detached(_handle))
+            _e = 0;
+        else
+            _e = pthread_join(_handle, NULL);
     }
 
     if (_e)
@@ -437,6 +459,8 @@ void thread::join()
     _id = id();
 }
 
+// A thread that has finished executing code, but has not yet been joined 
+// is still considered an active thread of execution and is therefore joinable. 
 bool thread::joinable() const _STDEX_NOEXCEPT_FUNCTION
 {
     return get_id() != id();
@@ -449,7 +473,10 @@ void thread::detach()
 
     if (joinable())
     {
-        _e = pthread_detach(_handle);
+        if (_pthread_is_dead_or_detached(_handle))
+            _e = 0;
+        else
+            _e = pthread_detach(_handle);
     }
 
     if (_e)
@@ -460,26 +487,8 @@ void thread::detach()
     _id = id();
 }
 
-void thread::id::invalidate() const {
-    _uid = invalid_id;
-}
-
 thread::id thread::get_id() const _STDEX_NOEXCEPT_FUNCTION
 {
-    if (_id == id())
-        return _id;
-    
-    const int err = pthread_kill(_handle, 0); // signal is zero so error checking is performed but no signal is actually sent
-    
-    enum { _STDEX_PTHREAD_KILL_EINVAL
-#   ifdef EINVAL
-    = EINVAL
-#   endif
-    };
-    
-    if (0 != err && _STDEX_PTHREAD_KILL_EINVAL != err) // if we get ESRCH (!0 && !EINVAL) value it might be the case that thread is dead or detached
-        _id.invalidate();
-
     return _id;
 }
 
@@ -1082,13 +1091,25 @@ void detail::sleep_for_impl(const stdex::timespec *reltime)
 
 namespace stdex
 {
-    void notify_all_at_thread_exit(condition_variable& cond, unique_lock<mutex> &lk)
+    namespace detail
     {
-        unique_lock<mutex> lk2;
+        void _notify_all_at_thread_exit(condition_variable& cond, unique_lock<mutex>& lk)
+        {
+            unique_lock<mutex> lk2;
 
-        lk.swap(lk2);
+            lk.swap(lk2);
 
-        thread_notification_data::add_to_this_thread_notification_data(&cond, &lk2);
+            thread_notification_data::add_to_this_thread_notification_data(&cond, &lk2);
+        }
+    }
+
+    void notify_all_at_thread_exit(condition_variable& cond, unique_lock<mutex> lk) // standart C++
+    {
+        detail::_notify_all_at_thread_exit(cond, lk);
+    }
+    void notify_all_at_thread_exit(condition_variable& cond, unique_lock<mutex> &lk) // not-so-standart C++ extension for implementation with no move-semantics
+    {
+        detail::_notify_all_at_thread_exit(cond, lk);
     }
 }
 
