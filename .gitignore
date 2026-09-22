@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+
+.vscode/settings.json
+=======
 # Prerequisites
 *.d
 
@@ -37,6 +41,7 @@
 .vscode
 .vscode/*
 *.~cpp
+>>>>>>> 568d6eb454841ff2fbeab31206e045cb0532e9fa
 tests/bin/*
 
 #visual studio
