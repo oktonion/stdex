@@ -1,0 +1,182 @@
+language: cpp
+matrix:
+  include:
+    - os: linux
+      dist: trusty
+      compiler: gcc
+      addons:
+        apt:
+          sources: 
+            - sourceline: 'deb     http://old-releases.ubuntu.com/ubuntu/ hardy universe'
+            - sourceline: 'deb-src http://old-releases.ubuntu.com/ubuntu/ hardy universe'
+          packages: ['gcc-3.4', 'g++-3.4', 'gcc-multilib', 'g++-multilib']
+      env: 
+      - COMPILER=g++-3.4
+      - BUILD_LIB_SCRIPT="./build_lib.sh"
+      - BUILD_SCRIPT="./build_tests.sh"
+      - RUN_SCRIPT="./run_tests.sh"
+      - LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH 
+      before_script:
+      - sudo /sbin/ldconfig -p | grep libgcc
+      - sudo ln -s /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib/libgcc_s.so.1
+      #before_install:
+      #- sudo apt-key adv --recv-keys --keyserver keyserver.ubuntu.com `sudo apt-get update 2>&1 | grep -o '[0-9A-Z]\{16\}$' | xargs`
+
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-4.4']
+      env: 
+      - COMPILER=g++-4.4
+      - BUILD_LIB_SCRIPT="./build_lib.sh"
+      - BUILD_SCRIPT="./build_tests.sh"
+      - RUN_SCRIPT="./run_tests.sh"
+
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-4.6']
+      env: 
+      - COMPILER=g++-4.6
+      - BUILD_LIB_SCRIPT="./build_lib.sh"
+      - BUILD_SCRIPT="./build_tests.sh"
+      - RUN_SCRIPT="./run_tests.sh"
+
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-4.8']
+      env: 
+      - COMPILER=g++-4.8
+      - BUILD_LIB_SCRIPT="./build_lib.sh"
+      - BUILD_SCRIPT="./build_tests.sh"
+      - RUN_SCRIPT="./run_tests.sh"
+
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-4.9']
+      env: 
+      - COMPILER=g++-4.9
+      - BUILD_LIB_SCRIPT="./build_lib.sh"
+      - BUILD_SCRIPT="./build_tests.sh"
+      - RUN_SCRIPT="./run_tests.sh"
+
+    - os: linux
+      compiler: gcc
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test']
+          packages: ['g++-5']
+      env: 
+      - COMPILER=g++-5
+      - BUILD_LIB_SCRIPT="./build_lib.sh"
+      - BUILD_SCRIPT="./build_tests.sh"
+      - RUN_SCRIPT="./run_tests.sh"
+
+    - os: linux
+      compiler: clang
+      env: 
+      - COMPILER=clang++
+      - BUILD_LIB_SCRIPT="./build_lib.sh"
+      - BUILD_SCRIPT="./build_tests.sh"
+      - RUN_SCRIPT="./run_tests.sh"
+
+    - os: linux
+      compiler: clang
+      addons:
+        apt:
+          sources: ['ubuntu-toolchain-r-test', 'llvm-toolchain-precise-3.5']
+          packages: ['clang-3.5']
+      env: 
+      - COMPILER=clang++-3.5
+      - BUILD_LIB_SCRIPT="./build_lib.sh"
+      - BUILD_SCRIPT="./build_tests.sh"
+      - RUN_SCRIPT="./run_tests.sh"
+
+    - os: linux
+      compiler: gcc
+      dist: precise
+      env:
+      - COMPILER=g++
+      - CODE_COVERAGE_LIBS=-lgcov
+      - CODE_COVERAGE_FLAGS=--coverage -fprofile-arcs -ftest-coverage
+      - BUILD_LIB_SCRIPT="./build_lib.sh"
+      - BUILD_SCRIPT="./build_tests.sh"
+      - RUN_SCRIPT="./run_tests.sh"
+      after_success:
+      - sudo pip install --upgrade pyOpenSSL
+      - sudo pip install codecov
+      - chmod +x ./get_code_cov.sh
+      - ./get_code_cov.sh
+      - codecov
+      - bash <(curl -s https://codecov.io/bash)
+
+    - os: osx
+      osx_image: xcode9
+      env: 
+      - COMPILER=clang++
+      - BUILD_LIB_SCRIPT=./build_lib.sh
+      - BUILD_SCRIPT=./build_tests.sh
+      - RUN_SCRIPT=./run_tests.sh
+
+    - os: windows
+      env: 
+      - BUILD_LIB_SCRIPT=build_lib.bat
+      - BUILD_SCRIPT=build_tests.bat
+      - RUN_SCRIPT=run_tests.bat
+      script:
+      - echo "script started"
+      - cd ./stdex
+      - echo "call \"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32.bat\"" > ~$BUILD_LIB_SCRIPT
+      - cat $BUILD_LIB_SCRIPT >> ~$BUILD_LIB_SCRIPT
+      - chmod +x ./~$BUILD_LIB_SCRIPT
+      - ./~$BUILD_LIB_SCRIPT
+      - cd ..
+      - echo "call \"C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32.bat\"" > ~$BUILD_SCRIPT
+      - cat $BUILD_SCRIPT >> ~$BUILD_SCRIPT
+      - chmod +x ./~$BUILD_SCRIPT
+      - ./~$BUILD_SCRIPT
+      - chmod +x ./$RUN_SCRIPT
+      - ./$RUN_SCRIPT
+
+    - os: windows
+      env: 
+      - BUILD_LIB_SCRIPT=build_lib.bat
+      - BUILD_SCRIPT=build_tests.bat
+      - RUN_SCRIPT=run_tests.bat
+      script:
+        #call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2017\\BuildTools\\VC\\Auxiliary\\Build\\vcvars64.bat" &&
+      - echo "script started"
+      - cd ./stdex
+      - echo "call \"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat\"" > ~$BUILD_LIB_SCRIPT
+      - cat $BUILD_LIB_SCRIPT >> ~$BUILD_LIB_SCRIPT
+      - chmod +x ./~$BUILD_LIB_SCRIPT
+      - ./~$BUILD_LIB_SCRIPT
+      - cd ..
+      - echo "call \"C:\Program Files (x86)\Microsoft Visual Studio\2017\BuildTools\VC\Auxiliary\Build\vcvars64.bat\"" > ~$BUILD_SCRIPT
+      - cat $BUILD_SCRIPT >> ~$BUILD_SCRIPT
+      - chmod +x ./~$BUILD_SCRIPT
+      - ./~$BUILD_SCRIPT
+      - chmod +x ./$RUN_SCRIPT
+      - ./$RUN_SCRIPT
+
+script:
+  - echo "script started"
+  - cd ./stdex
+  - chmod +x $BUILD_LIB_SCRIPT
+  - $BUILD_LIB_SCRIPT
+  - cd ..
+  - chmod +x $BUILD_SCRIPT
+  - $BUILD_SCRIPT
+  - chmod +x $RUN_SCRIPT
+  - $RUN_SCRIPT
+#make CXX=$COMPILER -j3
