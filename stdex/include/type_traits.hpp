@@ -3371,12 +3371,12 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         _Tp _common_other_type_any_value_declval<_Tp>::value;
 
         template<class _Tp, class _U, class _CommonT
-            , const int 
+            , class _DummyVT = const int[1], const int 
 #           if defined(__GNUC__) // since GCC has internal bug with Itanium mangling for 'sizeof(callable_arg)' and MSVS is bugged beyond infinity this has to be done:
             (*_Dummy)[1 +
                 sizeof( false ? ( (_common_other_type_any_value_declval<_U>::value) ) : ( (_common_other_type_any_value_declval<_Tp>::value) ) ) / 
                 sizeof( false ? ( (_common_other_type_any_value_declval<_Tp>::value) ) : ( (_common_other_type_any_value_declval<_U>::value) ) )
-            - 1] = 0
+            - 1] = static_cast<_DummyVT*>(0)
 #           elif !defined(__BORLANDC__)
             (*_Dummy)[1 +
                 sizeof( false ? ((_declval<_U>())) : ((_declval<_Tp>())) ) / 
@@ -3645,7 +3645,7 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         _common_other_type_std_tester1_works_impl<
             _common_other_type_parent_class, 
             _common_other_type_child_class,
-            true//intern::_has_feature<intern::_stdex_could_convert_pointer_to_array_type>::value == bool(true)
+            intern::_has_feature<intern::_stdex_could_convert_pointer_to_array_type>::value == bool(true)
         >::type _common_other_type_std_tester1_works;
 
         template<class _Tp, class _U, bool>
