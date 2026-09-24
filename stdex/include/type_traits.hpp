@@ -3370,13 +3370,16 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         template<class _Tp>
         _Tp _common_other_type_any_value_declval<_Tp>::value;
 
+        typedef const int _DummyVT[1];
+        static const _DummyVT *_DummyEL = 0;
+
         template<class _Tp, class _U, class _CommonT
-            , class _DummyVT = const int[1], const int 
+            , const int 
 #           if defined(__GNUC__) // since GCC has internal bug with Itanium mangling for 'sizeof(callable_arg)' and MSVS is bugged beyond infinity this has to be done:
             (*_Dummy)[1 +
                 sizeof( false ? ( (_common_other_type_any_value_declval<_U>::value) ) : ( (_common_other_type_any_value_declval<_Tp>::value) ) ) / 
                 sizeof( false ? ( (_common_other_type_any_value_declval<_Tp>::value) ) : ( (_common_other_type_any_value_declval<_U>::value) ) )
-            - 1] = (_DummyVT*)(0)
+            - 1] = _DummyEL
 #           elif !defined(__BORLANDC__)
             (*_Dummy)[1 +
                 sizeof( false ? ((_declval<_U>())) : ((_declval<_Tp>())) ) / 
