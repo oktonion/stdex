@@ -3370,8 +3370,11 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         template<class _Tp>
         _Tp _common_other_type_any_value_declval<_Tp>::value;
 
-        typedef const int _DummyVT[1];
-        static const _DummyVT *_DummyEL = 0;
+        struct _dummy_array_ptr {
+            typedef const int _DummyVT[1];
+            static const _DummyVT *_DummyEL;
+        };
+        _dummy_array_ptr::_DummyVT *_dummy_array_ptr::_DummyEL = 0;
 
         template<class _Tp, class _U, class _CommonT
             , const int 
@@ -3379,7 +3382,7 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
             (*_Dummy)[1 +
                 sizeof( false ? ( (_common_other_type_any_value_declval<_U>::value) ) : ( (_common_other_type_any_value_declval<_Tp>::value) ) ) / 
                 sizeof( false ? ( (_common_other_type_any_value_declval<_Tp>::value) ) : ( (_common_other_type_any_value_declval<_U>::value) ) )
-            - 1] = _DummyEL
+            - 1] = _dummy_array_ptr::_DummyEL
 #           elif !defined(__BORLANDC__)
             (*_Dummy)[1 +
                 sizeof( false ? ((_declval<_U>())) : ((_declval<_Tp>())) ) / 
