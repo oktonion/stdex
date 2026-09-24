@@ -3370,10 +3370,10 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         template<class _Tp>
         _Tp _common_other_type_any_value_declval<_Tp>::value;
 
-        extern const int _DummyEL[] = {0};
+        extern const char _DummyEL[] = "";
 
         template<class _Tp, class _U, class _CommonT
-            , const int 
+            , const char 
 #           if defined(__GNUC__) // since GCC has internal bug with Itanium mangling for 'sizeof(callable_arg)' and MSVS is bugged beyond infinity this has to be done:
             (*_Dummy)[1 +
                 sizeof( false ? ( (_common_other_type_any_value_declval<_U>::value) ) : ( (_common_other_type_any_value_declval<_Tp>::value) ) ) / 
@@ -3388,7 +3388,7 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
             _Dummy[1 +
                 sizeof( false ? ((_declval<_U>())) : ((_declval<_Tp>())) ) / 
                 sizeof( false ? ((_declval<_Tp>())) : ((_declval<_U>())) )
-            - 1] = &integral_constant<int, 0>::value
+            - 1] = &integral_constant<char, 0>::value
 #           endif
         >
         struct _common_other_type_impl1_any_value1 {
