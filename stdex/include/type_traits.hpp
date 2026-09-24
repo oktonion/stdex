@@ -3370,7 +3370,7 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         template<class _Tp>
         _Tp _common_other_type_any_value_declval<_Tp>::value;
 
-        extern const char _DummyEL[] = "";
+        namespace { extern const char _DummyEL[] = ""; }
 
         template<class _Tp, class _U, class _CommonT
             , const char 
