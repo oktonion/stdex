@@ -3645,7 +3645,7 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
         _common_other_type_std_tester1_works_impl<
             _common_other_type_parent_class, 
             _common_other_type_child_class,
-            intern::_has_feature<intern::_stdex_could_convert_pointer_to_array_type>::value == bool(true)
+            true//intern::_has_feature<intern::_stdex_could_convert_pointer_to_array_type>::value == bool(true)
         >::type _common_other_type_std_tester1_works;
 
         template<class _Tp, class _U, bool>
