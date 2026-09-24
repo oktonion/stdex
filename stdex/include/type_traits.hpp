@@ -3376,7 +3376,7 @@ _STDEX_MSVC_SUPPRESS_WARNING_POP // warning C4180
             (*_Dummy)[1 +
                 sizeof( false ? ( (_common_other_type_any_value_declval<_U>::value) ) : ( (_common_other_type_any_value_declval<_Tp>::value) ) ) / 
                 sizeof( false ? ( (_common_other_type_any_value_declval<_Tp>::value) ) : ( (_common_other_type_any_value_declval<_U>::value) ) )
-            - 1] = integral_constant<_DummyVT*, 0>::value
+            - 1] = (_DummyVT*)(0)
 #           elif !defined(__BORLANDC__)
             (*_Dummy)[1 +
                 sizeof( false ? ((_declval<_U>())) : ((_declval<_Tp>())) ) / 
