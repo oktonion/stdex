@@ -30,11 +30,11 @@
     #define STDEX_CLOCKS_PER_SEC CLOCKS_PER_SEC
 #endif
 
-#if !defined(TIME_UTC)
-    #define TIME_UTC 1
-#endif
-
-#define STDEX_TIME_UTC TIME_UTC
+//#if !defined(TIME_UTC) // C++ 17: warning: causing problems on win vs12 with TIME_UTC as enum value
+//    #define TIME_UTC 1
+//#endif
+//
+//#define STDEX_TIME_UTC TIME_UTC
 
 struct timespec;
 
