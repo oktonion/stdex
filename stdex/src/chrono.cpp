@@ -775,13 +775,41 @@ namespace stdex {
                 bool _LhsIsSigned>
             struct cmp_less_impl;
 
+            template<class _Tp>
+            struct is_signed
+                : stdex::is_signed<_Tp>
+            { };
+
+            template<class _Tp>
+            struct make_unsigned
+                : stdex::make_unsigned<_Tp>
+            { };
+
+            // this nonsense is for 'long long' being non-integral type and therefore not signed on some platforms:
+            template<>
+            struct is_signed<duration_long_long> : true_type {};
+            template<>
+            struct is_signed<const duration_long_long> : true_type {};
+            template<>
+            struct is_signed<duration_ulong_long> : false_type {};
+            template<>
+            struct is_signed<const duration_ulong_long> : false_type {};
+            template<>
+            struct make_unsigned<duration_long_long> { typedef duration_ulong_long type; };
+            template<>
+            struct make_unsigned<const duration_long_long> { typedef const duration_ulong_long type; };
+            template<>
+            struct make_unsigned<duration_ulong_long> { typedef duration_ulong_long type; };
+            template<>
+            struct make_unsigned<const duration_ulong_long> { typedef const duration_ulong_long type; };
+
             template<class _LhsT, class _RhsT>
             struct cmp_less_impl<_LhsT, _RhsT, 
                 false, false>
             {
                 bool operator()(_LhsT lhs, _RhsT rhs) const throw()
                 {
-                    typedef typename stdex::make_unsigned<_RhsT>::type type;
+                    typedef typename make_unsigned<_RhsT>::type type;
 
                     return rhs < 0 ? false : lhs < type(rhs);
                 }
@@ -793,7 +821,7 @@ namespace stdex {
             {
                 bool operator()(_LhsT lhs, _RhsT rhs) const throw()
                 {
-                    typedef typename stdex::make_unsigned<_LhsT>::type type;
+                    typedef typename make_unsigned<_LhsT>::type type;
 
                     return lhs < 0 ? true : type(lhs) < rhs;
                 }
@@ -812,8 +840,8 @@ namespace stdex {
             template<class _LhsT, class _RhsT>
             struct cmp_less_functor:
                 cmp_less_impl<_LhsT, _RhsT,
-                    (stdex::is_signed<_LhsT>::value == stdex::is_signed<_RhsT> ::value),
-                    stdex::is_signed<_LhsT>::value>
+                    (is_signed<_LhsT>::value == is_signed<_RhsT>::value),
+                    is_signed<_LhsT>::value>
             { };
 
             template<class _LhsT, class _RhsT>
